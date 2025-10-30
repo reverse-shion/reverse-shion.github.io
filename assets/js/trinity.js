@@ -2,71 +2,58 @@
   const video = document.getElementById('trinityVideo');
   if (!video) return;
 
-  let isControlled = false;
+  // 初期は無音ループで再生（背景として動いて見せる）
+  const tryAutoplay = () => {
+    video.muted = true;
+    video.loop = true;
+    video.play().catch(()=>{/* モバイルは失敗してもOK */});
+  };
 
-  function toggleLoopPlay() {
-    if (video.paused) {
-      try { video.muted = false; } catch(e){}
-      video.loop = true;
-      video.onended = null;
-      video.play().catch(()=>{});
-      isControlled = true;
+  // iOSの「タップで音解禁」＋「ループ切れ」対策
+  const enableSound = () => {
+    // iOSで音を確実に解錠
+    try { video.muted = false; } catch(e){}
+    // たまに無音フレームから始まって音が出ない対策
+    if (video.ended || video.currentTime >= video.duration - 0.05) {
+      video.currentTime = 0;
+    } else if (video.currentTime === 0) {
+      video.currentTime = 0.01; // iOSの無音スキップ対策
+    }
+    video.loop = true; // 常にループ維持
+    video.play().catch(()=>{/* ユーザー操作直後なら通る */});
+
+    // ヒントをフェードアウト
+    const hint = document.querySelector('.trinity__hint');
+    if (hint) { hint.style.opacity = '.35'; setTimeout(()=>hint.style.opacity='.2', 1200); }
+  };
+
+  // endedで止まるケースを強制復帰
+  video.addEventListener('ended', () => {
+    video.currentTime = 0;
+    video.play().catch(()=>{ /* まれに拒否されてもタップで復帰 */ });
+  });
+
+  // タップ/Enter/Spaceで音ON
+  const userToggle = (e) => {
+    // 2回目以降のタップで一時停止したい場合は下をトグルに
+    if (video.muted || video.paused) {
+      enableSound();
     } else {
+      // 音あり再生中にもう一度タップ → 一時停止（好みで無効化OK）
       video.pause();
     }
-  }
+  };
 
-  function setupVideoControls() {
-    if (isControlled) return;
-    video.onended = () => { video.pause(); };
-    video.addEventListener('click', toggleLoopPlay);
-    video.addEventListener('touchend', toggleLoopPlay, { passive:true });
-    video.setAttribute('tabindex','0');
-    video.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' || e.code === 'Space' || e.key === ' '){
-        e.preventDefault(); toggleLoopPlay();
-      }
-    });
-  }
-
-  video.addEventListener('loadedmetadata', () => {
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.then(setupVideoControls).catch(()=>{ setupVideoControls(); });
+  video.addEventListener('click', userToggle, { passive:true });
+  video.addEventListener('touchend', userToggle, { passive:true });
+  video.setAttribute('tabindex', '0');
+  video.addEventListener('keydown', (e)=>{
+    if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
+      e.preventDefault(); userToggle();
     }
   });
 
-  if (video.readyState >= 3) {
-    video.play().catch(()=>{});
-    setupVideoControls();
-  }
-
-  // 初回ヒントのフェード
-  let hintShown = false;
-  video.addEventListener('play', ()=>{
-    if (!hintShown) {
-      const hint = document.querySelector('.trinity__hint');
-      if (hint){ hint.style.opacity = '.6'; setTimeout(()=>hint.style.opacity='.3', 1500); }
-      hintShown = true;
-    }
-    <script>
-(() => {
-  const v = document.getElementById('trinityVideo');
-  if (!v) return;
-
-  // 404等で最初の<source>が失敗した場合の保険
-  v.addEventListener('error', () => {
-    // ソースを両方作り直して再トライ（パスは実体に合わせて）
-    v.pause();
-    v.removeAttribute('src'); // 既存の読み込み状態をリセット
-    v.innerHTML = `
-      <source src="/assets/trinity/loop.mp4" type="video/mp4">
-      <source src="/assets/trinity/loop.webm" type="video/webm">
-    `;
-    v.load();
-    v.play().catch(()=>{ /* ユーザー操作待ちでもOK */ });
-  }, true);
-})();
-</script>
-  }, { once: true });
+  // 読み込み後に無音ループを試す
+  if (video.readyState >= 1) tryAutoplay();
+  video.addEventListener('loadedmetadata', tryAutoplay, { once:true });
 })();
