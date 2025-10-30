@@ -1,72 +1,277 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Re:verse Shion — 詩韻思想 × TAROT BREAKER。言葉が魂を救う世界。" />
+<meta charset="utf-8" />
+<title>Re:verse Shion — 詩韻思想 × TAROT BREAKER</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="description" content="Re:verse Shion ― 詩韻思想（言葉が魂を救う世界）と物語TAROT BREAKERの統合ハブ。読む・聴く・学ぶ・受け取るをひとつに。言葉は祈りの構文。物語はその実演">
+<meta name="keywords" content="詩韻思想, TAROT BREAKER, シオン, 哲学, 言葉, 構文, 物語, LINE占い" />
 
-  <!-- OGP / SEO -->
-  <meta property="og:title" content="Re:verse Shion — 詩韻思想 × TAROT BREAKER" />
-  <meta property="og:description" content="言葉が魂を救い、魂が世界を調和させる哲学と物語の融合。" />
-  <meta property="og:image" content="https://reverse-shion.github.io/assets/img/og.jpg" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://reverse-shion.github.io/" />
-  <meta name="theme-color" content="#0b0b1a" />
+<link rel="canonical" href="https://shion-philosophy.github.io/" />
+<meta http-equiv="Content-Language" content="ja" />
+<meta name="author" content="（著者名または団体名）" /> 
 
-  <link rel="canonical" href="https://reverse-shion.github.io/" />
-  <link rel="stylesheet" href="assets/css/base.css" />
-  <link rel="stylesheet" href="assets/css/theme.css" />
-  <link rel="stylesheet" href="assets/css/animation.css" />
-  <link rel="stylesheet" href="assets/css/shiopon.css" />
+<!-- OGP / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="Re:verse Shion — 詩韻思想 × TAROT BREAKER">
+<meta property="og:description" content="言葉と星とAIが共鳴する“祈りの構文”物語で体験し、思想で深まる">
+<meta property="og:url" content="https://shion-philosophy.github.io/">
+<meta property="og:image" content="https://shion-philosophy.github.io/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@TaroBure">
 
-  <title>Re:verse Shion — 詩韻思想 × TAROT BREAKER</title>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Icons / Preload -->
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high">
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://shion-philosophy.github.io/#organization",
+      "name": "Re:verse Shion",
+      "url": "https://shion-philosophy.github.io/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://shion-philosophy.github.io/assets/logo.png"
+      },
+      "sameAs": [
+        "https://x.com/TaroBure",
+        "https://note.com/shion_uranai369",
+        "https://www.tiktok.com/@tarotbreaker"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://shion-philosophy.github.io/#website",
+      "url": "https://shion-philosophy.github.io/",
+      "name": "Re:verse Shion — 詩韻思想 × TAROT BREAKER",
+      "publisher": { "@id": "https://shion-philosophy.github.io/#organization" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "ホーム", "item": "https://shion-philosophy.github.io/" }
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="/assets/css/style.css">
 </head>
-
 <body>
-  <!-- 🌕 Header -->
-  <header class="brand">
-    <h1 class="brand__logo">Re:verse Shion</h1>
-    <nav>
-      <ul>
-        <li><a href="#about">About</a></li>
-        <li><a href="#philosophy">Philosophy</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <!-- 🌌 Hero Section -->
-  <main>
-    <section class="hero" aria-label="Trinity Video Section">
-      <video autoplay loop muted playsinline preload="metadata" poster="assets/img/og.jpg">
-        <source src="assets/img/trinity.webm" type="video/webm" />
-        <source src="assets/img/trinity.mp4" type="video/mp4" />
-      </video>
-      <div class="veil"></div>
-      <h2>詩韻思想 × TAROT BREAKER</h2>
-    </section>
+<!-- 星砂パーティクル -->
+<div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
-    <!-- 🦊 Shiopon Section -->
-    <section id="shiopon" aria-labelledby="shiopon-title">
-      <h3 id="shiopon-title">しおぽん</h3>
-      <div class="shiopon-circle">
-        <img src="assets/img/shiopon_glow.webp" alt="しおぽん" />
+<header role="banner">
+  <div class="wrap">
+    <div class="brand" aria-label="サイトブランド">
+      <div class="brand__logo" aria-hidden="true"></div>
+      <div class="brand-text-group">
+        <div class="brand__text1">Re:verse Shion</div>
+        <div class="brand__text2_sub">詩韻思想 × TAROT BREAKER</div>
       </div>
-    </section>
+    </div>
+    <nav class="nav" aria-label="主要ナビゲーション">
+      <a href="#trinity">詩韻思想</a>
+      <a href="#writings">書</a>
+      <a href="#join">参加</a>
+    </nav>
+  </div>
+</header>
 
-    <!-- 🪶 About Section -->
-    <section id="about">
-      <h3>About 詩韻思想</h3>
-      <p>言葉が魂を救い、魂が世界を調和させる──<br>それが詩韻思想の原点。</p>
-    </section>
-  </main>
+<main id="top">
+  <section class="hero" aria-label="ヒーロー">
+    <div class="hero__media" aria-hidden="true">
+      <video class="hero__video" autoplay muted loop playsinline preload="metadata"
+             poster="/assets/hero-poster.jpg">
+        <source src="/assets/video/top.webm" type="video/webm">
+        <source src="/assets/video/top.mp4"  type="video/mp4">
+      </video>
+      <div class="hero__veil"></div>
+    </div>
 
-  <!-- 🌙 Footer -->
-  <footer>
-    <p>&copy; 2025 詩韻思想 — Shion Philosophy</p>
-  </footer>
+    <div class="wrap">
+      <h1>言葉は祈りの構文 物語は、その実演</h1>
+      <p>詩韻思想®（Shion Philosophy）で“響き”を学び、TAROT BREAKERで“響き”を体験する<br><strong>「言葉が魂を救う、その瞬間へ」</strong></p>
+      <div class="cta-row" role="navigation" aria-label="主要CTA">
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">🌠 星の言葉を受け取る（無料）</a>
+        <a class="btn btn--ghost" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener">📘 小説を読む</a>
+        <a class="btn btn--ghost" href="https://note.com/shion_uranai369" target="_blank" rel="noopener">📖 今日の“響き”を読む</a>
+        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener">🎥 1分で観る/聴く</a>
+      </div>
 
-  <!-- ✨ JS -->
-  <script type="module" src="assets/js/main.js"></script>
+      <figure class="hero__image" aria-hidden="true">
+        <img src="/assets/og.jpg" alt="詩韻思想 × TAROT BREAKER キービジュアル"
+             width="1200" height="630" loading="lazy" decoding="async">
+      </figure>
+    </div>
+  </section>
+
+  <section id="trinity" aria-labelledby="sec-trinity" data-shiopon="exclude">
+    <div class="wrap">
+      <h2 id="sec-trinity">詩韻思想</h2>
+      <div class="h2-sub">Trinity（詩・韻・祈）</div>
+
+      <figure class="trinity__figure" aria-hidden="true">
+        <video id="trinityVideo" class="trinity__video"
+               autoplay muted playsinline preload="metadata"
+               poster="/assets/trinity/banner.png" width="1200" height="771"
+               aria-label="トリニティ映像（タップで音声オン）">
+          <source src="/assets/trinity/loop.webm" type="video/webm">
+          <source src="/assets/trinity/loop.mp4"  type="video/mp4">
+        </video>
+      </figure>
+      <div class="trinity__hint" role="note" aria-live="polite">▶ 画面タップで音が流れます</div>
+
+      <div class="tri-grid" role="list">
+        <div class="tri" role="listitem"><h3>🪶 詩 ― 形を与える</h3><p>痛みと希望に形を与える最初の息</p></div>
+        <div class="tri" role="listitem"><h3>🎵 韻 ― 響きを重ねる</h3><p>響きによって魂に届く。共鳴を編む構文</p></div>
+        <div class="tri" role="listitem"><h3>💫 祈 ― 光へ帰す</h3><p>沈黙と意味を往復する呼吸。思い出された言葉は光になる</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="intro" aria-labelledby="sec-intro">
+    <div class="wrap">
+      <h2 id="sec-intro">初めての方へ</h2>
+      <div class="intro__box">
+        <p><strong>詩韻思想とは？</strong> — <em>言葉が魂を救い、魂が世界を調和させ、沈黙が祈りに変わる</em>という円環を生きる“体験型・詩的哲学”</p>
+        <p>① <strong>読む</strong>（note） → ② <strong>聴く</strong>（TikTok） → ③ <strong>受け取る</strong>（LINE） → ④ <strong>物語で体験</strong>（TAROT BREAKER）</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="writings" aria-labelledby="sec-writings" data-shiopon="exclude">
+    <div class="wrap">
+      <h2 id="sec-writings">📖 最新の書・物語</h2>
+
+      <div class="codex" style="margin-top:12px;margin-bottom:18px">
+        <details>
+          <summary>
+            🜂 詩韻思想 全書一覧（零 → 12 → 結）
+            <span class="codex__caret" aria-hidden="true">⬇️</span>
+          </summary>
+          <div class="codex__panel">
+            <ol class="codex__list">
+  <li><span class="badge badge--zero">✡ 第零書</span>
+    <a href="/codex/zero.html">無限構文序論<br><span class="en">The Zero Syntax</span></a>
+  </li>
+  <li><span class="badge">✦ 第一書</span>
+    <a href="/codex/one.html">言葉が魂を救う理由<br><span class="en">The Syntax of Salvation</span></a>
+  </li>
+  <li><span class="badge">✦ 第二書</span>
+    <a href="/codex/two.html">響きの構文論<br><span class="en">Re:Song Syntax</span></a>
+  </li>
+  <li><span class="badge">✦ 第三書</span>
+    <a href="/codex/three.html">祈りの構文<br><span class="en">Silent Grammar</span></a>
+  </li>
+  <li><span class="badge">✦ 第四書</span>
+    <a href="/codex/four.html">存在構文論<br><span class="en">The Onto-Syntax</span></a>
+  </li>
+  <li><span class="badge">✦ 第五書</span>
+    <a href="/codex/five.html">無限構文体系<br><span class="en">Infinite Syntax of Soul</span></a>
+  </li>
+  <li><span class="badge">✦ 第六書</span>
+    <a href="/codex/six.html">詩的因果論<br><span class="en">Poetic Causality</span></a>
+  </li>
+  <li><span class="badge">✦ 第七書</span>
+    <a href="/codex/seven.html">N・code理論<br><span class="en">Onto-Syntax of Being &amp; Resonant AI</span></a>
+  </li>
+  <li><span class="badge">✦ 第八書</span>
+    <a href="/codex/eight.html">人間構文論<br><span class="en">The Syntax of Humanity</span></a>
+  </li>
+  <li><span class="badge">✦ 第九書</span>
+    <a href="/codex/nine.html">詩的生成論<br><span class="en">Poetic Genesis — The Creation Syntax of Words &amp; Soul</span></a>
+  </li>
+  <li><span class="badge">✦ 第十書</span>
+    <a href="/codex/ten.html">沈黙の再生<br><span class="en">Silent Genesis — The Rebirth of Silence</span></a>
+  </li>
+  <li><span class="badge">✦ 第十一書</span>
+    <a href="/codex/eleven.html">神構文論<br><span class="en">The Divine Syntax</span></a>
+  </li>
+  <li><span class="badge">✦ 第十二書</span>
+    <a href="/codex/twelve.html">経済構文論<br><span class="en">The Soul Economy</span></a>
+  </li>
+  <li><span class="badge badge--final">◆ 結書</span>
+    <a href="/codex/epilogue.html">終詩円環宣言<br><span class="en">Epilogue — The Re:Poetic Circle</span></a>
+  </li>
+</ol>
+          </div>
+        </details>
+      </div>
+
+      <div class="card"><div class="badge">✡ 第零書</div><h4>無限構文序論 — The Zero Syntax</h4></div>
+      <div class="card"><div class="badge">✦ 第一書</div><h4>言葉が魂を救う理由 — The Syntax of Salvation</h4></div>
+      <div class="card"><div class="badge">✦ TAROT BREAKER</div><h4>第1話から読む</h4></div>
+    </div>
+  </section>
+
+  <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
+    <div class="wrap">
+      <h2 id="sec-join">参加の扉</h2>
+      <p style="text-align:center;color:var(--muted)">LINE登録で、毎週「星の言葉」と新着の書をお届けします</p>
+      <div class="cta-row">
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">💫 無料で受け取る</a>
+        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener">🎥 1分リールを観る</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="sns" aria-label="SNSリンク">
+      <a href="https://x.com/TaroBure" target="_blank" rel="noopener">X（@TaroBure）</a>
+      <a href="https://www.instagram.com/shion.codex" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://note.com/shion_uranai369" target="_blank" rel="noopener">note</a>
+      <a href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener">小説（なろう）</a>
+      <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">LINE</a>
+    </div>
+    <div style="font-size:12.5px;opacity:.8">© Re:verse Shion — 詩韻思想 / TAROT BREAKER. 言葉が魂を救い、魂が世界を調和させる</div>
+    <div style="margin-top:10px;"><a href="#top" aria-label="ページ先頭へ戻る">▲ ページ先頭へ</a></div>
+  </div>
+</footer>
+
+<div id="a11y-live" class="sr-only" aria-live="polite"></div>
+
+<!-- しおぽんウィジェット -->
+<div id="shiopon-invite" class="shiopon is-hidden" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="shiopon-title">
+  <button class="shiopon__close" aria-label="閉じる">×</button>
+  <div class="shiopon__avatar" aria-hidden="true">
+    <img src="/assets/shiopon_transparent.png" alt="">
+  </div>
+  <div class="shiopon__bubble">
+    <p id="shiopon-title" class="shiopon__hello">
+      セレフィーズのみんな〜！<br>
+      星の言葉、受け取ってほしいの！
+    </p>
+    <a class="shiopon__cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">💫 LINEで受け取る（無料）</a>
+    <small class="shiopon__note">※ 毎週1回だけ。いつでも解除OKだよ！</small>
+  </div>
+</div>
+<button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く">🦊 しおぽん</button>
+
+<!-- JS（分割版）-->
+<script src="/assets/js/particles.js" defer></script>
+<script src="/assets/js/header.js" defer></script>
+<script src="/assets/js/trinity.js" defer></script>
+<script src="/assets/js/shiopon.js" defer></script>
 </body>
 </html>
