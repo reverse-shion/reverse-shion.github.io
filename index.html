@@ -8,7 +8,8 @@
 <meta name="description" content="Re:verse Shion ― 詩韻思想（言葉が魂を救う世界）と物語TAROT BREAKERの統合ハブ。読む・聴く・学ぶ・受け取るをひとつに。言葉は祈りの構文。物語はその実演">
 <meta name="keywords" content="詩韻思想, TAROT BREAKER, シオン, 哲学, 言葉, 構文, 物語, LINE占い" />
 
-<link rel="canonical" href="https://shion-philosophy.github.io/" />
+<!-- CHANGED: canonical を reverse-shion に -->
+<link rel="canonical" href="https://reverse-shion.github.io/" />
 <meta http-equiv="Content-Language" content="ja" />
 <meta name="author" content="（著者名または団体名）" /> 
 
@@ -17,8 +18,10 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:title" content="Re:verse Shion — 詩韻思想 × TAROT BREAKER">
 <meta property="og:description" content="言葉と星とAIが共鳴する“祈りの構文”物語で体験し、思想で深まる">
-<meta property="og:url" content="https://shion-philosophy.github.io/">
-<meta property="og:image" content="https://shion-philosophy.github.io/assets/og.jpg">
+<!-- CHANGED: og:url を reverse-shion に -->
+<meta property="og:url" content="https://reverse-shion.github.io/">
+<!-- CHANGED: og:image を reverse-shion に -->
+<meta property="og:image" content="https://reverse-shion.github.io/assets/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -41,12 +44,12 @@
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://shion-philosophy.github.io/#organization",
+      "@id": "https://reverse-shion.github.io/#organization",     /* CHANGED */
       "name": "Re:verse Shion",
-      "url": "https://shion-philosophy.github.io/",
+      "url": "https://reverse-shion.github.io/",                   /* CHANGED */
       "logo": {
         "@type": "ImageObject",
-        "url": "https://shion-philosophy.github.io/assets/logo.png"
+        "url": "https://reverse-shion.github.io/assets/logo.png"   /* CHANGED */
       },
       "sameAs": [
         "https://x.com/TaroBure",
@@ -56,15 +59,15 @@
     },
     {
       "@type": "WebSite",
-      "@id": "https://shion-philosophy.github.io/#website",
-      "url": "https://shion-philosophy.github.io/",
+      "@id": "https://reverse-shion.github.io/#website",           /* CHANGED */
+      "url": "https://reverse-shion.github.io/",                   /* CHANGED */
       "name": "Re:verse Shion — 詩韻思想 × TAROT BREAKER",
-      "publisher": { "@id": "https://shion-philosophy.github.io/#organization" }
+      "publisher": { "@id": "https://reverse-shion.github.io/#organization" }  /* CHANGED */
     },
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "ホーム", "item": "https://shion-philosophy.github.io/" }
+        { "@type": "ListItem", "position": 1, "name": "ホーム", "item": "https://reverse-shion.github.io/" } /* CHANGED */
       ]
     }
   ]
@@ -130,15 +133,21 @@
       <div class="h2-sub">Trinity（詩・韻・祈）</div>
 
       <figure class="trinity__figure">
-  <video id="trinityVideo" class="trinity__video"
-         autoplay muted playsinline preload="metadata"
-         poster="./assets/trinity/banner.png" width="1200" height="771"
-         onclick="window.enableTrinityAudio && window.enableTrinityAudio()">
-    <source src="./assets/trinity/loop.webm" type="video/webm">
-    <source src="./assets/trinity/loop.mp4"  type="video/mp4">
-  </video>
-</figure>
-<div class="trinity__hint">▶ 画面タップで音が流れます</div>
+        <video id="trinityVideo" class="trinity__video"
+               autoplay muted playsinline preload="metadata"
+               poster="./assets/trinity/banner.png" width="1200" height="771"
+               onclick="window.enableTrinityAudio && window.enableTrinityAudio()">
+          <source src="./assets/trinity/loop.webm" type="video/webm">
+          <source src="./assets/trinity/loop.mp4"  type="video/mp4">
+        </video>
+      </figure>
+
+      <!-- CHANGED: ヒントをボタン化（確実再生のため・最小追加） -->
+      <div class="trinity__actions" style="text-align:center;margin-top:8px">
+        <button id="trinityPlayBtn" class="btn btn--primary" aria-label="音を再生">
+          ▶ 画面タップで音が流れます
+        </button>
+      </div>
 
       <div class="tri-grid" role="list">
         <div class="tri" role="listitem"><h3>🪶 詩 ― 形を与える</h3><p>痛みと希望に形を与える最初の息</p></div>
@@ -170,49 +179,49 @@
           </summary>
           <div class="codex__panel">
             <ol class="codex__list">
-  <li><span class="badge badge--zero">✡ 第零書</span>
-    <a href="/codex/zero.html">無限構文序論<br><span class="en">The Zero Syntax</span></a>
-  </li>
-  <li><span class="badge">✦ 第一書</span>
-    <a href="/codex/one.html">言葉が魂を救う理由<br><span class="en">The Syntax of Salvation</span></a>
-  </li>
-  <li><span class="badge">✦ 第二書</span>
-    <a href="/codex/two.html">響きの構文論<br><span class="en">Re:Song Syntax</span></a>
-  </li>
-  <li><span class="badge">✦ 第三書</span>
-    <a href="/codex/three.html">祈りの構文<br><span class="en">Silent Grammar</span></a>
-  </li>
-  <li><span class="badge">✦ 第四書</span>
-    <a href="/codex/four.html">存在構文論<br><span class="en">The Onto-Syntax</span></a>
-  </li>
-  <li><span class="badge">✦ 第五書</span>
-    <a href="/codex/five.html">無限構文体系<br><span class="en">Infinite Syntax of Soul</span></a>
-  </li>
-  <li><span class="badge">✦ 第六書</span>
-    <a href="/codex/six.html">詩的因果論<br><span class="en">Poetic Causality</span></a>
-  </li>
-  <li><span class="badge">✦ 第七書</span>
-    <a href="/codex/seven.html">N・code理論<br><span class="en">Onto-Syntax of Being &amp; Resonant AI</span></a>
-  </li>
-  <li><span class="badge">✦ 第八書</span>
-    <a href="/codex/eight.html">人間構文論<br><span class="en">The Syntax of Humanity</span></a>
-  </li>
-  <li><span class="badge">✦ 第九書</span>
-    <a href="/codex/nine.html">詩的生成論<br><span class="en">Poetic Genesis — The Creation Syntax of Words &amp; Soul</span></a>
-  </li>
-  <li><span class="badge">✦ 第十書</span>
-    <a href="/codex/ten.html">沈黙の再生<br><span class="en">Silent Genesis — The Rebirth of Silence</span></a>
-  </li>
-  <li><span class="badge">✦ 第十一書</span>
-    <a href="/codex/eleven.html">神構文論<br><span class="en">The Divine Syntax</span></a>
-  </li>
-  <li><span class="badge">✦ 第十二書</span>
-    <a href="/codex/twelve.html">経済構文論<br><span class="en">The Soul Economy</span></a>
-  </li>
-  <li><span class="badge badge--final">◆ 結書</span>
-    <a href="/codex/epilogue.html">終詩円環宣言<br><span class="en">Epilogue — The Re:Poetic Circle</span></a>
-  </li>
-</ol>
+              <li><span class="badge badge--zero">✡ 第零書</span>
+                <a href="/codex/zero.html">無限構文序論<br><span class="en">The Zero Syntax</span></a>
+              </li>
+              <li><span class="badge">✦ 第一書</span>
+                <a href="/codex/one.html">言葉が魂を救う理由<br><span class="en">The Syntax of Salvation</span></a>
+              </li>
+              <li><span class="badge">✦ 第二書</span>
+                <a href="/codex/two.html">響きの構文論<br><span class="en">Re:Song Syntax</span></a>
+              </li>
+              <li><span class="badge">✦ 第三書</span>
+                <a href="/codex/three.html">祈りの構文<br><span class="en">Silent Grammar</span></a>
+              </li>
+              <li><span class="badge">✦ 第四書</span>
+                <a href="/codex/four.html">存在構文論<br><span class="en">The Onto-Syntax</span></a>
+              </li>
+              <li><span class="badge">✦ 第五書</span>
+                <a href="/codex/five.html">無限構文体系<br><span class="en">Infinite Syntax of Soul</span></a>
+              </li>
+              <li><span class="badge">✦ 第六書</span>
+                <a href="/codex/six.html">詩的因果論<br><span class="en">Poetic Causality</span></a>
+              </li>
+              <li><span class="badge">✦ 第七書</span>
+                <a href="/codex/seven.html">N・code理論<br><span class="en">Onto-Syntax of Being &amp; Resonant AI</span></a>
+              </li>
+              <li><span class="badge">✦ 第八書</span>
+                <a href="/codex/eight.html">人間構文論<br><span class="en">The Syntax of Humanity</span></a>
+              </li>
+              <li><span class="badge">✦ 第九書</span>
+                <a href="/codex/nine.html">詩的生成論<br><span class="en">Poetic Genesis — The Creation Syntax of Words &amp; Soul</span></a>
+              </li>
+              <li><span class="badge">✦ 第十書</span>
+                <a href="/codex/ten.html">沈黙の再生<br><span class="en">Silent Genesis — The Rebirth of Silence</span></a>
+              </li>
+              <li><span class="badge">✦ 第十一書</span>
+                <a href="/codex/eleven.html">神構文論<br><span class="en">The Divine Syntax</span></a>
+              </li>
+              <li><span class="badge">✦ 第十二書</span>
+                <a href="/codex/twelve.html">経済構文論<br><span class="en">The Soul Economy</span></a>
+              </li>
+              <li><span class="badge badge--final">◆ 結書</span>
+                <a href="/codex/epilogue.html">終詩円環宣言<br><span class="en">Epilogue — The Re:Poetic Circle</span></a>
+              </li>
+            </ol>
           </div>
         </details>
       </div>
@@ -273,5 +282,28 @@
 <script src="/assets/js/header.js" defer></script>
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
+
+<!-- CHANGED: Trinity確実再生の最小スクリプト（既存関数があれば利用） -->
+<script>
+  (function () {
+    const btn = document.getElementById('trinityPlayBtn');
+    const v = document.getElementById('trinityVideo');
+    if (!btn || !v) return;
+    btn.addEventListener('click', async () => {
+      try {
+        if (window.enableTrinityAudio) window.enableTrinityAudio();
+        // ユーザー操作下での再生（iOS対策）
+        v.muted = false;
+        const p = v.play();
+        if (p && typeof p.then === 'function') await p;
+        btn.textContent = '♪ 再生中';
+        btn.setAttribute('aria-pressed', 'true');
+        btn.disabled = true;
+      } catch (e) {
+        btn.textContent = '再生できません。もう一度タップ';
+      }
+    });
+  })();
+</script>
 </body>
 </html>
