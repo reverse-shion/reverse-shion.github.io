@@ -499,3 +499,43 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(255,255,255,0.25);
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.close-modal {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: transparent;
+  color: white;
+  font-size: 2rem;
+  border: none;
+  cursor: pointer;
+}
