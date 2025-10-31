@@ -569,18 +569,20 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   let stack = [];
   let picked = {};
 
-  function init(){
-    result.hidden = true;
-    picked = {};
-    deckBtns.forEach(b=>{
-      b.disabled = true;
-      b.innerHTML = '';
-      b.setAttribute('aria-pressed','false');
-      b.classList.remove('is-picked','is-back');
-      b.style.backgroundImage = '';
-    });
-    reset.disabled = true;
-  }
+  // Mini Reading（3枚）スクリプト内 抜粋
+function init(){
+  result.hidden = true;
+  picked = {};
+  deckBtns.forEach(b=>{
+    b.disabled = true;
+    b.innerHTML = '';
+    b.setAttribute('aria-pressed','false');
+    b.classList.remove('is-picked'); // is-back の削除は不要
+    b.classList.add('is-back');      // ★ 追加：裏面を強制表示する
+    b.style.backgroundImage = '';
+  });
+  reset.disabled = true;
+}
 
   function startReading(){
     stack = shuffle(CARDS);
