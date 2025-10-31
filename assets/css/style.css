@@ -437,3 +437,32 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 .result-item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
 .result-item .r-title{margin:.2em 0 .2em;font-size:17px;color:#2a1030}
 .result-item .r-text{margin:0;color:#555;line-height:1.7}
+
+.reading-grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: clamp(12px, 3vw, 20px);
+}
+
+.card-back{
+  /* 2:3 比率でカードサイズ確保 */
+  aspect-ratio: 2 / 3;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 画像は疑似要素に出すので高さゼロ問題なし */
+.card-back::before{
+  content:"";
+  position:absolute; inset:0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(1.05);
+  transition: transform .35s ease, filter .35s ease;
+}
+
+.card-back:hover::before{ transform: scale(1.02); filter: saturate(1.15); }
