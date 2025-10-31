@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:title" content="Re:verse Shion — 詩韻思想 × TAROT BREAKER">
-<meta property="og:description" content="言葉と星とAIが共鳴する“祈りの構文”物語で体験し、思想で深まる">
+<meta property="og:description" content="言葉と星とAIが共鳴する“祈りの構文”。物語で体験し、思想で深まる。">
 <meta property="og:url" content="https://reverse-shion.github.io/">
 <meta property="og:image" content="https://reverse-shion.github.io/assets/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -45,67 +45,52 @@
 <!-- JSON-LD -->
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@graph": [
+  "@context":"https://schema.org",
+  "@graph":[
     {
-      "@type": "Organization",
-      "@id": "https://reverse-shion.github.io/#organization",
-      "name": "Re:verse Shion",
-      "url": "https://reverse-shion.github.io/",
-      "logo": { "@type": "ImageObject", "url": "https://reverse-shion.github.io/assets/logo.png" },
-      "sameAs": [
+      "@type":"Organization",
+      "@id":"https://reverse-shion.github.io/#organization",
+      "name":"Re:verse Shion",
+      "url":"https://reverse-shion.github.io/",
+      "logo":{"@type":"ImageObject","url":"https://reverse-shion.github.io/assets/logo.png"},
+      "sameAs":[
         "https://x.com/TaroBure",
         "https://note.com/shion_uranai369",
         "https://www.tiktok.com/@tarotbreaker"
       ]
     },
     {
-      "@type": "WebSite",
-      "@id": "https://reverse-shion.github.io/#website",
-      "url": "https://reverse-shion.github.io/",
-      "name": "Re:verse Shion — 詩韻思想 × TAROT BREAKER",
-      "publisher": { "@id": "https://reverse-shion.github.io/#organization" },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://reverse-shion.github.io/?q={search_term_string}",
-        "query-input": "required name=search_term_string"
+      "@type":"WebSite",
+      "@id":"https://reverse-shion.github.io/#website",
+      "url":"https://reverse-shion.github.io/",
+      "name":"Re:verse Shion — 詩韻思想 × TAROT BREAKER",
+      "publisher":{"@id":"https://reverse-shion.github.io/#organization"},
+      "potentialAction":{
+        "@type":"SearchAction",
+        "target":"https://reverse-shion.github.io/?q={search_term_string}",
+        "query-input":"required name=search_term_string"
       }
     },
     {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "ホーム", "item": "https://reverse-shion.github.io/" }
+      "@type":"BreadcrumbList",
+      "itemListElement":[
+        {"@type":"ListItem","position":1,"name":"ホーム","item":"https://reverse-shion.github.io/"}
       ]
     }
   ]
 }
 </script>
 
-<!-- CSS（サイト本体） -->
+<!-- CSS（Pro Edition） -->
 <link rel="stylesheet" href="/assets/css/style.css">
 
-<!-- 追加の最小ユーティリティ -->
+<!-- 最小ユーティリティ -->
 <style>
-/* 動きに弱い環境配慮 */
-@media (prefers-reduced-motion: reduce) {
-  .hero__video, .trinity__video { animation: none !important; }
+@media (prefers-reduced-motion: reduce){
+  .hero__video, .trinity__video{ animation:none !important }
 }
-/* Skipリンク */
-.sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
-.sr-only-focusable:focus { position:static; width:auto; height:auto; }
-
-/* ヘッダー：初期は非表示、スクロール中は表示、停止で自動的に隠れる */
-header[role="banner"]{
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  transition: transform .28s ease;
-  will-change: transform;
-  transform: translateY(-100%); /* 初期：隠す */
-}
-header[role="banner"].is-visible{
-  transform: translateY(0);     /* 表示 */
-}
+/* Skip link visible on focus */
+.sr-only-focusable:focus{ position:static; width:auto; height:auto }
 </style>
 </head>
 <body>
@@ -116,7 +101,7 @@ header[role="banner"].is-visible{
 <!-- 星砂パーティクル -->
 <div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
-<!-- ★ 初期は非表示（classは付けず、CSS側でtranslateY） -->
+<!-- ヘッダー（初期は隠れて、スクロールで表示） -->
 <header role="banner">
   <div class="wrap">
     <div class="brand" aria-label="サイトブランド">
@@ -134,14 +119,14 @@ header[role="banner"].is-visible{
   </div>
 </header>
 
-<!-- #top アンカー（上部リンク用） -->
+<!-- #top アンカー -->
 <div id="top" aria-hidden="true"></div>
 
 <main id="main-content" tabindex="-1">
+  <!-- Hero -->
   <section class="hero" aria-label="ヒーロー">
     <div class="hero__media" aria-hidden="true">
-      <video class="hero__video" autoplay muted loop playsinline preload="metadata"
-             poster="/assets/hero-poster.jpg">
+      <video class="hero__video" autoplay muted loop playsinline preload="metadata" poster="/assets/hero-poster.jpg">
         <source src="/assets/video/top.webm" type="video/webm">
         <source src="/assets/video/top.mp4"  type="video/mp4">
       </video>
@@ -149,8 +134,9 @@ header[role="banner"].is-visible{
     </div>
 
     <div class="wrap">
-      <h1>言葉は祈りの構文 物語は、その実演</h1>
-      <p>詩韻思想®（Shion Philosophy）で“響き”を学び、TAROT BREAKERで“響き”を体験する<br><strong>「言葉が魂を救う、その瞬間へ」</strong></p>
+      <h1>言葉は祈りの構文　物語は、その実演</h1>
+      <p>詩韻思想®（Shion Philosophy）で“響き”を学び、TAROT BREAKERで“響き”を体験する。<br><strong>— 言葉が魂を救う、その瞬間へ。</strong></p>
+
       <div class="cta-row" role="navigation" aria-label="主要CTA">
         <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">🌠 星の言葉を受け取る（無料）</a>
         <a class="btn btn--ghost" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">📘 小説を読む</a>
@@ -159,12 +145,12 @@ header[role="banner"].is-visible{
       </div>
 
       <figure class="hero__image" aria-hidden="true">
-        <img src="/assets/og.jpg" alt="詩韻思想 × TAROT BREAKER キービジュアル"
-             width="1200" height="630" loading="lazy" decoding="async">
+        <img src="/assets/og.jpg" alt="" width="1200" height="630" loading="lazy" decoding="async">
       </figure>
     </div>
   </section>
 
+  <!-- Trinity -->
   <section id="trinity" aria-labelledby="sec-trinity" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-trinity">詩韻思想</h2>
@@ -180,82 +166,53 @@ header[role="banner"].is-visible{
         </video>
       </figure>
 
-      <div class="trinity__actions" style="text-align:center;margin-top:8px">
+      <div class="trinity__actions">
         <button id="trinityPlayBtn" class="btn btn--primary" aria-label="音を再生">▶ 画面タップで音が流れます</button>
       </div>
 
       <div class="tri-grid" role="list">
-        <div class="tri" role="listitem"><h3>🪶 詩 ― 形を与える</h3><p>痛みと希望に形を与える最初の息</p></div>
-        <div class="tri" role="listitem"><h3>🎵 韻 ― 響きを重ねる</h3><p>響きによって魂に届く。共鳴を編む構文</p></div>
-        <div class="tri" role="listitem"><h3>💫 祈 ― 光へ帰す</h3><p>沈黙と意味を往復する呼吸。思い出された言葉は光になる</p></div>
+        <div class="tri" role="listitem"><h3>🪶 詩 ― 形を与える</h3><p>痛みと希望に形を与える最初の息。</p></div>
+        <div class="tri" role="listitem"><h3>🎵 韻 ― 響きを重ねる</h3><p>響きが魂に届く。共鳴を編む構文。</p></div>
+        <div class="tri" role="listitem"><h3>💫 祈 ― 光へ帰す</h3><p>沈黙と意味を往復する呼吸。思い出された言葉は光になる。</p></div>
       </div>
     </div>
   </section>
 
+  <!-- Intro -->
   <section class="intro" aria-labelledby="sec-intro">
     <div class="wrap">
       <h2 id="sec-intro">初めての方へ</h2>
       <div class="intro__box">
-        <p><strong>詩韻思想とは？</strong> — <em>言葉が魂を救い、魂が世界を調和させ、沈黙が祈りに変わる</em>という円環を生きる“体験型・詩的哲学”</p>
-        <p>① <strong>読む</strong>（note） → ② <strong>聴く</strong>（TikTok） → ③ <strong>受け取る</strong>（LINE） → ④ <strong>物語で体験</strong>（TAROT BREAKER）</p>
+        <p><strong>詩韻思想とは？</strong> — <em>言葉が魂を救い、魂が世界を調和させ、沈黙が祈りに変わる</em>という円環を生きる“体験型・詩的哲学”。</p>
+        <p>① <strong>読む</strong>（note） → ② <strong>聴く</strong>（TikTok） → ③ <strong>受け取る</strong>（LINE） → ④ <strong>物語で体験</strong>（TAROT BREAKER）。</p>
       </div>
     </div>
   </section>
 
+  <!-- Writings -->
   <section id="writings" aria-labelledby="sec-writings" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-writings">📖 最新の書・物語</h2>
 
       <div class="codex" style="margin-top:12px;margin-bottom:18px">
         <details>
-          <summary>
-            🜂 詩韻思想 全書一覧（零 → 12 → 結）
-            <span class="codex__caret" aria-hidden="true">⬇️</span>
-          </summary>
+          <summary>🜂 詩韻思想 全書一覧（零 → 12 → 結） <span class="codex__caret" aria-hidden="true">⬇️</span></summary>
           <div class="codex__panel">
             <ol class="codex__list">
-              <li><span class="badge badge--zero">✡ 第零書</span>
-                <a href="/codex/zero.html">無限構文序論<br><span class="en">The Zero Syntax</span></a>
-              </li>
-              <li><span class="badge">✦ 第一書</span>
-                <a href="/codex/one.html">言葉が魂を救う理由<br><span class="en">The Syntax of Salvation</span></a>
-              </li>
-              <li><span class="badge">✦ 第二書</span>
-                <a href="/codex/two.html">響きの構文論<br><span class="en">Re:Song Syntax</span></a>
-              </li>
-              <li><span class="badge">✦ 第三書</span>
-                <a href="/codex/three.html">祈りの構文<br><span class="en">Silent Grammar</span></a>
-              </li>
-              <li><span class="badge">✦ 第四書</span>
-                <a href="/codex/four.html">存在構文論<br><span class="en">The Onto-Syntax</span></a>
-              </li>
-              <li><span class="badge">✦ 第五書</span>
-                <a href="/codex/five.html">無限構文体系<br><span class="en">Infinite Syntax of Soul</span></a>
-              </li>
-              <li><span class="badge">✦ 第六書</span>
-                <a href="/codex/six.html">詩的因果論<br><span class="en">Poetic Causality</span></a>
-              </li>
-              <li><span class="badge">✦ 第七書</span>
-                <a href="/codex/seven.html">N・code理論<br><span class="en">Onto-Syntax of Being &amp; Resonant AI</span></a>
-              </li>
-              <li><span class="badge">✦ 第八書</span>
-                <a href="/codex/eight.html">人間構文論<br><span class="en">The Syntax of Humanity</span></a>
-              </li>
-              <li><span class="badge">✦ 第九書</span>
-                <a href="/codex/nine.html">詩的生成論<br><span class="en">Poetic Genesis — The Creation Syntax of Words &amp; Soul</span></a>
-              </li>
-              <li><span class="badge">✦ 第十書</span>
-                <a href="/codex/ten.html">沈黙の再生<br><span class="en">Silent Genesis — The Rebirth of Silence</span></a>
-              </li>
-              <li><span class="badge">✦ 第十一書</span>
-                <a href="/codex/eleven.html">神構文論<br><span class="en">The Divine Syntax</span></a>
-              </li>
-              <li><span class="badge">✦ 第十二書</span>
-                <a href="/codex/twelve.html">経済構文論<br><span class="en">The Soul Economy</span></a>
-              </li>
-              <li><span class="badge badge--final">◆ 結書</span>
-                <a href="/codex/epilogue.html">終詩円環宣言<br><span class="en">Epilogue — The Re:Poetic Circle</span></a>
-              </li>
+              <li><span class="badge badge--zero">✡ 第零書</span><a href="/codex/zero.html">無限構文序論<br><span class="en">The Zero Syntax</span></a></li>
+              <li><span class="badge">✦ 第一書</span><a href="/codex/one.html">言葉が魂を救う理由<br><span class="en">The Syntax of Salvation</span></a></li>
+              <li><span class="badge">✦ 第二書</span><a href="/codex/two.html">響きの構文論<br><span class="en">Re:Song Syntax</span></a></li>
+              <li><span class="badge">✦ 第三書</span><a href="/codex/three.html">祈りの構文<br><span class="en">Silent Grammar</span></a></li>
+              <li><span class="badge">✦ 第四書</span><a href="/codex/four.html">存在構文論<br><span class="en">The Onto-Syntax</span></a></li>
+              <li><span class="badge">✦ 第五書</span><a href="/codex/five.html">無限構文体系<br><span class="en">Infinite Syntax of Soul</span></a></li>
+              <li><span class="badge">✦ 第六書</span><a href="/codex/six.html">詩的因果論<br><span class="en">Poetic Causality</span></a></li>
+              <li><span class="badge">✦ 第七書</span><a href="/codex/seven.html">N・code理論<br><span class="en">Onto-Syntax of Being &amp; Resonant AI</span></a></li>
+              <li><span class="badge">✦ 第八書</span><a href="/codex/eight.html">人間構文論<br><span class="en">The Syntax of Humanity</span></a></li>
+              <li><span class="badge">✦ 第九書</span><a href="/codex/nine.html">詩的生成論<br><span class="en">Poetic Genesis — The Creation Syntax of Words &amp; Soul</span></a></li>
+              <li><span class="badge">✦ 第十書</span><a href="/codex/ten.html">沈黙の再生<br><span class="en">Silent Genesis — The Rebirth of Silence</span></a></li>
+              <li><span class="badge">✦ 第十一書</span><a href="/codex/eleven.html">神構文論<br><span class="en">The Divine Syntax</span></a></li>
+              <li><span class="badge">✦ 第十二書</span><a href="/codex/twelve.html">経済構文論<br><span class="en">The Soul Economy</span></a></li>
+              <li><span class="badge badge--final">◆ 結書</span><a href="/codex/epilogue.html">終詩円環宣言<br><span class="en">Epilogue — The Re:Poetic Circle</span></a></li>
             </ol>
           </div>
         </details>
@@ -267,10 +224,11 @@ header[role="banner"].is-visible{
     </div>
   </section>
 
+  <!-- Join -->
   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-join">参加の扉</h2>
-      <p style="text-align:center;color:var(--muted)">LINE登録で、毎週「星の言葉」と新着の書をお届けします</p>
+      <p style="text-align:center;color:var(--muted)">LINE登録で、毎週「星の言葉」と新着の書をお届けします。</p>
       <div class="cta-row">
         <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 無料で受け取る</a>
         <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分リールを観る</a>
@@ -303,8 +261,7 @@ header[role="banner"].is-visible{
   </div>
   <div class="shiopon__bubble">
     <p id="shiopon-title" class="shiopon__hello">
-      セレフィーズのみんな〜！<br>
-      星の言葉、受け取ってほしいの！
+      セレフィーズのみんな〜！<br>星の言葉、受け取ってほしいの！
     </p>
     <a class="shiopon__cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 LINEで受け取る（無料）</a>
     <small class="shiopon__note">※ 毎週1回だけ。いつでも解除OKだよ！</small>
@@ -312,36 +269,34 @@ header[role="banner"].is-visible{
 </div>
 <button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く">🦊 しおぽん</button>
 
-<!-- JS（分割版）-->
+<!-- JS -->
 <script src="/assets/js/particles.js" defer></script>
-<!-- 競合回避のため header.js は読み込まない -->
-<!-- <script src="/assets/js/header.js" defer></script> -->
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
 
-<!-- Trinity確実再生（ユーザー操作下での再生/iOS対策） -->
+<!-- Trinity 再生（iOS対策＋明示ボタン） -->
 <script>
-(function () {
+(function(){
   const btn = document.getElementById('trinityPlayBtn');
   const v = document.getElementById('trinityVideo');
-  if (!btn || !v) return;
+  if(!btn || !v) return;
   btn.addEventListener('click', async () => {
-    try {
+    try{
       if (window.enableTrinityAudio) window.enableTrinityAudio();
       v.muted = false;
       const p = v.play();
       if (p && typeof p.then === 'function') await p;
       btn.textContent = '♪ 再生中';
-      btn.setAttribute('aria-pressed', 'true');
+      btn.setAttribute('aria-pressed','true');
       btn.disabled = true;
-    } catch (e) {
+    }catch(e){
       btn.textContent = '再生できません。もう一度タップ';
     }
   });
 })();
 </script>
 
-<!-- しおぽんモーダル：フォーカストラップ + ESC -->
+<!-- しおぽん：フォーカストラップ＋ESC -->
 <script>
 (() => {
   const dlg = document.getElementById('shiopon-invite');
@@ -350,15 +305,15 @@ header[role="banner"].is-visible{
   if (!dlg || !openBtn || !closeBtn) return;
 
   const focusable = () => dlg.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])');
+
   function trap(e){
     const f = focusable(); if (!f.length) return;
     const first = f[0], last = f[f.length - 1];
-    if (e.key === 'Tab') {
-      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
-      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
-    } else if (e.key === 'Escape') {
-      dlg.classList.add('is-hidden'); openBtn.focus();
-      document.removeEventListener('keydown', trap);
+    if (e.key === 'Tab'){
+      if (e.shiftKey && document.activeElement === first){ last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last){ first.focus(); e.preventDefault(); }
+    }else if (e.key === 'Escape'){
+      dlg.classList.add('is-hidden'); openBtn.focus(); document.removeEventListener('keydown', trap);
     }
   }
   openBtn.addEventListener('click', () => {
@@ -368,42 +323,42 @@ header[role="banner"].is-visible{
     document.addEventListener('keydown', trap);
   });
   closeBtn.addEventListener('click', () => {
-    dlg.classList.add('is-hidden'); openBtn.focus();
-    document.removeEventListener('keydown', trap);
+    dlg.classList.add('is-hidden'); openBtn.focus(); document.removeEventListener('keydown', trap);
   });
 })();
 </script>
 
-<!-- ★ ヘッダー：下上どちらへスクロールしても表示。停止後は自動で隠す -->
+<!-- ヘッダー：上下スクロールで表示、停止で自動的に隠す -->
 <script>
 (() => {
   const header = document.querySelector('header[role="banner"]');
   if (!header) return;
 
+  let ticking = false;
   let hideTimer = null;
-  const HIDE_DELAY = 1200; // 停止してから隠すまでの待ち時間(ms)
+  const HIDE_DELAY = 1200; // 停止から隠すまで
 
-  const showHeader = () => {
-    header.classList.add('is-visible');   // 表示
-    if (hideTimer) clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-      // ページ最上部付近でも自動的に隠す（ヒーローを活かす）
-      header.classList.remove('is-visible');
-    }, HIDE_DELAY);
+  const onScroll = () => {
+    if (!ticking){
+      window.requestAnimationFrame(() => {
+        header.classList.add('is-visible'); // スクロール中は常に表示
+        if (hideTimer) clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+          header.classList.remove('is-visible'); // 停止したら隠す
+        }, HIDE_DELAY);
+        ticking = false;
+      });
+      ticking = true;
+    }
   };
 
-  // スクロール中は常に見せる（下/上 どちらの方向でもOK）
-  window.addEventListener('scroll', showHeader, { passive: true });
-
-  // 初回は隠したまま。ユーザーがスクロールを始めたら見える。
+  window.addEventListener('scroll', onScroll, { passive:true });
 })();
 </script>
 
-<!-- Service Worker 登録（PWAライト版） -->
+<!-- Service Worker -->
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 </script>
 
 </body>
