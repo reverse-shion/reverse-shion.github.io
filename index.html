@@ -652,19 +652,28 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 })();
 </script>
 
-  <script>
-window.addEventListener('load', () => {
-  const dock = document.getElementById('shiopon-dock');
-  const invite = document.getElementById('shiopon-invite');
-  if (dock && invite){
-    dock.classList.remove('is-hidden');
-    invite.classList.remove('is-hidden');
-    console.log("しおぽんロード完了 🌙");
-  } else {
-    console.warn("しおぽん要素が見つかりません。");
-  }
-});
-</script>
+  <!-- しおぽんウィジェット -->
+<div id="shiopon-invite" class="shiopon is-hidden" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="shiopon-title">
+  <button class="shiopon__close" aria-label="閉じる">×</button>
+  <div class="shiopon__avatar" aria-hidden="true">
+    <img src="/assets/shiopon_transparent.png" alt="">
+  </div>
+  <div class="shiopon__bubble">
+    <p id="shiopon-title" class="shiopon__hello">
+      セレフィーズのみんな〜！<br>
+      星の言葉、受け取ってほしいの！
+    </p>
+    <a class="shiopon__cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 LINEで受け取る（無料）</a> <!-- CHANGED -->
+    <small class="shiopon__note">※ 毎週1回だけ。いつでも解除OKだよ！</small>
+  </div>
+</div>
+<button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く">🦊 しおぽん</button>
+
+<!-- JS（分割版）-->
+<script src="/assets/js/particles.js" defer></script>
+<script src="/assets/js/header.js" defer></script>
+<script src="/assets/js/trinity.js" defer></script>
+<script src="/assets/js/shiopon.js" defer></script>
 
 <!-- SVG Sprite (icons) -->
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
