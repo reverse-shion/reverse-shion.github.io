@@ -238,12 +238,20 @@
       <h2 id="miniReadingTitle">🃏 3枚リーディング（体験）</h2>
       <p class="h2-sub">現在／鍵／進む道 を1分で。終わったら「今日の一歩」をLINEで受け取れます。</p>
 
-      <div class="reading-deck" role="list" aria-label="カードデッキ">
-  <button class="card-slot is-back" data-slot="1" role="listitem" aria-label="1枚目を引く"></button>
-  <button class="card-slot is-back" data-slot="2" role="listitem" aria-label="2枚目を引く"></button>
-  <button class="card-slot is-back" data-slot="3" role="listitem" aria-label="3枚目を引く"></button>
-</div>
+      <div class="reading-ui" data-state="idle" aria-live="polite">
+        <div class="reading-actions">
+          <button class="btn btn--primary" id="readingStart">
+            <svg width="18" height="18" aria-hidden="true"><use href="#i-star"/></svg>
+            シャッフルして始める
+          </button>
+          <button class="btn btn--ghost" id="readingReset" disabled>リセット</button>
+        </div>
 
+        <div class="reading-deck" role="list" aria-label="カードデッキ">
+          <button class="card-slot" data-slot="1" role="listitem" aria-label="1枚目を引く"></button>
+          <button class="card-slot" data-slot="2" role="listitem" aria-label="2枚目を引く"></button>
+          <button class="card-slot" data-slot="3" role="listitem" aria-label="3枚目を引く"></button>
+        </div>
 
         <div class="reading-result" hidden>
           <div class="result-grid">
@@ -336,7 +344,7 @@
     <button class="close-modal modal__close" aria-label="閉じる">×</button>
     <figure class="modal__media">
       <picture>
-        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1620.jpg?v=1">
+        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
         <source media="(min-width: 641px)" srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
         <img src="/assets/images/modal/main_modal_1920x1280.jpg?v=1" alt="カードの結果" width="1920" height="1280" loading="lazy" decoding="async">
       </picture>
@@ -530,8 +538,8 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 <!-- Mini Reading（3枚） -->
 <script>
 (() => {
-  const start  = document.getElementById('readingStart');
-  const reset  = document.getElementById('readingReset');
+  const start = document.getElementById('readingStart');
+  const reset = document.getElementById('readingReset');
   const deckBtns = Array.from(document.querySelectorAll('.card-slot'));
   const result = document.querySelector('.reading-result');
 
@@ -559,9 +567,9 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 
   function shuffle(arr){
     const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+    for (let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
     }
     return a;
   }
@@ -569,29 +577,29 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   let stack = [];
   let picked = {};
 
-  // Mini Reading（3枚）スクリプト内 抜粋
-function init(){
-  result.hidden = true;
-  picked = {};
-  deckBtns.forEach(b=>{
-    b.disabled = true;
-    b.innerHTML = '';
-    b.setAttribute('aria-pressed','false');
-    b.classList.remove('is-picked'); // is-back の削除は不要
-    b.classList.add('is-back');      // ★ 追加：裏面を強制表示する
-    b.style.backgroundImage = '';
-  });
-  reset.disabled = true;
-}
+  function init(){
+    result.hidden = true;
+    picked = {};
+    deckBtns.forEach(b=>{
+      b.disabled = true;
+      b.textContent = '';
+      b.setAttribute('aria-pressed','false');
+      b.classList.remove('is-picked');
+      b.style.backgroundImage = '';
+    });
+    reset.disabled = true;
+  }
 
   function startReading(){
     stack = shuffle(CARDS);
     deckBtns.forEach(b=>{
       b.disabled = false;
-      b.innerHTML = '';
-      b.setAttribute('aria-pressed','false');
-      b.classList.remove('is-picked');
-      b.classList.add('is-back');   // ← 裏面表示（CSSで背景画像）
+      b.textContent = '';
+      /* 裏面（1枚の共通画像） */
+      b.style.backgroundImage = 'url(/assets/tarot/back.jpg)';
+      b.style.backgroundSize = 'cover';
+      b.style.backgroundPosition = '50% 50%';
+      b.style.backgroundRepeat = 'no-repeat';
     });
     start.disabled = true;
     reset.disabled = false;
@@ -604,13 +612,8 @@ function init(){
 
     btn.setAttribute('aria-pressed','true');
     btn.classList.add('is-picked');
-    btn.classList.remove('is-back');   // 裏面 → 表
     btn.style.backgroundImage = 'none';
-
-    btn.innerHTML =
-      `<strong style="font-size:16px;color:#2a1030">${card.name}</strong><br>
-       <span style="font-size:13px;color:#6b6b6b">${SLOT_TEXT[slot]}</span><br>
-       <span style="font-weight:700">${card.key}</span>`;
+    btn.innerHTML = `<strong style="font-size:16px;color:#2a1030">${card.name}</strong><br><span style="font-size:13px;color:#6b6b6b">${SLOT_TEXT[slot]}</span><br><span style="font-weight:700">${card.key}</span>`;
 
     if (picked[1] && picked[2] && picked[3]) {
       result.hidden = false;
@@ -627,20 +630,12 @@ function init(){
     }
   }
 
-  // 初期化とイベント
   init();
   start.addEventListener('click', startReading);
   reset.addEventListener('click', () => { start.disabled = false; init(); });
-  deckBtns.forEach(btn=>{
-    btn.addEventListener('click', () => {
-      if (!btn.disabled) reveal(btn.getAttribute('data-slot'), btn);
-    });
-  });
+  deckBtns.forEach(btn=> btn.addEventListener('click', () => { if (!btn.disabled) reveal(btn.getAttribute('data-slot'), btn); }));
 
-
-
-  /* 演出：カードをタップ→簡易モーダル */
-/*
+  /* 追加：カードをタップすると簡易モーダルを開く（演出） */
   const quickModal = document.getElementById('modal');
   const quickClose = quickModal?.querySelector('.close-modal');
   if (quickModal && quickClose){
@@ -650,16 +645,11 @@ function init(){
         quickModal.classList.add('active');
       });
     });
-    const closeQuick = () => {
-      quickModal.classList.remove('active');
-      quickModal.setAttribute('aria-hidden','true');
-    };
+    const closeQuick = () => { quickModal.classList.remove('active'); quickModal.setAttribute('aria-hidden','true'); };
     quickClose.addEventListener('click', closeQuick);
     quickModal.querySelector('.modal__overlay')?.addEventListener('click', closeQuick);
   }
-*/
 })();
-
 </script>
 
 <!-- SVG Sprite (icons) -->
