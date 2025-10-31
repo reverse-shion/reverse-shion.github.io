@@ -396,6 +396,17 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
 </script>
+  <!-- body末尾のスクリプト群の近くに追加 -->
+<script>
+(function(){
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('video').forEach(v => {
+      v.removeAttribute('autoplay');
+      try { v.pause(); } catch(e){}
+    });
+  }
+})();
+</script>
 
 <!-- GA4 任意イベント（ID設定時に有効）
 <script> setTimeout(()=>{ gtag('event','engaged_30s'); }, 30000); </script>
