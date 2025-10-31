@@ -466,3 +466,36 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 }
 
 .card-back:hover::before{ transform: scale(1.02); filter: saturate(1.15); }
+
+
+.reading-deck {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  justify-items: center;
+  margin: 2rem 0;
+}
+
+.card-slot {
+  width: 120px;
+  aspect-ratio: 2 / 3;
+  background-image: url("/assets/images/tarot_back_1024x1536.jpg?v=1");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-slot:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(255,255,255,.2);
+}
+
+.card-slot:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
