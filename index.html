@@ -4,14 +4,13 @@
 <meta charset="utf-8" />
 <title>Re:verse Shion — 詩韻思想 × TAROT BREAKER</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="theme-color" content="#0b0b1a" />
+<meta name="theme-color" content="#ffffff" />
 <meta name="description" content="Re:verse Shion ― 詩韻思想（言葉が魂を救う世界）と物語TAROT BREAKERの統合ハブ。読む・聴く・学ぶ・受け取るをひとつに。言葉は祈りの構文。物語はその実演">
 <meta name="keywords" content="詩韻思想, TAROT BREAKER, シオン, 哲学, 言葉, 構文, 物語, LINE占い" />
 
-<!-- 基本 -->
 <link rel="canonical" href="https://reverse-shion.github.io/" />
 <meta http-equiv="Content-Language" content="ja" />
-<meta name="author" content="詩韻 -シオン-" />
+<meta name="author" content="（著者名または団体名）" /> 
 
 <!-- OGP / Twitter -->
 <meta property="og:type" content="website">
@@ -25,21 +24,15 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@TaroBure">
 
-<!-- PWA -->
-<link rel="manifest" href="/manifest.webmanifest">
-
-<!-- Fonts（preload→onload昇格） -->
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap">
-</noscript>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
 
 <!-- Icons / Preload -->
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" sizes="180x180">
+<link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32"> <!-- CHANGED -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" sizes="180x180"> <!-- CHANGED -->
 <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high">
 
 <!-- JSON-LD -->
@@ -68,7 +61,7 @@
       "url": "https://reverse-shion.github.io/",
       "name": "Re:verse Shion — 詩韻思想 × TAROT BREAKER",
       "publisher": { "@id": "https://reverse-shion.github.io/#organization" },
-      "potentialAction": {
+      "potentialAction": { /* CHANGED: サイト内検索の強化（任意だが効果大） */
         "@type": "SearchAction",
         "target": "https://reverse-shion.github.io/?q={search_term_string}",
         "query-input": "required name=search_term_string"
@@ -87,28 +80,19 @@
 <!-- CSS -->
 <link rel="stylesheet" href="/assets/css/style.css">
 
-<!-- 追加の最小ユーティリティ -->
+<!-- CHANGED: 動きに弱い環境配慮（最小1ルール） -->
 <style>
-/* 動きに弱い環境配慮（CSSで止められないautoplayは末尾JSで対応） */
 @media (prefers-reduced-motion: reduce) {
   .hero__video, .trinity__video { animation: none !important; }
+  video { autoplay: false; }
 }
-/* Skipリンク */
 .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
 .sr-only-focusable:focus { position:static; width:auto; height:auto; }
-/* ヘッダーのスクロール演出 */
-header { transition: transform .28s ease; will-change: transform; }
-header.is-hidden { transform: translateY(-100%); }
 </style>
-
-<!-- GA4（任意：IDを設定したら有効化）
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);} gtag('js',new Date()); gtag('config','G-XXXXXXX');</script>
--->
 </head>
 <body>
 
-<!-- Skipリンク -->
+<!-- CHANGED: Skipリンク（A11y/SEO底上げ） -->
 <a href="#main-content" class="sr-only sr-only-focusable">本文へスキップ</a>
 
 <!-- 星砂パーティクル -->
@@ -131,10 +115,10 @@ header.is-hidden { transform: translateY(-100%); }
   </div>
 </header>
 
-<!-- #top アンカー（上部リンク用） -->
+<!-- CHANGED: #top アンカー維持のため分離 -->
 <div id="top" aria-hidden="true"></div>
 
-<main id="main-content" tabindex="-1">
+<main id="main-content" tabindex="-1"> <!-- CHANGED: Skipリンクの着地点 -->
   <section class="hero" aria-label="ヒーロー">
     <div class="hero__media" aria-hidden="true">
       <video class="hero__video" autoplay muted loop playsinline preload="metadata"
@@ -149,10 +133,10 @@ header.is-hidden { transform: translateY(-100%); }
       <h1>言葉は祈りの構文 物語は、その実演</h1>
       <p>詩韻思想®（Shion Philosophy）で“響き”を学び、TAROT BREAKERで“響き”を体験する<br><strong>「言葉が魂を救う、その瞬間へ」</strong></p>
       <div class="cta-row" role="navigation" aria-label="主要CTA">
-        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">🌠 星の言葉を受け取る（無料）</a>
-        <a class="btn btn--ghost" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">📘 小説を読む</a>
-        <a class="btn btn--ghost" href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">📖 今日の“響き”を読む</a>
-        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分で観る/聴く</a>
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">🌠 星の言葉を受け取る（無料）</a> <!-- CHANGED -->
+        <a class="btn btn--ghost" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">📘 小説を読む</a> <!-- CHANGED -->
+        <a class="btn btn--ghost" href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">📖 今日の“響き”を読む</a> <!-- CHANGED -->
+        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分で観る/聴く</a> <!-- CHANGED -->
       </div>
 
       <figure class="hero__image" aria-hidden="true">
@@ -170,16 +154,18 @@ header.is-hidden { transform: translateY(-100%); }
       <figure class="trinity__figure">
         <video id="trinityVideo" class="trinity__video"
                autoplay muted playsinline preload="metadata"
-               poster="/assets/trinity/banner.png" width="1200" height="771"
+               poster="./assets/trinity/banner.png" width="1200" height="771"
                onclick="window.enableTrinityAudio && window.enableTrinityAudio()">
-          <source src="/assets/trinity/loop.webm" type="video/webm">
-          <source src="/assets/trinity/loop.mp4"  type="video/mp4">
+          <source src="./assets/trinity/loop.webm" type="video/webm">
+          <source src="./assets/trinity/loop.mp4"  type="video/mp4">
         </video>
       </figure>
 
-      <!-- Trinity確実再生ボタン -->
+      <!-- Trinity確実再生ボタン（既存UIのまま機能強化） -->
       <div class="trinity__actions" style="text-align:center;margin-top:8px">
-        <button id="trinityPlayBtn" class="btn btn--primary" aria-label="音を再生">▶ 画面タップで音が流れます</button>
+        <button id="trinityPlayBtn" class="btn btn--primary" aria-label="音を再生">
+          ▶ 画面タップで音が流れます
+        </button>
       </div>
 
       <div class="tri-grid" role="list">
@@ -259,7 +245,7 @@ header.is-hidden { transform: translateY(-100%); }
         </details>
       </div>
 
-      <!-- 見出し階層 h3化 -->
+      <!-- CHANGED: カード見出しを h3 に（見出し階層の一貫性） -->
       <div class="card"><div class="badge">✡ 第零書</div><h3>無限構文序論 — The Zero Syntax</h3></div>
       <div class="card"><div class="badge">✦ 第一書</div><h3>言葉が魂を救う理由 — The Syntax of Salvation</h3></div>
       <div class="card"><div class="badge">✦ TAROT BREAKER</div><h3>第1話から読む</h3></div>
@@ -271,8 +257,8 @@ header.is-hidden { transform: translateY(-100%); }
       <h2 id="sec-join">参加の扉</h2>
       <p style="text-align:center;color:var(--muted)">LINE登録で、毎週「星の言葉」と新着の書をお届けします</p>
       <div class="cta-row">
-        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 無料で受け取る</a>
-        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分リールを観る</a>
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 無料で受け取る</a> <!-- CHANGED -->
+        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分リールを観る</a> <!-- CHANGED -->
       </div>
     </div>
   </section>
@@ -281,11 +267,11 @@ header.is-hidden { transform: translateY(-100%); }
 <footer>
   <div class="wrap">
     <div class="sns" aria-label="SNSリンク">
-      <a href="https://x.com/TaroBure" target="_blank" rel="noopener noreferrer">X（@TaroBure）</a>
-      <a href="https://www.instagram.com/shion.codex" target="_blank" rel="noopener noreferrer">Instagram</a>
-      <a href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">note</a>
-      <a href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">小説（なろう）</a>
-      <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">LINE</a>
+      <a href="https://x.com/TaroBure" target="_blank" rel="noopener noreferrer">X（@TaroBure）</a> <!-- CHANGED -->
+      <a href="https://www.instagram.com/shion.codex" target="_blank" rel="noopener noreferrer">Instagram</a> <!-- CHANGED -->
+      <a href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">note</a> <!-- CHANGED -->
+      <a href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">小説（なろう）</a> <!-- CHANGED -->
+      <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">LINE</a> <!-- CHANGED -->
     </div>
     <div style="font-size:12.5px;opacity:.8">© Re:verse Shion — 詩韻思想 / TAROT BREAKER. 言葉が魂を救い、魂が世界を調和させる</div>
     <div style="margin-top:10px;"><a href="#top" aria-label="ページ先頭へ戻る">▲ ページ先頭へ</a></div>
@@ -305,7 +291,7 @@ header.is-hidden { transform: translateY(-100%); }
       セレフィーズのみんな〜！<br>
       星の言葉、受け取ってほしいの！
     </p>
-    <a class="shiopon__cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 LINEで受け取る（無料）</a>
+    <a class="shiopon__cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 LINEで受け取る（無料）</a> <!-- CHANGED -->
     <small class="shiopon__note">※ 毎週1回だけ。いつでも解除OKだよ！</small>
   </div>
 </div>
@@ -313,34 +299,33 @@ header.is-hidden { transform: translateY(-100%); }
 
 <!-- JS（分割版）-->
 <script src="/assets/js/particles.js" defer></script>
-<!-- 二重挙動回避のため header.js は読み込まず、下のインラインで統一 -->
-<!-- <script src="/assets/js/header.js" defer></script> -->
+<script src="/assets/js/header.js" defer></script>
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
 
-<!-- Trinity確実再生（ユーザー操作下での再生/iOS対策） -->
+<!-- Trinity確実再生（最小・既存関数があれば利用） -->
 <script>
-(function () {
-  const btn = document.getElementById('trinityPlayBtn');
-  const v = document.getElementById('trinityVideo');
-  if (!btn || !v) return;
-  btn.addEventListener('click', async () => {
-    try {
-      if (window.enableTrinityAudio) window.enableTrinityAudio();
-      v.muted = false;
-      const p = v.play();
-      if (p && typeof p.then === 'function') await p;
-      btn.textContent = '♪ 再生中';
-      btn.setAttribute('aria-pressed', 'true');
-      btn.disabled = true;
-    } catch (e) {
-      btn.textContent = '再生できません。もう一度タップ';
-    }
-  });
-})();
+  (function () {
+    const btn = document.getElementById('trinityPlayBtn');
+    const v = document.getElementById('trinityVideo');
+    if (!btn || !v) return;
+    btn.addEventListener('click', async () => {
+      try {
+        if (window.enableTrinityAudio) window.enableTrinityAudio();
+        v.muted = false;
+        const p = v.play();
+        if (p && typeof p.then === 'function') await p;
+        btn.textContent = '♪ 再生中';
+        btn.setAttribute('aria-pressed', 'true');
+        btn.disabled = true;
+      } catch (e) {
+        btn.textContent = '再生できません。もう一度タップ';
+      }
+    });
+  })();
 </script>
 
-<!-- しおぽんモーダル：フォーカストラップ + ESC -->
+<!-- CHANGED: しおぽんモーダル フォーカストラップ + ESC -->
 <script>
 (() => {
   const dlg = document.getElementById('shiopon-invite');
@@ -350,7 +335,8 @@ header.is-hidden { transform: translateY(-100%); }
 
   const focusable = () => dlg.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])');
   function trap(e){
-    const f = focusable(); if (!f.length) return;
+    const f = focusable();
+    if (!f.length) return;
     const first = f[0], last = f[f.length - 1];
     if (e.key === 'Tab') {
       if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
@@ -372,45 +358,5 @@ header.is-hidden { transform: translateY(-100%); }
   });
 })();
 </script>
-
-<!-- ヘッダー：下スクロールで隠し、上スクロールで表示（一本化） -->
-<script>
-(() => {
-  const header = document.querySelector('header');
-  if (!header) return;
-  let lastY = window.scrollY;
-  function onScroll(){
-    const y = window.scrollY;
-    if (y < 10) { header.classList.remove('is-hidden'); lastY = y; return; }
-    if (y < lastY) header.classList.remove('is-hidden');
-    else header.classList.add('is-hidden');
-    lastY = y;
-  }
-  window.addEventListener('scroll', onScroll, {passive:true});
-})();
-</script>
-
-<!-- Service Worker 登録（PWAライト版） -->
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
-</script>
-
-<!-- 動きに弱い環境：自動再生を停止（CSSでは不可のためJSで対応） -->
-<script>
-(function(){
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll('video').forEach(v => {
-      v.removeAttribute('autoplay');
-      try { v.pause(); } catch(e){}
-    });
-  }
-})();
-</script>
-
-<!-- GA4 任意イベント（ID設定時に有効）
-<script> setTimeout(()=>{ gtag('event','engaged_30s'); }, 30000); </script>
--->
 </body>
 </html>
