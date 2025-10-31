@@ -199,3 +199,23 @@
     if (colRaf) cancelAnimationFrame(colRaf);
   }
 })();
+
+/* ===== Shiopon 強制テスト表示 ===== */
+(() => {
+  const invite = document.getElementById('shiopon-invite');
+  const dock   = document.getElementById('shiopon-dock');
+  if (!invite || !dock) return;
+
+  // ローカルストレージの非表示設定を解除
+  localStorage.removeItem('shiopon.hideUntil');
+
+  function showInvite(){
+    invite.classList.remove('is-hidden');
+    invite.classList.add('is-visible');
+    dock.classList.add('is-hidden');
+    console.log("⭐ しおぽん強制召喚完了！");
+  }
+
+  // 5秒後に自動表示
+  setTimeout(showInvite, 5000);
+})();
