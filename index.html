@@ -338,28 +338,18 @@
 </div>
 
 <!-- クリックで開く簡易モーダル（カード3枚用の表示） -->
-<!-- ▼▼ モーダル内の画像ブロックをこれで丸ごと置換 ▼▼ -->
-<div class="modal__media" aria-hidden="true">
-  <picture>
-    <!-- PC/タブレット（横長） -->
-    <source
-      media="(min-width: 768px)"
-      srcset="/assets/images/modal/main_modal_1920x1280.png 1x,
-              /assets/images/modal/print_hd_3072x2048.png 2x"
-      type="image/png" />
-    <!-- モバイル（縦長優先） -->
-    <img
-      src="/assets/images/modal/mobile_vertical_1080x1440.png"
-      alt="TAROT BREAKER プレビュー"
-      width="1080"
-      height="1440"
-      loading="eager"
-      decoding="async"
-      fetchpriority="high"
-    />
-  </picture>
-</div>
-<!-- ▲▲ ここまで置換 ▲▲ -->
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal__overlay" data-close="1"></div>
+  <div class="modal__panel" role="document">
+    <button class="close-modal modal__close" aria-label="閉じる">×</button>
+    <figure class="modal__media">
+      <picture>
+        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
+        <source media="(min-width: 641px)" srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
+        <img src="/assets/images/modal/main_modal_1920x1280.jpg?v=1" alt="カードの結果" width="1920" height="1280" loading="lazy" decoding="async">
+      </picture>
+    </figure>
+  </div>
 </div>
 
 <footer>
@@ -606,7 +596,7 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
       b.disabled = false;
       b.textContent = '';
       /* 裏面（1枚の共通画像） */
-      b.style.backgroundImage = 'url(/assets/tarot/tarot_back_1024x1536.jpg)';
+      b.style.backgroundImage = 'url(/assets/tarot/back.jpg)';
       b.style.backgroundSize = 'cover';
       b.style.backgroundPosition = '50% 50%';
       b.style.backgroundRepeat = 'no-repeat';
