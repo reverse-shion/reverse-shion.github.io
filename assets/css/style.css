@@ -5,9 +5,9 @@
 
 /* ===== Root & Base ===== */
 :root{
-  --ink:#20202a; 
+  --ink:#20202a;
   --muted:#636377;
-  --accent:#7e66ff; 
+  --accent:#7e66ff;
   --accent-2:#ffd76f;
   --glass:#ffffffcc;
   --bg:#ffffff;
@@ -17,21 +17,18 @@
   --header-h: 56px;
   color-scheme: light;
 }
-
 @media (color-gamut: p3){
   :root{
     --accent: color(display-p3 0.48 0.40 1.00);
     --accent-2: color(display-p3 1.00 0.84 0.45);
   }
 }
-
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#0b0b1a; --ink:#e9e9f0; --muted:#a6a6bb;
     --glass:#101018cc;
   }
 }
-
 *{ box-sizing:border-box }
 html{ scroll-padding-top: var(--header-h); scroll-behavior: smooth; }
 body{
@@ -349,29 +346,15 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 .shiopon__note{ display:block; margin-top:8px; color:#666; font-size:12px; opacity:.9 }
 .shiopon__close{
   position:absolute; top:-12px; right:-12px; width:28px; height:28px; border-radius:50%;
-  border:0; color:#333; background:#fff; box-shadow: 0 4px 10px rgba(0,0,0,.08);
-  cursor:pointer; font-size:16px; line-height:1; z-index:10;
+  border:1px solid rgba(0,0,0,.1); background:#fff; cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  font-size:16px; line-height:1; z-index:10;
 }
-.shiopon__close:hover{ filter: brightness(1.05) }
-.shiopon__opts{ margin-top:8px; display:flex; gap:10px; font-size:12px }
-.shiopon__opts button{ background:transparent; border:0; color:#6b6b6b; text-decoration:underline; cursor:pointer }
-.shiopon__opts button:hover{ color:#503080 }
-
-.shiopon-dock{
-  position: fixed;
-  right: calc(16px + env(safe-area-inset-right, 0px));
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  z-index: 1049;
-  padding:10px 14px; border-radius:999px; border:1px solid rgba(0,0,0,.08);
-  background:#fff; color:#503080; font-weight:800; box-shadow: 0 8px 18px rgba(0,0,0,.08);
-  cursor:pointer;
-}
-.shiopon-dock.is-hidden{ display:none }
 
 /* Dark mode specifics */
 @media (prefers-color-scheme: dark){
   header[role="banner"]{ background: rgba(16,16,24,.62); border-bottom-color: rgba(255,255,255,.06) }
-  .tri, .card, .intro__box, .codex details, .shiopon__bubble{
+  .tri, .card, .intro__box, .codex details, .shiopon__bubble, .modal__panel{
     background:#141422; border-color: rgba(255,255,255,.08); box-shadow: 0 8px 22px rgba(0,0,0,.4);
   }
   .nav a{ color: var(--ink); background: rgba(255,215,111,.12); border-color: rgba(255,215,111,.35) }
@@ -383,9 +366,9 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   .hero p, .h2-sub{ text-shadow:none }
 }
 
-/* ensure fixed stacking */
+/* ensure fixed stacking（iOS z-index安定化） */
 #shiopon-invite.shiopon{ position:fixed !important; z-index:1060 !important }
-#shiopon-dock.shiopon-dock{ position:fixed !重要; z-index:1059 !important }
+#shiopon-dock.shiopon-dock{ position:fixed !important; z-index:1059 !important }
 
 /* ===== Tarot Preview Modal ===== */
 .modal{position:fixed;inset:0;z-index:1000;display:none}
@@ -413,14 +396,28 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 #mini-reading{border-top:1px solid rgba(0,0,0,.05)}
 .reading-ui{margin-top:10px}
 .reading-actions{display:flex;gap:10px;justify-content:center;margin-bottom:12px}
-.reading-deck{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:720px;margin:0 auto}
+
+.reading-deck{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap: 12px;
+  max-width:720px;
+  margin:0 auto;
+  justify-items:center;
+}
+
+/* 開始前は無地（JSで開始後に裏面適用） */
 .card-slot{
-  height:132px;border-radius:14px;border:1px solid rgba(0,0,0,.08);
+  width: 120px;
+  aspect-ratio: 2 / 3;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
   background:
     linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.95)),
     radial-gradient(100% 100% at 50% 0%, rgba(255,215,111,.18),rgba(174,138,255,.15));
   box-shadow:0 8px 24px rgba(174,138,255,.16);
-  cursor:not-allowed; transition:transform .15s, box-shadow .15s, filter .15s;
+  cursor:not-allowed;
+  transition:transform .15s, box-shadow .15s, filter .15s, background-image .2s ease;
   position:relative; overflow:hidden;
 }
 .card-slot[aria-pressed="true"]{filter:saturate(110%)}
@@ -432,110 +429,9 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   opacity:0; transition:opacity .15s;
 }
 .card-slot:enabled:hover::after{opacity:1}
+
 .result-grid{display:grid;gap:12px;max-width:980px;margin:16px auto 0}
 @media(min-width:720px){.result-grid{grid-template-columns:repeat(3,1fr)}}
 .result-item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
 .result-item .r-title{margin:.2em 0 .2em;font-size:17px;color:#2a1030}
 .result-item .r-text{margin:0;color:#555;line-height:1.7}
-
-.reading-grid{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: clamp(12px, 3vw, 20px);
-}
-
-.card-back{
-  /* 2:3 比率でカードサイズ確保 */
-  aspect-ratio: 2 / 3;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.18);
-  background: #fff;
-  overflow: hidden;
-  position: relative;
-}
-
-/* 画像は疑似要素に出すので高さゼロ問題なし */
-.card-back::before{
-  content:"";
-  position:absolute; inset:0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: saturate(1.05);
-  transition: transform .35s ease, filter .35s ease;
-}
-
-.card-back:hover::before{ transform: scale(1.02); filter: saturate(1.15); }
-
-
-.reading-deck {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
-  justify-items: center;
-  margin: 2rem 0;
-}
-
-.card-slot {
-  width: 120px;
-  aspect-ratio: 2 / 3;
-  background-image: url("/assets/images/tarot_back_1024x1536.jpg?v=1");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.2);
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card-slot:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 32px rgba(255,255,255,.2);
-}
-
-.card-slot:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(8px);
-  z-index: 9999;
-}
-
-.modal.active {
-  display: flex;
-}
-
-.modal-content {
-  position: relative;
-  max-width: 90%;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(255,255,255,0.25);
-}
-
-.modal-content img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.close-modal {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  background: transparent;
-  color: white;
-  font-size: 2rem;
-  border: none;
-  cursor: pointer;
-}
