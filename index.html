@@ -89,10 +89,9 @@
 
 <!-- 追加の最小ユーティリティ -->
 <style>
-/* 動きに弱い環境配慮 */
+/* 動きに弱い環境配慮（CSSで止められないautoplayは末尾JSで対応） */
 @media (prefers-reduced-motion: reduce) {
   .hero__video, .trinity__video { animation: none !important; }
-  video { autoplay: false; }
 }
 /* Skipリンク */
 .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
@@ -314,7 +313,8 @@ header.is-hidden { transform: translateY(-100%); }
 
 <!-- JS（分割版）-->
 <script src="/assets/js/particles.js" defer></script>
-<script src="/assets/js/header.js" defer></script>
+<!-- 二重挙動回避のため header.js は読み込まず、下のインラインで統一 -->
+<!-- <script src="/assets/js/header.js" defer></script> -->
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
 
@@ -373,7 +373,7 @@ header.is-hidden { transform: translateY(-100%); }
 })();
 </script>
 
-<!-- ヘッダー：下スクロールで隠し、上スクロールで表示 -->
+<!-- ヘッダー：下スクロールで隠し、上スクロールで表示（一本化） -->
 <script>
 (() => {
   const header = document.querySelector('header');
@@ -396,7 +396,8 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
 </script>
-  <!-- body末尾のスクリプト群の近くに追加 -->
+
+<!-- 動きに弱い環境：自動再生を停止（CSSでは不可のためJSで対応） -->
 <script>
 (function(){
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -411,6 +412,5 @@ if ('serviceWorker' in navigator) {
 <!-- GA4 任意イベント（ID設定時に有効）
 <script> setTimeout(()=>{ gtag('event','engaged_30s'); }, 30000); </script>
 -->
-
 </body>
 </html>
