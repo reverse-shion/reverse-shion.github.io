@@ -435,3 +435,27 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 .result-item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
 .result-item .r-title{margin:.2em 0 .2em;font-size:17px;color:#2a1030}
 .result-item .r-text{margin:0;color:#555;line-height:1.7}
+
+/* ▼ 追記（既存CSSの最後でOK） */
+.reading-card,
+.reading-card.is-back { /* あなたのクラス名に合わせてOK。例 */
+  background-image: image-set(
+    url("/assets/images/tarot/tarot_back_1024x1536.png") 1x,
+    url("/assets/images/tarot/tarot_back_2x_2048x3072.png") 2x
+  );
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* 既存の角丸・影などはそのまま */
+}
+
+/* モーダル画像の表示安定化 */
+.modal__media picture,
+.modal__media img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: #0b0b1a; /* 読み込み中の下地色 */
+}
