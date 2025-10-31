@@ -449,3 +449,41 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   /* 万一グラデが上に来ても潰す */
   background-color: transparent !important;
 }
+/* === Tarot Mini Reading === */
+.reading-deck{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:12px;
+}
+.card-slot{
+  aspect-ratio: 2 / 3;
+  border:1px solid #dedbe6;
+  border-radius:10px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px;
+  font-family: var(--font-sans, "Noto Sans JP", system-ui, sans-serif);
+  transition: transform .15s ease, box-shadow .15s ease;
+  box-shadow: 0 1px 6px rgba(20,10,30,.06) inset;
+}
+.card-slot:is(:hover,:focus-visible){ transform:translateY(-1px); box-shadow: 0 3px 12px rgba(20,10,30,.12) }
+.card-slot[disabled]{ opacity:.6; pointer-events:none }
+
+/* 裏面：このクラスを付けた時に“裏面画像”を表示 */
+.card-slot.is-back{
+  background-image: url('/assets/tarot/tarot_back_1024x1536.jpg?v=3');
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  color: transparent;   /* 文字を消す（表にしたら外れる） */
+}
+
+/* 表になった時の文字見栄え */
+.card-slot.is-picked{
+  background:#fff;
+  color:#2a1030;
+}
