@@ -52,10 +52,7 @@
       "@id": "https://reverse-shion.github.io/#organization",
       "name": "Re:verse Shion",
       "url": "https://reverse-shion.github.io/",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://reverse-shion.github.io/assets/logo.png"
-      },
+      "logo": { "@type": "ImageObject", "url": "https://reverse-shion.github.io/assets/logo.png" },
       "sameAs": [
         "https://x.com/TaroBure",
         "https://note.com/shion_uranai369",
@@ -84,7 +81,7 @@
 }
 </script>
 
-<!-- CSS -->
+<!-- CSS（サイト本体） -->
 <link rel="stylesheet" href="/assets/css/style.css">
 
 <!-- 追加の最小ユーティリティ -->
@@ -92,20 +89,24 @@
 /* 動きに弱い環境配慮 */
 @media (prefers-reduced-motion: reduce) {
   .hero__video, .trinity__video { animation: none !important; }
-  video { autoplay: false; }
 }
 /* Skipリンク */
 .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
 .sr-only-focusable:focus { position:static; width:auto; height:auto; }
-/* ヘッダーのスクロール演出 */
-header { transition: transform .28s ease; will-change: transform; }
-header.is-hidden { transform: translateY(-100%); }
-</style>
 
-<!-- GA4（任意：IDを設定したら有効化）
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);} gtag('js',new Date()); gtag('config','G-XXXXXXX');</script>
--->
+/* ヘッダー：初期は非表示、スクロール中は表示、停止で自動的に隠れる */
+header[role="banner"]{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: transform .28s ease;
+  will-change: transform;
+  transform: translateY(-100%); /* 初期：隠す */
+}
+header[role="banner"].is-visible{
+  transform: translateY(0);     /* 表示 */
+}
+</style>
 </head>
 <body>
 
@@ -115,6 +116,7 @@ header.is-hidden { transform: translateY(-100%); }
 <!-- 星砂パーティクル -->
 <div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
+<!-- ★ 初期は非表示（classは付けず、CSS側でtranslateY） -->
 <header role="banner">
   <div class="wrap">
     <div class="brand" aria-label="サイトブランド">
@@ -178,7 +180,6 @@ header.is-hidden { transform: translateY(-100%); }
         </video>
       </figure>
 
-      <!-- Trinity確実再生ボタン -->
       <div class="trinity__actions" style="text-align:center;margin-top:8px">
         <button id="trinityPlayBtn" class="btn btn--primary" aria-label="音を再生">▶ 画面タップで音が流れます</button>
       </div>
@@ -260,7 +261,6 @@ header.is-hidden { transform: translateY(-100%); }
         </details>
       </div>
 
-      <!-- 見出し階層 h3化 -->
       <div class="card"><div class="badge">✡ 第零書</div><h3>無限構文序論 — The Zero Syntax</h3></div>
       <div class="card"><div class="badge">✦ 第一書</div><h3>言葉が魂を救う理由 — The Syntax of Salvation</h3></div>
       <div class="card"><div class="badge">✦ TAROT BREAKER</div><h3>第1話から読む</h3></div>
@@ -314,7 +314,8 @@ header.is-hidden { transform: translateY(-100%); }
 
 <!-- JS（分割版）-->
 <script src="/assets/js/particles.js" defer></script>
-<script src="/assets/js/header.js" defer></script>
+<!-- 競合回避のため header.js は読み込まない -->
+<!-- <script src="/assets/js/header.js" defer></script> -->
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
 
@@ -373,20 +374,28 @@ header.is-hidden { transform: translateY(-100%); }
 })();
 </script>
 
-<!-- ヘッダー：下スクロールで隠し、上スクロールで表示 -->
+<!-- ★ ヘッダー：下上どちらへスクロールしても表示。停止後は自動で隠す -->
 <script>
 (() => {
-  const header = document.querySelector('header');
+  const header = document.querySelector('header[role="banner"]');
   if (!header) return;
-  let lastY = window.scrollY;
-  function onScroll(){
-    const y = window.scrollY;
-    if (y < 10) { header.classList.remove('is-hidden'); lastY = y; return; }
-    if (y < lastY) header.classList.remove('is-hidden');
-    else header.classList.add('is-hidden');
-    lastY = y;
-  }
-  window.addEventListener('scroll', onScroll, {passive:true});
+
+  let hideTimer = null;
+  const HIDE_DELAY = 1200; // 停止してから隠すまでの待ち時間(ms)
+
+  const showHeader = () => {
+    header.classList.add('is-visible');   // 表示
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      // ページ最上部付近でも自動的に隠す（ヒーローを活かす）
+      header.classList.remove('is-visible');
+    }, HIDE_DELAY);
+  };
+
+  // スクロール中は常に見せる（下/上 どちらの方向でもOK）
+  window.addEventListener('scroll', showHeader, { passive: true });
+
+  // 初回は隠したまま。ユーザーがスクロールを始めたら見える。
 })();
 </script>
 
@@ -396,10 +405,6 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
 </script>
-
-<!-- GA4 任意イベント（ID設定時に有効）
-<script> setTimeout(()=>{ gtag('event','engaged_30s'); }, 30000); </script>
--->
 
 </body>
 </html>
