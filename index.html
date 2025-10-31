@@ -8,7 +8,6 @@
 <meta name="description" content="Re:verse Shion ― 詩韻思想（言葉が魂を救う世界）と物語TAROT BREAKERの統合ハブ。読む・聴く・学ぶ・受け取るをひとつに。言葉は祈りの構文。物語はその実演">
 <meta name="keywords" content="詩韻思想, TAROT BREAKER, シオン, 哲学, 言葉, 構文, 物語, LINE占い" />
 
-<!-- 基本 -->
 <link rel="canonical" href="https://reverse-shion.github.io/" />
 <meta http-equiv="Content-Language" content="ja" />
 <meta name="author" content="詩韻 -シオン-" />
@@ -84,12 +83,11 @@
 <!-- CSS（Pro Edition） -->
 <link rel="stylesheet" href="/assets/css/style.css">
 
-<!-- 最小ユーティリティ -->
+<!-- Minimal utility -->
 <style>
 @media (prefers-reduced-motion: reduce){
   .hero__video, .trinity__video{ animation:none !important }
 }
-/* Skip link visible on focus */
 .sr-only-focusable:focus{ position:static; width:auto; height:auto }
 </style>
 </head>
@@ -101,7 +99,7 @@
 <!-- 星砂パーティクル -->
 <div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
-<!-- ヘッダー（初期は隠れて、スクロールで表示） -->
+<!-- ヘッダー（初期は隠れて、スクロールで表示→停止で自動隠し） -->
 <header role="banner">
   <div class="wrap">
     <div class="brand" aria-label="サイトブランド">
@@ -126,7 +124,9 @@
   <!-- Hero -->
   <section class="hero" aria-label="ヒーロー">
     <div class="hero__media" aria-hidden="true">
-      <video class="hero__video" autoplay muted loop playsinline preload="metadata" poster="/assets/hero-poster.jpg">
+      <!-- 省データ環境に静止画フォールバック -->
+      <video class="hero__video" autoplay muted loop playsinline preload="metadata"
+             poster="/assets/hero-poster.jpg" data-fallback="/assets/hero-poster.jpg">
         <source src="/assets/video/top.webm" type="video/webm">
         <source src="/assets/video/top.mp4"  type="video/mp4">
       </video>
@@ -269,7 +269,7 @@
 </div>
 <button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く">🦊 しおぽん</button>
 
-<!-- JS -->
+<!-- JS（分割） -->
 <script src="/assets/js/particles.js" defer></script>
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
@@ -328,7 +328,7 @@
 })();
 </script>
 
-<!-- ヘッダー：上下スクロールで表示、停止で自動的に隠す -->
+<!-- ヘッダー：上下スクロールで表示、停止で自動的に隠す（rAF+タイマー） -->
 <script>
 (() => {
   const header = document.querySelector('header[role="banner"]');
@@ -354,6 +354,29 @@
 
   window.addEventListener('scroll', onScroll, { passive:true });
 })();
+</script>
+
+<!-- View Transitions：ページ内アンカーの神域フェード -->
+<script>
+if (document.startViewTransition){
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      const sel = a.getAttribute('href');
+      const target = document.querySelector(sel);
+      if(!target) return;
+      e.preventDefault();
+      document.startViewTransition(()=> target.scrollIntoView({behavior:'smooth', block:'start'}));
+    });
+  });
+}
+</script>
+
+<!-- 省データ環境でヒーローを静止画化 -->
+<script>
+if (navigator.connection?.saveData){
+  const hv = document.querySelector('.hero__video');
+  if(hv){ hv.outerHTML = `<img src="${hv.dataset.fallback}" alt="" style="width:100%;height:100%;object-fit:cover">`; }
+}
 </script>
 
 <!-- Service Worker -->
