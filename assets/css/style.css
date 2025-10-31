@@ -24,20 +24,20 @@ img{height:auto}
 :focus-visible{ outline:2px solid rgba(255,215,111,.85); outline-offset:2px; }
 
 /* ----------------------------------------------------- */
-/* Header（初期表示＝見える／隠す時だけ is-hidden） */
+/* Header */
 /* ----------------------------------------------------- */
 header[role="banner"]{
   min-height: var(--header-h);
-  position: sticky; top: 0; z-index: 1000;
+  position:sticky; top:0; z-index:20;
   display:block;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  background: rgba(255,255,255,.70);
+  background:rgba(255,255,255,0.70);
   border-bottom:1px solid rgba(0,0,0,.06);
   transform: translateY(0);
-  transition: transform .24s ease, background-color .28s ease, box-shadow .28s ease;
-  padding-top: env(safe-area-inset-top); /* iOSノッチ対策 */
+  opacity: 0;
+  transition: transform .24s ease, opacity .32s ease, background-color .28s ease, box-shadow .28s ease;
 }
-header.is-hidden{ transform: translateY(-100%); }
+header.is-visible{ opacity:1 }
 header.header--compact{
   background: rgba(255,255,255,.88);
   box-shadow: 0 8px 22px rgba(0,0,0,.06);
@@ -46,7 +46,6 @@ header .wrap{
   display:flex; flex-direction: column; align-items: center; justify-content:center;
   padding:10px 0;
 }
-
 /* ブランド */
 .brand{
   display:flex;
@@ -79,36 +78,7 @@ header .wrap{
   .brand__text2_sub{ display:inline; font-size:1.02em; line-height:1.2; font-weight: 700; color:var(--ink); margin-top:0;}
 }
 
-/* ナビ */
-.nav{
-  display:flex; gap:10px;
-  font-size:.9em; justify-content:center;
-  flex-wrap: wrap;
-  font-weight: 700;
-}
-.nav a{
-  padding: 8px 14px;
-  color: var(--ink);
-  border-radius: 999px;
-  transition: background-color .2s, box-shadow .2s, transform .2s;
-  background: rgba(255,215,111,.1); 
-  border: 1px solid rgba(255,215,111,.4);
-  box-shadow: 0 1px 3px rgba(0,0,0,.08);
-  white-space: nowrap;
-}
-.nav a:hover{
-  background: rgba(255,215,111,.2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,.1);
-}
-.nav a.is-active{
-  background: var(--b);
-  color: var(--ink);
-  border-color: var(--b);
-  box-shadow: 0 4px 10px rgba(255,215,111,.5);
-  transform: none;
-}
-
+/* 
 /* ----------------------------------------------------- */
 /* Hero */
 /* ----------------------------------------------------- */
