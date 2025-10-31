@@ -256,6 +256,12 @@
         <button class="card-slot" data-slot="3" role="listitem" aria-label="3枚目を引く" disabled></button>
       </div>
 
+      <div class="reading-grid">
+  <div class="card-back" aria-label="カード1" data-img="/assets/images/tarot_back_1024x1536.jpg?v=1"></div>
+  <div class="card-back" aria-label="カード2" data-img="/assets/images/tarot_back_1024x1536.jpg?v=1"></div>
+  <div class="card-back" aria-label="カード3" data-img="/assets/images/tarot_back_1024x1536.jpg?v=1"></div>
+</div>
+
       <div class="reading-result" hidden>
         <div class="result-grid">
           <div class="result-item">
@@ -627,6 +633,17 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     });
   });
 })();
+</script>
+
+  <script>
+  document.querySelectorAll('.card-back').forEach(el=>{
+    const url = el.getAttribute('data-img');
+    if(url){ el.style.setProperty('--bg', `url("${url}")`); el.style.background='transparent'; el.querySelector?.(':before'); }
+    // Safariでも確実に適用
+    const style = document.createElement('style');
+    style.textContent = `.card-back[data-img="${url}"]::before{background-image:url("${url}")}`;
+    document.head.appendChild(style);
+  });
 </script>
 </body>
   <!-- SVG Sprite (icons) -->
