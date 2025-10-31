@@ -46,6 +46,58 @@ header .wrap{
   display:flex; flex-direction: column; align-items: center; justify-content:center;
   padding:10px 0;
 }
+/* ★★★ ブランド表示（Re:verse Shion 2行化＆ロゴ再配置） ★★★ */
+.brand{
+  display:flex;
+  align-items: center; /* 中央に揃える */
+  justify-content:center;
+  gap:8px; /* ロゴとテキスト間の間隔を調整 */
+  text-align:left;
+  font-weight:700; color:var(--ink);
+  margin-bottom: 8px;
+}
+.brand__logo{
+  /* Re:verse Shionのテキストサイズに合わせて微調整（小さくする） */
+  width:24px; height:24px; 
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #ffd76f 0%, #ffb6ff 40%, #7e66ff 70%);
+  box-shadow:0 0 8px rgba(174,138,255,.3);
+  flex-shrink: 0;
+  margin-top: 0; 
+}
+.brand-text-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+/* 1行目: メインブランド名 */
+.brand__text1{font-size:1.05em; line-height:1.2; font-weight: 700;}
+/* 2行目: サブタイトル統合版（詩韻思想 × TAROT BREAKER） */
+.brand__text2_sub{font-size:.9em; line-height:1.2; font-weight: 500; color:var(--muted); margin-top: 1px;}
+
+/* 不要になった旧3行スタイルを非表示 */
+.brand__text2, .brand__text-sub{ display:none !important; }
+
+/* PC/タブレット（ロゴとテキストを1行に横並び） */
+@media (min-width: 720px) {
+  .brand{
+    align-items: center;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  .brand__logo{ /* PCではロゴを少し大きく戻す */
+    width:34px; height:34px;
+  }
+  .brand-text-group{ /* PCではテキストを元の1行表示に戻す */
+    display: block; 
+  }
+  /* PC時はサブタイトル統合版を非表示にし、元の1行表示に切り替える */
+  .brand__text1{ display:inline; font-size:1.05em; line-height:1.2; margin-top:0;}
+  .brand__text1::after{content:" — ";} /* PC表示ではハイフンを復活 */
+  .brand__text2_sub{ display:inline; font-size:1.02em; line-height:1.2; font-weight: 700; color:var(--ink); margin-top:0;} /* PCではサブタイトルをブランドテキストの続きとして表示 */
+}
+
 /* ブランド */
 .brand{
   display:flex;
