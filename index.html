@@ -1,318 +1,140 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TAROT BREAKER — 願い展開 × 星紋 × 詠唱</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+JP:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --deep:#0b0b1a; --ink:#eceaff; --gold:#ffd76f; --accent:#7e66ff; --r:16px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  min-height:100vh; background: radial-gradient(1200px 500px at 50% -10%, #1e1b38 0%, #0b0b1a 60%, #050510 100%);
-  color:var(--ink); font-family:'Noto Sans JP',sans-serif; line-height:1.85; padding:24px; display:flex; align-items:center; justify-content:center;
-}
-.app{max-width:1024px; width:100%}
-h1{font-family:'Cormorant Garamond',serif; letter-spacing:.04em; color:var(--gold); font-size:clamp(28px,4.2vw,46px); text-align:center}
-.sub{opacity:.75; text-align:center; margin:.25rem 0 1.25rem}
-.panel{
-  position:relative; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
-  border-radius:20px; padding:18px; backdrop-filter: blur(6px); overflow:hidden;
-}
-
-/* 入力行 */
-.wishbar{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:4px 0 10px}
-.wishbar textarea{
-  width:min(720px,100%); min-height:64px; border:1px solid rgba(255,255,255,.2); border-radius:14px;
-  background:rgba(255,255,255,.05); color:#fff; padding:12px 14px; font-size:1rem; outline:none;
-}
-.controls{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:.25rem 0 1rem}
-button{
-  appearance:none; border:none; padding:.82rem 1.5rem; border-radius:999px; font-weight:700; cursor:pointer; transition:.25s;
-  background:var(--accent); color:white; box-shadow:0 6px 20px rgba(126,102,255,.25);
-}
-button.secondary{background:#2a2940}
-button.ghost{background:transparent; border:1px solid rgba(255,255,255,.25)}
-button:hover{transform:translateY(-2px); filter:brightness(1.09)}
-button:disabled{opacity:.5; cursor:not-allowed; transform:none; filter:none}
-
-/* デッキ／カード */
-.deck-area{
-  display:grid; grid-template-columns: repeat(7, minmax(70px, 1fr)); gap:12px; justify-items:center; margin:10px auto; max-width:880px;
-  min-height:230px; position:relative;
-}
-.card{
-  width:120px; height:200px; position:relative; transform-style:preserve-3d; transition:transform 900ms cubic-bezier(.2,.8,.2,1), box-shadow .3s;
-  border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,.45);
-}
-.card.is-mini{width:70px; height:115px; border-radius:10px}
-.card .face{position:absolute; inset:0; backface-visibility:hidden; border-radius:inherit; overflow:hidden}
-.card .front{transform:rotateY(180deg); background:#fff}
-.card .front img{width:100%; height:100%; object-fit:cover}
-.card .back{display:grid; place-items:center; color:var(--gold); letter-spacing:.2em; font-weight:700;
-  background: conic-gradient(from 0deg, #191738, #332d68, #191738);
-}
-.card.flipped{transform:rotateY(180deg)}
-
-/* リーディング */
-.result{
-  margin:16px 0 8px; opacity:0; transform: translateY(6px); transition:.6s;
-  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:16px;
-}
-.result.show{opacity:1; transform:none}
-.result h3{font-family:'Cormorant Garamond',serif; color:var(--gold); font-size:22px; margin-bottom:.25rem}
-.result p{margin:.25rem 0}
-.small{font-size:.92rem; opacity:.85}
-.kicker{font-style:italic; color:#d9d5ff; text-align:center; margin-top:6px}
-.footer-actions{display:flex; gap:10px; justify-content:center; margin-top:10px}
-
-/* 星紋（クリック波紋） */
-.sigil{
-  position:absolute; pointer-events:none; width:12px; height:12px; left:0; top:0; transform:translate(-50%,-50%) scale(1);
-  opacity:.9; filter:drop-shadow(0 0 12px rgba(255,215,111,.6));
-  animation: sigil-expand .9s ease-out forwards;
-}
-@keyframes sigil-expand{
-  0%{transform:translate(-50%,-50%) scale(.2); opacity:.0}
-  10%{opacity:1}
-  70%{opacity:.9}
-  100%{transform:translate(-50%,-50%) scale(18); opacity:0}
-}
-/* 中身はSVG星を使う */
-.sigil svg{display:block; width:100%; height:100%}
-
-/* 詠唱テキスト（スライドイン） */
-#chant{
-  position:absolute; left:0; right:0; bottom:-140px; padding:14px 16px; text-align:center;
-  background: linear-gradient(180deg, rgba(10,8,28,.0), rgba(10,8,28,.55));
-  color:#efeaff; font-family:'Cormorant Garamond',serif; letter-spacing:.04em;
-  transition: transform .85s cubic-bezier(.17,.9,.24,1), opacity .85s; transform: translateY(100px); opacity:0;
-}
-#chant.show{transform: translateY(0px); opacity:1; bottom:0}
-#chant .spell{font-size:clamp(18px,3.2vw,28px)}
-#chant .wish{opacity:.85; font-size:.95rem; margin-top:4px}
-.badge{display:inline-block; border:1px solid rgba(255,215,111,.35); color:var(--gold); padding:.2rem .6rem; border-radius:999px; font-size:.8rem; margin-left:.5rem}
-</style>
+  <meta charset="utf-8" />
+  <title>星詠タロット — 3枚展開（表面出現 / Trinity対応）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b1a" />
+  <!-- 先読み（例：初期3枚） -->
+  <link rel="preload" as="image" href="/assets/images/tarot/majors/00_the_fool.jpg">
+  <link rel="preload" as="image" href="/assets/images/tarot/majors/01_the_magician.jpg">
+  <link rel="preload" as="image" href="/assets/images/tarot/majors/02_the_high_priestess.jpg">
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
+
 <body>
-<div class="app">
-  <h1>TAROT BREAKER<span class="badge">願い展開</span></h1>
-  <p class="sub">願いを言葉に → タロット展開 → 星紋（タップ波紋） → 3枚自動オープン → 詠唱スライドイン → クローズ／リセット</p>
+  <main class="wrap">
+    <header class="page-head">
+      <h1>星詠 3枚リーディング</h1>
+      <p class="lead">願いをひと言にして、「タロット展開」を押してね。光と音の中から、<strong>表面</strong>で3枚が現れるよ。</p>
+    </header>
 
-  <div class="panel" id="panel">
     <!-- 願い入力 -->
-    <div class="wishbar">
-      <textarea id="wish" placeholder="例：心の平穏が欲しい… 愛する人との絆を深めたい…"></textarea>
-    </div>
+    <section class="wish-form">
+      <label for="wish" class="sr-only">あなたの願い</label>
+      <input id="wish" type="text" inputmode="text" placeholder="例）あの人との関係を前に進めたい">
+      <button id="shuffle-btn" class="btn btn--primary">🔮 タロット展開</button>
+    </section>
 
-    <!-- 操作 -->
-    <div class="controls">
-      <button id="btnStart">タロット展開</button>
-      <button id="btnStop" class="secondary" disabled>止める</button>
-      <button id="btnClose" class="ghost" style="display:none">タロットクローズ</button>
-      <button id="btnReset" class="ghost" style="display:none">リセット</button>
-    </div>
-
-    <!-- デッキ／結果 -->
-    <div id="deckArea" class="deck-area"></div>
-
-    <div id="result" class="result">
-      <h3>リーディング結果</h3>
-      <div id="reading"></div>
-      <p id="poem" class="kicker small"></p>
-      <div class="footer-actions">
-        <button id="btnClose2" class="ghost" style="display:none">タロットクローズ</button>
-        <button id="btnReset2" class="ghost" style="display:none">リセット</button>
+    <!-- デッキ -->
+    <section id="wish-reading">
+      <div class="wish-deck" id="deck" aria-live="polite">
+        <!-- 表面画像は --face-url で差し替え可能 -->
+        <div class="tarot-card" style="--face-url:url('/assets/images/tarot/majors/00_the_fool.jpg')"></div>
+        <div class="tarot-card" style="--face-url:url('/assets/images/tarot/majors/01_the_magician.jpg')"></div>
+        <div class="tarot-card" style="--face-url:url('/assets/images/tarot/majors/02_the_high_priestess.jpg')"></div>
       </div>
-    </div>
 
-    <!-- 詠唱（スライドイン） -->
-    <div id="chant">
-      <div class="spell">言の葉は鍵、星の光は道しるべ。ステラン、ステラン、ステラン――来臨せよ、汝――シオリエル！</div>
-      <div class="wish" id="chantWish"></div>
-    </div>
-  </div>
-</div>
+      <!-- 結果：Trinity明示（詩・韻・祈） -->
+      <div id="wishResult" class="result-grid">
+        <div class="result-item" data-trinity="詩｜Poem（現在）">
+          <h3 class="item-title">—</h3>
+          <p class="item-text">カードを展開すると自動で入ります。</p>
+        </div>
+        <div class="result-item" data-trinity="韻｜Rhyme（鍵）">
+          <h3 class="item-title">—</h3>
+          <p class="item-text">カードを展開すると自動で入ります。</p>
+        </div>
+        <div class="result-item" data-trinity="祈｜Prayer（進む道）">
+          <h3 class="item-title">—</h3>
+          <p class="item-text">カードを展開すると自動で入ります。</p>
+        </div>
+      </div>
 
-<!-- BGM（ユーザー操作後に再生） -->
-<audio id="bgm" preload="auto" loop>
-  <source src="https://cdn.freesound.org/previews/620/620413_5674468-lq.mp3" type="audio/mpeg">
-</audio>
+      <!-- 閉じの言葉（願いの織り込み） -->
+      <p class="closing">タロットクローズ。<strong>大丈夫だよ。</strong></p>
 
-<script>
-/* =============== デッキ定義（デモ） ===============
-   本番は majorArcana + minorArcana を差し替え、
-   const fullDeck = [...majorArcana, ...minorArcana]; にしてください。
-*/
-const majorArcana = [
-  { name:"0. 愚者", img:"https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_00_Fool.jpg?width=400", meaning:"無限の旅立ち、純粋な一歩", poem:"最初の息は、沈黙の淵から飛び立つ" },
-  { name:"I. 魔術師", img:"https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_01_Magician.jpg?width=400", meaning:"意志の力、言葉の創造", poem:"構文は世界を形作り、魂を動かす" },
-  { name:"II. 女教皇", img:"https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_02_High_Priestess.jpg?width=400", meaning:"内なる声、沈黙の叡智", poem:"静寂の奥に、星の言葉が宿る" },
-  { name:"III. 女帝", img:"https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_03_Empress.jpg?width=400", meaning:"豊穣、母なる愛", poem:"大地は希望を抱き、命を紡ぐ" },
-  { name:"IV. 皇帝", img:"https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_04_Emperor.jpg?width=400", meaning:"秩序、確かな礎", poem:"骨組みは祈りを支え、光を導く" },
-];
-// 本番：const fullDeck = [...majorArcana, ...minorArcana];
-const fullDeck = [...majorArcana]; // デモ用
+      <!-- CTA（遅延フェード） -->
+      <div id="cta" class="cta" hidden>
+        <a class="btn cta-glow" href="https://lin.ee/your-line" target="_blank" rel="noopener">✨ 毎週の星詠をLINEで受け取る</a>
+        <p class="cta-note">光は巡り、言葉は祈りへ帰る。あなたの願いも、ちゃんと届く。</p>
+      </div>
+    </section>
+  </main>
 
-/* =============== util =============== */
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function sample3(deck){ return shuffle([...deck]).slice(0,3); }
+  <!-- 小さなチャイムSE（非ループ） -->
+  <audio id="chime" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-appear-1122.mp3" type="audio/mpeg">
+  </audio>
 
-/* =============== 要素参照 =============== */
-const panel = document.getElementById('panel');
-const deckArea = document.getElementById('deckArea');
-const btnStart = document.getElementById('btnStart');
-const btnStop  = document.getElementById('btnStop');
-const btnClose = document.getElementById('btnClose');
-const btnReset = document.getElementById('btnReset');
-const btnClose2= document.getElementById('btnClose2');
-const btnReset2= document.getElementById('btnReset2');
-const resultEl = document.getElementById('result');
-const readingEl= document.getElementById('reading');
-const poemEl   = document.getElementById('poem');
-const wishEl   = document.getElementById('wish');
-const chantEl  = document.getElementById('chant');
-const chantWish= document.getElementById('chantWish');
-const bgm      = document.getElementById('bgm');
+  <script>
+  // ===== 星詠：表面で現れる + Trinity + 願い織り込み + チャイムSE =====
+  (function(){
+    const btn = document.getElementById('shuffle-btn');
+    const wishInput = document.getElementById('wish');
+    const cards = Array.from(document.querySelectorAll('.tarot-card'));
+    const resultTitleEls = Array.from(document.querySelectorAll('.item-title'));
+    const resultTextEls  = Array.from(document.querySelectorAll('.item-text'));
+    const closing = document.querySelector('.closing');
+    const cta = document.getElementById('cta');
+    const chime = document.getElementById('chime');
 
-let shuffleTimer=null, state='idle', bgmPrimed=false;
+    // デモ用の3枚（フル78枚対応は fullDeck を差し替え）
+    const names = ["The Fool","The Magician","The High Priestess"];
+    const lines = [
+      "今は“はじまり”の呼吸。肩の力を抜いて、まず一歩。",
+      "意志を一点に集めて。道具は手の中に揃っている。",
+      "静かな直感を信じる。言葉の前に、心のささやき。"
+    ];
 
-/* =============== 星紋（タップ波紋） =============== */
-function spawnSigil(x,y){
-  const span = document.createElement('span');
-  span.className = 'sigil';
-  // 8点星の簡易SVG（strokeで光）
-  span.innerHTML = `
-    <svg viewBox="0 0 100 100" aria-hidden="true">
-      <g fill="none" stroke="rgba(255,215,111,.9)" stroke-width="2">
-        <path d="M50 10 L50 90 M10 50 L90 50 M22 22 L78 78 M78 22 L22 78"/>
-        <circle cx="50" cy="50" r="10" stroke-width="1.5" />
-      </g>
-    </svg>`;
-  span.style.left = x + 'px';
-  span.style.top  = y + 'px';
-  panel.appendChild(span);
-  span.addEventListener('animationend',()=> span.remove());
-}
-// パネル内をタップしたときに発生
-panel.addEventListener('pointerdown', (e)=>{
-  const rect = panel.getBoundingClientRect();
-  spawnSigil(e.clientX - rect.left, e.clientY - rect.top);
-});
+    function safePlay(audio){
+      try{ audio.currentTime = 0; audio.volume = 0.35; audio.play().catch(()=>{}); }
+      catch(e){}
+    }
 
-/* =============== カードDOM =============== */
-function cardNode(card, mini=false){
-  const d = document.createElement('div');
-  d.className = 'card' + (mini ? ' is-mini' : '');
-  d.innerHTML = `
-    <div class="face front"><img src="${card.img}" loading="lazy" alt="${card.name}"></div>
-    <div class="face back">✶</div>
-  `;
-  return d;
-}
+    function appearSequence() {
+      // 連打対策
+      btn.disabled = true;
+      btn.textContent = "✨ 星詠展開中…";
+      cta.hidden = true; cta.classList.remove('is-show');
 
-/* =============== シャッフル表示 =============== */
-function renderShuffleGrid(){
-  deckArea.innerHTML = '';
-  const view = sample3(fullDeck).concat(sample3(fullDeck), sample3(fullDeck), sample3(fullDeck).slice(0,5));
-  view.forEach(c => deckArea.appendChild(cardNode(c, true)));
-}
-function startShuffle(){
-  const wish = (wishEl.value || '').trim();
-  if (!wish){ alert('まず「願い」を言葉にしてね'); wishEl.focus(); return; }
+      // 初期化（再実行時もキレイに）
+      cards.forEach(c => c.classList.remove('show','pulse'));
+      resultTitleEls.forEach(el => el.textContent = "—");
+      resultTextEls.forEach(el => el.textContent  = "カードを展開すると自動で入ります。");
 
-  // 初回だけBGM prime
-  if (!bgmPrimed){
-    bgm.volume = 0.0;
-    bgm.play().then(()=>{
-      bgmPrimed = true;
-      let v = 0.0;
-      const t = setInterval(()=>{ v += 0.05; bgm.volume = Math.min(0.35, v); if (v>=0.35) clearInterval(t); }, 120);
-    }).catch(()=>{});
-  }
+      // 願いの文
+      const wishText = (wishInput.value || "あなたの魂").trim();
 
-  state='shuffling';
-  btnStart.disabled = true; btnStop.disabled = false;
-  btnClose.style.display='none'; btnReset.style.display='none';
-  resultEl.classList.remove('show'); chantEl.classList.remove('show');
+      // 0.45秒刻みで順に出現＋チャイム
+      cards.forEach((card, i) => {
+        setTimeout(() => {
+          safePlay(chime);
+          card.classList.add('show');
+          setTimeout(() => card.classList.add('pulse'), 120);
 
-  deckArea.innerHTML = '';
+          // 結果欄に反映
+          if (resultTitleEls[i]) resultTitleEls[i].textContent = names[i] || "—";
+          if (resultTextEls[i])  resultTextEls[i].textContent  = lines[i] || "";
+        }, i * 450);
+      });
 
-  // 🌟 円状配置でシャッフル開始
-  const tempDeck = shuffle([...fullDeck]);
-  const total = Math.min(tempDeck.length, 22); // 表示は22枚くらいで十分
-  const radius = 150; // 円の半径
-  const centerX = 0, centerY = 0;
+      // 願いの織り込み（最後の出現後）
+      setTimeout(() => {
+        closing.innerHTML = `「${wishText}」は、<em>${names[2]}</em> へと響き、やがて光となる。<br>タロットクローズ。<strong>大丈夫だよ。</strong>`;
+        btn.disabled = false;
+        btn.textContent = "🔮 タロット展開";
+        // CTA遅延フェード
+        setTimeout(() => { cta.hidden = false; requestAnimationFrame(()=> cta.classList.add('is-show')); }, 600);
+      }, (cards.length - 1) * 450 + 500);
+    }
 
-  for(let i=0; i<total; i++){
-    const c = tempDeck[i];
-    const card = cardNode(c,true);
-    const angle = (i / total) * 2 * Math.PI;
-    const x = Math.cos(angle) * radius;
-    const y = Math.sin(angle) * radius;
-    card.style.position = 'absolute';
-    card.style.left = `calc(50% + ${x}px)`;
-    card.style.top  = `calc(50% + ${y}px)`;
-    card.style.transform = `rotate(${angle}rad)`;
-    deckArea.appendChild(card);
-  }
+    btn.addEventListener('click', appearSequence);
 
-  // 回転アニメーション
-  let rot = 0;
-  shuffleTimer = setInterval(()=>{
-    rot += 5; // 回転速度
-    deckArea.style.transform = `rotate(${rot}deg)`;
-  }, 60);
-}
-/* =============== リーディング＋詠唱 =============== */
-function showReading(cards){
-  const [a,b,c] = cards;
-  const wish = (wishEl.value || 'あなたの魂').trim();
-
-  readingEl.innerHTML = `
-    <p><strong>① 詩 — 形を与える：</strong> ${a.name}／${a.meaning}</p>
-    <p><strong>② 韻 — 響きを重ねる：</strong> ${b.name}／${b.meaning}</p>
-    <p><strong>③ 祈 — 光へ帰す：</strong> <strong>${c.name}</strong>／${c.meaning}</p>
-    <p class="small" style="margin-top:.5rem">展開の物語：${a.poem} → ${b.poem} → <strong>${c.poem}</strong></p>
-  `;
-  poemEl.textContent = '「タロットクローズ」— 道は開かれた。大丈夫だよ。';
-
-  // 詠唱のスライドイン（願いを差し込む）
-  chantWish.textContent = `── 願い：「${wish}」`;
-  resultEl.classList.add('show');
-  setTimeout(()=> chantEl.classList.add('show'), 250);
-}
-
-/* =============== クローズ／リセット =============== */
-function tarotClose(){
-  if (state!=='revealed') return;
-  resultEl.classList.remove('show');
-  chantEl.classList.remove('show');
-  state='closed';
-}
-function resetAll(){
-  if (shuffleTimer){ clearInterval(shuffleTimer); shuffleTimer=null; }
-  deckArea.innerHTML='';
-  readingEl.innerHTML=''; poemEl.textContent='';
-  chantEl.classList.remove('show');
-  btnStart.disabled=false; btnStop.disabled=true;
-  btnClose.style.display='none'; btnReset.style.display='none';
-  btnClose2.style.display='none'; btnReset2.style.display='none';
-  state='idle';
-}
-
-/* =============== イベント =============== */
-btnStart.addEventListener('click', startShuffle);
-btnStop .addEventListener('click', stopShuffleAndReveal);
-btnClose.addEventListener('click', tarotClose);
-btnClose2.addEventListener('click', tarotClose);
-btnReset.addEventListener('click', resetAll);
-btnReset2.addEventListener('click', resetAll);
-
-// 軽いプリロード（flip直後の白抜け防止）
-(function preloadFew(){ fullDeck.slice(0,6).forEach(c=>{ const i=new Image(); i.src=c.img; }); })();
-</script>
+    // ===== 将来拡張：フル78枚
+    // const fullDeck = [{name:"The Fool", img:"/path", poem:"..."}, ...];
+    // 関数で3枚抽選して --face-url と結果を更新するだけでOK
+  })();
+  </script>
 </body>
 </html>
