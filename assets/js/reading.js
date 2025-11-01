@@ -1,17 +1,29 @@
-/* Re:verse Shion — 3-card Reading (flip + ripple + sound + shuffle) */
+/* Re:verse Shion — 3-card Reading (flip + star + sound) */
 (() => {
-  const $ = (sel, el = document) => el.querySelector(sel);
-  const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
+  // ⭐ タップ時の星紋
+  function createStarSymbol(target){
+    const star = document.createElement('div');
+    star.className = 'star-symbol';
+    target.appendChild(star);
+    star.animate(
+      [{ transform:'scale(0)', opacity:1 }, { transform:'scale(1.5)', opacity:0 }],
+      { duration: 800, easing: 'ease-out' }
+    );
+    setTimeout(() => star.remove(), 800);
+  }
 
-  const startBtn = $('#wishStart');
-  const resetBtn = $('#wishReset');
-  const deck = $('.wish-deck');
-  const cards = $$('.tarot-card', deck);
-  const ripple = $('#rippleCanvas');
-  const resultBox = $('#wishResult');
+  // 小ユーティリティ
+  const $  = (sel, el=document) => el.querySelector(sel);
+  const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
 
-  if (!startBtn || !resetBtn || !deck || !cards.length || !ripple) return;
+  // ✅ HTMLの実体に合わせた名前へ統一
+  const startBtn  = $('#readingStart');
+  const resetBtn  = $('#readingReset');
+  const deck      = $('#miniDeck');           // ← 親ラッパにidを付けておくと便利（任意）
+  const slots     = $$('.card-slot', deck);   // ← 3枚の「置き場」
+  const resultBox = $('#readingResult');
 
+  if (!startBtn || !resetBtn || !deck || !slots.length || !resultBox) return;
   /* --- Rider-Waite データ（表面画像＆詩鍵）--- */
   const CARD_SET = [
     { id:'00_fool',       name:'愚者',       key:['枠を超える','はじめの一歩','風を信じる'] },
