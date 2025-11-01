@@ -283,6 +283,61 @@
     </div>
   </section>
 
+  <section id="ritual" aria-labelledby="ritualTitle">
+  <div class="wrap ritual">
+    <h2 id="ritualTitle">🌌 星詠リチュアル（1分）</h2>
+    <p class="h2-sub">小さな儀式で心を整える。— 詩（形）・韻（響）・祈（還り）</p>
+
+    <!-- 星界の扉 / 背景レイヤ -->
+    <div class="ritual__stage" aria-hidden="true">
+      <canvas id="ritualStars" class="ritual__stars"></canvas>
+      <video id="ritualBg" class="ritual__bg" playsinline muted loop preload="metadata"
+             poster="/assets/ritual/poster.jpg">
+        <source src="/assets/ritual/bg.webm" type="video/webm">
+        <source src="/assets/ritual/bg.mp4"  type="video/mp4">
+      </video>
+      <div class="ritual__veil"></div>
+    </div>
+
+    <!-- コントロール -->
+    <div class="ritual__controls" role="group" aria-label="星詠の操作">
+      <button id="ritualOpen" class="btn btn--primary">⭐ 星詠をはじめる</button>
+      <button id="ritualReset" class="btn btn--ghost" disabled>リセット</button>
+      <button id="ritualAudio" class="btn btn--ghost" aria-pressed="false">🔈 音をオン</button>
+    </div>
+
+    <!-- 三枠（タロブレ式） -->
+    <div class="ritual__grid" role="list">
+      <button class="ritual-card" data-slot="compass" role="listitem" aria-label="コンパスをめくる">
+        <span class="ritual-card__rubric">コンパス</span>
+        <span class="ritual-card__face"></span>
+      </button>
+      <button class="ritual-card" data-slot="trigger" role="listitem" aria-label="トリガーをめくる">
+        <span class="ritual-card__rubric">トリガー</span>
+        <span class="ritual-card__face"></span>
+      </button>
+      <button class="ritual-card" data-slot="route" role="listitem" aria-label="ルートをめくる">
+        <span class="ritual-card__rubric">ルート</span>
+        <span class="ritual-card__face"></span>
+      </button>
+    </div>
+
+    <!-- 詩韻構文（自動生成） -->
+    <div class="ritual__poem" aria-live="polite" aria-atomic="true" hidden>
+      <h3 class="ritual__poem-title">🪶 星詠 — 詩・韻・祈</h3>
+      <p class="ritual__poem-line" data-kind="poem"></p>
+      <p class="ritual__poem-line" data-kind="rhyme"></p>
+      <p class="ritual__poem-line" data-kind="prayer"></p>
+      <div class="cta-row">
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">今日の“一歩”をLINEで受け取る</a>
+        <button id="ritualShare" class="btn btn--ghost">画像で保存 / 共有</button>
+      </div>
+    </div>
+
+    <p class="ritual__closing" hidden>タロットクローズ──大丈夫だよ。</p>
+  </div>
+</section>
+
   <!-- Join -->
   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
     <div class="wrap">
