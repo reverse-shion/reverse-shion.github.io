@@ -1,9 +1,9 @@
 /* -----------------------------------------------------
-   Re:verse Shion — 神域デザイン Pro Edition (2025-11-01)
+   Re:verse Shion — 神域デザイン Pro Edition (2025-10-31)
    Author: Shiopon
    ----------------------------------------------------- */
 
-/* ===== Root & Base ===== */
+/* ===== Root & Base (変更なし) ===== */
 :root{
   --ink:#20202a;
   --muted:#636377;
@@ -45,7 +45,7 @@ img{ height:auto; max-width: 100%; display:block }
 .sr-only{ position:absolute!important; left:-9999px; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap }
 :focus-visible{ outline:2px solid rgba(255,215,111,.9); outline-offset:2px }
 
-/* ===== Header ===== */
+/* ===== Header (変更なし) ===== */
 header[role="banner"]{
   position: sticky; top:0; z-index: 1000;
   min-height: var(--header-h);
@@ -67,8 +67,6 @@ header .wrap{
   display:flex; flex-direction: column; align-items: center; justify-content:center;
   padding:10px 0;
 }
-
-/* Brand */
 .brand{
   display:flex; align-items: center; justify-content:center; gap:10px;
   text-align:left; font-weight:700; color:var(--ink); margin-bottom: 8px;
@@ -92,8 +90,6 @@ header .wrap{
   .brand__text1::after{ content:" — " }
   .brand__text2_sub{ display:inline; color:var(--ink) }
 }
-
-/* Nav */
 .nav{
   display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
   font-size:.92em; font-weight:800;
@@ -112,7 +108,7 @@ header .wrap{
   box-shadow: 0 4px 12px rgba(255,215,111,.45);
 }
 
-/* ===== Hero ===== */
+/* ===== Hero (変更なし) ===== */
 .hero{ padding:110px 0 84px; position:relative; overflow:hidden; text-align:center }
 .hero__media{ position:absolute; inset:0; z-index:0; overflow:hidden }
 .hero__video{
@@ -166,7 +162,7 @@ header .wrap{
 .btn--ghost:hover{ transform: translateY(-1px); background: rgba(0,0,0,.5) }
 .hero__image{ display:none }
 
-/* ===== Sections ===== */
+/* ===== Sections (変更なし) ===== */
 section{
   padding:64px 0; border-top:1px solid rgba(0,0,0,.05);
 }
@@ -208,13 +204,14 @@ h2{ text-align:center; font-size: clamp(20px, 3.4vw, 24px); margin:0 0 10px }
   width:100%; aspect-ratio:21/13.5; display:block; object-fit:cover; object-position:50% 50%;
   cursor:pointer; position:relative;
 }
-/* モバイルでも確実に見えるヒント（最初の1回だけ） */
-.trinity__video[data-hint="1"]::after{
+.trinity__video::after{
   content:"タップで音声ON / もう一度で停止";
   position:absolute; inset:auto 12px 12px auto; padding:6px 10px; border-radius:999px;
   font-size:12px; font-weight:800; background:rgba(0,0,0,.46); color:#fff;
   border:1px solid rgba(255,215,111,.55); backdrop-filter: blur(4px);
+  opacity:0; transform: translateY(4px); transition: opacity .25s, transform .25s; pointer-events:none;
 }
+.trinity__video:hover::after, .trinity__video:focus-visible::after{ opacity:1; transform: translateY(0) }
 .trinity__actions{ text-align:center; margin-top:8px }
 
 /* Intro / Cards */
@@ -233,7 +230,7 @@ h2{ text-align:center; font-size: clamp(20px, 3.4vw, 24px); margin:0 0 10px }
   padding:2px 8px; border-radius: 999px; font-size:12px; font-weight:800;
 }
 
-/* ===== Codex Accordion ===== */
+/* ===== Codex Accordion (変更なし) ===== */
 .codex{ width:min(94vw,1120px); margin:0 auto }
 .codex details{
   border:1px solid rgba(0,0,0,.08); border-radius:14px; background:#fff; overflow:hidden;
@@ -285,7 +282,7 @@ details[open] .codex__caret{ transform: rotate(180deg) }
 .badge--zero{ background:rgba(110,180,255,.18); border-color:rgba(110,180,255,.38) }
 .badge--final{ background:rgba(174,138,255,.20); border-color:rgba(174,138,255,.40) }
 
-/* ===== Footer ===== */
+/* ===== Footer (変更なし) ===== */
 footer{
   padding:40px 0; color:var(--muted); font-size:13px; text-align:center;
   border-top:1px solid rgba(0,0,0,.05)
@@ -293,13 +290,13 @@ footer{
 .sns{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:10px }
 .sns a{ padding:8px 12px; background:rgba(255,215,111,.12); border-radius:999px; color:#503080 }
 
-/* ===== Star Sand Particles ===== */
+/* ===== Star Sand Particles (変更なし) ===== */
 .sky{ position:fixed; inset:0; z-index:0; pointer-events:none; filter:saturate(105%) }
 #goldDust{ width:100%; height:100%; display:block }
 header, .hero, section, footer{ position:relative; z-index:1 }
 @media (prefers-reduced-motion: reduce){ .sky{ display:none } }
 
-/* ===== Shiopon Widget ===== */
+/* ===== Shiopon Widget (変更なし) ===== */
 .shiopon{
   position: fixed;
   right: calc(16px + env(safe-area-inset-right, 0px));
@@ -354,7 +351,7 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   font-size:16px; line-height:1; z-index:10;
 }
 
-/* Dark mode specifics */
+/* Dark mode specifics (変更なし) */
 @media (prefers-color-scheme: dark){
   header[role="banner"]{ background: rgba(16,16,24,.62); border-bottom-color: rgba(255,255,255,.06) }
   .tri, .card, .intro__box, .codex details, .shiopon__bubble, .modal__panel{
@@ -373,7 +370,7 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 #shiopon-invite.shiopon{ position:fixed !important; z-index:1060 !important }
 #shiopon-dock.shiopon-dock{ position:fixed !important; z-index:1059 !important }
 
-/* ===== Tarot Preview Modal ===== */
+/* ===== Tarot Preview Modal (変更なし) ===== */
 .modal{position:fixed;inset:0;z-index:1000;display:none}
 .modal[aria-hidden="false"]{display:block}
 .modal__overlay{position:absolute;inset:0;background:rgba(5,5,15,.6);backdrop-filter:blur(6px);animation:fadeIn .18s ease}
@@ -395,9 +392,12 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 @keyframes rise{from{transform:translateY(6px);opacity:.0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* ===== Mini Reading UI ===== */
-#mini-reading{border-top:1px solid rgba(0,0,0,.05)}
-.reading-ui{margin-top:10px}
+/* ===== Mini Reading UI (更新) ===== */
+#mini-reading{ position:relative; overflow:hidden; border-top:1px solid rgba(0,0,0,.05); }
+.reading-ui{
+  margin-top:10px;
+  position:relative; /* Canvas配置の基準 */
+}
 .reading-actions{display:flex;gap:10px;justify-content:center;margin-bottom:12px}
 
 .reading-deck{
@@ -407,92 +407,112 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   max-width:720px;
   margin:0 auto;
   justify-items:center;
+  perspective: 1200px; /* 3Dフリップの基準 */
+}
+.card-wrap{
+  display:flex; flex-direction:column; align-items:center; gap:8px;
 }
 
-/* 開始前は無地（JSで開始後に裏面適用） */
 .card-slot{
   width: 120px;
   aspect-ratio: 2 / 3;
   border:1px solid rgba(0,0,0,.08);
   border-radius:16px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.95)),
-    radial-gradient(100% 100% at 50% 0%, rgba(255,215,111,.18),rgba(174,138,255,.15));
+  background-color: transparent; /* 背景画像を使用するため */
   box-shadow:0 8px 24px rgba(174,138,255,.16);
   cursor:not-allowed;
-  transition:transform .15s, box-shadow .15s, filter .15s, background-image .2s ease;
   position:relative; overflow:hidden;
-  text-align:center; display:flex; align-items:center; justify-content:center; padding:8px;
-  font-family: "Noto Sans JP", system-ui, sans-serif;
+  
+  /* フリップアニメーション用 */
+  transform-style: preserve-3d;
+  transition: transform .62s cubic-bezier(.22,.72,.18,1.05), box-shadow .2s;
+  
+  /* カード表面のコンテンツを隠す */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0;
+  
+  /* 裏面（初期状態） */
+  background-image:url('/assets/images/tarot/tarot_back_1024x1536.jpg'); /* 共通の裏面画像 */
+  background-size:cover; background-position:center;
 }
-.card-slot[aria-pressed="true"]{filter:saturate(110%)}
 .card-slot:enabled{cursor:pointer}
-.card-slot:enabled:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(174,138,255,.22)}
-.card-slot::after{
-  content:"TAP"; position:absolute; inset:auto 10px 10px auto; font-weight:800; font-size:12px;
-  color:#503080; background:rgba(255,215,111,.25); border:1px solid rgba(255,215,111,.45); padding:3px 8px; border-radius:999px;
-  opacity:0; transition:opacity .15s;
-}
-.card-slot:enabled:hover::after{opacity:1}
+.card-slot:enabled:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 14px 32px rgba(174,138,255,.22)}
 
-/* 裏面を“必ず”表示する専用クラス（グラデ潰し対策済） */
-.card-slot.is-back{
-  background: none !important;
-  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg?v=3') !important;
-  background-size: cover !important;
-  background-position: 50% 50% !important;
-  background-repeat: no-repeat !important;
-  color: transparent !important;
-  text-shadow: none !important;
-}
-
-/* 表になった時の文字見栄え */
 .card-slot.is-picked{
-  background:#fff !important;
-  color:#2a1030 !important;
-  text-shadow:none !important;
+  /* 表面にフリップ */
+  transform:rotateY(180deg);
+  background-image:url('/assets/images/tarot/face_generic.jpg'); /* 汎用的な表面画像（テキストはJSでキャプションに表示） */
+  background-size:cover; background-position:center;
+  box-shadow:0 18px 46px rgba(126,102,255,.25);
+  cursor:default;
 }
 
+/* カードの裏側 (フリップの反対側) */
+.card-slot::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: transparent;
+  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg'); /* 裏面画像 */
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  backface-visibility: hidden; /* 裏側にある時は見えない */
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+/* カードの表側 (フリップ後) */
+.card-slot::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/images/tarot/face_generic.jpg'); /* 汎用表面画像 */
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  backface-visibility: hidden; /* 裏側にある時は見えない */
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+/* 星環バーストアニメーション */
+.card-slot::before, .card-slot::after { transition: none; }
+.card-slot.is-burst::before, .card-slot.is-burst::after {
+  animation: cardAuraPulse 2.4s ease-in-out infinite alternate;
+}
+@keyframes cardAuraPulse {
+  0%{ box-shadow:0 12px 28px rgba(126,102,255,.2) }
+  50%{ box-shadow:0 18px 46px rgba(126,102,255,.35) }
+  100%{ box-shadow:0 12px 28px rgba(126,102,255,.2) }
+}
+
+
+.card-caption{
+  font-family:"Zen Old Mincho","Noto Sans JP",serif;
+  font-weight:700; letter-spacing:.04em;
+  font-size:clamp(15px,1.9vw,17px);
+  color:#2a1030; text-shadow:0 0 1px rgba(255,255,255,.4);
+  opacity:0; transform:translateY(8px);
+  transition:opacity .25s ease, transform .25s ease;
+  min-height: 1.5em; /* レイアウト崩れ防止 */
+}
+.card-caption.is-show{ opacity:1; transform:translateY(0) }
+
+/* 星環波紋 Canvas */
+.cosmic-ripple{
+  position:absolute; inset:0; pointer-events:none; z-index:2;
+  filter:saturate(120%) brightness(1.05);
+  mix-blend-mode:screen;
+  opacity:0; /* JSでアニメーション開始時に1にする */
+  transition: opacity 0.3s ease-out;
+}
+
+/* 結果 */
 .result-grid{display:grid;gap:12px;max-width:980px;margin:16px auto 0}
 @media(min-width:720px){.result-grid{grid-template-columns:repeat(3,1fr)}}
 .result-item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
-.result-item .r-title{margin:.2em 0 .2em;font-size:17px;color:#2a1030}
+.result-item .r-title{margin:.2em 0;font-size:17px;color:#2a1030}
 .result-item .r-text{margin:0;color:#555;line-height:1.7}
-
-/* タロット詳細カード用（任意セクションで使う場合） */
-.tarot-card {
-  background: #ffffff;
-  border: 1px solid #ECE8F7;
-  border-radius: 16px;
-  padding: 16px 18px;
-  box-shadow: 0 4px 16px rgba(29, 15, 51, 0.06);
-}
-.tarot-card .card-title {
-  font-weight: 700;
-  color: #1D0F33;
-  letter-spacing: .02em;
-  line-height: 1.35;
-  font-size: clamp(18px, 4.6vw, 22px);
-  margin: 4px 0 6px;
-}
-.tarot-card .card-vertical {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-weight: 600;
-  color: #20103E;
-  letter-spacing: .06em;
-  line-height: 1.9;
-  font-size: clamp(16px, 4.2vw, 19px);
-}
-.tarot-card .card-desc {
-  font-weight: 500;
-  color: #2A1A4A;
-  line-height: 1.85;
-  letter-spacing: .01em;
-  font-size: clamp(15px, 4.2vw, 17px);
-}
-@media (prefers-contrast: more) {
-  .tarot-card .card-title,
-  .tarot-card .card-vertical,
-  .tarot-card .card-desc { color: #140A26; }
-}
