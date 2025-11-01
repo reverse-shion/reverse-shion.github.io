@@ -1,5 +1,5 @@
 /* -----------------------------------------------------
-   Re:verse Shion — 神域デザイン Pro Edition (2025-10-31)
+   Re:verse Shion — 神域デザイン Pro Edition (2025-11-01)
    Author: Shiopon
    ----------------------------------------------------- */
 
@@ -208,14 +208,13 @@ h2{ text-align:center; font-size: clamp(20px, 3.4vw, 24px); margin:0 0 10px }
   width:100%; aspect-ratio:21/13.5; display:block; object-fit:cover; object-position:50% 50%;
   cursor:pointer; position:relative;
 }
-.trinity__video::after{
+/* モバイルでも確実に見えるヒント（最初の1回だけ） */
+.trinity__video[data-hint="1"]::after{
   content:"タップで音声ON / もう一度で停止";
   position:absolute; inset:auto 12px 12px auto; padding:6px 10px; border-radius:999px;
   font-size:12px; font-weight:800; background:rgba(0,0,0,.46); color:#fff;
   border:1px solid rgba(255,215,111,.55); backdrop-filter: blur(4px);
-  opacity:0; transform: translateY(4px); transition: opacity .25s, transform .25s; pointer-events:none;
 }
-.trinity__video:hover::after, .trinity__video:focus-visible::after{ opacity:1; transform: translateY(0) }
 .trinity__actions{ text-align:center; margin-top:8px }
 
 /* Intro / Cards */
@@ -396,8 +395,6 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 @keyframes rise{from{transform:translateY(6px);opacity:.0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-
-
 /* ===== Mini Reading UI ===== */
 #mini-reading{border-top:1px solid rgba(0,0,0,.05)}
 .reading-ui{margin-top:10px}
@@ -412,106 +409,57 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   justify-items:center;
 }
 
-/* カード本体：画像のみ表示（テキストは入れない） */
+/* 開始前は無地（JSで開始後に裏面適用） */
 .card-slot{
   width: 120px;
   aspect-ratio: 2 / 3;
   border:1px solid rgba(0,0,0,.08);
   border-radius:16px;
-  background:#fff;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.95)),
+    radial-gradient(100% 100% at 50% 0%, rgba(255,215,111,.18),rgba(174,138,255,.15));
   box-shadow:0 8px 24px rgba(174,138,255,.16);
   cursor:not-allowed;
   transition:transform .15s, box-shadow .15s, filter .15s, background-image .2s ease;
   position:relative; overflow:hidden;
+  text-align:center; display:flex; align-items:center; justify-content:center; padding:8px;
+  font-family: "Noto Sans JP", system-ui, sans-serif;
 }
+.card-slot[aria-pressed="true"]{filter:saturate(110%)}
 .card-slot:enabled{cursor:pointer}
 .card-slot:enabled:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(174,138,255,.22)}
-.card-slot[aria-pressed="true"]{filter:saturate(110%)}
+.card-slot::after{
+  content:"TAP"; position:absolute; inset:auto 10px 10px auto; font-weight:800; font-size:12px;
+  color:#503080; background:rgba(255,215,111,.25); border:1px solid rgba(255,215,111,.45); padding:3px 8px; border-radius:999px;
+  opacity:0; transition:opacity .15s;
+}
+.card-slot:enabled:hover::after{opacity:1}
 
-/* 裏面：共通画像を載せるためのクラス（JSで付与/削除） */
+/* 裏面を“必ず”表示する専用クラス（グラデ潰し対策済） */
 .card-slot.is-back{
-  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg');
-  background-size: cover;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  color: transparent;
+  background: none !important;
+  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg?v=3') !important;
+  background-size: cover !important;
+  background-position: 50% 50% !important;
+  background-repeat: no-repeat !important;
+  color: transparent !important;
+  text-shadow: none !important;
 }
-/* 表になった時の見え方（画像のみ。文字は枠下に出す） */
+
+/* 表になった時の文字見栄え */
 .card-slot.is-picked{
-  background-color:#fff;
+  background:#fff !important;
+  color:#2a1030 !important;
+  text-shadow:none !important;
 }
 
-/* カード名（枠下） */
-.reading-names{
-  max-width:720px;
-  margin:6px auto 0;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  text-align:center;
-}
-.card-name{
-  min-height:1.6em;
-  font-weight:700;
-  color:#1d0f33;
-  font-size:clamp(14px,4vw,16px);
-}
-
-/* 結果ボックス */
 .result-grid{display:grid;gap:12px;max-width:980px;margin:16px auto 0}
 @media(min-width:720px){.result-grid{grid-template-columns:repeat(3,1fr)}}
 .result-item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
 .result-item .r-title{margin:.2em 0 .2em;font-size:17px;color:#2a1030}
 .result-item .r-text{margin:0;color:#555;line-height:1.7}
 
-/* === Tarot Mini Reading === */
-.reading-deck{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:12px;
-}
-.card-slot{
-  aspect-ratio: 2 / 3;
-  border:1px solid #dedbe6;
-  border-radius:10px;
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:8px;
-  font-family: var(--font-sans, "Noto Sans JP", system-ui, sans-serif);
-  transition: transform .15s ease, box-shadow .15s ease;
-  box-shadow: 0 1px 6px rgba(20,10,30,.06) inset;
-}
-.card-slot:is(:hover,:focus-visible){ transform:translateY(-1px); box-shadow: 0 3px 12px rgba(20,10,30,.12) }
-.card-slot[disabled]{ opacity:.6; pointer-events:none }
-
-/* 裏面：このクラスを付けた時に“裏面画像”を表示 */
-.card-slot.is-back{
-  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg?v=3');
-  background-size: cover;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  color: transparent;   /* 文字を消す（表にしたら外れる） */
-}
-
-/* 表になった時の文字見栄え */
-.card-slot.is-picked{
-  background:#fff;
-  color:#2a1030;
-}
-
-
-/* ① 日本語向けの読みやすいフォント＆アンチエイリアス */
-html, body {
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "palt" 1, "pkna" 1;  /* 約物狭め＆仮名プロポーショナル */
-}
-
-/* ② カード全体のコントラストと余白を改善 */
+/* タロット詳細カード用（任意セクションで使う場合） */
 .tarot-card {
   background: #ffffff;
   border: 1px solid #ECE8F7;
@@ -519,63 +467,30 @@ html, body {
   padding: 16px 18px;
   box-shadow: 0 4px 16px rgba(29, 15, 51, 0.06);
 }
-
-/* ③ タイトル（例：運命の輪／死神／審判）を強く・大きく */
 .tarot-card .card-title {
-  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Meiryo", system-ui, sans-serif;
-  font-weight: 700;                 /* 細字→太字 */
-  color: #1D0F33;                   /* 濃い紫でコントラストUP */
-  letter-spacing: .02em;            /* 広がりすぎを抑制 */
-  line-height: 1.35;                
-  font-size: clamp(18px, 4.6vw, 22px);  /* モバイルで自動拡大 */
+  font-weight: 700;
+  color: #1D0F33;
+  letter-spacing: .02em;
+  line-height: 1.35;
+  font-size: clamp(18px, 4.6vw, 22px);
   margin: 4px 0 6px;
 }
-
-/* ④ 縦組みを使っている場合の最適化（縦書きカード文） */
 .tarot-card .card-vertical {
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic Medium", "Meiryo", system-ui, sans-serif;
-  font-weight: 600;                 /* ちょい太め */
+  font-weight: 600;
   color: #20103E;
-  letter-spacing: .06em;            /* 縦書きはわずかに広め */
-  line-height: 1.9;                 /* 行間をしっかり確保 */
+  letter-spacing: .06em;
+  line-height: 1.9;
   font-size: clamp(16px, 4.2vw, 19px);
 }
-
-/* ⑤ 説明文（カード下の解説） */
 .tarot-card .card-desc {
-  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", system-ui, sans-serif;
   font-weight: 500;
   color: #2A1A4A;
   line-height: 1.85;
   letter-spacing: .01em;
   font-size: clamp(15px, 4.2vw, 17px);
 }
-
-/* ⑥ 引用符やダッシュなどの記号を見やすく */
-.tarot-card .card-desc em,
-.tarot-card .card-vertical em {
-  font-style: normal;
-  font-weight: 700;
-}
-
-/* ⑦ 余計な影やぼかしをOFF（重なってる場合の読みづらさ解消） */
-.tarot-card .card-title,
-.tarot-card .card-vertical,
-.tarot-card .card-desc {
-  text-shadow: none !important;
-  filter: none !important;
-}
-
-/* ⑧ スマホ最適化（iPhone幅～） */
-@media (max-width: 420px) {
-  .tarot-card { padding: 14px 16px; }
-  .tarot-card .card-vertical { letter-spacing: .04em; line-height: 1.95; }
-  .tarot-card .card-title { font-size: 20px; }
-}
-
-/* ⑨ さらにコントラストが必要な人向け（端末設定が高コントラストなら濃く） */
 @media (prefers-contrast: more) {
   .tarot-card .card-title,
   .tarot-card .card-vertical,
