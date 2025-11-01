@@ -571,3 +571,30 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 /* 旧APIの“表になった時に裏面が残る”のを確実に隠す */
 .card-slot.is-picked::before,
 .tarot-card.is-flipped::before{ opacity: 0; }
+/* === Tarot Back: always show, flipで消える === */
+:root{
+  /* 実在する方だけ残してOK（もう片方は消す） */
+  --card-back-url: url("/assets/images/tarot/tarot_back_1024x1536.jpg?v=7");
+  /* --card-back-url: url("/assets/tarot/back.png?v=7"); */
+}
+
+.card-slot{ position:relative; overflow:hidden; }
+
+/* ← is-back条件を外す（常時 裏面） */
+.card-slot::before{
+  content:"";
+  position:absolute; inset:0;
+  background: var(--card-back-url) center/cover no-repeat;
+  filter: saturate(1.02);
+  z-index:0;
+}
+
+/* 表面（face）は上に載せる。反転時だけ見せる想定なら opacity をJSで切替 */
+.card-slot .face{ position:relative; z-index:1; }
+
+/* 表になった時に裏面を消す（flip/pick時にクラス付与） */
+.card-slot.is-picked::before,
+.card-slot.is-flipped::before{ opacity:0; transition: opacity .28s ease; }
+
+/* 競合を潰す（以前の背景指定が勝っていた時の保険） */
+.card-slot{ background: none !important; }
