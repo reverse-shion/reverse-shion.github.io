@@ -2,235 +2,181 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>詩韻思想 × TAROT BREAKER — 星詠3枚リーディング</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preload" as="image" href="/assets/tarot/back.jpg">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <title>詩韻思想 × TAROT BREAKER ― 星詠3枚リーディング</title>
   <meta name="theme-color" content="#0b0b1a" />
-  <style>
-    /* --- 念のための衝突回避: 上に覆いかぶさる要素を無効化 (ボタンが押せない問題対策) --- */
-    .hero__media, .hero__veil { pointer-events: none !important; }
-  </style>
+  <link rel="preload" as="image" href="/assets/tarot/back.jpg">
+  <link rel="stylesheet" href="/assets/css/tarot.css">
 </head>
 <body>
 
-<main class="wrap">
+<main id="wish-reading" aria-labelledby="title">
+  <header class="header">
+    <h1 id="title">願い事を想像して――星詠3枚リーディング</h1>
+    <p class="sub">「言葉は祈りの構文」——詩・韻・祈の三位一体で受け取る</p>
+  </header>
 
-  <section class="wish-head">
-    <h1>星詠 3枚リーディング</h1>
-    <p class="lead">あなたの願いをひとこと。結果の言葉に織り込みます（空でもOK）</p>
-    <label for="wish" class="sr-only">願い</label>
-    <input id="wish" class="wish-input" type="text" placeholder="例：もう一度、心から笑えるように">
-  </section>
+  <!-- 願い入力 -->
+  <div class="wishbox">
+    <label for="wish" class="visually-hidden">あなたの願い</label>
+    <input id="wish" type="text" inputmode="text" placeholder="あなたの願い（例：恋を進めたい、仕事を変えたい…）">
+  </div>
 
-  <section id="deckStage" class="deck-stage" aria-live="polite">
-    <div class="deck-stack" aria-label="タロットの束（裏面）">
-      <div class="deck-back layer-1"></div>
-      <div class="deck-back layer-2"></div>
-      <div class="deck-back layer-3"></div>
-      <div class="aura"></div>
-    </div>
-
-    <div class="controls">
-      <button id="dealBtn" class="btn btn--primary" aria-controls="readingArea">タロット展開</button>
-      <p class="hint">ボタンを押すと、カードが光に包まれて現れます。</p>
-    </div>
-  </section>
-
-  <section id="readingArea" class="reading-area" hidden>
-    <div class="tap-hint" id="tapHint">カードをタップ</div>
-
-    <div class="tarot-row" role="list" aria-label="3枚のカード">
+  <!-- 初期：束（デッキ） -->
+  <section class="stage" aria-live="polite">
+    <div class="deck-area">
+      <div class="deck-stack" aria-label="タロットの束">
+        <div class="deck-back layer-1"></div>
+        <div class="deck-back layer-2"></div>
+        <div class="deck-back layer-3"></div>
       </div>
-
-    <canvas id="rippleCanvas" class="ripple" aria-hidden="true"></canvas>
-
-    <div id="result" class="result-grid" aria-live="polite">
-      <article class="result-item" data-trinity="詩">
-        <span class="badge">詩</span>
-        <h3 class="item-title">—</h3>
-        <p class="item-text">カードをタップすると、ここに言葉が灯ります。</p>
-      </article>
-      <article class="result-item" data-trinity="韻">
-        <span class="badge">韻</span>
-        <h3 class="item-title">—</h3>
-        <p class="item-text">カードをタップすると、ここに言葉が灯ります。</p>
-      </article>
-      <article class="result-item" data-trinity="祈">
-        <span class="badge">祈</span>
-        <h3 class="item-title">—</h3>
-        <p class="item-text">カードをタップすると、ここに言葉が灯ります。</p>
-      </article>
+      <div class="controls">
+        <button id="dealBtn" class="btn btn--primary" type="button">タロット展開</button>
+        <button id="resetBtn" class="btn btn--ghost" type="button" hidden>リセット</button>
+      </div>
+      <p class="hint" id="hintText">ボタンを押すと、カードが光に包まれて3枚あらわれます</p>
     </div>
 
-    <div class="closing" id="closing" hidden>
-      <p class="closing-line" id="closingLine"></p>
-      <p class="close-text">タロットクローズ。<strong>大丈夫だよ。</strong></p>
-      <div class="closing-actions">
-        <button id="resetBtn" class="btn">リセット</button>
+    <!-- 展開後：3枚横並び（最初は裏面） -->
+    <div class="row" id="row" hidden aria-hidden="true">
+      <button class="tap-note" type="button" tabindex="-1">カードをタップ</button>
+
+      <div class="tarot-card" data-slot="0" role="button" aria-label="1枚目" tabindex="0">
+        <div class="face"></div>
+      </div>
+      <div class="tarot-card" data-slot="1" role="button" aria-label="2枚目" tabindex="0">
+        <div class="face"></div>
+      </div>
+      <div class="tarot-card" data-slot="2" role="button" aria-label="3枚目" tabindex="0">
+        <div class="face"></div>
       </div>
     </div>
-  </section>
 
+    <!-- 結果 -->
+    <section class="result" id="result" hidden>
+      <div class="result-item" data-trinity="詩（現在）">
+        <h3 class="r-title">—</h3>
+        <p class="r-text">—</p>
+      </div>
+      <div class="result-item" data-trinity="韻（未来）">
+        <h3 class="r-title">—</h3>
+        <p class="r-text">—</p>
+      </div>
+      <div class="result-item" data-trinity="祈（最終）">
+        <h3 class="r-title">—</h3>
+        <p class="r-text">—</p>
+      </div>
+
+      <p class="closing" id="closing">——</p>
+
+      <div class="cta">
+        <button id="closeBtn" class="btn btn--primary" type="button" hidden>タロットクローズ</button>
+        <button id="resetBtn2" class="btn btn--ghost" type="button" hidden>リセット</button>
+      </div>
+    </section>
+  </section>
 </main>
 
 <script>
 (() => {
-  /* ========= 設定 ========= */
-  const faces = [
-    { name: "The Star（星）",       face: "/assets/tarot/faces/major_17_star.jpg",
-      poem: "失われた澄明が、胸の泉に帰る。諦めは古い衣。いま、あなたは静かに光を汲む。" },
-    { name: "The Sun（太陽）",       face: "/assets/tarot/faces/major_19_sun.jpg",
-      poem: "迷いは影、影は光の証。笑っていい。祝福は、もうここにある。" },
-    { name: "Judgement（審判）",   face: "/assets/tarot/faces/major_20_judgement.jpg",
-      poem: "古い呼吸を手放し、新しい名で目覚める。赦しは、あなたの中で完了する。" }
+  // ------- 画像パスをあなたの環境に合わせて用意してね -------
+  const DECK = [
+    { name: "The Sun（太陽）", img: "/assets/tarot/majors/sun.jpg",
+      poem: "迷いはほどけ、心はひらく。あなたの笑顔が道しるべ。" },
+    { name: "The Lovers（恋人）", img: "/assets/tarot/majors/lovers.jpg",
+      poem: "選ぶのは愛か、恐れか。手を伸ばせば、世界は結ばれる。" },
+    { name: "Ace of Cups（杯のエース）", img: "/assets/tarot/minors/cups_ace.jpg",
+      poem: "胸の泉がこぼれ落ちる。最初の一滴が、すべてを潤す。" },
+    // 必要に応じて他のカードを追加（78枚対応可）
   ];
 
-  /* ========= 要素取得（安全ガード付き） ========= */
-  const el = {
-    deckStage: document.getElementById('deckStage'),
-    dealBtn:   document.getElementById('dealBtn'),
-    reading:   document.getElementById('readingArea'),
-    row:       document.querySelector('.tarot-row'),
-    tapHint:   document.getElementById('tapHint'),
-    result:    document.getElementById('result'),
-    closing:   document.getElementById('closing'),
-    closingLine: document.getElementById('closingLine'),
-    resetBtn:  null,
-    wish:      document.getElementById('wish'),
-    ripple:    document.getElementById('rippleCanvas')
-  };
-  // 要素未取得時の警告/ガード
-  for (const k in el){ if (!el[k]) console.warn('[init warn]', k, 'not found'); }
-  if (!el.dealBtn || !el.deckStage || !el.reading || !el.row || !el.closing) return; // 必須要素がない場合は起動を停止
+  const $ = (sel, ctx=document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
 
-  let flippedCount = 0;
+  const row = $('#row');
+  const hint = $('#hintText');
+  const result = $('#result');
+  const closeBtn = $('#closeBtn');
+  const resetBtn = $('#resetBtn');
+  const resetBtn2 = $('#resetBtn2');
+  const dealBtn = $('#dealBtn');
+  const closing = $('#closing');
 
-  /* ========= 小道具 ========= */
-  const $ = (q,root=document) => root.querySelector(q);
-  const $$ = (q,root=document) => Array.from(root.querySelectorAll(q));
+  const cards = $$('.tarot-card');
+  let draw = [];
+  let flipped = 0;
 
-  function createCard(i, data){
-    const card = document.createElement('div');
-    card.className = 'tarot-card is-back';
-    card.role = 'listitem';
-    card.dataset.index = i;
-    card.setAttribute('tabindex','0');
-
-    const face = document.createElement('div');
-    face.className = 'face';
-    if (data.face) {
-      face.style.setProperty('--face-url', `url('${data.face}')`);
-    } else {
-      face.classList.add('dummy');
-      face.innerHTML = `<div class="glyph">✶</div><div class="title">${data.name}</div>`;
-    }
-
-    const rubric = document.createElement('div');
-    rubric.className = 'rubric';
-    rubric.textContent = ['詩','韻','祈'][i];
-
-    card.appendChild(face);
-    card.appendChild(rubric);
-    return card;
+  function shuffleDraw() {
+    const arr = [...DECK].sort(() => Math.random() - 0.5);
+    draw = arr.slice(0,3);
   }
 
-  function deal(){
-    // 重複起動防止
-    el.dealBtn.disabled = true;
+  function deal() {
+    shuffleDraw();
 
-    const stack = $('.deck-stack');
-    if (stack) stack.classList.add('glow');
-
-    // 束の演出→読み場へ
+    // 束をフェードアウトして横並びを出す
+    $('.deck-stack').classList.add('fade-out');
     setTimeout(() => {
-      el.deckStage.hidden = true;
-      el.reading.hidden = false;
-
-      // 横並びの3枚を生成
-      el.row.innerHTML = '';
-      faces.forEach((f,i) => {
-        const card = createCard(i, f);
-        el.row.appendChild(card);
-        // requestAnimationFrame を挟み、DOM描画後にアニメーションを開始
-        requestAnimationFrame(() => {
-          setTimeout(() => card.classList.add('show'), 100*i);
-        });
+      $('.deck-area').style.display = 'none';
+      row.hidden = false;
+      row.setAttribute('aria-hidden', 'false');
+      // 光に包まれて出現
+      cards.forEach((c, i) => {
+        setTimeout(() => c.classList.add('show'), i * 250);
       });
-
-      // ヒントON
-      el.tapHint.classList.add('on');
-
-      bindCardEvents();
-    }, 520);
+      // ヒント変更
+      hint.innerText = "カードをタップしてめくってね";
+    }, 380);
   }
 
-  function bindCardEvents(){
-    $$('.tarot-card', el.row).forEach(card => {
-      const onFlip = () => flipCard(card);
-      card.addEventListener('click', onFlip);
-      card.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onFlip(); }
-      });
-    });
-  }
+  function flipCard(cardEl, idx) {
+    if (cardEl.classList.contains('is-flipped')) return;
+    const face = cardEl.querySelector('.face');
+    face.style.setProperty('--face-url', `url('${draw[idx].img}')`);
+    cardEl.classList.add('is-flipped');
+    flipped++;
 
-  function flipCard(card){
-    if (card.classList.contains('flipped')) return;
+    if (flipped === 3) {
+      // 結果へ
+      const names = draw.map(d => d.name);
+      const poems = draw.map(d => d.poem);
+      const wish = ($('#wish').value || 'あなたの願い').trim();
 
-    const i = Number(card.dataset.index);
-    const data = faces[i];
+      const titleEls = $$('.r-title', result);
+      const textEls  = $$('.r-text', result);
+      names.forEach((n,i) => titleEls[i].textContent = n);
+      poems.forEach((p,i) => textEls[i].textContent =
+        `${p} —— 「${wish}」は、${names[2]}へと響き、やがて光になる。`);
 
-    // 裏 → 表
-    card.classList.remove('is-back');
-    card.classList.add('flipped');
-
-    // 結果描画
-    const it = $$('.result-item')[i];
-    if (it){
-      $('.item-title', it).textContent = data.name;
-      $('.item-text',  it).textContent = data.poem;
-    }
-
-    flippedCount++;
-    if (flippedCount >= 3) onAllRevealed();
-  }
-
-  function onAllRevealed(){
-    if (!el.tapHint || !el.closing || !el.closingLine || !el.wish) return;
-
-    el.tapHint.classList.remove('on');
-    const wish = (el.wish.value || 'あなたの願い').trim();
-    el.closingLine.textContent = `「${wish}」は、祈りの円環へと還り、光になる。`;
-    el.closing.hidden = false;
-
-    if (!el.resetBtn){
-      el.resetBtn = document.getElementById('resetBtn');
-      el.resetBtn?.addEventListener('click', resetAll);
+      result.hidden = false;
+      setTimeout(() => result.classList.add('reveal'), 10);
+      closeBtn.hidden = false;
+      resetBtn2.hidden = false;
     }
   }
 
-  function resetAll(){
-    if (!el.reading || !el.deckStage || !el.dealBtn || !el.closing || !el.tapHint) return;
-
-    flippedCount = 0;
-    el.reading.hidden = true;
-    el.deckStage.hidden = false;
-    el.dealBtn.disabled = false;
-    el.closing.hidden = true;
-    el.tapHint.classList.remove('on');
-    $$('.result-item').forEach(it => {
-      if (it) { // nullチェック追加
-          $('.item-title', it).textContent = '—';
-          $('.item-text',  it).textContent = 'カードをタップすると、ここに言葉が灯ります。';
-      }
-    });
+  function closeReading() {
+    closing.textContent = "タロットクローズ。—— 道は開かれた。大丈夫だよ。";
+    closeBtn.disabled = true;
   }
 
-  // 起動
-  el.dealBtn?.addEventListener('click', deal);
+  function resetAll() {
+    // ページを素早く初期化
+    window.location.reload();
+  }
+
+  // イベント
+  dealBtn.addEventListener('click', deal);
+  resetBtn.addEventListener('click', resetAll);
+  resetBtn2.addEventListener('click', resetAll);
+  closeBtn.addEventListener('click', closeReading);
+  cards.forEach((el, i) => {
+    el.addEventListener('click', () => flipCard(el, i));
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipCard(el,i); }
+    });
+  });
 })();
 </script>
-
 </body>
 </html>
