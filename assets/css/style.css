@@ -644,3 +644,154 @@ html, body {
 /* 軽い入場アニメ */
 @keyframes glowIn{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
 .ritual__poem[hidden=false]{ animation: glowIn .28s ease }
+
+/* =====================================
+   🌙 星詠3枚リーディング 外部CSS
+   詩韻思想 × TAROT BREAKER 専用演出
+   -------------------------------------
+   制作者: 詩韻 -Shion-
+   ===================================== */
+
+/* 🔮 コンテナ全体 */
+.wish-reading-container {
+  text-align: center;
+  color: #fff;
+  font-family: 'Cinzel', 'Noto Serif JP', serif;
+  background: radial-gradient(circle at 50% 20%, rgba(80,70,150,0.35), rgba(10,10,20,0.95));
+  padding: 50px 20px 60px;
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(160,100,255,0.35);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 🌟 見出しタイトル */
+.wish-reading-title {
+  font-size: 1.6rem;
+  margin-bottom: 30px;
+  text-shadow: 0 0 15px rgba(200,150,255,0.8);
+}
+
+/* ✨ カード配置エリア */
+.wish-card-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 20px auto 40px;
+  flex-wrap: wrap;
+}
+
+/* 🎴 カードの基本形状 */
+.wish-card {
+  display: inline-block;
+  width: 110px;
+  height: 170px;
+  background: linear-gradient(145deg, #1a1a2e, #2e1a47);
+  border: 2px solid rgba(200,150,255,0.6);
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(200,150,255,0.3);
+  cursor: pointer;
+  transition: transform 0.6s ease, box-shadow 0.6s ease;
+  position: relative;
+}
+
+.wish-card:hover {
+  transform: translateY(-8px) rotate(3deg);
+  box-shadow: 0 0 22px rgba(255,200,255,0.8);
+}
+
+/* 背面デザイン */
+.wish-card.is-back {
+  background: linear-gradient(135deg, #130f26, #3a2b6b);
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 6px);
+}
+
+/* 「TAP」文字 */
+.wish-card .tap-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+
+/* カードめくり時 */
+.wish-card.revealed {
+  background: linear-gradient(145deg, #3a1a55, #764ab9);
+  color: #fff;
+  box-shadow: 0 0 25px rgba(200,150,255,0.7);
+  transform: rotateY(180deg);
+}
+
+/* 🌀 シャッフル演出 */
+.wish-card.shuffling {
+  animation: star-glow 1.2s infinite;
+}
+
+@keyframes star-glow {
+  0% { box-shadow: 0 0 10px rgba(200,150,255,0.3); }
+  50% { box-shadow: 0 0 25px rgba(255,220,255,0.8); }
+  100% { box-shadow: 0 0 10px rgba(200,150,255,0.3); }
+}
+
+/* 🪄 結果表示ブロック */
+.wish-reading-result {
+  margin-top: 25px;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: #eee;
+  text-shadow: 0 0 10px rgba(180,150,255,0.6);
+  white-space: pre-line;
+}
+
+.wish-reading-result h3 {
+  font-size: 1.2rem;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: #d9caff;
+}
+
+/* 🎼 詠唱・締めテキスト */
+.wish-reading-incantation,
+.wish-reading-close {
+  font-style: italic;
+  color: rgba(230,215,255,0.85);
+  margin-top: 20px;
+  text-shadow: 0 0 10px rgba(200,150,255,0.5);
+  animation: fadeIn 1.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 💎 操作ボタン */
+.wish-reading-controls {
+  margin-top: 30px;
+}
+
+.wish-reading-button {
+  background: linear-gradient(135deg, #6a4bcf, #c471ed);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 10px 24px;
+  margin: 0 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.wish-reading-button:hover {
+  background: linear-gradient(135deg, #8e7cff, #d59fff);
+  transform: translateY(-3px);
+}
+
+.wish-reading-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
