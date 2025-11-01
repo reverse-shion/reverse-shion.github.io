@@ -396,59 +396,85 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 @keyframes rise{from{transform:translateY(6px);opacity:.0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* ===== Mini Reading UI ===== */
-#mini-reading{border-top:1px solid rgba(0,0,0,.05)}
-.reading-ui{margin-top:10px}
-.reading-actions{display:flex;gap:10px;justify-content:center;margin-bottom:12px}
-
+/* ===== Reading UI ===== */
+#reading{ border-top:1px solid rgba(0,0,0,.05) }
+.reading-actions{ display:flex; gap:10px; justify-content:center; margin-bottom:12px }
 .reading-deck{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap: 12px;
-  max-width:720px;
-  margin:0 auto;
-  justify-items:center;
+  display:grid; grid-template-columns: repeat(3,1fr); gap:12px;
+  max-width:720px; margin:0 auto; justify-items:center;
+  perspective: 1200px;
 }
-
-/* 開始前は無地（JSで開始後に裏面適用） */
+.card-wrap{ display:flex; flex-direction:column; align-items:center; gap:6px }
 .card-slot{
-  width: 120px;
-  aspect-ratio: 2 / 3;
-  border:1px solid rgba(0,0,0,.08);
-  border-radius:16px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.95)),
-    radial-gradient(100% 100% at 50% 0%, rgba(255,215,111,.18),rgba(174,138,255,.15));
+  width:120px; aspect-ratio:2/3;
+  border:1px solid #dedbe6; border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.95));
   box-shadow:0 8px 24px rgba(174,138,255,.16);
-  cursor:not-allowed;
-  transition:transform .15s, box-shadow .15s, filter .15s, background-image .2s ease;
-  position:relative; overflow:hidden;
+  cursor:not-allowed; position:relative; overflow:hidden;
+  transform-style: preserve-3d;
+  transition:transform .62s cubic-bezier(.22,.72,.18,1.05);
 }
-.card-slot[aria-pressed="true"]{filter:saturate(110%)}
-.card-slot:enabled{cursor:pointer}
-.card-slot:enabled:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(174,138,255,.22)}
-.card-slot::after{
-  content:"TAP"; position:absolute; inset:auto 10px 10px auto; font-weight:800; font-size:12px;
-  color:#503080; background:rgba(255,215,111,.25); border:1px solid rgba(255,215,111,.45); padding:3px 8px; border-radius:999px;
-  opacity:0; transition:opacity .15s;
-}
-.card-slot:enabled:hover::after{opacity:1}
-
-.result-grid{display:grid;gap:12px;max-width:980px;margin:16px auto 0}
-@media(min-width:720px){.result-grid{grid-template-columns:repeat(3,1fr)}}
-.result-item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
-.result-item .r-title{margin:.2em 0 .2em;font-size:17px;color:#2a1030}
-.result-item .r-text{margin:0;color:#555;line-height:1.7}
-
-/* タロット裏面を確実に出す専用クラス */
+.card-slot:enabled{ cursor:pointer }
 .card-slot.is-back{
-  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg') !important;
-  background-size: cover !important;
-  background-position: 50% 50% !important;
-  background-repeat: no-repeat !important;
-  /* 万一グラデが上に来ても潰す */
-  background-color: transparent !important;
+  background-image:url('/assets/images/tarot/tarot_back_1024x1536.jpg');
+  background-size:cover; background-position:center;
 }
+.card-slot.is-picked{
+  transform:rotateY(180deg);
+  background-image:url('/assets/images/tarot/face_generic.jpg');
+  background-size:cover; background-position:center;
+  box-shadow:0 18px 46px rgba(126,102,255,.25);
+  animation:auraPulse 2.4s ease-in-out 1 both;
+}
+@keyframes auraPulse{
+  0%{ box-shadow:0 12px 28px rgba(126,102,255,.2) }
+  50%{ box-shadow:0 18px 46px rgba(126,102,255,.35) }
+  100%{ box-shadow:0 12px 28px rgba(126,102,255,.2) }
+}
+.card-slot::after{
+  content:""; position:absolute; inset:-12% -12%;
+  background:
+    radial-gradient(6px 6px at 20% 30%, rgba(255,255,255,.95), transparent 55%),
+    radial-gradient(7px 7px at 70% 20%, rgba(255,215,111,.95), transparent 55%),
+    radial-gradient(5px 5px at 40% 75%, rgba(174,138,255,.95), transparent 55%),
+    radial-gradient(4px 4px at 80% 65%, rgba(255,255,255,.95), transparent 55%);
+  border-radius:16px; filter: blur(.4px) saturate(120%); mix-blend-mode: screen;
+  opacity:0; transform:scale(.8);
+}
+.card-slot.is-burst::after{ animation:sparkleBurst 520ms ease-out forwards }
+@keyframes sparkleBurst{
+  0%{ opacity:0; transform:scale(.85) }
+  30%{ opacity:.95; transform:scale(1.08) }
+  80%{ opacity:.35 }
+  100%{ opacity:0; transform:scale(1) }
+}
+.card-caption{
+  font-family:"Zen Old Mincho","Noto Sans JP",serif;
+  font-weight:700; letter-spacing:.04em;
+  font-size:clamp(15px,1.9vw,17px);
+  color:#2a1030; text-shadow:0 0 1px rgba(255,255,255,.4);
+  opacity:0; transform:translateY(2px);
+  transition:opacity .25s ease, transform .25s ease;
+}
+.card-caption.is-show{ opacity:1; transform:translateY(0) }
+
+/* 星環波紋 */
+.cosmic-ripple{
+  position:absolute; inset:0; pointer-events:none; z-index:2;
+  filter:saturate(120%) brightness(1.05);
+  mix-blend-mode:screen;
+}
+
+/* 結果 */
+.result-grid{ display:grid; gap:12px; max-width:980px; margin:16px auto 0 }
+@media(min-width:720px){ .result-grid{ grid-template-columns:repeat(3,1fr) } }
+.result-item{ background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px; padding:12px; box-shadow:0 8px 18px rgba(0,0,0,.05) }
+.badge{ background:rgba(255,215,111,.18); border:1px solid rgba(255,215,111,.4); padding:2px 8px; border-radius:999px; font-size:12px; font-weight:800 }
+.result-item .r-title{ margin:.2em 0; font-size:17px; color:#2a1030 }
+.result-item .r-text{ margin:0; color:#555; line-height:1.7 }
+
+
+
 /* === Tarot Mini Reading === */
 .reading-deck{
   display:grid;
