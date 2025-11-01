@@ -2,139 +2,273 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>星詠タロット — 3枚展開（表面出現 / Trinity対応）</title>
+  <title>詩韻思想 × TAROT BREAKER — 星詠3枚リーディング</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preload" as="image" href="/assets/tarot/back.jpg">
+  <link rel="stylesheet" href="/assets/css/style.css">
   <meta name="theme-color" content="#0b0b1a" />
-  <!-- 先読み（例：初期3枚） -->
-  <link rel="preload" as="image" href="/assets/images/tarot/majors/00_the_fool.jpg">
-  <link rel="preload" as="image" href="/assets/images/tarot/majors/01_the_magician.jpg">
-  <link rel="preload" as="image" href="/assets/images/tarot/majors/02_the_high_priestess.jpg">
-  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
-
 <body>
-  <main class="wrap">
-    <header class="page-head">
-      <h1>星詠 3枚リーディング</h1>
-      <p class="lead">願いをひと言にして、「タロット展開」を押してね。光と音の中から、<strong>表面</strong>で3枚が現れるよ。</p>
-    </header>
 
-    <!-- 願い入力 -->
-    <section class="wish-form">
-      <label for="wish" class="sr-only">あなたの願い</label>
-      <input id="wish" type="text" inputmode="text" placeholder="例）あの人との関係を前に進めたい">
-      <button id="shuffle-btn" class="btn btn--primary">🔮 タロット展開</button>
-    </section>
+<main class="wrap">
 
-    <!-- デッキ -->
-    <section id="wish-reading">
-      <div class="wish-deck" id="deck" aria-live="polite">
-        <!-- 表面画像は --face-url で差し替え可能 -->
-        <div class="tarot-card" style="--face-url:url('/assets/images/tarot/majors/00_the_fool.jpg')"></div>
-        <div class="tarot-card" style="--face-url:url('/assets/images/tarot/majors/01_the_magician.jpg')"></div>
-        <div class="tarot-card" style="--face-url:url('/assets/images/tarot/majors/02_the_high_priestess.jpg')"></div>
+  <!-- 願い（任意） -->
+  <section class="wish-head">
+    <h1>星詠 3枚リーディング</h1>
+    <p class="lead">あなたの願いをひとこと。結果の言葉に織り込みます（空でもOK）</p>
+    <label for="wish" class="sr-only">願い</label>
+    <input id="wish" class="wish-input" type="text" placeholder="例：もう一度、心から笑えるように">
+  </section>
+
+  <!-- ① 束（初期表示） -->
+  <section id="deckStage" class="deck-stage" aria-live="polite">
+    <div class="deck-stack" aria-label="タロットの束（裏面）">
+      <div class="deck-back layer-1"></div>
+      <div class="deck-back layer-2"></div>
+      <div class="deck-back layer-3"></div>
+      <div class="aura"></div>
+    </div>
+
+    <div class="controls">
+      <button id="dealBtn" class="btn btn--primary" aria-controls="readingArea">タロット展開</button>
+      <p class="hint">ボタンを押すと、カードが光に包まれて現れます。</p>
+    </div>
+  </section>
+
+  <!-- ② 展開後の3枚＆結果 -->
+  <section id="readingArea" class="reading-area" hidden>
+    <div class="tap-hint" id="tapHint">カードをタップ</div>
+
+    <div class="tarot-row" role="list">
+      <!-- JSで生成：.tarot-card * 3 -->
+    </div>
+
+    <canvas id="rippleCanvas" class="ripple" aria-hidden="true"></canvas>
+
+    <div id="result" class="result-grid" aria-live="polite">
+      <article class="result-item" data-trinity="詩">
+        <span class="badge">詩</span>
+        <h3 class="item-title">—</h3>
+        <p class="item-text">カードをタップすると、ここに言葉が灯ります。</p>
+      </article>
+      <article class="result-item" data-trinity="韻">
+        <span class="badge">韻</span>
+        <h3 class="item-title">—</h3>
+        <p class="item-text">カードをタップすると、ここに言葉が灯ります。</p>
+      </article>
+      <article class="result-item" data-trinity="祈">
+        <span class="badge">祈</span>
+        <h3 class="item-title">—</h3>
+        <p class="item-text">カードをタップすると、ここに言葉が灯ります。</p>
+      </article>
+    </div>
+
+    <div class="closing" id="closing" hidden>
+      <p class="closing-line" id="closingLine"></p>
+      <p class="close-text">タロットクローズ。<strong>大丈夫だよ。</strong></p>
+      <div class="closing-actions">
+        <button id="resetBtn" class="btn">リセット</button>
       </div>
+    </div>
+  </section>
 
-      <!-- 結果：Trinity明示（詩・韻・祈） -->
-      <div id="wishResult" class="result-grid">
-        <div class="result-item" data-trinity="詩｜Poem（現在）">
-          <h3 class="item-title">—</h3>
-          <p class="item-text">カードを展開すると自動で入ります。</p>
-        </div>
-        <div class="result-item" data-trinity="韻｜Rhyme（鍵）">
-          <h3 class="item-title">—</h3>
-          <p class="item-text">カードを展開すると自動で入ります。</p>
-        </div>
-        <div class="result-item" data-trinity="祈｜Prayer（進む道）">
-          <h3 class="item-title">—</h3>
-          <p class="item-text">カードを展開すると自動で入ります。</p>
-        </div>
-      </div>
+</main>
 
-      <!-- 閉じの言葉（願いの織り込み） -->
-      <p class="closing">タロットクローズ。<strong>大丈夫だよ。</strong></p>
+<script>
+(() => {
+  /* ========= 設定 ========= */
+  const faces = [
+    {
+      name: "The Star（星）",
+      face: "/assets/tarot/faces/major_17_star.jpg",   // 画像が無ければ空文字でOK
+      poem: "失われた澄明が、胸の泉に帰る。諦めは古い衣。いま、あなたは静かに光を汲む。"
+    },
+    {
+      name: "The Sun（太陽）",
+      face: "/assets/tarot/faces/major_19_sun.jpg",
+      poem: "迷いは影、影は光の証。笑っていい。祝福は、もうここにある。"
+    },
+    {
+      name: "Judgement（審判）",
+      face: "/assets/tarot/faces/major_20_judgement.jpg",
+      poem: "古い呼吸を手放し、新しい名で目覚める。赦しは、あなたの中で完了する。"
+    }
+  ];
+  // ※ 本番は 78 枚配列に差し替え可能。ここはデモ用 3 枚固定。
 
-      <!-- CTA（遅延フェード） -->
-      <div id="cta" class="cta" hidden>
-        <a class="btn cta-glow" href="https://lin.ee/your-line" target="_blank" rel="noopener">✨ 毎週の星詠をLINEで受け取る</a>
-        <p class="cta-note">光は巡り、言葉は祈りへ帰る。あなたの願いも、ちゃんと届く。</p>
-      </div>
-    </section>
-  </main>
+  const el = {
+    deckStage: document.getElementById('deckStage'),
+    dealBtn:   document.getElementById('dealBtn'),
+    reading:   document.getElementById('readingArea'),
+    row:       document.querySelector('.tarot-row'),
+    tapHint:   document.getElementById('tapHint'),
+    result:    document.getElementById('result'),
+    closing:   document.getElementById('closing'),
+    closingLine: document.getElementById('closingLine'),
+    resetBtn:  null,
+    wish:      document.getElementById('wish'),
+    ripple:    document.getElementById('rippleCanvas')
+  };
 
-  <!-- 小さなチャイムSE（非ループ） -->
-  <audio id="chime" preload="auto">
-    <source src="https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-appear-1122.mp3" type="audio/mpeg">
-  </audio>
+  let flippedCount = 0;
 
-  <script>
-  // ===== 星詠：表面で現れる + Trinity + 願い織り込み + チャイムSE =====
-  (function(){
-    const btn = document.getElementById('shuffle-btn');
-    const wishInput = document.getElementById('wish');
-    const cards = Array.from(document.querySelectorAll('.tarot-card'));
-    const resultTitleEls = Array.from(document.querySelectorAll('.item-title'));
-    const resultTextEls  = Array.from(document.querySelectorAll('.item-text'));
-    const closing = document.querySelector('.closing');
-    const cta = document.getElementById('cta');
-    const chime = document.getElementById('chime');
+  /* ========= ユーティリティ ========= */
+  const $ = (q,root=document) => root.querySelector(q);
+  const $$ = (q,root=document) => [...root.querySelectorAll(q)];
 
-    // デモ用の3枚（フル78枚対応は fullDeck を差し替え）
-    const names = ["The Fool","The Magician","The High Priestess"];
-    const lines = [
-      "今は“はじまり”の呼吸。肩の力を抜いて、まず一歩。",
-      "意志を一点に集めて。道具は手の中に揃っている。",
-      "静かな直感を信じる。言葉の前に、心のささやき。"
-    ];
+  function createCard(i, data){
+    const li = document.createElement('div');
+    li.className = 'tarot-card is-back';
+    li.role = 'listitem';
+    li.dataset.index = i;
 
-    function safePlay(audio){
-      try{ audio.currentTime = 0; audio.volume = 0.35; audio.play().catch(()=>{}); }
-      catch(e){}
+    const face = document.createElement('div');
+    face.className = 'face';
+
+    if (data.face) {
+      face.style.setProperty('--face-url', `url('${data.face}')`);
+    } else {
+      // 画像がない場合のダミー
+      face.classList.add('dummy');
+      face.innerHTML = `
+        <div class="glyph">✶</div>
+        <div class="title">${data.name}</div>`;
     }
 
-    function appearSequence() {
-      // 連打対策
-      btn.disabled = true;
-      btn.textContent = "✨ 星詠展開中…";
-      cta.hidden = true; cta.classList.remove('is-show');
+    const rubric = document.createElement('div');
+    rubric.className = 'rubric';
+    rubric.textContent = ['詩','韻','祈'][i];
 
-      // 初期化（再実行時もキレイに）
-      cards.forEach(c => c.classList.remove('show','pulse'));
-      resultTitleEls.forEach(el => el.textContent = "—");
-      resultTextEls.forEach(el => el.textContent  = "カードを展開すると自動で入ります。");
+    li.appendChild(face);
+    li.appendChild(rubric);
+    li.setAttribute('tabindex','0');
+    return li;
+  }
 
-      // 願いの文
-      const wishText = (wishInput.value || "あなたの魂").trim();
+  function deal(){
+    // 束を光らせてから非表示 → 3枚出現
+    el.dealBtn.disabled = true;
+    $('.deck-stack').classList.add('glow');
 
-      // 0.45秒刻みで順に出現＋チャイム
-      cards.forEach((card, i) => {
-        setTimeout(() => {
-          safePlay(chime);
-          card.classList.add('show');
-          setTimeout(() => card.classList.add('pulse'), 120);
+    setTimeout(() => {
+      el.deckStage.hidden = true;
+      el.reading.hidden = false;
+      el.row.innerHTML = '';
 
-          // 結果欄に反映
-          if (resultTitleEls[i]) resultTitleEls[i].textContent = names[i] || "—";
-          if (resultTextEls[i])  resultTextEls[i].textContent  = lines[i] || "";
-        }, i * 450);
+      faces.forEach((f,i) => {
+        const card = createCard(i, f);
+        el.row.appendChild(card);
+        // 入場タイミングずらし
+        setTimeout(() => card.classList.add('show'), 120 * i);
       });
 
-      // 願いの織り込み（最後の出現後）
-      setTimeout(() => {
-        closing.innerHTML = `「${wishText}」は、<em>${names[2]}</em> へと響き、やがて光となる。<br>タロットクローズ。<strong>大丈夫だよ。</strong>`;
-        btn.disabled = false;
-        btn.textContent = "🔮 タロット展開";
-        // CTA遅延フェード
-        setTimeout(() => { cta.hidden = false; requestAnimationFrame(()=> cta.classList.add('is-show')); }, 600);
-      }, (cards.length - 1) * 450 + 500);
+      // ヒント表示
+      el.tapHint.classList.add('on');
+
+      bindCardEvents();
+    }, 680);
+  }
+
+  function bindCardEvents(){
+    $$('.tarot-card', el.row).forEach(card => {
+      const onFlip = () => flipCard(card);
+      card.addEventListener('click', onFlip);
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onFlip(); }
+      });
+    });
+  }
+
+  function flipCard(card){
+    if (card.classList.contains('flipped')) return;
+
+    const i = Number(card.dataset.index);
+    const data = faces[i];
+
+    // 裏→表
+    card.classList.remove('is-back');
+    card.classList.add('flipped');
+
+    // 表画像（ダミーでなければ背景に反映）
+    const face = $('.face', card);
+    if (!face.classList.contains('dummy') && data.face) {
+      face.style.setProperty('--face-url', `url('${data.face}')`);
     }
 
-    btn.addEventListener('click', appearSequence);
+    // 結果パネル反映
+    const item = $$('.result-item')[i];
+    $('.item-title', item).textContent = data.name;
+    $('.item-text', item).textContent  = data.poem;
 
-    // ===== 将来拡張：フル78枚
-    // const fullDeck = [{name:"The Fool", img:"/path", poem:"..."}, ...];
-    // 関数で3枚抽選して --face-url と結果を更新するだけでOK
+    flippedCount++;
+    if (flippedCount >= 3) onAllRevealed();
+  }
+
+  function onAllRevealed(){
+    el.tapHint.classList.remove('on');
+
+    // 願いを織り込んだ締め
+    const wish = (el.wish.value || 'あなたの願い').trim();
+    el.closingLine.textContent = `「${wish}」は、祈りの円環へと還り、光になる。`;
+    el.closing.hidden = false;
+
+    // リセットボタン取得＆バインド
+    if (!el.resetBtn) {
+      el.resetBtn = document.getElementById('resetBtn');
+      el.resetBtn.addEventListener('click', resetAll);
+    }
+  }
+
+  function resetAll(){
+    flippedCount = 0;
+    el.reading.hidden = true;
+    el.deckStage.hidden = false;
+    el.dealBtn.disabled = false;
+    el.closing.hidden = true;
+    el.tapHint.classList.remove('on');
+    // 結果初期化
+    $$('.result-item').forEach(it => {
+      $('.item-title', it).textContent = '—';
+      $('.item-text', it).textContent  = 'カードをタップすると、ここに言葉が灯ります。';
+    });
+  }
+
+  /* ========= 波紋（控えめ） ========= */
+  (function ripple(){
+    const cvs = el.ripple;
+    if (!cvs || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ctx = cvs.getContext('2d');
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize(){
+      const rect = cvs.getBoundingClientRect();
+      cvs.width  = Math.floor(rect.width * DPR);
+      cvs.height = Math.floor(rect.height * DPR);
+      ctx.scale(DPR, DPR);
+    }
+    resize(); addEventListener('resize', resize);
+
+    let tick = 0;
+    function loop(){
+      tick++;
+      ctx.clearRect(0,0,cvs.width, cvs.height);
+      // ささやかな星粒
+      for (let i=0;i<24;i++){
+        const x = (Math.sin((tick+i)*0.01+i)*0.5+0.5) * cvs.clientWidth;
+        const y = (Math.cos((tick+i)*0.012+i)*0.5+0.5) * cvs.clientHeight;
+        const r = 0.6 + 0.6 * Math.sin((tick+i)*0.05);
+        ctx.fillStyle = 'rgba(203,182,255,0.18)';
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
   })();
-  </script>
+
+  /* ========= Init ========= */
+  el.dealBtn.addEventListener('click', deal);
+})();
+</script>
+
 </body>
 </html>
