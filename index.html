@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/assets/css/style.css">
   <meta name="theme-color" content="#0b0b1a" />
   <style>
-    /* --- 念のための衝突回避: 上に覆いかぶさる要素を無効化 --- */
+    /* --- 念のための衝突回避: 上に覆いかぶさる要素を無効化 (ボタンが押せない問題対策) --- */
     .hero__media, .hero__veil { pointer-events: none !important; }
   </style>
 </head>
@@ -16,7 +16,6 @@
 
 <main class="wrap">
 
-  <!-- 願い（任意） -->
   <section class="wish-head">
     <h1>星詠 3枚リーディング</h1>
     <p class="lead">あなたの願いをひとこと。結果の言葉に織り込みます（空でもOK）</p>
@@ -24,7 +23,6 @@
     <input id="wish" class="wish-input" type="text" placeholder="例：もう一度、心から笑えるように">
   </section>
 
-  <!-- ① 束（初期表示） -->
   <section id="deckStage" class="deck-stage" aria-live="polite">
     <div class="deck-stack" aria-label="タロットの束（裏面）">
       <div class="deck-back layer-1"></div>
@@ -39,13 +37,11 @@
     </div>
   </section>
 
-  <!-- ② 展開後の3枚＆結果 -->
   <section id="readingArea" class="reading-area" hidden>
     <div class="tap-hint" id="tapHint">カードをタップ</div>
 
     <div class="tarot-row" role="list" aria-label="3枚のカード">
-      <!-- JSで .tarot-card * 3 を生成 -->
-    </div>
+      </div>
 
     <canvas id="rippleCanvas" class="ripple" aria-hidden="true"></canvas>
 
@@ -104,7 +100,9 @@
     wish:      document.getElementById('wish'),
     ripple:    document.getElementById('rippleCanvas')
   };
+  // 要素未取得時の警告/ガード
   for (const k in el){ if (!el[k]) console.warn('[init warn]', k, 'not found'); }
+  if (!el.dealBtn || !el.deckStage || !el.reading || !el.row || !el.closing) return; // 必須要素がない場合は起動を停止
 
   let flippedCount = 0;
 
@@ -138,8 +136,6 @@
   }
 
   function deal(){
-    if (!el.deckStage || !el.reading || !el.row) return;
-
     // 重複起動防止
     el.dealBtn.disabled = true;
 
@@ -156,6 +152,7 @@
       faces.forEach((f,i) => {
         const card = createCard(i, f);
         el.row.appendChild(card);
+        // requestAnimationFrame を挟み、DOM描画後にアニメーションを開始
         requestAnimationFrame(() => {
           setTimeout(() => card.classList.add('show'), 100*i);
         });
@@ -200,8 +197,10 @@
   }
 
   function onAllRevealed(){
+    if (!el.tapHint || !el.closing || !el.closingLine || !el.wish) return;
+
     el.tapHint.classList.remove('on');
-    const wish = (el.wish?.value || 'あなたの願い').trim();
+    const wish = (el.wish.value || 'あなたの願い').trim();
     el.closingLine.textContent = `「${wish}」は、祈りの円環へと還り、光になる。`;
     el.closing.hidden = false;
 
@@ -212,6 +211,8 @@
   }
 
   function resetAll(){
+    if (!el.reading || !el.deckStage || !el.dealBtn || !el.closing || !el.tapHint) return;
+
     flippedCount = 0;
     el.reading.hidden = true;
     el.deckStage.hidden = false;
@@ -219,8 +220,10 @@
     el.closing.hidden = true;
     el.tapHint.classList.remove('on');
     $$('.result-item').forEach(it => {
-      $('.item-title', it).textContent = '—';
-      $('.item-text',  it).textContent = 'カードをタップすると、ここに言葉が灯ります。';
+      if (it) { // nullチェック追加
+          $('.item-title', it).textContent = '—';
+          $('.item-text',  it).textContent = 'カードをタップすると、ここに言葉が灯ります。';
+      }
     });
   }
 
