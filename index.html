@@ -714,5 +714,188 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
 </svg>
+
+<script>
+(() => {
+  const openBtn = document.getElementById('ritualOpen');
+  const resetBtn = document.getElementById('ritualReset');
+  const audioBtn = document.getElementById('ritualAudio');
+  const bg = document.getElementById('ritualBg');
+  const stars = document.getElementById('ritualStars');
+  const poemBox = document.querySelector('.ritual__poem');
+  const closing = document.querySelector('.ritual__closing');
+  const shareBtn = document.getElementById('ritualShare');
+  const cards = Array.from(document.querySelectorAll('.ritual-card'));
+  if (!openBtn || !bg || !stars || !poemBox || !cards.length) return;
+
+  /* ===== 星粒（Canvas） ===== */
+  const ctx = stars.getContext('2d');
+  let w, h, P=[], rafId=null;
+  const resize = () => { w = stars.width = stars.clientWidth; h = stars.height = stars.clientHeight; };
+  const initParticles = (n=80) => {
+    P = Array.from({length:n}, _ => ({
+      x: Math.random()*w, y: Math.random()*h,
+      s: Math.random()*1.6+0.4, vx:(Math.random()-.5)*.15, vy:(Math.random()-.5)*.15,
+      a: Math.random()*0.6+0.2
+    }));
+  };
+  const tick = () => {
+    ctx.clearRect(0,0,w,h);
+    for (const p of P){
+      p.x+=p.vx; p.y+=p.vy;
+      if (p.x<0) p.x=w; if (p.x>w) p.x=0; if (p.y<0) p.y=h; if (p.y>h) p.y=0;
+      const grad = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s*3.2);
+      grad.addColorStop(0, `rgba(255,215,111,${p.a})`);
+      grad.addColorStop(1, 'rgba(255,215,111,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.s*2,0,Math.PI*2); ctx.fill();
+    }
+    rafId = requestAnimationFrame(tick);
+  };
+  const startStars = () => { resize(); initParticles(); cancelAnimationFrame(rafId); tick(); };
+  const stopStars  = () => { cancelAnimationFrame(rafId); };
+
+  new ResizeObserver(()=>resize()).observe(stars);
+
+  /* ===== オーディオ（iOS解禁対応） ===== */
+  const audio = new Audio('/assets/ritual/ambience.mp3');
+  audio.loop = true; audio.preload = 'auto'; audio.volume = 0.0;
+  let audioOn = false;
+  async function fadeAudio(target=0.6, ms=600){
+    const steps = 24, step = (target - audio.volume)/steps, wait = ms/steps;
+    for (let i=0;i<steps;i++){ audio.volume = Math.max(0, Math.min(1, audio.volume + step)); await new Promise(r=>setTimeout(r,wait)); }
+  }
+  audioBtn.addEventListener('click', async () => {
+    try{
+      if (!audioOn){ await audio.play(); audioOn = true; audioBtn.setAttribute('aria-pressed','true'); audioBtn.textContent='🔊 音オン（再タップでオフ）'; fadeAudio(.6,700); }
+      else { audioOn=false; audioBtn.setAttribute('aria-pressed','false'); audioBtn.textContent='🔈 音をオン'; fadeAudio(0,500).then(()=>audio.pause()); }
+    }catch(e){ audioBtn.textContent = '🔇 再タップで解禁'; }
+  });
+
+  /* ===== カードプール（大アルカナ・短句） ===== */
+  const POOL = [
+    {name:'愚者',     key:'自由に踏み出す'},
+    {name:'魔術師',   key:'いま始める'},
+    {name:'女教皇',   key:'静かに見極める'},
+    {name:'女帝',     key:'受け取り育てる'},
+    {name:'皇帝',     key:'決めて動かす'},
+    {name:'教皇',     key:'信頼に寄る'},
+    {name:'恋人',     key:'選び抜く'},
+    {name:'戦車',     key:'突破する'},
+    {name:'力',       key:'優しさで制す'},
+    {name:'隠者',     key:'内に灯す'},
+    {name:'運命の輪', key:'流れに乗る'},
+    {name:'正義',     key:'整えバランス'},
+    {name:'吊るされた男', key:'意味を反転'},
+    {name:'死神',     key:'一度終わらせる'},
+    {name:'節制',     key:'混ぜ調和する'},
+    {name:'悪魔',     key:'執着を手放す'},
+    {name:'塔',       key:'壊して更新'},
+    {name:'星',       key:'希望を見る'},
+    {name:'月',       key:'不安を識る'},
+    {name:'太陽',     key:'喜びで進む'},
+    {name:'審判',     key:'呼び覚ます'},
+    {name:'世界',     key:'完成し次へ'}
+  ];
+  const pick = () => POOL[Math.floor(Math.random()*POOL.length)];
+  const state = { compass:null, trigger:null, route:null, opened:false };
+
+  function reset() {
+    state.compass = state.trigger = state.route = null;
+    state.opened = false;
+    poemBox.hidden = true; closing.hidden = true;
+    cards.forEach(c=>{
+      c.classList.remove('is-flipped','is-ready');
+      c.querySelector('.ritual-card__face').textContent = '';
+      c.style.cursor='not-allowed';
+    });
+    resetBtn.disabled = true;
+  }
+
+  function openRitual() {
+    if (state.opened) return;
+    state.opened = true;
+    startStars();
+    try{ bg.play().catch(()=>{}); }catch(_){}
+    cards.forEach(c=>{ c.classList.add('is-ready'); c.style.cursor='pointer'; });
+    resetBtn.disabled = false;
+    // iOS/Chrome モバイルでの初回タップ解禁のため音量ゼロ再生
+    audio.play().then(()=>{ if(!audioOn){ audio.pause(); audio.currentTime=0; } }).catch(()=>{});
+  }
+
+  function flipCard(el){
+    if (!el.classList.contains('is-ready') || el.classList.contains('is-flipped')) return;
+    el.classList.add('is-flipped');
+    const slot = el.dataset.slot;
+    const card = pick();
+    if (slot==='compass') state.compass = card;
+    if (slot==='trigger') state.trigger = card;
+    if (slot==='route')   state.route   = card;
+    el.querySelector('.ritual-card__face').innerHTML =
+      `<strong style="font-size:18px">${card.name}</strong><br><span style="font-size:13px;color:#6b6b6b">${card.key}</span>`;
+    // 小さな鈴音
+    try{
+      const ding = new Audio('/assets/ritual/ding.mp3'); ding.volume = .6; ding.play().catch(()=>{});
+    }catch(_){}
+    // 3枚揃ったら詩を生成
+    if (state.compass && state.trigger && state.route) generatePoem();
+  }
+
+  function generatePoem(){
+    const P = {
+      poem:   (c,t,r)=>`「${c.name}」は ${c.key}。その息は、${t.name}の手で ${t.key}。そして、${r.name}が ${r.key} とき、言葉は光になる。`,
+      rhyme:  (c,t,r)=>`星は囁く── ${c.name}・${t.name}・${r.name}。拍（ビート）はあなたの鼓動に合う。`,
+      prayer: (c,t,r)=>`迷いよ、いま薄らげ。小さな一歩でいい。${t.key} こと、それが道標。`
+    };
+    const c=state.compass, t=state.trigger, r=state.route;
+    poemBox.querySelector('[data-kind="poem"]').textContent   = P.poem(c,t,r);
+    poemBox.querySelector('[data-kind="rhyme"]').textContent  = P.rhyme(c,t,r);
+    poemBox.querySelector('[data-kind="prayer"]').textContent = P.prayer(c,t,r);
+    poemBox.hidden = false;
+    closing.hidden = false;
+  }
+
+  cards.forEach(el=> el.addEventListener('click', ()=> flipCard(el)));
+  openBtn.addEventListener('click', openRitual);
+  resetBtn.addEventListener('click', ()=>{ reset(); stopStars(); try{ bg.pause(); }catch(_){}
+    if(audioOn){ fadeAudio(0,400).then(()=>audio.pause()); audioOn=false; audioBtn.setAttribute('aria-pressed','false'); audioBtn.textContent='🔈 音をオン'; }
+  });
+
+  // 共有：簡易画像化（Canvasに文字を書き出し）
+  shareBtn?.addEventListener('click', async ()=>{
+    if (poemBox.hidden) return;
+    const canvas = document.createElement('canvas');
+    const W = 1080, H = 1350;
+    canvas.width=W; canvas.height=H;
+    const c = canvas.getContext('2d');
+    // 背景
+    const grd = c.createLinearGradient(0,0,0,H);
+    grd.addColorStop(0,'#0b0b1a'); grd.addColorStop(1,'#2c2145'); c.fillStyle = grd; c.fillRect(0,0,W,H);
+    // タイトル
+    c.fillStyle='#FFD76F'; c.font='bold 44px "Noto Sans JP"'; c.fillText('星詠リチュアル', 64, 100);
+    // 本文
+    c.fillStyle='#FFFFFF'; c.font='600 36px "Noto Sans JP"';
+    const lines = Array.from(poemBox.querySelectorAll('.ritual__poem-line')).map(n=>n.textContent);
+    let y=180; const dy=60; const wrap = (text,maxWidth)=> {
+      const parts = []; let cur = '';
+      for (const ch of text){
+        const test = cur + ch; if (c.measureText(test).width > maxWidth){ parts.push(cur); cur = ch; } else { cur = test; }
+      }
+      if (cur) parts.push(cur); return parts;
+    };
+    for (const line of lines){
+      for (const l of wrap(line, W-128)){ c.fillText(l, 64, y); y+=dy; }
+      y+=10;
+    }
+    c.fillStyle='#FFD76F'; c.font='700 28px "Noto Sans JP"';
+    c.fillText('— 詩韻思想 × TAROT BREAKER', 64, H-80);
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a'); a.href=url; a.download='shiei_ritual.png'; a.click();
+  });
+
+  // 初期化
+  reset();
+})();
+</script>
 </body>
 </html>
