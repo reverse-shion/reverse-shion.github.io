@@ -1,191 +1,113 @@
-/* ===== Theme Tokens ===== */
+/* ===== Tokens ===== */
 :root{
-  /* palette */
-  --ink:#e9e9f0;
-  --muted:#A6A6C7;
-  --bg:#0b0b1a;
-  --panel:#151327;
-  --lav:#bda8ff;
+  --ink:#e9e9ff;
+  --bg:#0b0814;
+  --lav:#bfaeff;
   --gold:#ffd76f;
+  --glass:#ffffff1a;
 
-  /* glow */
-  --halo-a: rgba(255,215,111,.35);
-  --halo-b: rgba(189,168,255,.35);
-
-  /* layout */
-  --r:16px;
-  --card-w: clamp(96px, 22vw, 180px);
-  --card-h: calc(var(--card-w) * 1.6);
-
-  /* tarot back image（★差し替えOK） */
-  --card-back-url: url("/assets/tarot/back.jpg");
-}
-
-@media (prefers-color-scheme: light){
-  :root{ --ink:#20202a; --bg:#ffffff; --panel:#f6f6fb; }
+  /* カード画像（JSで上書きも可） */
+  --card-back-url: url('assets/tarot/back.png');
 }
 
 /* ===== Base ===== */
-*{ box-sizing: border-box }
+*{ box-sizing:border-box }
 html,body{ height:100% }
 body{
-  margin:0; color:var(--ink); background:
-    radial-gradient(1200px 900px at 50% -20%, #191738 0%, transparent 60%),
-    radial-gradient(1200px 900px at 50% 120%, #191738 0%, transparent 60%),
-    #0b0b1a;
-  font: 500 16px/1.6 "Noto Sans JP", system-ui, -apple-system, sans-serif;
+  margin:0; color:var(--ink); background:radial-gradient(1200px 800px at 50% -20%, #2a1b4a, transparent 60%),
+                                 radial-gradient(1400px 1000px at 50% 120%, #0e0a22, #070513 55%);
+  font-family: "Noto Sans JP", system-ui, sans-serif;
 }
+h1{ font-size:clamp(20px,6vw,40px); margin:24px 0 8px; letter-spacing:.06em }
+.wrap{ max-width:960px; margin:0 auto; padding:20px }
+.wish{ display:block; margin:8px 0 16px }
+.wish input{ width:min(720px,100%); padding:12px 14px; border-radius:12px; border:1px solid #3b3560; background:#110d22; color:var(--ink) }
 
-.visually-hidden{ position:absolute!important; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
-
-/* ===== Header ===== */
-.header{ max-width:980px; margin:24px auto 8px; padding:0 16px; text-align:center }
-.header h1{ margin:0 0 6px; font: 800 clamp(18px, 3.6vw, 28px)/1.2 "Noto Sans JP", sans-serif }
-.header .sub{ margin:0; color:var(--muted); font-size:clamp(12px, 2.6vw, 14px) }
-
-/* ===== Wish input ===== */
-.wishbox{ display:flex; justify-content:center; padding:8px 16px 4px }
-#wish{
-  width:min(760px, 92vw);
-  background:var(--panel);
-  color:var(--ink);
-  border:1px solid #292647;
-  border-radius:999px;
-  padding:10px 16px;
-  outline:none;
-}
-#wish::placeholder{ color:#8f8ab8 }
-
-/* ===== Deck (stack) ===== */
-.stage{ max-width:1100px; margin:8px auto 20px; padding:0 12px }
-.deck-area{ display:grid; place-items:center; gap:8px }
-.deck-stack{
-  position:relative;
-  width:min(180px, 44vw); /* ←束のサイズ（iPhoneで約親指大） */
-  height:calc(min(180px, 44vw) * 1.6);
-  margin:12px auto 6px;
-  filter: drop-shadow(0 8px 30px #0008);
-}
-.deck-stack.fade-out{ animation: fadeOut .36s ease forwards }
-@keyframes fadeOut{ to{ opacity:0; transform:scale(.96) } }
-
-.deck-back{
-  position:absolute; inset:0; border-radius:12px; overflow:hidden;
-  background:
-    var(--card-back-url),
-    radial-gradient(160% 120% at 50% -20%, #342a56 0%, transparent 60%),
-    radial-gradient(160% 120% at 50% 120%, #342a56 0%, transparent 60%),
-    #0e0b1f;
-  background-size: cover, auto, auto, auto;
-  background-position: center;
-  box-shadow: 0 1px 0 #ffffff22 inset, 0 18px 40px #0008;
-}
-.deck-back.layer-1{ transform: translateY(-10px) rotate(-4deg) }
-.deck-back.layer-2{ transform: translateY(2px) rotate(0deg) }
-.deck-back.layer-3{ transform: translateY(14px) rotate(4deg) }
-
-/* ===== Controls ===== */
-.controls{ display:flex; gap:10px; justify-content:center; align-items:center }
+.actions{ margin:10px 0 18px }
 .btn{
-  appearance:none; cursor:pointer; border:0; border-radius:999px;
-  padding:.7em 1.2em; font-weight:700; letter-spacing:.02em;
+  appearance:none; border:none; cursor:pointer;
+  padding:12px 18px; border-radius:999px; color:#1a1333; background:linear-gradient(135deg,#f7e9b0,#ffd76f);
+  box-shadow:0 10px 26px #0008, inset 0 1px 0 #fff7;
 }
-.btn--primary{
-  color:#1a1333; background: linear-gradient(180deg, #ffe8a7, #ffd76f);
-  box-shadow: 0 6px 20px var(--halo-a);
-}
-.btn--ghost{
-  color:#dacfff; background:#292647; border:1px solid #3a3566;
+.btn-primary{ font-weight:700 }
+.controls{ display:flex; gap:10px; margin-top:16px }
+
+/* ===== Deck ===== */
+.deck{
+  display:flex; justify-content:center; align-items:center; gap:clamp(10px,3vw,22px);
+  min-height:34vh; perspective:1200px;
 }
 
-/* ===== Row (3 cards side by side) ===== */
-.row{
-  display:grid; grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: clamp(12px, 3vw, 28px);
-  align-items: start; justify-items:center;
-  max-width:980px; margin:10px auto 0; padding:10px 6px;
+/* カード本体：幅は画面の約1/9〜1/6の範囲で自動 */
+.card{
+  width:clamp(88px,18vw,140px); aspect-ratio: 2 / 3;
+  position:relative; border-radius:14px; border:1px solid #0000; transform-style:preserve-3d;
+  opacity:0; transform:translateY(24px) scale(.94); transition:transform .5s ease, opacity .5s ease;
+  background:#0d0a19;
+  box-shadow:0 18px 46px rgba(0,0,0,.55), 0 0 0 1px #ffffff10 inset;
 }
-.tap-note{
-  grid-column:1/-1; justify-self:center; pointer-events:none;
-  background:transparent; border:0; color:#cbb6ff; font-weight:700; opacity:.9
-}
-.tarot-card{
-  position:relative; width:var(--card-w); height:var(--card-h);
-  transform-style:preserve-3d; perspective:1200px;
-  border-radius:12px; cursor:pointer;
-  transition: transform .28s ease;
-  box-shadow: 0 16px 46px rgba(0,0,0,.35), 0 0 0 1px #ffffff16 inset;
-  background: radial-gradient(140% 120% at 50% 120%, #19152e 0%, #0f0c1f 60%);
-}
-.tarot-card.show{ animation: burst .6s ease both }
-@keyframes burst{
-  0%{ opacity:0; transform:translateY(12px) scale(.92) }
-  60%{ opacity:1; transform:translateY(0) scale(1.04) }
-  100%{ transform:scale(1) }
-}
+.card.show{ opacity:1; transform:translateY(0) scale(1) }
 
-/* 裏面：::before で描画 */
-.tarot-card::before{
-  content:""; position:absolute; inset:0; border-radius:12px; backface-visibility:hidden;
-  background:
-    var(--card-back-url),
-    radial-gradient(180% 120% at 50% -10%, rgba(255,215,111,.14), transparent 56%),
-    radial-gradient(140% 100% at 50% 120%, rgba(174,138,255,.14), transparent 56%),
-    #0f0c1f;
-  background-size:cover, auto, auto, auto;
-  background-position:center;
-  box-shadow: 0 1px 0 #ffffff22 inset;
-  transform:rotateY(0deg);
-}
-
-/* 表面：.face 要素＋CSS変数で画像差替 */
-.tarot-card .face{
-  position:absolute; inset:0; border-radius:12px; backface-visibility:hidden;
-  display:grid; place-items:center; overflow:hidden;
-  opacity:0; transform: rotateY(-180deg); transition: opacity .28s ease;
-  background: var(--face-url, radial-gradient(120% 100% at 50% 20%, #2a2648 0%, #120f23 60%));
+.face{
+  position:absolute; inset:0; border-radius:14px; backface-visibility:hidden;
   background-size:cover; background-position:center;
 }
-.tarot-card.is-flipped::before{ transform: rotateY(180deg) }
-.tarot-card.is-flipped .face{ transform: rotateY(0deg); opacity:1 }
+.face.back{ background-image:var(--card-back-url) }
+.face.front{ background-image:var(--face-url); transform:rotateY(180deg) }
 
-/* クリック時の光（祈りの粒） */
-.tarot-card.show::after{
-  content:""; position:absolute; inset:-6px; border-radius:14px; pointer-events:none;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,215,111,.28), transparent 52%),
-    radial-gradient(circle at 70% 70%, rgba(174,138,255,.26), transparent 52%);
-  mix-blend-mode:screen; filter: blur(6px);
-  animation: prayer 3s ease-in-out infinite;
+.face-label{
+  position:absolute; left:8px; bottom:8px; font:600 12px/1.2 system-ui, sans-serif;
+  padding:6px 8px; border-radius:10px; background:linear-gradient(180deg,#171129,#0b0818); color:#cfc6ff;
+  box-shadow:0 6px 16px #000a, 0 0 0 1px #ffffff12 inset;
 }
-@keyframes prayer{
-  0%,100%{ transform:scale(1) rotate(0deg) }
-  50%{ transform:scale(1.06) rotate(3deg) }
-}
+
+/* 裏面の状態 */
+.card.is-back .front{ pointer-events:none }
+.card.is-flipped{ transform:rotateY(180deg) }
+
+/* ===== Hint ===== */
+.hint{ text-align:center; margin:8px 0 0; color:#c9bfff; opacity:.9 }
 
 /* ===== Result ===== */
-.result{
-  max-width:980px; margin:14px auto 24px; padding:0 10px; opacity:0; transform:translateY(6px);
-  transition: opacity .36s ease, transform .36s ease;
-}
-.result.reveal{ opacity:1; transform:none }
+.result{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:18px }
 .result-item{
-  background: linear-gradient(180deg, #171433, #14122a);
-  border:1px solid #2a2750; border-radius:14px; padding:12px clamp(12px,2.6vw,16px); margin-top:10px;
+  border-radius:14px; padding:14px; background:linear-gradient(180deg,#120d22,#0b0816);
+  box-shadow:0 10px 26px #0008, 0 0 0 1px #ffffff12 inset;
 }
 .result-item::before{
-  content:attr(data-trinity); display:block; font-size:12px; color:var(--gold); margin-bottom:4px;
+  content:attr(data-trinity); display:block; font-size:12px; color:var(--gold); margin-bottom:4px; letter-spacing:.08em
 }
-.r-title{ margin:.2em 0; font: 800 clamp(16px, 2.8vw, 20px)/1.2 "Noto Sans JP", sans-serif }
-.r-text{ margin:.2em 0 0; color:#D8D3FF }
+.r-title{ margin:.2em 0 .4em; font-size:14px; color:#efeaff }
+.r-text{ margin:0; color:#cfc7ff }
+.closing{ margin:.6em 0 0; color:#ffdca6 }
 
-.closing{ text-align:center; margin:16px 0 0; color:#C7B7FF }
-.cta{ display:flex; gap:8px; justify-content:center; margin-top:12px }
+/* ===== Global Glow (画面全体の光) ===== */
+.global-glow{
+  position:fixed; inset:0; pointer-events:none; opacity:0;
+  background:
+    radial-gradient(closest-side circle at 50% 50%, #ffffff, #ffeeb8, #bda6ff 60%, #0000 70%),
+    radial-gradient(1000px 700px at 50% -10%, #ffdd9a33, #0000 60%),
+    radial-gradient(1200px 900px at 50% 120%, #bca7ff2e, #0000 60%);
+  filter: blur(16px);
+  transition: opacity .35s ease;
+}
+.global-glow.is-on{
+  animation: glowExpand 1.1s ease forwards;
+}
+@keyframes glowExpand{
+  0%{ opacity:0; transform:scale(.9) }
+  30%{ opacity:1; transform:scale(1) }
+  100%{ opacity:0; transform:scale(1.12) }
+}
 
-/* ===== Buttons ===== */
-.btn:focus-visible{ outline:2px solid #8f7fff; outline-offset:2px }
+/* クローズ演出（画面を静かに暗く） */
+body.is-closed::after{
+  content:""; position:fixed; inset:0; background:radial-gradient(220vw 220vh at 50% 50%, #0000 30%, #02010a 60%, #02010a);
+  animation: fadeClose .9s ease forwards;
+}
+@keyframes fadeClose{ from{ opacity:0 } to{ opacity:1 } }
 
-/* ===== Motion reduce ===== */
+/* 動きに弱い人向け */
 @media (prefers-reduced-motion: reduce){
-  *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition:none !important; scroll-behavior:auto !important }
+  .card, .global-glow{ transition:none; animation:none }
 }
