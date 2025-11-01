@@ -396,6 +396,8 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 @keyframes rise{from{transform:translateY(6px);opacity:.0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
+
+
 /* ===== Mini Reading UI ===== */
 #mini-reading{border-top:1px solid rgba(0,0,0,.05)}
 .reading-ui{margin-top:10px}
@@ -410,45 +412,58 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   justify-items:center;
 }
 
-/* 開始前は無地（JSで開始後に裏面適用） */
+/* カード本体：画像のみ表示（テキストは入れない） */
 .card-slot{
   width: 120px;
   aspect-ratio: 2 / 3;
   border:1px solid rgba(0,0,0,.08);
   border-radius:16px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.95)),
-    radial-gradient(100% 100% at 50% 0%, rgba(255,215,111,.18),rgba(174,138,255,.15));
+  background:#fff;
   box-shadow:0 8px 24px rgba(174,138,255,.16);
   cursor:not-allowed;
   transition:transform .15s, box-shadow .15s, filter .15s, background-image .2s ease;
   position:relative; overflow:hidden;
 }
-.card-slot[aria-pressed="true"]{filter:saturate(110%)}
 .card-slot:enabled{cursor:pointer}
 .card-slot:enabled:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(174,138,255,.22)}
-.card-slot::after{
-  content:"TAP"; position:absolute; inset:auto 10px 10px auto; font-weight:800; font-size:12px;
-  color:#503080; background:rgba(255,215,111,.25); border:1px solid rgba(255,215,111,.45); padding:3px 8px; border-radius:999px;
-  opacity:0; transition:opacity .15s;
-}
-.card-slot:enabled:hover::after{opacity:1}
+.card-slot[aria-pressed="true"]{filter:saturate(110%)}
 
+/* 裏面：共通画像を載せるためのクラス（JSで付与/削除） */
+.card-slot.is-back{
+  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg');
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  color: transparent;
+}
+/* 表になった時の見え方（画像のみ。文字は枠下に出す） */
+.card-slot.is-picked{
+  background-color:#fff;
+}
+
+/* カード名（枠下） */
+.reading-names{
+  max-width:720px;
+  margin:6px auto 0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  text-align:center;
+}
+.card-name{
+  min-height:1.6em;
+  font-weight:700;
+  color:#1d0f33;
+  font-size:clamp(14px,4vw,16px);
+}
+
+/* 結果ボックス */
 .result-grid{display:grid;gap:12px;max-width:980px;margin:16px auto 0}
 @media(min-width:720px){.result-grid{grid-template-columns:repeat(3,1fr)}}
 .result-item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
 .result-item .r-title{margin:.2em 0 .2em;font-size:17px;color:#2a1030}
 .result-item .r-text{margin:0;color:#555;line-height:1.7}
 
-/* タロット裏面を確実に出す専用クラス */
-.card-slot.is-back{
-  background-image: url('/assets/images/tarot/tarot_back_1024x1536.jpg') !important;
-  background-size: cover !important;
-  background-position: 50% 50% !important;
-  background-repeat: no-repeat !important;
-  /* 万一グラデが上に来ても潰す */
-  background-color: transparent !important;
-}
 /* === Tarot Mini Reading === */
 .reading-deck{
   display:grid;
