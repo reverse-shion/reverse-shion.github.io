@@ -888,193 +888,229 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   reset();
 })();
 
+  
   <script>
 (() => {
-  const start = document.getElementById('readingStart');
-  const reset = document.getElementById('readingReset');
-  const deckBtns = [...document.querySelectorAll('.card-slot')];
-  const result = document.querySelector('.reading-result');
+  // 要素参照
+  const openBtn  = document.getElementById('ritualOpen');
+  const resetBtn = document.getElementById('ritualReset');
+  const audioBtn = document.getElementById('ritualAudio');
+  const bg       = document.getElementById('ritualBg');
+  const stars    = document.getElementById('ritualStars');
+  const poemBox  = document.querySelector('.ritual__poem');
+  const closing  = document.querySelector('.ritual__closing');
+  const shareBtn = document.getElementById('ritualShare');
+  const cards    = Array.from(document.querySelectorAll('.ritual-card'));
 
-  // オーディオ（再生失敗は握りつぶす）
-  const sFlip  = new Audio('/assets/audio/flip.mp3');
-  const sChime = new Audio('/assets/audio/chime.mp3');
-  sFlip.volume = 0.75; sChime.volume = 0.85;
+  if (!openBtn || !resetBtn || !audioBtn || !bg || !stars || !poemBox || !closing || !cards.length) return;
 
-  const safePlay = (audio) => {
-    try { audio.currentTime = 0; const p = audio.play(); if (p?.catch) p.catch(()=>{}); }
-    catch(_) {}
-  };
+  /* ====== 状態 ====== */
+  const state = { opened:false, compass:null, trigger:null, route:null };
 
-  const CARDS = [
-    {name:'愚者',key:'自由に踏み出す'},{name:'魔術師',key:'いま始める'},
-    {name:'女教皇',key:'静かに見極める'},{name:'女帝',key:'受け取り育てる'},
-    {name:'皇帝',key:'決めて動かす'},{name:'教皇',key:'信頼に寄る'},
-    {name:'恋人',key:'選び抜く'},{name:'戦車',key:'突破する'},
-    {name:'力',key:'優しさで制す'},{name:'隠者',key:'内に灯す'},
-    {name:'運命の輪',key:'流れに乗る'},{name:'正義',key:'整えバランス'},
-    {name:'吊るされた男',key:'意味を反転'},{name:'死神',key:'一度終わらせる'},
-    {name:'節制',key:'混ぜ調和する'},{name:'悪魔',key:'執着を手放す'},
-    {name:'塔',key:'壊して更新'},{name:'星',key:'希望を見る'},
-    {name:'月',key:'不安を識る'},{name:'太陽',key:'喜びで進む'},
-    {name:'審判',key:'呼び覚ます'},{name:'世界',key:'完成し次へ'}
-  ];
+  /* ====== 星粒（Canvas） ====== */
+  const ctx = stars.getContext('2d', { alpha: true });
+  let W=0, H=0, P=[], rafId=null;
 
-  // ヘルパ
-  let picked = {}, stack = [];
-  const cap   = i => document.querySelector(`.card-caption[data-cap="${i}"]`);
-  const title = i => document.querySelector(`.r-title[data-for="${i}"]`);
-  const text  = i => document.querySelector(`.r-text[data-for="${i}"]`);
-  const shuffle = (a) => { const x = a.slice(); for (let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; };
-
-  // 要素中心座標（ページ座標）
-  function centerOf(el){
-    const r = el.getBoundingClientRect();
-    return { x: r.left + r.width/2 + window.scrollX, y: r.top + r.height/2 + window.scrollY };
-  }
-
-  function resetDeck(){
-    deckBtns.forEach(b => { b.className = 'card-slot is-back'; b.disabled = true; });
-    [1,2,3].forEach(i => { const c = cap(i); if (c){ c.textContent=''; c.classList.remove('is-show'); }});
-    if (result) result.hidden = true;
-    reset.disabled = true;
-    start.disabled = false;
-    picked = {};
-  }
-
-  function startReading(){
-    stack = shuffle(CARDS);
-    deckBtns.forEach(b => b.disabled = false);
-    start.disabled = true;
-    reset.disabled = false;
-  }
-
-  function reveal(slot, btn){
-    if (picked[slot]) return;
-    const card = stack.pop();
-    picked[slot] = card;
-
-    // 裏→表アニメ（クラスはCSS側で定義）
-    btn.classList.remove('is-back');
-    requestAnimationFrame(() => {
-      btn.classList.add('is-picked','is-burst');
-      setTimeout(() => btn.classList.remove('is-burst'), 560);
-    });
-
-    safePlay(sFlip);
-
-    // 下のキャプション（カード名のみ）
-    const c = cap(slot);
-    if (c){ c.textContent = card.name; c.classList.add('is-show'); }
-
-    // 右側（または下部）の結果欄
-    if (title(slot)) title(slot).textContent = card.name;
-    if (text(slot))  text(slot).textContent  = card.key + '。';
-    if (result) result.hidden = false;
-
-    // 3枚そろったらチャイム
-    if (picked[1] && picked[2] && picked[3]) safePlay(sChime);
-
-    // タップ光演出（波紋）
-    const {x, y} = centerOf(btn);
-    spawnRipple(x, y);
-  }
-
-  // ========= 星環の波紋（Canvasアニメ） =========
-  const rippleCanvas = document.getElementById('rippleCanvas');
-  const rc = rippleCanvas?.getContext ? rippleCanvas.getContext('2d') : null;
-
-  // キャンバスがない場合は演出をスキップ
-  if (!rippleCanvas || !rc){
-    window.spawnRipple = () => {};
-  } else {
-    function sizeCanvas(){
-      const host = rippleCanvas.parentElement || document.body;
-      const r = host.getBoundingClientRect();
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      rippleCanvas.width = Math.max(1, r.width * dpr);
-      rippleCanvas.height = Math.max(1, r.height * dpr);
-      rippleCanvas.style.width = r.width + 'px';
-      rippleCanvas.style.height = r.height + 'px';
-      rc.setTransform(dpr, 0, 0, dpr, 0, 0);
+  function sizeToClient(canvas){
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const w = Math.floor(r.width  * dpr);
+    const h = Math.floor(r.height * dpr);
+    if (canvas.width !== w || canvas.height !== h){
+      canvas.width = w; canvas.height = h;
+      W = w; H = h;
+      ctx.setTransform(dpr,0,0,dpr,0,0); // ぼけ防止
     }
-    window.addEventListener('resize', sizeCanvas, { passive: true });
-    sizeCanvas();
-
-    let ripples = [];
-    let rafId = 0;
-
-    function loop(){
-      rc.clearRect(0,0,rippleCanvas.width, rippleCanvas.height);
-      const now = performance.now();
-      ripples = ripples.filter(r => {
-        const t = (now - r.t0) / r.life; // 0 → 1
-        if (t >= 1) return false;
-        const ease = t*t*(3-2*t); // smoothstep
-        const rNow = r.r0 + (r.r1 - r.r0) * ease;
-        const aNow = (1 - ease) * r.alpha;
-        // 複合リング（薄い円環）
-        rc.beginPath();
-        rc.arc(r.x, r.y, rNow, 0, Math.PI*2);
-        rc.strokeStyle = `rgba(${r.col[0]},${r.col[1]},${r.col[2]},${aNow})`;
-        rc.lineWidth = r.stroke * (1 - t*0.6);
-        rc.shadowBlur = 24 * (1 - t);
-        rc.shadowColor = `rgba(${r.col[0]},${r.col[1]},${r.col[2]},${aNow})`;
-        rc.stroke();
-        rc.shadowBlur = 0;
-
-        // 内側の微光点
-        rc.beginPath();
-        rc.arc(r.x, r.y, Math.max(1, rNow*0.04), 0, Math.PI*2);
-        rc.fillStyle = `rgba(${r.col[0]},${r.col[1]},${r.col[2]},${aNow*0.8})`;
-        rc.fill();
-        return true;
-      });
-      if (ripples.length) rafId = requestAnimationFrame(loop);
-      else rafId = 0;
+  }
+  function initParticles(n=80){
+    P = Array.from({length:n}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      s: Math.random()*1.6+0.4,
+      vx:(Math.random()-.5)*.15, vy:(Math.random()-.5)*.15,
+      a: Math.random()*0.6+0.2
+    }));
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of P){
+      p.x+=p.vx; p.y+=p.vy;
+      if (p.x<0) p.x=W; if (p.x>W) p.x=0;
+      if (p.y<0) p.y=H; if (p.y>H) p.y=0;
+      const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s*6);
+      g.addColorStop(0, `rgba(255,215,111,${p.a})`);
+      g.addColorStop(1, 'rgba(255,215,111,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.s*4,0,Math.PI*2); ctx.fill();
     }
+    rafId = requestAnimationFrame(tick);
+  }
+  function startStars(){
+    sizeToClient(stars);
+    initParticles();
+    cancelAnimationFrame(rafId);
+    tick();
+  }
+  function stopStars(){
+    cancelAnimationFrame(rafId);
+  }
+  new ResizeObserver(() => sizeToClient(stars)).observe(stars);
 
-    function toLocal(x, y){
-      const rect = rippleCanvas.getBoundingClientRect();
-      return { x: x - rect.left - window.scrollX, y: y - rect.top - window.scrollY };
+  /* ====== オーディオ（iOS解禁対応） ====== */
+  const audio = new Audio('/assets/ritual/ambience.mp3');
+  audio.loop = true; audio.preload = 'auto'; audio.volume = 0;
+  let audioOn = false;
+
+  async function fade(target=0.6, ms=600){
+    const steps = 24, step = (target - audio.volume)/steps, wait = ms/steps;
+    for (let i=0;i<steps;i++){
+      audio.volume = Math.max(0, Math.min(1, audio.volume + step));
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise(r=>setTimeout(r,wait));
     }
+  }
 
-    window.spawnRipple = (px, py) => {
-      const { x, y } = toLocal(px, py);
-      const now = performance.now();
-      const palette = [
-        [255,215,111], // gold
-        [174,138,255], // lavender
-        [255,255,255]  // white
-      ];
-      // 3枚レイヤー
-      for (let i=0;i<3;i++){
-        ripples.push({
-          x, y,
-          t0: now + i*24,       // 少し遅延して重ねる
-          life: 900,            // ms
-          r0: 16,               // 初期半径
-          r1: 180 + i*40,       // 最終半径
-          stroke: 3 - i*0.4,    // 線の太さ
-          alpha: 0.7 - i*0.15,  // 透明度
-          col: palette[i % palette.length]
-        });
-      }
-      if (!rafId) rafId = requestAnimationFrame(loop);
+  // どこかを最初にタップ/クリックした瞬間に再生解禁（音量0）
+  function primeAudioOnce(){
+    const once = () => {
+      audio.play().then(()=>{ audio.pause(); audio.currentTime = 0; }).catch(()=>{});
+      window.removeEventListener('pointerdown', once, { passive:true });
+      window.removeEventListener('keydown', once);
     };
+    window.addEventListener('pointerdown', once, { passive:true });
+    window.addEventListener('keydown', once);
+  }
+  primeAudioOnce();
+
+  audioBtn.addEventListener('click', async () => {
+    try{
+      if (!audioOn){
+        await audio.play();
+        audioOn = true;
+        audioBtn.setAttribute('aria-pressed','true');
+        audioBtn.textContent = '🔊 音オン（再タップでオフ）';
+        fade(.6, 700);
+      }else{
+        audioOn = false;
+        audioBtn.setAttribute('aria-pressed','false');
+        audioBtn.textContent = '🔈 音をオン';
+        fade(0, 500).then(()=>audio.pause());
+      }
+    }catch(_){
+      audioBtn.textContent = '🔇 再タップで解禁';
+    }
+  });
+
+  /* ====== カードプール ====== */
+  const POOL = [
+    {name:'愚者', key:'自由に踏み出す'}, {name:'魔術師', key:'いま始める'},
+    {name:'女教皇', key:'静かに見極める'}, {name:'女帝', key:'受け取り育てる'},
+    {name:'皇帝', key:'決めて動かす'}, {name:'教皇', key:'信頼に寄る'},
+    {name:'恋人', key:'選び抜く'}, {name:'戦車', key:'突破する'},
+    {name:'力', key:'優しさで制す'}, {name:'隠者', key:'内に灯す'},
+    {name:'運命の輪', key:'流れに乗る'}, {name:'正義', key:'整えバランス'},
+    {name:'吊るされた男', key:'意味を反転'}, {name:'死神', key:'一度終わらせる'},
+    {name:'節制', key:'混ぜ調和する'}, {name:'悪魔', key:'執着を手放す'},
+    {name:'塔', key:'壊して更新'}, {name:'星', key:'希望を見る'},
+    {name:'月', key:'不安を識る'}, {name:'太陽', key:'喜びで進む'},
+    {name:'審判', key:'呼び覚ます'}, {name:'世界', key:'完成し次へ'}
+  ];
+  const pick = () => POOL[Math.floor(Math.random()*POOL.length)];
+
+  /* ====== リセット／開始 ====== */
+  function reset(){
+    state.opened = false;
+    state.compass = state.trigger = state.route = null;
+    poemBox.hidden = true; closing.hidden = true;
+    cards.forEach(c=>{
+      c.classList.remove('is-flipped','is-ready');
+      c.querySelector('.ritual-card__face').textContent = '';
+      c.style.cursor = 'not-allowed';
+    });
+    resetBtn.disabled = true;
+    stopStars();
+    try{ bg.pause(); }catch(_){}
   }
 
-  // ========= イベント紐付け =========
-  resetDeck();
-  start?.addEventListener('click', startReading);
-  reset?.addEventListener('click', resetDeck);
-  deckBtns.forEach(btn => btn.addEventListener('click', () => {
-    if (!btn.disabled){
-      const slot = btn.getAttribute('data-slot');
-      reveal(slot, btn);
-    }
-  }));
+  function openRitual(){
+    if (state.opened) return;
+    state.opened = true;
+    startStars();
+    try{ bg.play().catch(()=>{}); }catch(_){}
+    cards.forEach(c=>{ c.classList.add('is-ready'); c.style.cursor='pointer'; });
+    resetBtn.disabled = false;
+    // 無音で一瞬再生→iOS解禁の保険
+    audio.play().then(()=>{ if(!audioOn){ audio.pause(); audio.currentTime=0; } }).catch(()=>{});
+  }
+
+  /* ====== ひっくり返し ====== */
+  function flipCard(el){
+    if (!state.opened) openRitual(); // ★未開始でもタップで開始→そのまま反応
+    if (!el.classList.contains('is-ready') || el.classList.contains('is-flipped')) return;
+
+    el.classList.add('is-flipped');
+    const slot = el.dataset.slot;
+    const card = pick();
+    state[slot] = card;
+
+    el.querySelector('.ritual-card__face').innerHTML =
+      `<strong style="font-size:18px">${card.name}</strong><br><span style="font-size:13px;color:#6b6b6b">${card.key}</span>`;
+
+    // 鈴音（失敗は無視）
+    try{ const ding = new Audio('/assets/ritual/ding.mp3'); ding.volume=.6; ding.play().catch(()=>{}); }catch(_){}
+
+    if (state.compass && state.trigger && state.route) generatePoem();
+  }
+
+  /* ====== 詩生成 ====== */
+  function generatePoem(){
+    const c=state.compass, t=state.trigger, r=state.route;
+    const poem   = `「${c.name}」は ${c.key}。その息は、${t.name}の手で ${t.key}。そして、${r.name}が ${r.key} とき、言葉は光になる。`;
+    const rhyme  = `星は囁く── ${c.name}・${t.name}・${r.name}。拍（ビート）はあなたの鼓動に合う。`;
+    const prayer = `迷いよ、いま薄らげ。小さな一歩でいい。${t.key} こと、それが道標。`;
+
+    poemBox.querySelector('[data-kind="poem"]').textContent   = poem;
+    poemBox.querySelector('[data-kind="rhyme"]').textContent  = rhyme;
+    poemBox.querySelector('[data-kind="prayer"]').textContent = prayer;
+
+    poemBox.hidden = false; closing.hidden = false;
+  }
+
+  /* ====== 共有画像 ====== */
+  shareBtn?.addEventListener('click', () => {
+    if (poemBox.hidden) return;
+    const canvas = document.createElement('canvas');
+    const W=1080, H=1350; canvas.width=W; canvas.height=H;
+    const c = canvas.getContext('2d');
+    const grd = c.createLinearGradient(0,0,0,H);
+    grd.addColorStop(0,'#0b0b1a'); grd.addColorStop(1,'#2c2145');
+    c.fillStyle = grd; c.fillRect(0,0,W,H);
+
+    c.fillStyle='#FFD76F'; c.font='bold 44px "Noto Sans JP"';
+    c.fillText('星詠リチュアル', 64, 100);
+
+    c.fillStyle='#FFFFFF'; c.font='600 36px "Noto Sans JP"';
+    const lines = Array.from(poemBox.querySelectorAll('.ritual__poem-line')).map(n=>n.textContent);
+    let y=180; const dy=60;
+    function wrap(text,max){ const out=[]; let cur=''; for(const ch of text){ const t=cur+ch; if(c.measureText(t).width>max){ out.push(cur); cur=ch; } else { cur=t; } } if(cur) out.push(cur); return out; }
+    for (const line of lines){ for (const l of wrap(line, W-128)){ c.fillText(l,64,y); y+=dy; } y+=10; }
+
+    c.fillStyle='#FFD76F'; c.font='700 28px "Noto Sans JP"';
+    c.fillText('— 詩韻思想 × TAROT BREAKER', 64, H-80);
+
+    const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='shiei_ritual.png'; a.click();
+  });
+
+  /* ====== イベント ====== */
+  openBtn.addEventListener('click', openRitual);
+  resetBtn.addEventListener('click', () => {
+    if (audioOn){ fade(0,400).then(()=>audio.pause()); audioOn=false; audioBtn.setAttribute('aria-pressed','false'); audioBtn.textContent='🔈 音をオン'; }
+    reset();
+  });
+  cards.forEach(el => el.addEventListener('click', () => flipCard(el)));
+
+  // 初期化
+  reset();
 })();
-</script>
 </script>
 </body>
 </html>
