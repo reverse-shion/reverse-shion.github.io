@@ -1,31 +1,27 @@
-/* Re:verse Shion — 3-card Reading (flip + star + sound) */
+/* Re:verse Shion — 3-card Reading (flip + star + sound + poetic result) */
 (() => {
-  // ⭐ タップ時の星紋
+
+  /* ✨ 星紋の光エフェクト */
   function createStarSymbol(target){
     const star = document.createElement('div');
     star.className = 'star-symbol';
     target.appendChild(star);
     star.animate(
       [{ transform:'scale(0)', opacity:1 }, { transform:'scale(1.5)', opacity:0 }],
-      { duration: 800, easing: 'ease-out' }
+      { duration:800, easing:'ease-out' }
     );
-    setTimeout(() => star.remove(), 800);
+    setTimeout(()=> star.remove(), 800);
   }
 
-  // 小ユーティリティ
-  const $  = (sel, el=document) => el.querySelector(sel);
-  const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
-
-  // ✅ HTMLの実体に合わせた名前へ統一
-  const startBtn  = $('#readingStart');
-  const resetBtn  = $('#readingReset');
-  const deck      = $('#miniDeck');           // ← 親ラッパにidを付けておくと便利（任意）
-  const slots     = $$('.card-slot', deck);   // ← 3枚の「置き場」
-  const resultBox = $('#readingResult');
-
-  if (!startBtn || !resetBtn || !deck || !slots.length || !resultBox) return;
+  /* 🎵 効果音 */
+  const tapSE  = new Audio('/assets/sfx/tap.mp3');
+  const flipSE = new Audio('/assets/sfx/flip.mp3');
+  document.addEventListener('pointerdown', ()=>{
+    tapSE.muted=false; flipSE.muted=false;
+  }, {once:true});
+  
   /* --- Rider-Waite データ（表面画像＆詩鍵）--- */
-  const CARD_SET = [
+  const CARDS = [
     { id:'00_fool',       name:'愚者',       key:['枠を超える','はじめの一歩','風を信じる'] },
     { id:'01_magician',   name:'魔術師',     key:['手の内にある','いま始める','言葉が現実になる'] },
     { id:'02_priestess',  name:'女教皇',     key:['沈黙が教える','見極める','澄んだ目で受け取る'] },
@@ -50,190 +46,113 @@
     { id:'21_world',      name:'世界',       key:['完成','輪が満ちる','次の円環へ'] },
   ];
 
-  /* 画像の場所（必要に合わせて調整） */
-  const IMG_BASE = '/assets/images/riderwaite/majors/'; // 例: 00_fool.jpg …
-  const IMG_EXT  = '.jpg';
-
-  /* サウンド（iOSは最初のユーザー操作でunlock） */
-  const sfx = {
-    tap: new Audio('/assets/sfx/tap.mp3'),
-    shuffle: new Audio('/assets/sfx/shuffle.mp3'),
-    flip: new Audio('/assets/sfx/flip.mp3')
-  };
-  [sfx.tap, sfx.shuffle, sfx.flip].forEach(a => { a.preload = 'auto'; a.volume = 0.28; });
-
-  /* 状態 */
-  let stack = [];
-  const picked = {};        // slot -> card
-  let ctx, W, H;            // ripple
-
-  /* ユーティリティ */
-  const shuffle = (arr) => {
+  /* 🔀 シャッフル関数 */
+  function shuffle(arr){
     const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
     }
     return a;
-  };
-
-  function fitCanvas() {
-    const rect = deck.getBoundingClientRect();
-    W = Math.ceil(rect.width);
-    H = Math.ceil(rect.height);
-    ripple.width = W; ripple.height = H;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    ripple.width = W * dpr; ripple.height = H * dpr;
-    ripple.style.width = W + 'px'; ripple.style.height = H + 'px';
-    ctx = ripple.getContext('2d');
-    ctx.scale(dpr, dpr);
   }
 
-  /* 星紋バースト（クリック位置に光の輪） */
-  function starRipple(clientX, clientY){
-    if (!ctx) return;
-    const rRect = deck.getBoundingClientRect();
-    const x = clientX - rRect.left;
-    const y = clientY - rRect.top;
-    const start = performance.now();
-    const D = 720; // ms
+  /* 💫 クエリ補助 */
+  const $  = (sel,el=document)=>el.querySelector(sel);
+  const $$ = (sel,el=document)=>Array.from(el.querySelectorAll(sel));
 
-    (function loop(t){
-      const k = Math.min(1, (t - start) / D);
-      ctx.clearRect(0,0,W,H);
-      // 多重リング
-      for (let i=0;i<3;i++){
-        const p = k * (1 - i*0.18);
-        if (p <= 0) continue;
-        const R = 20 + p * 160 + i*18;
-        const a = (1 - p) * (0.85 - i*0.18);
-        const grad = ctx.createRadialGradient(x,y, R*0.6, x,y, R);
-        grad.addColorStop(0, `rgba(255,255,255,${0.28*a})`);
-        grad.addColorStop(1, `rgba(174,138,255,0)`);
-        ctx.beginPath();
-        ctx.fillStyle = grad;
-        ctx.arc(x,y,R,0,Math.PI*2);
-        ctx.fill();
-      }
-      // 星粒
-      ctx.fillStyle = `rgba(255,215,111,${0.9*(1-k)})`;
-      for (let s=0;s<8;s++){
-        const ang = (s/8)*Math.PI*2 + k*4;
-        const rx = x + Math.cos(ang) * (30 + 90*k);
-        const ry = y + Math.sin(ang) * (30 + 90*k);
-        ctx.beginPath(); ctx.arc(rx,ry, 1.6*(1-k)+0.6, 0, Math.PI*2); ctx.fill();
-      }
-      if (k < 1) requestAnimationFrame(loop);
-      else setTimeout(()=> ctx.clearRect(0,0,W,H), 32);
-    })(start);
-  }
+  /* 🎴 要素取得 */
+  const startBtn  = $('#readingStart');
+  const resetBtn  = $('#readingReset');
+  const deck      = $('#miniDeck');
+  const slots     = $$('.card-slot', deck);
+  const resultBox = $('#readingResult');
 
-  /* 詩的3行（役割ごとに少しだけ表現を変える） */
-  function poeticLines(card, role){
-    // role: 1=現在 / 2=鍵 / 3=進む道
-    const [a,b,c] = card.key;
-    if (role === 1) return `${a}。\nいまの呼吸に名を与えよう。\n静かな合図は、もう鳴っている。`;
-    if (role === 2) return `${b}。\n一歩だけ、今日の約束に変える。\n小さく確かに、世界が動く。`;
-    return `${c}。\n迷いは光の前兆。\n言葉は祈りへ、君は前へ。`;
-  }
+  if(!startBtn || !resetBtn || !deck || !slots.length || !resultBox) return;
 
-  /* UI 初期化 */
+  /* 状態管理 */
+  let stack = [];
+  let picked = {};
+
+  /* 初期化 */
   function init(){
+    picked = {};
     resultBox.hidden = true;
-    Object.keys(picked).forEach(k => delete picked[k]);
-    cards.forEach((btn, i) => {
-      btn.disabled = true;
-      btn.setAttribute('aria-disabled','true');
-      btn.classList.remove('is-flipped','is-ready','is-burst','is-shuffling');
-      btn.style.removeProperty('--delay'); btn.style.removeProperty('--rot');
-      const img = $('.face-front img', btn); if (img) img.removeAttribute('src');
-      const cap = $(`.card-caption[data-cap="${i+1}"]`);
-      if (cap){ cap.textContent = ''; cap.classList.remove('is-show'); }
+    slots.forEach((slot,i)=>{
+      slot.innerHTML = `
+        <button type="button" class="tarot-card" data-slot="${i+1}">
+          <div class="card-inner">
+            <div class="card-front"></div>
+            <div class="card-back"></div>
+          </div>
+          <div class="card-caption"></div>
+        </button>`;
     });
-    fitCanvas();
+    resetBtn.disabled = true;
+    startBtn.disabled = false;
   }
 
-  /* シャッフル演出＋有効化 */
-  async function start(){
-    stack = shuffle(CARD_SET);
-    cards.forEach((btn, i) => {
-      const d = i * 90;
-      btn.style.setProperty('--delay', `${d}ms`);
-      btn.style.setProperty('--rot', `${(i===1? -1:1)*2}deg`);
-      btn.classList.add('is-shuffling');
-    });
-    try{ await sfx.shuffle.play().catch(()=>{}); }catch{}
-    await new Promise(r => setTimeout(r, 900));
-    cards.forEach(btn => {
-      btn.classList.remove('is-shuffling');
-      btn.classList.add('is-ready');
-      btn.disabled = false;
-      btn.removeAttribute('aria-disabled');
-    });
+  /* シャッフル開始 */
+  function startReading(){
+    stack = shuffle(CARDS);
     startBtn.disabled = true;
     resetBtn.disabled = false;
+    deck.classList.add('is-shuffling');
+    setTimeout(()=> deck.classList.remove('is-shuffling'), 1000);
+
+    slots.forEach(slot=>{
+      const btn = slot.querySelector('.tarot-card');
+      btn.disabled = false;
+    });
   }
 
-  /* フリップ（表面に絵柄のみ／名前は下キャプション） */
-  function flipCard(btn, slot, clientX, clientY){
-    if (picked[slot]) return;           // 二度押し防止
-    const card = stack.pop();           // 山札から1枚
-    if (!card) return;
-    picked[slot] = card;
+  /* カードをめくる */
+  function reveal(btn){
+    const slotIndex = Number(btn.getAttribute('data-slot'));
+    if(picked[slotIndex]) return;
+    const card = stack.pop();
+    picked[slotIndex] = card;
 
-    // 表の画像をセット
-    const img = $('.face-front img', btn);
-    if (img) img.src = `${IMG_BASE}${card.id}${IMG_EXT}`;
+    const face = btn.querySelector('.card-front');
+    face.style.backgroundImage = `url('/assets/tarot/rws/${card.id}.jpg')`;
 
-    // 音＆星紋＆バースト
-    try{ sfx.tap.currentTime = 0; sfx.tap.play().catch(()=>{}); }catch{}
-    try{ sfx.flip.currentTime = 0; sfx.flip.play().catch(()=>{}); }catch{}
-    btn.classList.add('is-burst');
-    starRipple(clientX, clientY);
+    btn.classList.add('flip');
+    try{ tapSE.currentTime=0; tapSE.play(); }catch(_){}
+    try{ flipSE.currentTime=0; flipSE.play(); }catch(_){}
+    createStarSymbol(btn);
 
-    // フリップ
-    requestAnimationFrame(() => btn.classList.add('is-flipped'));
+    btn.parentElement.querySelector('.card-caption').textContent = card.name;
+    btn.disabled = true;
 
-    // キャプション（名前のみ／カード下）
-    const cap = $(`.card-caption[data-cap="${slot}"]`);
-    if (cap){
-      cap.textContent = card.name;
-      cap.classList.add('is-show');
-    }
-
-    // 3枚揃ったら結果へ
-    if (picked[1] && picked[2] && picked[3]){
-      const t1 = $('[data-title="1"]'), t2 = $('[data-title="2"]'), t3 = $('[data-title="3"]');
-      const x1 = $('[data-text="1"]'),  x2 = $('[data-text="2"]'),  x3 = $('[data-text="3"]');
-      t1.textContent = picked[1].name; x1.textContent = poeticLines(picked[1],1);
-      t2.textContent = picked[2].name; x2.textContent = poeticLines(picked[2],2);
-      t3.textContent = picked[3].name; x3.textContent = poeticLines(picked[3],3);
-      resultBox.hidden = false;
-    }
+    if(picked[1] && picked[2] && picked[3]) showResult();
   }
 
-  /* 事件簿 */
-  startBtn.addEventListener('click', () => {
-    // iOSオーディオ解錠
-    [sfx.tap, sfx.shuffle, sfx.flip].forEach(a => { try{ a.play().then(()=>a.pause()).catch(()=>{});}catch{} });
-    start();
-  });
+  /* 結果表示 */
+  function showResult(){
+    resultBox.hidden = false;
+    const lines = [
+      { title:picked[1].name, text:`${picked[1].poem}` },
+      { title:picked[2].name, text:`${picked[2].poem}` },
+      { title:picked[3].name, text:`${picked[3].poem}` }
+    ];
+    const boxes = $$('.r-block', resultBox);
+    boxes.forEach((b,i)=>{
+      const t = b.querySelector('.r-title');
+      const tx = b.querySelector('.r-text');
+      if(t&&tx){
+        t.textContent = lines[i].title;
+        tx.innerHTML = lines[i].text.replace(/\n/g,'<br>');
+      }
+    });
+  }
 
-  resetBtn.addEventListener('click', () => {
-    startBtn.disabled = false;
-    resetBtn.disabled = true;
-    init();
-  });
-
-  cards.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      if (btn.disabled || !btn.classList.contains('is-ready')) return;
-      const slot = Number(btn.getAttribute('data-slot'));
-      const { clientX, clientY } = (e.touches?.[0] || e);
-      flipCard(btn, slot, clientX, clientY);
-    }, { passive:true });
-  });
-
-  window.addEventListener('resize', fitCanvas, { passive:true });
+  /* イベント */
   init();
+  startBtn.addEventListener('click', startReading);
+  resetBtn.addEventListener('click', init);
+  deck.addEventListener('click', e=>{
+    const btn = e.target.closest('.tarot-card');
+    if(!btn || btn.disabled) return;
+    reveal(btn);
+  });
+
 })();
