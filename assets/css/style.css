@@ -426,3 +426,56 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   50%{ transform:translateX(-6px) rotate(-1.5deg) }
   100%{ transform:translateX(6px) rotate(1.5deg) }
 }
+/* ===== 3枚リーディング（最小パッチ）===== */
+:root{
+  /* 裏面画像がまだなら暫定のパスにしてね */
+  --card-back-url: url("/assets/tarot/back.png");
+}
+
+/* ステージ */
+#wish-reading .wish-stage{ position:relative; padding:8px 0 16px; }
+#wish-reading #rippleCanvas{
+  position:absolute; inset:0; width:100%; height:100%;
+  display:block; pointer-events:none; z-index:0;
+}
+
+/* デッキ並び */
+#wish-reading .wish-deck{
+  display:grid; grid-template-columns:repeat(3, minmax(120px, 1fr));
+  gap:16px; align-items:start; z-index:1; position:relative;
+}
+
+/* 1カード枠＋キャプション */
+#wish-reading .card-wrap{ text-align:center; }
+#wish-reading .card-caption{
+  min-height:1.6em; margin-top:8px; font-size:14px; color:var(--muted);
+}
+
+/* カード本体（サイズは比率固定） */
+#wish-reading .tarot-card{
+  width: min(180px, 28vw); aspect-ratio: 63 / 88; /* トランプ比 */
+  border-radius:12px; border:none; background:transparent; padding:0;
+  perspective: 1000px; cursor:pointer; margin-inline:auto;
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,.12));
+}
+#wish-reading .tarot-card[disabled]{ cursor:default; opacity:.7 }
+
+/* 3D内側と表裏 */
+#wish-reading .tarot-card-inner{
+  position:relative; width:100%; height:100%; transform-style:preserve-3d;
+  transition: transform .6s cubic-bezier(.2,.6,.2,1);
+}
+#wish-reading .tarot-card.is-flipped .tarot-card-inner{ transform: rotateY(180deg); }
+
+#wish-reading .face{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; overflow:hidden;
+}
+#wish-reading .face img{ width:100%; height:100%; object-fit:cover; display:block; }
+#wish-reading .face-back{
+  background: #fff center/cover no-repeat var(--card-back-url);
+  border:1px solid rgba(0,0,0,.06);
+}
+#wish-reading .face-front{ transform: rotateY(180deg); background:#fff; }
+
+/* ボタン行 */
+#wish-reading .wish-actions{ display:flex; gap:12px; margin:12px 0 18px; justify-content:center; }
