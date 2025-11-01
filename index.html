@@ -84,7 +84,7 @@
   <!-- CSS（外部） -->
   <link rel="stylesheet" href="/assets/css/style.css">
 
-  <!-- 最小ユーティリティ -->
+  <!-- 最小ユーティリティ（残す） -->
   <style>
     @media (prefers-reduced-motion: reduce){
       .hero__video, .trinity__video{ animation:none !important }
@@ -94,13 +94,10 @@
 </head>
 <body>
 
-<!-- Skipリンク -->
 <a href="#main-content" class="sr-only sr-only-focusable">本文へスキップ</a>
 
-<!-- 星砂パーティクル -->
 <div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
-<!-- ヘッダー（初期は隠れて、スクロールで表示→停止で自動隠し） -->
 <header role="banner">
   <div class="wrap">
     <div class="brand" aria-label="サイトブランド">
@@ -118,7 +115,6 @@
   </div>
 </header>
 
-<!-- #top アンカー -->
 <div id="top" aria-hidden="true"></div>
 
 <main id="main-content" tabindex="-1">
@@ -232,199 +228,70 @@
     </div>
   </section>
 
-  <!-- =========================
-  星詠3枚リーディング（タロット展開版）— Drop-in Section
-  ・重複なしで3枚
-  ・「タップですぐ表」＋星紋エフェクト＋効果音
-  ・シャッフル時にデッキ演出（配る動き）
-========================= -->
-<section id="wish-reading" aria-labelledby="wishReadingTitle">
-  <style>
-    /* ==== Theme (Lavender × White Light) ==== */
-    #wish-reading{
-      --bg:#0b0b1a; --ink:#ece9f8; --muted:#bdb6d9; --gold:#FFD76F; --outline:#ffffff26;
-      --glow:#bfa9ff44; --shadow:0 10px 28px rgba(30,16,60,.26);
-      position:relative; padding:clamp(32px,5vw,56px) 0; color:var(--ink);
-      background:
-        radial-gradient(1400px 900px at 50% -20%, #ffffff10 0%, transparent 60%),
-        radial-gradient(1400px 900px at 50% 120%, #b598ff18 0%, transparent 70%),
-        var(--bg);
-      overflow:clip;
-    }
-    #wish-reading .wrap{ width:min(1120px,92vw); margin:0 auto; }
+  <!-- 星詠3枚リーディング（Drop-in） -->
+  <section id="wish-reading" aria-labelledby="wishReadingTitle">
+    <div class="wrap">
+      <h2 id="wishReadingTitle">🃏 願い事を想像して</h2>
+      <div class="h2-sub">3枚をめくって、星の合図を受け取る — <em>現状 / 未来 / 最終結果</em></div>
 
-    /* Heading */
-    #wish-reading h2{
-      margin:0 0 6px; letter-spacing:.02em; display:flex; align-items:center; gap:.6em;
-      font: 700 clamp(22px,2.6vw,28px)/1.2 "Noto Sans JP", system-ui;
-    }
-    #wish-reading .h2-sub{ color:var(--muted); font-size:clamp(13px,1.6vw,14.5px); margin-bottom:18px; }
-
-    /* Actions */
-    .wish-actions{ display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 22px; }
-    .btn{ appearance:none; border:1px solid var(--outline); color:var(--ink);
-      background:linear-gradient(180deg,#ffffff14,#ffffff08); border-radius:10px; padding:10px 14px;
-      cursor:pointer; box-shadow:var(--shadow); transition:transform .18s ease, border-color .2s, background .2s;
-    }
-    .btn--primary{ border-color:#ffffff40;
-      background:
-        radial-gradient(120% 180% at 50% -40%, #ffffff22 0%, transparent 60%),
-        linear-gradient(180deg, #c7b3ff2a, #7b51ff23);
-    }
-    .btn:hover{ transform:translateY(-1px); border-color:#ffffff66; }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; }
-
-    /* Deck */
-    .wish-deck{
-      display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(14px,3.2vw,22px);
-      position:relative; z-index:1;
-    }
-    .card-wrap{ display:flex; flex-direction:column; align-items:center; gap:8px; }
-    .tarot-card{
-      width:min(280px,28vw); aspect-ratio:2/3; border-radius:14px; border:1px solid var(--outline);
-      background:#120d1f; position:relative; overflow:hidden; cursor:not-allowed;
-      transform:translateZ(0); will-change:transform, box-shadow; box-shadow:var(--shadow);
-    }
-    .tarot-card.is-ready{ cursor:pointer; }
-    /* 裏面（軽量模様） */
-    .tarot-card::before{
-      content:""; position:absolute; inset:0;
-      background:
-        radial-gradient(180% 120% at 50% -10%, #ffffff1f 0%, transparent 60%),
-        radial-gradient(140% 100% at 50% 120%, #bfa9ff18 0%, transparent 70%),
-        conic-gradient(from 0deg at 50% 40%, #ffffff10, #c9b6ff16, #ffffff10);
-      mask: radial-gradient(120% 90% at 50% 10%, #fff 45%, transparent 80%);
-    }
-    .tarot-card .face{
-      position:absolute; inset:0; display:grid; place-items:center; padding:8px;
-      opacity:0; transition:opacity .2s ease; background:#0f0b18;
-    }
-    .tarot-card .face img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .tarot-card.is-flipped .face{ opacity:1; }
-
-    /* ダミーの表面（画像未用意時） */
-    .dummy{ width:100%; height:100%; display:grid; place-items:center; text-align:center;
-      background: radial-gradient(120% 100% at 50% 0%, #ffffff16 0%, transparent 60%), linear-gradient(160deg, #8f79ff26, #e7deff12 60%);
-      border:1px solid #ffffff22;
-    }
-    .dummy .glyph{
-      width:72%; aspect-ratio:1/1; border-radius:20%; border:1px solid #ffffff36; display:grid; place-items:center;
-      background: radial-gradient(90% 70% at 50% 30%, #ffffff18 0%, transparent 60%), #0f0b18;
-      box-shadow: inset 0 0 40px #ffffff20, 0 0 30px #bfa9ff24;
-    }
-    .dummy .title{ margin-top:12px; font-weight:700; letter-spacing:.08em; color:#f3efff; text-shadow:0 2px 16px #bfa9ff55; font-size:clamp(14px,2.2vw,16px); }
-
-    .card-caption{ font:600 14px/1.4 "Noto Sans JP", system-ui; color:var(--muted); min-height:1.4em; text-align:center; }
-
-    /* 結果 */
-    .wish-result{ margin-top:20px; display:none; }
-    .wish-result.is-show{ display:block; }
-    .result-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-    .result-item{ border:1px solid var(--outline); border-radius:12px; padding:12px 14px;
-      background:linear-gradient(180deg,#ffffff0b,#00000006); box-shadow:var(--shadow);
-    }
-    .badge{ display:inline-block; font-size:12px; color:#201630; background:#e9deff; padding:2px 8px; border-radius:999px; margin-bottom:6px; }
-    .item-title{ font-weight:700; margin:2px 0 6px; color:#f0eaff; }
-    .item-text{ color:#d8d2ee; font-size:14px; }
-
-    /* 星紋リップル（クリック演出） */
-    .ripple{
-      position:absolute; pointer-events:none; border-radius:50%;
-      border:2px solid var(--gold); filter:drop-shadow(0 0 8px #FFD76F);
-      animation:ripple .6s ease-out forwards;
-    }
-    @keyframes ripple{
-      from{ opacity:.9; transform:translate(-50%,-50%) scale(.2); }
-      to  { opacity:0;  transform:translate(-50%,-50%) scale(1.6); }
-    }
-
-    /* タロット展開（シャッフル／配る動き） */
-    .wish-deck.is-shuffling .tarot-card{ animation:shuffleTilt .5s ease-in-out infinite alternate; }
-    @keyframes shuffleTilt{
-      from{ transform:translateY(-2px) rotate(-.8deg); }
-      to  { transform:translateY( 2px) rotate(.8deg); }
-    }
-    .deal-pos-1{ animation:dealIn .6s cubic-bezier(.2,.8,.2,1) .10s both; }
-    .deal-pos-2{ animation:dealIn .6s cubic-bezier(.2,.8,.2,1) .22s both; }
-    .deal-pos-3{ animation:dealIn .6s cubic-bezier(.2,.8,.2,1) .34s both; }
-    @keyframes dealIn{
-      from{ transform:translateY(-24px) scale(.96); opacity:.0; }
-      to  { transform:translateY(0) scale(1);    opacity:1; }
-    }
-
-    @media (max-width:760px){
-      .wish-deck{ gap:14px; }
-      .tarot-card{ width:100%; }
-      .result-grid{ grid-template-columns:1fr; }
-    }
-  </style>
-
-  <div class="wrap">
-    <h2 id="wishReadingTitle">🃏 願い事を想像して</h2>
-    <div class="h2-sub">3枚をめくって、星の合図を受け取る — <em>現状 / 未来 / 最終結果</em></div>
-
-    <div class="wish-actions" role="group" aria-label="3枚リーディング操作">
-      <button class="btn btn--primary" id="wishStart">🔮 タロット展開（シャッフル）</button>
-      <button class="btn" id="wishReset" disabled>リセット</button>
-    </div>
-
-    <div class="wish-deck" id="wishDeck" aria-live="polite">
-      <!-- 現状 -->
-      <div class="card-wrap">
-        <button class="tarot-card" data-slot="present" aria-label="現状をめくる" disabled>
-          <span class="face"></span>
-        </button>
-        <div class="card-caption" data-cap="present"></div>
+      <div class="wish-actions" role="group" aria-label="3枚リーディング操作">
+        <button class="btn btn--primary" id="wishStart">🔮 タロット展開（シャッフル）</button>
+        <button class="btn" id="wishReset" disabled>リセット</button>
       </div>
-      <!-- 未来 -->
-      <div class="card-wrap">
-        <button class="tarot-card" data-slot="future" aria-label="未来をめくる" disabled>
-          <span class="face"></span>
-        </button>
-        <div class="card-caption" data-cap="future"></div>
-      </div>
-      <!-- 最終結果 -->
-      <div class="card-wrap">
-        <button class="tarot-card" data-slot="outcome" aria-label="最終結果をめくる" disabled>
-          <span class="face"></span>
-        </button>
-        <div class="card-caption" data-cap="outcome"></div>
-      </div>
-    </div>
 
-    <div class="wish-result" id="wishResult">
-      <div class="result-grid">
-        <div class="result-item">
-          <span class="badge">① 現状</span>
-          <div class="item-title" data-title="present">—</div>
-          <div class="item-text"  data-text="present">—</div>
+      <div class="wish-deck" id="wishDeck" aria-live="polite">
+        <div class="card-wrap">
+          <button class="tarot-card" data-slot="present" aria-label="現状をめくる" disabled>
+            <span class="face"></span>
+          </button>
+          <div class="card-caption" data-cap="present"></div>
         </div>
-        <div class="result-item">
-          <span class="badge">② 未来</span>
-          <div class="item-title" data-title="future">—</div>
-          <div class="item-text"  data-text="future">—</div>
+        <div class="card-wrap">
+          <button class="tarot-card" data-slot="future" aria-label="未来をめくる" disabled>
+            <span class="face"></span>
+          </button>
+          <div class="card-caption" data-cap="future"></div>
         </div>
-        <div class="result-item">
-          <span class="badge">③ 最終結果</span>
-          <div class="item-title" data-title="outcome">—</div>
-          <div class="item-text"  data-text="outcome">—</div>
+        <div class="card-wrap">
+          <button class="tarot-card" data-slot="outcome" aria-label="最終結果をめくる" disabled>
+            <span class="face"></span>
+          </button>
+          <div class="card-caption" data-cap="outcome"></div>
         </div>
       </div>
 
-      <!-- 余韻の締め（詩韻ブランド定番・任意で残せます） -->
-      <div style="margin-top:10px;color:#cfc7ea;font-size:14px">
-        <div>―― タロットクローズ。</div>
-        <div><strong>大丈夫だよ。</strong></div>
+      <div class="wish-result" id="wishResult">
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="badge">① 現状</span>
+            <div class="item-title" data-title="present">—</div>
+            <div class="item-text"  data-text="present">—</div>
+          </div>
+          <div class="result-item">
+            <span class="badge">② 未来</span>
+            <div class="item-title" data-title="future">—</div>
+            <div class="item-text"  data-text="future">—</div>
+          </div>
+          <div class="result-item">
+            <span class="badge">③ 最終結果</span>
+            <div class="item-title" data-title="outcome">—</div>
+            <div class="item-text"  data-text="outcome">—</div>
+          </div>
+        </div>
+
+        <div class="reading-close">
+          <div>―― タロットクローズ。</div>
+          <div><strong>大丈夫だよ。</strong></div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
-  
+  </section>
+
   <!-- Join -->
   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-join">参加の扉</h2>
-      <p style="text-align:center;color:var(--muted)">LINE登録で、毎週「星の言葉」と新着の書をお届けします。</p>
+      <p class="join-lead">LINE登録で、毎週「星の言葉」と新着の書をお届けします。</p>
       <div class="cta-row">
         <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 無料で受け取る</a>
         <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分リールを観る</a>
@@ -433,34 +300,23 @@
   </section>
 </main>
 
-<!-- Tarot Preview Modal -->
+<!-- Tarot Preview Modal（一本化） -->
 <div id="tarotModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="tarotModalTitle" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
     <button class="modal__close" aria-label="閉じる"><svg width="18" height="18"><use href="#i-x"/></svg></button>
 
-    <!-- ★ ここを picture で差し替え（SP/PC自動切替） -->
     <figure class="modal__media">
       <picture>
-        <!-- 縦長スマホ優先 -->
-        <source
-          media="(max-width: 640px)"
-          srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
-        <!-- それ以外（デスクトップ等） -->
-        <source
-          media="(min-width: 641px)"
-          srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
-        <img
-          src="/assets/images/modal/main_modal_1920x1280.jpg?v=1"
-          alt="TAROT BREAKER プレビュー"
-          width="1920" height="1280" loading="lazy" decoding="async">
+        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
+        <source media="(min-width: 641px)" srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
+        <img src="/assets/images/modal/main_modal_1920x1280.jpg?v=1" alt="TAROT BREAKER プレビュー" width="1920" height="1280" loading="lazy" decoding="async">
       </picture>
     </figure>
 
     <div class="modal__body">
       <h3 id="tarotModalTitle">TAROT BREAKER ― 星の言霊使い</h3>
-      <p class="lead">「言の葉は鍵、星の光は道しるべ。」  
-        迷いの影が生まれる夜、カードは静かに呼吸し、言葉は祈りへと変わる。</p>
+      <p class="lead">「言の葉は鍵、星の光は道しるべ。」 迷いの影が生まれる夜、カードは静かに呼吸し、言葉は祈りへと変わる。</p>
       <ul class="bullets">
         <li>3行あらすじ：<em>迷いの正体に、言葉で触れる。</em></li>
         <li>詩的体験：<em>星詠展開 → 封命完了 → 大丈夫だよ。</em></li>
@@ -474,21 +330,6 @@
   </div>
 </div>
 
-<!-- クリックで開く簡易モーダル（カード3枚用の表示） -->
-<div id="modal" class="modal" aria-hidden="true">
-  <div class="modal__overlay" data-close="1"></div>
-  <div class="modal__panel" role="document">
-    <button class="close-modal modal__close" aria-label="閉じる">×</button>
-    <figure class="modal__media">
-      <picture>
-        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
-        <source media="(min-width: 641px)" srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
-        <img src="/assets/images/modal/main_modal_1920x1280.jpg?v=1" alt="カードの結果" width="1920" height="1280" loading="lazy" decoding="async">
-      </picture>
-    </figure>
-  </div>
-</div>
-
 <footer>
   <div class="wrap">
     <div class="sns" aria-label="SNSリンク">
@@ -498,8 +339,8 @@
       <a href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">小説（なろう）</a>
       <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">LINE</a>
     </div>
-    <div style="font-size:12.5px;opacity:.8">© Re:verse Shion — 詩韻思想 / TAROT BREAKER. 言葉が魂を救い、魂が世界を調和させる</div>
-    <div style="margin-top:10px;"><a href="#top" aria-label="ページ先頭へ戻る">▲ ページ先頭へ</a></div>
+    <div class="copy">© Re:verse Shion — 詩韻思想 / TAROT BREAKER. 言葉が魂を救い、魂が世界を調和させる</div>
+    <div class="to-top"><a href="#top" aria-label="ページ先頭へ戻る">▲ ページ先頭へ</a></div>
   </div>
 </footer>
 
@@ -571,7 +412,7 @@
   openBtn.addEventListener('click', () => {
     dlg.classList.remove('is-hidden');
     dlg.setAttribute('aria-hidden','false');
-    focusable()[0]?.focus();
+    (dlg.querySelector('a,button,[tabindex]:not([tabindex="-1"])')||openBtn).focus();
     document.addEventListener('keydown', trap);
   });
   closeBtn.addEventListener('click', () => {
@@ -672,198 +513,186 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 })();
 </script>
 
-  <script>
-  (() => {
-    const $  = (s, r=document) => r.querySelector(s);
-    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+<!-- 星詠3枚リーディング：ロジック -->
+<script>
+(() => {
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-    const startBtn = $('#wishStart');
-    const resetBtn = $('#wishReset');
-    const deckEl   = $('#wishDeck');
-    const cards    = $$('.tarot-card');
-    const resultEl = $('#wishResult');
+  const startBtn = $('#wishStart');
+  const resetBtn = $('#wishReset');
+  const deckEl   = $('#wishDeck');
+  const cards    = $$('.tarot-card');
+  const resultEl = $('#wishResult');
 
-    const caps = {
-      present: $('[data-cap="present"]'),
-      future:  $('[data-cap="future"]'),
-      outcome: $('[data-cap="outcome"]')
-    };
-    const rTitle = {
-      present: $('[data-title="present"]'),
-      future:  $('[data-title="future"]'),
-      outcome: $('[data-title="outcome"]')
-    };
-    const rText = {
-      present: $('[data-text="present"]'),
-      future:  $('[data-text="future"]'),
-      outcome: $('[data-text="outcome"]')
-    };
+  const caps = {
+    present: $('[data-cap="present"]'),
+    future:  $('[data-cap="future"]'),
+    outcome: $('[data-cap="outcome"]')
+  };
+  const rTitle = {
+    present: $('[data-title="present"]'),
+    future:  $('[data-title="future"]'),
+    outcome: $('[data-title="outcome"]')
+  };
+  const rText = {
+    present: $('[data-text="present"]'),
+    future:  $('[data-text="future"]'),
+    outcome: $('[data-text="outcome"]')
+  };
 
-    // ====== 大アルカナ22（front: 画像URL。未設定ならダミーUIで表示） ======
-    const MAJORS = [
-      {id:'00', name:'愚者',       key:'自由に踏み出す',     front:''},
-      {id:'01', name:'魔術師',     key:'いま始める',         front:''},
-      {id:'02', name:'女教皇',     key:'静かに見極める',     front:''},
-      {id:'03', name:'女帝',       key:'受け取り育てる',     front:''},
-      {id:'04', name:'皇帝',       key:'決めて動かす',       front:''},
-      {id:'05', name:'教皇',       key:'信頼に寄る',         front:''},
-      {id:'06', name:'恋人',       key:'選び抜く',           front:''},
-      {id:'07', name:'戦車',       key:'突破する',           front:''},
-      {id:'08', name:'力',         key:'優しさで制す',       front:''},
-      {id:'09', name:'隠者',       key:'内に灯す',           front:''},
-      {id:'10', name:'運命の輪',   key:'流れに乗る',         front:''},
-      {id:'11', name:'正義',       key:'整えバランス',       front:''},
-      {id:'12', name:'吊るされた男', key:'意味を反転',       front:''},
-      {id:'13', name:'死神',       key:'一度終わらせる',     front:''},
-      {id:'14', name:'節制',       key:'混ぜ調和する',       front:''},
-      {id:'15', name:'悪魔',       key:'執着を手放す',       front:''},
-      {id:'16', name:'塔',         key:'壊して更新',         front:''},
-      {id:'17', name:'星',         key:'希望を見る',         front:''},
-      {id:'18', name:'月',         key:'不安を識る',         front:''},
-      {id:'19', name:'太陽',       key:'喜びで進む',         front:''},
-      {id:'20', name:'審判',       key:'呼び覚ます',         front:''},
-      {id:'21', name:'世界',       key:'完成し次へ',         front:''}
-    ];
+  // 大アルカナ22
+  const MAJORS = [
+    {id:'00', name:'愚者',       key:'自由に踏み出す',     front:''},
+    {id:'01', name:'魔術師',     key:'いま始める',         front:''},
+    {id:'02', name:'女教皇',     key:'静かに見極める',     front:''},
+    {id:'03', name:'女帝',       key:'受け取り育てる',     front:''},
+    {id:'04', name:'皇帝',       key:'決めて動かす',       front:''},
+    {id:'05', name:'教皇',       key:'信頼に寄る',         front:''},
+    {id:'06', name:'恋人',       key:'選び抜く',           front:''},
+    {id:'07', name:'戦車',       key:'突破する',           front:''},
+    {id:'08', name:'力',         key:'優しさで制す',       front:''},
+    {id:'09', name:'隠者',       key:'内に灯す',           front:''},
+    {id:'10', name:'運命の輪',   key:'流れに乗る',         front:''},
+    {id:'11', name:'正義',       key:'整えバランス',       front:''},
+    {id:'12', name:'吊るされた男', key:'意味を反転',       front:''},
+    {id:'13', name:'死神',       key:'一度終わらせる',     front:''},
+    {id:'14', name:'節制',       key:'混ぜ調和する',       front:''},
+    {id:'15', name:'悪魔',       key:'執着を手放す',       front:''},
+    {id:'16', name:'塔',         key:'壊して更新',         front:''},
+    {id:'17', name:'星',         key:'希望を見る',         front:''},
+    {id:'18', name:'月',         key:'不安を識る',         front:''},
+    {id:'19', name:'太陽',       key:'喜びで進む',         front:''},
+    {id:'20', name:'審判',       key:'呼び覚ます',         front:''},
+    {id:'21', name:'世界',       key:'完成し次へ',         front:''}
+  ];
 
-    // ====== 位置別の意味（詩韻思想に沿った短文） ======
-    const SLOT_HINT = {
-      present: (c)=> `${c.key}。いまの状況をそのまま認めると流れが整う。`,
-      future:  (c)=> `${c.key} の兆し。小さな一歩を重ねるほど早く近づく。`,
-      outcome: (c)=> `${c.key} の結実。願いの“核”に沿えば自然に収束する。`
-    };
+  const SLOT_HINT = {
+    present: (c)=> `${c.key}。いまの状況をそのまま認めると流れが整う。`,
+    future:  (c)=> `${c.key} の兆し。小さな一歩を重ねるほど早く近づく。`,
+    outcome: (c)=> `${c.key} の結実。願いの“核”に沿えば自然に収束する。`
+  };
 
-    // 効果音（存在しなくてもOK）
-    const SFX = {
-      shuffle: new Audio('/assets/sfx/shuffle.mp3'),
-      ding:    new Audio('/assets/sfx/ding.mp3')
-    };
-    Object.values(SFX).forEach(a => { try{ a.preload='auto'; a.volume=.75; }catch(_){} });
+  // 効果音（存在しなくてもOK）
+  const SFX = {
+    shuffle: new Audio('/assets/sfx/shuffle.mp3'),
+    ding:    new Audio('/assets/sfx/ding.mp3')
+  };
+  Object.values(SFX).forEach(a => { try{ a.preload='auto'; a.volume=.75; }catch(_){} });
 
-    const state = { deck:[], chosen:{}, opened:false };
+  const state = { deck:[], chosen:{}, opened:false };
 
-    const shuffle = (arr) => {
-      const a = arr.slice();
-      for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-      return a;
-    };
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  };
 
-    function init(){
-      state.deck=[]; state.chosen={present:null,future:null,outcome:null}; state.opened=false;
-      resultEl.classList.remove('is-show');
-      deckEl.classList.remove('is-shuffling');
-      cards.forEach(btn=>{
-        btn.disabled=true; btn.classList.remove('is-flipped','is-ready','deal-pos-1','deal-pos-2','deal-pos-3');
-        $('.face',btn).innerHTML='';
-      });
-      Object.values(caps).forEach(n=> n.textContent='');
-      Object.values(rTitle).forEach(n=> n.textContent='—');
-      Object.values(rText).forEach(n=> n.textContent='—');
-      resetBtn.disabled=true; startBtn.disabled=false;
-    }
-
-    function start(){
-      // デッキ生成→シャッフル
-      state.deck = shuffle(MAJORS);
-      state.opened = true;
-      startBtn.disabled = true; resetBtn.disabled = false;
-
-      // 視覚：シャッフル中の揺れ
-      deckEl.classList.add('is-shuffling');
-      try{ SFX.shuffle.currentTime=0; SFX.shuffle.play().catch(()=>{}); }catch(_){}
-
-      // 少し待ってから「配る」アニメを適用→クリック可能に
-      setTimeout(() => {
-        deckEl.classList.remove('is-shuffling');
-        // 3枚を確定（重複なし）
-        const [c1,c2,c3] = state.deck.slice(-3);
-        state.deck.length -= 3;
-        state.chosen.present = c1; state.chosen.future = c2; state.chosen.outcome = c3;
-
-        // 配る（deal）演出
-        $$('.tarot-card').forEach((btn, i) => {
-          btn.classList.add(`deal-pos-${i+1}`);
-          btn.disabled = false;
-          btn.classList.add('is-ready');
-        });
-      }, 700);
-    }
-
-    // 画像面のセット（未指定時はダミー面）
-    function setFace(el, card){
-      const face = $('.face', el); face.innerHTML='';
-      if (card.front){
-        const img = new Image();
-        img.alt = card.name; img.decoding='async'; img.loading='eager';
-        img.src = card.front;
-        img.onerror = () => makeDummy(face, card.name);
-        face.appendChild(img);
-      } else {
-        makeDummy(face, card.name);
-      }
-    }
-    function makeDummy(container, title){
-      const wrap = document.createElement('div'); wrap.className='dummy';
-      const glyph = document.createElement('div'); glyph.className='glyph';
-      const svgNS='http://www.w3.org/2000/svg';
-      const svg=document.createElementNS(svgNS,'svg'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('width','64'); svg.setAttribute('height','64');
-      const path=document.createElementNS(svgNS,'path'); path.setAttribute('d','M12 2l2.6 6 6.4.6-4.8 4.3 1.4 6.1L12 16.8 6.4 19.9l1.4-6.1L3 8.6 9.4 8z');
-      path.setAttribute('fill','#FFD76F'); path.setAttribute('opacity','.9');
-      svg.appendChild(path); glyph.appendChild(svg);
-      const t=document.createElement('div'); t.className='title'; t.textContent=title;
-      wrap.appendChild(glyph); wrap.appendChild(t); container.appendChild(wrap);
-    }
-
-    // 星紋リップル
-    function rippleAt(el, evt){
-      const r=document.createElement('span'); r.className='ripple';
-      const rect=el.getBoundingClientRect();
-      const x=(evt.clientX|| (rect.left+rect.width/2)) - rect.left;
-      const y=(evt.clientY|| (rect.top +rect.height/2)) - rect.top;
-      r.style.left = x+'px'; r.style.top = y+'px';
-      el.appendChild(r);
-      setTimeout(()=> r.remove(), 620);
-    }
-
-    function flip(slot, btn, evt){
-      if (!state.opened || btn.classList.contains('is-flipped') || btn.disabled) return;
-
-      setFace(btn, state.chosen[slot]);
-      btn.classList.add('is-flipped');
-      caps[slot].textContent = state.chosen[slot].name;
-
-      rippleAt(btn, evt||{});
-      try{ SFX.ding.currentTime=0; SFX.ding.play().catch(()=>{}); }catch(_){}
-
-      // 全部出たら結果まとめ
-      if ($$('.tarot-card.is-flipped').length === 3){
-        rTitle.present.textContent = state.chosen.present.name;
-        rTitle.future.textContent  = state.chosen.future.name;
-        rTitle.outcome.textContent = state.chosen.outcome.name;
-
-        rText.present.textContent = SLOT_HINT.present(state.chosen.present);
-        rText.future.textContent  = SLOT_HINT.future(state.chosen.future);
-        rText.outcome.textContent = SLOT_HINT.outcome(state.chosen.outcome);
-
-        resultEl.classList.add('is-show');
-      }
-    }
-
-    // events
-    startBtn.addEventListener('click', start);
-    resetBtn.addEventListener('click', init);
+  function init(){
+    state.deck=[]; state.chosen={present:null,future:null,outcome:null}; state.opened=false;
+    resultEl.classList.remove('is-show');
+    deckEl.classList.remove('is-shuffling');
     cards.forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        if (btn.disabled) return;
-        const slot = btn.getAttribute('data-slot'); // present / future / outcome
-        flip(slot, btn, e);
-      });
+      btn.disabled=true; btn.classList.remove('is-flipped','is-ready','deal-pos-1','deal-pos-2','deal-pos-3');
+      btn.querySelector('.face').innerHTML='';
     });
+    Object.values(caps).forEach(n=> n.textContent='');
+    Object.values(rTitle).forEach(n=> n.textContent='—');
+    Object.values(rText).forEach(n=> n.textContent='—');
+    resetBtn.disabled=true; startBtn.disabled=false;
+  }
 
-    // 公開API（画像URLをあとから差し込む例）
-    //   MAJORS.find(c=>c.id==='00').front = '/assets/tarot/majors/00_fool.jpg';
+  function start(){
+    state.deck = shuffle(MAJORS);
+    state.opened = true;
+    startBtn.disabled = true; resetBtn.disabled = false;
 
-    init();
-  })();
-  </script>
+    deckEl.classList.add('is-shuffling');
+    try{ SFX.shuffle.currentTime=0; SFX.shuffle.play().catch(()=>{}); }catch(_){}
+
+    setTimeout(() => {
+      deckEl.classList.remove('is-shuffling');
+      const [c1,c2,c3] = state.deck.slice(-3);
+      state.deck.length -= 3;
+      state.chosen.present = c1; state.chosen.future = c2; state.chosen.outcome = c3;
+
+      cards.forEach((btn, i) => {
+        btn.classList.add(`deal-pos-${i+1}`);
+        btn.disabled = false;
+        btn.classList.add('is-ready');
+      });
+    }, 700);
+  }
+
+  function setFace(el, card){
+    const face = el.querySelector('.face'); face.innerHTML='';
+    if (card.front){
+      const img = new Image();
+      img.alt = card.name; img.decoding='async'; img.loading='eager';
+      img.src = card.front;
+      img.onerror = () => makeDummy(face, card.name);
+      face.appendChild(img);
+    } else {
+      makeDummy(face, card.name);
+    }
+  }
+  function makeDummy(container, title){
+    const wrap = document.createElement('div'); wrap.className='dummy';
+    const glyph = document.createElement('div'); glyph.className='glyph';
+    const svgNS='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(svgNS,'svg'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('width','64'); svg.setAttribute('height','64');
+    const path=document.createElementNS(svgNS,'path'); path.setAttribute('d','M12 2l2.6 6 6.4.6-4.8 4.3 1.4 6.1L12 16.8 6.4 19.9l1.4-6.1L3 8.6 9.4 8z');
+    path.setAttribute('fill','#FFD76F'); path.setAttribute('opacity','.9');
+    svg.appendChild(path); glyph.appendChild(svg);
+    const t=document.createElement('div'); t.className='title'; t.textContent=title;
+    wrap.appendChild(glyph); wrap.appendChild(t); container.appendChild(wrap);
+  }
+
+  function rippleAt(el, evt){
+    const r=document.createElement('span'); r.className='ripple';
+    const rect=el.getBoundingClientRect();
+    const x=(evt.clientX|| (rect.left+rect.width/2)) - rect.left;
+    const y=(evt.clientY|| (rect.top +rect.height/2)) - rect.top;
+    r.style.left = x+'px'; r.style.top = y+'px';
+    el.appendChild(r);
+    setTimeout(()=> r.remove(), 620);
+  }
+
+  function flip(slot, btn, evt){
+    if (!state.opened || btn.classList.contains('is-flipped') || btn.disabled) return;
+
+    setFace(btn, state.chosen[slot]);
+    btn.classList.add('is-flipped');
+    caps[slot].textContent = state.chosen[slot].name;
+
+    rippleAt(btn, evt||{});
+    try{ SFX.ding.currentTime=0; SFX.ding.play().catch(()=>{}); }catch(_){}
+
+    if (document.querySelectorAll('.tarot-card.is-flipped').length === 3){
+      rTitle.present.textContent = state.chosen.present.name;
+      rTitle.future.textContent  = state.chosen.future.name;
+      rTitle.outcome.textContent = state.chosen.outcome.name;
+
+      rText.present.textContent = SLOT_HINT.present(state.chosen.present);
+      rText.future.textContent  = SLOT_HINT.future(state.chosen.future);
+      rText.outcome.textContent = SLOT_HINT.outcome(state.chosen.outcome);
+
+      resultEl.classList.add('is-show');
+    }
+  }
+
+  startBtn.addEventListener('click', start);
+  resetBtn.addEventListener('click', init);
+  cards.forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      if (btn.disabled) return;
+      const slot = btn.getAttribute('data-slot');
+      flip(slot, btn, e);
+    });
+  });
+
+  init();
+})();
+</script>
 </body>
 </html>
