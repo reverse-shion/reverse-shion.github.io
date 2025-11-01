@@ -231,56 +231,83 @@
     </div>
   </section>
 
-  <!-- ミニ・リーディングUI（修正版） -->
-  <section id="mini-reading" aria-labelledby="miniReadingTitle">
-    <div class="wrap">
-      <h2 id="miniReadingTitle">🃏 3枚リーディング（体験）</h2>
-      <p class="h2-sub">現在／鍵／進む道 を1分で。終わったら「今日の一歩」をLINEで受け取れます。</p>
+  <!-- 🃏 3枚リーディング（フリップ＋星紋＋音） -->
+<section id="wish-reading" aria-labelledby="wishReadingTitle">
+  <div class="wrap">
+    <h2 id="wishReadingTitle">🃏 3枚リーディング（体験）</h2>
+    <p class="h2-sub">現在／鍵／進む道。タップでめくれ、星紋が光るよ。</p>
 
-      <div class="reading-ui" data-state="idle" aria-live="polite">
-        <div class="reading-actions">
-          <button class="btn btn--primary" id="readingStart">
-            <svg width="18" height="18" aria-hidden="true"><use href="#i-star"/></svg>
-            シャッフルして始める
+    <div class="wish-actions" role="group" aria-label="操作">
+      <button class="btn btn--primary" id="wishStart">シャッフルして始める</button>
+      <button class="btn btn--ghost"   id="wishReset" disabled>リセット</button>
+    </div>
+
+    <div class="wish-stage">
+      <!-- 星紋（リップル）キャンバス：デッキの下層 -->
+      <canvas id="rippleCanvas" aria-hidden="true"></canvas>
+
+      <div class="wish-deck" role="list" aria-label="カードデッキ">
+        <!-- カード x 3：裏面固定、表は画像のみ（文字は下のキャプションに出す） -->
+        <div class="card-wrap" role="listitem">
+          <button class="tarot-card" data-slot="1" aria-label="1枚目を引く" disabled>
+            <div class="tarot-card-inner">
+              <div class="face face-front"><img alt=""></div>
+              <div class="face face-back" aria-hidden="true"></div>
+            </div>
           </button>
-          <button class="btn btn--ghost" id="readingReset" disabled>リセット</button>
+          <div class="card-caption" data-cap="1" aria-live="polite"></div>
         </div>
 
-        <div class="reading-deck" role="list" aria-label="カードデッキ">
-          <button class="card-slot" data-slot="1" role="listitem" aria-label="1枚目を引く"></button>
-          <button class="card-slot" data-slot="2" role="listitem" aria-label="2枚目を引く"></button>
-          <button class="card-slot" data-slot="3" role="listitem" aria-label="3枚目を引く"></button>
+        <div class="card-wrap" role="listitem">
+          <button class="tarot-card" data-slot="2" aria-label="2枚目を引く" disabled>
+            <div class="tarot-card-inner">
+              <div class="face face-front"><img alt=""></div>
+              <div class="face face-back" aria-hidden="true"></div>
+            </div>
+          </button>
+          <div class="card-caption" data-cap="2" aria-live="polite"></div>
         </div>
 
-        <div class="reading-result" id="readingResult" hidden tabindex="-1">
-          <div class="result-grid">
-            <div class="result-item">
-              <div class="badge">① 現在</div>
-              <h4 class="r-title" data-for="1">—</h4>
-              <p class="r-text" data-for="1">—</p>
+        <div class="card-wrap" role="listitem">
+          <button class="tarot-card" data-slot="3" aria-label="3枚目を引く" disabled>
+            <div class="tarot-card-inner">
+              <div class="face face-front"><img alt=""></div>
+              <div class="face face-back" aria-hidden="true"></div>
             </div>
-            <div class="result-item">
-              <div class="badge">② 鍵</div>
-              <h4 class="r-title" data-for="2">—</h4>
-              <p class="r-text" data-for="2">—</p>
-            </div>
-            <div class="result-item">
-              <div class="badge">③ 進む道</div>
-              <h4 class="r-title" data-for="3">—</h4>
-              <p class="r-text" data-for="3">—</p>
-            </div>
-          </div>
-
-          <div class="cta-row" style="margin-top:16px">
-            <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
-              <svg width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
-              今日の“一歩”をLINEで受け取る（無料）
-            </a>
-          </div>
+          </button>
+          <div class="card-caption" data-cap="3" aria-live="polite"></div>
         </div>
       </div>
     </div>
-  </section>
+
+    <!-- 結果：各3行、詩韻思想っぽい“詩的ブリーフ” -->
+    <div id="wishResult" hidden>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="badge">① 現在</div>
+          <h4 class="item-title" data-title="1">—</h4>
+          <p class="item-text"  data-text="1">—</p>
+        </div>
+        <div class="result-item">
+          <div class="badge">② 鍵</div>
+          <h4 class="item-title" data-title="2">—</h4>
+          <p class="item-text"  data-text="2">—</p>
+        </div>
+        <div class="result-item">
+          <div class="badge">③ 進む道</div>
+          <h4 class="item-title" data-title="3">—</h4>
+          <p class="item-text"  data-text="3">—</p>
+        </div>
+      </div>
+
+      <div class="cta-row" style="margin-top:16px">
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
+          今日の“一歩”をLINEで受け取る（無料）
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
 
   <!-- Join -->
   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
@@ -652,5 +679,7 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
 </svg>
+
+<script src="/assets/js/reading.js" defer></script>
 </body>
 </html>
