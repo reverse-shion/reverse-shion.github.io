@@ -233,55 +233,46 @@
   </section>
 
   <!-- ミニ・リーディングUI -->
-  <section id="mini-reading" aria-labelledby="miniReadingTitle">
-    <div class="wrap">
-      <h2 id="miniReadingTitle">🃏 3枚リーディング（体験）</h2>
-      <p class="h2-sub">現在／鍵／進む道 を1分で。終わったら「今日の一歩」をLINEで受け取れます。</p>
+  <main>
+<section id="reading">
+  <div class="wrap">
+    <h2>🃏 3枚リーディング（体験）</h2>
+    <p class="h2-sub">現在／鍵／進む道 を1分で。</p>
 
-      <div class="reading-ui" data-state="idle" aria-live="polite">
-        <div class="reading-actions">
-          <button class="btn btn--primary" id="readingStart">
-            <svg width="18" height="18" aria-hidden="true"><use href="#i-star"/></svg>
-            シャッフルして始める
-          </button>
-          <button class="btn btn--ghost" id="readingReset" disabled>リセット</button>
+    <div class="reading-ui">
+      <canvas id="rippleCanvas" class="cosmic-ripple"></canvas>
+
+      <div class="reading-actions">
+        <button class="btn btn--primary" id="readingStart">シャッフルして始める</button>
+        <button class="btn btn--ghost" id="readingReset" disabled>リセット</button>
+      </div>
+
+      <div class="reading-deck">
+        <div class="card-wrap">
+          <button class="card-slot is-back" data-slot="1"></button>
+          <div class="card-caption" data-cap="1"></div>
         </div>
-
-        <div class="reading-deck" role="list" aria-label="カードデッキ">
-          <button class="card-slot" data-slot="1" role="listitem" aria-label="1枚目を引く"></button>
-          <button class="card-slot" data-slot="2" role="listitem" aria-label="2枚目を引く"></button>
-          <button class="card-slot" data-slot="3" role="listitem" aria-label="3枚目を引く"></button>
+        <div class="card-wrap">
+          <button class="card-slot is-back" data-slot="2"></button>
+          <div class="card-caption" data-cap="2"></div>
         </div>
+        <div class="card-wrap">
+          <button class="card-slot is-back" data-slot="3"></button>
+          <div class="card-caption" data-cap="3"></div>
+        </div>
+      </div>
 
-        <div class="reading-result" hidden>
-          <div class="result-grid">
-            <div class="result-item">
-              <div class="badge">① 現在</div>
-              <h4 class="r-title" data-for="1">—</h4>
-              <p class="r-text" data-for="1">—</p>
-            </div>
-            <div class="result-item">
-              <div class="badge">② 鍵</div>
-              <h4 class="r-title" data-for="2">—</h4>
-              <p class="r-text" data-for="2">—</p>
-            </div>
-            <div class="result-item">
-              <div class="badge">③ 進む道</div>
-              <h4 class="r-title" data-for="3">—</h4>
-              <p class="r-text" data-for="3">—</p>
-            </div>
-          </div>
-
-          <div class="cta-row" style="margin-top:16px">
-            <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
-              <svg width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
-              今日の“一歩”をLINEで受け取る（無料）
-            </a>
-          </div>
+      <div class="reading-result" hidden>
+        <div class="result-grid">
+          <div class="result-item"><div class="badge">① 現在</div><h4 class="r-title" data-for="1">—</h4><p class="r-text" data-for="1">—</p></div>
+          <div class="result-item"><div class="badge">② 鍵</div><h4 class="r-title" data-for="2">—</h4><p class="r-text" data-for="2">—</p></div>
+          <div class="result-item"><div class="badge">③ 進む道</div><h4 class="r-title" data-for="3">—</h4><p class="r-text" data-for="3">—</p></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+</main>
 
   <section id="ritual" aria-labelledby="ritualTitle">
   <div class="wrap ritual">
@@ -896,6 +887,194 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   // 初期化
   reset();
 })();
+
+  <script>
+(() => {
+  const start = document.getElementById('readingStart');
+  const reset = document.getElementById('readingReset');
+  const deckBtns = [...document.querySelectorAll('.card-slot')];
+  const result = document.querySelector('.reading-result');
+
+  // オーディオ（再生失敗は握りつぶす）
+  const sFlip  = new Audio('/assets/audio/flip.mp3');
+  const sChime = new Audio('/assets/audio/chime.mp3');
+  sFlip.volume = 0.75; sChime.volume = 0.85;
+
+  const safePlay = (audio) => {
+    try { audio.currentTime = 0; const p = audio.play(); if (p?.catch) p.catch(()=>{}); }
+    catch(_) {}
+  };
+
+  const CARDS = [
+    {name:'愚者',key:'自由に踏み出す'},{name:'魔術師',key:'いま始める'},
+    {name:'女教皇',key:'静かに見極める'},{name:'女帝',key:'受け取り育てる'},
+    {name:'皇帝',key:'決めて動かす'},{name:'教皇',key:'信頼に寄る'},
+    {name:'恋人',key:'選び抜く'},{name:'戦車',key:'突破する'},
+    {name:'力',key:'優しさで制す'},{name:'隠者',key:'内に灯す'},
+    {name:'運命の輪',key:'流れに乗る'},{name:'正義',key:'整えバランス'},
+    {name:'吊るされた男',key:'意味を反転'},{name:'死神',key:'一度終わらせる'},
+    {name:'節制',key:'混ぜ調和する'},{name:'悪魔',key:'執着を手放す'},
+    {name:'塔',key:'壊して更新'},{name:'星',key:'希望を見る'},
+    {name:'月',key:'不安を識る'},{name:'太陽',key:'喜びで進む'},
+    {name:'審判',key:'呼び覚ます'},{name:'世界',key:'完成し次へ'}
+  ];
+
+  // ヘルパ
+  let picked = {}, stack = [];
+  const cap   = i => document.querySelector(`.card-caption[data-cap="${i}"]`);
+  const title = i => document.querySelector(`.r-title[data-for="${i}"]`);
+  const text  = i => document.querySelector(`.r-text[data-for="${i}"]`);
+  const shuffle = (a) => { const x = a.slice(); for (let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; };
+
+  // 要素中心座標（ページ座標）
+  function centerOf(el){
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width/2 + window.scrollX, y: r.top + r.height/2 + window.scrollY };
+  }
+
+  function resetDeck(){
+    deckBtns.forEach(b => { b.className = 'card-slot is-back'; b.disabled = true; });
+    [1,2,3].forEach(i => { const c = cap(i); if (c){ c.textContent=''; c.classList.remove('is-show'); }});
+    if (result) result.hidden = true;
+    reset.disabled = true;
+    start.disabled = false;
+    picked = {};
+  }
+
+  function startReading(){
+    stack = shuffle(CARDS);
+    deckBtns.forEach(b => b.disabled = false);
+    start.disabled = true;
+    reset.disabled = false;
+  }
+
+  function reveal(slot, btn){
+    if (picked[slot]) return;
+    const card = stack.pop();
+    picked[slot] = card;
+
+    // 裏→表アニメ（クラスはCSS側で定義）
+    btn.classList.remove('is-back');
+    requestAnimationFrame(() => {
+      btn.classList.add('is-picked','is-burst');
+      setTimeout(() => btn.classList.remove('is-burst'), 560);
+    });
+
+    safePlay(sFlip);
+
+    // 下のキャプション（カード名のみ）
+    const c = cap(slot);
+    if (c){ c.textContent = card.name; c.classList.add('is-show'); }
+
+    // 右側（または下部）の結果欄
+    if (title(slot)) title(slot).textContent = card.name;
+    if (text(slot))  text(slot).textContent  = card.key + '。';
+    if (result) result.hidden = false;
+
+    // 3枚そろったらチャイム
+    if (picked[1] && picked[2] && picked[3]) safePlay(sChime);
+
+    // タップ光演出（波紋）
+    const {x, y} = centerOf(btn);
+    spawnRipple(x, y);
+  }
+
+  // ========= 星環の波紋（Canvasアニメ） =========
+  const rippleCanvas = document.getElementById('rippleCanvas');
+  const rc = rippleCanvas?.getContext ? rippleCanvas.getContext('2d') : null;
+
+  // キャンバスがない場合は演出をスキップ
+  if (!rippleCanvas || !rc){
+    window.spawnRipple = () => {};
+  } else {
+    function sizeCanvas(){
+      const host = rippleCanvas.parentElement || document.body;
+      const r = host.getBoundingClientRect();
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      rippleCanvas.width = Math.max(1, r.width * dpr);
+      rippleCanvas.height = Math.max(1, r.height * dpr);
+      rippleCanvas.style.width = r.width + 'px';
+      rippleCanvas.style.height = r.height + 'px';
+      rc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', sizeCanvas, { passive: true });
+    sizeCanvas();
+
+    let ripples = [];
+    let rafId = 0;
+
+    function loop(){
+      rc.clearRect(0,0,rippleCanvas.width, rippleCanvas.height);
+      const now = performance.now();
+      ripples = ripples.filter(r => {
+        const t = (now - r.t0) / r.life; // 0 → 1
+        if (t >= 1) return false;
+        const ease = t*t*(3-2*t); // smoothstep
+        const rNow = r.r0 + (r.r1 - r.r0) * ease;
+        const aNow = (1 - ease) * r.alpha;
+        // 複合リング（薄い円環）
+        rc.beginPath();
+        rc.arc(r.x, r.y, rNow, 0, Math.PI*2);
+        rc.strokeStyle = `rgba(${r.col[0]},${r.col[1]},${r.col[2]},${aNow})`;
+        rc.lineWidth = r.stroke * (1 - t*0.6);
+        rc.shadowBlur = 24 * (1 - t);
+        rc.shadowColor = `rgba(${r.col[0]},${r.col[1]},${r.col[2]},${aNow})`;
+        rc.stroke();
+        rc.shadowBlur = 0;
+
+        // 内側の微光点
+        rc.beginPath();
+        rc.arc(r.x, r.y, Math.max(1, rNow*0.04), 0, Math.PI*2);
+        rc.fillStyle = `rgba(${r.col[0]},${r.col[1]},${r.col[2]},${aNow*0.8})`;
+        rc.fill();
+        return true;
+      });
+      if (ripples.length) rafId = requestAnimationFrame(loop);
+      else rafId = 0;
+    }
+
+    function toLocal(x, y){
+      const rect = rippleCanvas.getBoundingClientRect();
+      return { x: x - rect.left - window.scrollX, y: y - rect.top - window.scrollY };
+    }
+
+    window.spawnRipple = (px, py) => {
+      const { x, y } = toLocal(px, py);
+      const now = performance.now();
+      const palette = [
+        [255,215,111], // gold
+        [174,138,255], // lavender
+        [255,255,255]  // white
+      ];
+      // 3枚レイヤー
+      for (let i=0;i<3;i++){
+        ripples.push({
+          x, y,
+          t0: now + i*24,       // 少し遅延して重ねる
+          life: 900,            // ms
+          r0: 16,               // 初期半径
+          r1: 180 + i*40,       // 最終半径
+          stroke: 3 - i*0.4,    // 線の太さ
+          alpha: 0.7 - i*0.15,  // 透明度
+          col: palette[i % palette.length]
+        });
+      }
+      if (!rafId) rafId = requestAnimationFrame(loop);
+    };
+  }
+
+  // ========= イベント紐付け =========
+  resetDeck();
+  start?.addEventListener('click', startReading);
+  reset?.addEventListener('click', resetDeck);
+  deckBtns.forEach(btn => btn.addEventListener('click', () => {
+    if (!btn.disabled){
+      const slot = btn.getAttribute('data-slot');
+      reveal(slot, btn);
+    }
+  }));
+})();
+</script>
 </script>
 </body>
 </html>
