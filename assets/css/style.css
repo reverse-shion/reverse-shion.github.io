@@ -530,3 +530,44 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   .hero h1{ font-size: clamp(22px, 7vw, 32px) }
   .hero p{ font-size: clamp(14px, 4vw, 16px) }
 }
+/* ===== Tarot back FIX (force) ===== */
+
+/* 1) 絶対パス＋キャッシュバスターで確実に */
+:root{
+  /* 実在する画像パスに合わせてどちらかを使う（片方はコメントアウト） */
+  /* 例A: /assets/images/tarot/tarot_back_1024x1536.jpg がある場合 */
+  --card-back-url: url("/assets/images/tarot/tarot_back_1024x1536.jpg?v=5");
+  /* 例B: /assets/tarot/back.png がある場合 */
+  /* --card-back-url: url("/assets/tarot/back.png?v=5"); */
+}
+
+/* 2) HTMLが .card-slot を使っていても .tarot-card を使っていても両対応 */
+.tarot-card,
+.card-slot{ position: relative; overflow: hidden; }
+
+/* 擬似要素に裏面を描画（要素背景の上に来るので確実） */
+.tarot-card::before,
+.card-slot.is-back::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image: var(--card-back-url);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(1.02);
+  z-index: 0;
+}
+
+/* 3) 既存の背景指定を無効化して競合回避 */
+.card-slot.is-back{
+  background: none !important;
+  background-image: none !important;
+}
+
+/* 反転などで表面を出す側は上に */
+.tarot-card .face,
+.card-slot .face{ position: relative; z-index: 1; }
+
+/* 旧APIの“表になった時に裏面が残る”のを確実に隠す */
+.card-slot.is-picked::before,
+.tarot-card.is-flipped::before{ opacity: 0; }
