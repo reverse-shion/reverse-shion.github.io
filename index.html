@@ -114,7 +114,7 @@
     <nav class="nav" aria-label="主要ナビゲーション">
       <a href="#trinity">詩韻思想</a>
       <a href="#writings">書</a>
-      <a href="#wish-reading">体験</a>
+      <a href="#mini-reading">体験</a>
       <a href="#join">参加</a>
     </nav>
   </div>
@@ -124,8 +124,6 @@
 <div id="top" aria-hidden="true"></div>
 
 <main id="main-content" tabindex="-1">
-
-  
   <!-- Hero -->
   <section class="hero" aria-label="ヒーロー">
     <div class="hero__media" aria-hidden="true">
@@ -233,83 +231,56 @@
     </div>
   </section>
 
-  <!-- 🃏 3枚リーディング（フリップ＋星紋＋音） -->
-<section id="wish-reading" aria-labelledby="wishReadingTitle">
-  <div class="wrap">
-    <h2 id="wishReadingTitle">🃏 3枚リーディング（体験）</h2>
-    <p class="h2-sub">現在／鍵／進む道。タップでめくれ、星紋が光るよ。</p>
+  <!-- ミニ・リーディングUI（修正版） -->
+  <section id="mini-reading" aria-labelledby="miniReadingTitle">
+    <div class="wrap">
+      <h2 id="miniReadingTitle">🃏 3枚リーディング（体験）</h2>
+      <p class="h2-sub">現在／鍵／進む道 を1分で。終わったら「今日の一歩」をLINEで受け取れます。</p>
 
-    <div class="wish-actions" role="group" aria-label="操作">
-      <button class="btn btn--primary" id="wishStart">シャッフルして始める</button>
-      <button class="btn btn--ghost"   id="wishReset" disabled>リセット</button>
-    </div>
-
-    <div class="wish-stage">
-      <!-- 星紋（リップル）キャンバス：デッキの下層 -->
-      <canvas id="rippleCanvas" aria-hidden="true"></canvas>
-
-      <div class="wish-deck" role="list" aria-label="カードデッキ">
-        <!-- カード x 3：裏面固定、表は画像のみ（文字は下のキャプションに出す） -->
-        <div class="card-wrap" role="listitem">
-          <button class="tarot-card" data-slot="1" aria-label="1枚目を引く" disabled>
-            <div class="tarot-card-inner">
-              <div class="face face-front"><img alt=""></div>
-              <div class="face face-back" aria-hidden="true"></div>
-            </div>
+      <div class="reading-ui" data-state="idle" aria-live="polite">
+        <div class="reading-actions">
+          <button class="btn btn--primary" id="readingStart">
+            <svg width="18" height="18" aria-hidden="true"><use href="#i-star"/></svg>
+            シャッフルして始める
           </button>
-          <div class="card-caption" data-cap="1" aria-live="polite"></div>
+          <button class="btn btn--ghost" id="readingReset" disabled>リセット</button>
         </div>
 
-        <div class="card-wrap" role="listitem">
-          <button class="tarot-card" data-slot="2" aria-label="2枚目を引く" disabled>
-            <div class="tarot-card-inner">
-              <div class="face face-front"><img alt=""></div>
-              <div class="face face-back" aria-hidden="true"></div>
-            </div>
-          </button>
-          <div class="card-caption" data-cap="2" aria-live="polite"></div>
+        <div class="reading-deck" role="list" aria-label="カードデッキ">
+          <button class="card-slot" data-slot="1" role="listitem" aria-label="1枚目を引く"></button>
+          <button class="card-slot" data-slot="2" role="listitem" aria-label="2枚目を引く"></button>
+          <button class="card-slot" data-slot="3" role="listitem" aria-label="3枚目を引く"></button>
         </div>
 
-        <div class="card-wrap" role="listitem">
-          <button class="tarot-card" data-slot="3" aria-label="3枚目を引く" disabled>
-            <div class="tarot-card-inner">
-              <div class="face face-front"><img alt=""></div>
-              <div class="face face-back" aria-hidden="true"></div>
+        <div class="reading-result" id="readingResult" hidden tabindex="-1">
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="badge">① 現在</div>
+              <h4 class="r-title" data-for="1">—</h4>
+              <p class="r-text" data-for="1">—</p>
             </div>
-          </button>
-          <div class="card-caption" data-cap="3" aria-live="polite"></div>
+            <div class="result-item">
+              <div class="badge">② 鍵</div>
+              <h4 class="r-title" data-for="2">—</h4>
+              <p class="r-text" data-for="2">—</p>
+            </div>
+            <div class="result-item">
+              <div class="badge">③ 進む道</div>
+              <h4 class="r-title" data-for="3">—</h4>
+              <p class="r-text" data-for="3">—</p>
+            </div>
+          </div>
+
+          <div class="cta-row" style="margin-top:16px">
+            <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
+              <svg width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
+              今日の“一歩”をLINEで受け取る（無料）
+            </a>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- 結果：各3行、詩韻思想っぽい“詩的ブリーフ” -->
-    <div id="wishResult" hidden>
-      <div class="result-grid">
-        <div class="result-item">
-          <div class="badge">① 現在</div>
-          <h4 class="item-title" data-title="1">—</h4>
-          <p class="item-text"  data-text="1">—</p>
-        </div>
-        <div class="result-item">
-          <div class="badge">② 鍵</div>
-          <h4 class="item-title" data-title="2">—</h4>
-          <p class="item-text"  data-text="2">—</p>
-        </div>
-        <div class="result-item">
-          <div class="badge">③ 進む道</div>
-          <h4 class="item-title" data-title="3">—</h4>
-          <p class="item-text"  data-text="3">—</p>
-        </div>
-      </div>
-
-      <div class="cta-row" style="margin-top:16px">
-        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
-          今日の“一歩”をLINEで受け取る（無料）
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
 
   <!-- Join -->
   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
@@ -513,8 +484,166 @@ if (navigator.connection?.saveData){
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 </script>
 
+<!-- Tarot Preview Modal：開閉 -->
+<script>
+(() => {
+  const openBtn = document.querySelector('.tarot-preview-open');
+  const modal = document.getElementById('tarotModal');
+  if (!openBtn || !modal) return;
 
+  const panel = modal.querySelector('.modal__panel');
+  const overlay = modal.querySelector('.modal__overlay');
+  const closeBtn = modal.querySelector('.modal__close');
 
+  function open() {
+    modal.setAttribute('aria-hidden', 'false');
+    setTimeout(() => closeBtn.focus(), 10);
+    document.addEventListener('keydown', onKey);
+  }
+  function close() {
+    modal.setAttribute('aria-hidden', 'true');
+    openBtn.focus();
+    document.removeEventListener('keydown', onKey);
+  }
+  function onKey(e) {
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') {
+      const f = panel.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])');
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+    }
+  }
+  openBtn.addEventListener('click', open);
+  overlay.addEventListener('click', close);
+  closeBtn.addEventListener('click', close);
+})();
+</script>
+
+<!-- Mini Reading（3枚）— 修正版：裏面CSS化・Array.from・A11y -->
+<script>
+(() => {
+  const start = document.getElementById('readingStart');
+  const reset = document.getElementById('readingReset');
+  const deckBtns = Array.from(document.querySelectorAll('.card-slot')); // ← Array.fromで安定化
+  const result = document.getElementById('readingResult');
+
+  if (!start || !reset || !deckBtns.length) return;
+
+  const CARDS = [
+    { name:'愚者', key:'自由に踏み出す' }, { name:'魔術師', key:'いま始める' },
+    { name:'女教皇', key:'静かに見極める' }, { name:'女帝', key:'受け取り育てる' },
+    { name:'皇帝', key:'決めて動かす' }, { name:'教皇', key:'信頼に寄る' },
+    { name:'恋人', key:'選び抜く' }, { name:'戦車', key:'突破する' },
+    { name:'力', key:'優しさで制す' }, { name:'隠者', key:'内に灯す' },
+    { name:'運命の輪', key:'流れに乗る' }, { name:'正義', key:'整えバランス' },
+    { name:'吊るされた男', key:'意味を反転' }, { name:'死神', key:'一度終わらせる' },
+    { name:'節制', key:'混ぜ調和する' }, { name:'悪魔', key:'執着を手放す' },
+    { name:'塔', key:'壊して更新' }, { name:'星', key:'希望を見る' },
+    { name:'月', key:'不安を識る' }, { name:'太陽', key:'喜びで進む' },
+    { name:'審判', key:'呼び覚ます' }, { name:'世界', key:'完成し次へ' }
+  ];
+
+  const SLOT_TEXT = {
+    1: '— “現在”の要点 — ',
+    2: '— “鍵”のひと言 — ',
+    3: '— “進む道”への合図 — '
+  };
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  let stack = [];
+  let picked = {};
+
+  function init(){
+    result.hidden = true;
+    picked = {};
+    deckBtns.forEach(b=>{
+      b.disabled = true;
+      b.innerHTML = '';         // 表面テキスト消去
+      b.classList.remove('is-picked','is-ready');
+      b.setAttribute('aria-pressed','false');
+    });
+    reset.disabled = true;
+  }
+
+  function startReading(){
+    stack = shuffle(CARDS);
+    deckBtns.forEach(b=>{
+      b.disabled = false;
+      b.classList.add('is-ready');     // ホバー演出ON
+      // 裏面はCSSの ::before で常時表示されるためJS指定なし
+    });
+    start.disabled = true;
+    reset.disabled = false;
+  }
+
+  function reveal(slot, btn){
+    if (picked[slot]) return;
+    const card = stack.pop();
+    picked[slot] = card;
+
+    btn.setAttribute('aria-pressed','true');
+    btn.classList.add('is-picked'); // ← 裏面::beforeをCSSでフェードアウト
+    btn.innerHTML = `
+      <div class="face tarot-block">
+        <strong class="card-title">${card.name}</strong>
+        <div class="card-desc"><span style="opacity:.7">${SLOT_TEXT[slot]}</span><br>${card.key}</div>
+      </div>`;
+
+    // すべて引いたら結果表示
+    if (picked[1] && picked[2] && picked[3]) {
+      result.hidden = false;
+
+      document.querySelector('.r-title[data-for="1"]').textContent = picked[1].name;
+      document.querySelector('.r-title[data-for="2"]').textContent = picked[2].name;
+      document.querySelector('.r-title[data-for="3"]').textContent = picked[3].name;
+
+      document.querySelector('.r-text[data-for="1"]').textContent = picked[1].key + '。いまの自分を“名前で呼ぶ”ように受け止めると整う。';
+      document.querySelector('.r-text[data-for="2"]').textContent = picked[2].key + '。今日ひとつだけ実行する約束を。';
+      document.querySelector('.r-text[data-for="3"]').textContent = picked[3].key + '。小さく始めて継続する。';
+
+      const live = document.getElementById('a11y-live');
+      if (live) live.textContent = 'リーディング完了。今日の一歩は、LINEで受け取れます。';
+      setTimeout(()=> result.focus({preventScroll:true}), 30);
+    }
+  }
+
+  init();
+  start.addEventListener('click', startReading);
+  reset.addEventListener('click', () => { start.disabled = false; init(); });
+
+  deckBtns.forEach(btn=>{
+    btn.addEventListener('click', () => {
+      if (!btn.disabled) reveal(btn.getAttribute('data-slot'), btn);
+    });
+  });
+
+  // 演出：カードタップで簡易モーダル（任意）
+  const quickModal = document.getElementById('modal');
+  const quickClose = quickModal?.querySelector('.close-modal');
+  if (quickModal && quickClose){
+    document.querySelectorAll('.card-slot').forEach(card=>{
+      card.addEventListener('click', () => {
+        if (Object.keys(picked).length === 0) return; // 開始前は開かない
+        quickModal.setAttribute('aria-hidden','false');
+        quickModal.classList.add('active');
+      });
+    });
+    const closeQuick = () => { quickModal.classList.remove('active'); quickModal.setAttribute('aria-hidden','true'); };
+    quickClose.addEventListener('click', closeQuick);
+    quickModal.querySelector('.modal__overlay')?.addEventListener('click', closeQuick);
+  }
+})();
+</script>
 
 <!-- SVG Sprite (icons) -->
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -523,7 +652,5 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
 </svg>
-
-<script src="/assets/js/reading.js" defer></script>
 </body>
 </html>
