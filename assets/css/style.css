@@ -487,3 +487,82 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   background:#fff;
   color:#2a1030;
 }
+
+
+/* ① 日本語向けの読みやすいフォント＆アンチエイリアス */
+html, body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "palt" 1, "pkna" 1;  /* 約物狭め＆仮名プロポーショナル */
+}
+
+/* ② カード全体のコントラストと余白を改善 */
+.tarot-card {
+  background: #ffffff;
+  border: 1px solid #ECE8F7;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 16px rgba(29, 15, 51, 0.06);
+}
+
+/* ③ タイトル（例：運命の輪／死神／審判）を強く・大きく */
+.tarot-card .card-title {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Meiryo", system-ui, sans-serif;
+  font-weight: 700;                 /* 細字→太字 */
+  color: #1D0F33;                   /* 濃い紫でコントラストUP */
+  letter-spacing: .02em;            /* 広がりすぎを抑制 */
+  line-height: 1.35;                
+  font-size: clamp(18px, 4.6vw, 22px);  /* モバイルで自動拡大 */
+  margin: 4px 0 6px;
+}
+
+/* ④ 縦組みを使っている場合の最適化（縦書きカード文） */
+.tarot-card .card-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic Medium", "Meiryo", system-ui, sans-serif;
+  font-weight: 600;                 /* ちょい太め */
+  color: #20103E;
+  letter-spacing: .06em;            /* 縦書きはわずかに広め */
+  line-height: 1.9;                 /* 行間をしっかり確保 */
+  font-size: clamp(16px, 4.2vw, 19px);
+}
+
+/* ⑤ 説明文（カード下の解説） */
+.tarot-card .card-desc {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+  font-weight: 500;
+  color: #2A1A4A;
+  line-height: 1.85;
+  letter-spacing: .01em;
+  font-size: clamp(15px, 4.2vw, 17px);
+}
+
+/* ⑥ 引用符やダッシュなどの記号を見やすく */
+.tarot-card .card-desc em,
+.tarot-card .card-vertical em {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ⑦ 余計な影やぼかしをOFF（重なってる場合の読みづらさ解消） */
+.tarot-card .card-title,
+.tarot-card .card-vertical,
+.tarot-card .card-desc {
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* ⑧ スマホ最適化（iPhone幅～） */
+@media (max-width: 420px) {
+  .tarot-card { padding: 14px 16px; }
+  .tarot-card .card-vertical { letter-spacing: .04em; line-height: 1.95; }
+  .tarot-card .card-title { font-size: 20px; }
+}
+
+/* ⑨ さらにコントラストが必要な人向け（端末設定が高コントラストなら濃く） */
+@media (prefers-contrast: more) {
+  .tarot-card .card-title,
+  .tarot-card .card-vertical,
+  .tarot-card .card-desc { color: #140A26; }
+}
