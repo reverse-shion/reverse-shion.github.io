@@ -228,10 +228,9 @@ function startShuffle(){
     bgm.volume = 0.0;
     bgm.play().then(()=>{
       bgmPrimed = true;
-      // フェードイン
       let v = 0.0;
       const t = setInterval(()=>{ v += 0.05; bgm.volume = Math.min(0.35, v); if (v>=0.35) clearInterval(t); }, 120);
-    }).catch(()=>{/* モバイルでブロックされたら無視 */});
+    }).catch(()=>{});
   }
 
   state='shuffling';
@@ -239,35 +238,34 @@ function startShuffle(){
   btnClose.style.display='none'; btnReset.style.display='none';
   resultEl.classList.remove('show'); chantEl.classList.remove('show');
 
-  renderShuffleGrid();
-  shuffleTimer = setInterval(() => {
-    [...deckArea.children].forEach((el,i)=>{
-      el.style.transform = `translateZ(0) rotate(${(Math.random()*8-4).toFixed(2)}deg)`;
-    });
-    if (Math.random() < .45){
-      const kids = [...deckArea.children];
-      const idx = Math.floor(Math.random()*kids.length);
-      const rep = cardNode(fullDeck[Math.floor(Math.random()*fullDeck.length)], true);
-      deckArea.replaceChild(rep, kids[idx]);
-    }
-  }, 200);
-}
-function stopShuffleAndReveal(){
-  if (shuffleTimer){ clearInterval(shuffleTimer); shuffleTimer=null; }
-  const chosen = sample3(fullDeck);
   deckArea.innerHTML = '';
-  chosen.forEach((c,i)=>{
-    const el = cardNode(c,false);
-    deckArea.appendChild(el);
-    setTimeout(()=> el.classList.add('flipped'), 220 + i*720);
-  });
-  setTimeout(()=> showReading(chosen), 220 + 3*720 + 320);
-  btnStop.disabled = true; btnStart.disabled = true;
-  btnClose.style.display='inline-block'; btnReset.style.display='inline-block';
-  btnClose2.style.display='inline-block'; btnReset2.style.display='inline-block';
-  state='revealed';
-}
 
+  // 🌟 円状配置でシャッフル開始
+  const tempDeck = shuffle([...fullDeck]);
+  const total = Math.min(tempDeck.length, 22); // 表示は22枚くらいで十分
+  const radius = 150; // 円の半径
+  const centerX = 0, centerY = 0;
+
+  for(let i=0; i<total; i++){
+    const c = tempDeck[i];
+    const card = cardNode(c,true);
+    const angle = (i / total) * 2 * Math.PI;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    card.style.position = 'absolute';
+    card.style.left = `calc(50% + ${x}px)`;
+    card.style.top  = `calc(50% + ${y}px)`;
+    card.style.transform = `rotate(${angle}rad)`;
+    deckArea.appendChild(card);
+  }
+
+  // 回転アニメーション
+  let rot = 0;
+  shuffleTimer = setInterval(()=>{
+    rot += 5; // 回転速度
+    deckArea.style.transform = `rotate(${rot}deg)`;
+  }, 60);
+}
 /* =============== リーディング＋詠唱 =============== */
 function showReading(cards){
   const [a,b,c] = cards;
