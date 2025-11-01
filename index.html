@@ -1,3 +1,4 @@
+<!-- index.html（置き換え用 / 変更点はMini Readingと微修正のみ） -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -100,7 +101,7 @@
 <!-- 星砂パーティクル -->
 <div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
-<!-- ヘッダー（初期は隠れて、スクロールで表示→停止で自動隠し） -->
+<!-- ヘッダー（スクロールで表示→停止で自動隠し） -->
 <header role="banner">
   <div class="wrap">
     <div class="brand" aria-label="サイトブランド">
@@ -113,6 +114,7 @@
     <nav class="nav" aria-label="主要ナビゲーション">
       <a href="#trinity">詩韻思想</a>
       <a href="#writings">書</a>
+      <a href="#mini-reading">体験</a>
       <a href="#join">参加</a>
     </nav>
   </div>
@@ -144,7 +146,9 @@
         <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分で観る/聴く</a>
       </div>
 
-    
+      <figure class="hero__image" aria-hidden="true">
+        <img src="/assets/og.jpg" alt="" width="1200" height="630" loading="lazy" decoding="async">
+      </figure>
     </div>
   </section>
 
@@ -230,7 +234,7 @@
     </div>
   </section>
 
-  <!-- ミニ・リーディングUI -->
+  <!-- ミニ・リーディングUI（修正版） -->
   <section id="mini-reading" aria-labelledby="miniReadingTitle">
     <div class="wrap">
       <h2 id="miniReadingTitle">🃏 3枚リーディング（体験）</h2>
@@ -251,7 +255,7 @@
           <button class="card-slot" data-slot="3" role="listitem" aria-label="3枚目を引く"></button>
         </div>
 
-        <div class="reading-result" hidden>
+        <div class="reading-result" id="readingResult" hidden tabindex="-1">
           <div class="result-grid">
             <div class="result-item">
               <div class="badge">① 現在</div>
@@ -299,29 +303,16 @@
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
     <button class="modal__close" aria-label="閉じる"><svg width="18" height="18"><use href="#i-x"/></svg></button>
-
-    <!-- ★ ここを picture で差し替え（SP/PC自動切替） -->
     <figure class="modal__media">
       <picture>
-        <!-- 縦長スマホ優先 -->
-        <source
-          media="(max-width: 640px)"
-          srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
-        <!-- それ以外（デスクトップ等） -->
-        <source
-          media="(min-width: 641px)"
-          srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
-        <img
-          src="/assets/images/modal/main_modal_1920x1280.jpg?v=1"
-          alt="TAROT BREAKER プレビュー"
-          width="1920" height="1280" loading="lazy" decoding="async">
+        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
+        <source media="(min-width: 641px)" srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
+        <img src="/assets/images/modal/main_modal_1920x1280.jpg?v=1" alt="TAROT BREAKER プレビュー" width="1920" height="1280" loading="lazy" decoding="async">
       </picture>
     </figure>
-
     <div class="modal__body">
       <h3 id="tarotModalTitle">TAROT BREAKER ― 星の言霊使い</h3>
-      <p class="lead">「言の葉は鍵、星の光は道しるべ。」  
-        迷いの影が生まれる夜、カードは静かに呼吸し、言葉は祈りへと変わる。</p>
+      <p class="lead">「言の葉は鍵、星の光は道しるべ。」 迷いの影が生まれる夜、カードは静かに呼吸し、言葉は祈りへと変わる。</p>
       <ul class="bullets">
         <li>3行あらすじ：<em>迷いの正体に、言葉で触れる。</em></li>
         <li>詩的体験：<em>星詠展開 → 封命完了 → 大丈夫だよ。</em></li>
@@ -533,13 +524,13 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 })();
 </script>
 
-<!-- Mini Reading（3枚） -->
+<!-- Mini Reading（3枚）— 修正版：裏面CSS化・Array.from・A11y -->
 <script>
 (() => {
   const start = document.getElementById('readingStart');
   const reset = document.getElementById('readingReset');
-  const deckBtns = Array.from(document.querySelectorAll('.card-slot'));
-  const result = document.querySelector('.reading-result');
+  const deckBtns = Array.from(document.querySelectorAll('.card-slot')); // ← Array.fromで安定化
+  const result = document.getElementById('readingResult');
 
   if (!start || !reset || !deckBtns.length) return;
 
@@ -580,10 +571,9 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     picked = {};
     deckBtns.forEach(b=>{
       b.disabled = true;
-      b.textContent = '';
+      b.innerHTML = '';         // 表面テキスト消去
+      b.classList.remove('is-picked','is-ready');
       b.setAttribute('aria-pressed','false');
-      b.classList.remove('is-picked');
-      b.style.backgroundImage = '';
     });
     reset.disabled = true;
   }
@@ -592,12 +582,8 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     stack = shuffle(CARDS);
     deckBtns.forEach(b=>{
       b.disabled = false;
-      b.textContent = '';
-      /* 裏面（1枚の共通画像） */
-      b.style.backgroundImage = 'url(/assets/images/tarot/tarot_back_1024x1536.jpg)';
-      b.style.backgroundSize = 'cover';
-      b.style.backgroundPosition = '50% 50%';
-      b.style.backgroundRepeat = 'no-repeat';
+      b.classList.add('is-ready');     // ホバー演出ON
+      // 裏面はCSSの ::before で常時表示されるためJS指定なし
     });
     start.disabled = true;
     reset.disabled = false;
@@ -609,12 +595,17 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     picked[slot] = card;
 
     btn.setAttribute('aria-pressed','true');
-    btn.classList.add('is-picked');
-    btn.style.backgroundImage = 'none';
-    btn.innerHTML = `<strong style="font-size:16px;color:#2a1030">${card.name}</strong><br><span style="font-size:13px;color:#6b6b6b">${SLOT_TEXT[slot]}</span><br><span style="font-weight:700">${card.key}</span>`;
+    btn.classList.add('is-picked'); // ← 裏面::beforeをCSSでフェードアウト
+    btn.innerHTML = `
+      <div class="face tarot-block">
+        <strong class="card-title">${card.name}</strong>
+        <div class="card-desc"><span style="opacity:.7">${SLOT_TEXT[slot]}</span><br>${card.key}</div>
+      </div>`;
 
+    // すべて引いたら結果表示
     if (picked[1] && picked[2] && picked[3]) {
       result.hidden = false;
+
       document.querySelector('.r-title[data-for="1"]').textContent = picked[1].name;
       document.querySelector('.r-title[data-for="2"]').textContent = picked[2].name;
       document.querySelector('.r-title[data-for="3"]').textContent = picked[3].name;
@@ -625,20 +616,27 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 
       const live = document.getElementById('a11y-live');
       if (live) live.textContent = 'リーディング完了。今日の一歩は、LINEで受け取れます。';
+      setTimeout(()=> result.focus({preventScroll:true}), 30);
     }
   }
 
   init();
   start.addEventListener('click', startReading);
   reset.addEventListener('click', () => { start.disabled = false; init(); });
-  deckBtns.forEach(btn=> btn.addEventListener('click', () => { if (!btn.disabled) reveal(btn.getAttribute('data-slot'), btn); }));
 
-  /* 追加：カードをタップすると簡易モーダルを開く（演出） */
+  deckBtns.forEach(btn=>{
+    btn.addEventListener('click', () => {
+      if (!btn.disabled) reveal(btn.getAttribute('data-slot'), btn);
+    });
+  });
+
+  // 演出：カードタップで簡易モーダル（任意）
   const quickModal = document.getElementById('modal');
   const quickClose = quickModal?.querySelector('.close-modal');
   if (quickModal && quickClose){
     document.querySelectorAll('.card-slot').forEach(card=>{
       card.addEventListener('click', () => {
+        if (Object.keys(picked).length === 0) return; // 開始前は開かない
         quickModal.setAttribute('aria-hidden','false');
         quickModal.classList.add('active');
       });
