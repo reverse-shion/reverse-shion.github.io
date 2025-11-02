@@ -1,121 +1,139 @@
-/* === Re:verse Shion - Mini Reading (scoped) === */
-.tb-mini{--ink:#26263a;--muted:#727297;--halo:#ffd76f80;--accent:#7e66ff;--panel:#ffffffcc;--r:16px;--card-back-url:url("/assets/tarot/back.png");color:var(--ink)}
+/* =========================================================
+   Re:verse Shion — Mini Reading (3-cards) scoped stylesheet
+   Version: 2025-11-02 stable
+   役割：#mini-reading セクション専用（UI・カード反転・結果表示）
+   注意：全体CSSと重複/競合しないよう、.tb-mini でスコープ。
+   ========================================================= */
+
+.tb-mini{
+  --ink:#26263a;
+  --muted:#727297;
+  --halo:#ffd76f80;
+  --accent:#7e66ff;
+  --panel:#ffffffcc;
+  --r:16px;
+
+  /* 裏面画像：ここで一元管理（存在する実ファイルに合わせて更新） */
+  --card-back-url: url("/assets/tarot/back.png?v=1");
+
+  color:var(--ink);
+}
 .tb-mini *{box-sizing:border-box}
-.tb-mini .tbm-head{padding:20px 16px 8px;background:linear-gradient(#fff,#fff8);backdrop-filter:saturate(140%) blur(6px);border-radius:18px}
+
+/* ===== Head ===== */
+.tb-mini .tbm-head{
+  padding:20px 16px 8px;
+  background:linear-gradient(#fff,#fff8);
+  backdrop-filter:saturate(140%) blur(6px);
+  border-radius:18px
+}
 .tb-mini .tbm-head h2{margin:0 0 6px;font-size:20px}
 .tb-mini .tbm-lead{margin:0 0 12px;color:var(--muted);font-size:14px}
 .tb-mini .tbm-actions{display:flex;gap:12px;flex-wrap:wrap}
-.tb-mini .tbm-btn{appearance:none;border:none;border-radius:999px;padding:10px 16px;background:#eee;color:#333;font-weight:600;cursor:pointer}
-.tb-mini .tbm-btn.primary{background:linear-gradient(135deg,#ffb3cf,#ffd76f 60%,#ffe8a8);box-shadow:0 8px 24px -10px var(--halo)}
+.tb-mini .tbm-btn{
+  appearance:none;border:none;border-radius:999px;padding:10px 16px;background:#eee;color:#333;
+  font-weight:700;cursor:pointer;transition:transform .05s ease
+}
+.tb-mini .tbm-btn.primary{
+  background:linear-gradient(135deg,#ffb3cf,#ffd76f 60%,#ffe8a8);
+  box-shadow:0 8px 24px -10px var(--halo)
+}
 .tb-mini .tbm-btn:active{transform:translateY(1px)}
 
-.tb-mini .tbm-spread{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:18px 0 28px}
-@media (max-width:780px){.tb-mini .tbm-spread{grid-template-columns:1fr}}
+/* ===== Spread ===== */
+.tb-mini .tbm-spread{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;padding:18px 0 28px
+}
+@media (max-width:780px){
+  .tb-mini .tbm-spread{grid-template-columns:1fr}
+}
 
-.tb-mini .tbm-slot{position:relative;background:var(--panel);border-radius:20px;padding:16px;border:1px solid #eee;box-shadow:0 10px 30px -20px rgba(0,0,0,.2)}
-.tb-mini .tbm-title{margin:0 0 10px;font-size:15px;color:var(--muted)}
-.tb-mini .tbm-hint{margin:12px 2px 0;font-size:14px;min-height:2.5em;color:#454562}
+.tb-mini .tbm-slot{
+  position:relative;background:var(--panel);border-radius:20px;padding:16px;
+  border:1px solid #eee;box-shadow:0 10px 30px -20px rgba(0,0,0,.2);
+  display:flex;flex-direction:column;align-items:center;gap:10px
+}
+.tb-mini .tbm-title{margin:0 0 6px;font-size:15px;color:var(--muted)}
+.tb-mini .tbm-name{
+  font-weight:800; font-size:14px; letter-spacing:.02em;
+  color:#5a4a86; margin:2px 0 0; min-height:1.6em; /* レイアウト揺れ防止 */
+}
+.tb-mini .tbm-hint{margin:8px 2px 0;font-size:14px;min-height:2.4em;color:#454562;text-align:center}
 
-/* Card */
-.tb-mini .tbm-card{position:relative;width:100%;aspect-ratio:2/3;border-radius:14px;cursor:pointer;perspective:1000px;outline:none;will-change:transform,box-shadow}
-.tb-mini .tbm-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1);border-radius:inherit}
-.tb-mini .tbm-face{position:absolute;inset:0;border-radius:inherit;backface-visibility:hidden;background-size:cover;background-position:center;box-shadow:0 10px 30px -12px rgba(0,0,0,.35)}
-.tb-mini .tbm-face.back{background-image:var(--card-back-url)}
-.tb-mini .tbm-face.front{transform:rotateY(180deg);background-image:var(--front-url, none)}
-.tb-mini .tbm-card.flipped .tbm-card-inner{transform:rotateY(180deg)}
-.tb-mini .tbm-card:focus-visible{box-shadow:0 0 0 3px #c9b4ff80}
+/* ===== Card core ===== */
+.tb-mini .tbm-card{
+  position:relative;width:100%;aspect-ratio:2/3;border-radius:14px;cursor:pointer;
+  perspective:1000px;outline:none;will-change:transform,box-shadow;overflow:hidden;
+  /* 触ってもサイズは変えない（拡大禁止） */
+  transition:box-shadow .35s ease, filter .35s ease;
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+}
+.tb-mini .tbm-card:hover{ box-shadow: 0 12px 28px rgba(126,102,255,.28) }
 
-/* flip pop + aura */
-.tb-mini .tbm-card.flip-pop{animation:tbmFlipPop .32s ease-out}
-@keyframes tbmFlipPop{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.03)}100%{transform:translateY(0) scale(1)}}
-.tb-mini .tbm-card.aura-pop{animation:tbmAura .6s ease-out}
-@keyframes tbmAura{0%{box-shadow:0 0 0 0 rgba(126,102,255,.00),0 0 0 0 rgba(255,215,111,.00)}50%{box-shadow:0 0 24px 8px rgba(126,102,255,.35),0 0 60px 18px rgba(255,215,111,.25)}100%{box-shadow:0 2px 24px -10px rgba(0,0,0,.35)}}
+.tb-mini .tbm-card-inner{
+  position:absolute; inset:0; transform-style:preserve-3d;
+  border-radius:inherit; transition:transform .6s cubic-bezier(.2,.8,.2,1)
+}
+.tb-mini .tbm-face{
+  position:absolute; inset:0; border-radius:inherit; backface-visibility:hidden;
+  background-size:cover; background-position:center; box-shadow:0 10px 30px -12px rgba(0,0,0,.35)
+}
+/* 裏面（常時表示） */
+.tb-mini .tbm-face.back{ background-image:var(--card-back-url) }
+/* 表面（JSで --front-url を付与） */
+.tb-mini .tbm-face.front{ transform:rotateY(180deg); background-image:var(--front-url, none) }
 
-/* ripple (tap position) */
+/* 反転（サイズ不変） */
+.tb-mini .tbm-card.flipped .tbm-card-inner{ transform:rotateY(180deg) }
+
+/* Focusリング */
+.tb-mini .tbm-card:focus-visible{ box-shadow:0 0 0 3px #c9b4ff80 }
+
+/* ===== Tap演出（光・リップル） ===== */
+.tb-mini .tbm-card.aura-pop{
+  animation:tbmAura .6s ease-out
+}
+@keyframes tbmAura{
+  0%{box-shadow:0 0 0 0 rgba(126,102,255,.00),0 0 0 0 rgba(255,215,111,.00)}
+  50%{box-shadow:0 0 24px 8px rgba(126,102,255,.35),0 0 60px 18px rgba(255,215,111,.25)}
+  100%{box-shadow:0 2px 24px -10px rgba(0,0,0,.35)}
+}
+/* ripple（タップ位置に応じて） */
 .tb-mini .tbm-card::after{
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(circle at var(--tap-x,50%) var(--tap-y,50%), rgba(255,255,255,.55) 0%, rgba(255,215,111,.45) 20%, rgba(126,102,255,.35) 40%, rgba(126,102,255,.00) 60%);
+  background:radial-gradient(circle at var(--tap-x,50%) var(--tap-y,50%),
+    rgba(255,255,255,.55) 0%, rgba(255,215,111,.45) 20%, rgba(126,102,255,.35) 40%, rgba(126,102,255,.00) 60%);
   opacity:0;transform:scale(.6);
 }
 .tb-mini .tbm-card.ripple::after{animation:tbmRipple .7s ease-out}
-@keyframes tbmRipple{0%{opacity:0;transform:scale(.6)}10%{opacity:.85}60%{opacity:.45}100%{opacity:0;transform:scale(2.2)}}
-
-/* shuffle (riffle→fan→settle) */
-.tb-mini .tbm-card.shuffle-seq{
-  animation: tbmRiffle .45s cubic-bezier(.2,.8,.2,1) var(--delay,0ms),
-             tbmFan    .30s cubic-bezier(.2,.8,.2,1) calc(var(--delay,0ms) + .45s),
-             tbmSettle .22s ease-out               calc(var(--delay,0ms) + .75s);
+@keyframes tbmRipple{
+  0%{opacity:0;transform:scale(.6)}
+  10%{opacity:.85}
+  60%{opacity:.45}
+  100%{opacity:0;transform:scale(2.2)}
 }
-@keyframes tbmRiffle{from{transform:translate3d(0,0,0) rotate(0)}to{transform:translate3d(var(--rif-dx,0),var(--rif-dy,0),0) rotate(var(--rif-rz,0))}}
-@keyframes tbmFan{from{transform:translate3d(var(--rif-dx,0),var(--rif-dy,0),0) rotate(var(--rif-rz,0))}to{transform:translate3d(0,0,0) rotate(var(--fan-rz,0))}}
-@keyframes tbmSettle{from{transform:translate3d(0,0,0) rotate(var(--fan-rz,0))}to{transform:translate3d(0,0,0) rotate(0)}}
 
-/* reduce motion */
+/* ===== Result（詩／韻／祈） ===== */
+#readingResult{ margin-top:22px }
+#readingResult .result-grid{
+  display:grid; gap:14px; max-width:980px; margin:16px auto 0;
+}
+@media (min-width:720px){ #readingResult .result-grid{ grid-template-columns:repeat(3,1fr) } }
+#readingResult .result-item{
+  background: linear-gradient(180deg, #ffffff0b, #00000006);
+  border:1px solid #FFFFFF26; border-radius:14px; padding:12px 14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12)
+}
+#readingResult .result-item .badge{
+  display:inline-block; font-size:12px; color:#201630; background:#e9deff;
+  padding:2px 8px; border-radius:999px; margin-bottom:6px; font-weight:800;
+}
+#readingResult .result-item .r-title{ margin:.2em 0; font-size:17px; color:#503080; font-weight:800 }
+#readingResult .result-item .r-text{ margin:0; color:#3a3058; line-height:1.85; font-size:14.5px }
+
+/* ===== Motion Safety ===== */
 @media (prefers-reduced-motion: reduce){
   .tb-mini .tbm-card-inner{transition:none}
-  .tb-mini .tbm-card.flip-pop,.tb-mini .tbm-card.aura-pop,.tb-mini .tbm-card.ripple,.tb-mini .tbm-card.shuffle-seq{animation:none}
-}
-/* ===== Mini Reading：横並び3枚＋レスポンシブ ===== */
-#mini-reading .tbm-spread {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-wrap: nowrap;
-  gap: 4vw;
-  width: 100%;
-  margin: 20px auto;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 0 4vw;
-}
-
-/* 各カード枠 */
-#mini-reading .tbm-card {
-  position: relative;
-  flex: 0 0 calc(28vw);
-  aspect-ratio: 2 / 3;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  background: var(--card-back-url) center/cover no-repeat;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-  scroll-snap-align: center;
-  transition: transform 0.6s ease, box-shadow 0.6s ease;
-}
-
-/* タップ時（反転・光の演出） */
-#mini-reading .tbm-card:active {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(255, 215, 111, 0.7), 0 0 60px rgba(174, 138, 255, 0.5);
-}
-
-/* 光の輪（エフェクト） */
-#mini-reading .tbm-card::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.6), transparent);
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: all 0.8s ease;
-}
-#mini-reading .tbm-card.clicked::after {
-  width: 300px;
-  height: 300px;
-  opacity: 1;
-}
-
-/* ===== モバイル対応 ===== */
-@media (max-width: 600px) {
-  #mini-reading .tbm-spread {
-    gap: 3vw;
-    padding: 0 3vw;
-  }
-  #mini-reading .tbm-card {
-    flex: 0 0 calc(30vw);
-  }
+  .tb-mini .tbm-card.aura-pop,.tb-mini .tbm-card.ripple{animation:none}
 }
