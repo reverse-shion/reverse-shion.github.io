@@ -598,3 +598,76 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 
 /* 競合を潰す（以前の背景指定が勝っていた時の保険） */
 .card-slot{ background: none !important; }
+
+/* ===== Mini Reading：サイズブレ防止＋名札＋演出 ===== */
+
+/* 3列レイアウトはそのまま、カードは常に同一サイズ */
+#mini-reading .tbm-spread{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap: min(4vw,18px);
+}
+
+/* 枠（見出しや説明を含む一列） */
+#mini-reading .tbm-slot{
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+}
+
+/* カード本体：絶対サイズ＋アスペクト比固定、タップ時に**拡大しない** */
+#mini-reading .tbm-card{
+  width: clamp(110px, 28vw, 180px);
+  aspect-ratio: 2 / 3;
+  border-radius: 14px;
+  background:#120d1f;
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+  position: relative; overflow: hidden; cursor: pointer;
+  /* ★タップで大きさが変わらないよう transform は使わない */
+  transition: box-shadow .35s ease, filter .35s ease;
+}
+#mini-reading .tbm-card:hover{ box-shadow: 0 12px 28px rgba(126,102,255,.28) }
+
+/* 内部3D面（常に同寸） */
+#mini-reading .tbm-card-inner{ position:absolute; inset:0; transform-style:preserve-3d; }
+#mini-reading .tbm-face{ position:absolute; inset:0; backface-visibility:hidden }
+
+/* 裏面（共通バック） */
+#mini-reading .tbm-face.back{
+  background: var(--card-back-url) center/cover no-repeat;
+}
+
+/* 表面（画像は CSS 変数 --front-url で貼る。img 要素は使わない） */
+#mini-reading .tbm-face.front{
+  transform: rotateY(180deg);
+  background: var(--front-url, none) center/cover no-repeat;
+}
+
+/* 反転アニメ（大きさ不変） */
+#mini-reading .tbm-card.flipped .tbm-card-inner{
+  animation: tbmFlip .6s ease both;
+}
+@keyframes tbmFlip{
+  0%  { transform: rotateY(0) }
+  100%{ transform: rotateY(180deg) }
+}
+
+/* タップ時の光だけ（サイズ変更なし） */
+#mini-reading .tbm-card.aura-pop{ box-shadow: 0 0 0 3px rgba(255,215,111,.45), 0 18px 42px rgba(126,102,255,.32) }
+
+/* 名札（カード名） */
+#mini-reading .tbm-name{
+  font-weight:800; font-size:14px; letter-spacing:.02em;
+  color:#5a4a86; margin:2px 0 0; min-height:1.6em; /* 高さキープでレイアウト揺れ防止 */
+}
+
+/* 下のヒント文（変わらず） */
+#mini-reading .tbm-hint{ text-align:center; color:#6d6b7a; font-size:14px; min-height:2.4em }
+
+/* 結果枠：見出しを“詩／韻／祈”で表示し、本文はボリューム多めでも読みやすく */
+#readingResult .result-grid{ display:grid; gap:14px; grid-template-columns:repeat(3,1fr) }
+#readingResult .result-item{ line-height:1.85 }
+#readingResult .result-item .r-title{ font-weight:800; color:#f0eaff; margin:.1em 0 .3em }
+#readingResult .result-item .r-text{ color:#d8d2ee; font-size:15px }
+
+/* モバイル微調整 */
+@media (max-width: 640px){
+  #readingResult .result-grid{ grid-template-columns:1fr }
+}
