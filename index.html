@@ -1,4 +1,3 @@
-<!-- index.html（置き換え用 / 変更点はMini Readingと微修正のみ） -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -82,20 +81,12 @@
   }
   </script>
 
-  <!-- CSS（外部） -->
+  <!-- CSS（外部のみ）-->
   <link rel="stylesheet" href="/assets/css/style.css">
-　<link rel="stylesheet" href="/assets/css/mini-reading.css">
-  <!-- 最小ユーティリティ -->
-  <style>
-    @media (prefers-reduced-motion: reduce){
-      .hero__video, .trinity__video{ animation:none !important }
-    }
-    .sr-only-focusable:focus{ position:static; width:auto; height:auto }
-  </style>
+  <link rel="stylesheet" href="/assets/css/mini-reading.css">
 </head>
 <body>
 
-<!-- Skipリンク -->
 <a href="#main-content" class="sr-only sr-only-focusable">本文へスキップ</a>
 
 <!-- 星砂パーティクル -->
@@ -120,7 +111,6 @@
   </div>
 </header>
 
-<!-- #top アンカー -->
 <div id="top" aria-hidden="true"></div>
 
 <main id="main-content" tabindex="-1">
@@ -139,13 +129,12 @@
       <h1>言葉は祈りの構文　物語は、その実演</h1>
       <p>詩韻思想®（Shion Philosophy）で“響き”を学び、TAROT BREAKERで“響き”を体験する。<br><strong>— 言葉が魂を救う、その瞬間へ。</strong></p>
 
-      <div class="cta-row" role="navigation" aria-label="主要CTA">
+      <nav class="cta-row" aria-label="主要CTA">
         <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">🌠 星の言葉を受け取る（無料）</a>
         <a class="btn btn--ghost" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">📘 小説を読む</a>
         <a class="btn btn--ghost" href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">📖 今日の“響き”を読む</a>
         <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分で観る/聴く</a>
-      </div>
-
+      </nav>
     </div>
   </section>
 
@@ -231,73 +220,90 @@
     </div>
   </section>
 
-  <!-- ミニ・リーディングUI（修正版） -->
-  <section class="tb-mini" id="mini-reading">
-  <header class="tbm-head">
-    <h2>🜂 3枚リーディング（体験）</h2>
-    <p class="tbm-lead">現在／鍵／進む道。カードは画像のみで表示。タップで表に反転するよ。</p>
-    <div class="tbm-actions">
-      <button id="tbm-shuffle" class="tbm-btn primary">シャッフルして始める</button>
-      <button id="tbm-reset" class="tbm-btn">リセット</button>
-    </div>
-  </header>
+  <!-- ミニ・リーディングUI -->
+  <section class="tb-mini" id="mini-reading" aria-label="3枚リーディング（体験）">
+    <header class="tbm-head">
+      <h2>🜂 3枚リーディング（体験）</h2>
+      <p class="tbm-lead">現在／鍵／進む道。カードは画像のみで表示。タップで表に反転するよ。</p>
+      <div class="tbm-actions">
+        <button id="tbm-shuffle" class="tbm-btn primary">シャッフルして始める</button>
+        <button id="tbm-reset" class="tbm-btn">リセット</button>
+      </div>
+    </header>
 
-  <main class="tbm-spread" aria-live="polite">
-    <!-- ① 現在 -->
-    <section class="tbm-slot">
-      <h3 class="tbm-title">① 現在</h3>
-      <div class="tbm-card" role="button" tabindex="0"
-           aria-label="カード：現在"
-           data-front="/assets/tarot/fronts/star.jpg">
-        <div class="tbm-card-inner">
-          <div class="tbm-face back" aria-hidden="true"></div>
-          <div class="tbm-face front" aria-hidden="true"></div>
+    <main class="tbm-spread" aria-live="polite">
+      <!-- ① 現在 -->
+      <section class="tbm-slot">
+        <h3 class="tbm-title">① 現在</h3>
+        <div class="tbm-card" role="button" tabindex="0" aria-label="カード：現在"
+             data-front="/assets/tarot/fronts/star.jpg">
+          <div class="tbm-card-inner">
+            <div class="tbm-face back" aria-hidden="true"></div>
+            <div class="tbm-face front" aria-hidden="true"></div>
+          </div>
+        </div>
+        <p class="tbm-name" aria-live="polite">—</p>
+        <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
+      </section>
+
+      <!-- ② 鍵 -->
+      <section class="tbm-slot">
+        <h3 class="tbm-title">② 鍵</h3>
+        <div class="tbm-card" role="button" tabindex="0" aria-label="カード：鍵"
+             data-front="/assets/tarot/fronts/magician.jpg">
+          <div class="tbm-card-inner">
+            <div class="tbm-face back" aria-hidden="true"></div>
+            <div class="tbm-face front" aria-hidden="true"></div>
+          </div>
+        </div>
+        <p class="tbm-name" aria-live="polite">—</p>
+        <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
+      </section>
+
+      <!-- ③ 進む道 -->
+      <section class="tbm-slot">
+        <h3 class="tbm-title">③ 進む道</h3>
+        <div class="tbm-card" role="button" tabindex="0" aria-label="カード：進む道"
+             data-front="/assets/tarot/fronts/sun.jpg">
+          <div class="tbm-card-inner">
+            <div class="tbm-face back" aria-hidden="true"></div>
+            <div class="tbm-face front" aria-hidden="true"></div>
+          </div>
+        </div>
+        <p class="tbm-name" aria-live="polite">—</p>
+        <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
+      </section>
+    </main>
+
+    <!-- ▼ 結果表示（詩／韻／祈） -->
+    <section class="tbm-result" id="readingResult" hidden>
+      <h3 class="tbm-result-title">結果</h3>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="badge">🪶 詩</div>
+          <p class="r-text" data-for="1">—</p>
+        </div>
+        <div class="result-item">
+          <div class="badge">🎵 韻</div>
+          <p class="r-text" data-for="2">—</p>
+        </div>
+        <div class="result-item">
+          <div class="badge">💫 祈</div>
+          <p class="r-text" data-for="3">—</p>
         </div>
       </div>
-      <p class="tbm-name" aria-live="polite">—</p>
-      <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
     </section>
 
-    <!-- ② 鍵 -->
-    <section class="tbm-slot">
-      <h3 class="tbm-title">② 鍵</h3>
-      <div class="tbm-card" role="button" tabindex="0"
-           aria-label="カード：鍵"
-           data-front="/assets/tarot/fronts/magician.jpg">
-        <div class="tbm-card-inner">
-          <div class="tbm-face back" aria-hidden="true"></div>
-          <div class="tbm-face front" aria-hidden="true"></div>
-        </div>
-      </div>
-      <p class="tbm-name" aria-live="polite">—</p>
-      <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
-    </section>
+    <!-- 効果音 -->
+    <audio id="tbm-sfx-tap"  src="/assets/sfx/tap-chime.mp3"  preload="auto"></audio>
+    <audio id="tbm-sfx-flip" src="/assets/sfx/flip-woosh.mp3" preload="auto"></audio>
+  </section>
 
-    <!-- ③ 進む道 -->
-    <section class="tbm-slot">
-      <h3 class="tbm-title">③ 進む道</h3>
-      <div class="tbm-card" role="button" tabindex="0"
-           aria-label="カード：進む道"
-           data-front="/assets/tarot/fronts/sun.jpg">
-        <div class="tbm-card-inner">
-          <div class="tbm-face back" aria-hidden="true"></div>
-          <div class="tbm-face front" aria-hidden="true"></div>
-        </div>
-      </div>
-      <p class="tbm-name" aria-live="polite">—</p>
-      <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
-    </section>
-  </main>
-
-  <!-- 効果音（任意の音源に差し替え可） -->
-  <audio id="tbm-sfx-tap"  src="/assets/sfx/tap-chime.mp3"  preload="auto"></audio>
-  <audio id="tbm-sfx-flip" src="/assets/sfx/flip-woosh.mp3" preload="auto"></audio>
-</section>
   <!-- Join -->
   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-join">参加の扉</h2>
-      <p style="text-align:center;color:var(--muted)">LINE登録で、毎週「星の言葉」と新着の書をお届けします。</p>
+      <p class="muted center">LINE登録で、毎週「星の言葉」と新着の書をお届けします。</p>
       <div class="cta-row">
         <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 無料で受け取る</a>
         <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分リールを観る</a>
@@ -334,7 +340,7 @@
   </div>
 </div>
 
-<!-- クリックで開く簡易モーダル（カード3枚用の表示） -->
+<!-- クリックで開く簡易モーダル（カード3枚用） -->
 <div id="modal" class="modal" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
@@ -351,15 +357,15 @@
 
 <footer>
   <div class="wrap">
-    <div class="sns" aria-label="SNSリンク">
+    <nav class="sns" aria-label="SNSリンク">
       <a href="https://x.com/TaroBure" target="_blank" rel="noopener noreferrer">X（@TaroBure）</a>
       <a href="https://www.instagram.com/shion.codex" target="_blank" rel="noopener noreferrer">Instagram</a>
       <a href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">note</a>
       <a href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">小説（なろう）</a>
       <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">LINE</a>
-    </div>
-    <div style="font-size:12.5px;opacity:.8">© Re:verse Shion — 詩韻思想 / TAROT BREAKER. 言葉が魂を救い、魂が世界を調和させる</div>
-    <div style="margin-top:10px;"><a href="#top" aria-label="ページ先頭へ戻る">▲ ページ先頭へ</a></div>
+    </nav>
+    <div class="copyright">© Re:verse Shion — 詩韻思想 / TAROT BREAKER. 言葉が魂を救い、魂が世界を調和させる</div>
+    <div class="to-top"><a href="#top" aria-label="ページ先頭へ戻る">▲ ページ先頭へ</a></div>
   </div>
 </footer>
 
@@ -381,7 +387,7 @@
 </div>
 <button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く">🦊 しおぽん</button>
 
-<!-- JS（分割） -->
+<!-- JS（外部分割ファイル） -->
 <script src="/assets/js/particles.js" defer></script>
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
@@ -431,7 +437,7 @@
   openBtn.addEventListener('click', () => {
     dlg.classList.remove('is-hidden');
     dlg.setAttribute('aria-hidden','false');
-    focusable()[0]?.focus();
+    (focusable()[0]||openBtn).focus();
     document.addEventListener('keydown', trap);
   });
   closeBtn.addEventListener('click', () => {
@@ -455,9 +461,7 @@
       window.requestAnimationFrame(() => {
         header.classList.add('is-visible');
         if (hideTimer) clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => {
-          header.classList.remove('is-visible');
-        }, HIDE_DELAY);
+        hideTimer = setTimeout(() => header.classList.remove('is-visible'), HIDE_DELAY);
         ticking = false;
       });
       ticking = true;
@@ -532,13 +536,12 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 })();
 </script>
 
-<!-- Mini Reading（3枚）— 修正版：裏面CSS化・Array.from・A11y -->
+<!-- Mini Reading（3枚） -->
 <script>
 (() => {
   const root = document.getElementById('mini-reading');
   if(!root) return;
 
-  // 表面画像の候補
   const pool = [
     '/assets/tarot/fronts/star.jpg',
     '/assets/tarot/fronts/magician.jpg',
@@ -547,12 +550,10 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     '/assets/tarot/fronts/hermit.jpg'
   ];
 
-  // ファイル名 → 表示名（必要分だけでOK、無ければそのまま）
   const nameMap = {
     star:'星', magician:'魔術師', sun:'太陽', highpriestess:'女教皇', hermit:'隠者'
   };
 
-  // 1枚毎の短いキーワード
   const shortMap = {
     star:'希望／回復／自己受容',
     magician:'開始／能動／宣言',
@@ -561,15 +562,14 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     hermit:'探究／学び／成熟'
   };
 
-  // “詩／韻／祈” 用のボリュームある文章を合成するテンプレ
   function buildLong(kind, cardKey){
     const kw = shortMap[cardKey] || '意味';
     switch(kind){
-      case 'poem': // 詩
+      case 'poem':
         return `【詩】胸の奥でまだ言葉にならない感情に、やさしく輪郭を与える段階。キーは「${kw}」。まずは今の自分を否定せず、呼吸が落ち着く速度で状況を見つめ直すこと。焦らないで大丈夫だよ。`;
-      case 'rhyme': // 韻
+      case 'rhyme':
         return `【韻】小さな行動で響きを重ね、今日を1ミリ動かす段階。カードが示す運びは「${kw}」。手を動かす・短く宣言する・記録する——いずれかを“今この場で”やってしまおう。`;
-      default: // 祈
+      default:
         return `【祈】結果を急がず、選んだ行動を光へ渡す段階。「${kw}」の学びは必ず実を結ぶ。空を見上げる、深呼吸を3回、そして心の中で『道は開かれた。大丈夫だよ』と結ぶ。`;
     }
   }
@@ -583,28 +583,22 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
   const slots      = $$('.tbm-slot');
   const resultSec  = document.getElementById('readingResult');
 
-  // 結果ラベルを“詩／韻／祈”に差し替え
-  const labels = ['詩','韻','祈'];
   $('#readingResult .result-grid .result-item:nth-child(1) .badge')?.replaceChildren('🪶 詩');
   $('#readingResult .result-grid .result-item:nth-child(2) .badge')?.replaceChildren('🎵 韻');
   $('#readingResult .result-grid .result-item:nth-child(3) .badge')?.replaceChildren('💫 祈');
 
-  // 表面画像をCSS変数でセット（レイアウト揺れゼロ）
   function setFrontImage(cardEl){
     const url = cardEl.dataset.front;
     cardEl.querySelector('.tbm-face.front')
           .style.setProperty('--front-url', `url("${url}")`);
   }
 
-  // 名札セット（ファイル名 → 表示名）
   function setName(slotEl, cardKey){
     const el = slotEl.querySelector('.tbm-name');
     if(!el) return;
-    const disp = nameMap[cardKey] || cardKey;
-    el.textContent = disp;
+    el.textContent = nameMap[cardKey] || cardKey;
   }
 
-  // 初期化
   function prime(){
     resultSec.hidden = true;
     cards.forEach((c,i)=>{
@@ -614,13 +608,10 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
       setName(slots[i], key);
     });
     btnReset.disabled = true;
-    // ヒントを初期メッセに
     $$('.tbm-hint').forEach(h=> h.textContent = h.dataset.default || 'タップでカードを開く');
-    // 結果文を一旦空に
     $$('.r-text').forEach(t=> t.textContent = '—');
   }
 
-  // シャッフル：画像差し替え＆名札更新のみ（サイズは不変）
   function doShuffle(){
     cards.forEach((c,i)=>{
       c.dataset.front = pool[Math.floor(Math.random()*pool.length)];
@@ -634,34 +625,23 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     resultSec.hidden = true;
   }
 
-  // カードを開く
   function reveal(card, idx){
     if(card.classList.contains('revealed')) return;
     card.classList.add('flipped','aura-pop','revealed');
     setTimeout(()=> card.classList.remove('aura-pop'), 400);
 
     const key = (card.dataset.front.split('/').pop()||'').replace(/\.\w+$/,'');
-    const msg = {
-      0: buildLong('poem',  key),
-      1: buildLong('rhyme', key),
-      2: buildLong('pray',  key)
-    }[idx] || '道は開かれた。大丈夫だよ。';
-
-    // スロット下のヒントを短文に
     slots[idx].querySelector('.tbm-hint').textContent =
       (shortMap[key]||'') + ' —— タップ済み';
 
-    // 3枚全部開いたら結果欄を表示
     if($$('.tbm-card.revealed').length===3){
       resultSec.hidden = false;
-      // 各枠にボリューム文面
       $('.r-text[data-for="1"]').textContent = buildLong('poem',  (cards[0].dataset.front.split('/').pop()||'').replace(/\.\w+$/,''));
       $('.r-text[data-for="2"]').textContent = buildLong('rhyme', (cards[1].dataset.front.split('/').pop()||'').replace(/\.\w+$/,''));
       $('.r-text[data-for="3"]').textContent = buildLong('pray',  (cards[2].dataset.front.split('/').pop()||'').replace(/\.\w+$/,''));
     }
   }
 
-  // 監視イベント
   cards.forEach((card, i)=>{
     setFrontImage(card);
     card.addEventListener('click', ()=> reveal(card, i));
