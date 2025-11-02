@@ -397,3 +397,12 @@ main, section, footer, header {
   display: none !important;
   pointer-events: none !important;
 }
+/* --- Modal scroll fix (iOS/Android) --- */
+.modal{ overflow:auto; -webkit-overflow-scrolling:touch; }
+.modal__panel{
+  max-height: 92vh;
+  overflow:auto;               /* パネル内だけ縦スクロール */
+}
+.modal__overlay{ touch-action:none; } /* 背景はスクロールさせない */
+.card--link{ display:block; color:inherit; }
+.card--link:hover{ transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255,215,111,.22); border-color: rgba(255,215,111,.45); }
