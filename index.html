@@ -84,7 +84,7 @@
 
   <!-- CSS（外部） -->
   <link rel="stylesheet" href="/assets/css/style.css">
-
+　<link rel="stylesheet" href="/assets/css/mini-reading.css">
   <!-- 最小ユーティリティ -->
   <style>
     @media (prefers-reduced-motion: reduce){
@@ -232,56 +232,64 @@
   </section>
 
   <!-- ミニ・リーディングUI（修正版） -->
-  <section id="mini-reading" aria-labelledby="miniReadingTitle">
-    <div class="wrap">
-      <h2 id="miniReadingTitle">🃏 3枚リーディング（体験）</h2>
-      <p class="h2-sub">現在／鍵／進む道 を1分で。終わったら「今日の一歩」をLINEで受け取れます。</p>
+  <section class="tb-mini" id="mini-reading">
+  <header class="tbm-head">
+    <h2>🜂 3枚リーディング（体験）</h2>
+    <p class="tbm-lead">現在／鍵／進む道。カードは画像のみで表示。タップで表に反転するよ。</p>
+    <div class="tbm-actions">
+      <button id="tbm-shuffle" class="tbm-btn primary">シャッフルして始める</button>
+      <button id="tbm-reset" class="tbm-btn">リセット</button>
+    </div>
+  </header>
 
-      <div class="reading-ui" data-state="idle" aria-live="polite">
-        <div class="reading-actions">
-          <button class="btn btn--primary" id="readingStart">
-            <svg width="18" height="18" aria-hidden="true"><use href="#i-star"/></svg>
-            シャッフルして始める
-          </button>
-          <button class="btn btn--ghost" id="readingReset" disabled>リセット</button>
-        </div>
-
-        <div class="reading-deck" role="list" aria-label="カードデッキ">
-          <button class="card-slot" data-slot="1" role="listitem" aria-label="1枚目を引く"></button>
-          <button class="card-slot" data-slot="2" role="listitem" aria-label="2枚目を引く"></button>
-          <button class="card-slot" data-slot="3" role="listitem" aria-label="3枚目を引く"></button>
-        </div>
-
-        <div class="reading-result" id="readingResult" hidden tabindex="-1">
-          <div class="result-grid">
-            <div class="result-item">
-              <div class="badge">① 現在</div>
-              <h4 class="r-title" data-for="1">—</h4>
-              <p class="r-text" data-for="1">—</p>
-            </div>
-            <div class="result-item">
-              <div class="badge">② 鍵</div>
-              <h4 class="r-title" data-for="2">—</h4>
-              <p class="r-text" data-for="2">—</p>
-            </div>
-            <div class="result-item">
-              <div class="badge">③ 進む道</div>
-              <h4 class="r-title" data-for="3">—</h4>
-              <p class="r-text" data-for="3">—</p>
-            </div>
-          </div>
-
-          <div class="cta-row" style="margin-top:16px">
-            <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
-              <svg width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
-              今日の“一歩”をLINEで受け取る（無料）
-            </a>
-          </div>
+  <main class="tbm-spread" aria-live="polite">
+    <!-- ① 現在 -->
+    <section class="tbm-slot">
+      <h3 class="tbm-title">① 現在</h3>
+      <div class="tbm-card" role="button" tabindex="0"
+           aria-label="カード：現在"
+           data-front="/assets/tarot/fronts/star.jpg">
+        <div class="tbm-card-inner">
+          <div class="tbm-face back" aria-hidden="true"></div>
+          <div class="tbm-face front" aria-hidden="true"></div>
         </div>
       </div>
-    </div>
-  </section>
+      <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
+    </section>
 
+    <!-- ② 鍵 -->
+    <section class="tbm-slot">
+      <h3 class="tbm-title">② 鍵</h3>
+      <div class="tbm-card" role="button" tabindex="0"
+           aria-label="カード：鍵"
+           data-front="/assets/tarot/fronts/magician.jpg">
+        <div class="tbm-card-inner">
+          <div class="tbm-face back" aria-hidden="true"></div>
+          <div class="tbm-face front" aria-hidden="true"></div>
+        </div>
+      </div>
+      <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
+    </section>
+
+    <!-- ③ 進む道 -->
+    <section class="tbm-slot">
+      <h3 class="tbm-title">③ 進む道</h3>
+      <div class="tbm-card" role="button" tabindex="0"
+           aria-label="カード：進む道"
+           data-front="/assets/tarot/fronts/sun.jpg">
+        <div class="tbm-card-inner">
+          <div class="tbm-face back" aria-hidden="true"></div>
+          <div class="tbm-face front" aria-hidden="true"></div>
+        </div>
+      </div>
+      <p class="tbm-hint" data-default="タップでカードを開く">タップでカードを開く</p>
+    </section>
+  </main>
+
+  <!-- 効果音（任意の音源に差し替え可） -->
+  <audio id="tbm-sfx-tap"  src="/assets/sfx/tap-chime.mp3"  preload="auto"></audio>
+  <audio id="tbm-sfx-flip" src="/assets/sfx/flip-woosh.mp3" preload="auto"></audio>
+</section>
   <!-- Join -->
   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
     <div class="wrap">
@@ -642,6 +650,116 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
     quickClose.addEventListener('click', closeQuick);
     quickModal.querySelector('.modal__overlay')?.addEventListener('click', closeQuick);
   }
+})();
+</script>
+
+  <script>
+(() => {
+  const pool = [
+    '/assets/tarot/fronts/star.jpg',
+    '/assets/tarot/fronts/magician.jpg',
+    '/assets/tarot/fronts/sun.jpg',
+    '/assets/tarot/fronts/highpriestess.jpg',
+    '/assets/tarot/fronts/hermit.jpg'
+  ];
+
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const root = $('#mini-reading');
+
+  function setFrontImage(card){
+    const url = card.dataset.front;
+    card.querySelector('.tbm-face.front')
+        .style.setProperty('--front-url', `url("${url}")`);
+  }
+  function setHint(slot, msg='タップでカードを開く'){
+    $('.tbm-hint', slot).textContent = msg;
+  }
+  function primeAll(){
+    $$('.tbm-card', root).forEach(c=>{
+      setFrontImage(c);
+      c.classList.remove('flipped','revealed','flip-pop','aura-pop','ripple','shuffle-seq');
+      c.style.removeProperty('--tap-x'); c.style.removeProperty('--tap-y');
+      setHint(c.closest('.tbm-slot'));
+    });
+  }
+  function play(id){
+    const el = $('#'+id, root);
+    if(!el) return;
+    el.currentTime = 0;
+    el.play().catch(()=>{});
+  }
+  function rippleAt(card, clientX, clientY){
+    const r = card.getBoundingClientRect();
+    const px = ((clientX - r.left) / r.width) * 100;
+    const py = ((clientY - r.top)  / r.height)* 100;
+    card.style.setProperty('--tap-x', px+'%');
+    card.style.setProperty('--tap-y', py+'%');
+    card.classList.remove('ripple'); void card.offsetWidth; card.classList.add('ripple');
+  }
+  function reveal(card, evt){
+    if(card.classList.contains('revealed')) return;
+    const x = evt?.clientX ?? (card.getBoundingClientRect().left + card.clientWidth/2);
+    const y = evt?.clientY ?? (card.getBoundingClientRect().top  + card.clientHeight/2);
+    rippleAt(card, x, y);
+    play('tbm-sfx-tap');
+
+    card.classList.add('flipped','revealed','flip-pop','aura-pop');
+    card.addEventListener('animationend',()=>card.classList.remove('flip-pop','aura-pop'),{once:true});
+
+    const name = (card.dataset.front.split('/').pop()||'').replace(/\.\w+$/,'');
+    const map = {
+      'star':'希望を見る。いまの自分を“名前で呼ぶ”ように受け止め整える。',
+      'magician':'いま始める。今日ひとつだけ実行の約束を。',
+      'sun':'迷いを照らす真昼の光。決めた道を明るく歩む。'
+    };
+    setHint(card.closest('.tbm-slot'), map[name] || '道は開かれた。大丈夫だよ。');
+    play('tbm-sfx-flip');
+  }
+
+  // クリック/Enter/Spaceでオープン
+  $$('.tbm-card', root).forEach(card=>{
+    card.addEventListener('click', e=> reveal(card, e));
+    card.addEventListener('keydown', e=>{
+      if((e.key==='Enter'||e.key===' ') && !card.classList.contains('revealed')){
+        e.preventDefault(); reveal(card, null);
+      }
+    });
+  });
+
+  // リセット
+  $('#tbm-reset', root).addEventListener('click', primeAll);
+
+  // シャッフル：画像再割当＋誘導文＋“それっぽい動き”
+  $('#tbm-shuffle', root).addEventListener('click', ()=>{
+    const cards = $$('.tbm-card', root);
+    cards.forEach(c=>{
+      c.dataset.front = pool[Math.floor(Math.random()*pool.length)];
+      setFrontImage(c);
+      c.classList.remove('flipped','revealed');
+    });
+    $$('.tbm-slot', root).forEach(slot=> setHint(slot)); // 「タップで開く」を必ず表示
+
+    const center = (cards.length-1)/2;
+    cards.forEach((c,i)=>{
+      const dx = (Math.random()*40-20);
+      const dy = (Math.random()*30-10);
+      const rz = (Math.random()*10-5);
+      const spread = 10;
+      const fanAngle = (i-center)*spread;
+
+      c.style.setProperty('--rif-dx', dx.toFixed(1)+'px');
+      c.style.setProperty('--rif-dy', dy.toFixed(1)+'px');
+      c.style.setProperty('--rif-rz', rz.toFixed(1)+'deg');
+      c.style.setProperty('--fan-rz', fanAngle+'deg');
+      c.style.setProperty('--delay', (i*70)+'ms');
+      c.classList.add('shuffle-seq');
+      c.addEventListener('animationend',()=>c.classList.remove('shuffle-seq'),{once:true});
+    });
+  });
+
+  // 初期化
+  primeAll();
 })();
 </script>
 
