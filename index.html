@@ -11,6 +11,7 @@
   <meta http-equiv="Content-Language" content="ja" />
   <meta name="author" content="詩韻 -シオン-" />
 
+  <!-- Icons / PWA -->
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
@@ -18,6 +19,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+  <!-- OGP / Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:title" content="Re:verse Shion — 詩韻思想 × TAROT BREAKER">
@@ -29,17 +31,18 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@TaroBure">
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preload" as="style"
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap"
-        onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap">
   </noscript>
 
+  <!-- Hero poster preload -->
   <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high">
 
+  <!-- JSON-LD -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -78,18 +81,25 @@
   }
   </script>
 
+  <!-- CSS -->
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/mini-reading.css">
   <link rel="stylesheet" href="/assets/css/intro.css">
   <link rel="stylesheet" href="/assets/css/main.css">
-  <link rel="stylesheet" href="/assets/css/nav.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/nav.css">
 </head>
 <body>
 
 <a href="#main-content" class="sr-only sr-only-focusable">本文へスキップ</a>
 
+<!-- 星砂パーティクル -->
 <div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
+<!-- ヘッダー -->
+<!-- ===== Header Navigation ===== -->
 <header class="header" role="banner">
   <div class="header-inner">
     <a href="/" class="logo">Re:verse Shion</a>
@@ -106,10 +116,11 @@
 <div id="top" aria-hidden="true"></div>
 
 <main id="main-content" tabindex="-1">
+  <!-- Hero（※この1本のみ） -->
   <section class="hero" aria-label="ヒーロー">
     <div class="hero__media" aria-hidden="true">
       <video class="hero__video" autoplay muted loop playsinline preload="metadata"
-             poster="/assets/hero-poster.jpg" data-fallback="/assets/hero-poster.jpg" data-testid="hero-video">
+             poster="/assets/hero-poster.jpg" data-fallback="/assets/hero-poster.jpg">
         <source src="/assets/video/top.webm" type="video/webm">
         <source src="/assets/video/top.mp4"  type="video/mp4">
       </video>
@@ -129,12 +140,14 @@
     </div>
   </section>
 
-  <section id="starter" class="intro-section" aria-labelledby="intro-title">
+  <!-- 初めての方へ：最初の一歩 -->
+<section id="starter" class="intro-section" aria-labelledby="intro-title">
   <div class="intro-wrap">
     <h2 id="intro-title" class="intro-title">初めての方へ — 最初の一歩</h2>
     <p class="intro-lead">3つの入り口から、あなたに合うペースで。<br aria-hidden="true">迷ったら「3分でわかる」へどうぞ。</p>
 
     <div class="intro-grid" role="list">
+      <!-- 入口A：第零書 -->
       <a class="intro-card" role="listitem" href="#zero" aria-label="第零書（ゼロから知る）へ">
         <span class="intro-kicker">A</span>
         <h3 class="intro-card-title">第零書｜ゼロから知る</h3>
@@ -142,6 +155,7 @@
         <span class="intro-cta">読む</span>
       </a>
 
+      <!-- 入口B：3分ガイド -->
       <a class="intro-card" role="listitem" href="#guide-3min" aria-label="3分でわかるガイドへ">
         <span class="intro-kicker">B</span>
         <h3 class="intro-card-title">3分でわかる</h3>
@@ -149,6 +163,7 @@
         <span class="intro-cta">見る</span>
       </a>
 
+      <!-- 入口C：物語 -->
       <a class="intro-card" role="listitem" href="https://ncode.syosetu.com/n5806lb/1/" aria-label="物語 TAROT BREAKER 第1話へ">
         <span class="intro-kicker">C</span>
         <h3 class="intro-card-title">物語で体験</h3>
@@ -157,11 +172,13 @@
       </a>
     </div>
 
+    <!-- 二次導線：行動の選択 -->
     <div class="intro-actions" aria-label="次の行動">
       <a class="intro-btn primary" href="https://lin.ee/LYnlU0f">LINEで受け取る</a>
       <a class="intro-btn ghost" href="https://note.com/shion_uranai369">noteをフォロー</a>
     </div>
 
+    <!-- 音のガイド（初訪問向け） -->
     <button class="intro-sound" type="button" data-sound-toggle aria-pressed="false" aria-label="音の案内を開く">
       <span class="intro-sound-icon" aria-hidden="true">♪</span>
       <span class="intro-sound-text">画面タップで音が流れます</span>
@@ -169,7 +186,8 @@
   </div>
 </section>
 
-  <section class="duo-gate" aria-label="世界の入口">
+  <!-- 🌕 Dual Gate（思想／物語 分岐） -->
+<section class="duo-gate" aria-label="世界の入口">
   <h2 class="duo-title">どの星から、始めますか？</h2>
   <div class="duo-grid">
     <a href="/philosophy.html" class="duo-card philosophy">
@@ -183,9 +201,10 @@
   </div>
 </section>
 
+<!-- 🌌 3分動画（世界観ガイド） -->
 <section id="guide-3min" class="guide-section">
   <h2>3分でわかる Re:verse Shion</h2>
-  <video class="guide-video" controls poster="/assets/img/guide-thumb.jpg" loading="lazy">
+  <video class="guide-video" controls poster="/assets/img/guide-thumb.jpg">
     <source src="/assets/video/3min.mp4" type="video/mp4">
   </video>
   <p class="guide-caption">光・言葉・魂の三位一体構文を、映像で体験。</p>
@@ -193,6 +212,7 @@
 
 
 
+  <!-- Trinity -->
   <section id="trinity" aria-labelledby="sec-trinity" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-trinity">詩韻思想</h2>
@@ -220,6 +240,7 @@
     </div>
   </section>
 
+  <!-- Intro -->
   <section class="intro" aria-labelledby="sec-intro">
     <div class="wrap">
       <h2 id="sec-intro">初めての方へ</h2>
@@ -230,6 +251,7 @@
     </div>
   </section>
 
+  <!-- Writings -->
   <section id="writings" aria-labelledby="sec-writings" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-writings">📖 最新の書・物語</h2>
@@ -273,6 +295,7 @@
     </div>
   </section>
 
+  <!-- ===== Mini Reading（体験） ===== -->
   <section id="mini-reading" class="tb-mini" aria-labelledby="miniHeading">
     <div class="wrap">
       <header class="tbm-head">
@@ -286,6 +309,7 @@
         </div>
       </header>
 
+      <!-- 3枚のスプレッド（横3枚） -->
       <div class="tbm-spread" id="spread" aria-live="polite">
         <div class="tbm-slot" data-pos="0">
           <div class="tbm-title">① 現在</div>
@@ -324,6 +348,7 @@
         </div>
       </div>
 
+      <!-- 結果（詩／韻／祈） -->
       <section id="readingResult" aria-labelledby="resultHeading" style="margin-top:22px;">
         <h2 id="resultHeading" class="sr-only">結果</h2>
         <div class="result-grid">
@@ -353,7 +378,8 @@
     </div>
   </section>
 
-   <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
+   <!-- Join -->
+  <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
     <div class="wrap">
       <h2 id="sec-join">参加の扉</h2>
       <p style="text-align:center;color:var(--muted)">LINE登録で、新着の書をお届けします。</p>
@@ -365,16 +391,20 @@
   </section>
 </main>
 
+<!-- Tarot Preview Modal -->
 <div id="tarotModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="tarotModalTitle" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
     <button class="modal__close" aria-label="閉じる"><svg width="18" height="18"><use href="#i-x"/></svg></button>
 
+    <!-- ★ ここを picture で差し替え（SP/PC自動切替） -->
     <figure class="modal__media">
       <picture>
+        <!-- 縦長スマホ優先 -->
         <source
           media="(max-width: 640px)"
           srcset="/assets/images/modal/mobile_vertical_1080x1620.jpg?v=1">
+        <!-- それ以外（デスクトップ等） -->
         <source
           media="(min-width: 641px)"
           srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
@@ -402,6 +432,7 @@
   </div>
 </div>
 
+<!-- クリックで開く簡易モーダル（カード3枚用の表示） -->
 <div id="modal" class="modal" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
@@ -428,6 +459,7 @@
   </div>
 </footer>
 
+<!-- しおぽんウィジェット -->
 <div id="shiopon-invite" class="shiopon is-hidden" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="shiopon-title">
   <button class="shiopon__close" aria-label="閉じる">×</button>
   <div class="shiopon__avatar" aria-hidden="true"><img src="/assets/shiopon_transparent.png" alt=""></div>
@@ -439,23 +471,12 @@
 </div>
 <button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く">🦊 しおぽん</button>
 
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
-  <symbol id="i-book" viewBox="0 0 24 24"><path d="M18 2H8a3 3 0 0 0-3 3v14a3 3 0 0 1 3-3h10v-2H8a5 5 0 0 0-3 1V5a1 1 0 0 1 1-1h12v14h2V4a2 2 0 0 0-2-2z"/></symbol>
-  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
-</svg>
-
-<div id="ensotrans" aria-hidden="true"></div>
-
+<!-- JS（外部） -->
 <script src="/assets/js/particles.js" defer></script>
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
-<script src="/assets/js/main.js" defer></script>
 
-<script>
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }
-</script>
-
+<!-- Trinity 再生（iOS対策） -->
 <script>
 (function(){
   const btn = document.getElementById('trinityPlayBtn');
@@ -477,6 +498,7 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }
 })();
 </script>
 
+<!-- しおぽん：フォーカストラップ＋ESC -->
 <script>
 (() => {
   const dlg = document.getElementById('shiopon-invite');
@@ -508,42 +530,29 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }
 })();
 </script>
 
+<!-- ヘッダー：上下スクロールで表示、停止で自動的に隠す -->
 <script>
 (() => {
-  const header = document.querySelector('.header');
+  const header = document.querySelector('header[role="banner"]');
   if (!header) return;
-
-  const HIDE_DELAY = 1200; // 表示維持時間
-  let lastScrollY = window.scrollY;
-  let hideTimer = null;
-
+  let ticking = false, hideTimer = null;
+  const HIDE_DELAY = 1200;
   const onScroll = () => {
-    const currentScrollY = window.scrollY;
-
-    // スクロール量が100pxを超えた場合に判定を開始
-    if (currentScrollY > 100) {
-      if (currentScrollY > lastScrollY + 5) { // 下方向にスクロール（少しのブレは無視）
-        header.classList.add('hide');
-        if (hideTimer) clearTimeout(hideTimer); // 下スクロール時はタイマーをクリア
-      } else if (currentScrollY < lastScrollY - 5) { // 上方向にスクロール
-        header.classList.remove('hide');
+    if (!ticking){
+      window.requestAnimationFrame(() => {
+        header.classList.add('is-visible');
         if (hideTimer) clearTimeout(hideTimer);
-        // 上スクロールを止めると自動的に隠れるようにタイマーを設定
-        hideTimer = setTimeout(() => header.classList.add('hide'), HIDE_DELAY);
-      }
-    } else {
-      // ページトップ付近では常に表示
-      header.classList.remove('hide');
-      if (hideTimer) clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => header.classList.remove('is-visible'), HIDE_DELAY);
+        ticking = false;
+      });
+      ticking = true;
     }
-
-    lastScrollY = currentScrollY;
   };
-
-  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive:true });
 })();
 </script>
 
+<!-- アンカー遷移のフェード -->
 <script>
 if (document.startViewTransition){
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -558,13 +567,20 @@ if (document.startViewTransition){
 }
 </script>
 
+<!-- 省データでヒーローを静止画に -->
 <script>
 if (navigator.connection?.saveData){
-  const hv = document.querySelector('[data-testid="hero-video"]'); // data-testidで確実に選択
-  if(hv){ hv.outerHTML = `<img src="${hv.dataset.fallback}" alt="" style="width:100%;height:100%;object-fit:cover" loading="eager">`; }
+  const hv = document.querySelector('.hero__video');
+  if(hv){ hv.outerHTML = `<img src="${hv.dataset.fallback}" alt="" style="width:100%;height:100%;object-fit:cover">`; }
 }
 </script>
 
+<!-- Service Worker -->
+<script>
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }
+</script>
+
+<!-- Tarot Preview Modal（モーダル要素が無い場合はスキップ） -->
 <script>
 (() => {
   const openBtn = document.querySelector('.tarot-preview-open');
@@ -575,7 +591,6 @@ if (navigator.connection?.saveData){
   const closeBtn = modal.querySelector('.modal__close');
   function open() {
     modal.setAttribute('aria-hidden', 'false');
-    modal.focus(); // モーダル自体にフォーカスを当てる（a11y改善）
     setTimeout(() => closeBtn.focus(), 10);
     document.addEventListener('keydown', onKey);
   }
@@ -600,6 +615,7 @@ if (navigator.connection?.saveData){
 })();
 </script>
 
+<!-- Mini Reading：3枚重複なし／めくってから名前表示／願いと連動 -->
 <script>
 const TAROT_IMG_BASE = "/assets/images/tarot/majors/";
 const TAROT = [
@@ -648,7 +664,7 @@ function buildResult(cards, wish){
 }
 
 const spreadEl = document.getElementById('spread');
-const slots    = Array.from(spreadEl?.querySelectorAll('.tbm-slot') || []);
+const slots    = Array.from(spreadEl.querySelectorAll('.tbm-slot'));
 const btnStart = document.getElementById('btnStart');
 const btnReset = document.getElementById('btnReset');
 const wishInput= document.getElementById('wishInput');
@@ -669,8 +685,8 @@ function resetUI(){
   });
   document.querySelector('#res-poem  .r-title').textContent = "—";
   document.querySelector('#res-poem  .r-text').textContent  = "カードをめくると表示されます。";
-  document.querySelector('#res-rhyme .r-title').textContent= "—";
-  document.querySelector('#res-rhyme .r-text').textContent = "カードをめくると表示されます。";
+  document.querySelector('#res-rhyme  .r-title').textContent= "—";
+  document.querySelector('#res-rhyme  .r-text').textContent = "カードをめくると表示されます。";
   document.querySelector('#res-prayer .r-title').textContent= "—";
   document.querySelector('#res-prayer .r-text').textContent = "カードをめくると表示されます。";
 }
@@ -683,14 +699,22 @@ function startReading(){
     const front = slot.querySelector('.tbm-face.front');
     front.style.setProperty('--front-url', `url('${imgOf(currentDraw[idx].slug)}')`);
     card.dataset.index = String(idx);
-    card.setAttribute('aria-label', `カード${idx + 1}をめくる（${slot.querySelector('.tbm-title').textContent}）`);
-    card.tabIndex = 0;
   });
-  slots[0].querySelector('.tbm-card')?.focus({preventScroll:true});
+  slots[0].querySelector('.tbm-card').focus({preventScroll:true});
 }
 
-function updateResult(){
-  if(flippedCount === slots.length){
+function onFlip(e){
+  const card = e.currentTarget;
+  if(card.classList.contains('flipped')) return;
+  const idx    = Number(card.dataset.index||0);
+  const chosen = currentDraw[idx];
+  const slot   = card.closest('.tbm-slot');
+  const name   = slot.querySelector('.tbm-name');
+  card.classList.add('flipped','flip-pop','aura-pop','ripple');
+  name.textContent = chosen.key;
+  name.removeAttribute('aria-hidden');
+  flippedCount++;
+  if(flippedCount===3){
     const {titles,texts} = buildResult(currentDraw, wishInput.value);
     document.querySelector('#res-poem  .r-title').textContent = titles[0];
     document.querySelector('#res-poem  .r-text').textContent  = texts[0];
@@ -700,21 +724,6 @@ function updateResult(){
     document.querySelector('#res-prayer .r-text').textContent = texts[2];
     document.getElementById('readingResult').scrollIntoView({behavior:'smooth', block:'start'});
   }
-}
-
-function onFlip(e){
-  const card = e.currentTarget;
-  if(card.classList.contains('flipped') || currentDraw.length === 0) return;
-  const idx    = Number(card.dataset.index||0);
-  const chosen = currentDraw[idx];
-  const slot   = card.closest('.tbm-slot');
-  const name   = slot.querySelector('.tbm-name');
-  card.classList.add('flipped','flip-pop','aura-pop','ripple');
-  card.tabIndex = -1; // めくった後はフォーカス不可に
-  name.textContent = chosen.key;
-  name.removeAttribute('aria-hidden');
-  flippedCount++;
-  updateResult();
 }
 
 function bindCardEvents(){
@@ -729,35 +738,80 @@ function bindCardEvents(){
   });
 }
 bindCardEvents();
-btnStart?.addEventListener('click', startReading);
-btnReset?.addEventListener('click', resetUI);
+btnStart.addEventListener('click', startReading);
+btnReset.addEventListener('click', resetUI);
 </script>
 
-<script>
+  <script>
+/* Intro: 音案内のトグル（アナリティクス化しやすいデータ属性付き） */
 (function(){
   const btn = document.querySelector('[data-sound-toggle]');
   if(!btn) return;
   btn.addEventListener('click', function(){
     const on = this.getAttribute('aria-pressed') === 'true';
     this.setAttribute('aria-pressed', String(!on));
+    // 任意：ここでBGMの再生フラグや、モーダル案内を起動可能
+    // window.dispatchEvent(new CustomEvent('sound-toggle', { detail: { enabled: !on }}));
   });
 })();
 </script>
 
-<script>
+<!-- SVG Sprite -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l2.84 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 7.16-1.01L12 2z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M18 2H8a3 3 0 0 0-3 3v14a3 3 0 0 1 3-3h10v-2H8a5 5 0 0 0-3 1V5a1 1 0 0 1 1-1h12v14h2V4a2 2 0 0 0-2-2z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
+</svg>
+
+  <!-- 光転移エフェクト -->
+<div id="ensotrans" aria-hidden="true"></div>
+<script src="/assets/js/main.js"></script>
+
+  <script>
+let lastScrollY = window.scrollY;
+let header = document.querySelector('.site-header');
+let timeoutId;
+
+window.addEventListener('scroll', () => {
+  if(window.scrollY > lastScrollY + 50){ // 下方向にスクロール
+    header.classList.add('visible');
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      header.classList.remove('visible');
+    }, 2000); // ← 表示維持時間（ミリ秒）2秒に延長
+  }
+  lastScrollY = window.scrollY;
+});
+</script>
+
+  <script>
 (() => {
   const path = location.pathname.replace(/\/+$/, ""); // 末尾スラッシュ除去
-  const currentPath = path === "" ? "/" : path;
   document.querySelectorAll('.nav-main a[href]').forEach(a => {
     const href = a.getAttribute('href');
     // 外部リンクは除外
     if (/^https?:/.test(href)) return;
-    const target = href.replace(/\/+$/, "") || "/";
-    if (target === currentPath) {
-      a.setAttribute('aria-current','page');
-    }
+    const target = href.replace(/\/+$/, "");
+    if (target === "" && path === "/") { a.setAttribute('aria-current','page'); }
+    if (target && path.endsWith(target)) { a.setAttribute('aria-current','page'); }
   });
 })();
 </script>
+<script>
+let lastScroll = 0;
+const header = document.querySelector('.header');
+
+window.addEventListener('scroll', () => {
+  const current = window.scrollY;
+  if (current > lastScroll && current > 100) {
+    header.classList.add('hide');
+  } else {
+    header.classList.remove('hide');
+  }
+  lastScroll = current;
+});
+</script> 
+  
 </body>
 </html>
