@@ -1,1 +1,85 @@
+/* -----------------------------------------------------
+   Re:verse Shion — Celestial Navigation
+   白地 × 紫苑 × 金光 の詩韻ヘッダー
+----------------------------------------------------- */
 
+.header{
+  position:fixed;
+  top:0; left:0; right:0;
+  height:64px;
+  z-index:999;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background:rgba(255,255,255,0.75);
+  border-bottom:1px solid rgba(126,102,255,0.12);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .3s ease;
+}
+.header.scrolled{
+  background:rgba(255,255,255,0.92);
+  box-shadow:0 2px 8px rgba(10,0,60,0.05);
+}
+
+/* ロゴ */
+.logo{
+  font-family:"Shippori Mincho","Noto Serif JP",serif;
+  font-weight:600;
+  color:#6d57f0;
+  font-size:1.25rem;
+  text-decoration:none;
+  letter-spacing:0.04em;
+  margin-right:auto;
+  margin-left:18px;
+}
+
+/* ナビ本体 */
+.nav-main{
+  display:flex;
+  gap:22px;
+  margin-right:18px;
+  align-items:center;
+}
+.nav-main a{
+  position:relative;
+  font-family:"Zen Kaku Gothic New",sans-serif;
+  font-size:.95rem;
+  letter-spacing:0.02em;
+  color:#2b2250;
+  text-decoration:none;
+  font-weight:500;
+  padding:8px 0;
+  transition:color .3s ease;
+}
+.nav-main a::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:0%;
+  height:2px;
+  background:linear-gradient(90deg,#c9b0ff 0%,#ffd76f 100%);
+  border-radius:2px;
+  transform:translateX(-50%);
+  transition:width .35s ease;
+}
+.nav-main a:hover{
+  color:#7e66ff;
+}
+.nav-main a:hover::after{
+  width:90%;
+}
+
+/* スクロール時に少し縮小 */
+@media (max-width:720px){
+  .nav-main{display:none;}
+}
+
+/* モバイル用トグル（任意実装） */
+.header::after{
+  content:"";
+  position:absolute;bottom:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,#a98eff33,#ffd76f55,#a98eff33);
+}
