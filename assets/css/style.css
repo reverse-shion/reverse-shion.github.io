@@ -382,3 +382,18 @@ main, section, footer, header {
   position: relative;
   z-index: 2;
 }
+/* ヒーローの見えない層が下をブロックしないように */
+.hero__media,
+.hero__veil{
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+.hero > .wrap{
+  position: relative;
+  z-index: 1;
+}
+/* モーダルは非表示時に完全にクリック無効化 */
+.modal[aria-hidden="true"]{
+  display: none !important;
+  pointer-events: none !important;
+}
