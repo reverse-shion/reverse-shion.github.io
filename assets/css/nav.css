@@ -1,170 +1,131 @@
-/* -------------------------------------------------------
-   Re:verse Shion — Header Navigation (nav.css)
-   Celestial White × 紫苑 × 星光ゴールド
-   ・常時固定ヘッダー（消えない）
-   ・モバイル横スクロールの丸ピルナビ
-   ・キーボード/スクリーンリーダー配慮
-   ・高コントラスト/低動作オプション対応
-------------------------------------------------------- */
+/* -----------------------------------------------------
+   Re:verse Shion — Navigation CSS (2025 Final)
+   神秘 × 見やすさ × 操作性
+   ----------------------------------------------------- */
 
-/* ===== Design Tokens ===== */
-:root{
-  --header-h: 64px;              /* PCヘッダー高 */
-  --header-h-sp: 60px;           /* SPヘッダー高 */
-  --bg-glass: rgba(255,255,255,.82);
-  --bg-glass-strong: rgba(255,255,255,.92);
-  --border: rgba(126,102,255,.14);   /* 紫苑の薄縁 */
-  --shadow: 0 2px 10px rgba(10,0,60,.06);
-  --ink: #2b2250;                    /* 深宇紺 */
-  --muted: #6b6390;
-  --accent: #7e66ff;                 /* 紫苑 */
-  --gold: #ffd76f;                    /* 星光ゴールド */
+/* ===== 基本設定 ===== */
+:root {
+  --bg-nav: rgba(255, 255, 255, 0.8);
+  --blur: 12px;
+  --border: rgba(255, 255, 255, 0.3);
+  --ink: #503080;
+  --accent: #7e66ff;
+  --hover-bg: rgba(255, 255, 255, 0.9);
+  --shadow: rgba(0, 0, 0, 0.08);
+  --transition: all 0.35s ease;
 }
 
-/* ===== Base Header ===== */
-.header{
+/* ===== ヘッダー固定 ===== */
+.header {
   position: fixed;
-  top: 0; left: 0; right: 0;
-  height: var(--header-h);
-  z-index: 999;
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  top: 0;
+  left: 0;
+  width: 100%;
+  backdrop-filter: blur(var(--blur));
+  background: var(--bg-nav);
   border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  /* 透明環境でのフォールバック */
-}
-@supports not ((backdrop-filter: blur(12px))){
-  .header{ background: var(--bg-glass-strong); }
+  box-shadow: 0 4px 14px var(--shadow);
+  z-index: 1000;
+  transform: translateY(0);
+  opacity: 1;
+  transition: var(--transition);
 }
 
-/* PC/共通レイアウト */
-.header-inner{
-  width: min(1080px, 94vw);
-  height: 100%;
-  margin: 0 auto;
+/* ===== ヘッダー内部 ===== */
+.header-inner {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 18px;
+  align-items: center;
+  max-width: 1200px;
+  padding: 12px 28px;
+  margin: 0 auto;
 }
 
-/* ロゴ */
-.logo{
-  font-family: "Shippori Mincho","Noto Serif JP",serif;
+/* ===== ロゴ ===== */
+.logo {
+  font-family: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
   font-weight: 600;
-  letter-spacing: .04em;
-  color: #6d57f0;
-  font-size: 1.25rem;
-  text-decoration: none;
-  white-space: nowrap;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-}
-
-/* ===== Primary Nav ===== */
-.nav-main{
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-
-/* リンク：最小タップ面積44px・視認性・下線アニメ（PC） */
-.nav-main a{
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;           /* タップ領域 */
-  padding: 10px 2px;          /* PCは細身の下線演出 */
+  font-size: 20px;
+  letter-spacing: 0.03em;
   color: var(--ink);
   text-decoration: none;
-  font: 500 .95rem/1 "Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
-  letter-spacing: .02em;
-  transition: color .25s ease, transform .2s ease;
+  transition: color 0.3s;
 }
-.nav-main a::after{
+.logo:hover {
+  color: var(--accent);
+}
+
+/* ===== ナビゲーション ===== */
+.nav-main {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.nav-main a {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 8px 6px;
+  border-radius: 6px;
+  transition: color 0.3s, background 0.3s;
+  position: relative;
+}
+
+/* ===== ホバー演出（星の煌めき） ===== */
+.nav-main a::after {
   content: "";
   position: absolute;
-  left: 50%; bottom: 6px;
-  width: 0%;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  width: 60%;
   height: 2px;
-  background: linear-gradient(90deg, #c9b0ff 0%, var(--gold) 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, #ffd76f 100%);
+  transition: transform 0.35s ease;
   border-radius: 2px;
-  transform: translateX(-50%);
-  transition: width .28s ease;
 }
-.nav-main a:hover{
+
+.nav-main a:hover {
   color: var(--accent);
+  background: var(--hover-bg);
 }
-.nav-main a:hover::after{
-  width: 90%;
-}
-
-/* 現在地ハイライト（aria-current or .is-active） */
-.nav-main a[aria-current="page"],
-.nav-main a.is-active{
-  color: var(--accent);
-}
-.nav-main a[aria-current="page"]::after,
-.nav-main a.is-active::after{
-  width: 90%;
+.nav-main a:hover::after {
+  transform: translateX(-50%) scaleX(1);
 }
 
-/* キーボード操作：focus-visible で視認性アップ */
-.nav-main a:focus-visible{
-  outline: none;
-  color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(126,102,255,.18);
-  border-radius: 6px;
+/* ===== スクロール時フェード制御 ===== */
+.header.hide {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
-/* ===== Mobile（<=720px）：横スクロール・丸ピル ===== */
-@media (max-width: 720px){
-  :root{ --header-h: var(--header-h-sp); }
-  .header{ height: var(--header-h); }
-  .header-inner{ padding: 0 10px; }
-  .logo{ font-size: 1.05rem; }
+/* ===== ホバー中は常に表示 ===== */
+.header:hover,
+.header:focus-within {
+  transform: translateY(0);
+  opacity: 1;
+}
 
-  .nav-main{
-    gap: 10px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 6px 8px;
-    margin-right: 6px;
+/* ===== スマホ対応 ===== */
+@media (max-width: 720px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 18px;
   }
-  .nav-main::-webkit-scrollbar{ display: none; }
 
-  .nav-main a{
-    padding: 8px 12px;                    /* 丸ピル化 */
-    border: 1px solid rgba(126,102,255,.25);
-    border-radius: 999px;
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(20,10,60,.06);
-    white-space: nowrap;
+  .nav-main {
+    flex-wrap: wrap;
+    gap: 16px 20px;
+    justify-content: flex-start;
   }
-  .nav-main a::after{ display: none; }    /* 下線アニメはSPでオフ */
-}
 
-/* ===== Scroll Margin（アンカーずれ防止） ===== */
-main, body > section:first-of-type, [id]{
-  scroll-margin-top: var(--header-h);
-}
-
-/* ===== Prefers-Reduced-Motion（動きを抑制） ===== */
-@media (prefers-reduced-motion: reduce){
-  .nav-main a,
-  .nav-main a::after{
-    transition: none;
+  .nav-main a {
+    font-size: 14px;
+    padding: 6px 4px;
   }
 }
-
-/* ===== Optional: ダーク系背景に乗せる時（任意） ===== */
-/* ヒーローの最上部が暗め動画の場合、最初のセクション直上だけ濃くしたいなら：
-.header{ background: var(--bg-glass-strong); }
-*/
-
-/* ===== Optional: ハンバーガー実装予定のためのフック（未使用） ===== */
-/* .nav-toggle{ display:none; }  将来SP用トグルを入れる時の拡張点 */
