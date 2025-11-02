@@ -1,1 +1,87 @@
+:root{
+  --ink:#20202a;
+  --muted:#666;
+  --accent:#7e66ff;
+  --accent-2:#ffd76f;
+  --panel:#ffffffcc;
+  --r:14px;
+  font-family:"Zen Kaku Gothic New",sans-serif;
+}
 
+body{
+  margin:0;
+  background:#0b0b1a;
+  color:#fefefe;
+  font-family:"Shippori Mincho","Zen Kaku Gothic New",serif;
+}
+
+/* ===== Header ===== */
+.header{
+  position:sticky; top:0; backdrop-filter:blur(12px);
+  background:rgba(11,11,26,0.75);
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 20px; z-index:100;
+}
+.logo{ color:#fff; text-decoration:none; font-weight:600; font-size:18px; }
+.nav a{
+  color:#ddd; text-decoration:none; margin-left:16px; transition:.2s;
+}
+.nav a:hover{ color:var(--accent-2); }
+
+/* ===== Book Title ===== */
+.book-wrapper{ max-width:840px; margin:60px auto; padding:0 20px; line-height:1.8; }
+.book-title{
+  font-family:"Shippori Mincho",serif;
+  font-size:26px; letter-spacing:.04em;
+  color:#fff; text-align:center;
+}
+.book-title span{ color:var(--accent-2); }
+.book-subtitle{
+  text-align:center; font-size:14px; color:var(--muted);
+  margin-top:4px; margin-bottom:30px;
+}
+
+/* ===== Mode Switch ===== */
+.mode-switch{
+  display:flex; justify-content:center; gap:8px; margin-bottom:20px;
+}
+.mode-switch button{
+  border:1px solid rgba(174,138,255,.4);
+  border-radius:999px; background:#fff; color:#444;
+  padding:6px 14px; font:inherit; cursor:pointer;
+  transition:.25s ease;
+}
+.mode-switch button[aria-selected="true"]{
+  background:linear-gradient(180deg,#f6f2ff,#fff);
+  border-color:var(--accent);
+  color:var(--accent);
+  font-weight:600;
+}
+
+/* ===== Poem Fade-in ===== */
+.mode--poem .line{
+  opacity:0; transform:translateY(12px); filter:blur(4px);
+  animation:lineFade 1.3s ease forwards;
+}
+@keyframes lineFade{
+  to{ opacity:1; transform:translateY(0); filter:blur(0);
+      text-shadow:0 0 8px rgba(255,255,255,.6),0 0 18px rgba(174,138,255,.35);
+  }
+}
+.mode--poem .line:nth-child(1){ animation-delay:0s; }
+.mode--poem .line:nth-child(2){ animation-delay:1s; }
+.mode--poem .line:nth-child(3){ animation-delay:2s; }
+
+/* ===== Layout ===== */
+.book-body{
+  background:radial-gradient(circle at 50% 0%, rgba(174,138,255,.08), rgba(20,10,40,1));
+  padding:40px 24px; border-radius:var(--r);
+  box-shadow:0 8px 28px rgba(0,0,0,.2);
+}
+.to-top{
+  display:inline-block; margin:24px auto 0; text-align:center; text-decoration:none;
+  color:var(--accent-2); font-size:14px;
+}
+
+/* ===== Footer ===== */
+.footer{ text-align:center; color:#999; font-size:13px; padding:40px 0; }
