@@ -1,4 +1,4 @@
-* =========================================================
+/* =========================================================
    Re:verse Shion — 神域デザイン Pro Edition (2025-10-31 fix-02)
    Theme: Lavender × White Light （紫苑×白光）
    Author: Shiopon
@@ -7,9 +7,7 @@
    - 変数: --card-back-url で裏面画像を一元管理
    - ヘッダー: スクロール出現用 .is-visible を想定（初期は隠す）
    - ヒーロー: 透過ヴェール＋文字シャドウで可読性UP
-   - タロット: 旧 `.reading-deck / .card-slot` を新 `.wish-deck / .tarot-card` に統合
-     （互換のため alias セレクタも用意）
-   - 星紋Canvas: #rippleCanvas をカード下に正しくレイヤー配置
+   - タロット: 旧 `.reading-deck / .card-slot` をそのまま使用
    ========================================================= */
 
 /* ===== Root & Tokens ===== */
@@ -32,8 +30,9 @@
   --r:14px;
   --header-h: 56px;
 
-  /* Tarot Back (一元管理) */
-  --card-back-url: url("/assets/images/tarot/tarot_back_1024x1536.jpg");
+  /* Tarot Back (一元管理・キャッシュバスター付) */
+  --card-back-url: url("/assets/images/tarot/tarot_back_1024x1536.jpg?v=7);
+
   color-scheme: light;
 }
 @media (color-gamut: p3){
@@ -43,10 +42,7 @@
   }
 }
 @media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0b0b1a; --ink:#e9e9f0; --muted:#a6a6bb;
-    --glass:#101018cc;
-  }
+  :root{ --bg:#0b0b1a; --ink:#e9e9f0; --muted:#a6a6bb; --glass:#101018cc; }
 }
 
 /* ===== Base ===== */
@@ -73,14 +69,11 @@ header[role="banner"]{
   transform: translateY(-100%); /* 初期は隠す：JSで .is-visible 付与 */
   transition: transform .28s ease, background-color .28s ease, box-shadow .28s ease, opacity .28s ease;
   background: rgba(255,255,255,.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(0,0,0,.06);
   opacity:.98;
-  will-change: transform;
 }
 header.is-visible{ transform: translateY(0) }
-header.header--compact{ background: rgba(255,255,255,.88); box-shadow: 0 8px 22px rgba(0,0,0,.06) }
 header .wrap{ display:flex; flex-direction: column; align-items: center; justify-content:center; padding:10px 0 }
 
 /* Brand */
@@ -184,18 +177,7 @@ h2{ text-align:center; font-size: clamp(20px, 3.4vw, 24px); margin:0 0 10px }
   }
 }
 
-/* ===== Trinity Cards / Video ===== */
-.tri-grid{ display:grid; gap:18px; width:min(92vw,860px); margin:0 auto }
-@container shell (min-width:720px){ .tri-grid{ grid-template-columns: repeat(3, 1fr) } }
-.tri{
-  background:#fff; border:1px solid rgba(0,0,0,.08); border-radius: var(--r); padding:18px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.05);
-  transition: transform .15s, box-shadow .2s, border-color .2s;
-}
-.tri:hover{ transform: translateY(-3px); box-shadow: 0 10px 22px rgba(255,215,111,.25); border-color: rgba(255,215,111,.5) }
-.tri h3{ margin:0 0 8px; font-size:18px; color:#503080 }
-.tri p{ margin:0; font-size:15px; color:var(--muted) }
-
+/* ===== Trinity ===== */
 .trinity__figure{
   max-width:min(1200px,92vw); margin:0 auto 22px; border-radius:16px; overflow:hidden;
   box-shadow: 0 12px 32px rgba(174,138,255,.22), 0 0 0 1px rgba(255,255,255,.4) inset;
@@ -213,6 +195,16 @@ h2{ text-align:center; font-size: clamp(20px, 3.4vw, 24px); margin:0 0 10px }
 }
 .trinity__video:hover::after, .trinity__video:focus-visible::after{ opacity:1; transform: translateY(0) }
 .trinity__actions{ text-align:center; margin-top:8px }
+.tri-grid{ display:grid; gap:18px; width:min(92vw,860px); margin:0 auto }
+@container shell (min-width:720px){ .tri-grid{ grid-template-columns: repeat(3, 1fr) } }
+.tri{
+  background:#fff; border:1px solid rgba(0,0,0,.08); border-radius: var(--r); padding:18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05);
+  transition: transform .15s, box-shadow .2s, border-color .2s;
+}
+.tri:hover{ transform: translateY(-3px); box-shadow: 0 10px 22px rgba(255,215,111,.25); border-color: rgba(255,215,111,.5) }
+.tri h3{ margin:0 0 8px; font-size:18px; color:#503080 }
+.tri p{ margin:0; font-size:15px; color:var(--muted) }
 
 /* ===== Intro / Cards Box ===== */
 .intro__box{
@@ -378,43 +370,24 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* =========================================================
-   🌙 星詠 3枚リーディング（Wish Reading）
-   - HTML側: <section id="wish-reading"> … </section>
-   - 旧API互換: .reading-deck → .wish-deck, .card-slot → .tarot-card
+   🃏 Mini Reading（3枚）
+   - HTML: .reading-ui / .reading-actions / .reading-deck / .card-slot / #readingResult
+   - 裏面は常時表示、.is-picked / .is-flipped で裏面をフェード
 ========================================================= */
 
-/* Section backdrop */
-#wish-reading{
-  position: relative;
-  padding: clamp(32px, 5vw, 60px) 0;
-  background:
-    radial-gradient(1000px 700px at 50% -20%, rgba(230,220,255,.08), transparent 70%),
-    radial-gradient(1200px 800px at 50% 120%, rgba(168,139,255,.08), transparent 80%),
-    linear-gradient(180deg, #120c1f, #1b1035);
-  overflow: clip;
-}
-#wish-reading h2{
-  font: 700 clamp(22px,2.6vw,28px)/1.2 "Noto Sans JP", system-ui;
-  margin:0 0 6px; letter-spacing:.02em; color:#EEEAF9;
-}
-#wish-reading .h2-sub{
-  color: #BFB8D9; font-size: clamp(13px,1.6vw,14.5px); margin-bottom: 22px;
-}
-.wish-actions{ display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 24px }
+.reading-ui{ max-width:980px; margin:0 auto }
+.reading-actions{ display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 24px; justify-content:center }
 
 /* Deck (3 columns) */
-.wish-deck,
-.reading-deck{ /* 旧クラス互換 */
+.reading-deck{
   display:grid; grid-template-columns: repeat(3, 1fr);
   gap: clamp(14px,3.6vw,22px);
   position: relative; z-index: 1;
   max-width: 980px; margin: 0 auto;
 }
-.card-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px }
 
-/* Card core (裏面は常時表示) */
-.tarot-card,
-.card-slot{ /* 旧クラス互換 */
+/* Card core */
+.card-slot{
   width: min(280px, 28vw); aspect-ratio: 2/3;
   border-radius: var(--r);
   border: 1px solid #FFFFFF26;
@@ -423,40 +396,32 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   cursor: not-allowed; background:#120d1f;
   transition: transform .62s cubic-bezier(.22,.72,.18,1.05), box-shadow .25s ease;
 }
-.tarot-card.is-ready,
 .card-slot:enabled{ cursor:pointer }
-.tarot-card:hover:is(.is-ready),
 .card-slot:is(:hover,:focus-visible){ transform: translateY(-1px); box-shadow: 0 14px 36px rgba(126,102,255,.28) }
 
-/* Back face (variable image + pattern) */
-.tarot-card::before,
-.card-slot.is-back{ /* `.card-slot.is-back` 旧仕様にも適用 */
+/* 裏面（常時） */
+.card-slot::before{
   content:"";
   position:absolute; inset:0;
-  background-image: var(--card-back-url),
-    radial-gradient(180% 120% at 50% -10%, #ffffff1f 0%, transparent 60%),
-    radial-gradient(140% 100% at 50% 120%, #bfa9ff18 0%, transparent 70%),
-    conic-gradient(from 0deg at 50% 40%, #ffffff10, #c9b6ff16, #ffffff10);
-  background-size: cover, auto, auto, auto;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: var(--card-back-url) center/cover no-repeat,
+              radial-gradient(180% 120% at 50% -10%, #ffffff1f 0%, transparent 60%),
+              radial-gradient(140% 100% at 50% 120%, #bfa9ff18 0%, transparent 70%);
   filter: saturate(1.02);
+  z-index:0;
 }
 
-/* Front face (flip to show) */
-.tarot-card .face{
-  position:absolute; inset:0; display:grid; place-items:center; padding:10px;
-  opacity:0; transition: opacity .28s ease; background:#0f0b18;
-}
-.tarot-card .face img{ width:100%; height:100%; object-fit:cover; display:block }
-.tarot-card.is-flipped .face{ opacity:1 }
-.card-slot.is-picked{ /* 旧API flip互換 */
-  transform:rotateY(180deg);
-  box-shadow:0 18px 46px rgba(126,102,255,.25);
+/* 表面（JSで .face を差し込む） */
+.card-slot .face{
+  position:relative; z-index:1; display:grid; place-items:center; padding:10px;
+  opacity:1; background:#0f0b18e6;
 }
 
-/* Sparkle burst (tap feedback) */
-.tarot-card::after{
+/* ピック時：裏面フェード */
+.card-slot.is-picked::before,
+.card-slot.is-flipped::before{ opacity:0; transition: opacity .28s ease }
+
+/* Sparkle burst（タップ演出：.is-picked 付与時） */
+.card-slot::after{
   content:""; position:absolute; inset:-12% -12%;
   background:
     radial-gradient(6px 6px at 20% 30%, rgba(255,255,255,.95), transparent 55%),
@@ -465,8 +430,9 @@ header, .hero, section, footer{ position:relative; z-index:1 }
     radial-gradient(4px 4px at 80% 65%, rgba(255,255,255,.95), transparent 55%);
   border-radius:16px; filter: blur(.4px) saturate(120%); mix-blend-mode: screen;
   opacity:0; transform:scale(.8);
+  pointer-events:none;
 }
-.tarot-card.is-burst::after{ animation:sparkleBurst 520ms ease-out forwards }
+.card-slot.is-picked::after{ animation:sparkleBurst 520ms ease-out forwards }
 @keyframes sparkleBurst{
   0%{ opacity:0; transform:scale(.85) }
   30%{ opacity:.95; transform:scale(1.08) }
@@ -474,24 +440,7 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   100%{ opacity:0; transform:scale(1) }
 }
 
-/* Caption under each card */
-.card-caption{
-  font-family:"Zen Old Mincho","Noto Sans JP",serif; font-weight:700; letter-spacing:.04em;
-  font-size:clamp(15px,1.9vw,17px);
-  color:#f0eaff; text-shadow:0 0 1px rgba(255,255,255,.2);
-  opacity:0; transform:translateY(2px); transition:opacity .25s ease, transform .25s ease;
-}
-.card-caption.is-show{ opacity:1; transform:translateY(0) }
-
-/* Ripple Canvas (星紋) */
-#rippleCanvas{
-  position:absolute; inset:0; width:100%; height:100%;
-  pointer-events:none; z-index:0; /* デッキ背景として下層に固定 */
-  filter:saturate(120%) brightness(1.05); mix-blend-mode:screen;
-}
-
-/* Result panel */
-#wishResult{ margin-top: 22px }
+/* 結果表示 */
 .result-grid{ display:grid; gap:14px; max-width:980px; margin:16px auto 0 }
 @media(min-width:720px){ .result-grid{ grid-template-columns:repeat(3,1fr) } }
 .result-item{
@@ -499,102 +448,26 @@ header, .hero, section, footer{ position:relative; z-index:1 }
   border:1px solid #FFFFFF26; border-radius:14px; padding:12px 14px;
   box-shadow:0 8px 18px rgba(0,0,0,.12)
 }
-.badge{ display:inline-block; font-size:12px; color:#201630; background:#e9deff; padding:2px 8px; border-radius:999px; margin-bottom:6px }
-.item-title{ margin:.2em 0; font-size:17px; color:#f0eaff; font-weight:700 }
-.item-text{ margin:0; color:#d8d2ee; line-height:1.75; font-size:14.5px }
+.result-item .badge{ display:inline-block; font-size:12px; color:#201630; background:#e9deff; padding:2px 8px; border-radius:999px; margin-bottom:6px }
+.r-title{ margin:.2em 0; font-size:17px; color:#1D0F33; font-weight:700 }
+.r-text{ margin:0; color:#2A1A4A; line-height:1.75; font-size:14.5px }
 
-/* Motion Safety */
-@media (prefers-reduced-motion: reduce){
-  *{ animation: none !important; transition: none !important }
-}
-
-/* ===== Typography helpers for tarot detail blocks ===== */
+/* タロット詳細ブロック（カード内テキスト） */
 .tarot-block .card-title{
-  font-weight:700; color:#1D0F33; line-height:1.35;
-  font-size: clamp(18px, 4.6vw, 22px); margin:4px 0 6px;
+  font-weight:700; color:#f0eaff; line-height:1.35;
+  font-size: clamp(18px, 4.6vw, 22px); margin:4px 0 6px; text-align:center;
 }
 .tarot-block .card-desc{
-  font-weight:500; color:#2A1A4A; line-height:1.85; letter-spacing:.01em;
-  font-size: clamp(15px, 4.2vw, 17px);
-}
-@media (prefers-contrast: more){
-  .tarot-block .card-title, .tarot-block .card-desc{ color:#140A26 }
+  font-weight:500; color:#d8d2ee; line-height:1.85; letter-spacing:.01em;
+  font-size: clamp(15px, 4.2vw, 17px); text-align:center;
 }
 
-/* ===== Responsive tweaks ===== */
+/* ===== Responsive ===== */
 @media (max-width: 960px){
   .result-grid{ grid-template-columns: 1fr }
-  .tarot-card, .card-slot{ width:100% }
+  .card-slot{ width:100% }
 }
 @media (max-width: 600px){
   .hero h1{ font-size: clamp(22px, 7vw, 32px) }
   .hero p{ font-size: clamp(14px, 4vw, 16px) }
 }
-/* ===== Tarot back FIX (force) ===== */
-
-/* 1) 絶対パス＋キャッシュバスターで確実に */
-:root{
-  /* 実在する画像パスに合わせてどちらかを使う（片方はコメントアウト） */
-  /* 例A: /assets/images/tarot/tarot_back_1024x1536.jpg がある場合 */
-  --card-back-url: url("/assets/images/tarot/tarot_back_1024x1536.jpg?v=5");
-  /* 例B: /assets/tarot/back.png がある場合 */
-  /* --card-back-url: url("/assets/tarot/back.png?v=5"); */
-}
-
-/* 2) HTMLが .card-slot を使っていても .tarot-card を使っていても両対応 */
-.tarot-card,
-.card-slot{ position: relative; overflow: hidden; }
-
-/* 擬似要素に裏面を描画（要素背景の上に来るので確実） */
-.tarot-card::before,
-.card-slot.is-back::before{
-  content:"";
-  position:absolute; inset:0;
-  background-image: var(--card-back-url);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: saturate(1.02);
-  z-index: 0;
-}
-
-/* 3) 既存の背景指定を無効化して競合回避 */
-.card-slot.is-back{
-  background: none !important;
-  background-image: none !important;
-}
-
-/* 反転などで表面を出す側は上に */
-.tarot-card .face,
-.card-slot .face{ position: relative; z-index: 1; }
-
-/* 旧APIの“表になった時に裏面が残る”のを確実に隠す */
-.card-slot.is-picked::before,
-.tarot-card.is-flipped::before{ opacity: 0; }
-/* === Tarot Back: always show, flipで消える === */
-:root{
-  /* 実在する方だけ残してOK（もう片方は消す） */
-  --card-back-url: url("/assets/images/tarot/tarot_back_1024x1536.jpg?v=7");
-  /* --card-back-url: url("/assets/tarot/back.png?v=7"); */
-}
-
-.card-slot{ position:relative; overflow:hidden; }
-
-/* ← is-back条件を外す（常時 裏面） */
-.card-slot::before{
-  content:"";
-  position:absolute; inset:0;
-  background: var(--card-back-url) center/cover no-repeat;
-  filter: saturate(1.02);
-  z-index:0;
-}
-
-/* 表面（face）は上に載せる。反転時だけ見せる想定なら opacity をJSで切替 */
-.card-slot .face{ position:relative; z-index:1; }
-
-/* 表になった時に裏面を消す（flip/pick時にクラス付与） */
-.card-slot.is-picked::before,
-.card-slot.is-flipped::before{ opacity:0; transition: opacity .28s ease; }
-
-/* 競合を潰す（以前の背景指定が勝っていた時の保険） */
-.card-slot{ background: none !important; }
