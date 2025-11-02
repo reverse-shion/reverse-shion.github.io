@@ -1,1 +1,142 @@
+/* ===== Root & Base ===== */
+:root{
+  --bg:#fdfcff;
+  --ink:#3b2c59;
+  --muted:#6c6480;
+  --accent:#7e66ff;
+  --gold:#ffd76f;
+  --panel:#ffffff;
+  --r:14px;
+  color-scheme: light;
+}
 
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  font-family:"Hiragino Sans","Noto Sans JP",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height:1.8;
+  letter-spacing:.02em;
+}
+
+/* ===== Header（固定・透明ガラス / トップと同じ雰囲気） ===== */
+.header{
+  position:fixed; inset:0 0 auto 0; height:56px; z-index:999;
+  background: rgba(255,255,255,.72);
+  backdrop-filter: blur(12px);
+  border-bottom:1px solid rgba(0,0,0,.05);
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+.header__inner{
+  max-width:1120px; margin:0 auto; height:56px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px;
+}
+.logo{
+  text-decoration:none; color:var(--accent); font-weight:700; font-size:18px;
+}
+.nav-main a{
+  text-decoration:none; color:var(--ink); margin-left:14px; font-size:14px;
+  padding:8px 12px; border-radius:999px; transition: background .2s, color .2s;
+}
+.nav-main a:hover{ color:var(--accent); background:rgba(126,102,255,.08) }
+
+.main{ padding-top: calc(72px + env(safe-area-inset-top)) }
+
+/* ===== Hero ===== */
+.hero{
+  position:relative; overflow:hidden; text-align:center;
+  padding:96px 20px 72px;
+}
+.hero__aura{
+  position:absolute; inset:auto 50% -60px auto; left:50%; transform:translateX(-50%);
+  width:320px; height:320px; border-radius:50%;
+  background: radial-gradient(ellipse at center, rgba(255,215,111,.3), transparent 70%),
+              radial-gradient(ellipse at center, rgba(126,102,255,.24), transparent 75%);
+  filter: blur(16px);
+  animation: aura 7s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+@keyframes aura{
+  from{ transform:translateX(-50%) scale(1); opacity:.7 }
+  to  { transform:translateX(-50%) scale(1.15); opacity:.95 }
+}
+.hero h1{ margin:0 0 8px; font-size:36px; color:var(--accent); letter-spacing:.04em }
+.subtitle{ margin:0; font-size:15px; color:var(--muted) }
+
+/* ===== Content Wrapper ===== */
+.content{ max-width:980px; margin:0 auto; padding:24px 20px 72px }
+.content h2{ margin-top:36px; color:var(--accent); font-size:20px }
+.content__head{ display:flex; align-items:center; justify-content:space-between }
+.to-top{
+  text-decoration:none; font-size:13px; color:var(--muted);
+  background:#fff; border:1px solid rgba(0,0,0,.06);
+  padding:6px 10px; border-radius:10px; line-height:1;
+}
+.to-top:hover{ color:var(--accent); border-color: rgba(126,102,255,.35) }
+
+/* ===== Book List ===== */
+.booklist{
+  list-style:none; margin:18px 0 0; padding:0;
+  display:grid; gap:14px;
+}
+/* モバイル1列 → タブ2列 → PC3列 */
+@media (min-width:560px){ .booklist{ grid-template-columns: 1fr; } }
+@media (min-width:720px){ .booklist{ grid-template-columns: 1fr 1fr; } }
+@media (min-width:1080px){ .booklist{ grid-template-columns: 1fr 1fr 1fr; } }
+
+.bookcard{}
+.booklink{
+  display:block; width:100%;
+  background: var(--panel);
+  border:1px solid rgba(126,102,255,.14);
+  border-radius: var(--r);
+  padding:16px 18px;
+  text-decoration:none; color:var(--ink);
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  transition: transform .18s, box-shadow .18s, border-color .18s, color .18s;
+}
+.booklink:hover{
+  transform: translateY(-2px);
+  border-color: rgba(126,102,255,.35);
+  box-shadow: 0 10px 22px rgba(126,102,255,.16);
+  color: var(--accent);
+}
+.badge{
+  display:inline-block; font-size:12px; line-height:1;
+  padding:6px 10px; margin-bottom:8px;
+  border-radius:999px; background:#fff6e6; color:#6b5600;
+  border:1px solid rgba(255,215,111,.55);
+}
+.badge-zero{ background:#f1ecff; color:#4a3aa5; border-color:rgba(126,102,255,.5) }
+.badge-finale{ background:#efeaff; color:#5a3a9c; border-color:rgba(126,102,255,.55) }
+
+.ttl-ja{ font-weight:700; font-size:18px; letter-spacing:.02em; margin-bottom:4px }
+.ttl-en{ font-size:13px; color:var(--muted) }
+
+/* Finale special */
+.bookcard-finale .booklink{
+  border-color: rgba(255,215,111,.45);
+  box-shadow: 0 6px 18px rgba(255,215,111,.12);
+}
+.bookcard-finale .booklink:hover{
+  box-shadow: 0 10px 26px rgba(255,215,111,.22);
+  color:#7a5a00;
+}
+
+/* ===== Join ===== */
+.join{
+  text-align:center; padding:80px 20px;
+  background: linear-gradient(180deg, #f7f4ff 0%, #fff 100%);
+}
+.btn{
+  display:inline-block; margin-top:14px; padding:12px 28px;
+  background:var(--accent); color:#fff; text-decoration:none; border-radius:var(--r);
+  transition: background .2s;
+}
+.btn:hover{ background:var(--gold); color:#3c2a00 }
+
+/* ===== Footer ===== */
+.footer{ text-align:center; padding:40px 0; color:var(--muted); font-size:13px }
