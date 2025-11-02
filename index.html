@@ -784,6 +784,20 @@ window.addEventListener('scroll', () => {
   lastScrollY = window.scrollY;
 });
 </script>
+
+  <script>
+(() => {
+  const path = location.pathname.replace(/\/+$/, ""); // 末尾スラッシュ除去
+  document.querySelectorAll('.nav-main a[href]').forEach(a => {
+    const href = a.getAttribute('href');
+    // 外部リンクは除外
+    if (/^https?:/.test(href)) return;
+    const target = href.replace(/\/+$/, "");
+    if (target === "" && path === "/") { a.setAttribute('aria-current','page'); }
+    if (target && path.endsWith(target)) { a.setAttribute('aria-current','page'); }
+  });
+})();
+</script>
   
 </body>
 </html>
