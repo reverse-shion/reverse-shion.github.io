@@ -371,3 +371,14 @@ header, .hero, section, footer{ position:relative; z-index:1 }
 }
 @keyframes rise{from{transform:translateY(6px);opacity:.0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* === Fix: iOS/Safari click blocking by canvas overlay === */
+.sky, #goldDust {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+main, section, footer, header {
+  position: relative;
+  z-index: 2;
+}
