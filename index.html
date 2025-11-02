@@ -763,6 +763,18 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }
 })();
 </script>
 
+  <script>
+document.querySelectorAll('.tbm-card').forEach(card => {
+  card.addEventListener('click', () => {
+    card.classList.add('clicked');
+    const audio = new Audio('/assets/sound/shine.mp3');
+    audio.volume = 0.4;
+    audio.play();
+    setTimeout(() => card.classList.remove('clicked'), 800);
+  });
+});
+</script>
+
 <!-- SVG Sprite (icons) -->
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l2.84 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 7.16-1.01L12 2z"/></symbol>
