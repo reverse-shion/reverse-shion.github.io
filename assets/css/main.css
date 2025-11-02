@@ -34,22 +34,69 @@ a{color:var(--accent);text-decoration:none}
 a:hover{opacity:.9}
 
 /* ===== Hero（動画はダークでコントラスト確保） ===== */
-.hero{position:relative;height:100vh;overflow:hidden;text-align:center}
-.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+/* ===== Hero: 可読性強化（見出し・段落・背景） ===== */
 .hero-overlay{
-  position:absolute;inset:0;z-index:-1;
+  /* 背景が明るいカットでも文字が沈まないように少し強めに */
   background:
-    radial-gradient(800px 400px at 50% 20%, rgba(11,11,26,.25), rgba(11,11,26,.65) 70%, rgba(11,11,26,.85) 100%);
+    linear-gradient(to bottom, rgba(11,11,26,.30), rgba(11,11,26,.72) 60%, rgba(11,11,26,.85));
 }
-.hero-content{position:relative;top:50%;transform:translateY(-50%)}
-.hero h1{margin:0;color:#fff;font-size:3rem;letter-spacing:.02em}
-.hero p{margin:.5rem 0 0;color:#eae6ff;font-size:1.2rem}
-.scroll-down{
-  display:inline-block;margin-top:28px;padding:11px 18px;border-radius:999px;
-  border:1px solid #eae6ff;color:#fff;transition:.25s;background:transparent
-}
-.scroll-down:hover{background:#ffffff22}
 
+/* 中央のコピー一式に“やわらかガラス”の台座を敷く */
+.hero-content{
+  width:min(92vw, 760px);
+  margin-inline:auto;
+  padding:20px 18px;
+  text-align:center;
+  position:relative;
+}
+.hero-content::before{
+  content:"";
+  position:absolute; inset:-10px;
+  border-radius:22px;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index:-1;
+}
+
+/* メインコピー（詩：明朝系で凛と） */
+.hero h1{
+  font-family:"Shippori Mincho","Noto Serif JP",serif;
+  font-weight:500;
+  font-size:clamp(1.9rem, 5.4vw, 3rem);
+  line-height:1.85;
+  letter-spacing:.04em;
+  margin:0 0 1.1rem;
+  color:#fefcff;
+  /* 背景動画に負けない柔らかい縁取り */
+  text-shadow:
+    0 2px 12px rgba(0,0,0,.45),
+    0 0 1px rgba(255,255,255,.35);
+  text-wrap:balance; /* iOS/Chromiumで行のバランスを最適化 */
+  -webkit-font-smoothing:antialiased;
+}
+
+/* サブコピー（説明：ゴシックで読みやすく） */
+.hero p{
+  font-family:"Zen Kaku Gothic New",system-ui,-apple-system,sans-serif;
+  font-size:clamp(1rem, 3.4vw, 1.22rem);
+  line-height:1.9;
+  letter-spacing:.01em;
+  color:rgba(255,255,255,.92);
+  margin:0;
+  text-shadow:0 1px 6px rgba(0,0,0,.35);
+}
+
+/* ボタン群の間隔を少し広げてタップしやすく */
+.cta-row{ margin-top:20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.cta-row .btn{ min-height:44px; padding:12px 18px; }
+
+/* さらに小さい端末の微調整 */
+@media (max-width:380px){
+  .hero-content{ padding:16px 14px; }
+  .hero h1{ font-size:clamp(1.7rem, 6vw, 2.2rem); }
+}
 /* ===== Intro（最初の一歩） ===== */
 .intro-section{padding:72px 16px;text-align:center}
 .intro-title{font-size:1.6rem;margin:0;color:var(--ink)}
