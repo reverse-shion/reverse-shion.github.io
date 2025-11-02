@@ -84,6 +84,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/mini-reading.css">
+  <link rel="stylesheet" href="/assets/css/intro.css">
 </head>
 <body>
 
@@ -137,6 +138,52 @@
       </nav>
     </div>
   </section>
+
+  <!-- 初めての方へ：最初の一歩 -->
+<section id="starter" class="intro-section" aria-labelledby="intro-title">
+  <div class="intro-wrap">
+    <h2 id="intro-title" class="intro-title">初めての方へ — 最初の一歩</h2>
+    <p class="intro-lead">3つの入り口から、あなたに合うペースで。<br aria-hidden="true">迷ったら「3分でわかる」へどうぞ。</p>
+
+    <div class="intro-grid" role="list">
+      <!-- 入口A：第零書 -->
+      <a class="intro-card" role="listitem" href="#zero" aria-label="第零書（ゼロから知る）へ">
+        <span class="intro-kicker">A</span>
+        <h3 class="intro-card-title">第零書｜ゼロから知る</h3>
+        <p class="intro-card-desc">詩韻思想の“息”と“輪”。まずは核だけ、要点で。</p>
+        <span class="intro-cta">読む</span>
+      </a>
+
+      <!-- 入口B：3分ガイド -->
+      <a class="intro-card" role="listitem" href="#guide-3min" aria-label="3分でわかるガイドへ">
+        <span class="intro-kicker">B</span>
+        <h3 class="intro-card-title">3分でわかる</h3>
+        <p class="intro-card-desc">短い映像＆一枚図で世界観を一気に把握。</p>
+        <span class="intro-cta">見る</span>
+      </a>
+
+      <!-- 入口C：物語 -->
+      <a class="intro-card" role="listitem" href="#story" aria-label="物語 TAROT BREAKER 第1話へ">
+        <span class="intro-kicker">C</span>
+        <h3 class="intro-card-title">物語で体験</h3>
+        <p class="intro-card-desc">第1話から。配信×星界、“参加”できる物語。</p>
+        <span class="intro-cta">入る</span>
+      </a>
+    </div>
+
+    <!-- 二次導線：行動の選択 -->
+    <div class="intro-actions" aria-label="次の行動">
+      <a class="intro-btn primary" href="#line">LINEで受け取る</a>
+      <a class="intro-btn ghost" href="#note">noteをフォロー</a>
+    </div>
+
+    <!-- 音のガイド（初訪問向け） -->
+    <button class="intro-sound" type="button" data-sound-toggle aria-pressed="false" aria-label="音の案内を開く">
+      <span class="intro-sound-icon" aria-hidden="true">♪</span>
+      <span class="intro-sound-text">画面タップで音が流れます</span>
+    </button>
+  </div>
+</section>
 
   <!-- Trinity -->
   <section id="trinity" aria-labelledby="sec-trinity" data-shiopon="exclude">
@@ -666,6 +713,20 @@ function bindCardEvents(){
 bindCardEvents();
 btnStart.addEventListener('click', startReading);
 btnReset.addEventListener('click', resetUI);
+</script>
+
+  <script>
+/* Intro: 音案内のトグル（アナリティクス化しやすいデータ属性付き） */
+(function(){
+  const btn = document.querySelector('[data-sound-toggle]');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    const on = this.getAttribute('aria-pressed') === 'true';
+    this.setAttribute('aria-pressed', String(!on));
+    // 任意：ここでBGMの再生フラグや、モーダル案内を起動可能
+    // window.dispatchEvent(new CustomEvent('sound-toggle', { detail: { enabled: !on }}));
+  });
+})();
 </script>
 
 <!-- SVG Sprite -->
