@@ -1,1 +1,128 @@
+/* Re:verse Shion — Intro Section (紫苑×白光) */
+:root{
+  --intro-ink:#20202a;
+  --intro-muted:#666688;
+  --intro-bg:#ffffff;
+  --intro-veil: rgba(255,255,255,.6);
+  --intro-accent:#7e66ff;      /* 紫苑 */
+  --intro-gold:#ffd76f;         /* 白光 */
+  --intro-r:16px;
+  --intro-bw:1px;
+}
+@media (color-gamut:p3){
+  :root{
+    --intro-accent: color(display-p3 0.48 0.40 1.00);
+    --intro-gold:   color(display-p3 1.00 0.84 0.45);
+  }
+}
 
+.intro-section{
+  position:relative;
+  isolation:isolate;
+  padding: clamp(28px, 5vw, 56px) 20px;
+  background:
+    radial-gradient(1200px 600px at 50% -20%, rgba(126,102,255,.10), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.85), #fff 40%, #fff);
+  color: var(--intro-ink);
+}
+.intro-wrap{ max-width: min(96vw, 1080px); margin:0 auto; }
+
+.intro-title{
+  font-size: clamp(22px, 2.8vw, 32px);
+  letter-spacing:.02em;
+  margin:0 0 8px;
+  color:#503080;
+}
+.intro-lead{
+  color: var(--intro-muted);
+  margin:0 0 18px;
+  line-height:1.7;
+}
+
+/* 3カード */
+.intro-grid{
+  display:grid;
+  gap:16px;
+  grid-template-columns: 1fr;
+  margin: 14px 0 10px;
+  container-type:inline-size;
+}
+@container (min-width:720px){
+  .intro-grid{ grid-template-columns: repeat(3,1fr); }
+}
+.intro-card{
+  position:relative;
+  display:block;
+  padding:18px 16px 46px;
+  border: var(--intro-bw) solid rgba(0,0,0,.08);
+  border-radius: var(--intro-r);
+  background:#fff;
+  text-decoration:none;
+  color: inherit;
+  box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
+  overflow:hidden;
+}
+.intro-card::before{
+  content:"";
+  position:absolute; inset:-2px;
+  background: radial-gradient(240px 140px at 20% 0%, rgba(126,102,255,.12), transparent 40%),
+              radial-gradient(280px 160px at 80% 120%, rgba(255,215,111,.10), transparent 50%);
+  pointer-events:none;
+  opacity:.9;
+}
+.intro-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(126,102,255,.14);
+  border-color: rgba(126,102,255,.35);
+}
+.intro-kicker{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%;
+  background: linear-gradient(180deg, var(--intro-accent), var(--intro-gold));
+  color:#fff; font-weight:700; font-size:14px; margin-bottom:8px;
+}
+.intro-card-title{
+  font-size: clamp(18px, 2.2vw, 20px);
+  margin:0 0 6px; color:#452a88; letter-spacing:.02em;
+}
+.intro-card-desc{ margin:0; color:var(--intro-muted); font-size:15px; line-height:1.6; }
+.intro-cta{
+  position:absolute; right:14px; bottom:12px;
+  font-weight:700; font-size:14px;
+  color:#352066;
+  padding:6px 10px; border-radius:999px;
+  background:linear-gradient(180deg, #fff, #f8f6ff);
+  border:1px solid rgba(126,102,255,.35);
+}
+
+/* 二次導線 */
+.intro-actions{
+  display:flex; gap:10px; flex-wrap:wrap;
+  margin:18px 0 0;
+}
+.intro-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:40px; padding:0 14px; border-radius:10px; text-decoration:none;
+  font-weight:700; letter-spacing:.02em;
+  border:1px solid rgba(0,0,0,.08);
+}
+.intro-btn.primary{
+  background: linear-gradient(180deg, var(--intro-accent), var(--intro-gold));
+  color:#fff; border-color: transparent;
+}
+.intro-btn.ghost{
+  background:#fff; color:#3a2a66;
+}
+
+/* 音のガイド（軽量） */
+.intro-sound{
+  margin:18px 0 0; display:inline-flex; align-items:center; gap:8px;
+  padding:10px 14px; border-radius:999px; border:1px dashed rgba(126,102,255,.45);
+  background: #fff; color:#3a2a66; cursor:pointer;
+}
+.intro-sound-icon{ font-size:16px; }
+.intro-sound[aria-pressed="true"]{
+  border-style:solid;
+  box-shadow: 0 0 0 6px rgba(126,102,255,.10);
+}
