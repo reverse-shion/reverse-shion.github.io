@@ -15,9 +15,28 @@
   --panel:#ffffffcc;
   --r:16px;
 
-  /* 裏面画像：存在する実パスに合わせて必要なら差し替え */
-  --card-back-url: url("/assets/tarot/back.png?v=1");
+  :root{
+  --accent:#7e66ff;
+  --r:14px;
+  /* ↓この行を追記 */
+  --card-back-url-1x: url("/assets/images/tarot/tarot_back_1024x1536.jpg");
+  --card-back-url-2x: url("/assets/images/tarot/tarot_back_2x_2048x3072.jpg");
+}
+   .tbm-face.back{
+  background-image: var(--card-back-url-1x);
+  background-image: image-set(
+    var(--card-back-url-1x) 1x,
+    var(--card-back-url-2x) 2x
+  );
+  background-size: cover;
+  background-position: center;
+}
 
+.tbm-face.front{
+  background-image: var(--front-url);
+  background-size: cover;
+  background-position: center;
+}
   color:var(--ink);
 }
 .tb-mini *{ box-sizing:border-box }
