@@ -15,21 +15,19 @@
   --panel:#ffffffcc;
   --r:16px;
 
-  :root{
-  --accent:#7e66ff;
-  --r:14px;
-  /* ↓この行を追記 */
-  --card-back-url-1x: url("/assets/images/tarot/tarot_back_1024x1536.jpg");
-  --card-back-url-2x: url("/assets/images/tarot/tarot_back_2x_2048x3072.jpg");
-}
-   .tbm-face.back{
-  background-image: var(--card-back-url-1x);
-  background-image: image-set(
-    var(--card-back-url-1x) 1x,
-    var(--card-back-url-2x) 2x
+  /* ===== 変数：カード裏面（グローバル） ===== */
+:root{
+  --card-back-url: image-set(
+    url("/assets/images/tarot/tarot_back_1024x1536.jpg") 1x,
+    url("/assets/images/tarot/tarot_back_2x_2048x3072.jpg") 2x
   );
-  background-size: cover;
+}
+   /* 裏面：変数をそのまま使う */
+.tbm-face.back{
+  background-image: var(--card-back-url);
+  background-repeat: no-repeat;
   background-position: center;
+  background-size: cover;
 }
 
 .tbm-face.front{
