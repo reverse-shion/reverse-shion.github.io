@@ -293,14 +293,85 @@
             <p class="r-text">カードをめくると表示されます。</p>
           </article>
         </div>
+         <div class="cta-row" style="margin-top:16px">
+            <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
+              <svg width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
+              今日の“一歩”をLINEで受け取る（無料）
+            </a>
+          </div>
       </section>
     </div>
   </section>
 
-  <!-- ダミー -->
-  <section id="codex"><div class="wrap"><h2>書（Codex）</h2><p class="h2-sub">詩韻思想の基本書式と連携。</p></div></section>
-  <section id="join"><div class="wrap"><h2>参加</h2><p class="h2-sub">公式LINEやサブスクで深く学ぶ。</p></div></section>
+   <!-- Join -->
+  <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
+    <div class="wrap">
+      <h2 id="sec-join">参加の扉</h2>
+      <p style="text-align:center;color:var(--muted)">LINE登録で、毎週「星の言葉」と新着の書をお届けします。</p>
+      <div class="cta-row">
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 無料で受け取る</a>
+        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 1分リールを観る</a>
+      </div>
+    </div>
+  </section>
 </main>
+
+<!-- Tarot Preview Modal -->
+<div id="tarotModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="tarotModalTitle" aria-hidden="true">
+  <div class="modal__overlay" data-close="1"></div>
+  <div class="modal__panel" role="document">
+    <button class="modal__close" aria-label="閉じる"><svg width="18" height="18"><use href="#i-x"/></svg></button>
+
+    <!-- ★ ここを picture で差し替え（SP/PC自動切替） -->
+    <figure class="modal__media">
+      <picture>
+        <!-- 縦長スマホ優先 -->
+        <source
+          media="(max-width: 640px)"
+          srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
+        <!-- それ以外（デスクトップ等） -->
+        <source
+          media="(min-width: 641px)"
+          srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
+        <img
+          src="/assets/images/modal/main_modal_1920x1280.jpg?v=1"
+          alt="TAROT BREAKER プレビュー"
+          width="1920" height="1280" loading="lazy" decoding="async">
+      </picture>
+    </figure>
+
+    <div class="modal__body">
+      <h3 id="tarotModalTitle">TAROT BREAKER ― 星の言霊使い</h3>
+      <p class="lead">「言の葉は鍵、星の光は道しるべ。」  
+        迷いの影が生まれる夜、カードは静かに呼吸し、言葉は祈りへと変わる。</p>
+      <ul class="bullets">
+        <li>3行あらすじ：<em>迷いの正体に、言葉で触れる。</em></li>
+        <li>詩的体験：<em>星詠展開 → 封命完了 → 大丈夫だよ。</em></li>
+        <li>参加方法：<em>ギフトとコメントが“技”を進化。</em></li>
+      </ul>
+      <div class="cta-row">
+        <a class="btn btn--primary" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener">第1話の続きを読む</a>
+        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener">1分で観る/聴く</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- クリックで開く簡易モーダル（カード3枚用の表示） -->
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal__overlay" data-close="1"></div>
+  <div class="modal__panel" role="document">
+    <button class="close-modal modal__close" aria-label="閉じる">×</button>
+    <figure class="modal__media">
+      <picture>
+        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1440.jpg?v=1">
+        <source media="(min-width: 641px)" srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
+        <img src="/assets/images/modal/main_modal_1920x1280.jpg?v=1" alt="カードの結果" width="1920" height="1280" loading="lazy" decoding="async">
+      </picture>
+    </figure>
+  </div>
+</div>
+
 
 <footer>
   <div class="wrap">
