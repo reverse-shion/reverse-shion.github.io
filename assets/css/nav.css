@@ -113,3 +113,65 @@
   .logo{ font-size:1.05rem; margin-left:10px; }
   .header{ height:60px; }
 }
+
+/* ヘッダーの基本デザイン */
+.site-header {
+  position: fixed;
+  top: -70px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transition: top 0.5s ease, opacity 0.5s ease;
+  z-index: 1000;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 10px 18px;
+}
+
+.site-header h1 a {
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 600;
+  color: #7150ff;
+}
+
+.nav-main a {
+  margin-left: 18px;
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+  transition: color 0.3s;
+}
+
+.nav-main a:hover {
+  color: #7150ff;
+}
+
+/* スクロール時に表示 */
+.site-header.visible {
+  top: 0;
+  opacity: 1;
+}
+
+/* モバイル調整 */
+@media (max-width: 720px){
+  .nav-main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 0;
+  }
+  .nav-main a {
+    font-size: 14px;
+    margin: 0;
+  }
+}
