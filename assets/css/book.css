@@ -94,4 +94,14 @@ body{
   transform: none !important;
   animation: none !important;
   transition: none !important;
+
+  /* タイトルの予期せぬ改行を抑止 */
+.book-title{
+  word-break: keep-all;   /* 句読点以外で極力折り返さない */
+  line-break: strict;     /* 和文の禁則を強めに */
+}
+.book-title .nowrap{
+  white-space: nowrap;    /* ここは絶対に折り返さない */
+  display: inline-block;
+}
 }
