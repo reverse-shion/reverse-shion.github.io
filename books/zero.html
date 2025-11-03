@@ -19,34 +19,34 @@
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/book.css">
 
-  <!-- ===== Hotfix: ぼかし完全無効＋行フェードのみ ===== -->
+  <!-- ===== Page Hotfix（行順次表示を強制） ===== -->
   <style>
-    /* タイトルの不自然改行防止 */
+    /* タイトルの不自然改行を抑制 */
     .nowrap{ white-space: nowrap; }
     h1.book-title{ word-break: keep-all; overflow-wrap: anywhere; }
 
-    /* ページ全体の“ぼかし”強制OFF（他CSSのfilter/backdrop-filterを上書き） */
-    .book-wrapper,
-    .book-wrapper *{
+    /* ぼかし系は全停止（初期ピンぼけ防止） */
+    .book-wrapper, .book-wrapper *{
       filter: none !important;
       -webkit-backdrop-filter: none !important;
       backdrop-filter: none !important;
-      text-shadow: none; /* 文字ボケの原因になる強い影があれば無効化 */
+      text-shadow: none;
     }
 
-    /* 行アニメ：最初は透明＆わずかに下から、blurは使わない */
+    /* 行アニメーション：blurは使わず透明→不透明のみ */
     .mode .line{
       opacity: 0;
       transform: translateY(6px);
-      transition: opacity .55s ease, transform .55s ease;
+      transition: opacity .45s ease, transform .45s ease;
+      will-change: opacity, transform;
     }
     .mode .line.is-show{
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* タブ切替の瞬間チラつき防止（面を開くまで内側を非表示→JSで段階表示） */
-    .mode[hidden] .line{ opacity: 0 !important; }
+    /* 非表示パネル内の行は常に非表示のまま（チラ見え防止） */
+    .mode[hidden] .line{ opacity: 0 !important; transform: translateY(6px) !important; }
   </style>
 </head>
 
@@ -113,50 +113,64 @@
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
-  <!-- 既存の共通JS -->
-  <script src="/assets/js/common.js" defer></script>
-  <script src="/assets/js/tabs.js" defer></script>
-  <script src="/assets/js/scroll.js" defer></script>
-
-  <!-- ===== Hotfix JS: 行フェードを“常に”最初から順次表示、ぼかし無し ===== -->
+  <!-- ===== 必要最小限のページ内JS：タブ切替＋行の順次表示 ===== -->
   <script>
     (function(){
       const STAGGER = 140; // 1行ごとの遅延(ms)
 
-      function revealLines(panel){
+      // パネル内の .line を先頭から順に表示
+      function sequentialReveal(panel){
         if(!panel) return;
         const lines = Array.from(panel.querySelectorAll('.line'));
-        lines.forEach(l => l.classList.remove('is-show'));
-        // 先頭から順にフェード（後半が最初から出てしまう症状を抑止）
-        lines.forEach((el, i) => {
-          setTimeout(() => el.classList.add('is-show'), i * STAGGER);
+        // まず全部リセット（途中から表示される不具合の抑止）
+        lines.forEach(el => el.classList.remove('is-show'));
+        // 1本ずつ遅延表示
+        let i = 0;
+        function step(){
+          if(i >= lines.length) return;
+          lines[i].classList.add('is-show');
+          i++;
+          setTimeout(step, STAGGER);
+        }
+        // レイアウト確定後に開始
+        requestAnimationFrame(() => setTimeout(step, 30));
+      }
+
+      // タブUI（外部tabs.jsに依存しない）
+      function activateTab(btn){
+        const tablist = btn.closest('[role="tablist"]');
+        const buttons = Array.from(tablist.querySelectorAll('[role="tab"]'));
+        buttons.forEach(b => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
+
+        const id = btn.getAttribute('aria-controls');
+        const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+        panels.forEach(p => {
+          const show = (p.id === id);
+          p.toggleAttribute('hidden', !show);
+          // 表示する面はここで順次表示を必ず実行
+          if(show){ sequentialReveal(p); }
         });
       }
 
-      // 初期表示：現在見えている面
+      // 初期化
       document.addEventListener('DOMContentLoaded', () => {
-        const active = document.querySelector('.mode:not([hidden])');
-        revealLines(active);
-      });
+        // 初期の可視面に対して必ず順次表示
+        const initial = document.querySelector('.mode:not([hidden])');
+        sequentialReveal(initial);
 
-      // タブ切替後に毎回やり直す（tabs.jsのhidden切替後に実行されるよう微遅延）
-      document.addEventListener('click', (e) => {
-        const btn = e.target.closest('[role="tab"]');
-        if(!btn) return;
-        const targetId = btn.getAttribute('aria-controls');
-        // DOM反映完了を待ってから
-        setTimeout(() => {
-          revealLines(document.getElementById(targetId));
-        }, 10);
-      });
-
-      // 低速端末・省モーションでは一括表示
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      if(mq.matches){
-        document.addEventListener('DOMContentLoaded', () => {
-          document.querySelectorAll('.line').forEach(el => el.classList.add('is-show'));
+        // タブクリック
+        document.querySelector('.mode-switch')?.addEventListener('click', (e) => {
+          const btn = e.target.closest('[role="tab"]');
+          if(!btn) return;
+          activateTab(btn);
         });
-      }
+
+        // 省モーション設定の端末では即時表示
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if(mq.matches){
+          document.querySelectorAll('.line').forEach(el => el.classList.add('is-show'));
+        }
+      });
     })();
   </script>
 </body>
