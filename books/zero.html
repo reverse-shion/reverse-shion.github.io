@@ -14,112 +14,82 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Site CSS -->
+  <!-- 共通CSS -->
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/book.css">
 
-  <!-- Page-only: 神秘的な光演出（多層グロー＋スパークル） -->
+  <!-- このページだけの上書き（最小差分） -->
   <style>
-    :root{
-      /* 配色トークン（好みで調整OK） */
-      --glow-gold: rgba(255,215,111,.95);
-      --glow-amethyst: rgba(174,138,255,.95);
-      --glow-icy: rgba(220,236,255,.95);
-      --glow-core: #ffffff;
-
-      /* 光量と速度 */
-      --char-interval: 100ms;   /* 1文字の間隔（遅いほど神秘的） */
-      --line-delay: 700ms;      /* 行と行の間 */
-      --pulse-speed: 2.4s;      /* 呼吸する脈動速度 */
-      --spark-size: 0.5em;      /* スパークルの最大サイズ */
-    }
-
-    /* ヘッダーは常時追尾＆消えない */
+    /* 1) ヘッダーは常に追尾＆タップ中は消えない */
     .header{
-      position: fixed !important; top:0; left:0; right:0; z-index:9999;
-      transform: translateY(0) !important; opacity:1 !important;
+      position: fixed !important; top:0; left:0; right:0;
+      transform: translateY(0) !important; opacity:1 !important; z-index: 9999;
     }
     body{ padding-top: calc(var(--header-h,64px) + env(safe-area-inset-top,0px)) !important; }
 
-    /* タイトルの不自然改行を抑制 */
+    /* 2) タイトルの不自然改行を抑制 */
     h1.book-title{ word-break: keep-all; }
     .nowrap{ white-space: nowrap; }
 
-    /* ====== 文字出現のベース（行） ====== */
-    .line{
+    /* 3) 「詩」だけが全体ボケる不具合のガード
+          （どこかのフィルタ指定が乗ってもここで打ち消す） */
+    .mode--poem, .mode--poem .line{
+      filter: none !important;
+      -webkit-filter: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* 4) 行アニメの初期状態（他CSSより強めに指定） */
+    .mode .line{
       opacity: 0; visibility: hidden; transform: translateY(6px);
-      transition: opacity .5s ease, transform .5s ease, visibility 0s linear .5s;
+      transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
+      will-change: opacity, transform;
     }
-    .line.visible{
+    .mode .line.is-show{
       opacity: 1; visibility: visible; transform: translateY(0);
+      transition-delay: 0s;
     }
 
-    /* ====== 1文字ずつ発光しながら出る ====== */
+    /* 5) 一文字ずつの“星光”演出（詩のみ） */
     .char{
-      opacity: 0; display: inline-block; transform: translateY(6px);
-      /* 中心から金→紫→白の多層グロー（文字が光源に見える） */
-      text-shadow:
-        0 0 .6px var(--glow-core),
-        0 0 2px var(--glow-core),
-        0 0 6px var(--glow-icy),
-        0 0 12px var(--glow-amethyst),
-        0 0 18px var(--glow-gold);
-      /* 文字自体にグラデーションを薄く載せて神域感 */
-      background: linear-gradient(180deg, #fff 0%, #f9f6ff 40%, #f3eeff 70%, #ffffff 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-
-      animation: charIn .45s cubic-bezier(.22,.61,.36,1) forwards,
-                 charPulse var(--pulse-speed) ease-in-out infinite;
-      animation-delay: var(--d, 0s);
-      position: relative;
-    }
-    @keyframes charIn{
-      0% { opacity:0; transform: translateY(6px) scale(.98) }
-      60%{ opacity:1; transform: translateY(0)   scale(1.00) }
-      100%{ opacity:1; transform: translateY(0)   scale(1.00) }
-    }
-    /* 微弱な呼吸（明滅）の脈動。光量がわずかに上下して“生きた文字”に */
-    @keyframes charPulse{
-      0%  { filter: brightness(1) drop-shadow(0 0 2px var(--glow-icy)); }
-      50% { filter: brightness(1.06) drop-shadow(0 0 6px var(--glow-amethyst)); }
-      100%{ filter: brightness(1) drop-shadow(0 0 2px var(--glow-icy)); }
-    }
-
-    /* ====== スパークル（粒光）：各文字の上で微小に瞬く ====== */
-    .char::after{
-      content:""; position:absolute; left:50%; top:0.35em;
-      width: 0; height: 0; border-radius: 999px; pointer-events: none;
-      background:
-        radial-gradient(circle, var(--glow-core) 0%, var(--glow-gold) 40%, rgba(255,255,255,0) 60%);
       opacity: 0;
-      transform: translateX(-50%) translateY(-50%) scale(0.6);
-      animation: spark var(--pulse-speed) ease-in-out infinite;
-      animation-delay: calc(var(--d, 0s) + var(--r, 0s));
-      filter: blur(.2px);
+      display: inline-block;
+      transform: translateY(.15em);
+      filter: blur(2px);
+      transition: opacity .28s ease, transform .28s ease, filter .28s ease, text-shadow .28s ease;
+      text-shadow:
+        0 0 0 rgba(255,255,255,0),
+        0 0 0 rgba(126,102,255,0);
     }
-    @keyframes spark{
-      0%,68% { opacity: 0; width:0; height:0; }
-      70%    { opacity: .8; width: calc(var(--spark-size) * .25); height: calc(var(--spark-size) * .25); }
-      78%    { opacity: 1;  width: calc(var(--spark-size) * .5 ); height: calc(var(--spark-size) * .5 ); }
-      85%    { opacity: .0; width: 0; height: 0; }
-      100%   { opacity: 0; width: 0; height: 0; }
+    .char.on{
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      /* 神秘的な発光：白→紫苑→金の淡い後光 */
+      text-shadow:
+        0 0 6px rgba(255,255,255,.65),
+        0 0 14px rgba(126,102,255,.35),
+        0 0 26px rgba(255,215,111,.25);
     }
 
-    /* タブの見た目（軽調整） */
+    /* 6) タブ周りの微調整（視認性） */
     .mode-switch{ display:flex; gap:14px; margin:12px 0 16px; }
     .mode-switch [role="tab"]{
-      min-height:40px; padding:8px 16px; border-radius:999px; border:1px solid rgba(126,102,255,.25);
-      background:#fff; font:500 14px/1 "Zen Kaku Gothic New",system-ui,sans-serif;
+      min-height:40px; padding:8px 16px; border-radius:999px;
+      border:1px solid rgba(126,102,255,.25); background:#fff;
+      font:500 14px/1 "Zen Kaku Gothic New",system-ui,sans-serif;
     }
     .mode-switch [aria-selected="true"]{
-      box-shadow:0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0;
+      box-shadow: 0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0;
     }
 
-    /* 動きを抑制したい人の設定尊重 */
+    /* 動きを抑える設定の人にはアニメ無効化 */
     @media (prefers-reduced-motion: reduce){
-      .char, .char::after{ animation: none !important; opacity: 1 !important; transform: none !important; }
-      .line{ opacity:1 !important; visibility: visible !important; transform:none !important; }
+      .char, .mode .line{ transition: none !important; }
+      .char{ opacity: 1 !important; transform: none !important; filter: none !important; text-shadow: none !important; }
+      .mode .line{ opacity: 1 !important; visibility: visible !important; transform: none !important; }
     }
   </style>
 </head>
@@ -143,7 +113,7 @@
     <h1 class="book-title">詩韻思想&nbsp;第零書&nbsp;—&nbsp;<span class="nowrap">無限構文序論</span></h1>
     <p class="book-subtitle">Shion Philosophy Vol.0 — The Zero Syntax</p>
 
-    <!-- タブ -->
+    <!-- モード切替 -->
     <div class="mode-switch" role="tablist" aria-label="表示モード切替">
       <button id="tab-poem" role="tab" aria-controls="panel-poem" aria-selected="true">詩</button>
       <button id="tab-canon" role="tab" aria-controls="panel-canon" aria-selected="false">経典</button>
@@ -152,7 +122,7 @@
 
     <!-- 本文 -->
     <article class="book-body">
-      <!-- 詩 -->
+      <!-- 詩：一文字ずつ発光して出現 -->
       <section id="panel-poem" role="tabpanel" aria-labelledby="tab-poem" class="mode mode--poem">
         <p class="line">沈黙が、息をした。</p>
         <p class="line">その吐息が、光となり、</p>
@@ -163,7 +133,7 @@
         <p class="line">それが、世界の始まりだった。</p>
       </section>
 
-      <!-- 経典 -->
+      <!-- 経典：行ごとに順次 -->
       <section id="panel-canon" role="tabpanel" aria-labelledby="tab-canon" class="mode mode--canon" hidden>
         <p class="line">はじめに沈黙あり。沈黙は息を孕み、息は光を生む。</p>
         <p class="line">光は意味を求め、意味は言葉を呼び、言葉は世界を照らした。</p>
@@ -171,7 +141,7 @@
         <p class="line">この息を“零”と呼ぶ。すなわち、有限と無限の境に在るものなり。</p>
       </section>
 
-      <!-- 註解 -->
+      <!-- 註解：行ごとに順次 -->
       <section id="panel-comment" role="tabpanel" aria-labelledby="tab-comment" class="mode mode--comment" hidden>
         <p class="line"><strong>要旨：</strong>「沈黙」「光」「呼吸」は、詩韻思想における三原理。言葉とは、“沈黙が光をまとって息をする瞬間”である。</p>
         <p class="line"><strong>実践：</strong> 一日の始まりに30秒、息を感じてほしい。言葉を探すのではなく、「まだ言葉にならない想い」を聴く時間を。</p>
@@ -182,56 +152,84 @@
     <a href="#main" class="to-top" aria-label="ページ上部へ戻る">↑ TOP</a>
   </main>
 
+  <!-- ===== Footer ===== -->
   <footer class="footer">
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
-  <!-- ===== JS：1文字ずつ＋行ごと順次（スパーク用ランダム遅延付与） ===== -->
+  <!-- 既存の共通JSはそのまま -->
+  <script src="/assets/js/common.js" defer></script>
+  <script src="/assets/js/tabs.js" defer></script>
+  <script src="/assets/js/scroll.js" defer></script>
+
+  <!-- このページだけの追加JS（最小差分） -->
   <script>
     (function(){
-      const CHAR_INTERVAL = 100; // 文字の間隔（ms） ← ゆっくり
-      const LINE_DELAY    = 700; // 行と行の間（ms）
+      // ===== 設定値 =====
+      const PER_CHAR_DELAY = 70;   // 詩：一文字ごとの遅延(ms) ゆっくり
+      const LINE_BASE_DELAY = 260; // 行キックの間隔（詩）
+      const LINE_DELAY_OTHERS = 220; // 経典/註解：行ごとの間隔
 
-      function splitToChars(line, baseDelaySec){
-        const text = line.textContent;
-        line.textContent = "";
-        const frag = document.createDocumentFragment();
-        for(let i=0;i<text.length;i++){
-          const span = document.createElement('span');
-          span.className = 'char';
-          span.textContent = text[i];
-          // 文字ごとの遅延（CSS変数で渡す）
-          const charDelaySec = baseDelaySec + (i * (CHAR_INTERVAL/1000));
-          span.style.setProperty('--d', charDelaySec + 's');
-          // スパークの個体差（0〜0.9sのランダム）
-          span.style.setProperty('--r', (Math.random()*0.9).toFixed(2) + 's');
-          frag.appendChild(span);
-        }
-        line.appendChild(frag);
+      // ヘッダー：タップ中は消えず、常に表示
+      const header = document.querySelector('.header');
+      if(header){
+        let touching = false;
+        header.addEventListener('pointerdown', ()=> touching = true);
+        window.addEventListener('pointerup', ()=> touching = false);
+        window.addEventListener('scroll', ()=> {
+          if(touching) return;
+          header.style.transform = 'translateY(0)';
+          header.style.opacity = '1';
+        }, {passive:true});
       }
 
-      function revealSequential(panel){
+      // 文字を<span class="char">で分割（詩のみ）
+      function wrapChars(lineEl){
+        const text = lineEl.textContent;
+        lineEl.textContent = '';
+        for(const ch of text){
+          const s = document.createElement('span');
+          s.className = 'char';
+          s.textContent = ch;
+          lineEl.appendChild(s);
+        }
+      }
+
+      // 詩：行→その中の文字を順次点灯
+      function playPoem(panel){
         if(!panel) return;
         const lines = Array.from(panel.querySelectorAll('.line'));
-        // リセット
-        lines.forEach(l => {
-          l.classList.remove('visible');
-          const raw = l.textContent;      // 元テキストを保存して
-          l.textContent = raw;            // 既存charをクリア
-        });
-
-        let t = 0; // 秒で管理（CSSに渡しやすい）
-        lines.forEach(line => {
-          // 先に分解→ディレイ設定
-          splitToChars(line, t);
-          // lineの表示タイミング
-          setTimeout(() => line.classList.add('visible'), t*1000 - 50);
-          // 次行までの遅延＝この行の文字時間＋行ディレイ
-          const len = line.textContent.length;
-          t += (len * (CHAR_INTERVAL/1000)) + (LINE_DELAY/1000);
+        let t = 0;
+        lines.forEach((line, li) => {
+          // 初期状態（行自体は表示してから中の文字を点灯させる）
+          line.classList.add('is-show');
+          wrapChars(line);
+          const chars = line.querySelectorAll('.char');
+          // 行ごとのベース遅延
+          t += (li === 0 ? 0 : LINE_BASE_DELAY);
+          chars.forEach((c, i) => {
+            setTimeout(()=> c.classList.add('on'), t + i * PER_CHAR_DELAY);
+          });
+          // 行末に軽く“余韻”を入れて次行へ（読感をゆっくりに）
+          t += PER_CHAR_DELAY * Math.max(chars.length * 0.25, 4);
         });
       }
 
+      // 経典/註解：行単位で順次
+      function playLinesSequential(panel, interval){
+        if(!panel) return;
+        const lines = Array.from(panel.querySelectorAll('.line'));
+        lines.forEach(el => el.classList.remove('is-show'));
+        let i = 0;
+        const tick = () => {
+          if(i >= lines.length) return;
+          lines[i++].classList.add('is-show');
+          setTimeout(tick, interval);
+        };
+        tick();
+      }
+
+      // タブ切替
       function activateTab(btn){
         const targetId = btn.getAttribute('aria-controls');
         document.querySelectorAll('[role="tab"]').forEach(b =>
@@ -240,22 +238,36 @@
         document.querySelectorAll('[role="tabpanel"]').forEach(p =>
           p.toggleAttribute('hidden', p.id !== targetId)
         );
-        revealSequential(document.getElementById(targetId));
+        const panel = document.getElementById(targetId);
+        if(targetId === 'panel-poem'){
+          // 再生のたびに文字分割をやり直すため、元テキストへ戻す
+          panel.querySelectorAll('.line').forEach(line=>{
+            line.innerHTML = line.textContent; // span除去してテキストに戻す
+          });
+          playPoem(panel);
+        }else{
+          playLinesSequential(panel, LINE_DELAY_OTHERS);
+        }
+        // タブ直下まで少しスクロール
+        const y = document.querySelector('.mode-switch').getBoundingClientRect().top + window.pageYOffset - 12;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
 
-      function setupTabsAndInit(){
-        // 初期表示：可視パネルだけ実行
-        const initialPanel = document.querySelector('.mode:not([hidden])');
-        revealSequential(initialPanel);
+      document.addEventListener('DOMContentLoaded', () => {
+        // 初回：詩パネルを再生
+        playPoem(document.getElementById('panel-poem'));
 
-        // タブ切替
+        // タブクリック
         document.querySelector('.mode-switch')?.addEventListener('click', e => {
           const btn = e.target.closest('[role="tab"]');
           if(btn) activateTab(btn);
         });
-      }
 
-      document.addEventListener('DOMContentLoaded', setupTabsAndInit);
+        // 動きを抑える設定なら即時表示
+        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+          document.querySelectorAll('.line').forEach(el => el.classList.add('is-show'));
+        }
+      });
     })();
   </script>
 </body>
