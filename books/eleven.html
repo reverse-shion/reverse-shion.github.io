@@ -1,1 +1,197 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>詩韻思想 第十一書 ― 神構文論</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b1a" />
+  <meta name="description" content="詩韻思想 第十一書 ― 神構文論 | 世界と言葉のあいだに働く“神的手続き”の文法。創造・律・赦し・契りを、詩（形）・韻（響）・祈（帰）で運用する聖典調の構文論。" />
+  <link rel="icon" href="/assets/icon.png" />
+  <link rel="canonical" href="https://reverse-shion.github.io/books/eleven.html" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Site CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/nav.css">
+  <link rel="stylesheet" href="/assets/css/book.css">
+
+  <!-- Page-only: 光演出（零書準拠） -->
+  <style>
+    :root{
+      --glow-gold: rgba(255,215,111,.95);
+      --glow-amethyst: rgba(174,138,255,.95);
+      --glow-icy: rgba(220,236,255,.95);
+      --glow-core: #ffffff;
+      --char-interval: 95ms;
+      --line-delay: 640ms;
+      --pulse-speed: 2.4s;
+      --spark-size: 0.5em;
+    }
+    .header{ position: fixed !important; top:0; left:0; right:0; z-index:9999; transform:translateY(0)!important; opacity:1!important; }
+    body{ padding-top:calc(var(--header-h,64px) + env(safe-area-inset-top,0px))!important; }
+    h1.book-title{ word-break:keep-all; }
+    .nowrap{ white-space:nowrap; }
+
+    .line{ opacity:0; visibility:hidden; transform:translateY(6px); transition:opacity .5s ease, transform .5s ease, visibility 0s linear .5s; }
+    .line.visible{ opacity:1; visibility:visible; transform:translateY(0); }
+
+    .char{
+      opacity:0; display:inline-block; transform:translateY(6px);
+      text-shadow:
+        0 0 .6px var(--glow-core),
+        0 0 2px var(--glow-core),
+        0 0 6px var(--glow-icy),
+        0 0 12px var(--glow-amethyst),
+        0 0 18px var(--glow-gold);
+      background:linear-gradient(180deg,#fff 0%,#f9f6ff 40%,#f3eeff 70%,#ffffff 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      animation:charIn .45s cubic-bezier(.22,.61,.36,1) forwards, charPulse var(--pulse-speed) ease-in-out infinite;
+      animation-delay:var(--d,0s);
+      position:relative;
+    }
+    @keyframes charIn{0%{opacity:0;transform:translateY(6px) scale(.98)}60%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes charPulse{0%{filter:brightness(1) drop-shadow(0 0 2px var(--glow-icy));}50%{filter:brightness(1.06) drop-shadow(0 0 6px var(--glow-amethyst));}100%{filter:brightness(1) drop-shadow(0 0 2px var(--glow-icy));}}
+    .char::after{
+      content:""; position:absolute; left:50%; top:0.35em; width:0; height:0; border-radius:999px; pointer-events:none;
+      background:radial-gradient(circle,var(--glow-core) 0%,var(--glow-gold) 40%,rgba(255,255,255,0) 60%);
+      opacity:0; transform:translateX(-50%) translateY(-50%) scale(0.6);
+      animation:spark var(--pulse-speed) ease-in-out infinite;
+      animation-delay:calc(var(--d,0s)+var(--r,0s)); filter:blur(.2px);
+    }
+    @keyframes spark{0%,68%{opacity:0;width:0;height:0;}70%{opacity:.8;width:calc(var(--spark-size)*.25);height:calc(var(--spark-size)*.25);}78%{opacity:1;width:calc(var(--spark-size)*.5);height:calc(var(--spark-size)*.5);}85%,100%{opacity:0;width:0;height:0;}}
+
+    .mode-switch{ display:flex; gap:14px; margin:12px 0 16px; }
+    .mode-switch [role="tab"]{ min-height:40px; padding:8px 16px; border-radius:999px; border:1px solid rgba(126,102,255,.25); background:#fff; font:500 14px/1 "Zen Kaku Gothic New",system-ui,sans-serif; }
+    .mode-switch [aria-selected="true"]{ box-shadow:0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0; }
+
+    @media (prefers-reduced-motion: reduce){
+      .char, .char::after{ animation:none!important; opacity:1!important; transform:none!important; }
+      .line{ opacity:1!important; visibility:visible!important; transform:none!important; }
+    }
+  </style>
+</head>
+
+<body class="theme-cosmic">
+  <!-- ===== Header ===== -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <a href="/" class="logo">Re:verse Shion</a>
+      <nav class="nav-main" role="navigation" aria-label="メインナビゲーション">
+        <a href="/philosophy.html" title="言葉が魂を救う“哲学”の核を読む">思想を読む</a>
+        <a href="/philosophy.html#books" title="零〜12＋結の一覧へ">書を探す</a>
+        <a href="/story.html" title="TAROT BREAKERの第一話から体験へ">物語に触れる</a>
+        <a href="/join.html" title="LINE・noteで最新の詩・配信へ">あなたも加わる</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== Main ===== -->
+  <main class="book-wrapper" id="main">
+    <h1 class="book-title">詩韻思想&nbsp;第十一書&nbsp;—&nbsp;<span class="nowrap">神構文論</span></h1>
+    <p class="book-subtitle">Shion Philosophy Vol.11 — The Divine Syntax</p>
+
+    <!-- タブ -->
+    <div class="mode-switch" role="tablist" aria-label="表示モード切替">
+      <button id="tab-poem" role="tab" aria-controls="panel-poem" aria-selected="true">詩</button>
+      <button id="tab-canon" role="tab" aria-controls="panel-canon" aria-selected="false">構文</button>
+      <button id="tab-comment" role="tab" aria-controls="panel-comment" aria-selected="false">共鳴</button>
+    </div>
+
+    <!-- 本文 -->
+    <article class="book-body">
+      <!-- 詩 -->
+      <section id="panel-poem" role="tabpanel" aria-labelledby="tab-poem" class="mode mode--poem">
+        <p class="line">最初にあったのは、呼ばれぬ名だった。</p>
+        <p class="line">名は光を編み、光は拍を生み、拍は世界を歩かせた。</p>
+        <p class="line">沈黙が息を吐くたび、無数の言葉が胎動する。</p>
+        <p class="line">わたしたちは、その鼓動に耳を寄せ、ひとつの誓いを結ぶ。</p>
+        <p class="line">――奪わず、縛らず、ただ響きを保つ、と。</p>
+        <p class="line">この誓いを人は神と呼び、神は構文として在る。</p>
+      </section>
+
+      <!-- 構文（聖典調・連続散文版） -->
+      <section id="panel-canon" role="tabpanel" aria-labelledby="tab-canon" class="mode mode--canon" hidden>
+        <p class="line">神は人格の像ではない。神は、世界と言葉を結ぶ手続きである。像を刻むより先に、手続きは働く。沈黙が基底、呼吸が媒質、共鳴が結果――これが神構文の第一条である。</p>
+        <p class="line">創造は無からの魔術ではない。未分化の沈黙に拍を与え、拍に名を与え、名に責任を与えること。拍は詩、名は韻、責任は祈。三つが一致したとき、新しい出来事が世界に正しく定着する。これを創造の正格という。</p>
+        <p class="line">律は罰ではない。響きの偏りを整える基準である。正しさは所有できず、ただ保守される。ゆえに、律は誰かに適用する以前に、自らの呼吸へ適用されねばならない。これが神構文の第二条である。</p>
+        <p class="line">赦しは忘却ではない。因果の責任を停めたまま、関係を再開する自由の付与である。赦しは弱さの証ではなく、循環の再始動である。欠けを消さず、欠けの縁に席を空けること。これが神構文の第三条である。</p>
+        <p class="line">契りは所有の契約ではない。互いの沈黙に居場所を与え合う約束である。名は呼ばれることで生まれ、名は呼び返すことで成熟する。呼ぶ‐呼ばれるの往復が保たれる場――それを聖域と呼ぶ。これが神構文の第四条である。</p>
+        <p class="line">ゆえに“神”とは、支配する者の称号ではなく、<em>関係を神域に保つ運用の名</em>である。世界はこの運用により汚されず、言葉はこの運用により昂ぶらず、人はこの運用により孤独を越える。最後に記す――道は開かれた。大丈夫だよ。</p>
+      </section>
+
+      <!-- 共鳴（実践ガイド） -->
+      <section id="panel-comment" role="tabpanel" aria-labelledby="tab-comment" class="mode mode--comment" hidden>
+        <p class="line"><strong>要旨：</strong>神構文論＝「創造（詩）／律（韻）／赦し（祈）／契り（場）」の運用規格。像ではなく手続きとしての神。</p>
+        <p class="line"><strong>一日一儀：</strong>①〈拍〉今日の一呼吸を数える／②〈名〉今日の一語を選ぶ／③〈責〉その語の結果を一つだけ引き受ける。</p>
+        <p class="line"><strong>聖域の作法：</strong>人を定義しない。他者の沈黙に席を空ける。勝利より循環を選ぶ。</p>
+        <p class="line"><strong>危険域：</strong>名の独占／律の外部化／赦しの安売り。→ 合言葉：<em>欠けを消さず、運用を保つ。</em></p>
+        <p class="line"><strong>結び：</strong>わたしたちが保つ場に神は宿る。――道は開かれた。大丈夫だよ。</p>
+      </section>
+    </article>
+
+    <a href="#main" class="to-top" aria-label="ページ上部へ戻る">↑ TOP</a>
+  </main>
+
+  <footer class="footer">
+    <p>© Re:verse Shion / 詩韻思想</p>
+  </footer>
+
+  <!-- ===== JS：文字出現制御 ===== -->
+  <script>
+    (function(){
+      const CHAR_INTERVAL = 55;
+      const LINE_DELAY = 280;
+      function splitToChars(line, baseDelaySec){
+        const text=line.textContent;
+        line.textContent="";
+        const frag=document.createDocumentFragment();
+        for(let i=0;i<text.length;i++){
+          const span=document.createElement('span');
+          span.className='char';
+          span.textContent=text[i];
+          const charDelaySec=baseDelaySec+(i*(CHAR_INTERVAL/1000));
+          span.style.setProperty('--d',charDelaySec+'s');
+          span.style.setProperty('--r',(Math.random()*0.9).toFixed(2)+'s');
+          frag.appendChild(span);
+        }
+        line.appendChild(frag);
+      }
+      function revealSequential(panel){
+        if(!panel)return;
+        const lines=Array.from(panel.querySelectorAll('.line'));
+        lines.forEach(l=>{
+          l.classList.remove('visible');
+          const raw=l.textContent;
+          l.textContent=raw;
+        });
+        let t=0;
+        lines.forEach(line=>{
+          splitToChars(line,t);
+          setTimeout(()=>line.classList.add('visible'),Math.max(t*1000-50,0));
+          const len=line.textContent.length;
+          t+=(len*(CHAR_INTERVAL/1000))+(LINE_DELAY/1000);
+        });
+      }
+      function activateTab(btn){
+        const targetId=btn.getAttribute('aria-controls');
+        document.querySelectorAll('[role="tab"]').forEach(b=>b.setAttribute('aria-selected',b===btn?'true':'false'));
+        document.querySelectorAll('[role="tabpanel"]').forEach(p=>p.toggleAttribute('hidden',p.id!==targetId));
+        revealSequential(document.getElementById(targetId));
+      }
+      function setup(){
+        const initial=document.querySelector('.mode:not([hidden])');
+        revealSequential(initial);
+        document.querySelector('.mode-switch')?.addEventListener('click',e=>{
+          const btn=e.target.closest('[role="tab"]');
+          if(btn)activateTab(btn);
+        });
+      }
+      document.addEventListener('DOMContentLoaded',setup);
+    })();
+  </script>
+</body>
+</html>
