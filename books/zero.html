@@ -19,47 +19,42 @@
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/book.css">
 
-  <!-- ===== Page hotfix ===== -->
+  <!-- --- Page-only fixes (強制上書き) --- -->
   <style>
-    /* ヘッダーを常時追尾（外部CSSに左右されないよう強制） */
+    /* 常時追尾＆消えない */
     .header{
-      position: fixed !important;
-      top: 0; left: 0; right: 0;
-      z-index: 9999;
-      transform: translateY(0) !important;
-      opacity: 1 !important;
+      position: fixed !important; top:0;left:0;right:0; z-index:9999;
+      transform: translateY(0) !important; opacity:1 !important;
     }
-    /* 本文との被り回避 */
-    body{ padding-top: calc(var(--header-h, 64px) + env(safe-area-inset-top, 0px)) !important; }
+    body{ padding-top: calc(var(--header-h,64px) + env(safe-area-inset-top,0px)) !important; }
 
-    /* タイトルの変な改行を抑制 */
+    /* タイトルの不自然改行を抑制 */
     .nowrap{ white-space: nowrap; }
-    h1.book-title{ word-break: keep-all; overflow-wrap: anywhere; }
+    h1.book-title{ word-break: keep-all; }
 
-    /* 初期ピンぼけを完全停止（このページだけで） */
+    /* ぼかし・シャドウ無効化（このページ限定） */
     .book-wrapper, .book-wrapper *{
-      filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
-      text-shadow: none !important;
+      filter:none !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
     }
 
-    /* 行アニメーション（blur不使用） */
+    /* 1行ずつ表示のための初期状態（強制） */
     .mode .line{
-      opacity: 0 !important;
+      opacity:0 !important;
+      visibility:hidden !important;
       transform: translateY(6px);
-      transition: opacity .45s ease, transform .45s ease;
+      transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
       will-change: opacity, transform;
     }
     .mode .line.is-show{
-      opacity: 1 !important;
+      opacity:1 !important;
+      visibility:visible !important;
       transform: translateY(0);
+      transition-delay: 0s;
     }
-    /* 隠れパネルのチラ見え防止 */
-    .mode[hidden] .line{ opacity: 0 !important; transform: translateY(6px) !important; }
+    .mode[hidden] .line{ opacity:0 !important; visibility:hidden !important; transform: translateY(6px) !important; }
 
-    /* タブの見た目微調整（任意） */
-    .mode-switch{ display:flex; gap:14px; justify-content:flex-start; margin:12px 0 16px; }
+    /* タブ見た目（軽微調整） */
+    .mode-switch{ display:flex; gap:14px; margin:12px 0 16px; }
     .mode-switch [role="tab"]{
       min-height:40px; padding:8px 16px; border-radius:999px; border:1px solid rgba(126,102,255,.25);
       background:#fff; font:500 14px/1 "Zen Kaku Gothic New",system-ui,sans-serif;
@@ -70,7 +65,7 @@
 
 <body>
   <!-- ===== Header ===== -->
-  <header class="header" role="banner" data-behavior="pin">
+  <header class="header" role="banner">
     <div class="header-inner">
       <a href="/" class="logo">Re:verse Shion</a>
       <nav class="nav-main" role="navigation" aria-label="メインナビゲーション">
@@ -130,90 +125,73 @@
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
-  <!-- ===== Page JS（タブ＋行順次表示＋ヘッダー固定挙動） ===== -->
+  <!-- ===== Page JS：1行ずつ順次表示＋タブ切替＋ヘッダー維持 ===== -->
   <script>
     (function(){
-      const STAGGER = 140; // 1行ごとの遅延(ms)
+      const INTERVAL = 140; // 1行ごとの表示間隔(ms)
 
-      /* ===== 行を必ず順番に表示 ===== */
-      function sequentialReveal(panel){
+      function revealSequential(panel){
         if(!panel) return;
         const lines = Array.from(panel.querySelectorAll('.line'));
-        // まず全行を非表示リセット（他CSSの影響を上書き）
+        // まず全行を非表示に固定（他CSSの上書き対策）
         lines.forEach(el => {
           el.classList.remove('is-show');
           el.style.opacity = '0';
+          el.style.visibility = 'hidden';
           el.style.transform = 'translateY(6px)';
         });
 
         let i = 0;
-        const tick = () => {
-          if(i >= lines.length) return;
-          lines[i].classList.add('is-show');
-          lines[i].style.opacity = '';
-          lines[i].style.transform = '';
-          i++;
-          setTimeout(tick, STAGGER);
-        };
-        // レイアウト確定後に開始
-        requestAnimationFrame(() => setTimeout(tick, 30));
+        const timer = setInterval(() => {
+          if(i >= lines.length){ clearInterval(timer); return; }
+          const el = lines[i++];
+          el.classList.add('is-show');
+          el.style.opacity = '';      // inline解除→CSSに委ねる
+          el.style.visibility = '';   // 同上
+          el.style.transform = '';
+        }, INTERVAL);
       }
 
-      /* ===== タブ切替（外部JS不要） ===== */
       function activateTab(btn){
-        const tablist = btn.closest('[role="tablist"]');
-        const buttons = Array.from(tablist.querySelectorAll('[role="tab"]'));
-        buttons.forEach(b => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
-
-        const target = btn.getAttribute('aria-controls');
-        const panels = document.querySelectorAll('[role="tabpanel"]');
-        panels.forEach(p => {
-          const show = (p.id === target);
-          p.toggleAttribute('hidden', !show);
-          if(show) sequentialReveal(p);
-        });
-        // スクロール位置が大きくズレた場合に備えて少しだけ上へ
-        window.scrollTo({ top: document.querySelector('.mode-switch').offsetTop - 20, behavior: 'smooth' });
+        const targetId = btn.getAttribute('aria-controls');
+        document.querySelectorAll('[role="tab"]').forEach(b =>
+          b.setAttribute('aria-selected', b === btn ? 'true' : 'false')
+        );
+        document.querySelectorAll('[role="tabpanel"]').forEach(p =>
+          p.toggleAttribute('hidden', p.id !== targetId)
+        );
+        revealSequential(document.getElementById(targetId));
+        // タブ直下へ少しスクロール
+        const y = document.querySelector('.mode-switch').getBoundingClientRect().top + window.pageYOffset - 16;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
 
-      /* ===== ヘッダー：スクロール中は表示／タップ中は消えない ===== */
       function setupHeader(){
         const header = document.querySelector('.header');
         if(!header) return;
-
-        let scrolling;               // スクロール中フラグ
-        let pointerPinned = false;   // ユーザーがタップ中
-
-        // タップ中は絶対に隠さない
-        header.addEventListener('pointerdown', () => { pointerPinned = true; });
-        window.addEventListener('pointerup',   () => { pointerPinned = false; });
-
-        // スクロール中は常に表示、停止しても隠さない（＝常時追尾）
+        let pointerDown = false;
+        header.addEventListener('pointerdown', () => { pointerDown = true; });
+        window.addEventListener('pointerup',   () => { pointerDown = false; });
         window.addEventListener('scroll', () => {
-          if(pointerPinned) return;
+          if(pointerDown) return; // タップ中は何もしない=常に表示
           header.style.transform = 'translateY(0)';
           header.style.opacity = '1';
-          clearTimeout(scrolling);
-          scrolling = setTimeout(() => {
-            // 何もしない＝固定表示のまま
-          }, 120);
-        }, { passive: true });
+        }, { passive:true });
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-        // 初期表示：可視パネルを順次表示
-        sequentialReveal(document.querySelector('.mode:not([hidden])'));
+        // 初回：可視パネルのみ順次表示
+        revealSequential(document.querySelector('.mode:not([hidden])'));
         // タブ
         document.querySelector('.mode-switch')?.addEventListener('click', e => {
           const btn = e.target.closest('[role="tab"]');
           if(btn) activateTab(btn);
         });
-        // ヘッダー挙動
+        // ヘッダー維持
         setupHeader();
 
-        // アクセシビリティ：reduce motion の場合は即時表示
-        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-        if(mq.matches){
+        // 動きを抑える利用者設定に配慮
+        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
           document.querySelectorAll('.line').forEach(el => el.classList.add('is-show'));
         }
       });
