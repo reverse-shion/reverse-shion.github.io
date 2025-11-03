@@ -118,6 +118,21 @@
       background-size: cover; background-position: center;
     }
   </style>
+
+  <style>
+/* ヘッダー安定化：他スクリプトの .hide を無効化 */
+header.header{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: transform .24s ease, opacity .24s ease;
+  will-change: transform, opacity;
+}
+header.header.hide{ transform:none !important; opacity:1 !important; }
+header.header.is-visible{ opacity:1; pointer-events:auto; }
+/* ヘッダー操作中の安全フラグ（見た目変えたい時はここに追記） */
+header.header[data-hold="true"]{ /* 例：box-shadow など */ }
+</style>
 </head>
 <body>
 
@@ -777,6 +792,88 @@ btnReset.addEventListener('click', resetUI);
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
 </svg>
+
+  <script>
+/*
+  Header Keeper v1.0
+  要件：
+  1) スクロール中は常に表示（非表示にしない）
+  2) ヘッダーをタップ/操作中は絶対に消えない
+  3) スクロール停止後のみ、一定時間経過で自動的に隠す（任意）
+     → デフォルトは「隠さない」。隠したい場合は AUTO_HIDE_MS を 0 以外に設定
+*/
+(() => {
+  const header = document.querySelector('header.header');
+  if (!header) return;
+
+  // ==== 設定値 ====
+  const AUTO_HIDE_MS = 0; // 0 = 自動非表示なし。例：1500 にすると停止1.5s後に隠す
+  const SCROLL_THROTTLE_MS = 50;
+
+  // ==== 内部状態 ====
+  let hovering = false;     // マウスがヘッダー上
+  let holding  = false;     // タップ/クリック中（操作中）
+  let hideTimer = null;
+  let lastScrollY = window.scrollY;
+  let lastTick = 0;
+
+  // 既存スクリプトが .hide を付けても効かないように CSS 側で無効化済み
+  // ここでも保険として定期的に除去
+  const neutralizeHideClass = () => header.classList.remove('hide');
+
+  const showHeader = () => {
+    header.classList.add('is-visible');
+    neutralizeHideClass();
+  };
+
+  const scheduleAutoHide = () => {
+    if (AUTO_HIDE_MS <= 0) return;              // 自動非表示を使わない
+    if (hovering || holding) return;            // 操作/ホバー中は隠さない
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (!hovering && !holding) {
+        header.classList.remove('is-visible');  // ここで初めて隠す
+      }
+    }, AUTO_HIDE_MS);
+  };
+
+  // ==== スクロール：動いている間は常に表示 ====
+  const onScroll = () => {
+    const now = performance.now();
+    if (now - lastTick < SCROLL_THROTTLE_MS) return;
+    lastTick = now;
+
+    // どの方向でもスクロール中は表示を強制
+    showHeader();
+    // スクロール停止後の挙動（任意）
+    scheduleAutoHide();
+
+    lastScrollY = window.scrollY;
+  };
+
+  // ==== ヘッダー上のホバー / タップ（操作中は消えない） ====
+  const holdOn  = () => { holding = true;  header.dataset.hold = "true";  showHeader(); clearTimeout(hideTimer); };
+  const holdOff = () => { holding = false; header.dataset.hold = "false"; scheduleAutoHide(); };
+
+  header.addEventListener('mouseenter', () => { hovering = true;  showHeader(); clearTimeout(hideTimer); });
+  header.addEventListener('mouseleave', () => { hovering = false; scheduleAutoHide(); });
+
+  // マウス操作
+  header.addEventListener('mousedown', holdOn);
+  window.addEventListener('mouseup', holdOff);
+
+  // タッチ操作（iOS/Android）
+  header.addEventListener('touchstart', holdOn, {passive:true});
+  window.addEventListener('touchend', holdOff, {passive:true});
+  window.addEventListener('touchcancel', holdOff, {passive:true});
+
+  // スクロール監視
+  window.addEventListener('scroll', onScroll, { passive:true });
+
+  // 初期状態：表示して開始
+  showHeader();
+})();
+</script>
 
 </body>
 </html>
