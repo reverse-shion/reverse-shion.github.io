@@ -425,11 +425,13 @@ main, section, footer, header {
 }
 /* ヒーローの見えない層が下をブロックしないように */
 .hero__media,
+/* 文字可読性をもう一段階UP（明るいポスター対策） */
 .hero__veil{
-  pointer-events: none !important;
-  z-index: 0 !important;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,.62) 60%, rgba(0,0,0,.74) 100%),
+    radial-gradient(60% 60% at 50% 45%, rgba(255,255,255,.10), rgba(255,255,255,0) 60%);
 }
-.hero > .wrap{
+.wrap{
   position: relative;
   z-index: 1;
 }
@@ -467,4 +469,105 @@ main, section, footer, header {
   transform: translateY(-3px);
   box-shadow: 0 0 25px rgba(255,215,111,0.6);
   filter: brightness(1.1);
+}
+
+/* ===== Hero CTA – Celestial Glass Buttons ===== */
+.cta-grid{
+  --cta-h: 56px;
+  --cta-r: 14px;
+  --cta-gap: 12px;
+  width: min(94vw, 720px);
+  margin: 20px auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* モバイルは 2×2 */
+  gap: var(--cta-gap);
+}
+
+@media (min-width: 900px){
+  .cta-grid{
+    grid-template-columns: repeat(4, 1fr); /* PCは4横並び */
+    width: min(92vw, 880px);
+  }
+}
+
+.cta{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6em;
+  height: var(--cta-h);
+  border-radius: var(--cta-r);
+  padding: 0 18px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: #fff;
+  text-align: center;
+  /* 神秘的ガラス：薄い暗幕＋縁光＋ブラー */
+  background: linear-gradient(180deg, rgba(10,10,20,.42), rgba(10,10,20,.58));
+  border: 1px solid rgba(255,215,111,.46);
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.25),
+    0 0 0 1px rgba(255,255,255,.06) inset,
+    0 0 24px rgba(174,138,255,.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+.cta:hover{
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 36px rgba(0,0,0,.32),
+    0 0 0 1px rgba(255,255,255,.1) inset,
+    0 0 34px rgba(174,138,255,.28);
+}
+
+.cta:active{ transform: translateY(0) scale(.995) }
+
+/* プライマリだけ黄金×紫のやわらかグラデ */
+.cta--primary{
+  background: linear-gradient(135deg, #ffd76f 0%, #caa2ff 55%, #7e66ff 100%);
+  color: #2a1030;
+  border-color: rgba(255,215,111,.8);
+  box-shadow:
+    0 14px 36px rgba(255,215,111,.45),
+    0 0 0 1px rgba(255,255,255,.16) inset;
+}
+.cta--primary:hover{
+  box-shadow:
+    0 18px 44px rgba(255,215,111,.6),
+    0 0 0 1px rgba(255,255,255,.2) inset;
+}
+
+/* アイコンは data-ico から統一描画（フォント依存回避） */
+.cta::before{
+  content: attr(data-ico);
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  font-size: 16px;
+  line-height: 1;
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.26);
+  box-shadow: 0 0 10px rgba(255,255,255,.12) inset;
+}
+
+/* テキストの折返し最適化＆はみだし防止 */
+.cta span{
+  display: inline-block;
+  max-width: 100%;
+  text-wrap: balance;
+  white-space: nowrap;
+}
+
+/* ダークモードでの調整 */
+@media (prefers-color-scheme: dark){
+  .cta{
+    background: linear-gradient(180deg, rgba(8,8,14,.5), rgba(8,8,14,.72));
+    color:#eef;
+  }
+  .cta--primary{ color:#1c0e22 }
 }
