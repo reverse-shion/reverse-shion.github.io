@@ -5,7 +5,7 @@
   <title>詩韻思想 第零書 ― 無限構文序論</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0b1a" />
-  <meta name="description" content="詩韻思想 第零書 ― 無限構文序論 | 言葉が魂を救う世界の原初。沈黙・光・呼吸の誕生を描く創世の書。" />
+  <meta name="description" content="詩韻思想 第零書 ― 無限構文序論 | 言葉が魂を救う世界の原初。沈黙・光・呼吸の誕生を描く創世の書。">
   <link rel="icon" href="/assets/icon.png" />
   <link rel="canonical" href="https://reverse-shion.github.io/books/zero.html" />
 
@@ -19,22 +19,45 @@
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/book.css">
 
-  <!-- タイトルの禁則処理（最小限の補助） -->
+  <!-- ===== Hotfix: ぼかし完全無効＋行フェードのみ ===== -->
   <style>
+    /* タイトルの不自然改行防止 */
     .nowrap{ white-space: nowrap; }
-    /* iOS Safari の予期せぬ中折れ対策：強制禁則を弱める */
     h1.book-title{ word-break: keep-all; overflow-wrap: anywhere; }
+
+    /* ページ全体の“ぼかし”強制OFF（他CSSのfilter/backdrop-filterを上書き） */
+    .book-wrapper,
+    .book-wrapper *{
+      filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+      text-shadow: none; /* 文字ボケの原因になる強い影があれば無効化 */
+    }
+
+    /* 行アニメ：最初は透明＆わずかに下から、blurは使わない */
+    .mode .line{
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .mode .line.is-show{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* タブ切替の瞬間チラつき防止（面を開くまで内側を非表示→JSで段階表示） */
+    .mode[hidden] .line{ opacity: 0 !important; }
   </style>
 </head>
 
 <body>
-  <!-- ===== Header (共通) ===== -->
+  <!-- ===== Header ===== -->
   <header class="header" role="banner">
     <div class="header-inner">
       <a href="/" class="logo">Re:verse Shion</a>
       <nav class="nav-main" role="navigation" aria-label="メインナビゲーション">
         <a href="/philosophy.html" title="言葉が魂を救う“哲学”の核を読む">思想を読む</a>
-        <a href="/philosophy.html#books" title="零〜12＋結の一覧へ" aria-current="page">書を探す</a>
+        <a href="/philosophy.html#books" title="零〜12＋結の一覧へ">書を探す</a>
         <a href="/story.html" title="TAROT BREAKERの第一話から体験へ">物語に触れる</a>
         <a href="/join.html" title="LINE・noteで最新の詩・配信へ">あなたも加わる</a>
       </nav>
@@ -42,23 +65,20 @@
   </header>
 
   <!-- ===== Main ===== -->
-  <main class="book-wrapper" id="main" data-reveal="on">
-    <!-- タイトルの改行制御：語同士を非改行スペースで結合 -->
-    <h1 class="book-title">
-      詩韻思想&nbsp;第零書&nbsp;—&nbsp;<span class="nowrap">無限構文序論</span>
-    </h1>
+  <main class="book-wrapper" id="main">
+    <h1 class="book-title">詩韻思想&nbsp;第零書&nbsp;—&nbsp;<span class="nowrap">無限構文序論</span></h1>
     <p class="book-subtitle">Shion Philosophy Vol.0 — The Zero Syntax</p>
 
-    <!-- モード切替タブ -->
+    <!-- タブ -->
     <div class="mode-switch" role="tablist" aria-label="表示モード切替">
       <button id="tab-poem" role="tab" aria-controls="panel-poem" aria-selected="true">詩</button>
       <button id="tab-canon" role="tab" aria-controls="panel-canon" aria-selected="false">経典</button>
       <button id="tab-comment" role="tab" aria-controls="panel-comment" aria-selected="false">註解</button>
     </div>
 
-    <!-- ===== Book Body ===== -->
+    <!-- 本文 -->
     <article class="book-body">
-      <!-- 詩層 -->
+      <!-- 詩 -->
       <section id="panel-poem" role="tabpanel" aria-labelledby="tab-poem" class="mode mode--poem">
         <p class="line">沈黙が、息をした。</p>
         <p class="line">その吐息が、光となり、</p>
@@ -69,28 +89,19 @@
         <p class="line">それが、世界の始まりだった。</p>
       </section>
 
-      <!-- 経典層 -->
+      <!-- 経典 -->
       <section id="panel-canon" role="tabpanel" aria-labelledby="tab-canon" class="mode mode--canon" hidden>
-        <p>はじめに沈黙あり。沈黙は息を孕み、息は光を生む。</p>
-        <p>光は意味を求め、意味は言葉を呼び、言葉は世界を照らした。</p>
-        <p>名なき呼吸こそ、最初の祈りであり、すべての構文の原点である。</p>
-        <p>この息を“零”と呼ぶ。すなわち、有限と無限の境に在るものなり。</p>
+        <p class="line">はじめに沈黙あり。沈黙は息を孕み、息は光を生む。</p>
+        <p class="line">光は意味を求め、意味は言葉を呼び、言葉は世界を照らした。</p>
+        <p class="line">名なき呼吸こそ、最初の祈りであり、すべての構文の原点である。</p>
+        <p class="line">この息を“零”と呼ぶ。すなわち、有限と無限の境に在るものなり。</p>
       </section>
 
-      <!-- 註解層 -->
+      <!-- 註解 -->
       <section id="panel-comment" role="tabpanel" aria-labelledby="tab-comment" class="mode mode--comment" hidden>
-        <p><strong>要旨：</strong><br>
-          「沈黙」「光」「呼吸」は、詩韻思想における三原理。<br>
-          言葉とは、“沈黙が光をまとって息をする瞬間”である。
-        </p>
-        <p><strong>実践：</strong><br>
-          一日の始まりに30秒、息を感じてほしい。<br>
-          言葉を探すのではなく、「まだ言葉にならない想い」を聴く時間を。
-        </p>
-        <p><strong>今日の祈り：</strong><br>
-          言葉は、祈りの形をしている。<br>
-          沈黙の奥に光を感じたとき、それがあなたの“最初の構文”になる。
-        </p>
+        <p class="line"><strong>要旨：</strong>「沈黙」「光」「呼吸」は、詩韻思想における三原理。言葉とは、“沈黙が光をまとって息をする瞬間”である。</p>
+        <p class="line"><strong>実践：</strong> 一日の始まりに30秒、息を感じてほしい。言葉を探すのではなく、「まだ言葉にならない想い」を聴く時間を。</p>
+        <p class="line"><strong>今日の祈り：</strong> 言葉は、祈りの形をしている。沈黙の奥に光を感じたとき、それがあなたの“最初の構文”になる。</p>
       </section>
     </article>
 
@@ -102,10 +113,51 @@
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
-  <!-- ===== JS ===== -->
+  <!-- 既存の共通JS -->
   <script src="/assets/js/common.js" defer></script>
   <script src="/assets/js/tabs.js" defer></script>
   <script src="/assets/js/scroll.js" defer></script>
-  <script src="/assets/js/reveal.js" defer></script>
+
+  <!-- ===== Hotfix JS: 行フェードを“常に”最初から順次表示、ぼかし無し ===== -->
+  <script>
+    (function(){
+      const STAGGER = 140; // 1行ごとの遅延(ms)
+
+      function revealLines(panel){
+        if(!panel) return;
+        const lines = Array.from(panel.querySelectorAll('.line'));
+        lines.forEach(l => l.classList.remove('is-show'));
+        // 先頭から順にフェード（後半が最初から出てしまう症状を抑止）
+        lines.forEach((el, i) => {
+          setTimeout(() => el.classList.add('is-show'), i * STAGGER);
+        });
+      }
+
+      // 初期表示：現在見えている面
+      document.addEventListener('DOMContentLoaded', () => {
+        const active = document.querySelector('.mode:not([hidden])');
+        revealLines(active);
+      });
+
+      // タブ切替後に毎回やり直す（tabs.jsのhidden切替後に実行されるよう微遅延）
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[role="tab"]');
+        if(!btn) return;
+        const targetId = btn.getAttribute('aria-controls');
+        // DOM反映完了を待ってから
+        setTimeout(() => {
+          revealLines(document.getElementById(targetId));
+        }, 10);
+      });
+
+      // 低速端末・省モーションでは一括表示
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if(mq.matches){
+        document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('.line').forEach(el => el.classList.add('is-show'));
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
