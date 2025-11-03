@@ -23,7 +23,7 @@ body{
   padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
 }
 
-/* ===== 固定ヘッダー（常時表示。スクロールで隠したい場合は .hide を付与） ===== */
+/* ===== 固定ヘッダー（JSで可視/不可視を切替） ===== */
 .header{
   position: fixed; top: 0; left: 0; right: 0;
   height: var(--header-h); z-index: 999;
@@ -33,15 +33,31 @@ body{
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow);
   transition: transform .35s ease, opacity .35s ease, background .3s ease;
+  transform: translateY(0); opacity: 1; /* 初期は表示 */
 }
 @supports not ((backdrop-filter: blur(12px))){
   .header{ background: var(--glass-strong); }
 }
 
-/* スクロールで隠す用（任意・JSで .hide を付与） */
+/* ======== JSフック（common.jsと一致） ======== */
+/* 表示中（スクロール中も含む） */
+.header.is-visible{ transform: translateY(0); opacity: 1; }
+/* 停止後に自動で隠す時に付与 */
+.header.is-hidden{ transform: translateY(-100%); opacity: 0; }
+/* スクロール中の視覚強調（お好みで微グロー） */
+.header.is-scrolling{
+  box-shadow: 0 6px 18px rgba(10,0,60,.08);
+}
+/* タップ/ホールド中は一切隠さない＆トランジション抑止 */
+.header.is-hold{ transition: none; transform: translateY(0); opacity: 1; }
+
+/* 旧クラス互換（.hide→.is-hiddenにマッピング） */
 .header.hide{ transform: translateY(-100%); opacity: 0; }
-/* 触れている/フォーカス中は絶対に消えない */
-.header:hover, .header:focus-within{ transform: none; opacity: 1; }
+
+/* 触れている/フォーカス中は絶対に消えない（念押し） */
+.header:hover, .header:focus-within{
+  transform: translateY(0); opacity: 1;
+}
 
 /* ===== レイアウト ===== */
 .header-inner{
@@ -117,6 +133,11 @@ body{
     white-space: nowrap;
   }
   .nav-main a::after{ display: none; }
+  /* 現在地の視認性（ピルの色で判別） */
+  .nav-main a[aria-current="page"], .nav-main a.is-active{
+    background: linear-gradient(180deg, #fff, #f9f6ff);
+    border-color: rgba(126,102,255,.55);
+  }
 }
 
 /* ===== スマホ（≤420px）：1行横スクロールの丸ピル ===== */
@@ -138,6 +159,12 @@ body{
     box-shadow: 0 2px 6px rgba(20,10,60,.06);
   }
   .nav-main a::after{ display: none; } /* 下線アニメはSPでオフ */
+
+  /* 現在地の視認性アップ（ピル強調） */
+  .nav-main a[aria-current="page"], .nav-main a.is-active{
+    background: linear-gradient(180deg, #fff, #f6f0ff);
+    border-color: rgba(126,102,255,.55);
+  }
 }
 
 /* ===== 動きを抑えたい利用者配慮 ===== */
