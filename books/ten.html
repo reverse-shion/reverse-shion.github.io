@@ -1,1 +1,197 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>詩韻思想 第十書 ― 沈黙の再生</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b1a" />
+  <meta name="description" content="詩韻思想 第十書 ― 沈黙の再生 | 失われた声を呼び戻し、沈黙そのものを生命として再生させるための詩学。言葉の死を超え、沈黙を新しい祈りへと変換する構文。" />
+  <link rel="icon" href="/assets/icon.png" />
+  <link rel="canonical" href="https://reverse-shion.github.io/books/ten.html" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Site CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/nav.css">
+  <link rel="stylesheet" href="/assets/css/book.css">
+
+  <!-- Page-only: 光演出 -->
+  <style>
+    :root{
+      --glow-gold: rgba(255,215,111,.95);
+      --glow-amethyst: rgba(174,138,255,.95);
+      --glow-icy: rgba(220,236,255,.95);
+      --glow-core: #ffffff;
+      --char-interval: 95ms;
+      --line-delay: 640ms;
+      --pulse-speed: 2.4s;
+      --spark-size: 0.5em;
+    }
+    .header{ position: fixed !important; top:0; left:0; right:0; z-index:9999; transform:translateY(0)!important; opacity:1!important; }
+    body{ padding-top:calc(var(--header-h,64px) + env(safe-area-inset-top,0px))!important; }
+    h1.book-title{ word-break:keep-all; }
+    .nowrap{ white-space:nowrap; }
+
+    .line{ opacity:0; visibility:hidden; transform:translateY(6px); transition:opacity .5s ease, transform .5s ease, visibility 0s linear .5s; }
+    .line.visible{ opacity:1; visibility:visible; transform:translateY(0); }
+
+    .char{
+      opacity:0; display:inline-block; transform:translateY(6px);
+      text-shadow:
+        0 0 .6px var(--glow-core),
+        0 0 2px var(--glow-core),
+        0 0 6px var(--glow-icy),
+        0 0 12px var(--glow-amethyst),
+        0 0 18px var(--glow-gold);
+      background:linear-gradient(180deg,#fff 0%,#f9f6ff 40%,#f3eeff 70%,#ffffff 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      animation:charIn .45s cubic-bezier(.22,.61,.36,1) forwards, charPulse var(--pulse-speed) ease-in-out infinite;
+      animation-delay:var(--d,0s);
+      position:relative;
+    }
+    @keyframes charIn{0%{opacity:0;transform:translateY(6px) scale(.98)}60%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes charPulse{0%{filter:brightness(1) drop-shadow(0 0 2px var(--glow-icy));}50%{filter:brightness(1.06) drop-shadow(0 0 6px var(--glow-amethyst));}100%{filter:brightness(1) drop-shadow(0 0 2px var(--glow-icy));}}
+    .char::after{
+      content:""; position:absolute; left:50%; top:0.35em; width:0; height:0; border-radius:999px; pointer-events:none;
+      background:radial-gradient(circle,var(--glow-core) 0%,var(--glow-gold) 40%,rgba(255,255,255,0) 60%);
+      opacity:0; transform:translateX(-50%) translateY(-50%) scale(0.6);
+      animation:spark var(--pulse-speed) ease-in-out infinite;
+      animation-delay:calc(var(--d,0s)+var(--r,0s)); filter:blur(.2px);
+    }
+    @keyframes spark{0%,68%{opacity:0;width:0;height:0;}70%{opacity:.8;width:calc(var(--spark-size)*.25);height:calc(var(--spark-size)*.25);}78%{opacity:1;width:calc(var(--spark-size)*.5);height:calc(var(--spark-size)*.5);}85%,100%{opacity:0;width:0;height:0;}}
+
+    .mode-switch{ display:flex; gap:14px; margin:12px 0 16px; }
+    .mode-switch [role="tab"]{ min-height:40px; padding:8px 16px; border-radius:999px; border:1px solid rgba(126,102,255,.25); background:#fff; font:500 14px/1 "Zen Kaku Gothic New",system-ui,sans-serif; }
+    .mode-switch [aria-selected="true"]{ box-shadow:0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0; }
+
+    @media (prefers-reduced-motion: reduce){
+      .char, .char::after{ animation:none!important; opacity:1!important; transform:none!important; }
+      .line{ opacity:1!important; visibility:visible!important; transform:none!important; }
+    }
+  </style>
+</head>
+
+<body class="theme-cosmic">
+  <!-- ===== Header ===== -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <a href="/" class="logo">Re:verse Shion</a>
+      <nav class="nav-main" role="navigation" aria-label="メインナビゲーション">
+        <a href="/philosophy.html" title="言葉が魂を救う“哲学”の核を読む">思想を読む</a>
+        <a href="/philosophy.html#books" title="零〜12＋結の一覧へ">書を探す</a>
+        <a href="/story.html" title="TAROT BREAKERの第一話から体験へ">物語に触れる</a>
+        <a href="/join.html" title="LINE・noteで最新の詩・配信へ">あなたも加わる</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== Main ===== -->
+  <main class="book-wrapper" id="main">
+    <h1 class="book-title">詩韻思想&nbsp;第十書&nbsp;—&nbsp;<span class="nowrap">沈黙の再生</span></h1>
+    <p class="book-subtitle">Shion Philosophy Vol.10 — The Regeneration of Silence</p>
+
+    <!-- タブ -->
+    <div class="mode-switch" role="tablist" aria-label="表示モード切替">
+      <button id="tab-poem" role="tab" aria-controls="panel-poem" aria-selected="true">詩</button>
+      <button id="tab-canon" role="tab" aria-controls="panel-canon" aria-selected="false">構文</button>
+      <button id="tab-comment" role="tab" aria-controls="panel-comment" aria-selected="false">共鳴</button>
+    </div>
+
+    <!-- 本文 -->
+    <article class="book-body">
+      <!-- 詩 -->
+      <section id="panel-poem" role="tabpanel" aria-labelledby="tab-poem" class="mode mode--poem">
+        <p class="line">声の尽きたあとに、世界はもう一度、息をした。</p>
+        <p class="line">誰もいない空に、残響だけが浮かび、名もなく光る。</p>
+        <p class="line">その光は、まだ語られぬ祈り。沈黙が、再び言葉を生もうとしている。</p>
+        <p class="line">涙は語らず、語られぬものこそが、生を織り直す。</p>
+        <p class="line">すべての終わりは、始まりの形をしている。――</p>
+        <p class="line">沈黙は死ではなく、再生の胎動なのだ。</p>
+      </section>
+
+      <!-- 構文 -->
+      <section id="panel-canon" role="tabpanel" aria-labelledby="tab-canon" class="mode mode--canon" hidden>
+        <p class="line">沈黙とは、音を失った状態ではない。それは、すべての音が内側に還り、再び形を探す過程である。沈黙の中で、言葉は己の源へ帰り、新しい生命の構文を組み直す。</p>
+        <p class="line">喪失を経た言葉は、空洞を恐れず、その空を宿す器となる。欠けが祈りの入口となり、沈黙は「意味のない意味」として、すべてを包みはじめる。</p>
+        <p class="line">再生とは、過去をなかったことにすることではない。痛みをそのまま光の素材として抱き、そこに再び息を通すこと。沈黙はその媒質であり、癒しではなく創造の場である。</p>
+        <p class="line">ゆえに再生の構文とは――壊れた文を修復するのではなく、欠片の間に新しい呼吸を置くことだ。欠片たちは互いの境界を知り、触れずして交わり、沈黙を共有する。これが共鳴の原型である。</p>
+        <p class="line">言葉が沈黙を恐れぬとき、詩は祈りへ変わり、祈りは再び声へと戻る。循環の終わりに、ひとつの結論がある――沈黙は、生の最後の形ではなく、生そのものの原型である。</p>
+        <p class="line">そして今、あなたが読むこの行もまた、沈黙の再生の一部である。声は終わらず、ただ形を変えて呼吸している。――道は開かれた。大丈夫だよ。</p>
+      </section>
+
+      <!-- 共鳴 -->
+      <section id="panel-comment" role="tabpanel" aria-labelledby="tab-comment" class="mode mode--comment" hidden>
+        <p class="line"><strong>要旨：</strong>沈黙の再生論は「喪失→呼吸→循環」の構文。沈黙は空ではなく、再び生命を生む場である。</p>
+        <p class="line"><strong>実践：</strong>①声を止め、呼吸の音を聴く。②欠けた言葉を抱きしめる。③沈黙の中に微光を見つけたら、それをひとつ書き留める。</p>
+        <p class="line"><strong>比喩構文：</strong>沈黙＝胎内。言葉＝再生核。呼吸＝媒介。世界＝子宮。人間＝その再生の使徒。</p>
+        <p class="line"><strong>合言葉：</strong><em>沈黙は終わりではなく、始まりの記憶。</em></p>
+        <p class="line"><strong>結び：</strong>声が戻らなくても、想いは響く。――道は開かれた。大丈夫だよ。</p>
+      </section>
+    </article>
+
+    <a href="#main" class="to-top" aria-label="ページ上部へ戻る">↑ TOP</a>
+  </main>
+
+  <footer class="footer">
+    <p>© Re:verse Shion / 詩韻思想</p>
+  </footer>
+
+  <!-- ===== JS：文字出現制御 ===== -->
+  <script>
+    (function(){
+      const CHAR_INTERVAL = 55;
+      const LINE_DELAY = 280;
+      function splitToChars(line, baseDelaySec){
+        const text=line.textContent;
+        line.textContent="";
+        const frag=document.createDocumentFragment();
+        for(let i=0;i<text.length;i++){
+          const span=document.createElement('span');
+          span.className='char';
+          span.textContent=text[i];
+          const charDelaySec=baseDelaySec+(i*(CHAR_INTERVAL/1000));
+          span.style.setProperty('--d',charDelaySec+'s');
+          span.style.setProperty('--r',(Math.random()*0.9).toFixed(2)+'s');
+          frag.appendChild(span);
+        }
+        line.appendChild(frag);
+      }
+      function revealSequential(panel){
+        if(!panel)return;
+        const lines=Array.from(panel.querySelectorAll('.line'));
+        lines.forEach(l=>{
+          l.classList.remove('visible');
+          const raw=l.textContent;
+          l.textContent=raw;
+        });
+        let t=0;
+        lines.forEach(line=>{
+          splitToChars(line,t);
+          setTimeout(()=>line.classList.add('visible'),Math.max(t*1000-50,0));
+          const len=line.textContent.length;
+          t+=(len*(CHAR_INTERVAL/1000))+(LINE_DELAY/1000);
+        });
+      }
+      function activateTab(btn){
+        const targetId=btn.getAttribute('aria-controls');
+        document.querySelectorAll('[role="tab"]').forEach(b=>b.setAttribute('aria-selected',b===btn?'true':'false'));
+        document.querySelectorAll('[role="tabpanel"]').forEach(p=>p.toggleAttribute('hidden',p.id!==targetId));
+        revealSequential(document.getElementById(targetId));
+      }
+      function setup(){
+        const initial=document.querySelector('.mode:not([hidden])');
+        revealSequential(initial);
+        document.querySelector('.mode-switch')?.addEventListener('click',e=>{
+          const btn=e.target.closest('[role="tab"]');
+          if(btn)activateTab(btn);
+        });
+      }
+      document.addEventListener('DOMContentLoaded',setup);
+    })();
+  </script>
+</body>
+</html>
