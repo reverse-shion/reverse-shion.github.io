@@ -1,1 +1,228 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>詩韻思想 第一書 ― 言葉が魂を救う理由</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b1a" />
+  <meta name="description" content="詩韻思想 第一書 ― 言葉が魂を救う理由 | 言葉が人の心を救い、魂を調和へ導く“響き”の哲学。">
+  <link rel="icon" href="/assets/icon.png" />
+  <link rel="canonical" href="https://reverse-shion.github.io/books/one.html" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Site CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/nav.css">
+  <link rel="stylesheet" href="/assets/css/book.css">
+
+  <!-- Page-only: 神秘的な光演出（多層グロー＋スパークル） -->
+  <style>
+    :root{
+      --glow-gold: rgba(255,215,111,.95);
+      --glow-amethyst: rgba(174,138,255,.95);
+      --glow-icy: rgba(220,236,255,.95);
+      --glow-core: #ffffff;
+      --char-interval: 100ms;
+      --line-delay: 700ms;
+      --pulse-speed: 2.4s;
+      --spark-size: 0.5em;
+    }
+
+    .header{
+      position: fixed !important; top:0; left:0; right:0; z-index:9999;
+      transform: translateY(0) !important; opacity:1 !important;
+    }
+    body{ padding-top: calc(var(--header-h,64px) + env(safe-area-inset-top,0px)) !important; }
+
+    h1.book-title{ word-break: keep-all; }
+    .nowrap{ white-space: nowrap; }
+
+    .line{
+      opacity: 0; visibility: hidden; transform: translateY(6px);
+      transition: opacity .5s ease, transform .5s ease, visibility 0s linear .5s;
+    }
+    .line.visible{
+      opacity: 1; visibility: visible; transform: translateY(0);
+    }
+
+    .char{
+      opacity: 0; display: inline-block; transform: translateY(6px);
+      text-shadow:
+        0 0 .6px var(--glow-core),
+        0 0 2px var(--glow-core),
+        0 0 6px var(--glow-icy),
+        0 0 12px var(--glow-amethyst),
+        0 0 18px var(--glow-gold);
+      background: linear-gradient(180deg, #fff 0%, #f9f6ff 40%, #f3eeff 70%, #ffffff 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: charIn .45s cubic-bezier(.22,.61,.36,1) forwards,
+                 charPulse var(--pulse-speed) ease-in-out infinite;
+      animation-delay: var(--d, 0s);
+      position: relative;
+    }
+    @keyframes charIn{
+      0% { opacity:0; transform: translateY(6px) scale(.98) }
+      60%{ opacity:1; transform: translateY(0) scale(1.00) }
+      100%{ opacity:1; transform: translateY(0) scale(1.00) }
+    }
+    @keyframes charPulse{
+      0%  { filter: brightness(1) drop-shadow(0 0 2px var(--glow-icy)); }
+      50% { filter: brightness(1.06) drop-shadow(0 0 6px var(--glow-amethyst)); }
+      100%{ filter: brightness(1) drop-shadow(0 0 2px var(--glow-icy)); }
+    }
+    .char::after{
+      content:""; position:absolute; left:50%; top:0.35em;
+      width: 0; height: 0; border-radius: 999px; pointer-events: none;
+      background:
+        radial-gradient(circle, var(--glow-core) 0%, var(--glow-gold) 40%, rgba(255,255,255,0) 60%);
+      opacity: 0;
+      transform: translateX(-50%) translateY(-50%) scale(0.6);
+      animation: spark var(--pulse-speed) ease-in-out infinite;
+      animation-delay: calc(var(--d, 0s) + var(--r, 0s));
+      filter: blur(.2px);
+    }
+    @keyframes spark{
+      0%,68% { opacity: 0; width:0; height:0; }
+      70%    { opacity: .8; width: calc(var(--spark-size) * .25); height: calc(var(--spark-size) * .25); }
+      78%    { opacity: 1;  width: calc(var(--spark-size) * .5 ); height: calc(var(--spark-size) * .5 ); }
+      85%    { opacity: .0; width: 0; height: 0; }
+      100%   { opacity: 0; width: 0; height: 0; }
+    }
+
+    .mode-switch{ display:flex; gap:14px; margin:12px 0 16px; }
+    .mode-switch [role="tab"]{
+      min-height:40px; padding:8px 16px; border-radius:999px; border:1px solid rgba(126,102,255,.25);
+      background:#fff; font:500 14px/1 "Zen Kaku Gothic New",system-ui,sans-serif;
+    }
+    .mode-switch [aria-selected="true"]{
+      box-shadow:0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .char, .char::after{ animation: none !important; opacity: 1 !important; transform: none !important; }
+      .line{ opacity:1 !important; visibility: visible !important; transform:none !important; }
+    }
+  </style>
+</head>
+
+<body class="theme-cosmic">
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <a href="/" class="logo">Re:verse Shion</a>
+      <nav class="nav-main" role="navigation" aria-label="メインナビゲーション">
+        <a href="/philosophy.html" title="言葉が魂を救う“哲学”の核を読む">思想を読む</a>
+        <a href="/philosophy.html#books" title="零〜12＋結の一覧へ">書を探す</a>
+        <a href="/story.html" title="TAROT BREAKERの第一話から体験へ">物語に触れる</a>
+        <a href="/join.html" title="LINE・noteで最新の詩・配信へ">あなたも加わる</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="book-wrapper" id="main">
+    <h1 class="book-title">詩韻思想&nbsp;第一書&nbsp;—&nbsp;<span class="nowrap">言葉が魂を救う理由</span></h1>
+    <p class="book-subtitle">Shion Philosophy Vol.1 — The Syntax of Salvation</p>
+
+    <div class="mode-switch" role="tablist" aria-label="表示モード切替">
+      <button id="tab-poem" role="tab" aria-controls="panel-poem" aria-selected="true">詩</button>
+      <button id="tab-canon" role="tab" aria-controls="panel-canon" aria-selected="false">経典</button>
+      <button id="tab-comment" role="tab" aria-controls="panel-comment" aria-selected="false">註解</button>
+    </div>
+
+    <article class="book-body">
+      <!-- 詩 -->
+      <section id="panel-poem" role="tabpanel" aria-labelledby="tab-poem" class="mode mode--poem">
+        <p class="line">言葉は、光のかけら。</p>
+        <p class="line">痛みの中で生まれ、</p>
+        <p class="line">誰かの沈黙をやさしく照らす。</p>
+        <p class="line">語ることは、癒えること。</p>
+        <p class="line">響き合うとき、魂は呼吸を思い出す。</p>
+        <p class="line">その瞬間――</p>
+        <p class="line">“あなた”の声が、世界を救う。</p>
+      </section>
+
+      <!-- 構文 -->
+      <section id="panel-canon" role="tabpanel" aria-labelledby="tab-canon" class="mode mode--canon" hidden>
+        <p class="line">言葉は、沈黙の延長である。沈黙が形を欲したとき、それは声となる。</p>
+        <p class="line">声は、他者を求めて響き合い、共鳴の中で意味を得る。</p>
+        <p class="line">ゆえに言葉とは、孤独の癒しであり、魂の再結合の術なり。</p>
+        <p class="line">言葉が魂を救うのではなく、魂が言葉を通して自らを思い出すのである。</p>
+      </section>
+
+      <!-- 共鳴 -->
+      <section id="panel-comment" role="tabpanel" aria-labelledby="tab-comment" class="mode mode--comment" hidden>
+        <p class="line"><strong>要旨：</strong>「救い」とは外から与えられるものではなく、“響き”の中で生まれる内的覚醒。言葉はその媒介である。</p>
+        <p class="line"><strong>実践：</strong> 日々の会話の中で、ひとつでも“本当の想い”を伝えてみよう。その瞬間、あなたの世界は少し変わる。</p>
+        <p class="line"><strong>今日の祈り：</strong> あなたの言葉が、誰かの心を温める光となりますように。</p>
+      </section>
+    </article>
+
+    <a href="#main" class="to-top" aria-label="ページ上部へ戻る">↑ TOP</a>
+  </main>
+
+  <footer class="footer">
+    <p>© Re:verse Shion / 詩韻思想</p>
+  </footer>
+
+  <!-- JS：1文字ずつ＋行ごと順次 -->
+  <script>
+    (function(){
+      const CHAR_INTERVAL = 100;
+      const LINE_DELAY    = 700;
+      function splitToChars(line, baseDelaySec){
+        const text = line.textContent;
+        line.textContent = "";
+        const frag = document.createDocumentFragment();
+        for(let i=0;i<text.length;i++){
+          const span = document.createElement('span');
+          span.className = 'char';
+          span.textContent = text[i];
+          const charDelaySec = baseDelaySec + (i * (CHAR_INTERVAL/1000));
+          span.style.setProperty('--d', charDelaySec + 's');
+          span.style.setProperty('--r', (Math.random()*0.9).toFixed(2) + 's');
+          frag.appendChild(span);
+        }
+        line.appendChild(frag);
+      }
+      function revealSequential(panel){
+        if(!panel) return;
+        const lines = Array.from(panel.querySelectorAll('.line'));
+        lines.forEach(l => {
+          l.classList.remove('visible');
+          const raw = l.textContent;
+          l.textContent = raw;
+        });
+        let t = 0;
+        lines.forEach(line => {
+          splitToChars(line, t);
+          setTimeout(() => line.classList.add('visible'), t*1000 - 50);
+          const len = line.textContent.length;
+          t += (len * (CHAR_INTERVAL/1000)) + (LINE_DELAY/1000);
+        });
+      }
+      function activateTab(btn){
+        const targetId = btn.getAttribute('aria-controls');
+        document.querySelectorAll('[role="tab"]').forEach(b =>
+          b.setAttribute('aria-selected', b === btn ? 'true' : 'false')
+        );
+        document.querySelectorAll('[role="tabpanel"]').forEach(p =>
+          p.toggleAttribute('hidden', p.id !== targetId)
+        );
+        revealSequential(document.getElementById(targetId));
+      }
+      function setupTabsAndInit(){
+        const initialPanel = document.querySelector('.mode:not([hidden])');
+        revealSequential(initialPanel);
+        document.querySelector('.mode-switch')?.addEventListener('click', e => {
+          const btn = e.target.closest('[role="tab"]');
+          if(btn) activateTab(btn);
+        });
+      }
+      document.addEventListener('DOMContentLoaded', setupTabsAndInit);
+    })();
+  </script>
+</body>
+</html>
