@@ -1,14 +1,21 @@
-/* ===== scroll.js ===== */
+// /assets/js/scroll.js
+// スクロール出現（reveal）。data-reveal="off" のページでは無効化。
+
 (() => {
-  const toTop = document.querySelector('.to-top');
-  if (!toTop) return;
+  const root = document.querySelector('[data-reveal="off"]');
+  if (root) return; // ← 零書などでは何もしない
 
-  window.addEventListener('scroll', () => {
-    toTop.classList.toggle('show', window.scrollY > 300);
-  });
+  const items = document.querySelectorAll('[data-reveal], .reveal');
+  if (!items.length) return;
 
-  toTop.addEventListener('click', e => {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  const io = new IntersectionObserver((ents) => {
+    ents.forEach(ent => {
+      if (ent.isIntersecting) {
+        ent.target.classList.add('is-revealed');
+        io.unobserve(ent.target);
+      }
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+
+  items.forEach(el => io.observe(el));
 })();
