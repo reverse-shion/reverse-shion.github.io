@@ -19,40 +19,58 @@
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/book.css">
 
-  <!-- ===== Page Hotfix（行順次表示を強制） ===== -->
+  <!-- ===== Page hotfix ===== -->
   <style>
-    /* タイトルの不自然改行を抑制 */
+    /* ヘッダーを常時追尾（外部CSSに左右されないよう強制） */
+    .header{
+      position: fixed !important;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+    }
+    /* 本文との被り回避 */
+    body{ padding-top: calc(var(--header-h, 64px) + env(safe-area-inset-top, 0px)) !important; }
+
+    /* タイトルの変な改行を抑制 */
     .nowrap{ white-space: nowrap; }
     h1.book-title{ word-break: keep-all; overflow-wrap: anywhere; }
 
-    /* ぼかし系は全停止（初期ピンぼけ防止） */
+    /* 初期ピンぼけを完全停止（このページだけで） */
     .book-wrapper, .book-wrapper *{
       filter: none !important;
       -webkit-backdrop-filter: none !important;
       backdrop-filter: none !important;
-      text-shadow: none;
+      text-shadow: none !important;
     }
 
-    /* 行アニメーション：blurは使わず透明→不透明のみ */
+    /* 行アニメーション（blur不使用） */
     .mode .line{
-      opacity: 0;
+      opacity: 0 !important;
       transform: translateY(6px);
       transition: opacity .45s ease, transform .45s ease;
       will-change: opacity, transform;
     }
     .mode .line.is-show{
-      opacity: 1;
+      opacity: 1 !important;
       transform: translateY(0);
     }
-
-    /* 非表示パネル内の行は常に非表示のまま（チラ見え防止） */
+    /* 隠れパネルのチラ見え防止 */
     .mode[hidden] .line{ opacity: 0 !important; transform: translateY(6px) !important; }
+
+    /* タブの見た目微調整（任意） */
+    .mode-switch{ display:flex; gap:14px; justify-content:flex-start; margin:12px 0 16px; }
+    .mode-switch [role="tab"]{
+      min-height:40px; padding:8px 16px; border-radius:999px; border:1px solid rgba(126,102,255,.25);
+      background:#fff; font:500 14px/1 "Zen Kaku Gothic New",system-ui,sans-serif;
+    }
+    .mode-switch [aria-selected="true"]{ box-shadow:0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0; }
   </style>
 </head>
 
 <body>
   <!-- ===== Header ===== -->
-  <header class="header" role="banner">
+  <header class="header" role="banner" data-behavior="pin">
     <div class="header-inner">
       <a href="/" class="logo">Re:verse Shion</a>
       <nav class="nav-main" role="navigation" aria-label="メインナビゲーション">
@@ -108,64 +126,92 @@
     <a href="#main" class="to-top" aria-label="ページ上部へ戻る">↑ TOP</a>
   </main>
 
-  <!-- ===== Footer ===== -->
   <footer class="footer">
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
-  <!-- ===== 必要最小限のページ内JS：タブ切替＋行の順次表示 ===== -->
+  <!-- ===== Page JS（タブ＋行順次表示＋ヘッダー固定挙動） ===== -->
   <script>
     (function(){
       const STAGGER = 140; // 1行ごとの遅延(ms)
 
-      // パネル内の .line を先頭から順に表示
+      /* ===== 行を必ず順番に表示 ===== */
       function sequentialReveal(panel){
         if(!panel) return;
         const lines = Array.from(panel.querySelectorAll('.line'));
-        // まず全部リセット（途中から表示される不具合の抑止）
-        lines.forEach(el => el.classList.remove('is-show'));
-        // 1本ずつ遅延表示
+        // まず全行を非表示リセット（他CSSの影響を上書き）
+        lines.forEach(el => {
+          el.classList.remove('is-show');
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(6px)';
+        });
+
         let i = 0;
-        function step(){
+        const tick = () => {
           if(i >= lines.length) return;
           lines[i].classList.add('is-show');
+          lines[i].style.opacity = '';
+          lines[i].style.transform = '';
           i++;
-          setTimeout(step, STAGGER);
-        }
+          setTimeout(tick, STAGGER);
+        };
         // レイアウト確定後に開始
-        requestAnimationFrame(() => setTimeout(step, 30));
+        requestAnimationFrame(() => setTimeout(tick, 30));
       }
 
-      // タブUI（外部tabs.jsに依存しない）
+      /* ===== タブ切替（外部JS不要） ===== */
       function activateTab(btn){
         const tablist = btn.closest('[role="tablist"]');
         const buttons = Array.from(tablist.querySelectorAll('[role="tab"]'));
         buttons.forEach(b => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
 
-        const id = btn.getAttribute('aria-controls');
-        const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+        const target = btn.getAttribute('aria-controls');
+        const panels = document.querySelectorAll('[role="tabpanel"]');
         panels.forEach(p => {
-          const show = (p.id === id);
+          const show = (p.id === target);
           p.toggleAttribute('hidden', !show);
-          // 表示する面はここで順次表示を必ず実行
-          if(show){ sequentialReveal(p); }
+          if(show) sequentialReveal(p);
         });
+        // スクロール位置が大きくズレた場合に備えて少しだけ上へ
+        window.scrollTo({ top: document.querySelector('.mode-switch').offsetTop - 20, behavior: 'smooth' });
       }
 
-      // 初期化
+      /* ===== ヘッダー：スクロール中は表示／タップ中は消えない ===== */
+      function setupHeader(){
+        const header = document.querySelector('.header');
+        if(!header) return;
+
+        let scrolling;               // スクロール中フラグ
+        let pointerPinned = false;   // ユーザーがタップ中
+
+        // タップ中は絶対に隠さない
+        header.addEventListener('pointerdown', () => { pointerPinned = true; });
+        window.addEventListener('pointerup',   () => { pointerPinned = false; });
+
+        // スクロール中は常に表示、停止しても隠さない（＝常時追尾）
+        window.addEventListener('scroll', () => {
+          if(pointerPinned) return;
+          header.style.transform = 'translateY(0)';
+          header.style.opacity = '1';
+          clearTimeout(scrolling);
+          scrolling = setTimeout(() => {
+            // 何もしない＝固定表示のまま
+          }, 120);
+        }, { passive: true });
+      }
+
       document.addEventListener('DOMContentLoaded', () => {
-        // 初期の可視面に対して必ず順次表示
-        const initial = document.querySelector('.mode:not([hidden])');
-        sequentialReveal(initial);
-
-        // タブクリック
-        document.querySelector('.mode-switch')?.addEventListener('click', (e) => {
+        // 初期表示：可視パネルを順次表示
+        sequentialReveal(document.querySelector('.mode:not([hidden])'));
+        // タブ
+        document.querySelector('.mode-switch')?.addEventListener('click', e => {
           const btn = e.target.closest('[role="tab"]');
-          if(!btn) return;
-          activateTab(btn);
+          if(btn) activateTab(btn);
         });
+        // ヘッダー挙動
+        setupHeader();
 
-        // 省モーション設定の端末では即時表示
+        // アクセシビリティ：reduce motion の場合は即時表示
         const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
         if(mq.matches){
           document.querySelectorAll('.line').forEach(el => el.classList.add('is-show'));
