@@ -53,6 +53,20 @@
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/nav.css">
 
+<style>
+/* Keep header always visible & override any .hide from other scripts */
+header.header{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: transform .24s ease, opacity .24s ease;
+  will-change: transform, opacity;
+}
+header.header.hide{ transform:none !important; opacity:1 !important; }
+header.header.is-visible{ opacity:1; pointer-events:auto; }
+header.header[data-hold="true"]{ /* 触ってる間は常時表示（見た目調整はここへ） */ }
+</style>
+  
 </head>
 <body>
 
@@ -221,5 +235,54 @@
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/main.js" defer></script>
 <script src="/assets/js/lang-switch.js" defer></script>
+<script>
+/*
+  Header Keeper v1.0 (EN)
+  — Scroll中は常に表示・hover/タップ中は絶対に消えない
+  — 他スクリプトが .hide を付けても無効化
+*/
+(() => {
+  const header = document.querySelector('header.header');
+  if (!header) return;
+
+  const AUTO_HIDE_MS = 0; // 0=自動で隠さない（必要なら1500などに）
+  const SCROLL_THROTTLE_MS = 50;
+
+  let hovering = false, holding = false, hideTimer = null, lastTick = 0;
+
+  const neutralizeHide = () => header.classList.remove('hide');
+  const show = () => { header.classList.add('is-visible'); neutralizeHide(); };
+  const scheduleAutoHide = () => {
+    if (AUTO_HIDE_MS <= 0 || hovering || holding) return;
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (!hovering && !holding) header.classList.remove('is-visible');
+    }, AUTO_HIDE_MS);
+  };
+
+  const onScroll = () => {
+    const now = performance.now();
+    if (now - lastTick < SCROLL_THROTTLE_MS) return;
+    lastTick = now;
+    show();                 // どの方向でもスクロール中は表示
+    scheduleAutoHide();     // 停止後のみ（任意）隠す
+  };
+
+  const holdOn  = () => { holding = true;  header.dataset.hold = "true";  show(); clearTimeout(hideTimer); };
+  const holdOff = () => { holding = false; header.dataset.hold = "false"; scheduleAutoHide(); };
+
+  header.addEventListener('mouseenter', () => { hovering = true;  show(); clearTimeout(hideTimer); });
+  header.addEventListener('mouseleave', () => { hovering = false; scheduleAutoHide(); });
+  header.addEventListener('mousedown', holdOn);
+  window.addEventListener('mouseup', holdOff);
+  header.addEventListener('touchstart', holdOn, {passive:true});
+  window.addEventListener('touchend', holdOff, {passive:true});
+  window.addEventListener('touchcancel', holdOff, {passive:true});
+  window.addEventListener('scroll', onScroll, { passive:true });
+
+  show(); // 初期表示
+})();
+</script>
+
 </body>
 </html>
