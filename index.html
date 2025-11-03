@@ -31,18 +31,23 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@TaroBure">
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts（本文=Zen Kaku、見出し=Shippori） -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="preload"
+    as="style"
+    href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;600&family=Shippori+Mincho:wght@400;600&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap">
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;600&family=Shippori+Mincho:wght@400;600&display=swap">
   </noscript>
 
   <!-- Hero poster preload -->
   <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high">
 
-  <!-- JSON-LD -->
+  <!-- JSON-LD（Organization / WebSite / WebPage / Breadcrumb） -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -72,6 +77,14 @@
         }
       },
       {
+        "@type":"WebPage",
+        "@id":"https://reverse-shion.github.io/#webpage",
+        "url":"https://reverse-shion.github.io/",
+        "name":"Re:verse Shion — 詩韻思想 × TAROT BREAKER",
+        "isPartOf":{"@id":"https://reverse-shion.github.io/#website"},
+        "about":{"@id":"https://reverse-shion.github.io/#organization"}
+      },
+      {
         "@type":"BreadcrumbList",
         "itemListElement":[
           {"@type":"ListItem","position":1,"name":"ホーム","item":"https://reverse-shion.github.io/"}
@@ -81,15 +94,30 @@
   }
   </script>
 
-  <!-- CSS -->
+  <!-- 外部CSS -->
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/mini-reading.css">
   <link rel="stylesheet" href="/assets/css/intro.css">
   <link rel="stylesheet" href="/assets/css/main.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/nav.css">
+  <link rel="stylesheet" href="/assets/css/nav.css">
+
+  <!-- 安全装備（最小限の補助スタイル） -->
+  <style>
+    /* ヘッダーの表示/非表示制御（nav.cssに無い場合の保険） */
+    header.header{
+      position: sticky;
+      top: 0; z-index: 1000;
+      transition: transform .28s ease, opacity .28s ease;
+      will-change: transform, opacity;
+    }
+    header.header.hide{ transform: translateY(-100%); }
+    header.header.is-visible{ opacity: 1; pointer-events: auto; }
+    /* Mini Reading：カード表面の画像をJSから受け取る */
+    .tbm-face.front{
+      background-image: var(--front-url);
+      background-size: cover; background-position: center;
+    }
+  </style>
 </head>
 <body>
 
@@ -98,12 +126,10 @@
 <!-- 星砂パーティクル -->
 <div class="sky" aria-hidden="true"><canvas id="goldDust"></canvas></div>
 
-<!-- ヘッダー -->
 <!-- ===== Header Navigation ===== -->
 <header class="header" role="banner">
   <div class="header-inner">
     <a href="/" class="logo">Re:verse Shion</a>
-
     <nav class="nav-main" role="navigation" aria-label="メインナビゲーション">
       <a href="/philosophy.html" title="言葉が魂を救う“哲学”の核を読む">思想を読む</a>
       <a href="/philosophy.html#books" title="零書〜第12書、結書までの構文を一覧で">書を探す</a>
@@ -116,7 +142,7 @@
 <div id="top" aria-hidden="true"></div>
 
 <main id="main-content" tabindex="-1">
-  <!-- Hero（※この1本のみ） -->
+  <!-- Hero -->
   <section class="hero" aria-label="ヒーロー">
     <div class="hero__media" aria-hidden="true">
       <video class="hero__video" autoplay muted loop playsinline preload="metadata"
@@ -126,91 +152,82 @@
       </video>
       <div class="hero__veil"></div>
     </div>
-
     <div class="wrap">
       <h1>言葉は祈りの構文<br>物語は、その実演</h1>
-    <p>詩韻思想（Shion Philosophy）で<br>“響き”を学び<br>TAROT BREAKERで“響き”を体験する<br><strong>— 言葉が魂を救う、その瞬間へ</strong></p>
-
+      <p>詩韻思想（Shion Philosophy）で<br>“響き”を学び<br>TAROT BREAKERで“響き”を体験する<br><strong>— 言葉が魂を救う、その瞬間へ</strong></p>
       <nav class="cta-row" aria-label="主要CTA">
-        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">🌠 占いを受ける</a>
-        <a class="btn btn--ghost" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer">📘 小説を読む</a>
-        <a class="btn btn--ghost" href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">📖 詩韻思想を読む</a>
-        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 TikTok</a>
+        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer" type="button">🌠 占いを受ける</a>
+        <a class="btn btn--ghost" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener noreferrer" type="button">📘 小説を読む</a>
+        <a class="btn btn--ghost" href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer" type="button">📖 詩韻思想を読む</a>
+        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer" type="button">🎥 TikTok</a>
       </nav>
     </div>
   </section>
 
   <!-- 初めての方へ：最初の一歩 -->
-<section id="starter" class="intro-section" aria-labelledby="intro-title">
-  <div class="intro-wrap">
-    <h2 id="intro-title" class="intro-title">初めての方へ — 最初の一歩</h2>
-    <p class="intro-lead">3つの入り口から、あなたに合うペースで。<br aria-hidden="true">迷ったら「3分でわかる」へどうぞ。</p>
+  <section id="starter" class="intro-section" aria-labelledby="intro-title">
+    <div class="intro-wrap">
+      <h2 id="intro-title" class="intro-title">初めての方へ — 最初の一歩</h2>
+      <p class="intro-lead">3つの入り口から、あなたに合うペースで。<br aria-hidden="true">迷ったら「3分でわかる」へどうぞ。</p>
 
-    <div class="intro-grid" role="list">
-      <!-- 入口A：第零書 -->
-      <a class="intro-card" role="listitem" href="#zero" aria-label="第零書（ゼロから知る）へ">
-        <span class="intro-kicker">A</span>
-        <h3 class="intro-card-title">第零書｜ゼロから知る</h3>
-        <p class="intro-card-desc">詩韻思想の“息”と“輪”。まずは核だけ、要点で。</p>
-        <span class="intro-cta">読む</span>
+      <div class="intro-grid" role="list">
+        <a class="intro-card" role="listitem" href="#zero" aria-label="第零書（ゼロから知る）へ">
+          <span class="intro-kicker">A</span>
+          <h3 class="intro-card-title">第零書｜ゼロから知る</h3>
+          <p class="intro-card-desc">詩韻思想の“息”と“輪”。まずは核だけ、要点で。</p>
+          <span class="intro-cta">読む</span>
+        </a>
+
+        <a class="intro-card" role="listitem" href="#guide-3min" aria-label="3分でわかるガイドへ">
+          <span class="intro-kicker">B</span>
+          <h3 class="intro-card-title">3分でわかる</h3>
+          <p class="intro-card-desc">短い映像＆一枚図で世界観を一気に把握。</p>
+          <span class="intro-cta">見る</span>
+        </a>
+
+        <a class="intro-card" role="listitem" href="https://ncode.syosetu.com/n5806lb/1/" aria-label="物語 TAROT BREAKER 第1話へ">
+          <span class="intro-kicker">C</span>
+          <h3 class="intro-card-title">物語で体験</h3>
+          <p class="intro-card-desc">第1話から。配信×星界、“参加”できる物語。</p>
+          <span class="intro-cta">入る</span>
+        </a>
+      </div>
+
+      <div class="intro-actions" aria-label="次の行動">
+        <a class="intro-btn primary" href="https://lin.ee/LYnlU0f">LINEで受け取る</a>
+        <a class="intro-btn ghost" href="https://note.com/shion_uranai369">noteをフォロー</a>
+      </div>
+
+      <button class="intro-sound" type="button" data-sound-toggle aria-pressed="false" aria-label="音の案内を開く">
+        <span class="intro-sound-icon" aria-hidden="true">♪</span>
+        <span class="intro-sound-text">画面タップで音が流れます</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Dual Gate -->
+  <section class="duo-gate" aria-label="世界の入口">
+    <h2 class="duo-title">どの星から、始めますか？</h2>
+    <div class="duo-grid">
+      <a href="/philosophy.html" class="duo-card philosophy">
+        <h3>詩韻思想</h3>
+        <p>Poem / Rhythm / Prayer<br>言葉が魂を救う世界。</p>
       </a>
-
-      <!-- 入口B：3分ガイド -->
-      <a class="intro-card" role="listitem" href="#guide-3min" aria-label="3分でわかるガイドへ">
-        <span class="intro-kicker">B</span>
-        <h3 class="intro-card-title">3分でわかる</h3>
-        <p class="intro-card-desc">短い映像＆一枚図で世界観を一気に把握。</p>
-        <span class="intro-cta">見る</span>
-      </a>
-
-      <!-- 入口C：物語 -->
-      <a class="intro-card" role="listitem" href="https://ncode.syosetu.com/n5806lb/1/" aria-label="物語 TAROT BREAKER 第1話へ">
-        <span class="intro-kicker">C</span>
-        <h3 class="intro-card-title">物語で体験</h3>
-        <p class="intro-card-desc">第1話から。配信×星界、“参加”できる物語。</p>
-        <span class="intro-cta">入る</span>
+      <a href="/tarotbreaker.html" class="duo-card tarot">
+        <h3>TAROT BREAKER</h3>
+        <p>星詠×タロットバトル<br>あなたも参加できる物語。</p>
       </a>
     </div>
+  </section>
 
-    <!-- 二次導線：行動の選択 -->
-    <div class="intro-actions" aria-label="次の行動">
-      <a class="intro-btn primary" href="https://lin.ee/LYnlU0f">LINEで受け取る</a>
-      <a class="intro-btn ghost" href="https://note.com/shion_uranai369">noteをフォロー</a>
-    </div>
-
-    <!-- 音のガイド（初訪問向け） -->
-    <button class="intro-sound" type="button" data-sound-toggle aria-pressed="false" aria-label="音の案内を開く">
-      <span class="intro-sound-icon" aria-hidden="true">♪</span>
-      <span class="intro-sound-text">画面タップで音が流れます</span>
-    </button>
-  </div>
-</section>
-
-  <!-- 🌕 Dual Gate（思想／物語 分岐） -->
-<section class="duo-gate" aria-label="世界の入口">
-  <h2 class="duo-title">どの星から、始めますか？</h2>
-  <div class="duo-grid">
-    <a href="/philosophy.html" class="duo-card philosophy">
-      <h3>詩韻思想</h3>
-      <p>Poem / Rhythm / Prayer<br>言葉が魂を救う世界。</p>
-    </a>
-    <a href="/tarotbreaker.html" class="duo-card tarot">
-      <h3>TAROT BREAKER</h3>
-      <p>星詠×タロットバトル<br>あなたも参加できる物語。</p>
-    </a>
-  </div>
-</section>
-
-<!-- 🌌 3分動画（世界観ガイド） -->
-<section id="guide-3min" class="guide-section">
-  <h2>3分でわかる Re:verse Shion</h2>
-  <video class="guide-video" controls poster="/assets/img/guide-thumb.jpg">
-    <source src="/assets/video/3min.mp4" type="video/mp4">
-  </video>
-  <p class="guide-caption">光・言葉・魂の三位一体構文を、映像で体験。</p>
-</section>
-
-
+  <!-- 3分動画 -->
+  <section id="guide-3min" class="guide-section">
+    <h2>3分でわかる Re:verse Shion</h2>
+    <video class="guide-video" controls poster="/assets/img/guide-thumb.jpg">
+      <source src="/assets/video/3min.mp4" type="video/mp4">
+    </video>
+    <p class="guide-caption">光・言葉・魂の三位一体構文を、映像で体験。</p>
+  </section>
 
   <!-- Trinity -->
   <section id="trinity" aria-labelledby="sec-trinity" data-shiopon="exclude">
@@ -229,7 +246,7 @@
       </figure>
 
       <div class="trinity__actions">
-        <button id="trinityPlayBtn" class="btn btn--primary" aria-label="音を再生">▶ 画面タップで音が流れます</button>
+        <button id="trinityPlayBtn" class="btn btn--primary" aria-label="音を再生" type="button">▶ 画面タップで音が流れます</button>
       </div>
 
       <div class="tri-grid" role="list">
@@ -280,14 +297,13 @@
         </details>
       </div>
 
- <div class="card"><div class="badge">✡ 第零書</div><h3>無限構文序論 — The Zero Syntax</h3></div>
+      <div class="card"><div class="badge">✡ 第零書</div><h3>無限構文序論 — The Zero Syntax</h3></div>
       <div class="card"><div class="badge">✦ 第一書</div><h3>言葉が魂を救う理由 — The Syntax of Salvation</h3></div>
 
       <div class="card">
         <div class="badge">✦ TAROT BREAKER</div>
-        
         <h3>第1話から読む</h3>
-        <button class="btn btn--primary tarot-preview-open" data-analytics="tarot_preview_open">
+        <button class="btn btn--primary tarot-preview-open" data-analytics="tarot_preview_open" type="button">
           <svg width="18" height="18" aria-hidden="true"><use href="#i-play"/></svg>
           1分で体験する
         </button>
@@ -295,7 +311,7 @@
     </div>
   </section>
 
-  <!-- ===== Mini Reading（体験） ===== -->
+  <!-- Mini Reading -->
   <section id="mini-reading" class="tb-mini" aria-labelledby="miniHeading">
     <div class="wrap">
       <header class="tbm-head">
@@ -309,7 +325,6 @@
         </div>
       </header>
 
-      <!-- 3枚のスプレッド（横3枚） -->
       <div class="tbm-spread" id="spread" aria-live="polite">
         <div class="tbm-slot" data-pos="0">
           <div class="tbm-title">① 現在</div>
@@ -348,7 +363,6 @@
         </div>
       </div>
 
-      <!-- 結果（詩／韻／祈） -->
       <section id="readingResult" aria-labelledby="resultHeading" style="margin-top:22px;">
         <h2 id="resultHeading" class="sr-only">結果</h2>
         <div class="result-grid">
@@ -368,25 +382,13 @@
             <p class="r-text">カードをめくると表示されます。</p>
           </article>
         </div>
-         <div class="cta-row" style="margin-top:16px">
-            <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
-              <svg width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
-              LINEで占い予約
-            </a>
-          </div>
+        <div class="cta-row" style="margin-top:16px">
+          <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
+            <svg width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
+            LINEで占い予約
+          </a>
+        </div>
       </section>
-    </div>
-  </section>
-
-   <!-- Join -->
-  <section id="join" aria-labelledby="sec-join" data-shiopon="exclude">
-    <div class="wrap">
-      <h2 id="sec-join">参加の扉</h2>
-      <p style="text-align:center;color:var(--muted)">LINE登録で、新着の書をお届けします。</p>
-      <div class="cta-row">
-        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">💫 無料で受け取る</a>
-        <a class="btn btn--ghost" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener noreferrer">🎥 TikTokを観る</a>
-      </div>
     </div>
   </section>
 </main>
@@ -396,29 +398,16 @@
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
     <button class="modal__close" aria-label="閉じる"><svg width="18" height="18"><use href="#i-x"/></svg></button>
-
-    <!-- ★ ここを picture で差し替え（SP/PC自動切替） -->
     <figure class="modal__media">
       <picture>
-        <!-- 縦長スマホ優先 -->
-        <source
-          media="(max-width: 640px)"
-          srcset="/assets/images/modal/mobile_vertical_1080x1620.jpg?v=1">
-        <!-- それ以外（デスクトップ等） -->
-        <source
-          media="(min-width: 641px)"
-          srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
-        <img
-          src="/assets/images/modal/main_modal_1920x1280.jpg?v=1"
-          alt="TAROT BREAKER プレビュー"
-          width="1920" height="1280" loading="lazy" decoding="async">
+        <source media="(max-width: 640px)" srcset="/assets/images/modal/mobile_vertical_1080x1620.jpg?v=1">
+        <source media="(min-width: 641px)" srcset="/assets/images/modal/main_modal_1920x1280.jpg?v=1">
+        <img src="/assets/images/modal/main_modal_1920x1280.jpg?v=1" alt="TAROT BREAKER プレビュー" width="1920" height="1280" loading="lazy" decoding="async">
       </picture>
     </figure>
-
     <div class="modal__body">
       <h3 id="tarotModalTitle">TAROT BREAKER ― 星の言霊使い</h3>
-      <p class="lead">「言の葉は鍵、星の光は道しるべ。」  
-        迷いの影が生まれる夜、カードは静かに呼吸し、言葉は祈りへと変わる。</p>
+      <p class="lead">「言の葉は鍵、星の光は道しるべ。」 迷いの影が生まれる夜、カードは静かに呼吸し、言葉は祈りへと変わる。</p>
       <ul class="bullets">
         <li>3行あらすじ：<em>迷いの正体に、言葉で触れる。</em></li>
         <li>詩的体験：<em>星詠展開 → 封命完了 → 大丈夫だよ。</em></li>
@@ -432,7 +421,7 @@
   </div>
 </div>
 
-<!-- クリックで開く簡易モーダル（カード3枚用の表示） -->
+<!-- クリックで開く簡易モーダル（カード3枚用） -->
 <div id="modal" class="modal" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
@@ -446,7 +435,6 @@
     </figure>
   </div>
 </div>
-
 
 <footer>
   <div class="wrap">
@@ -469,20 +457,22 @@
     <small class="shiopon__note">※ 毎週1回だけ。いつでも解除OKだよ！</small>
   </div>
 </div>
-<button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く">🦊 しおぽん</button>
+<button id="shiopon-dock" class="shiopon-dock is-hidden" aria-label="しおぽんを開く" type="button">🦊 しおぽん</button>
 
-<!-- JS（外部） -->
+<!-- ===== 外部JS ===== -->
 <script src="/assets/js/particles.js" defer></script>
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
+<script src="/assets/js/main.js" defer></script>
 
-<!-- Trinity 再生（iOS対策） -->
+<!-- Trinity 再生（iOS対策強化） -->
 <script>
 (function(){
   const btn = document.getElementById('trinityPlayBtn');
   const v = document.getElementById('trinityVideo');
   if(!btn || !v) return;
-  btn.addEventListener('click', async () => {
+
+  async function tryPlay(){
     try{
       if (window.enableTrinityAudio) window.enableTrinityAudio();
       v.muted = false;
@@ -492,9 +482,11 @@
       btn.setAttribute('aria-pressed','true');
       btn.disabled = true;
     }catch(e){
-      btn.textContent = '再生できません。もう一度タップ';
+      btn.textContent = 'もう一度タップで再生します';
+      btn.disabled = false;
     }
-  });
+  }
+  btn.addEventListener('click', tryPlay);
 })();
 </script>
 
@@ -530,29 +522,43 @@
 })();
 </script>
 
-<!-- ヘッダー：上下スクロールで表示、停止で自動的に隠す -->
+<!-- ヘッダー：統合版（競合解消・ホバー中は消えない） -->
 <script>
 (() => {
-  const header = document.querySelector('header[role="banner"]');
+  const header = document.querySelector('header.header');
   if (!header) return;
-  let ticking = false, hideTimer = null;
-  const HIDE_DELAY = 1200;
-  const onScroll = () => {
-    if (!ticking){
-      window.requestAnimationFrame(() => {
-        header.classList.add('is-visible');
-        if (hideTimer) clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => header.classList.remove('is-visible'), HIDE_DELAY);
-        ticking = false;
-      });
-      ticking = true;
-    }
+
+  let lastY = window.scrollY;
+  let idleTimer = null;
+  const IDLE_MS = 1200;
+
+  header.addEventListener('mouseenter', () => header.classList.add('is-visible'));
+  header.addEventListener('mouseleave', () => { /* スクロール制御に任せる */ });
+
+  const show = () => {
+    header.classList.add('is-visible');
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => header.classList.remove('is-visible'), IDLE_MS);
   };
-  window.addEventListener('scroll', onScroll, { passive:true });
+
+  const onScroll = () => {
+    const y = window.scrollY;
+    const goingDown = y > lastY;
+    if (goingDown && y > 80) {
+      header.classList.add('hide');
+    } else {
+      header.classList.remove('hide');
+      show();
+    }
+    lastY = y;
+  };
+
+  show();
+  window.addEventListener('scroll', onScroll, { passive: true });
 })();
 </script>
 
-<!-- アンカー遷移のフェード -->
+<!-- 内部アンカー遷移のViewTransition（未対応は自然フォールバック） -->
 <script>
 if (document.startViewTransition){
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -580,25 +586,34 @@ if (navigator.connection?.saveData){
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }
 </script>
 
-<!-- Tarot Preview Modal（モーダル要素が無い場合はスキップ） -->
+<!-- Tarot Preview Modal：スクロール固定＋inert -->
 <script>
 (() => {
   const openBtn = document.querySelector('.tarot-preview-open');
   const modal = document.getElementById('tarotModal');
   if (!openBtn || !modal) return;
+
   const panel = modal.querySelector('.modal__panel');
   const overlay = modal.querySelector('.modal__overlay');
   const closeBtn = modal.querySelector('.modal__close');
+  const main = document.querySelector('main');
+
   function open() {
+    document.body.style.overflow = 'hidden';
+    if (main) main.inert = true;
     modal.setAttribute('aria-hidden', 'false');
     setTimeout(() => closeBtn.focus(), 10);
     document.addEventListener('keydown', onKey);
   }
+
   function close() {
     modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (main) main.inert = false;
     openBtn.focus();
     document.removeEventListener('keydown', onKey);
   }
+
   function onKey(e) {
     if (e.key === 'Escape') close();
     if (e.key === 'Tab') {
@@ -609,13 +624,14 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }
       else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
     }
   }
+
   openBtn.addEventListener('click', open);
   overlay.addEventListener('click', close);
   closeBtn.addEventListener('click', close);
 })();
 </script>
 
-<!-- Mini Reading：3枚重複なし／めくってから名前表示／願いと連動 -->
+<!-- Mini Reading：3枚重複なし／結果生成 -->
 <script>
 const TAROT_IMG_BASE = "/assets/images/tarot/majors/";
 const TAROT = [
@@ -719,7 +735,7 @@ function onFlip(e){
     document.querySelector('#res-poem  .r-title').textContent = titles[0];
     document.querySelector('#res-poem  .r-text').textContent  = texts[0];
     document.querySelector('#res-rhyme .r-title').textContent = titles[1];
-    document.querySelector('#res-rhyme .r-text').textContent  = texts[1];
+    document.querySelector('#res-rhyme .r-text').textContent = texts[1];
     document.querySelector('#res-prayer .r-title').textContent= titles[2];
     document.querySelector('#res-prayer .r-text').textContent = texts[2];
     document.getElementById('readingResult').scrollIntoView({behavior:'smooth', block:'start'});
@@ -742,16 +758,14 @@ btnStart.addEventListener('click', startReading);
 btnReset.addEventListener('click', resetUI);
 </script>
 
-  <script>
-/* Intro: 音案内のトグル（アナリティクス化しやすいデータ属性付き） */
+<!-- Intro 音案内トグル -->
+<script>
 (function(){
   const btn = document.querySelector('[data-sound-toggle]');
   if(!btn) return;
   btn.addEventListener('click', function(){
     const on = this.getAttribute('aria-pressed') === 'true';
     this.setAttribute('aria-pressed', String(!on));
-    // 任意：ここでBGMの再生フラグや、モーダル案内を起動可能
-    // window.dispatchEvent(new CustomEvent('sound-toggle', { detail: { enabled: !on }}));
   });
 })();
 </script>
@@ -764,54 +778,5 @@ btnReset.addEventListener('click', resetUI);
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
 </svg>
 
-  <!-- 光転移エフェクト -->
-<div id="ensotrans" aria-hidden="true"></div>
-<script src="/assets/js/main.js"></script>
-
-  <script>
-let lastScrollY = window.scrollY;
-let header = document.querySelector('.site-header');
-let timeoutId;
-
-window.addEventListener('scroll', () => {
-  if(window.scrollY > lastScrollY + 50){ // 下方向にスクロール
-    header.classList.add('visible');
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      header.classList.remove('visible');
-    }, 2000); // ← 表示維持時間（ミリ秒）2秒に延長
-  }
-  lastScrollY = window.scrollY;
-});
-</script>
-
-  <script>
-(() => {
-  const path = location.pathname.replace(/\/+$/, ""); // 末尾スラッシュ除去
-  document.querySelectorAll('.nav-main a[href]').forEach(a => {
-    const href = a.getAttribute('href');
-    // 外部リンクは除外
-    if (/^https?:/.test(href)) return;
-    const target = href.replace(/\/+$/, "");
-    if (target === "" && path === "/") { a.setAttribute('aria-current','page'); }
-    if (target && path.endsWith(target)) { a.setAttribute('aria-current','page'); }
-  });
-})();
-</script>
-<script>
-let lastScroll = 0;
-const header = document.querySelector('.header');
-
-window.addEventListener('scroll', () => {
-  const current = window.scrollY;
-  if (current > lastScroll && current > 100) {
-    header.classList.add('hide');
-  } else {
-    header.classList.remove('hide');
-  }
-  lastScroll = current;
-});
-</script> 
-  
 </body>
 </html>
