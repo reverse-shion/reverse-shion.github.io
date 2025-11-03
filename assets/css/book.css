@@ -360,3 +360,101 @@ body{
   .theme-cosmic .mode .line,
   .theme-cosmic .mode .line .ch{ opacity:1 !important; transform:none !important; }
 }
+
+/* ==== Perf & Readability Hotfix (2025-11-03) ==== */
+
+/* 文字背後に“読取ベール”を敷いてコントラスト安定 */
+.theme-cosmic .book-body{
+  position: relative;
+  isolation: isolate;
+}
+.theme-cosmic .book-body::after{
+  content:"";
+  position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(120% 85% at 50% 0%, rgba(10,10,20,.35), transparent 60%),
+    linear-gradient(180deg, rgba(10,10,20,.32), rgba(10,10,20,.48));
+  /* わずかに揺らめく光膜（超軽量） */
+  animation: veilBreath 26s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+@keyframes veilBreath{
+  0%   { transform: translate3d(0,0,0) scale(1);   opacity:.9 }
+  100% { transform: translate3d(0,1%,0) scale(1.03); opacity:.98 }
+}
+
+/* 行そのものの可読性を底上げ（行間＆サイズ） */
+.mode .line{
+  line-height: 2.1;
+  font-size: clamp(17px, 2.8vw, 21px);
+  text-shadow: 0 1px 0 rgba(0,0,0,.25);
+}
+
+/* ===== 1文字アニメの軽量化 ===== */
+/* 重い filter / drop-shadow / 多段text-shadow を撤去 → transform/opacity のみ */
+.char{
+  opacity: 0;
+  display: inline-block;
+  transform: translateY(.35em);
+  will-change: opacity, transform;
+  /* うっすら輝く“静的グロー”は1段だけに */
+  text-shadow: 0 0 10px rgba(255,255,255,.20);
+  /* グラデのハイライトは継続（神域感） */
+  background: linear-gradient(180deg, #fff 0%, #faf8ff 50%, #f3eeff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+
+  animation: charIn .42s cubic-bezier(.22,.61,.36,1) forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes charIn{
+  0%   { opacity:0; transform: translateY(.35em) scale(.995) }
+  100% { opacity:1; transform: translateY(0)      scale(1) }
+}
+
+/* 以前のきらめき（.char::after, charPulse, spark）は無効化 */
+.char::after{ display:none !important }
+
+/* ===== 行の“光のスイープ”：軽い神秘演出を行単位に移す ===== */
+.line{
+  position: relative;
+}
+.line.visible::before{
+  content:"";
+  position:absolute; left:-4%; right:-4%; top:0; bottom:0; pointer-events:none;
+  background:
+    linear-gradient(90deg, transparent 0%,
+      rgba(255,215,111,.08) 35%,
+      rgba(174,138,255,.12) 50%,
+      transparent 65%);
+  filter: blur(1px);
+  opacity: 0;
+  animation: sweep 1400ms ease-out .06s 1 forwards;
+}
+@keyframes sweep{
+  0%{ opacity:0; transform: translateX(-12%) }
+  35%{ opacity:.9 }
+  100%{ opacity:0; transform: translateX(12%) }
+}
+
+/* ===== タブやタイトルの視認性補強 ===== */
+.theme-cosmic .mode-switch [role="tab"]{
+  background:#ffffff; color:#3f376c;
+  border:1px solid rgba(126,102,255,.35);
+  box-shadow: 0 6px 16px rgba(0,0,0,.14);
+}
+.theme-cosmic .mode-switch [aria-selected="true"]{
+  color:#5f4cf2;
+  box-shadow: 0 0 0 2px rgba(126,102,255,.24) inset, 0 10px 24px rgba(40,20,70,.22);
+}
+
+/* モバイルでの行折返し時も可読性を維持 */
+@media (max-width: 480px){
+  .mode .line{ line-height: 2.2; font-size: 17.5px }
+}
+
+/* 動きを抑えたい人の設定は引き続き尊重 */
+@media (prefers-reduced-motion: reduce){
+  .char{ animation: none !important; opacity:1 !important; transform:none !important }
+  .line.visible::before{ display:none !important }
+  .theme-cosmic .book-body::after{ animation: none !important }
+}
