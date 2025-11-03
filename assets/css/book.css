@@ -407,4 +407,27 @@ body{ padding-top: calc(var(--header-h) + env(safe-area-inset-top,0px)); }
 .theme-cosmic .book-title span{ color:var(--gold); }
 .theme-cosmic .book-subtitle{ color: var(--muted); text-align:center; }
 
+/* ---- タブ（微調整：コントラストUP） --------------------- */
+.theme-cosmic .mode-switch{ display:flex; justify-content:center; gap:12px; margin: 14px 0 18px; }
+.theme-cosmic .mode-switch [role="tab"]{
+  background:#ffffff;
+  color:#423a70;
+  border:1px solid rgba(126,102,255,.35);
+  border-radius:999px;
+  padding:10px 16px; min-height:40px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+}
+.theme-cosmic .mode-switch [aria-selected="true"]{
+  color:#6f57ff;
+  box-shadow: 0 0 0 2px rgba(126,102,255,.26) inset, 0 8px 20px rgba(30,20,70,.25);
+}
+
+
+/* ---- アニメ抑制（配慮） --------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  .theme-cosmic *{ animation: none !important; transition: none !important; }
+  .theme-cosmic .mode .line,
+  .theme-cosmic .mode .line .char{ opacity:1 !important; transform:none !important; }
+}
+
 
