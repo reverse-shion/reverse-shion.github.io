@@ -471,3 +471,55 @@ a:hover{opacity:.9}
   color: rgba(80, 40, 160, 0.65);
   margin-top: 4px;
 }
+/* ====== Shion 専用グラデボタン強制適用 ====== */
+.intro-actions{ text-align:center; }
+
+a.btn--shion{
+  /* ボタン形状を確定 */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5em;
+  text-decoration:none;
+  text-align:center;
+  white-space:normal;
+  line-height:1.25;
+  min-height:56px;
+  padding:14px 22px;
+  border-radius:16px;
+
+  /* ここが肝：優先度高め＆!importantで確実に上書き */
+  background: linear-gradient(135deg,#7e66ff 0%,#a78bff 45%,#ffd76f 100%) !important;
+  color:#2a1030 !important;
+  border:1px solid rgba(255,215,111,.75) !important;
+  box-shadow:
+    0 14px 28px rgba(126,102,255,.28),
+    0 0 0 1px rgba(255,255,255,.16) inset,
+    0 0 34px rgba(174,138,255,.22);
+  text-shadow:0 1px 0 rgba(255,255,255,.25);
+  transition:transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+
+a.btn--shion:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.04);
+  box-shadow:
+    0 18px 36px rgba(126,102,255,.35),
+    0 0 0 1px rgba(255,255,255,.2) inset,
+    0 0 40px rgba(255,215,111,.35);
+}
+
+/* モバイルは横幅フィットで押しやすく */
+@media (max-width: 480px){
+  a.btn--shion{ width: min(92vw, 560px); }
+}
+
+/* 既存の .btn--primary / .cta--primary にも波及させたい場合の保険 */
+.btn--primary.btn--shion,
+.cta--primary.btn--shion,
+.intro-btn.primary.btn--shion{
+  background: inherit !important;
+  color: inherit !important;
+  border: inherit !important;
+  box-shadow: inherit !important;
+}
