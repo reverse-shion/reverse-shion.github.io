@@ -1,14 +1,12 @@
-name: Generate sitemap.xml
+name: Generate sitemap
 
 on:
   push:
-    branches: [ main ]            # mainに変更が入ったら実行
-  schedule:
-    - cron: "0 18 * * 1"          # 毎週月曜 18:00(JST+9=UTC9時)に実行
-  workflow_dispatch:              # 手動実行もOK
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
-  contents: write                 # コミット権限
+  contents: write
 
 jobs:
   build:
@@ -21,25 +19,17 @@ jobs:
         uses: cicirello/generate-sitemap@v1
         with:
           base-url: https://reverse-shion.github.io
-          include-pdfs: false
           additional-paths: |
-            /                          # ルート
+            /
             /philosophy.html
-            /en/index.html
+            /en/
           exclude-paths: |
             /sw.js
             /manifest.webmanifest
             /assets/
-          sitemap-path: ./sitemap.xml  # 生成先（リポジトリ直下）
-
-      - name: Commit & push sitemap.xml
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name  "Shion Bot"
-            git config user.email "actions@github.com"
-            git add sitemap.xml
-            git commit -m "chore: auto-update sitemap.xml"
-            git push
-          else
-            echo "No changes in sitemap.xml"
-          fi
+            /google*.html
+      - name: Commit sitemap.xml
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update sitemap.xml"
+          file_pattern: sitemap.xml
