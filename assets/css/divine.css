@@ -1,226 +1,163 @@
 /* =================================================================
-   Re:verse Shion — Divine Layer（最終安定版）
-   機能: 神降臨（起動光／刻印／音ヒント）＋ 統一グラデボタン
-   対応: Safari / Chrome / iOS / Android
+   Re:verse Shion — Divine Layer（FINAL / 2025-11-05）
+   目的: 神降臨（神光／聖印／起動ヒント）＋ 紫グラデ統一ボタン
+   安定化: ヘッダー伸縮バグ回避 / z-index競合排除 / pointer-events保証
+   依存: 既存テーマに上書きしない（必要箇所だけ最小限オーバーライド）
    ================================================================= */
 
-/* ---- 入場フェード（任意・軽め） ---- */
-html.is-booting body {
-  opacity: 0;
-  filter: blur(6px);
-  transition: opacity .6s ease, filter .6s ease;
+/* ============= 0) 入場フェード（ヘッダー除外で安定） ============= */
+html.is-booting body{
+  opacity:0;
+  filter:blur(6px);
+  transition:opacity .6s ease, filter .6s ease;
 }
-html:not(.is-booting) body,
-html.is-booting body {
-  opacity: 1;
-  filter: none;
-}
+html.is-booting header{ opacity:1 !important; filter:none !important; transform:none !important }
+html:not(.is-booting) body{ opacity:1; filter:none }
 
-/* ---- 神気の脈動（背景の柔らかい光） ---- */
-body.divine::before {
-  content: "";
-  position: fixed;
-  inset: -10vh -10vw;
+/* ============= 1) 神気の脈動（背景光） ============= */
+body.divine::before{
+  content:"";
+  position:fixed; inset:-12vh -12vw;
   background:
-    radial-gradient(38vmax 38vmax at 50% 35%, rgba(255,215,111,.18), transparent 60%),
+    radial-gradient(38vmax 38vmax at 50% 34%, rgba(255,215,111,.18), transparent 60%),
     radial-gradient(48vmax 48vmax at 50% 70%, rgba(174,138,255,.20), transparent 65%);
-  mix-blend-mode: soft-light;
-  animation: divinePulse 7s ease-in-out infinite alternate;
-  pointer-events: none;
-  z-index: 0;
+  mix-blend-mode:soft-light;
+  animation:divinePulse 7s ease-in-out infinite alternate;
+  pointer-events:none; z-index:0;
 }
-@keyframes divinePulse {
-  0%   { opacity: .55; transform: scale(1); }
-  100% { opacity: .85; transform: scale(1.06); }
-}
-
-/* ---- 詩韻OSの刻印（淡い聖印文字） ---- */
-body.divine::after {
-  content: "詩  韻  祈";
-  position: fixed;
-  inset: 0;
-  font-family: "Shippori Mincho","Noto Serif JP",serif;
-  font-weight: 600;
-  letter-spacing: .4em;
-  font-size: clamp(54px, 10vw, 160px);
-  line-height: 100vh;
-  text-align: center;
-  color: rgba(255,255,255,.06);
-  text-shadow: 0 0 1px rgba(255,255,255,.04);
-  pointer-events: none;
-  z-index: 0;
-  animation: sealSwell 9s ease-in-out infinite alternate;
-  mix-blend-mode: lighten;
-}
-@keyframes sealSwell {
-  0%   { opacity: .28; transform: translateY(-1vh) scale(1); }
-  100% { opacity: .46; transform: translateY(1vh) scale(1.02); }
+@keyframes divinePulse{
+  from{ opacity:.55; transform:scale(1) }
+  to  { opacity:.85; transform:scale(1.06) }
 }
 
-/* ---- コンテンツ前面固定 ---- */
-header, .hero, main, section, footer, .wrap, .sky {
-  position: relative;
-  z-index: 1;
+/* ============= 2) 詩韻OSの聖印（極淡の大文字） ============= */
+body.divine::after{
+  content:"詩  韻  祈";
+  position:fixed; inset:0;
+  font-family:"Shippori Mincho","Noto Serif JP",serif;
+  font-weight:600; letter-spacing:.4em;
+  font-size:clamp(54px, 10vw, 160px);
+  line-height:100vh; text-align:center;
+  color:rgba(255,255,255,.06);
+  text-shadow:0 0 1px rgba(255,255,255,.04);
+  animation:sealSwell 9s ease-in-out infinite alternate;
+  mix-blend-mode:lighten;
+  pointer-events:none; z-index:0;
+}
+@keyframes sealSwell{
+  from{ opacity:.28; transform:translateY(-1vh) scale(1) }
+  to  { opacity:.46; transform:translateY( 1vh) scale(1.02) }
 }
 
-/* ==========================================================
-   Divine Flash — 神光のレイヤー
-   ========================================================== */
-.divine-flash {
-  position: fixed;
-  inset: 0;
-  z-index: 0 !important;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .4s ease, transform .4s ease;
+/* ============= 3) 神光レイヤー（クリック不干渉） ============= */
+.divine-flash{
+  position:fixed; inset:0;
+  pointer-events:none;
+  opacity:0; transform:scale(1);
+  transition:opacity .42s ease, transform .42s ease;
+  z-index:1500; /* コンテンツより前、ヘッダーより下でもOK（pointer-events: none） */
 }
-.divine-flash.active {
-  opacity: 1;
-  transform: scale(2);
-  background: radial-gradient(circle at center,
-             rgba(255,255,255,0.9),
-             rgba(190,160,255,0.3) 50%,
-             rgba(255,220,160,0) 80%);
+.divine-flash.active{
+  opacity:1; transform:scale(2);
+  background:radial-gradient(circle at center,
+             rgba(255,255,255,.92),
+             rgba(190,160,255,.32) 52%,
+             rgba(255,220,160,0) 82%);
 }
 
-/* ==========================================================
-   Divine Hint — 起動ヒント（音の案内ピル）
-   ========================================================== */
-.divine-hint {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  background: linear-gradient(90deg,#a67cff,#e3c6ff);
-  color: #fff;
-  border: none;
-  border-radius: 24px;
-  padding: 8px 18px;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 0 12px rgba(255,220,255,.4);
-  cursor: pointer;
-  z-index: 1000;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: opacity .5s ease, transform .5s ease;
+/* ============= 4) 起動ヒント（中央ピル） ============= */
+.divine-hint{
+  position:fixed;
+  left:50%;
+  bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+  transform:translateX(-50%);
+  padding:10px 22px;
+  border:none; border-radius:24px;
+  font-size:15px; font-weight:800;
+  color:#fff;
+  background:linear-gradient(90deg,#a67cff,#e3c6ff);
+  box-shadow:0 0 18px rgba(255,220,255,.45);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  cursor:pointer; z-index:1600;
+  transition:opacity .5s ease, transform .5s ease;
+  animation:floatHint 5s ease-in-out infinite alternate;
 }
-.divine-hint.fade-out {
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
+.divine-hint.fade-out{
+  opacity:0; transform:translate(-50%, 10px);
+  pointer-events:none;
+}
+@keyframes floatHint{
+  from{ transform:translate(-50%, 0) }
+  to  { transform:translate(-50%, -8px) }
 }
 
-/* ==========================================================
-   Unified Gradient Buttons（紫グラデ統一）
-   ========================================================== */
-:root {
+/* ============= 5) 紫グラデ統一ボタン（既存クラスへ適用） ============= */
+:root{
   --shion-grad: linear-gradient(135deg, #7e66ff 0%, #a78bff 45%, #ffd76f 100%);
   --shion-text: #2a1030;
 }
 
 .btn--primary,
 .cta--primary,
-.intro-btn.primary {
-  background: var(--shion-grad) !important;
-  color: var(--shion-text) !important;
-  border: 1px solid rgba(255,215,111,.75) !important;
+.intro-btn.primary{
+  background:var(--shion-grad) !important;
+  color:var(--shion-text) !important;
+  border:1px solid rgba(255,215,111,.75) !important;
   box-shadow:
     0 12px 26px rgba(126,102,255,.28),
     0 0 0 1px rgba(255,255,255,.16) inset,
     0 0 34px rgba(174,138,255,.22);
-  text-shadow: 0 1px 0 rgba(255,255,255,.25);
-  border-radius: 14px !important;
-  min-height: 48px;
-  padding: 12px 20px;
-  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+  text-shadow:0 1px 0 rgba(255,255,255,.25);
+  border-radius:14px !important;
+  min-height:48px; padding:12px 20px;
+  transition:transform .18s ease, filter .18s ease, box-shadow .18s ease;
 }
 .btn--primary:hover,
 .cta--primary:hover,
-.intro-btn.primary:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.04);
+.intro-btn.primary:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
   box-shadow:
     0 16px 36px rgba(126,102,255,.35),
     0 0 0 1px rgba(255,255,255,.2) inset,
     0 0 40px rgba(255,215,111,.35);
 }
-
-/* ==========================================================
-   ダークモード補正
-   ========================================================== */
-@media (prefers-color-scheme: dark) {
-  :root { --shion-text: #1b0a1f; }
+@media (prefers-color-scheme: dark){
+  :root{ --shion-text:#1b0a1f }
 }
 
-/* ==========================================================
-   汎用修正＆安全対策
-   ========================================================== */
-
-/* 操作ブロック対策 */
-.sky, #goldDust, .hero__veil {
-  pointer-events: none;
+/* ============= 6) ヘッダー安定化（伸縮バグ抑止） ============= */
+/* 既存テーマが sticky でも OK。ここで fixed に統一し、bodyに余白を確保 */
+:root{ --header-h: 64px } /* 既存に合わせて必要なら 56px へ */
+header[role="banner"], header.header{
+  position:fixed !important;
+  top:0; left:0; width:100%;
+  height:var(--header-h);
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(0,0,0,.06);
+  z-index:2000 !important;
+  transition:background .3s ease;
 }
-
-/* Safariのスタッキング修正 */
-#shiopon-invite.shiopon {
-  position: fixed !important;
-  z-index: 1060 !important;
-}
-
-/* ヘッダーの高さ崩れ修正 */
-header {
-  position: relative !important;
-  z-index: 2000 !important;
-}
-
-/* コンテンツ重なり順の明示 */
-main, section, footer {
-  position: relative;
-  z-index: 10;
-}
-
-/* 横スクロール防止 */
-body {
-  overflow-x: hidden;
-}
-
-/* 動きを控えたい人への配慮 */
-@media (prefers-reduced-motion: reduce) {
-  body.divine::before,
-  body.divine::after,
-  .divine-hint,
-  .divine-flash {
-    animation: none;
-    transition: none;
+@media (prefers-color-scheme: dark){
+  header[role="banner"], header.header{
+    background:rgba(16,16,24,.78);
+    border-bottom:1px solid rgba(255,255,255,.08);
   }
 }
+body{ padding-top:var(--header-h); overflow-x:hidden }
+html, body{ overscroll-behavior:none } /* iOSのゴム伸び抑制 */
 
-.divine-hint {
-  position: fixed;
-  left: 50%;
-  bottom: 15vh;
-  transform: translateX(-50%);
-  background: linear-gradient(90deg, #a67cff, #e3c6ff);
-  color: #fff;
-  border: none;
-  border-radius: 24px;
-  padding: 10px 22px;
-  font-size: 15px;
-  font-weight: 700;
-  box-shadow: 0 0 18px rgba(255,220,255,.45);
-  cursor: pointer;
-  z-index: 1200;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: opacity .5s ease, transform .5s ease;
-  animation: floatHint 5s ease-in-out infinite alternate;
-}
-.divine-hint.fade-out {
-  opacity: 0;
-  transform: translate(-50%, 10px);
-  pointer-events: none;
-}
-@keyframes floatHint {
-  0% { transform: translate(-50%, 0); }
-  100% { transform: translate(-50%, -8px); }
+/* is-booting の影響をヘッダーから除外（初回の伸び縮み防止） */
+html.is-booting header{ opacity:1 !important; filter:none !important; transform:none !important }
+
+/* ============= 7) スタッキング／操作安全（衝突回避） ============= */
+header, .hero, main, section, footer, .wrap{ position:relative; z-index:1 }
+.sky, #goldDust, .hero__veil{ pointer-events:none }
+#shiopon-invite.shiopon{ position:fixed !important; z-index:1900 !important } /* シオポンは神光の下、ヘッダーの下に */
+
+@media (prefers-reduced-motion: reduce){
+  body.divine::before, body.divine::after, .divine-flash, .divine-hint{
+    animation:none; transition:none;
+  }
 }
