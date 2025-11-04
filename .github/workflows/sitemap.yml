@@ -35,21 +35,3 @@ jobs:
         with:
           commit_message: "update sitemap.xml"
           file_pattern: sitemap.xml
-
-                - name: Generate sitemap
-        uses: cicirello/generate-sitemap@v1
-        with:
-          base-url: https://reverse-shion.github.io
-          # 追加：ベースURLと異なるURLをSitemapから除外
-          strip-base-url: true 
-          additional-paths: |
-            /
-            /philosophy.html
-            /books/
-            /en/
-          exclude-paths: |
-            /sw.js
-            /manifest.webmanifest
-            /assets/
-            /google*.html
-
