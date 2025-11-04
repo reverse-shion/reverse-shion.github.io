@@ -441,23 +441,40 @@ a:hover{opacity:.9}
   transform: scale(1.02);
   box-shadow: 0 0 36px rgba(174,138,255,.4), 0 0 72px rgba(255,215,111,.3);
 }
-/* --- Avatar hard fix --- */
+/* ===== Avatar Hard Fix (always front & visible) ===== */
 .profile-mini,
-.profile-mini::before,
-.profile-mini::after,
 .profile-mini__inner,
 .profile-mini__avatar { position: relative; }
 
 .profile-mini::before,
-.profile-mini::after { z-index: 0; }     /* 背景エフェクトは背面へ */
-.profile-mini__inner { z-index: 1; }     /* ガラスカード */
-.profile-mini__avatar { z-index: 2; }    /* アバター枠をさらに前面へ */
+.profile-mini::after { z-index: 0; }   /* 背景演出は最背面へ */
+.profile-mini__inner { z-index: 1; }   /* ガラスカード */
+.profile-mini__avatar { z-index: 2; }  /* アバター枠をさらに上へ */
+
+/* 画像の可視化を強制（他CSSのアニメ／非表示を無効化） */
 .profile-mini__avatar img{
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
   position: relative !important;
-  z-index: 3 !important;                 /* 画像を最前面へ */
-  border: 2px solid rgba(255,255,255,.85); /* 一時確認用の枠（見えたらOK） */
-  background: #fff !important;
+  z-index: 3 !important;
+  background: #fff;
+}
+
+/* 背景演出のhover影響が前面に出ないように */
+.profile-mini__avatar::before,
+.profile-mini__avatar::after{
+  z-index: 1;   /* 画像(z=3)より背面に固定 */
+  pointer-events: none;
+}
+
+/* 念のため：他CSSで変な transform/opacity が当たっても戻す */
+.profile-mini__avatar,
+.profile-mini__inner {
+  transform: none !important;
+  opacity: 1 !important;
 }
