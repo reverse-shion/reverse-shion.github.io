@@ -1012,5 +1012,57 @@ document.addEventListener("click", async () => {
 });
 </script>
 
+  <!-- 光のレイヤー -->
+<div class="divine-flash" id="divineFlash"></div>
+
+<!-- 起動ヒントボタン（中央配置） -->
+<button id="divineHint" type="button" class="divine-hint" aria-live="polite">
+  ▶ タップで“起動”する
+</button>
+
+<!-- 音ファイル（未実装でもOK） -->
+<audio id="divineSound" preload="auto"
+       src="/assets/sound/reverse-init.mp3?v=3"></audio>
+
+<!-- 起動スクリプト -->
+<script>
+(() => {
+  const s = document.getElementById("divineSound");
+  const hint = document.getElementById("divineHint");
+  const flash = document.getElementById("divineFlash");
+  let played = false;
+
+  const activateFlash = () => {
+    flash.classList.add("active");
+    setTimeout(() => flash.classList.remove("active"), 1000);
+  };
+
+  // 起動イベント
+  const boot = async () => {
+    if (played) return;
+    played = true;
+
+    // 音再生（存在しなくてもtry内でスルーされる）
+    try {
+      await s.play();
+    } catch(e) {
+      console.warn("音なし起動モード", e);
+    }
+
+    // 光を出す
+    activateFlash();
+
+    // ボタンをフェードアウト
+    hint.classList.add("fade-out");
+
+    // 次のクリックで繰り返し光るよう登録
+    document.addEventListener("click", activateFlash);
+  };
+
+  // 初回タップで起動
+  hint.addEventListener("click", boot);
+})();
+</script>
+
 </body>
 </html>
