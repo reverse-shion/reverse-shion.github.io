@@ -988,5 +988,29 @@ btnReset.addEventListener('click', resetUI);
 })();
 </script>
 
+  <script>
+document.addEventListener("click", async () => {
+  const s = document.getElementById("divineSound");
+  const hint = document.getElementById("divineHint");
+  const flash = document.getElementById("divineFlash");
+
+  try {
+    // 音再生
+    await s.play();
+
+    // 光の演出を発動
+    flash.classList.add("active");
+    setTimeout(() => flash.classList.remove("active"), 1000);
+
+    // 音が終わったらヒントを消す
+    s.onended = () => {
+      hint.classList.add("fade-out");
+    };
+  } catch(e) {
+    console.warn("音の再生がブロックされました", e);
+  }
+});
+</script>
+
 </body>
 </html>
