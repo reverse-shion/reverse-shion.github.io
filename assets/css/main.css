@@ -441,3 +441,23 @@ a:hover{opacity:.9}
   transform: scale(1.02);
   box-shadow: 0 0 36px rgba(174,138,255,.4), 0 0 72px rgba(255,215,111,.3);
 }
+/* --- Avatar hard fix --- */
+.profile-mini,
+.profile-mini::before,
+.profile-mini::after,
+.profile-mini__inner,
+.profile-mini__avatar { position: relative; }
+
+.profile-mini::before,
+.profile-mini::after { z-index: 0; }     /* 背景エフェクトは背面へ */
+.profile-mini__inner { z-index: 1; }     /* ガラスカード */
+.profile-mini__avatar { z-index: 2; }    /* アバター枠をさらに前面へ */
+.profile-mini__avatar img{
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 3 !important;                 /* 画像を最前面へ */
+  border: 2px solid rgba(255,255,255,.85); /* 一時確認用の枠（見えたらOK） */
+  background: #fff !important;
+}
