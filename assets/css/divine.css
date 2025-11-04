@@ -1,1 +1,153 @@
+/* =================================================================
+   Re:verse Shion — Divine Layer
+   機能: 神降臨（起動光/刻印/音ヒント）＋ 統一グラデボタン
+   影響範囲: body.divine のみ。既存テーマを上書きしません。
+   ================================================================= */
 
+/* ---- 入場フェード（任意・軽め） ---- */
+html.is-booting body{ opacity:.0; filter: blur(6px); transition: opacity .6s ease, filter .6s ease }
+html:not(.is-booting) body, html.is-booting body{ opacity:1; filter:none }
+
+/* ---- 神気の脈動（背景の柔らかい光） ---- */
+body.divine::before{
+  content:"";
+  position:fixed; inset:-10vh -10vw;
+  background:
+    radial-gradient(38vmax 38vmax at 50% 35%, rgba(255,215,111,.18), transparent 60%),
+    radial-gradient(48vmax 48vmax at 50% 70%, rgba(174,138,255,.20), transparent 65%);
+  mix-blend-mode: soft-light;
+  animation: divinePulse 7s ease-in-out infinite alternate;
+  pointer-events:none; z-index:0;
+}
+@keyframes divinePulse{
+  0%  { opacity:.55; transform: scale(1) }
+  100%{ opacity:.85; transform: scale(1.06) }
+}
+
+/* ---- 詩韻OSの刻印（超淡い大文字） ---- */
+body.divine::after{
+  content:"詩  韻  祈";
+  position:fixed; inset:0;
+  font-family:"Shippori Mincho","Noto Serif JP",serif;
+  font-weight:600; letter-spacing:.4em;
+  font-size:clamp(54px, 10vw, 160px);
+  line-height:100vh; text-align:center;
+  color: rgba(255,255,255,.06);
+  text-shadow: 0 0 1px rgba(255,255,255,.04);
+  pointer-events:none; z-index:0;
+  animation: sealSwell 9s ease-in-out infinite alternate;
+  /* 明るいテーマ下でも沈まないよう、ブレンド微調整 */
+  mix-blend-mode: lighten;
+}
+@keyframes sealSwell{
+  0%  { opacity:.28; transform: translateY(-1vh) scale(1) }
+  100%{ opacity:.46; transform: translateY(1vh)  scale(1.02) }
+}
+
+/* ---- コンテンツは前面に ---- */
+header, .hero, main, section, footer, .wrap, .sky{ position:relative; z-index:1 }
+
+/* ---- 起動ヒント（小さなピル） ---- */
+.divine-hint{
+  position: fixed;
+  left: 50%; bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 800; font-size: 14px;
+  color:#2a1030;
+  background: linear-gradient(135deg, #ffd76f 0%, #caa2ff 55%, #7e66ff 100%);
+  border: 1px solid rgba(255,215,111,.75);
+  box-shadow: 0 10px 24px rgba(126,102,255,.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: opacity .28s ease, transform .28s ease;
+}
+.divine-hint.is-hide{ opacity:0; transform: translateX(-50%) translateY(6px); pointer-events:none }
+
+/* ---- 動きを控えたい設定尊重 ---- */
+@media (prefers-reduced-motion: reduce){
+  body.divine::before,
+  body.divine::after,
+  .divine-hint{ animation: none }
+}
+
+/* ==========================================================
+   統一グラデーション・ボタン（紫系） — 既存クラスに適用
+   既存の .btn--primary / .cta--primary / .intro-btn.primary を吸収
+   ========================================================== */
+
+:root{
+  --shion-grad: linear-gradient(135deg, #7e66ff 0%, #a78bff 45%, #ffd76f 100%);
+  --shion-text: #2a1030;
+}
+
+/* 既存の紫ボタン群に一括適用 */
+.btn--primary,
+.cta--primary,
+.intro-btn.primary{
+  background: var(--shion-grad) !important;
+  color: var(--shion-text) !important;
+  border: 1px solid rgba(255,215,111,.75) !important;
+  box-shadow:
+    0 12px 26px rgba(126,102,255,.28),
+    0 0 0 1px rgba(255,255,255,.16) inset,
+    0 0 34px rgba(174,138,255,.22);
+  text-shadow: 0 1px 0 rgba(255,255,255,.25);
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+
+.btn--primary:hover,
+.cta--primary:hover,
+.intro-btn.primary:hover{
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow:
+    0 16px 36px rgba(126,102,255,.35),
+    0 0 0 1px rgba(255,255,255,.2) inset,
+    0 0 40px rgba(255,215,111,.35);
+}
+
+/* 角丸・高さの差異を吸収（見た目をそろえる） */
+.btn--primary, .cta--primary, .intro-btn.primary{
+  border-radius: 14px !important;
+  min-height: 48px;
+  padding: 12px 20px;
+}
+
+/* ダークモード微調整（読みやすい色へ） */
+@media (prefers-color-scheme: dark){
+  :root{ --shion-text:#1b0a1f }
+}
+
+/* ==========================================================
+   既存の重なり対策（クリックブロック/粒子など）
+   ========================================================== */
+
+/* 粒子や動画ベールが操作をブロックしないよう最優先で無効化 */
+.sky, #goldDust, .hero__veil{ pointer-events:none }
+
+/* Safariでのスタッキング不具合を回避 */
+#shiopon-invite.shiopon{ position:fixed !important; z-index:1060 !important }
+
+.divine-hint{
+  position:fixed;
+  bottom:16px;
+  right:16px;
+  background:linear-gradient(90deg,#a67cff,#e3c6ff);
+  color:#fff;
+  border:none;
+  border-radius:24px;
+  padding:8px 18px;
+  font-size:14px;
+  box-shadow:0 0 12px rgba(255,220,255,.4);
+  cursor:pointer;
+  z-index:1000;
+  transition:opacity .5s ease,transform .5s ease;
+}
+.divine-hint.fade-out{
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+}
