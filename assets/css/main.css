@@ -418,3 +418,26 @@ a:hover{opacity:.9}
   transform: scale(1.02);
   transition: all 0.3s ease;
 }
+.profile-mini__avatar img {
+  position: relative;
+  z-index: 5; /* ← 画像を前面に */
+}
+
+.profile-mini::before,
+.profile-mini::after {
+  z-index: 1; /* ← 光輪と粒子を背面に */
+}
+
+.profile-mini__inner {
+  position: relative;
+  z-index: 2;
+}
+.profile-mini__avatar img {
+  border-radius: 50%;
+  box-shadow: 0 0 24px rgba(174,138,255,.25), 0 0 48px rgba(255,215,111,.15);
+  transition: transform .4s ease, box-shadow .4s ease;
+}
+.profile-mini__avatar img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 36px rgba(174,138,255,.4), 0 0 72px rgba(255,215,111,.3);
+}
