@@ -18,18 +18,20 @@ jobs:
       - name: Generate sitemap
         uses: cicirello/generate-sitemap@v1
         with:
-          base-url: https://reverse-shion.github.io
+          base-url: https://reverse-shion.github.io   # ← ここが重要！
           additional-paths: |
             /
             /philosophy.html
+            /books/
             /en/
           exclude-paths: |
             /sw.js
             /manifest.webmanifest
             /assets/
             /google*.html
+
       - name: Commit sitemap.xml
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: update sitemap.xml"
+          commit_message: "update sitemap.xml"
           file_pattern: sitemap.xml
