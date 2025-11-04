@@ -102,7 +102,8 @@
   <link rel="stylesheet" href="/assets/css/intro.css">
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/nav.css">
-
+  <link rel="stylesheet" href="/assets/css/divine.css?v=3">
+  
   <!-- 安全装備（最小限の補助スタイル） -->
   <style>
     /* ヘッダーの表示/非表示制御（nav.cssに無い場合の保険） */
@@ -952,5 +953,40 @@ btnReset.addEventListener('click', resetUI);
 </script>
 
   <script src="/assets/js/lang-switch.js" defer></script>
+
+<!-- 画面タップで音を鳴らす（追加） -->
+<audio id="divineSound" preload="auto"
+       src="/assets/sound/reverse-init.mp3?v=3"></audio>
+
+<!-- 起動ヘルパー：小さな案内ピル（追加：任意） -->
+<button id="divineHint" type="button" class="divine-hint" aria-live="polite">
+  ▶ 画面タップで“起動音”が流れます
+</button>
+
+
+  
+  <!-- 起動スクリプト（追加） -->
+<script>
+(() => {
+  const audio = document.getElementById('divineSound');
+  const hint  = document.getElementById('divineHint');
+  let played = false;
+
+  // 初回タップで起動音（モバイルの自動再生規制対策）
+  const boot = () => {
+    if (played) return;
+    played = true;
+    hint?.classList.add('is-hide');
+    audio?.play().catch(()=>{ /* サイレント失敗でOK */ });
+    window.removeEventListener('pointerdown', boot, {passive:true});
+  };
+  window.addEventListener('pointerdown', boot, {passive:true});
+
+  // ページ入場の微フェード（任意：好みで）
+  document.documentElement.classList.add('is-booting');
+  setTimeout(() => document.documentElement.classList.remove('is-booting'), 700);
+})();
+</script>
+
 </body>
 </html>
