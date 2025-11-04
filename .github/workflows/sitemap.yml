@@ -18,12 +18,12 @@ jobs:
       - name: Generate sitemap
         uses: cicirello/generate-sitemap@v1
         with:
-          base-url: https://reverse-shion.github.io  # ✅ ここが重要！
-          additional-paths: |
-            /
-            /philosophy.html
-            /books/
-            /en/
+          base-url-path: /
+          path-to-root: ./
+          include-html: true
+          sitemap-format: xml
+          include-pdf: false
+          date-only: false
           exclude-paths: |
             /sw.js
             /manifest.webmanifest
