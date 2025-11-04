@@ -151,3 +151,31 @@ header, .hero, main, section, footer, .wrap, .sky{ position:relative; z-index:1 
   transform:translateY(10px);
   pointer-events:none;
 }
+
+/* ヘッダーが伸びる・押し下げられる不具合修正 */
+header {
+  position: relative !important;
+  z-index: 2000 !important;
+}
+
+/* 光レイヤーを背景に固定 */
+.divine-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 0 !important;
+  pointer-events: none;
+}
+
+/* 他コンテンツが上に来るよう明示 */
+main, section, footer {
+  position: relative;
+  z-index: 10;
+}
+.divine-flash.active{
+  opacity:1;
+  transform:scale(2);
+  background: radial-gradient(circle at center,
+             rgba(255,255,255,0.9),
+             rgba(190,160,255,0.3) 50%,
+             rgba(255,220,160,0) 80%);
+}
