@@ -118,3 +118,67 @@ footer{ text-align:center; padding: 40px 0 24px; font-size:14px; color:#8a87a6 }
   .about-hero{ padding: 24px 14px 20px }
   .about-hero img{ width: 200px; height: 200px; min-width:200px; min-height:200px }
 }
+/* ====== About 仕上げパッチ v3 ====== */
+
+/* 強調色（白飛び防止） */
+body.about strong,
+body.about li strong{
+  color:#3a2fb0 !important;  /* 濃ラベンダー */
+  font-weight:700;
+}
+
+/* 本文 & リストの薄色を救出 */
+body.about .about-wrap p,
+body.about .about-wrap li{
+  color:#2e2a44 !important;
+}
+
+/* フッターの視認性 */
+body.about footer{
+  color:#6f6a8f !important;  /* コントラスト上げる */
+  opacity: .98 !important;
+}
+
+/* ヒーローの白円（オーラ）を控えめに＆スクロール時の違和感を軽減 */
+.about-hero{
+  will-change: transform;     /* iOSのチラつき対策 */
+  transform: translateZ(0);   /* 合成レイヤー固定で“動いて見える”のを抑える */
+}
+.about-hero::before{
+  inset:-10% -10% -15% -10%; /* はみ出しを増やして縁の輪郭を消す */
+  filter: blur(60px);
+  opacity:.28;               /* 明るさダウン */
+}
+
+/* 画像が404でも崩れない（?アイコンを目立たせない） */
+.about-hero img{
+  aspect-ratio:1 / 1;
+  background:
+    radial-gradient(90px 90px at 35% 30%, rgba(126,102,255,.12), transparent 70%),
+    #edeaff;
+  border:2px solid rgba(255,255,255,.9);
+}
+/* Safariのbroken-imageアイコンを目立たなくする小技 */
+.about-hero img:not([src]), 
+.about-hero img[src=""], 
+.about-hero img[src*="data:"]{
+  background:#edeaff;
+}
+
+/* 見出しの可読性をもう一押し */
+body.about .about-wrap h2{
+  color:#4a3fa5 !important;
+  text-shadow: 0 0 6px rgba(255,255,255,.65);
+}
+
+/* CTAの点線フォーカスや発光の競合を抑える（iOS見え方安定） */
+body.about .cta a{
+  outline: none;
+  box-shadow: none;
+}
+body.about .btn-main{
+  box-shadow: 0 8px 22px rgba(126,102,255,.28);
+}
+body.about .btn-sub{
+  box-shadow: 0 3px 10px rgba(0,0,0,.06);
+}
