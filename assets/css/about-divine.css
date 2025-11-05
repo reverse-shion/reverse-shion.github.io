@@ -211,3 +211,164 @@ a:hover{ color:#fff; text-shadow:0 0 10px rgba(143,122,255,.55); border-color:tr
 .center{ text-align:center }
 .muted{ color:var(--muted) }
 .mt{ margin-top:1.2em } .mt2{ margin-top:2.0em } .mb2{ margin-bottom:2.0em }
+
+/* ============================================================
+   Re:verse Shion — about-divine.css (Light Sanctum Edition)
+   最終安定版 / 神格化演出＋可読性重視
+   ============================================================ */
+
+:root{
+  --ink:#1a1533;
+  --muted:#5a5680;
+  --accent:#7e66ff;
+  --accent-2:#ffd76f;
+  --bg-light:#f9f7ff;
+  --bg-white:#ffffff;
+  --r:18px;
+  --shadow-soft:0 6px 22px rgba(126,102,255,.15);
+  --shadow-strong:0 12px 36px rgba(126,102,255,.22);
+}
+
+/* ===== 全体 ===== */
+body.about{
+  background:
+    radial-gradient(900px 600px at 10% -10%, rgba(126,102,255,.08), transparent 70%),
+    radial-gradient(900px 700px at 90% 0%, rgba(255,215,111,.08), transparent 70%),
+    linear-gradient(180deg, #fff, var(--bg-light));
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-shadow: none;
+}
+
+/* ===== ヒーロー ===== */
+.about-hero{
+  position: relative;
+  background: linear-gradient(180deg, #fff, #f7f4ff);
+  border-radius: var(--r);
+  padding: 40px 20px 36px;
+  box-shadow: var(--shadow-strong);
+  text-align: center;
+  overflow: hidden;
+}
+.about-hero::before{
+  content:"";
+  position:absolute; inset:0;
+  background: radial-gradient(circle at 50% 20%, rgba(126,102,255,.18), transparent 70%);
+  filter: blur(80px);
+  z-index:0;
+}
+.about-hero img{
+  position:relative;
+  z-index:1;
+  width:220px; height:220px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#edeaff;
+  box-shadow:0 10px 30px rgba(126,102,255,.25);
+  border:2px solid rgba(255,255,255,.9);
+}
+.about-hero h1{
+  position:relative; z-index:1;
+  font-family:"Shippori Mincho",serif;
+  font-size:28px;
+  color:#2a1f6a;
+  margin:1.2em 0 .4em;
+}
+.about-hero p{
+  position:relative; z-index:1;
+  color:#6a6680; margin:0;
+}
+
+/* ===== 本文セクション ===== */
+.about-wrap{
+  width:min(860px,92vw);
+  margin:0 auto;
+  padding:80px 0 60px;
+  line-height:1.9;
+  font-family:"Zen Kaku Gothic New",sans-serif;
+}
+.about-wrap h2{
+  font-family:"Shippori Mincho",serif;
+  font-size:22px;
+  margin:2.4em 0 1em;
+  color:#4a3fa5;
+  text-shadow:0 0 6px rgba(255,255,255,.6);
+}
+.about-wrap p{ color:#2b2844; margin:0 0 1.2em; }
+
+/* ===== リスト ===== */
+.about-wrap ul{
+  list-style:none;
+  padding:0; margin:1.2em 0 1.8em;
+}
+.about-wrap li{
+  padding:.5em 0;
+  font-size:15px;
+  color:#302d52;
+  display:flex; align-items:flex-start;
+}
+.about-wrap li::before{
+  content:"✨";
+  display:inline-block;
+  margin-right:.6em;
+  font-size:1em;
+}
+
+/* ===== 引用 ===== */
+.quote{
+  font-style:italic;
+  border-left:4px solid #b5a3ff;
+  padding-left:1em;
+  margin:1.5em 0;
+  color:#4c4972;
+  background:rgba(255,255,255,.7);
+  border-radius:8px;
+  box-shadow:inset 0 0 20px rgba(126,102,255,.08);
+}
+
+/* ===== CTA ===== */
+.cta{
+  text-align:center;
+  margin:3em 0 0;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:1em;
+}
+.cta a{
+  display:inline-block;
+  padding:12px 28px;
+  border-radius:999px;
+  text-decoration:none;
+  font-weight:600;
+  transition:.3s;
+  font-family:"Zen Kaku Gothic New",sans-serif;
+}
+.btn-main{
+  background:linear-gradient(135deg,#7e66ff,#9b87ff);
+  color:#fff;
+  box-shadow:0 6px 20px rgba(126,102,255,.3);
+}
+.btn-main:hover{ transform:translateY(-3px); box-shadow:0 10px 26px rgba(126,102,255,.4); }
+.btn-sub{
+  background:#fff;
+  border:1px solid rgba(126,102,255,.4);
+  color:#5a47dc;
+  box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+.btn-sub:hover{ background:#f7f4ff; }
+
+/* ===== フッター ===== */
+footer{
+  text-align:center;
+  padding:40px 0 24px;
+  font-size:14px;
+  color:#8a87a6;
+}
+
+/* ===== モバイル調整 ===== */
+@media (max-width:599.98px){
+  .about-hero img{ width:200px; height:200px; }
+  .about-hero{ padding:32px 16px; }
+  .about-wrap{ padding:60px 1.2em 50px; }
+}
