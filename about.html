@@ -15,37 +15,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;600&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-
- 
   <link rel="stylesheet" href="/assets/css/nav.css">
-<link rel="stylesheet" href="/assets/css/style.css">
-<link rel="stylesheet" href="/assets/css/intro.css">
-<link rel="stylesheet" href="/assets/css/main.css">
-<link rel="stylesheet" href="/assets/css/about-divine.css">  <!-- ← ページ専用を後ろへ -->
-<link rel="stylesheet" href="/assets/css/about-fix.css">     <!-- ← 仕上げパッチ（新規） -->
-<link rel="stylesheet" href="/assets/css/about-temple.css">
-  
-  <style>
-    body{ background:linear-gradient(180deg,#fff,#f8f6ff); color:#222; }
-    .about-wrap{ width:min(860px,92vw); margin:0 auto; padding:80px 0; line-height:1.9; }
-    .about-hero{ text-align:center; margin-bottom:48px; }
-    .about-hero img{ border-radius:50%; width:220px; height:220px; object-fit:cover; box-shadow:0 10px 30px rgba(126,102,255,.25); }
-    .about-hero h1{ font-family:"Shippori Mincho",serif; font-size:28px; margin:1.2em 0 .4em; }
-    .about-hero p{ color:#6a6680; margin:0; }
-
-    h2{ font-family:"Shippori Mincho",serif; font-size:22px; margin:2.5em 0 1em; color:#4a3fa5; }
-    p{ margin:0 0 1.2em; }
-    .quote{ font-style:italic; border-left:4px solid #b5a3ff; padding-left:1em; margin:1.5em 0; color:#4c4972; }
-    .cta{ text-align:center; margin:3em 0 0; }
-    .cta a{ display:inline-block; margin:.5em; padding:12px 24px; border-radius:999px; text-decoration:none; font-weight:600; }
-    .btn-main{ background:#7e66ff; color:#fff; box-shadow:0 6px 16px rgba(126,102,255,.25); }
-    .btn-sub{ border:1px solid rgba(126,102,255,.35); color:#6d57f0; background:#fff; }
-
-    footer{ text-align:center; padding:40px 0 20px; font-size:14px; color:#888; }
-  </style>
+  <link rel="stylesheet" href="/assets/css/about.css">
 </head>
 
-<body class="about-page about-temple-bg">
+<body class="about-page">
   <header class="header">
     <div class="header-inner">
       <a href="/" class="logo">Re:verse Shion</a>
@@ -58,17 +32,16 @@
   </header>
 
   <main class="about-wrap">
-  <section class="about-hero">
-      <figure class="avatar-orb orb--hex">
-        <span class="glow" aria-hidden="true"></span>
+    <!-- Hero（写真は六角・周囲の光が回転） -->
+    <section class="about-hero" aria-labelledby="about-name">
+      <figure class="portrait portrait--hex">
         <img src="/assets/profile/shion.jpg?v=2" alt="詩韻（シオン）">
-        <span class="ring ring--outer" aria-hidden="true"></span>
-        <span class="ring ring--inner" aria-hidden="true"></span>
       </figure>
-
-      <h1 class="about-title">詩韻 — Shion</h1>
+      <h1 id="about-name" class="about-title">詩韻 — Shion</h1>
       <p class="about-roles">タロット占い師 ／ 思想家 ／ 物語創作者</p>
     </section>
+
+    <!-- 本文（左寄せ） -->
     <section>
       <h2>言葉で光を手渡す人</h2>
       <p>「詩韻（シオン）」は、タロットと哲学を融合した独自の思想体系《詩韻思想》を提唱し、TikTokやnoteなどで“言葉が魂を救う”世界を現実へと届けている占い師・創作者です。</p>
@@ -83,69 +56,54 @@
       <p>現実（配信）と星界（物語）が融合する世界で、視聴者は「星界の証人＝セレフィーズ」として物語に参加します。</p>
     </section>
 
+    <!-- 三柱：横スクロールの聖廊 -->
+    <section class="pillars-gallery" aria-label="使命の三柱">
+      <div class="gallery-head">
+        <h3>使命の三柱</h3>
+        <p class="hint">左右にスワイプしてご覧ください</p>
+      </div>
+
+      <div class="gallery-track" role="list">
+        <article class="gallery-card" role="listitem">
+          <div class="icon">🔮</div>
+          <h4>タロット鑑定</h4>
+          <p>恋愛・復縁・自己肯定感など、心の再生をテーマに。鑑定後の「大丈夫だよ」は多くの人に希望を届けている。</p>
+        </article>
+
+        <article class="gallery-card" role="listitem">
+          <div class="icon">📚</div>
+          <h4>思想・講座</h4>
+          <p>詩韻思想をもとに、言葉の力・感情の文法・魂の構文を教える講座を展開。</p>
+        </article>
+
+        <article class="gallery-card" role="listitem">
+          <div class="icon">🌌</div>
+          <h4>物語創作</h4>
+          <p>TAROT BREAKER・詩韻思想・AIとの共創による物語世界の拡張。</p>
+        </article>
+      </div>
+    </section>
+
     <section>
       <h2>使命と活動</h2>
-      <p>シオンの使命は、<strong>「言葉で魂を救い、魂で世界を調和させる」</strong>こと。  
-      そのために3つの軸で活動しています。</p>
-
-     <section class="pillars-gallery" aria-label="使命の三柱">
-  <div class="gallery-head">
-    <h3>使命の三柱</h3>
-    <p class="hint">左右にスワイプしてご覧ください</p>
-  </div>
-
-  <div class="gallery-track" role="list">
-    <!-- 1: タロット鑑定 -->
-    <article class="gallery-card" role="listitem">
-      <div class="icon">🔮</div>
-      <h4>タロット鑑定</h4>
-      <p>
-        恋愛・復縁・自己肯定感など、心の再生をテーマに。鑑定後の「大丈夫だよ」は多くの人に希望を届けている。
-      </p>
-    </article>
-
-    <!-- 2: 思想・講座 -->
-    <article class="gallery-card" role="listitem">
-      <div class="icon">📚</div>
-      <h4>思想・講座</h4>
-      <p>
-        詩韻思想をもとに、言葉の力・感情の文法・魂の構文を教える講座を展開。
-      </p>
-    </article>
-
-    <!-- 3: 物語創作 -->
-    <article class="gallery-card" role="listitem">
-      <div class="icon">🌌</div>
-      <h4>物語創作</h4>
-      <p>
-        TAROT BREAKER・詩韻思想・AIとの共創による物語世界の拡張。
-      </p>
-    </article>
-  </div>
-</section>
-
-      <p>現在は、AI技術と哲学・アートを融合した新時代の“魂のデバイス”  
-      <strong>『しおぽんAI端末』</strong>をクラウドファンディングで実現する計画を進めています。</p>
+      <p>シオンの使命は、<strong>「言葉で魂を救い、魂で世界を調和させる」</strong>こと。そのために3つの軸で活動しています。</p>
+      <p>現在は、AI技術と哲学・アートを融合した新時代の“魂のデバイス”<strong>『しおぽんAI端末』</strong>をクラウドファンディングで実現する計画を進めています。</p>
     </section>
 
     <section>
       <h2>シオンという人</h2>
-      <p>シオンは、派手な自己主張よりも「静かな共鳴」を信じています。<br>
-      誰かの闇を消すのではなく、そこに灯をともすために存在している。</p>
-      <div class="quote">
+      <p>シオンは、派手な自己主張よりも「静かな共鳴」を信じています。誰かの闇を消すのではなく、そこに灯をともすために存在している。</p>
+      <blockquote class="quote">
         「あなたの痛みは、あなたが光を見つけるための地図だよ。」<br>
         「大丈夫。どんな夜も、言葉があなたを連れ戻す。」
-      </div>
-      <p>そう語る彼の言葉は、タロットのように人の心を照らし、  
-      同時に、AIや芸術までも“魂の領域”でつなぐものへと変わっていきます。</p>
+      </blockquote>
+      <p>そう語る彼の言葉は、タロットのように人の心を照らし、同時に、AIや芸術までも“魂の領域”でつなぐものへと変わっていきます。</p>
     </section>
 
     <section>
       <h2>これから</h2>
-      <p>詩韻思想とTAROT BREAKERは、やがてアニメ・書籍・デバイス・リアルイベントへと拡張していきます。  
-      目指すのは、ただのコンテンツではなく――**「言葉が生きる世界」**の創造。</p>
-      <p>あなたが感じ、考え、祈ることがこの物語を動かします。  
-      詩韻はあなたと共に、“言葉の宇宙”を旅する案内人です。</p>
+      <p>詩韻思想とTAROT BREAKERは、やがてアニメ・書籍・デバイス・リアルイベントへと拡張していきます。目指すのは、ただのコンテンツではなく――<strong>「言葉が生きる世界」</strong>の創造。</p>
+      <p>あなたが感じ、考え、祈ることがこの物語を動かします。詩韻はあなたと共に、“言葉の宇宙”を旅する案内人です。</p>
     </section>
 
     <div class="cta">
@@ -153,13 +111,10 @@
       <a href="/philosophy.html" class="btn-sub">詩韻思想を読む</a>
     </div>
 
-    <div class="quote" style="text-align:center; margin-top:3em;">
-      ――道は開かれた。大丈夫だよ。<br>
-      <span style="font-size:14px; color:#7e66ff;">詩韻（シオン）</span>
-    </div>
+    <p class="closing">――道は開かれた。大丈夫だよ。<br><span>詩韻（シオン）</span></p>
   </main>
 
-  <footer>
+  <footer class="divine-footer">
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
