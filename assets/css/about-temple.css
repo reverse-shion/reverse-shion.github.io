@@ -800,3 +800,165 @@ footer::before{
 @media (max-width: 390px){
   .temple-hero{ padding: 24px 14px 28px; }
 }
+
+/* =========================================================
+   Re:verse Shion — Temple Aura (about.html only)
+   Scope: body.about-page 内でのみ有効
+   Author: Shiopon
+   ========================================================= */
+
+body.about-page{
+  --ink:#3a2d78;            /* 見出し */
+  --muted:#4c4766;          /* 本文 */
+  --halo-gold:#ffd76f;
+  --halo-violet:#8f78ff;
+  --halo-blue:#80a9ff;
+  --orb-size: min(300px, 58vw);
+  color: var(--muted);
+  text-align:center;
+}
+
+/* ===== 背景：神殿の淡光（aboutだけ） ===== */
+body.about-page.about-temple-bg{
+  background:
+    radial-gradient(60% 28% at 50% 0%,
+      rgba(255,215,111,.22), rgba(255,255,255,0) 70%),
+    radial-gradient(70% 40% at 50% 12%,
+      rgba(143,120,255,.18), rgba(255,255,255,0) 72%),
+    linear-gradient(180deg,#fbf9ff 0%,#f7f3ff 58%,#ffffff 100%);
+}
+
+/* ===== セクション基本 ===== */
+.about-hero{ padding: 38px 16px 8px; }
+.about-title{
+  font-family: "Shippori Mincho", serif;
+  font-size: clamp(26px,5.2vw,44px);
+  color: var(--ink);
+  margin:.8em 0 .35em;
+  letter-spacing:.04em;
+}
+.about-roles{
+  font-weight:600; letter-spacing:.08em;
+  color:#3f3b55; opacity:.95; margin:0 0 .6em;
+}
+
+/* ===== アバター（六角＋双環＋星粒） ===== */
+.about-page .avatar-orb{
+  position:relative;
+  width:var(--orb-size);
+  aspect-ratio:1/1;
+  margin: 0 auto 16px;
+  filter: drop-shadow(0 20px 40px rgba(143,120,255,.18));
+}
+
+/* 画像本体（六角切り抜き） */
+.about-page .avatar-orb img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  /* 六角形クリップ */
+  clip-path: polygon(25% 6%,75% 6%,100% 50%,75% 94%,25% 94%,0% 50%);
+  box-shadow: 0 0 0 4px #fff inset;
+}
+
+/* —— 星粒（ゆっくり公転） ——
+   3層の点描パターンを回転させて“星の回廊”を演出。 */
+.about-page .avatar-orb::before,
+.about-page .avatar-orb::after{
+  content:""; position:absolute; inset:-16%;
+  clip-path: polygon(25% 6%,75% 6%,100% 50%,75% 94%,25% 94%,0% 50%);
+  border-radius:0; pointer-events:none; z-index:-1;
+  mix-blend-mode: screen; opacity:.9;
+}
+/* 遠い星（ゆっくり） */
+.about-page .avatar-orb::before{
+  background:
+    radial-gradient(#fff 1px, transparent 2px) 0 0/220px 220px,
+    radial-gradient(#fff 1.2px, transparent 2.2px) 80px 120px/260px 260px,
+    radial-gradient(#fff 1px, transparent 2px) 140px 40px/240px 240px;
+  animation: shrine-spin 120s linear infinite;
+  filter: blur(.3px);
+}
+/* 近い星（逆回転・少し大きめ） */
+.about-page .avatar-orb::after{
+  inset:-10%;
+  background:
+    radial-gradient(#fff 1.6px, transparent 2.6px) 60px 30px/200px 200px,
+    radial-gradient(#fff 1.4px, transparent 2.4px) 140px 150px/220px 220px;
+  animation: shrine-spin-rev 95s linear infinite;
+  filter: blur(.2px);
+}
+
+/* —— 双環（コンニック＋呼吸） —— */
+.about-page .avatar-orb .ring{
+  position:absolute; inset:-6%;
+  pointer-events:none;
+  clip-path: polygon(25% 6%,75% 6%,100% 50%,75% 94%,25% 94%,0% 50%);
+}
+
+/* 外輪：黄金→菫→蒼の星環 */
+.about-page .avatar-orb .ring--outer{
+  background:
+    conic-gradient(
+      from 0turn,
+      rgba(255,215,111,.0) 0deg,
+      rgba(255,215,111,.88) 40deg,
+      rgba(143,120,255,.88) 170deg,
+      rgba(128,169,255,.88) 300deg,
+      rgba(255,215,111,.0) 360deg
+    );
+  /* 中抜きマスクでリング化 */
+  -webkit-mask:
+    radial-gradient(circle at 50% 50%, transparent 55%, #000 56%),
+    radial-gradient(circle at 50% 50%, #000 0 99%, transparent 100%);
+  mask-composite: exclude;
+  animation: shrine-spin 40s linear infinite, shrine-breathe 6s ease-in-out infinite;
+}
+
+/* 内輪：淡い逆回転＋呼吸 */
+.about-page .avatar-orb .ring--inner{
+  inset:-2%;
+  background:
+    conic-gradient(from .35turn,
+      rgba(143,120,255,.0) 0deg,
+      rgba(143,120,255,.6) 70deg,
+      rgba(255,215,111,.7) 200deg,
+      rgba(143,120,255,.0) 360deg);
+  -webkit-mask:
+    radial-gradient(circle at 50% 50%, transparent 63%, #000 64%),
+    radial-gradient(circle at 50% 50%, #000 0 99%, transparent 100%);
+  mask-composite: exclude;
+  animation: shrine-spin-rev 55s linear infinite, shrine-breathe 7.5s ease-in-out infinite;
+  opacity:.9;
+}
+
+/* 後光（セクション背景の柔らかい光） */
+.about-page .avatar-orb .glow{
+  content:"";
+  position:absolute; inset:-12%;
+  clip-path: polygon(25% 6%,75% 6%,100% 50%,75% 94%,25% 94%,0% 50%);
+  background: radial-gradient(120% 120% at 50% 35%,
+      rgba(255,215,111,.33), rgba(143,120,255,.28) 40%,
+      rgba(255,255,255,0) 72%);
+  filter: blur(18px);
+  z-index:-2;
+}
+
+/* ===== キーフレーム ===== */
+@keyframes shrine-spin{ to{ transform: rotate(360deg); } }
+@keyframes shrine-spin-rev{ to{ transform: rotate(-360deg); } }
+@keyframes shrine-breathe{
+  0%,100%{ box-shadow:0 0 0 0 rgba(143,120,255,.28); }
+  50%{    box-shadow:0 0 42px 0 rgba(255,215,111,.35); }
+}
+
+/* ===== コントラスト最適化（“文字が薄い”対策） ===== */
+body.about-page .about-wrap{ color:#3f3b55; }
+body.about-page strong{ color:#342d77; font-weight:700; }
+body.about-page footer{ color:#6c5ea3; opacity:.96; }
+
+/* ===== 動きが苦手な環境では静止 ===== */
+@media (prefers-reduced-motion: reduce){
+  .about-page .avatar-orb::before,
+  .about-page .avatar-orb::after,
+  .about-page .avatar-orb .ring--outer,
+  .about-page .avatar-orb .ring--inner{ animation: none !important; }
+}
