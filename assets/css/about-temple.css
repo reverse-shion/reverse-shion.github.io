@@ -683,3 +683,120 @@ footer::before{
   filter: blur(14px); opacity:.5; pointer-events:none;
 }
 }
+/* ===== 神殿ヒーロー：神々しい背景＋中央配置 ===== */
+.temple-hero{
+  position: relative;
+  isolation: isolate;
+  padding: clamp(28px, 5vw, 48px) 18px 36px;
+  border-radius: 24px;
+  text-align: center;                    /* ← 中央揃え */
+  /* 神々しい多層グラデ（軽量・モバイル安定） */
+  background:
+    radial-gradient(120% 80% at 50% 0%,
+      rgba(126,102,255,.20), transparent 60%),
+    radial-gradient(80% 60% at 50% 100%,
+      rgba(255,215,111,.16), transparent 62%),
+    linear-gradient(180deg, #ffffff 0%, #f7f4ff 60%, #f2efff 100%);
+  box-shadow:
+    0 20px 60px rgba(126,102,255,.12),
+    inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+/* 上部の淡い光のアーチ（飾り） */
+.temple-arch{
+  position:absolute; inset: -12% -6% auto -6%; height: 42%;
+  background:
+    conic-gradient(from 20deg,
+      rgba(255,215,111,.65),
+      rgba(117,92,255,.75),
+      rgba(214,178,255,.55),
+      rgba(255,215,111,.65));
+  filter: blur(28px) saturate(115%);
+  border-radius: 1000px;
+  opacity:.70;
+  pointer-events:none;
+  z-index:-1;
+}
+
+/* ===== タイトルの可読性UP（くっきり濃色） ===== */
+.temple-title{
+  margin: 14px 0 6px;
+  font-family: "Shippori Mincho", serif;
+  font-size: clamp(22px, 5.2vw, 32px);
+  line-height: 1.25;
+  color: #372ca2;             /* 濃い藍 */
+  text-shadow: 0 1px 0 #fff, 0 8px 24px rgba(79,52,214,.16);
+  letter-spacing: .02em;
+}
+.temple-sub{
+  margin: 4px 0 0;
+  font-size: clamp(13px, 3.5vw, 16px);
+  color: #3d3a59;             /* 濃いめのグレー藍 */
+  font-weight: 600;
+  opacity: .95;
+}
+
+/* 本文中の <strong> が白くなる対策（最優先上書き） */
+.about-wrap strong{
+  color:#2f2a6e !important;
+  font-weight: 700;
+}
+
+/* ===== 六角形ポートレート枠 ===== */
+.portrait{
+  width: min(64vw, 280px);
+  aspect-ratio: 1;
+  margin: 0 auto 14px;
+  position: relative;
+}
+
+/* 画像を六角形にクリップ */
+.portrait--hex img{
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+  /* 六角形クリップ（広範囲サポート） */
+  clip-path: polygon(
+    25% 6%, 75% 6%,
+    100% 50%,
+    75% 94%, 25% 94%,
+    0% 50%
+  );
+  border-radius: 0;           /* 念のため */
+}
+
+/* 六角形の“光るリング”を擬似要素で描画（ズレない固定枠） */
+.portrait--hex::before{
+  content:"";
+  position:absolute; inset:-8px;
+  clip-path: polygon(
+    25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%
+  );
+  background: conic-gradient(from 30deg,
+      #ffd76f, #9a7cff, #caa7ff, #ffd76f);
+  filter: saturate(115%);
+  z-index: -1;
+  border-radius: 0;
+}
+.portrait--hex::after{
+  /* 内側に白い縁＝額縁感を出す */
+  content:"";
+  position:absolute; inset:-2px;
+  clip-path: polygon(
+    25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%
+  );
+  background: linear-gradient(#ffffff, #ffffff);
+  z-index:-1;
+  mask:
+    radial-gradient(closest-side, transparent 76%, black 78%);
+  opacity:.9;
+}
+
+/* 低スペック・視差で酔いやすい人向けに動きを抑制 */
+@media (prefers-reduced-motion: reduce){
+  .temple-arch{ filter:none; }
+}
+
+/* 小さめ端末の余白最適化 */
+@media (max-width: 390px){
+  .temple-hero{ padding: 24px 14px 28px; }
+}
