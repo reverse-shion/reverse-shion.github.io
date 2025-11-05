@@ -1,0 +1,146 @@
+/* ==========================================================
+   Re:verse Shion — About “Temple Fix” (v4)
+   - 1) Hero枠のブレ防止
+   - 2) 神殿ピラー（3つの柱）デザイン
+   - 3) CTAの崩れ修正
+   ========================================================== */
+
+/* 1) Heroの枠が“動いて見える”問題を根絶 */
+.about-hero{
+  position: relative;
+  background: linear-gradient(180deg,#fff,#f7f4ff);
+  border-radius: 18px;
+  padding: 36px 18px 30px;
+  box-shadow: 0 12px 36px rgba(126,102,255,.18);
+  overflow: hidden;
+  /* iOS の合成レイヤー最適化＆サブピクセルズレ抑止 */
+  transform: translateZ(0);
+  will-change: auto;
+}
+.about-hero::before{
+  /* 以前の大きな発光は弱めて“固定感”を出す */
+  content:"";
+  position:absolute; inset:-6% -6% -10% -6%;
+  background:
+    radial-gradient(380px 260px at 50% 18%, rgba(126,102,255,.15), transparent 70%),
+    radial-gradient(420px 300px at 50% 82%, rgba(255,215,111,.10), transparent 72%);
+  filter: blur(45px);
+  opacity:.26;
+  pointer-events:none;
+}
+.about-hero img{
+  position: relative;
+  z-index: 1;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* “枠線”は box-shadow ではなく outline で固定（視差感をなくす） */
+  outline: 3px solid rgba(255,255,255,.95);
+  box-shadow: 0 8px 26px rgba(126,102,255,.20);
+  background:#edeaff;          /* 404時のプレースホルダー */
+}
+
+/* 2) “神殿ピラー”：3つの柱（可読・神秘・カード） */
+.pillars{
+  list-style: none; padding: 0; margin: 1.4em 0 2.2em;
+  display: grid; gap: 14px;
+}
+@container (min-width: 720px){
+  .pillars{ grid-template-columns: repeat(3, 1fr); }
+}
+/* 端末にコンテナクエリが無い場合用 */
+@media (min-width: 760px){
+  .pillars{ grid-template-columns: repeat(3, 1fr); }
+}
+.pillars li{
+  position: relative;
+  padding: 16px 14px 14px 14px;
+  border-radius: 16px;
+  background: linear-gradient(180deg,#ffffff, #fbf9ff);
+  border: 1px solid rgba(126,102,255,.28);
+  box-shadow:
+    0 8px 22px rgba(126,102,255,.18),
+    inset 0 0 22px rgba(126,102,255,.06);
+  color:#2e2a44;
+  line-height:1.75;
+  min-height: 120px;
+  overflow:hidden;
+}
+.pillars li::before{
+  /* 神殿の柱頭アーチ */
+  content:"";
+  position:absolute; inset:-20% -20% 50% -20%;
+  background:
+    radial-gradient(60% 80% at 50% 100%, rgba(126,102,255,.12), transparent 60%),
+    radial-gradient(40% 60% at 50% 100%, rgba(255,215,111,.10), transparent 55%);
+  filter: blur(18px);
+  pointer-events:none;
+}
+.pillars b, .pillars strong{
+  display:block;
+  font-weight:700;
+  color:#3a2fb0;
+  margin-bottom:.35em;
+}
+.pillars .emoji{
+  display:inline-grid; place-items:center;
+  width:34px; height:34px; border-radius:50%;
+  background: radial-gradient(100% 100% at 30% 30%, #ffffff, #efe9ff);
+  border:1px solid rgba(126,102,255,.35);
+  box-shadow: 0 4px 12px rgba(126,102,255,.18);
+  margin-right:.5em;
+  font-size:18px;
+  vertical-align:middle;
+}
+.pillars .line{ margin:0 }  /* 説明行用 */
+
+@media (max-width: 599.98px){
+  .pillars li{ padding: 14px 12px }
+}
+
+/* 3) CTA（LINE／詩韻思想）崩れ修正＆ガラス板に */
+.cta{
+  margin: 2.6em 0 0;
+  display: flex; flex-wrap: wrap; gap: 12px;
+  justify-content: center;
+}
+.cta::before{
+  /* 背景の“灰パネル”を抑え、淡いガラス板に */
+  content:"";
+  position:absolute; left:50%; transform:translateX(-50%);
+  width:min(92vw,820px); height:72px;
+  background: linear-gradient(180deg, rgba(126,102,255,.12), rgba(255,255,255,.65));
+  border: 1px solid rgba(126,102,255,.25);
+  border-radius: 20px;
+  box-shadow: 0 10px 26px rgba(126,102,255,.20);
+  z-index: 0; filter: blur(0.2px);
+}
+.cta a{
+  position: relative; z-index:1;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width: 220px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing:.02em;
+  transition: transform .15s ease, box-shadow .25s ease, background .25s ease, color .2s;
+}
+.btn-main{
+  background: linear-gradient(135deg,#7e66ff,#9b87ff);
+  color:#fff; border: 1px solid rgba(255,255,255,.7);
+  box-shadow: 0 8px 22px rgba(126,102,255,.30);
+}
+.btn-main:hover{ transform: translateY(-2px); box-shadow: 0 14px 30px rgba(126,102,255,.38); }
+
+.btn-sub{
+  background:#ffffff;
+  color:#5a47dc;
+  border:1px solid rgba(126,102,255,.35);
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+.btn-sub:hover{ background:#f7f4ff }
+
+/* 仕上げ：強調・フッターのコントラスト */
+body.about strong{ color:#3a2fb0; font-weight:700 }
+body.about footer{ color:#6f6a8f; opacity:.98 }
