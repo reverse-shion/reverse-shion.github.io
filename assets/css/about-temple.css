@@ -572,4 +572,114 @@ footer p{
 /* タブレット以上：カード幅を落ち着かせて3枚見せ */
 @media (min-width: 900px){
   .gallery-track{ grid-auto-columns: minmax(320px, 360px); }
+
+   /* ===== Temple Hero : 神殿アーチ＋安定円環ポートレート ===== */
+.temple-hero{
+  width:min(980px,92vw);
+  margin: 18px auto 10px;
+  padding: clamp(12px, 3.5vw, 22px) 0 8px;
+  position: relative;
+  isolation: isolate;
+}
+
+/* 上部の神殿アーチ（背景装飾のみ・スクロール固定ではない） */
+.temple-arch{
+  position:absolute; inset: 0 0 auto 0; height: clamp(200px, 42vw, 340px);
+  border-radius: 28px 28px 20px 20px / 100% 100% 12px 12px;
+  background:
+    radial-gradient(80% 120% at 50% 0%, rgba(126,102,255,.20), transparent 60%),
+    linear-gradient(180deg, #ffffff, #f6f2ff);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    0 18px 50px rgba(126,102,255,.18);
+  z-index: 0;
+}
+
+/* 円環ポートレート（ズレ防止の要） */
+.portrait{
+  width: min(520px, 84vw);
+  aspect-ratio: 1 / 1;           /* ← 高さ固定：スクロールでも動かない */
+  margin: clamp(8px, 3vw, 18px) auto 0;
+  border-radius: 50%;
+  overflow: hidden;               /* はみ出しを完全に隠す */
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  box-shadow:
+    0 14px 36px rgba(126,102,255,.20),
+    inset 0 0 0 2px #fff;         /* 内側白リングで安定 */
+}
+
+/* 外側の神輪（conic＋薄金ハイライト） */
+.portrait::before{
+  content:"";
+  position:absolute; inset:-10px;
+  border-radius:50%;
+  background:
+    conic-gradient(from 0deg,
+      #caaeff 0deg, #8f7aff 120deg, #ffd76f 220deg, #caaeff 360deg);
+  filter: blur(.6px);
+  z-index:-1;
+  animation: templeRing 28s linear infinite;
+}
+@keyframes templeRing{ to{ transform: rotate(360deg); } }
+
+/* 外縁の細い白金リング */
+.portrait::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:50%;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.9), 0 0 22px rgba(143,122,255,.35) inset;
+  pointer-events:none;
+}
+
+/* 画像を固定フィット（ズレの根源を封じる） */
+.portrait img{
+  width:100%; height:100%;
+  object-fit: cover;
+  display:block;
+  transform: translateZ(0);   /* レイヤー固定でバウンス防止 */
+  will-change: auto;
+}
+
+/* タイトル群（神殿のキャプション） */
+.temple-caption{
+  text-align:center; margin-top: clamp(14px, 3vw, 22px);
+}
+.temple-title{
+  margin:0;
+  font-family:"Shippori Mincho", serif;
+  font-weight:700; letter-spacing:.05em;
+  font-size: clamp(20px, 6vw, 28px);
+  color:#3a32b6;
+  position:relative;
+}
+.temple-title::after{
+  /* タイトル下の“聖光レイ” */
+  content:"";
+  display:block; margin: 8px auto 0;
+  width: clamp(120px, 46%, 260px); height: 4px; border-radius: 4px;
+  background: linear-gradient(90deg, #ffd76f, #8f7aff);
+  box-shadow: 0 0 22px rgba(143,122,255,.35);
+  filter: saturate(115%);
+}
+.temple-sub{
+  margin:.6em 0 0; color:#6a66a0; font-size: clamp(13px, 3.2vw, 15px);
+}
+
+/* ===== Footerの“神々しさ”強化（任意） ===== */
+footer{
+  position: relative; overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(126,102,255,.10), transparent 60%),
+    linear-gradient(180deg,#fff,#f7f4ff);
+  color:#6f6b98;
+}
+footer::before{
+  /* 中央に小さな光輪 */
+  content:""; position:absolute; left:50%; top:-18px; transform:translateX(-50%);
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,215,111,.55), rgba(255,215,111,0) 60%);
+  filter: blur(14px); opacity:.5; pointer-events:none;
+}
 }
