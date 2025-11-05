@@ -460,3 +460,116 @@ footer p{
   .pillars{ grid-template-columns: 1fr 1fr; }
   .pillar-card:last-child{ grid-column: 1 / -1; }
 }
+/* ===== Pillars: 横スクロール聖廊 ===== */
+.pillars-gallery{
+  margin: 28px 0 8px;
+  position: relative;
+  isolation: isolate;
+}
+
+.pillars-gallery .gallery-head{
+  display:flex; align-items:baseline; gap:10px;
+  margin: 0 4px 10px;
+}
+.pillars-gallery .gallery-head h3{
+  margin:0; font-family:"Shippori Mincho",serif;
+  font-weight:700; letter-spacing:.04em;
+  font-size: clamp(18px, 4vw, 22px);
+  background: linear-gradient(90deg, #5e4cff, #ffd76f);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 0 16px rgba(126,102,255,.18);
+}
+.pillars-gallery .gallery-head .hint{
+  margin:0; color: #7a76a5; font-size: 12px;
+}
+
+/* スクロールトラック */
+.gallery-track{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(78%, 420px);   /* モバイルは大きめカード */
+  gap: 14px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  padding: 10px 6px 18px;
+  border-radius: 18px;
+  position: relative;
+  background: linear-gradient(180deg,#ffffffee,#f7f3ff);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    0 10px 26px rgba(126,102,255,.12);
+}
+
+/* 両端フェード（マスク） */
+.gallery-track::before,
+.gallery-track::after{
+  content:""; position: sticky; top:0;
+  width:24px; height: 100%;
+  pointer-events:none; z-index: 2;
+}
+.gallery-track::before{
+  left:0;
+  background: linear-gradient(90deg, #fff, transparent);
+}
+.gallery-track::after{
+  left: calc(100% - 24px);
+  background: linear-gradient(270deg, #fff, transparent);
+}
+
+/* カード */
+.gallery-card{
+  scroll-snap-align: center;
+  background: linear-gradient(180deg,#ffffff,#f6f2ff);
+  border:1px solid rgba(143,122,255,.28);
+  border-radius: 16px;
+  padding: 16px 16px 18px;
+  box-shadow:
+    0 8px 20px rgba(126,102,255,.14),
+    inset 0 -12px 26px rgba(143,122,255,.06);
+  position: relative;
+}
+.gallery-card::after{
+  /* 足元の金色ハイライト */
+  content:""; position:absolute; left:16px; right:16px; bottom:10px; height:2px;
+  border-radius:2px;
+  background: radial-gradient(50% 80% at 50% 50%, rgba(255,215,111,.7), transparent);
+  filter: blur(1px);
+}
+
+.gallery-card .icon{
+  font-size: 26px; line-height: 1; margin-bottom: 10px;
+  filter: drop-shadow(0 3px 10px rgba(143,122,255,.25));
+}
+.gallery-card h4{
+  margin: 0 0 8px;
+  font-family:"Shippori Mincho",serif;
+  font-weight:700; letter-spacing:.04em;
+  color:#3a32b6; font-size: 18px;
+  position: relative;
+}
+.gallery-card h4::after{
+  content:""; position:absolute; left:0; bottom:-6px; height:2px; width: 72px;
+  background: linear-gradient(90deg,#ffd76f,#8f7aff);
+  border-radius: 2px; box-shadow: 0 0 10px rgba(143,122,255,.28);
+}
+.gallery-card p{
+  margin: 14px 0 2px; color:#474264; line-height: 1.85;
+}
+
+/* ホバー/フォーカス（PCとキーボード） */
+@media (hover:hover){
+  .gallery-card:hover{ transform: translateY(-2px); transition: transform .15s ease, box-shadow .2s ease;
+    box-shadow: 0 14px 28px rgba(126,102,255,.18), inset 0 -12px 26px rgba(143,122,255,.06);
+  }
+}
+.gallery-card:focus-within{
+  outline: 2px solid color-mix(in oklab, #8f7aff 70%, #ffd76f);
+  outline-offset: 2px;
+}
+
+/* タブレット以上：カード幅を落ち着かせて3枚見せ */
+@media (min-width: 900px){
+  .gallery-track{ grid-auto-columns: minmax(320px, 360px); }
+}
