@@ -1,0 +1,239 @@
+/* ---------------------------------------------------------
+   Re:verse Shion — Temple Color Theme (2025-11-05)
+   drop-in theme. attach AFTER your base CSS.
+   --------------------------------------------------------- */
+
+/* ==== Palette / Tokens ==== */
+:root{
+  /* core colors */
+  --ink: #1f1f2a;            /* 宙墨：見出し/本文の深色 */
+  --muted: #5b5870;          /* 抑えめテキスト */
+  --accent: #7e66ff;         /* 紫苑 */
+  --accent-2: #f4d87b;       /* 宵金（柔らかい金光） */
+
+  /* surfaces */
+  --bg: #faf8f5;             /* 月光の白（乳白） */
+  --panel: #ffffff;          /* 純白パネル */
+
+  /* halos / particles */
+  --halo-a: rgba(255, 215, 111, .35);
+  --halo-b: rgba(174, 138, 255, .30);
+  --stars: rgba(220,230,255,.08);
+
+  /* shape / layout */
+  --r: 14px;
+  --header-h: 56px;
+
+  /* optional assets */
+  --stars-url: url("/assets/bg/stardust.png");
+  --sigil-url: url("/assets/sigil/hexagram.svg"); /* 零/結章用など */
+  --card-back-url: url("/assets/tarot/back.png"); /* タロット裏面（任意） */
+
+  color-scheme: light;
+}
+
+/* ==== Base ==== */
+html, body{
+  background:
+    radial-gradient(1200px 800px at 50% -4%, #ffffff 0%, var(--bg) 58%, #f6f1ff 100%),
+    repeating-radial-gradient( circle at 50% 120%, var(--stars) 0, transparent 32px );
+  background-attachment: fixed, fixed;
+  color: var(--ink);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+a{ color: var(--ink); text-decoration: none; }
+a:hover{
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--halo-b);
+  transition: color .2s ease, text-shadow .3s ease;
+}
+
+strong{ color: var(--ink); }
+
+/* ==== Header / Nav（触れてる間は消えない） ==== */
+.header{
+  position: sticky; top:0; z-index: 50;
+  height: var(--header-h);
+  display: grid; place-items: center;
+  backdrop-filter: blur(10px);
+  background: color-mix(in oklab, #ffffff 78%, #f2eaff 22%);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+.header-inner{
+  width:min(92vw, 1160px);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.logo{ font-weight: 800; letter-spacing:.02em }
+.nav-main a{
+  position: relative;
+  padding: .6em .8em;
+  border-radius: 10px;
+}
+.nav-main a:hover,
+.nav-main a:focus-visible{
+  background: radial-gradient(200px 80px at 50% 120%, #fff8 0, transparent 70%);
+  outline: none;
+}
+.header:hover,
+.nav-main:hover{ opacity: 1; } /* hover中は絶対消えない */
+
+/* ==== Hero（読みやすさUP） ==== */
+.hero{ position: relative; isolation: isolate; }
+.hero__inner{
+  max-width: min(92vw, 920px);
+  margin: 0 auto; padding: 64px 16px 40px;
+  text-align: center;
+}
+.hero__title{
+  font-size: clamp(26px, 3.8vw, 46px);
+  line-height: 1.22; letter-spacing: .02em;
+  text-shadow: 0 1px 0 #fff, 0 0 18px rgba(255,255,255,.55);
+}
+.hero__lede{ margin:.6em 0 .25em; font-size:clamp(16px,1.6vw,20px) }
+.hero__desc{ margin:.4em 0 1.2em; color:var(--muted) }
+.hero__micro{ margin-top:.8em; font-size:.92rem; color:var(--muted) }
+
+/* 背景映像の上に薄い羽衣レイヤー（可読性UP） */
+.hero::before{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:
+    radial-gradient(1200px 800px at 50% -8%, rgba(255,255,255,.85), transparent 60%),
+    radial-gradient(600px 320px at 80% 12%, rgba(255,215,111,.18), transparent 60%),
+    radial-gradient(720px 420px at 20% 12%, rgba(174,138,255,.18), transparent 60%);
+  pointer-events: none;
+}
+.hero__bg{ position:absolute; inset:0; z-index:-2; }
+.hero__video{ width:100%; height:100%; object-fit:cover; filter:brightness(1.05) saturate(1.02) }
+
+/* ==== Buttons ==== */
+.btn{
+  display:inline-flex; align-items:center; gap:.5em;
+  padding:.72em 1.1em; border-radius: var(--r);
+  font-weight:700; line-height:1; border:1px solid transparent;
+  box-shadow: 0 6px 22px rgba(0,0,0,.05);
+  transition: transform .12s ease, box-shadow .25s ease, border-color .2s ease;
+}
+.btn--primary{
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  color:#111; border-color: rgba(0,0,0,.06);
+}
+.btn--ghost{
+  background: var(--panel);
+  color:#333; border-color: rgba(0,0,0,.12);
+}
+.btn:hover{ transform: translateY(-1px); box-shadow: 0 12px 30px rgba(255,215,111,.25) }
+
+/* ==== Cards / Panels ==== */
+.card, .tri{
+  background: var(--panel);
+  border:1px solid rgba(0,0,0,.08);
+  border-radius: var(--r);
+  box-shadow: 0 4px 14px rgba(0,0,0,.05);
+  transition: transform .15s, box-shadow .2s, border-color .2s;
+}
+.card:hover, .tri:hover{
+  transform: translateY(-3px);
+  border-color: color-mix(in oklab, var(--accent) 35%, #fff 65%);
+  box-shadow: 0 10px 26px rgba(174,138,255,.22);
+}
+
+/* ==== Corridor / 聖典回廊（2列・レスポンシブ） ==== */
+.corridor__inner{ width:min(92vw, 1040px); margin:0 auto; padding: 16px 0 48px }
+.corridor__lead{ color: var(--muted); margin:.25em 0 1.25em; text-wrap: balance }
+
+#corridor .books{
+  display:grid; gap: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+#corridor .book{
+  background: var(--panel);
+  border:1px solid rgba(0,0,0,.08);
+  border-radius: var(--r);
+  padding:16px 16px 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.05);
+  text-decoration: none; color: inherit;
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+#corridor .book:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(174,138,255,.22);
+  border-color: color-mix(in oklab, var(--accent) 35%, #fff 65%);
+}
+
+#corridor .book__title{
+  display:flex; align-items:center; gap:10px;
+  font-size:18px; color:#503080; margin: 0 0 6px;
+  position:relative;
+}
+#corridor .book__icon{
+  width:20px; height:20px; color: var(--accent);
+  filter: drop-shadow(0 0 6px var(--halo-b));
+}
+#corridor .book__desc{
+  margin:0; color: var(--muted); font-size:15px;
+}
+
+/* ツールチップ（data-tip） */
+#corridor .book__title[data-tip]::after{
+  content: attr(data-tip);
+  position:absolute; left:0; bottom:100%; transform: translateY(-10px);
+  background:#ffffffee; color:var(--ink);
+  border:1px solid rgba(0,0,0,.08); border-radius:10px;
+  padding:.32em .56em; font-size:.82rem; white-space:nowrap;
+  box-shadow:0 8px 22px rgba(0,0,0,.06);
+  opacity:0; pointer-events:none; transition: opacity .2s, transform .2s;
+}
+#corridor .book__title:hover::after,
+#corridor .book__title:focus-within::after{
+  opacity:1; transform: translateY(-14px);
+}
+
+/* 狭い端末での余白 */
+@media (max-width: 420px){
+  #corridor .books{ gap:16px }
+  #corridor .book{ padding:14px }
+}
+
+/* ==== Tarot back（必要時） ==== */
+.tarot--back::before{
+  content:""; display:block; width:100%; aspect-ratio: 63 / 88;
+  background: var(--card-back-url) center/cover no-repeat;
+  border-radius: calc(var(--r) - 2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.10);
+}
+
+/* ==== Ritual FX：光輪 / 星紋（JSと連携） ==== */
+#divineFlash{
+  position:fixed; inset:0; pointer-events:none; opacity:0; z-index:9999;
+  background: radial-gradient(60vmax 60vmax at 50% 50%, rgba(255,255,255,.9), var(--halo-a) 40%, transparent 64%);
+  transition: opacity .18s ease-out;
+}
+#divineFlash.is-awake{ opacity:1; animation: fadeAura .9s ease-out forwards; }
+@keyframes fadeAura{ 0%{opacity:1} 100%{opacity:0} }
+
+.star-sigil{
+  position:absolute; width:84px; height:84px; pointer-events:none; opacity:0; transform: scale(.72) rotate(-8deg);
+  background: var(--sigil-url) center/contain no-repeat;
+  mix-blend-mode: screen; filter: drop-shadow(0 0 12px var(--halo-b));
+  z-index:9998;
+}
+.star-sigil.is-ritual{
+  opacity:1; animation: sigilPop .52s ease-out both;
+}
+@keyframes sigilPop{
+  0%{ transform: scale(.72) rotate(-8deg); opacity:0 }
+  40%{ transform: scale(1.06) rotate(0); opacity:1 }
+  100%{ transform: scale(1.00) rotate(0); opacity:0 }
+}
+
+/* ==== Helpers ==== */
+.center{ text-align:center }
+.u-underline{ text-decoration: underline; text-underline-offset: 3px; }
+
+/* ==== A11y / Motion ==== */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation: none !important; transition: none !important; }
+  #divineFlash, .star-sigil{ display:none !important; }
+}
