@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="無料タロット占い。詩韻Shionが3枚リーディングで今日の運勢を詩で届ける。恋愛・復縁・連絡時期も対応。"/>
-  <title>【無料タロット】今日の運勢を詩で届ける｜詩韻Shion</title>
+  <meta name="description" content="無料タロット占い。大アルカナ22枚で3枚リーディング。詩韻Shionがあなたの願いを詩・韻・祈で解釈。恋愛・復縁・連絡時期も対応。"/>
+  <title>【無料タロット】大アルカナで運勢を詩で届ける｜詩韻Shion</title>
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   
   <!-- External CSS -->
-  <link rel="stylesheet" href="style1.css"/>
+  <link rel="stylesheet" href="style.css"/>
   
   <!-- Open Graph -->
-  <meta property="og:title" content="【無料タロット】今日の運勢を詩で届ける｜詩韻Shion"/>
-  <meta property="og:description" content="3枚のカードをタップ。あなたの願いに響く詩が届きます。"/>
+  <meta property="og:title" content="【無料タロット】大アルカナで運勢を詩で届ける｜詩韻Shion"/>
+  <meta property="og:description" content="大アルカナ22枚から3枚をタップ。あなたの願いに響く詩・韻・祈が届きます。"/>
   <meta property="og:image" content="https://reverse-shion.github.io/ogp.jpg"/>
   <meta property="og:url" content="https://reverse-shion.github.io/"/>
   <meta property="og:type" content="website"/>
@@ -24,7 +24,7 @@
     <!-- Header -->
     <header class="header">
       <h1 class="title">詩韻 Shion</h1>
-      <p class="subtitle">言葉は祈りの構文 — タロットで“響き”を体験</p>
+      <p class="subtitle">言葉は祈りの構文 — 大アルカナタロットで“響き”を体験</p>
     </header>
 
     <!-- Intro -->
@@ -46,7 +46,10 @@
                 <span class="label">① 現在</span>
                 <p class="tap">タップでめくる</p>
               </div>
-              <div class="card-face card-front-face"></div>
+              <div class="card-face card-front-face">
+                <div class="card-content"></div>
+                <p class="card-name"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -59,7 +62,10 @@
                 <span class="label">② 鍵</span>
                 <p class="tap">タップでめくる</p>
               </div>
-              <div class="card-face card-front-face"></div>
+              <div class="card-face card-front-face">
+                <div class="card-content"></div>
+                <p class="card-name"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -72,7 +78,10 @@
                 <span class="label">③ 進む道</span>
                 <p class="tap">タップでめくる</p>
               </div>
-              <div class="card-face card-front-face"></div>
+              <div class="card-face card-front-face">
+                <div class="card-content"></div>
+                <p class="card-name"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -82,17 +91,17 @@
       <div id="result" class="result hidden">
         <div class="result-item">
           <span class="icon">🪶</span>
-          <h3>詩</h3>
+          <h3>詩（現在）</h3>
           <p id="poem"></p>
         </div>
         <div class="result-item">
           <span class="icon">🎵</span>
-          <h3>韻</h3>
+          <h3>韻（鍵）</h3>
           <p id="rhyme"></p>
         </div>
         <div class="result-item">
           <span class="icon">✨</span>
-          <h3>祈</h3>
+          <h3>祈（進む道）</h3>
           <p id="prayer"></p>
         </div>
       </div>
@@ -102,7 +111,7 @@
         <p class="next">もっと深く知りたい方は…</p>
         <div class="btn-group">
           <a href="https://line.me/R/ti/p/@yourline" target="_blank" class="btn-line">LINEで毎日1枚無料</a>
-          <a href="https://www.tiktok.com/@your_tiktok" target="_blank" class="btn-tiktok">TikTokで恋愛鑑定予約</a>
+          <a href="https://www.tiktok.com/@your_tiktok" target="_blank" class="btn-tiktok">TikTokで個人鑑定予約（恋愛/復縁/連絡時期）</a>
           <a href="https://note.com/your_note/m/magazine" target="_blank" class="btn-note">詩韻思想 零〜結 無料公開</a>
         </div>
         <button id="restartBtn" class="btn-restart">もう一度占う</button>
@@ -117,42 +126,35 @@
 
   <!-- JavaScript -->
   <script>
-    // Tarot Data (詩・韻・祈のセット)
+    // Tarot Data: 大アルカナ22枚 (名前と基本意味)
     const tarotData = [
-      {
-        poem: "夜明け前の静寂に、君の名前が灯る。",
-        rhyme: "響きは波となり、心の奥へ届く。",
-        prayer: "どうか、その光を胸に抱きしめて。"
-      },
-      {
-        poem: "涙は種となり、明日の花を育てる。",
-        rhyme: "沈黙の奥で、希望が息を吹き返す。",
-        prayer: "大丈夫。道はすでに開かれている。"
-      },
-      {
-        poem: "風が運ぶのは、忘れていた勇気。",
-        rhyme: "一歩踏み出すたび、世界が優しくなる。",
-        prayer: "君の物語は、ここから始まる。"
-      },
-      {
-        poem: "傷跡は地図。痛みは道しるべ。",
-        rhyme: "過去は重しではなく、翼になる。",
-        prayer: "飛べるよ。もう十分に強くなった。"
-      },
-      {
-        poem: "連絡が来ない夜は、星が語りかけてる。",
-        rhyme: "タイミングは宇宙が決める。君は信じるだけ。",
-        prayer: "そのときが来るまで、静かに微笑んで。"
-      },
-      {
-        poem: "復縁は“戻る”ことではなく、“新しく始める”こと。",
-        rhyme: "二人の魂は、すでに繋がっている。",
-        prayer: "言葉より先に、心が届く日が来る。"
-      }
+      { name: "The Fool (愚者)", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。" },
+      { name: "The Magician (魔術師)", meaning: "創造力、スキル、顕現。意志を現実化する力。" },
+      { name: "The High Priestess (女教皇)", meaning: "直感、神秘、内なる知識。潜在意識の声に耳を傾ける。" },
+      { name: "The Empress (女帝)", meaning: "豊かさ、養育、創造性。母性と自然の恵み。" },
+      { name: "The Emperor (皇帝)", meaning: "構造、権威、安定。秩序とリーダーシップ。" },
+      { name: "The Hierophant (法王)", meaning: "伝統、適合、教育。指導者からの学び。" },
+      { name: "The Lovers (恋人)", meaning: "関係、選択、調和。愛と価値観の一致。" },
+      { name: "The Chariot (戦車)", meaning: "意志力、勝利、決意。目標に向かう推進力。" },
+      { name: "Strength (力)", meaning: "勇気、忍耐、慈悲。内なる強さを発揮。" },
+      { name: "The Hermit (隠者)", meaning: "内省、導き、孤独。自己探求の旅。" },
+      { name: "Wheel of Fortune (運命の輪)", meaning: "周期、変化、運命。人生の転機。" },
+      { name: "Justice (正義)", meaning: "公正、真実、法。バランスの取れた判断。" },
+      { name: "The Hanged Man (吊られた男)", meaning: "降伏、視点、犠牲。新たな視野を得る。" },
+      { name: "Death (死神)", meaning: "変容、終わり、新生。古いものを手放す。" },
+      { name: "Temperance (節制)", meaning: "バランス、節度、調和。統合と中庸。" },
+      { name: "The Devil (悪魔)", meaning: "束縛、物質主義、依存。影の側面に直面。" },
+      { name: "The Tower (塔)", meaning: "激変、啓示、混沌。突然の変化。" },
+      { name: "The Star (星)", meaning: "希望、インスピレーション、平穏。未来への光。" },
+      { name: "The Moon (月)", meaning: "幻想、恐れ、直感。不確実性の中の真実。" },
+      { name: "The Sun (太陽)", meaning: "成功、活力、ポジティブ。喜びと明晰さ。" },
+      { name: "Judgement (審判)", meaning: "再生、内なる呼び声、赦し。目覚めの瞬間。" },
+      { name: "The World (世界)", meaning: "完成、統合、達成。サイクルの完結。" }
     ];
 
     let flippedCount = 0;
     const totalCards = 3;
+    let selectedCards = []; // 選択されたカードを保持
 
     // Start Button
     document.getElementById('startBtn').addEventListener('click', () => {
@@ -162,27 +164,31 @@
       document.getElementById('result').classList.add('hidden');
       document.getElementById('ctaAfter').classList.add('hidden');
       resetCards();
+      selectedCards = getRandomCards(); // ランダムに3枚選択
     });
 
+    // Random Cards (重複なし)
+    function getRandomCards() {
+      const shuffled = [...tarotData].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 3);
+    }
+
     // Flip Card
-    window.flipCard = function(card) {
-      if (card.classList.contains('flipped')) return;
+    window.flipCard = function(cardElem) {
+      if (cardElem.classList.contains('flipped')) return;
       
-      card.classList.add('flipped');
+      cardElem.classList.add('flipped');
       flippedCount++;
 
-      // Random data
-      const randomSet = tarotData[Math.floor(Math.random() * tarotData.length)];
-      const index = card.parentElement.dataset.index;
-      const front = card.querySelector('.card-front-face');
+      const index = cardElem.parentElement.dataset.index;
+      const card = selectedCards[index];
+      const front = cardElem.querySelector('.card-front-face');
+      const content = front.querySelector('.card-content');
+      const nameElem = front.querySelector('.card-name');
 
       setTimeout(() => {
-        front.innerHTML = `
-          <div class="result-mini">
-            <p><strong>${index == 0 ? '詩' : index == 1 ? '韻' : '祈'}</strong></p>
-            <p>${index == 0 ? randomSet.poem : index == 1 ? randomSet.rhyme : randomSet.prayer}</p>
-          </div>
-        `;
+        content.innerHTML = `<p class="card-meaning">${card.meaning}</p>`;
+        nameElem.textContent = card.name;
       }, 300);
 
       if (flippedCount === totalCards) {
@@ -190,16 +196,16 @@
       }
     };
 
-    // Show Full Result
+    // Show Full Result (詩・韻・祈として再解釈)
     function showFullResult() {
-      const results = document.querySelectorAll('.card-front-face .result-mini p:last-child');
-      const poem = results[0].textContent;
-      const rhyme = results[1].textContent;
-      const prayer = results[2].textContent;
+      // カードの意味を詩・韻・祈に再解釈（例: 基本意味を基に詩的に表現）
+      const poemInterp = `痛みと希望に形を与える: ${selectedCards[0].meaning} — あなたの現在を詩のように織りなす。`;
+      const rhymeInterp = `響きが魂に届く: ${selectedCards[1].meaning} — 鍵となる共鳴を編む。`;
+      const prayerInterp = `光へ帰す: ${selectedCards[2].meaning} — 祈りの呼吸で未来を照らす。`;
 
-      document.getElementById('poem').textContent = poem;
-      document.getElementById('rhyme').textContent = rhyme;
-      document.getElementById('prayer').textContent = prayer;
+      document.getElementById('poem').textContent = poemInterp;
+      document.getElementById('rhyme').textContent = rhymeInterp;
+      document.getElementById('prayer').textContent = prayerInterp;
 
       setTimeout(() => {
         document.getElementById('result').classList.remove('hidden');
@@ -211,7 +217,8 @@
     function resetCards() {
       document.querySelectorAll('.card-back').forEach(card => {
         card.classList.remove('flipped');
-        card.querySelector('.card-front-face').innerHTML = '';
+        card.querySelector('.card-content').innerHTML = '';
+        card.querySelector('.card-name').textContent = '';
       });
     }
 
@@ -223,6 +230,7 @@
       setTimeout(() => {
         resetCards();
         flippedCount = 0;
+        selectedCards = getRandomCards();
       }, 500);
     });
   </script>
