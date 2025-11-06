@@ -47,8 +47,7 @@
                 <p class="tap">タップでめくる</p>
               </div>
               <div class="card-face card-front-face">
-                <div class="card-content"></div>
-                <p class="card-name"></p>
+                <img class="card-image" src="" alt="">
               </div>
             </div>
           </div>
@@ -63,8 +62,7 @@
                 <p class="tap">タップでめくる</p>
               </div>
               <div class="card-face card-front-face">
-                <div class="card-content"></div>
-                <p class="card-name"></p>
+                <img class="card-image" src="" alt="">
               </div>
             </div>
           </div>
@@ -79,8 +77,7 @@
                 <p class="tap">タップでめくる</p>
               </div>
               <div class="card-face card-front-face">
-                <div class="card-content"></div>
-                <p class="card-name"></p>
+                <img class="card-image" src="" alt="">
               </div>
             </div>
           </div>
@@ -91,24 +88,24 @@
       <div id="result" class="result hidden">
         <div class="result-item">
           <span class="icon">🪶</span>
-          <h3>詩（現在）</h3>
+          <h3 id="poemTitle">詩 — </h3>
           <p id="poem"></p>
         </div>
         <div class="result-item">
           <span class="icon">🎵</span>
-          <h3>韻（鍵）</h3>
+          <h3 id="rhymeTitle">韻 — </h3>
           <p id="rhyme"></p>
         </div>
         <div class="result-item">
           <span class="icon">✨</span>
-          <h3>祈（進む道）</h3>
+          <h3 id="prayerTitle">祈 — </h3>
           <p id="prayer"></p>
         </div>
       </div>
 
       <!-- CTA After Result -->
       <div id="ctaAfter" class="cta-after hidden">
-        <p class="next">もっと深く知りたい方は…</p>
+        <p class="next">もっと深く知りたい方は…詳しくは個人鑑定へ</p>
         <div class="btn-group">
           <a href="https://line.me/R/ti/p/@yourline" target="_blank" class="btn-line">LINEで毎日1枚無料</a>
           <a href="https://www.tiktok.com/@your_tiktok" target="_blank" class="btn-tiktok">TikTokで個人鑑定予約（恋愛/復縁/連絡時期）</a>
@@ -124,32 +121,35 @@
     </footer>
   </div>
 
+  <!-- Audio for Flip Sound -->
+  <audio id="flipSound" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
+
   <!-- JavaScript -->
   <script>
-    // Tarot Data: 大アルカナ22枚 (名前と基本意味)
+    // Tarot Data: 大アルカナ22枚 (名前、意味、画像URL)
     const tarotData = [
-      { name: "The Fool (愚者)", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。" },
-      { name: "The Magician (魔術師)", meaning: "創造力、スキル、顕現。意志を現実化する力。" },
-      { name: "The High Priestess (女教皇)", meaning: "直感、神秘、内なる知識。潜在意識の声に耳を傾ける。" },
-      { name: "The Empress (女帝)", meaning: "豊かさ、養育、創造性。母性と自然の恵み。" },
-      { name: "The Emperor (皇帝)", meaning: "構造、権威、安定。秩序とリーダーシップ。" },
-      { name: "The Hierophant (法王)", meaning: "伝統、適合、教育。指導者からの学び。" },
-      { name: "The Lovers (恋人)", meaning: "関係、選択、調和。愛と価値観の一致。" },
-      { name: "The Chariot (戦車)", meaning: "意志力、勝利、決意。目標に向かう推進力。" },
-      { name: "Strength (力)", meaning: "勇気、忍耐、慈悲。内なる強さを発揮。" },
-      { name: "The Hermit (隠者)", meaning: "内省、導き、孤独。自己探求の旅。" },
-      { name: "Wheel of Fortune (運命の輪)", meaning: "周期、変化、運命。人生の転機。" },
-      { name: "Justice (正義)", meaning: "公正、真実、法。バランスの取れた判断。" },
-      { name: "The Hanged Man (吊られた男)", meaning: "降伏、視点、犠牲。新たな視野を得る。" },
-      { name: "Death (死神)", meaning: "変容、終わり、新生。古いものを手放す。" },
-      { name: "Temperance (節制)", meaning: "バランス、節度、調和。統合と中庸。" },
-      { name: "The Devil (悪魔)", meaning: "束縛、物質主義、依存。影の側面に直面。" },
-      { name: "The Tower (塔)", meaning: "激変、啓示、混沌。突然の変化。" },
-      { name: "The Star (星)", meaning: "希望、インスピレーション、平穏。未来への光。" },
-      { name: "The Moon (月)", meaning: "幻想、恐れ、直感。不確実性の中の真実。" },
-      { name: "The Sun (太陽)", meaning: "成功、活力、ポジティブ。喜びと明晰さ。" },
-      { name: "Judgement (審判)", meaning: "再生、内なる呼び声、赦し。目覚めの瞬間。" },
-      { name: "The World (世界)", meaning: "完成、統合、達成。サイクルの完結。" }
+      { name: "The Fool", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg" },
+      { name: "The Magician", meaning: "創造力、スキル、顕現。意志を現実化する力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg" },
+      { name: "The High Priestess", meaning: "直感、神秘、内なる知識。潜在意識の声に耳を傾ける。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
+      { name: "The Empress", meaning: "豊かさ、養育、創造性。母性と自然の恵み。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
+      { name: "The Emperor", meaning: "構造、権威、安定。秩序とリーダーシップ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
+      { name: "The Hierophant", meaning: "伝統、適合、教育。指導者からの学び。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg" },
+      { name: "The Lovers", meaning: "関係、選択、調和。愛と価値観の一致。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d5/RWS_Tarot_06_Lovers.jpg" },
+      { name: "The Chariot", meaning: "意志力、勝利、決意。目標に向かう推進力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
+      { name: "Strength", meaning: "勇気、忍耐、慈悲。内なる強さを発揮。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
+      { name: "The Hermit", meaning: "内省、導き、孤独。自己探求の旅。", image_url: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
+      { name: "Wheel of Fortune", meaning: "周期、変化、運命。人生の転機。", image_url: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg" },
+      { name: "Justice", meaning: "公正、真実、法。バランスの取れた判断。", image_url: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg" },
+      { name: "The Hanged Man", meaning: "降伏、視点、犠牲。新たな視野を得る。", image_url: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg" },
+      { name: "Death", meaning: "変容、終わり、新生。古いものを手放す。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg" },
+      { name: "Temperance", meaning: "バランス、節度、調和。統合と中庸。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg" },
+      { name: "The Devil", meaning: "束縛、物質主義、依存。影の側面に直面。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg" },
+      { name: "The Tower", meaning: "激変、啓示、混沌。突然の変化。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg" },
+      { name: "The Star", meaning: "希望、インスピレーション、平穏。未来への光。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg" },
+      { name: "The Moon", meaning: "幻想、恐れ、直感。不確実性の中の真実。", image_url: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg" },
+      { name: "The Sun", meaning: "成功、活力、ポジティブ。喜びと明晰さ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" },
+      { name: "Judgement", meaning: "再生、内なる呼び声、赦し。目覚めの瞬間。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg" },
+      { name: "The World", meaning: "完成、統合、達成。サイクルの完結。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg" }
     ];
 
     let flippedCount = 0;
@@ -177,18 +177,25 @@
     window.flipCard = function(cardElem) {
       if (cardElem.classList.contains('flipped')) return;
       
+      // Play sound
+      const flipSound = document.getElementById('flipSound');
+      flipSound.play();
+
+      // Add glow animation
+      cardElem.classList.add('glow');
+
       cardElem.classList.add('flipped');
       flippedCount++;
 
       const index = cardElem.parentElement.dataset.index;
       const card = selectedCards[index];
       const front = cardElem.querySelector('.card-front-face');
-      const content = front.querySelector('.card-content');
-      const nameElem = front.querySelector('.card-name');
+      const img = front.querySelector('.card-image');
 
       setTimeout(() => {
-        content.innerHTML = `<p class="card-meaning">${card.meaning}</p>`;
-        nameElem.textContent = card.name;
+        img.src = card.image_url;
+        img.alt = card.name;
+        cardElem.classList.remove('glow'); // Remove animation after
       }, 300);
 
       if (flippedCount === totalCards) {
@@ -198,10 +205,15 @@
 
     // Show Full Result (詩・韻・祈として再解釈)
     function showFullResult() {
-      // カードの意味を詩・韻・祈に再解釈（例: 基本意味を基に詩的に表現）
-      const poemInterp = `痛みと希望に形を与える: ${selectedCards[0].meaning} — あなたの現在を詩のように織りなす。`;
-      const rhymeInterp = `響きが魂に届く: ${selectedCards[1].meaning} — 鍵となる共鳴を編む。`;
-      const prayerInterp = `光へ帰す: ${selectedCards[2].meaning} — 祈りの呼吸で未来を照らす。`;
+      // タイトルにカード名を追加
+      document.getElementById('poemTitle').textContent = `詩 — ${selectedCards[0].name}`;
+      document.getElementById('rhymeTitle').textContent = `韻 — ${selectedCards[1].name}`;
+      document.getElementById('prayerTitle').textContent = `祈 — ${selectedCards[2].name}`;
+
+      // 詩韻思想ベースの詩的解釈 (わかりやすいが詩的)
+      const poemInterp = `痛みと希望に形を与える最初の息: ${selectedCards[0].name}の響きが、あなたの現在を優しく包み、${selectedCards[0].meaning.split('。')[0]}の光を呼び覚ます。`;
+      const rhymeInterp = `響きを重ねる共鳴の構文: ${selectedCards[1].name}が鍵となり、魂に届く波を編み、${selectedCards[1].meaning.split('。')[0]}の調和を呼び起こす。`;
+      const prayerInterp = `沈黙と意味を往復する呼吸: ${selectedCards[2].name}が光へ帰す道を示し、${selectedCards[2].meaning.split('。')[0]}の祈りが、あなたの物語を完結させる。`;
 
       document.getElementById('poem').textContent = poemInterp;
       document.getElementById('rhyme').textContent = rhymeInterp;
@@ -216,9 +228,9 @@
     // Reset Cards
     function resetCards() {
       document.querySelectorAll('.card-back').forEach(card => {
-        card.classList.remove('flipped');
-        card.querySelector('.card-content').innerHTML = '';
-        card.querySelector('.card-name').textContent = '';
+        card.classList.remove('flipped', 'glow');
+        card.querySelector('.card-image').src = '';
+        card.querySelector('.card-image').alt = '';
       });
     }
 
