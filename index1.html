@@ -35,6 +35,14 @@
       </div>
     </section>
 
+    <!-- Ritual Overlay -->
+<div id="ritual" class="ritual" aria-hidden="true">
+  <p class="chant line">言の葉は鍵、星の光は道しるべ。</p>
+  <p class="chant line">いま、あなたの願いに“韻”を与えよう。</p>
+  <p class="chant line">深く息をして――タロット展開。</p>
+</div>
+    
+
     <!-- Tarot Area (Hidden initially) -->
     <section id="tarotSection" class="tarot-section hidden">
       <div class="tarot-grid">
@@ -240,5 +248,108 @@
       }, 500);
     });
   </script>
+
+  // ★ 共有用シード（同じ結果を再現）
+function seedShuffle(arr, seed){
+  // xorshift 32
+  let x = seed || crypto.getRandomValues(new Uint32Array(1))[0] || 123456789;
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    x ^= x<<13; x ^= x>>>17; x ^= x<<5;
+    const j = Math.abs(x) % (i+1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function getSeed(){
+  const p = new URLSearchParams(location.search);
+  return p.has("seed") ? Number(p.get("seed")) : undefined;
+}
+function setSeed(seed){
+  const u = new URL(location.href);
+  u.searchParams.set("seed", String(seed));
+  history.replaceState(null,"",u.toString());
+}
+
+let flippedCount = 0;
+const totalCards = 3;
+let selectedCards = [];
+let currentSeed = getSeed();
+
+// Start Button
+document.getElementById('startBtn').addEventListener('click', () => {
+  document.querySelector('.intro').classList.add('hidden');
+  document.getElementById('tarotSection').classList.remove('hidden');
+
+  // ★ 詠唱オーバーレイを一瞬表示してから開始
+  const ritual = document.getElementById('ritual');
+  ritual.classList.remove('hide');
+  setTimeout(()=> ritual.classList.add('hide'), 1100);
+
+  flippedCount = 0;
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('ctaAfter').classList.add('hidden');
+  resetCards();
+
+  // ★ シード確定 → デッキ確定 → 3枚選択
+  if(!currentSeed){ currentSeed = crypto.getRandomValues(new Uint32Array(1))[0]; }
+  setSeed(currentSeed);
+  const deck = seedShuffle(tarotData, currentSeed);
+  selectedCards = deck.slice(0,3);
+});
+
+// Random Cards（既存 getRandomCards は不要になったら削除可）
+
+// Flip Card
+window.flipCard = function(cardElem) {
+  if (cardElem.classList.contains('flipped')) return;
+
+  document.getElementById('flipSound').currentTime = 0;
+  document.getElementById('flipSound').play();
+
+  cardElem.classList.add('glow','flipped');
+  flippedCount++;
+
+  const index = cardElem.parentElement.dataset.index;
+  const card = selectedCards[index];
+  const img = cardElem.querySelector('.card-image');
+
+  setTimeout(() => {
+    img.src = card.image_url;
+    img.alt = card.name;
+    cardElem.classList.remove('glow');
+  }, 300);
+
+  if (flippedCount === totalCards) showFullResult();
+};
+
+// Show Full Result（“詩・韻・祈”の語りを少しだけ深める）
+function showFullResult() {
+  document.getElementById('poemTitle').textContent = `詩 — ${selectedCards[0].name}`;
+  document.getElementById('rhymeTitle').textContent = `韻 — ${selectedCards[1].name}`;
+  document.getElementById('prayerTitle').textContent = `祈 — ${selectedCards[2].name}`;
+
+  const p0 = selectedCards[0], p1 = selectedCards[1], p2 = selectedCards[2];
+  const t1 = p0.meaning.split('。')[0], t2 = p1.meaning.split('。')[0], t3 = p2.meaning.split('。')[0];
+
+  document.getElementById('poem').textContent   = `はじまりの息：${p0.name}。${t1}——その気づきは、あなたの現在に“言の葉”を灯す。`;
+  document.getElementById('rhyme').textContent  = `共鳴の構文：${p1.name}。${t2}——行動の韻を一歩、揃えよう。`;
+  document.getElementById('prayer').textContent = `帰る祈り：${p2.name}。${t3}——結びの場所は「いま」。大丈夫だよ。`;
+
+  setTimeout(() => {
+    document.getElementById('result').classList.remove('hidden');
+    document.getElementById('ctaAfter').classList.remove('hidden');
+  }, 700);
+}
+
+// Restart（シードは保持＝共有リンクで同じ展開を再演できる）
+document.getElementById('restartBtn').addEventListener('click', () => {
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('ctaAfter').classList.add('hidden');
+  document.querySelector('.tarot-section').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => {
+    resetCards(); flippedCount = 0;
+  }, 400);
+});
 </body>
 </html>
