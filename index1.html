@@ -87,17 +87,17 @@
       <!-- Result Display -->
       <div id="result" class="result hidden">
         <div class="result-item">
-          <span class="icon">🪶</span>
+          <span class="icon">羽</span>
           <h3 id="poemTitle">詩 — </h3>
           <p id="poem"></p>
         </div>
         <div class="result-item">
-          <span class="icon">🎵</span>
+          <span class="icon">音符</span>
           <h3 id="rhymeTitle">韻 — </h3>
           <p id="rhyme"></p>
         </div>
         <div class="result-item">
-          <span class="icon">✨</span>
+          <span class="icon">輝き</span>
           <h3 id="prayerTitle">祈 — </h3>
           <p id="prayer"></p>
         </div>
@@ -154,7 +154,7 @@
 
     let flippedCount = 0;
     const totalCards = 3;
-    let selectedCards = []; // 選択されたカードを保持
+    let selectedCards = [];
 
     // Start Button
     document.getElementById('startBtn').addEventListener('click', () => {
@@ -164,7 +164,7 @@
       document.getElementById('result').classList.add('hidden');
       document.getElementById('ctaAfter').classList.add('hidden');
       resetCards();
-      selectedCards = getRandomCards(); // ランダムに3枚選択
+      selectedCards = getRandomCards();
     });
 
     // Random Cards (重複なし)
@@ -177,25 +177,21 @@
     window.flipCard = function(cardElem) {
       if (cardElem.classList.contains('flipped')) return;
       
-      // Play sound
       const flipSound = document.getElementById('flipSound');
       flipSound.play();
 
-      // Add glow animation
       cardElem.classList.add('glow');
-
       cardElem.classList.add('flipped');
       flippedCount++;
 
       const index = cardElem.parentElement.dataset.index;
       const card = selectedCards[index];
-      const front = cardElem.querySelector('.card-front-face');
-      const img = front.querySelector('.card-image');
+      const img = cardElem.querySelector('.card-image');
 
       setTimeout(() => {
         img.src = card.image_url;
         img.alt = card.name;
-        cardElem.classList.remove('glow'); // Remove animation after
+        cardElem.classList.remove('glow');
       }, 300);
 
       if (flippedCount === totalCards) {
@@ -203,14 +199,12 @@
       }
     };
 
-    // Show Full Result (詩・韻・祈として再解釈)
+    // Show Full Result
     function showFullResult() {
-      // タイトルにカード名を追加
       document.getElementById('poemTitle').textContent = `詩 — ${selectedCards[0].name}`;
       document.getElementById('rhymeTitle').textContent = `韻 — ${selectedCards[1].name}`;
       document.getElementById('prayerTitle').textContent = `祈 — ${selectedCards[2].name}`;
 
-      // 詩韻思想ベースの詩的解釈 (わかりやすいが詩的)
       const poemInterp = `痛みと希望に形を与える最初の息: ${selectedCards[0].name}の響きが、あなたの現在を優しく包み、${selectedCards[0].meaning.split('。')[0]}の光を呼び覚ます。`;
       const rhymeInterp = `響きを重ねる共鳴の構文: ${selectedCards[1].name}が鍵となり、魂に届く波を編み、${selectedCards[1].meaning.split('。')[0]}の調和を呼び起こす。`;
       const prayerInterp = `沈黙と意味を往復する呼吸: ${selectedCards[2].name}が光へ帰す道を示し、${selectedCards[2].meaning.split('。')[0]}の祈りが、あなたの物語を完結させる。`;
