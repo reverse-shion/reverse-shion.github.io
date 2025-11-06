@@ -23,25 +23,12 @@
 <body>
 
   <!-- 🌌 神殿ヒーロー -->
-  <section class="hero" aria-label="神殿の門">
-  <picture>
-    <!-- AVIF/WEBP を本当に置いている場合だけ使う。無ければこの2行は削除 -->
-    <source type="image/avif"
-            srcset="assets/temple-768.avif 768w, assets/temple-1280.avif 1280w, assets/temple-1800.avif 1800w"
-            sizes="100vw">
-    <source type="image/webp"
-            srcset="assets/temple-768.webp 768w, assets/temple-1280.webp 1280w, assets/temple-1800.webp 1800w"
-            sizes="100vw">
-
-    <!-- フォールバック（必ず存在する JPG） -->
-    <img
-      src="assets/temple.jpg?v=1"
-      alt="星の神殿の回廊と開かれた光の門"
-      loading="eager"
-      fetchpriority="high"
-      width="1800" height="900" />
-  </picture>
-
+  <!-- 🌌 HERO（確実に出る版） -->
+<section class="hero" aria-label="神殿の門">
+  <img class="hero__img"
+       src="/assets/temple.jpg?v=4"
+       alt="星の神殿の回廊と開かれた光の門"
+       width="1800" height="900" loading="eager" fetchpriority="high">
   <div class="hero__veil"></div>
   <div class="hero__copy">
     <h1>Re:Verse Shion — The Temple of Words</h1>
@@ -49,6 +36,7 @@
     <button id="heroStartBtn" class="btn-primary" aria-label="無料占いを始める">無料占いを始める</button>
   </div>
 </section>
+  
   <div class="container">
     <!-- Header -->
     <header class="header">
