@@ -1,0 +1,256 @@
+/* ================================================
+   Re:verse Shion — Mystic Conversion Top (2025-11-06)
+   目的：最短CV（無料占い→LINE/TikTok）× 神秘的可読
+   ================================================ */
+
+/* ===== Tokens ===== */
+:root{
+  --bg:#0b0b1a;
+  --ink:#ece9ff;
+  --muted:#b7b3d9;
+  --accent:#9b87ff;     /* 紫苑 */
+  --accent2:#ffd76f;    /* 白光（金の粒子） */
+  --line:rgba(255,255,255,.12);
+  --glass:#ffffff14;
+  --r:14px;
+  --header-h:64px;
+  color-scheme: dark;
+}
+
+/* ===== Base ===== */
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0; color:var(--ink);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+  line-height:1.75;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #15152a 20%, transparent 60%) no-repeat,
+    linear-gradient(180deg, #0b0b1a 0%, #0b0b1a 100%);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+a{ color:var(--ink); text-decoration:none }
+a:hover{ color:#fff; text-shadow:0 0 10px rgba(174,138,255,.4) }
+img,video{ max-width:100%; height:auto; display:block }
+.skip{ position:absolute; left:-9999px; top:-9999px }
+.skip:focus{ left:12px; top:12px; background:#000; color:#fff; padding:8px 12px; border-radius:8px }
+.sr-only{
+  position:absolute!important; height:1px; width:1px; overflow:hidden;
+  clip:rect(1px,1px,1px,1px); white-space:nowrap;
+}
+
+/* ===== Header ===== */
+.header{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(5,5,12,.75), rgba(5,5,12,.45));
+  border-bottom:1px solid var(--line);
+}
+.header__inner{
+  height:var(--header-h);
+  max-width:1100px; margin:0 auto; padding:0 16px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.logo{ font-weight:800; letter-spacing:.3px }
+.nav a{
+  color:var(--muted); margin-left:16px; padding:8px 10px; border-radius:10px; font-size:14.5px;
+  transition: color .2s, background .2s;
+}
+.nav a:hover, .nav a:focus{ color:var(--ink); background:var(--glass) }
+
+/* ===== Hero ===== */
+.hero{ position:relative; text-align:center; overflow:hidden;
+  padding: clamp(72px, 8vw, 128px) 16px 56px; }
+.hero__halo{
+  position:absolute; inset:-20% -10% auto -10%; height:120%;
+  background:
+    radial-gradient(800px 400px at 50% 20%, rgba(155,135,255,.25), transparent 60%),
+    radial-gradient(600px 400px at 50% 30%, rgba(255,215,111,.2), transparent 65%);
+  filter: blur(2px); pointer-events:none;
+}
+.hero__inner{ position:relative; max-width:980px; margin:0 auto }
+.hero__title{
+  font-family:"Noto Serif JP", serif;
+  font-size: clamp(22px, 3.6vw, 42px);
+  line-height:1.35; letter-spacing:.3px;
+  text-shadow:0 2px 18px rgba(255,255,255,.06);
+}
+.hero__lead{ margin:12px auto 18px; color:var(--muted); font-size:clamp(15px, 2.1vw, 18px) }
+.hero__cta{ margin-top:8px }
+.hero__bg{ position:absolute; inset:0; z-index:-1 }
+.hero__video{ width:100%; height:100%; object-fit:cover; filter:brightness(1.08) saturate(1.03) }
+.hero::before{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:
+    radial-gradient(1200px 800px at 50% -8%, rgba(0,0,0,.35), transparent 60%),
+    linear-gradient(180deg, rgba(5,5,12,.35), rgba(5,5,12,.55));
+  pointer-events:none;
+}
+
+/* ===== Buttons ===== */
+.btn{
+  display:inline-block; user-select:none; cursor:pointer;
+  padding:12px 20px; border-radius:999px; border:1px solid transparent;
+  font-weight:700; letter-spacing:.2px;
+  transition: transform .1s, box-shadow .25s, background .25s, color .25s;
+}
+.btn:active{ transform: translateY(1px) }
+.btn--primary{
+  background: linear-gradient(135deg, var(--accent), #7e66ff);
+  color:#0b0b1a;
+  box-shadow: 0 10px 28px rgba(155,135,255,.35), inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.btn--primary:hover{ box-shadow: 0 16px 42px rgba(155,135,255,.5) }
+.btn--ghost{
+  background: transparent; color:var(--ink); border:1px solid var(--line);
+}
+.btn--ghost:hover{ background:var(--glass) }
+.btn--accent{
+  background: linear-gradient(135deg, var(--accent2), #ffe6a1);
+  color:#2a2300;
+  box-shadow: 0 10px 28px rgba(255,215,111,.28), inset 0 0 0 1px rgba(0,0,0,.06);
+}
+.btn--line{
+  background:#06c755; color:#0b0b1a; box-shadow:0 10px 24px rgba(6,199,85,.25);
+}
+.btn--lg{ padding:14px 24px; font-size:18px }
+.btn--full{ display:block; text-align:center }
+
+/* ===== Proof（声） ===== */
+.proof{ padding: 14px 16px 0 }
+.proof__list{
+  width:min(96vw, 1100px); margin:0 auto; display:flex; flex-wrap:wrap; gap:10px;
+  list-style:none; padding:0; justify-content:center;
+}
+.chip{
+  background: #0f1020; color:var(--ink);
+  border:1px solid var(--line); border-radius:999px; padding:8px 12px;
+  font-size:13.5px;
+}
+
+/* ===== Tarot ===== */
+.tarot{ padding: 28px 16px 12px }
+.tarot__inner{ max-width:980px; margin:0 auto }
+.tarot h2{ font-family:"Noto Serif JP", serif; font-size:clamp(20px, 2.6vw, 28px) }
+.tarot__note{ color:var(--muted); margin-top:6px }
+.tarot__app{
+  margin:18px 0 20px; padding:22px; border:1px dashed var(--line); border-radius:var(--r);
+  background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+}
+.result-actions{
+  display:grid; gap:12px; grid-template-columns:1fr; margin:12px 0 0;
+}
+@media (min-width: 740px){ .result-actions{ grid-template-columns: repeat(3,1fr) } }
+
+/* ===== Doors（扉） ===== */
+.doors{ padding: 44px 16px 12px }
+.doors h2{
+  text-align:center; font-family:"Noto Serif JP", serif; font-size:clamp(20px,2.6vw,28px)
+}
+.doors__lead{ text-align:center; color:var(--muted); margin: 8px auto 22px; max-width:720px }
+.door-grid{
+  display:grid; gap:18px; width:min(94vw, 1000px); margin:0 auto;
+}
+@media (min-width: 760px){ .door-grid{ grid-template-columns: repeat(4,1fr) } }
+.door{
+  background:#0f1020; border:1px solid var(--line); border-radius:var(--r);
+  padding:18px; text-decoration:none; color:var(--ink);
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  transition: transform .18s ease, box-shadow .28s ease, border-color .25s ease;
+}
+.door:hover, .door:focus{
+  transform: translateY(-4px);
+  border-color: rgba(155,135,255,.45);
+  box-shadow:0 18px 46px rgba(155,135,255,.22), 0 0 0 1px inset rgba(255,255,255,.06);
+}
+.door h3{ margin: 2px 0 8px; font-size:18px }
+.door p{ margin:0; color:var(--muted) }
+
+/* ===== Origin（序文：ブランドの名乗り） ===== */
+.origin{
+  position: relative;
+  padding: 40px 16px 16px;
+  margin: 12px 0 0;
+  isolation: isolate;
+}
+.origin::before{
+  content:"";
+  position:absolute; inset:0 0 auto 0; height:160px; z-index:-1;
+  background:
+    radial-gradient(800px 320px at 50% 10%, rgba(155,135,255,.15), transparent 60%),
+    radial-gradient(600px 260px at 50% 0%, rgba(255,215,111,.12), transparent 60%);
+  filter: blur(2px);
+  pointer-events:none;
+}
+.origin__inner{
+  width:min(92vw, 820px);
+  margin:0 auto;
+  padding: 22px 20px;
+  border:1px solid var(--line);
+  border-radius: var(--r);
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+  box-shadow: 0 12px 36px rgba(0,0,0,.25);
+  text-align: center;
+}
+.origin__inner p{
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-family: "Noto Serif JP", serif;
+  font-size: clamp(15px, 2.2vw, 18px);
+  line-height: 1.9;
+}
+.origin__line{
+  font-size: clamp(16px, 2.6vw, 20px);
+  color: var(--ink);
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 22px rgba(174,138,255,.18);
+}
+@media (max-width: 520px){
+  .origin{ padding-top: 32px }
+  .origin__inner{ padding: 18px 16px }
+}
+
+/* ===== CTA ===== */
+.cta{ padding: 54px 16px 72px; text-align:center }
+.cta h2{ font-family:"Noto Serif JP", serif; font-size:clamp(20px,2.6vw,28px) }
+.cta__lead{ color:var(--muted); margin:.25em 0 1em }
+
+/* ===== Footer ===== */
+.footer{ border-top:1px solid var(--line); padding:24px 16px 32px; background:#0b0b1a }
+.footer__inner{ max-width:1100px; margin:0 auto; display:grid; gap:14px }
+.footer nav a{ color:var(--muted); margin-right:16px }
+.footer nav a:hover{ color:var(--ink) }
+.sns a{ color:var(--muted); margin-right:14px }
+.sns a:hover{ color:var(--ink) }
+
+/* ===== Ritual FX：光輪 / 聖紋 ===== */
+#divineFlash{
+  position:fixed; inset:0; pointer-events:none; opacity:0; z-index:9998;
+  background: radial-gradient(60vmax 60vmax at 50% 50%, rgba(255,255,255,.9), rgba(255,215,111,.35) 40%, transparent 64%);
+  transition: opacity .18s ease-out;
+}
+#divineFlash.is-awake{ opacity:1; animation: fadeAura .9s ease-out forwards; }
+@keyframes fadeAura{ 0%{opacity:1} 100%{opacity:0} }
+
+#starSigil{
+  position:absolute; width:84px; height:84px; pointer-events:none; opacity:0;
+  transform: scale(.72) rotate(-8deg); z-index:9999;
+  background: url("/assets/sigil/hexagram.svg") center/contain no-repeat;
+  mix-blend-mode: screen; filter: drop-shadow(0 0 12px rgba(174,138,255,.6));
+}
+#starSigil.is-ritual{
+  opacity:1; animation: sigilPop .52s ease-out both;
+}
+@keyframes sigilPop{
+  0%{ transform: scale(.72) rotate(-8deg); opacity:0 }
+  40%{ transform: scale(1.06) rotate(0); opacity:1 }
+  100%{ transform: scale(1.00) rotate(0); opacity:0 }
+}
+
+/* ===== Responsive micro ===== */
+.sp{ display:none }
+@media (max-width:520px){ .sp{ display:inline } }
