@@ -9,7 +9,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- External CSS -->
+  <!-- External CSS（あなたのstyleファイル） -->
   <link rel="stylesheet" href="style1.css"/>
 
   <!-- Open Graph -->
@@ -18,6 +18,7 @@
   <meta property="og:image" content="https://reverse-shion.github.io/ogp.jpg"/>
   <meta property="og:url" content="https://reverse-shion.github.io/"/>
   <meta property="og:type" content="website"/>
+
 </head>
 <body>
 
@@ -26,7 +27,7 @@
     <picture>
       <source type="image/avif" srcset="/assets/temple-768.avif 768w, /assets/temple-1280.avif 1280w, /assets/temple-1800.avif 1800w" sizes="100vw">
       <source type="image/webp" srcset="/assets/temple-768.webp 768w, /assets/temple-1280.webp 1280w, /assets/temple-1800.webp 1800w" sizes="100vw">
-      <img src="./assets/temple.jpg" alt="星の神殿の回廊と開かれた光の門" loading="eager">
+  <img src="./assets/temple.jpg" alt="星の神殿の回廊と開かれた光の門" loading="eager">
     </picture>
     <div class="hero__veil"></div>
     <div class="hero__copy">
@@ -58,12 +59,12 @@
       <p class="chant line">深く息をして――タロット展開。</p>
     </div>
 
-    <!-- Tarot Area -->
+    <!-- Tarot Area (Hidden initially) -->
     <section id="tarotSection" class="tarot-section hidden" aria-live="polite">
       <div class="tarot-grid">
         <!-- Card 1 -->
         <div class="card-wrapper" data-index="0">
-          <div class="card-back" onclick="flipCard(this)" role="button" tabindex="0" aria-label="現在のカードをめくる" onkeydown="if(event.key==='Enter'||event.key===' ') flipCard(this)">
+          <div class="card-back" onclick="flipCard(this)" role="button" tabindex="0" aria-label="現在のカードをめくる">
             <div class="card-inner">
               <div class="card-face card-back-face">
                 <span class="label">① 現在</span>
@@ -77,7 +78,7 @@
         </div>
         <!-- Card 2 -->
         <div class="card-wrapper" data-index="1">
-          <div class="card-back" onclick="flipCard(this)" role="button" tabindex="0" aria-label="鍵のカードをめくる" onkeydown="if(event.key==='Enter'||event.key===' ') flipCard(this)">
+          <div class="card-back" onclick="flipCard(this)" role="button" tabindex="0" aria-label="鍵のカードをめくる">
             <div class="card-inner">
               <div class="card-face card-back-face">
                 <span class="label">② 鍵</span>
@@ -91,7 +92,7 @@
         </div>
         <!-- Card 3 -->
         <div class="card-wrapper" data-index="2">
-          <div class="card-back" onclick="flipCard(this)" role="button" tabindex="0" aria-label="進む道のカードをめくる" onkeydown="if(event.key==='Enter'||event.key===' ') flipCard(this)">
+          <div class="card-back" onclick="flipCard(this)" role="button" tabindex="0" aria-label="進む道のカードをめくる">
             <div class="card-inner">
               <div class="card-face card-back-face">
                 <span class="label">③ 進む道</span>
@@ -128,9 +129,9 @@
       <div id="ctaAfter" class="cta-after hidden">
         <p class="next">もっと深く知りたい方は…詳しくは個人鑑定へ</p>
         <div class="btn-group">
-          <a href="https://line.me/R/ti/p/@shion" target="_blank" class="btn-line" rel="noopener">LINEで毎日1枚無料</a>
-          <a href="https://www.tiktok.com/@shion" target="_blank" class="btn-tiktok" rel="noopener">TikTokで個人鑑定予約（恋愛/復縁/連絡時期）</a>
-          <a href="https://note.com/shion_philosophy" target="_blank" class="btn-note" rel="noopener">詩韻思想 零〜結 無料公開</a>
+          <a href="https://line.me/R/ti/p/@yourline" target="_blank" class="btn-line" rel="noopener">LINEで毎日1枚無料</a>
+          <a href="https://www.tiktok.com/@your_tiktok" target="_blank" class="btn-tiktok" rel="noopener">TikTokで個人鑑定予約（恋愛/復縁/連絡時期）</a>
+          <a href="https://note.com/your_note/m/magazine" target="_blank" class="btn-note" rel="noopener">詩韻思想 零〜結 無料公開</a>
         </div>
         <button id="restartBtn" class="btn-restart">もう一度占う</button>
       </div>
@@ -138,14 +139,14 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <p>© 詩韻 Shion — 言葉で光を手渡す</p>
+      <p>&copy; 詩韻 Shion — 言葉で光を手渡す</p>
     </footer>
   </div>
 
   <!-- Audio for Flip Sound -->
-  <audio id="flipSound" src="./assets/flip.mp3" preload="auto"></audio>
+  <audio id="flipSound" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
 
-  <!-- JavaScript -->
+  <!-- JavaScript（1ブロックに統合） -->
   <script>
     // ===== Tarot Data: 大アルカナ22枚 =====
     const tarotData = [
@@ -189,6 +190,7 @@
       document.querySelector('.intro').classList.add('hidden');
       document.getElementById('tarotSection').classList.remove('hidden');
 
+      // 詠唱オーバーレイ
       const ritual = document.getElementById('ritual');
       ritual.classList.remove('hide');
       setTimeout(() => ritual.classList.add('hide'), 1100);
@@ -198,33 +200,29 @@
       document.getElementById('ctaAfter').classList.add('hidden');
       resetCards();
 
-      if (!currentSeed) {
-        currentSeed = (crypto.getRandomValues?.(new Uint32Array(1))[0]) || Date.now();
-      }
+      // シード確定 → デッキ確定 → 3枚
+      if (!currentSeed) currentSeed = crypto.getRandomValues(new Uint32Array(1))[0];
       setSeed(currentSeed);
       const deck = seedShuffle(tarotData, currentSeed);
       selectedCards = deck.slice(0, 3);
     });
 
     // ===== Seeded Shuffle (xorshift32) =====
-    function seedShuffle(arr, seed) {
-      let x = seed >>> 0;
+    function seedShuffle(arr, seed){
+      let x = seed || 123456789;
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
         x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
-        x = x >>> 0;
-        const j = x % (i + 1);
+        const j = Math.abs(x) % (i + 1);
         [a[i], a[j]] = [a[j], a[i]];
       }
       return a;
     }
-
-    function getSeed() {
+    function getSeed(){
       const p = new URLSearchParams(location.search);
       return p.has("seed") ? Number(p.get("seed")) : undefined;
     }
-
-    function setSeed(seed) {
+    function setSeed(seed){
       const u = new URL(location.href);
       u.searchParams.set("seed", String(seed));
       history.replaceState(null, "", u.toString());
@@ -235,9 +233,9 @@
       if (cardElem.classList.contains('flipped')) return;
 
       const se = document.getElementById('flipSound');
-      try { se.currentTime = 0; se.play(); } catch(e) {}
+      try { se.currentTime = 0; se.play(); } catch(e){ /* iOS対策 */ }
 
-      cardElem.classList.add('glow', 'flipped');
+      cardElem.classList.add('glow','flipped');
       flippedCount++;
 
       const index = cardElem.parentElement.dataset.index;
@@ -275,12 +273,17 @@
     // ===== Reset & Restart =====
     function resetCards() {
       document.querySelectorAll('.card-back').forEach(card => {
-        card.classList.remove('flipped', 'glow');
+        card.classList.remove('flipped','glow');
         const img = card.querySelector('.card-image');
-        if (img) { img.src = ''; img.alt = ''; }
+        if (img){ img.src = ''; img.alt = ''; }
       });
     }
-
     document.getElementById('restartBtn').addEventListener('click', () => {
       document.getElementById('result').classList.add('hidden');
-      document.get<|eos|>
+      document.getElementById('ctaAfter').classList.add('hidden');
+      document.querySelector('.tarot-section').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => { resetCards(); flippedCount = 0; }, 400);
+    });
+  </script>
+</body>
+</html>
