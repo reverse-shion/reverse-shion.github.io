@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>詩韻 — 光の神殿へ | TAROT BREAKER × 詩韻思想</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b1a" />
+  <meta name="description" content="暗闇のコードから光の神殿へ。扉を開くとタロットが展開され、詩（象徴）・韻（響）・祈（導き）が示される。詳しく見るで詩韻思想の詩的解説へ。最後はLINEで個人鑑定へ。">
+  <link rel="canonical" href="/" />
+  <link rel="icon" href="/assets/icon.png" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css?v=20251108" />
+</head>
+<body>
+
+  <!-- ========== 0) Global Tap Ripple (星紋) ========== -->
+  <span class="ripple-root" aria-hidden="true"></span>
+
+  <!-- ========== 1) PROLOGUE — 暗闇：青いコードが縦に流れる ========== -->
+  <section id="intro" class="view view--intro" aria-label="序章：暗闇とコード">
+    <canvas id="codeRain" class="intro__canvas" aria-hidden="true"></canvas>
+
+    <div class="intro__overlay">
+      <h1 class="brand">詩韻<span class="brand__sub">Shion</span></h1>
+      <p class="tag">言葉は祈りの構文。世界は、その応答。</p>
+      <button id="enterTemple" class="btn btn--primary" aria-label="光の神殿へ">光の神殿へ</button>
+
+      <!-- ユーザー操作後に初回再生されるBGM（任意・差し替え可） -->
+      <audio id="bgm" preload="auto">
+        <!-- 置き換え推奨：/assets/sound/init.mp3 -->
+        <source src="/assets/sound/init.mp3" type="audio/mpeg" />
+      </audio>
+    </div>
+  </section>
+
+  <!-- ========== 2) REVELATION — 光の神殿：啓示と導き ========== -->
+  <section id="temple" class="view view--temple" aria-label="啓示：光の神殿">
+    <div class="temple__halo" aria-hidden="true"></div>
+    <div class="temple__pillars" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="temple__inner">
+      <h2 class="temple__title">星の神殿</h2>
+      <p class="temple__lead">扉を開けば、占導は始まる。<br>「タロット展開」を押して、あなたの詩・韻・祈を受け取って。</p>
+
+      <button id="startReading" class="btn btn--shine" aria-label="タロット展開">タロット展開</button>
+    </div>
+
+    <!-- 神殿→占い 画面遷移の柔らかい光 -->
+    <div class="veil" aria-hidden="true"></div>
+  </section>
+
+  <!-- ========== 3) READING — タロット・詩韻祈（簡潔）→ 詳しく見る（詩韻思想） ========== -->
+  <section id="reading" class="view view--reading" aria-label="タロット・リーディング">
+    <header class="reading__head">
+      <h3>タロット・リーディング</h3>
+      <p class="reading__note">3枚展開：<strong>詩（象徴）</strong> / <strong>韻（響き）</strong> / <strong>祈（導き）</strong></p>
+      <div class="reading__controls">
+        <button id="drawBtn" class="btn" aria-label="もう一度展開">もう一度展開</button>
+      </div>
+    </header>
+
+    <div class="cards" id="cards"></div>
+
+    <!-- 3行サマリー（カードを引いた直後に出す） -->
+    <div class="summary" id="summary" hidden>
+      <div class="summary__col">
+        <h4>詩</h4>
+        <p id="sumPoem"></p>
+      </div>
+      <div class="summary__col">
+        <h4>韻</h4>
+        <p id="sumRes"></p>
+      </div>
+      <div class="summary__col">
+        <h4>祈</h4>
+        <p id="sumPray"></p>
+      </div>
+    </div>
+
+    <!-- 詳しく見る（詩韻思想の詩的解説） -->
+    <div class="deep" id="deep" hidden>
+      <h4>詳しく見る（詩韻思想）</h4>
+      <article id="deepText"></article>
+    </div>
+  </section>
+
+  <!-- ========== 4) BRIDGE — LINE誘導 & サイトへ ========== -->
+  <section id="cta" class="view view--cta" aria-label="個人鑑定とサイト案内" hidden>
+    <div class="cta__box">
+      <h3>現実へ橋をかける</h3>
+      <p>もし、この言葉が心に灯ったなら。<br>つづきは対話で丁寧に編もう。</p>
+
+      <!-- 差し替え：あなたのLINE公式URL -->
+      <a class="btn btn--line" href="https://lin.ee/your-line-link" target="_blank" rel="noopener" aria-label="LINEで個人鑑定">
+        LINEで個人鑑定
+      </a>
+
+      <!-- 差し替え：あなたのサイトTOP -->
+      <p class="cta__link">
+        <a href="https://reverse-shion.github.io/" target="_blank" rel="noopener">サイトへ</a>
+      </p>
+    </div>
+  </section>
+
+  <script src="/app.js?v=20251108" defer></script>
+</body>
+</html>
