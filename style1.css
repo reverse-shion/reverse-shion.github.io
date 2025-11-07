@@ -37,9 +37,15 @@ body::before{
   transition:opacity 1400ms ease, transform 1800ms ease; will-change:opacity,transform;
 }
 /* 相対パスに統一（GitHub Pages のルート差異対策） */
-）*/
-.hero-door{ background-image:url("assets/temple-door.jpg"); }
-.hero-hall{ background-image:url("assets/temple-hall.jpg"); }
+.hero-door{
+  background-image:url("assets/temple-door.jpg");
+  opacity:1;              /* 初期表示：扉を見せる */
+}
+.hero-hall{
+  background-image:url("assets/temple-hall.jpg");
+  opacity:0;              /* 初期表示：広間は非表示 */
+}
+
 
 
 /* 光 */
@@ -157,3 +163,5 @@ body::before{
 /* Utils */
 .hidden{ display:none !important }
 @media (max-width:480px){ .title{ font-size:1.8rem } .card-wrapper{ width:100px; height:165px } }
+.ritual{ position:fixed; inset:0; display:grid; place-items:center; z-index:20; pointer-events:none }
+.ritual.hide{ display:none }
