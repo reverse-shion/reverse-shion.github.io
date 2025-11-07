@@ -22,18 +22,21 @@
 </head>
 <body>
 
-  <!-- 🌌 神殿ヒーロー -->
-  <!-- 🌌 HERO（確実に出る版） -->
-<section class="hero" aria-label="神殿の門">
-  <img class="hero__img"
-       src="/assets/temple.jpg?v=4"
-       alt="星の神殿の回廊と開かれた光の門"
-       width="1800" height="900" loading="eager" fetchpriority="high">
-  <div class="hero__veil"></div>
-  <div class="hero__copy">
+  <!-- 🌌 神殿ヒーロー（自動開扉→光→クロスフェード→CTA） -->
+<section class="hero-temple" aria-label="星の神殿の門">
+  <!-- 背景レイヤー：手前＝縦構図（扉）／奥＝横構図（広間） -->
+  <div class="hero-layer hero-door" aria-hidden="true"></div>
+  <div class="hero-layer hero-hall" aria-hidden="true"></div>
+
+  <!-- 光のヴェール＆エフェクト -->
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-glow" aria-hidden="true"></div>
+
+  <!-- コピーとCTA（後からふわっと出現） -->
+  <div class="hero-copy">
     <h1>Re:Verse Shion — The Temple of Words</h1>
-    <p>言葉が魂を救う世界へ。扉の向こうで、あなたの“韻”が目を覚ます。</p>
-    <button id="heroStartBtn" class="btn-primary" aria-label="無料占いを始める">無料占いを始める</button>
+    <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
+    <button id="startBtn" class="btn-primary">無料占いを始める</button>
   </div>
 </section>
   
@@ -148,6 +151,24 @@
 
   <!-- JavaScript（1ブロックに統合） -->
   <script>
+  // ===== Hero 導線（自動開扉 → フェード → CTA） =====
+  window.addEventListener('load', () => {
+    const hero = document.querySelector('.hero-temple');
+    if(!hero) return;
+
+    // 1) 扉の光を点火
+    hero.classList.add('is-opening');
+
+    // 2) 少し後に広間へクロスフェード
+    setTimeout(()=> hero.classList.add('is-revealed'), 1100);
+
+    // 3) CTAをふわっと
+    setTimeout(()=> hero.classList.add('is-cta'), 2200);
+  });
+
+  // ✅ このボタンは既存の startBtn と同じIDなので、今の占い開始JSがそのまま動きます
+  // （もし intro セクション内にも二つ目のボタンがあるなら、重複を避けるため
+  //  そちらのボタンだけ id を削除 or 押したらスクロールにするのが安全）
     // ===== Tarot Data: 大アルカナ22枚 =====
     const tarotData = [
       { name: "The Fool", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg" },
