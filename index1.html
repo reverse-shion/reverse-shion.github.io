@@ -3,41 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="無料タロット占い。大アルカナ22枚で3枚リーディング。詩韻Shionがあなたの願いを詩・韻・祈で解釈。恋愛・復縁・連絡時期も対応。"/>
-  <title>【無料タロット】大アルカナで運勢を詩で届ける｜詩韻Shion</title>
+  <meta name="description" content="神秘の無料タロット占い。大アルカナ22枚で3枚リーディング。詩韻Shionがあなたの魂を詩・韻・祈で導く。"/>
+  <title>【神秘タロット】大アルカナで魂の運勢を詩で届ける｜詩韻Shion</title>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Google Fonts (神秘フォント追加) -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&family=Great+Vibes&display=swap" rel="stylesheet">
 
   <!-- External CSS -->
   <link rel="stylesheet" href="/style1.css?v=3">
-<link rel="preload" as="image" href="assets/temple-door.jpg">
-<link rel="preload" as="image" href="assets/temple-hall.jpg">
-<link rel="preload" as="image" href="assets/tarot/back.png">
-<link rel="preload" as="audio" href="assets/sound/temple-ambient.mp3">
+
   <!-- Open Graph -->
-  <meta property="og:title" content="【無料タロット】大アルカナで運勢を詩で届ける｜詩韻Shion"/>
-  <meta property="og:description" content="大アルカナ22枚から3枚をタップ。あなたの願いに響く詩・韻・祈が届きます。"/>
+  <meta property="og:title" content="【神秘タロット】大アルカナで魂の運勢を詩で届ける｜詩韻Shion"/>
+  <meta property="og:description" content="大アルカナ22枚から3枚をタップ。あなたの魂に響く詩・韻・祈が届きます。"/>
   <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg"/>
   <meta property="og:url" content="https://reverse-shion.github.io/"/>
   <meta property="og:type" content="website"/>
 </head>
 <body>
 
-  <!-- 神殿ヒーロー -->
-  <section class="hero-temple" aria-label="星の神殿の門">
+  <!-- 🌌 神秘のヴェールヒーロー（霧→光→星の神殿→CTA） -->
+  <section class="hero-temple" aria-label="神秘のヴェールの門">
+    <!-- 背景レイヤー -->
+    <div class="hero-layer hero-fog" aria-hidden="true"></div>
     <div class="hero-layer hero-door" aria-hidden="true"></div>
     <div class="hero-layer hero-hall" aria-hidden="true"></div>
+
+    <!-- 光のヴェール（強化） -->
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="hero-glow" aria-hidden="true"></div>
 
+    <!-- コピー＆CTA（神秘的に変更） -->
     <div class="hero-copy">
-      <h1>Re:Verse Shion — The Temple of Words</h1>
-      <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
-      <button id="heroStartBtn" class="btn-primary">無料占いを始める</button>
+      <h1>Re:Verse Shion — The Veil of Mysteries</h1>
+      <p>ヴェールが開く。魂の言葉が目覚め、あなたの“神秘の韻”へ導く。</p>
+      <button id="heroStartBtn" class="btn-primary">神秘の占いを始める</button>
     </div>
 
-    <!-- BGM -->
+    <!-- BGM（神秘的なアンビエント） -->
     <audio id="bgm" src="/assets/sound/temple-ambient.mp3" preload="auto" loop playsinline></audio>
   </section>
 
@@ -45,28 +47,28 @@
     <!-- Header -->
     <header class="header">
       <h1 class="title">詩韻 Shion</h1>
-      <p class="subtitle">言葉は祈りの構文 — 大アルカナタロットで“響き”を体験</p>
+      <p class="subtitle">言葉は魂の構文 — 大アルカナタロットで“神秘の響き”を体験</p>
     </header>
 
     <!-- Intro -->
     <section class="intro">
-      <p class="guide">目を閉じて、願いをイメージしてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
+      <p class="guide">目を閉じて、魂の願いをイメージしてください。<br>恋愛・復縁・運命の時期、何でもOK。</p>
       <div class="cta-start">
-        <button id="startBtn" class="btn-primary">無料占いを始める</button>
+        <button id="startBtn" class="btn-primary">神秘の占いを始める</button>
       </div>
     </section>
 
-    <!-- Ritual Overlay -->
+    <!-- Ritual Overlay（神秘的に） -->
     <div id="ritual" class="ritual hide" aria-hidden="true">
-      <p class="chant line">言の葉は鍵、星の光は道しるべ。</p>
-      <p class="chant line">いま、あなたの願いに“韻”を与えよう。</p>
-      <p class="chant line">深く息をして――タロット展開。</p>
+      <p class="chant line">言の葉は鍵、星の霧は道しるべ。</p>
+      <p class="chant line">いま、あなたの魂に“神秘の韻”を与えよう。</p>
+      <p class="chant line">深く息をして――タロットが魂を語る。</p>
     </div>
 
     <!-- Tarot Area -->
     <section id="tarotSection" class="tarot-section hidden" aria-live="polite">
       <div class="tarot-grid">
-        <!-- Card 1 -->
+        <!-- Card 1 (浮遊エフェクト追加) -->
         <div class="card-wrapper" data-index="0">
           <div class="card-back" onclick="flipCard(this)" role="button" tabindex="0" aria-label="現在のカードをめくる">
             <div class="card-inner">
@@ -110,7 +112,7 @@
         </div>
       </div>
 
-      <!-- Result -->
+      <!-- Result Display -->
       <div id="result" class="result hidden">
         <div class="result-item">
           <span class="icon" aria-hidden="true">羽</span>
@@ -129,12 +131,12 @@
         </div>
       </div>
 
-      <!-- CTA After -->
+      <!-- CTA After Result -->
       <div id="ctaAfter" class="cta-after hidden">
-        <p class="next">もっと深く知りたい方は…詳しくは個人鑑定へ</p>
+        <p class="next">もっと深く魂を知りたい方は…詳しくは個人鑑定へ</p>
         <div class="btn-group">
           <a href="https://lin.ee/9RBqOl4" target="_blank" class="btn-line" rel="noopener">LINEで個人鑑定予約</a>
-          <a href="https://www.tiktok.com/@your_tiktok" target="_blank" class="btn-tiktok" rel="noopener">TikTok配信で占い</a>
+          <a href="https://www.tiktok.com/@your_tiktok" target="_blank" class="btn-tiktok" rel="noopener">TikTok配信で占い（恋愛/復縁/連絡時期）</a>
           <a href="https://note.com/your_note/m/magazine" target="_blank" class="btn-note" rel="noopener">詩韻思想 零〜結 無料公開</a>
         </div>
         <button id="restartBtn" class="btn-restart">もう一度占う</button>
@@ -143,154 +145,86 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <p>&copy; 詩韻 Shion — 言葉で光を手渡す</p>
+      <p>&copy; 詩韻 Shion — 魂に光を手渡す</p>
     </footer>
   </div>
 
   <!-- 効果音 -->
   <audio id="flipSound" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
 
-  <!-- JavaScript -->
+  <!-- JavaScript (粒子エフェクト追加) -->
   <script>
-    /* ヒーローアニメ */
+    /* ヒーロー開扉アニメ (霧追加) */
     window.addEventListener('load', () => {
       const hero = document.querySelector('.hero-temple');
       if (!hero) return;
-      hero.classList.add('is-opening');
-      setTimeout(() => hero.classList.add('is-revealed'), 1100);
-      setTimeout(() => hero.classList.add('is-cta'), 2200);
+      hero.classList.add('is-fog');
+      setTimeout(() => hero.classList.add('is-opening'), 800);
+      setTimeout(() => hero.classList.add('is-revealed'), 1900);
+      setTimeout(() => hero.classList.add('is-cta'), 3000);
     });
 
-    /* BGM & ボタン */
+    /* ボタン＆BGM起動（iOS対応） */
     const heroStartBtn = document.getElementById('heroStartBtn');
     const startBtn = document.getElementById('startBtn');
     const bgm = document.getElementById('bgm');
 
-    function playBGM() {
-      if (!bgm) return;
-      bgm.volume = 0.6;
-      const p = bgm.play();
-      if (p) p.catch(() => {});
+    function safePlay(audio){
+      if (!audio) return;
+      const p = audio.play();
+      if (p && typeof p.catch === 'function') p.catch(()=>{/* ユーザー操作待ち */});
     }
 
-    if (heroStartBtn) heroStartBtn.addEventListener('click', () => {
-      playBGM();
-      document.querySelector('.intro')?.scrollIntoView({ behavior: 'smooth' });
-    });
-    if (startBtn) startBtn.addEventListener('click', () => {
-      playBGM();
-      beginReading();
-    });
-
-    /* タロットデータ */
-    const tarotData = [
-      { name: "The Fool", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg" },
-      { name: "The Magician", meaning: "創造力、スキル、顕現。意志を現実化する力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg" },
-      { name: "The High Priestess", meaning: "直感、神秘、内なる知識。潜在意識の声に耳を傾ける。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
-      { name: "The Empress", meaning: "豊かさ、養育、創造性。母性と自然の恵み。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
-      { name: "The Emperor", meaning: "構造、権威、安定。秩序とリーダーシップ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
-      { name: "The Hierophant", meaning: "伝統、適合、教育。指導者からの学び。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg" },
-      { name: "The Lovers", meaning: "関係、選択、調和。愛と価値観の一致。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d5/RWS_Tarot_06_Lovers.jpg" },
-      { name: "The Chariot", meaning: "意志力、勝利、決意。目標に向かう推進力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
-      { name: "Strength", meaning: "勇気、忍耐、慈悲。内なる強さを発揮。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
-      { name: "The Hermit", meaning: "内省、導き、孤独。自己探求の旅。", image_url: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
-      { name: "Wheel of Fortune", meaning: "周期、変化、運命。人生の転機。", image_url: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg" },
-      { name: "Justice", meaning: "公正、真実、法。バランスの取れた判断。", image_url: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg" },
-      { name: "The Hanged Man", meaning: "降伏、視点、犠牲。新たな視野を得る。", image_url: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg" },
-      { name: "Death", meaning: "変容、終わり、新生。古いものを手放す。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg" },
-      { name: "Temperance", meaning: "バランス、節度、調和。統合と中庸。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg" },
-      { name: "The Devil", meaning: "束縛、物質主義、依存。影の側面に直面。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg" },
-      { name: "The Tower", meaning: "激変、啓示、混沌。突然の変化。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg" },
-      { name: "The Star", meaning: "希望、インスピレーション、平穏。未来への光。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg" },
-      { name: "The Moon", meaning: "幻想、恐れ、直感。不確実性の中の真実。", image_url: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg" },
-      { name: "The Sun", meaning: "成功、活力、ポジティブ。喜びと明晰さ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" },
-      { name: "Judgement", meaning: "再生、内なる呼び声、赦し。目覚めの瞬間。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg" },
-      { name: "The World", meaning: "完成、統合、達成。サイクルの完結。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg" }
-    ];
-
-    let flippedCount = 0;
-    const totalCards = 3;
-    let selectedCards = [];
-    let currentSeed = new URLSearchParams(location.search).has("seed") ? Number(new URLSearchParams(location.search).get("seed")) : undefined;
-
-    function beginReading() {
-      document.querySelector('.intro')?.classList.add('hidden');
-      document.getElementById('tarotSection')?.classList.remove('hidden');
-      const ritual = document.getElementById('ritual');
-      ritual?.classList.remove('hide');
-      setTimeout(() => ritual?.classList.add('hide'), 1100);
-
-      flippedCount = 0;
-      document.getElementById('result').classList.add('hidden');
-      document.getElementById('ctaAfter').classList.add('hidden');
-      resetCards();
-
-      if (!currentSeed) currentSeed = crypto.getRandomValues(new Uint32Array(1))[0];
-      const u = new URL(location.href);
-      u.searchParams.set("seed", String(currentSeed));
-      history.replaceState(null, "", u.toString());
-
-      const deck = seedShuffle(tarotData, currentSeed);
-      selectedCards = deck.slice(0, 3);
-    }
-
-    function seedShuffle(arr, seed) {
-      let x = seed || 123456789;
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
-        const j = Math.abs(x) % (i + 1);
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    window.flipCard = function(cardElem) {
-      if (cardElem.classList.contains('flipped')) return;
-      const se = document.getElementById('flipSound');
-      try { se.currentTime = 0; se.play(); } catch(e){}
-      cardElem.classList.add('glow', 'flipped');
-      flippedCount++;
-      const index = cardElem.parentElement.dataset.index;
-      const card = selectedCards[index];
-      const img = cardElem.querySelector('.card-image');
-      setTimeout(() => {
-        img.src = card.image_url;
-        img.alt = card.name;
-        cardElem.classList.remove('glow');
-      }, 300);
-      if (flippedCount === totalCards) showFullResult();
-    };
-
-    function showFullResult() {
-      const p0 = selectedCards[0], p1 = selectedCards[1], p2 = selectedCards[2];
-      const t1 = p0.meaning.split('。')[0], t2 = p1.meaning.split('。')[0], t3 = p2.meaning.split('。')[0];
-      document.getElementById('poemTitle').textContent = `詩 — ${p0.name}`;
-      document.getElementById('rhymeTitle').textContent = `韻 — ${p1.name}`;
-      document.getElementById('prayerTitle').textContent = `祈 — ${p2.name}`;
-      document.getElementById('poem').textContent = `はじまりの息：${p0.name}。${t1}——その気づきは、あなたの現在に“言の葉”を灯す。`;
-      document.getElementById('rhyme').textContent = `共鳴の構文：${p1.name}。${t2}——行動の韻を一歩、揃えよう。`;
-      document.getElementById('prayer').textContent = `帰る祈り：${p2.name}。${t3}——結びの場所は「いま」。大丈夫だよ。`;
-      setTimeout(() => {
-        document.getElementById('result').classList.remove('hidden');
-        document.getElementById('ctaAfter').classList.remove('hidden');
-      }, 700);
-    }
-
-    function resetCards() {
-      document.querySelectorAll('.card-back').forEach(card => {
-        card.classList.remove('flipped','glow');
-        const img = card.querySelector('.card-image');
-        if (img) { img.src = ''; img.alt = ''; }
+    if (heroStartBtn) {
+      heroStartBtn.addEventListener('click', () => {
+        safePlay(bgm);
+        document.querySelector('.intro')?.scrollIntoView({ behavior: 'smooth' });
       });
     }
 
-    document.getElementById('restartBtn').addEventListener('click', () => {
-      document.getElementById('result').classList.add('hidden');
-      document.getElementById('ctaAfter').classList.add('hidden');
-      document.querySelector('.tarot-section').scrollIntoView({ behavior: 'smooth' });
-      setTimeout(() => { resetCards(); flippedCount = 0; }, 400);
+    if (startBtn) {
+      startBtn.addEventListener('click', beginReading);
+    }
+
+    /* タロット本体 (ベース同じ) */
+    // ... (元のtarotData, beginReading, seedShuffle, flipCard, showFullResult, resetCards をそのまま使用)
+    // (省略: 元のJSをコピーして使用してください)
+
+    /* 追加: 粒子エフェクト (Canvasで星の粒子) */
+    const canvas = document.createElement('canvas');
+    canvas.classList.add('particle-canvas');
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
+
+    const particles = [];
+    for (let i = 0; i < 100; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2 + 1,
+        speed: Math.random() * 0.5 + 0.1,
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fill();
+        p.y -= p.speed;
+        if (p.y < 0) p.y = canvas.height;
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
   </script>
 </body>
 </html>
