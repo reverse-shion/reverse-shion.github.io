@@ -34,10 +34,12 @@
 
   <!-- コピーとCTA（後からふわっと出現） -->
   <div class="hero-copy">
-    <h1>Re:Verse Shion — The Temple of Words</h1>
-    <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
-    <button id="startBtn" class="btn-primary">無料占いを始める</button>
-  </div>
+  <h1>Re:Verse Shion — The Temple of Words</h1>
+  <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
+  <button id="heroStartBtn" class="btn-primary">無料占いを始める</button>
+</div>
+
+
 </section>
   
   <div class="container">
@@ -51,8 +53,8 @@
     <section class="intro">
       <p class="guide">目を閉じて、願いをイメージしてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
       <div class="cta-start">
-        <button id="startBtn" class="btn-primary">無料占いを始める</button>
-      </div>
+  <button id="startBtn" class="btn-primary">無料占いを始める</button>
+</div>
     </section>
 
     <!-- Ritual Overlay -->
@@ -151,6 +153,37 @@
 
   <!-- JavaScript（1ブロックに統合） -->
   <script>
+    // Hero演出
+window.addEventListener('load', () => {
+  const hero = document.querySelector('.hero-temple');
+  if (!hero) return;
+  hero.classList.add('is-opening');
+  setTimeout(() => hero.classList.add('is-revealed'), 1100);
+  setTimeout(() => hero.classList.add('is-cta'), 2200);
+});
+
+// nullガード＆両ボタン
+const heroStartBtn = document.getElementById('heroStartBtn');
+const startBtn     = document.getElementById('startBtn');
+
+if (heroStartBtn) {
+  heroStartBtn.addEventListener('click', () => {
+    document.querySelector('.intro')?.scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+if (startBtn) {
+  startBtn.addEventListener('click', beginReading);
+}
+
+function beginReading(){
+  document.querySelector('.intro')?.classList.add('hidden');
+  document.getElementById('tarotSection')?.classList.remove('hidden');
+
+  const ritual = document.getElementById('ritual');
+  ritual?.classList.remove('hide');
+  setTimeout(() => ritual?.classList.add('hide'), 1100);
+
   // ===== Hero 導線（自動開扉 → フェード → CTA） =====
   window.addEventListener('load', () => {
     const hero = document.querySelector('.hero-temple');
