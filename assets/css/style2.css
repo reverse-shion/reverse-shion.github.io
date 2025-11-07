@@ -1,0 +1,213 @@
+/* =======================================================
+   詩韻 — 光の神殿 導入体験
+   Last update: 2025-11-08
+   Fonts: Noto Serif JP / Cormorant Garamond
+   カラーモード：白光 × 紫苑
+======================================================= */
+
+:root{
+  --ink:#1a1730;
+  --muted:#676394;
+  --bg:#0b0b1a;
+  --glow:#cbb7ff;
+  --glow-2:#ffd76f;
+  --accent:#8c78ff;
+  --accent-2:#ffe49b;
+  --panel:#ffffffee;
+  --glass:#ffffffc8;
+  --line:#06c755; /* LINE緑 */
+  --r:14px;
+  --shadow: 0 10px 28px rgba(0,0,0,.25);
+  color-scheme: dark light;
+}
+
+@media (color-gamut: p3){
+  :root{
+    --accent: color(display-p3 0.56 0.50 1.00);
+    --accent-2: color(display-p3 1.00 0.90 0.58);
+    --glow: color(display-p3 0.78 0.70 1.00);
+  }
+}
+
+*{ box-sizing: border-box }
+html,body{ height:100% }
+body{
+  margin:0; font-family: "Noto Serif JP", serif;
+  color:#f8f7ff; background: radial-gradient(60% 60% at 50% 10%, #15122a 0%, #0b0b1a 60%, #05050b 100%);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+
+/* Utility */
+.hidden{ display:none !important }
+
+/* Buttons */
+.btn{
+  appearance:none; border:0; cursor:pointer; border-radius: var(--r);
+  padding: 12px 18px; font-weight:700; font-size: 16px;
+  background: #ffffff10; color:#fff; backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.35) }
+.btn:active{ transform: translateY(0) scale(.99) }
+.btn--primary{ background: linear-gradient(135deg, #1f1b3f, #2c2a66); box-shadow: 0 8px 24px rgba(80,70,200,.35) }
+.btn--shine{
+  background: linear-gradient(135deg, var(--accent), var(--glow));
+  color:#1a1533; box-shadow: 0 12px 30px rgba(140,120,255,.45);
+}
+.btn--line{
+  background: var(--line); color:#001a06; font-weight:800;
+  box-shadow: 0 12px 30px rgba(6,199,85,.35);
+}
+
+/* Views */
+.view{ position:relative; min-height:100svh; display:grid; place-items:center; overflow:hidden }
+.view--intro{ background:#02030a }
+.view--temple{ background: radial-gradient(120% 80% at 50% 20%, #f7f7ff 0%, #eae6ff 40%, #b5a6ff 78%, #6d57ff 100%) }
+.view--reading{ background: linear-gradient(180deg, #0d0a1c 0%, #110f26 100%) }
+.view--cta{ background: radial-gradient(100% 100% at 50% 0%, #1a1533, #0b0b1a) }
+
+/* ========== INTRO ========== */
+.intro__canvas{ position:absolute; inset:0; width:100%; height:100% }
+.intro__overlay{
+  position:relative; z-index:2; text-align:center; padding: 16px;
+  display:grid; gap:18px; place-items:center;
+}
+.brand{
+  margin:0; font-weight:700; letter-spacing:.06em; font-size: clamp(28px, 5vw, 48px);
+  text-shadow: 0 0 24px rgba(120,180,255,.25), 0 0 64px rgba(90,150,255,.15);
+}
+.brand__sub{ display:inline-block; font-family:"Cormorant Garamond", serif; opacity:.85; margin-left:.25em }
+.tag{ margin:6px 0 10px; color:#a9c2ff; font-size:14px; opacity:.9 }
+
+/* ========== TEMPLE ========== */
+.temple__halo{
+  position:absolute; inset:-20% -10% -10% -10%;
+  background:
+    radial-gradient(40% 40% at 50% 10%, rgba(255,255,255,.9), transparent 60%),
+    radial-gradient(60% 60% at 50% 60%, rgba(255,215,111,.35), transparent 70%),
+    radial-gradient(70% 70% at 50% 80%, rgba(140,120,255,.35), transparent 80%);
+  filter: blur(40px);
+}
+.temple__pillars{
+  position:absolute; inset:0; display:grid; grid-template-columns: repeat(4,1fr); align-items:stretch; gap:6vw; padding: 0 10vw;
+}
+.temple__pillars > span{
+  display:block; height:100%;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0)),
+    linear-gradient(180deg, rgba(255,215,111,.35), transparent 60%);
+  mix-blend-mode: screen; filter: blur(2px);
+  mask: linear-gradient(#0000, #000 20%, #000 80%, #0000);
+  border-radius: 999px;
+  animation: pillarGlow 7s ease-in-out infinite;
+}
+.temple__pillars > span:nth-child(odd){ animation-delay: -3.5s }
+@keyframes pillarGlow{
+  0%,100%{ opacity:.3 } 50%{ opacity:.9 }
+}
+
+.temple__inner{
+  position:relative; z-index:2; text-align:center; color:#1b1537;
+  padding: 24px; border-radius: var(--r);
+  background: linear-gradient(180deg, #ffffffee, #ffffffd8);
+  box-shadow: var(--shadow), 0 0 0 1px rgba(120,110,200,.15) inset;
+  max-width:min(92vw,820px);
+}
+.temple__title{
+  font-family:"Cormorant Garamond", serif; margin:0 0 6px;
+  font-size: clamp(28px, 5vw, 44px); letter-spacing:.06em;
+}
+.temple__lead{ margin: 6px 0 16px; color:#4c4785 }
+.veil{
+  position:absolute; inset:0; pointer-events:none; opacity:0;
+  background: radial-gradient(60% 30% at 50% 50%, rgba(255,255,255,.75), transparent 70%);
+  transition: opacity .8s ease;
+}
+
+/* ========== READING ========== */
+.view--reading{ padding: 56px 16px 72px }
+.reading__head{ width:min(1000px,94vw); margin:0 auto 12px; }
+.reading__head h3{ margin:0 0 6px; font-size: clamp(18px,3.2vw,22px); color:#e7e4ff }
+.reading__note{ margin:0 0 10px; color:#a89fe6; font-size:14px }
+.reading__controls{ display:flex; gap:8px }
+
+.cards{
+  display:grid; gap:16px; width:min(1000px,94vw); margin: 0 auto 16px;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+}
+.card{
+  perspective:1200px; position:relative; height: clamp(220px, 40vw, 340px);
+}
+.card__inner{
+  position:absolute; inset:0; border-radius: 14px; transform-style: preserve-3d;
+  transition: transform .6s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease;
+  box-shadow: 0 8px 28px rgba(0,0,0,.35);
+}
+.card__face{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius: 14px; overflow:hidden;
+}
+.card__front img{ width:100%; height:100%; object-fit:cover; display:block }
+.card__back{
+  background:
+    radial-gradient(120% 120% at 50% 10%, rgba(255,255,255,.08), transparent 60%),
+    var(--card-back-url, url("/assets/tarot/back.png"));
+  background-size: cover;
+  display:grid; place-items:center;
+}
+.card.is-flipped .card__inner{ transform: rotateY(180deg) }
+.card__back, .card__front{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.08) }
+.card__front{ transform: rotateY(180deg) }
+
+.summary{
+  width:min(1000px,94vw); margin:0 auto 16px; display:grid; gap:12px;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+}
+.summary__col{
+  background: linear-gradient(180deg, #1a1633, #15102a);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius: var(--r); padding:14px; box-shadow: 0 10px 22px rgba(0,0,0,.25);
+}
+.summary__col h4{ margin:0 0 6px; color:#ffd76f }
+.summary__col p{ margin:0; color:#d8d4ff; line-height:1.7 }
+
+.deep{
+  width:min(1000px,94vw); margin: 10px auto 0;
+  background: linear-gradient(180deg, #161334, #141129);
+  border-radius: var(--r); border:1px solid rgba(255,255,255,.1);
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  padding: 16px 16px 18px;
+}
+.deep h4{ margin:0 0 8px; color:#ffe49b }
+.deep article{ color:#eae8ff; line-height:1.9; font-size: 15.5px; }
+
+/* ========== CTA ========== */
+.view--cta{ padding: 72px 16px }
+.cta__box{
+  width:min(680px,92vw); margin:0 auto; text-align:center;
+  background: var(--panel); color:#1d1734; border-radius: var(--r);
+  padding: 22px 18px; box-shadow: var(--shadow);
+}
+.cta__box h3{ margin:0 0 8px; font-family:"Cormorant Garamond", serif; font-size:28px }
+.cta__box p{ margin:0 0 16px; color:#4b4579 }
+.cta__link a{ color:#3b2fd9; font-weight:700; text-decoration: none; border-bottom:1px solid #3b2fd9 }
+
+/* ========== Ripple (星紋) ========== */
+.ripple-root{ position: fixed; inset:0; pointer-events:none; z-index:9999 }
+.ripple{
+  position:absolute; border-radius:50%;
+  box-shadow: 0 0 0 0 rgba(255,255,255,.6), 0 0 40px 8px rgba(174,138,255,.35) inset;
+  transform: translate(-50%,-50%) scale(.3); opacity:.9;
+  animation: ripple 600ms ease-out forwards;
+}
+@keyframes ripple{
+  60%{ box-shadow: 0 0 0 24px rgba(255,255,255,.0), 0 0 80px 18px rgba(174,138,255,.20) inset; opacity:.65 }
+  100%{ transform: translate(-50%,-50%) scale(1); opacity:0 }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce){
+  .card__inner{ transition: none }
+  .temple__pillars > span{ animation:none }
+  .ripple{ display:none }
+}
