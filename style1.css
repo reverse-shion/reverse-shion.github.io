@@ -1,61 +1,138 @@
+/* ============ Reset & Base ============ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --purple:#1a0d38; --gold:#ffd76f; --light:#f0e6ff;
+  --ink:#2a2438; --muted:#6c6790; --violet:#6d4ba8; --lav:#9c7cc9; --glow:#ffd76f;
+  --haloA: rgba(255,215,111,.22); --haloB: rgba(156,124,201,.18);
+  --hero-h: min(100vh, 860px);
 }
-html,body{height:100%;font-family:'Noto Serif JP',serif;color:var(--light);background:var(--purple);overflow-x:hidden}
-h1,h3{font-family:'Great Vibes',cursive}
-
-/* ヒーロー */
-.hero{position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff}
-.stars,.fog{position:absolute;inset:0;background:url('/assets/bg-stars.jpg') center/cover;opacity:0.6}
-.fog{background:url('/assets/temple-door.jpg') center/cover;opacity:0.3;animation:fog 20s infinite linear}
-@keyframes fog{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-.hero-content z-index:2;
-.hero h1{font-size:3.5rem;margin-bottom:.5rem;text-shadow:0 0 20px rgba(255,215,111,.5)}
-.hero p{font-size:1.2rem;margin-bottom:2rem;opacity:.9}
-.btn-glow{
-  background:linear-gradient(45deg,#8c6cb9,#5d3a98);color:var(--gold);border:none;padding:1rem 2.5rem;
-  font-size:1.1rem;border-radius:50px;cursor:pointer;box-shadow:0 0 20px rgba(255,215,111,.4);
-  transition:.3s;animation:pulse 2s infinite;
+html,body{height:100%}
+body{
+  font-family:'Noto Serif JP', serif; color:#2b2b36; line-height:1.7; min-height:100vh;
+  background:
+    radial-gradient(1400px 800px at 50% -20%, rgba(255,255,255,.35), transparent 60%),
+    radial-gradient(900px 600px at 80% 110%, rgba(255,255,255,.18), transparent 65%),
+    linear-gradient(135deg, #f6f3ff 0%, #f2edff 35%, #fafafa 100%);
+  position:relative; overflow-x:hidden;
 }
-.btn-glow:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(255,215,111,.6)}
-@keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(255,215,111,.4)}50%{box-shadow:0 0 35px rgba(255,215,111,.7)}}
-
-/* コンテナ */
-.container{max-width:500px;margin:0 auto;padding:2rem;text-align:center}
-.hidden{display:none}
-
-/* イントロ */
-.intro{background:rgba(26,13,56,.8);padding:2rem;border-radius:20px;margin:2rem 1rem;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-.guide{font-size:1.1rem;margin-bottom:1.5rem;opacity:.9}
-
-/* 儀式 */
-.ritual{position:fixed;inset:0;background:rgba(10,5,26,.98);display:grid;place-items:center;opacity:0;pointer-events:none;z-index:10;transition:.5s;font-size:1.5rem}
-.ritual.show{opacity:1;pointer-events:auto}
-.ritual p{animation:fade 1s forwards}
-.ritual p:nth-child(2){animation-delay:.5s}
-@keyframes fade{to{opacity:1;transform:translateY(-10px)}}
-
-/* タロット */
-.tarot-grid{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin:3rem 0}
-.card{perspective:1000px;width:120px;height:180px;cursor:pointer}
-.card-inner{position:relative;width:100%;height:100%;transition:transform .8s;transform-style:preserve-3d}
-.card.flipped .card-inner{transform:rotateY(180deg)}
-.card-back,.card-front{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 8px 25px rgba(0,0,0,.4)}
-.card-back{background:#1a0d38 url('/assets/tarot-back.png') center/cover;color:var(--gold);font-size:.9rem}
-.card-front{background:#0d0626;transform:rotateY(180deg);border:2px solid var(--gold)}
-.card-front img{width:100%;height:100%;object-fit:cover;border-radius:14px}
-
-/* 結果 */
-.result{background:rgba(26,13,56,.9);padding:2rem;border-radius:20px;margin:2rem 1rem;box-shadow:0 10px 30px rgba(93,58,152,.4)}
-.verse{margin-bottom:1.5rem;text-align:left}
-.verse h3{color:var(--gold);margin-bottom:.5rem}
-.verse p{font-size:1rem;line-height:1.7}
-.btn-share,.btn-restart{margin:1rem .5rem;padding:.8rem 1.8rem;border-radius:50px;cursor:pointer}
-.btn-share{background:var(--gold);color:var(--purple);border:none}
-.btn-restart{background:transparent;color:var(--gold);border:2px solid var(--gold)}
-
-@media (max-width:480px){
-  .hero h1{font-size:2.8rem}
-  .card{width:100px;height:150px}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 60% 80%, rgba(255,255,255,.45) 0 1px, transparent 2px),
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,.4) 0 1px, transparent 2px);
+  background-size: 3px 3px, 4px 4px, 5px 5px;
+  animation: twinkle 6s infinite ease-in-out alternate; opacity:.6;
 }
+@keyframes twinkle{ 50%{ opacity:.9 } }
+
+/* ============ Hero Temple ============ */
+.hero-temple{
+  position:relative; height:var(--hero-h); overflow:hidden; isolation:isolate;
+  background:#0b0b1a; color:#fff; font-family:"Cormorant Garamond","Noto Serif JP",serif;
+}
+.hero-layer{
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  transform:scale(1.02); transition:opacity 1400ms ease, transform 1800ms ease;
+}
+.hero-door{ background-image:url("/assets/temple-door.jpg"); opacity:1 }
+.hero-hall{ background-image:url("/assets/temple-hall.jpg"); opacity:0 }
+.hero-veil{
+  position:absolute; inset:0;
+  background: radial-gradient(120px 160px at 50% 60%, rgba(255,255,255,.85), transparent 60%),
+              radial-gradient(60px 90px at 50% 60%, rgba(255,230,160,.75), transparent 65%);
+  opacity:0; filter:blur(2px); pointer-events:none; transition:opacity 900ms ease;
+}
+.hero-glow{
+  position:absolute; inset:0;
+  background: radial-gradient(800px 520px at 50% 60%, rgba(255,220,160,.18), transparent 70%),
+              radial-gradient(1200px 720px at 50% 80%, rgba(124,98,255,.15), transparent 70%);
+  mix-blend-mode:screen; opacity:0; pointer-events:none; transition:opacity 1600ms ease 300ms;
+}
+.hero-copy{
+  position:absolute; inset:0; display:grid; place-items:end center; gap:12px;
+  padding:clamp(16px,4vw,40px); text-align:center; transform:translateY(12px); opacity:0;
+  transition:opacity 700ms ease, transform 700ms ease;
+}
+.hero-copy h1{ font-size:clamp(24px,4vw,44px); line-height:1.25; letter-spacing:.02em; text-shadow:0 6px 30px rgba(0,0,0,.45); margin:0 0 .25em; }
+.hero-copy p{ font-size:clamp(14px,2.4vw,18px); color:rgba(255,255,255,.92); margin:0 0 18px; text-shadow:0 6px 24px rgba(0,0,0,.45); }
+
+/* 状態 */
+.hero-temple.is-opening .hero-veil{ opacity:1 }
+.hero-temple.is-opening .hero-door{ transform:scale(1.0) }
+.hero-temple.is-revealed .hero-hall{ opacity:1; transform:scale(1.0) }
+.hero-temple.is-revealed .hero-door{ opacity:0; transform:scale(1.03) }
+.hero-temple.is-revealed .hero-glow{ opacity:1 }
+.hero-temple.is-cta .hero-copy{ opacity:1; transform:translateY(0) }
+
+@media (max-width:480px){ :root{ --hero-h:92vh } }
+
+/* ============ Layout ============ */
+.container{ max-width:480px; margin:0 auto; padding:1rem }
+.header{ text-align:center; padding:2rem 1rem 1.5rem }
+.title{ font-family:'Cormorant Garamond',serif; font-size:2rem; color:#4f3488; margin-bottom:.5rem; letter-spacing:.05em }
+.subtitle{ font-size:.95rem; color:#666; font-weight:500 }
+.intro{ text-align:center; padding:2rem 1rem; background:rgba(255,255,255,.8); border-radius:16px; margin:1rem; box-shadow:0 4px 12px rgba(0,0,0,.05); }
+.guide{ font-size:1.1rem; margin-bottom:1.5rem; color:#444 }
+
+/* Buttons */
+.btn-primary{
+  appearance:none; border:0; background:linear-gradient(45deg,#9c7cc9,#6d4ba8); color:#fff;
+  padding:.9rem 2rem; font-size:1.1rem; border-radius:999px; cursor:pointer; font-weight:700;
+  box-shadow:0 8px 22px rgba(109,75,168,.35); transition:transform .2s, box-shadow .2s
+}
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(109,75,168,.45) }
+.btn-restart{ background:transparent; color:#6d4ba8; border:2px solid #6d4ba8; padding:.7rem 1.5rem; border-radius:999px; font-size:.9rem; transition:.2s }
+.btn-restart:hover{ background:#6d4ba8; color:#fff }
+
+/* Tarot */
+.tarot-section{ padding:2rem 1rem; text-align:center }
+.tarot-grid{ display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; margin:2rem 0 }
+.card-wrapper{ perspective:1000px; width:110px; height:180px }
+.card-back{ width:100%; height:100%; position:relative; cursor:pointer; transition:transform .6s; transform-style:preserve-3d }
+.card-back.flipped{ transform:rotateY(180deg) }
+.card-back.glow{ animation:glow 1s ease-in-out }
+@keyframes glow{
+  0%{ box-shadow:0 0 5px rgba(255,255,255,.5) }
+  50%{ box-shadow:0 0 25px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.6) }
+  100%{ box-shadow:0 0 5px rgba(255,255,255,.5) }
+}
+.card-inner{ position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d }
+.card-face{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.1); overflow:hidden;
+}
+.card-back-face{
+  background:#221a35 url("/assets/tarot/back.png") center/cover no-repeat; color:#fff; padding:1rem;
+}
+.card-front-face{ background:#fff; transform:rotateY(180deg); border:2px solid #e6d9ff }
+.card-image{ width:100%; height:100%; object-fit:cover; border-radius:10px }
+.label{ font-size:.9rem; font-weight:600; margin-bottom:.3rem }
+.tap{ font-size:.78rem; opacity:.9; margin-top:.3rem }
+
+/* Result */
+.result{ background:#fff; border-radius:16px; padding:1.5rem; margin:2rem 1rem; box-shadow:0 6px 20px rgba(0,0,0,.08); text-align:left }
+.result-item{ margin-bottom:1.2rem }
+.result-item .icon{ font-size:1.4rem; margin-right:.5rem }
+.result-item h3{ display:inline; font-size:1.1rem; color:#4f3488; font-weight:600 }
+.result-item p{ margin-top:.5rem; font-size:1rem; color:#444; padding-left:2rem }
+
+/* CTA */
+.cta-after{ text-align:center; padding:1.5rem 1rem }
+.next{ margin-bottom:1rem; color:#666; font-size:.95rem }
+.btn-group{ display:flex; flex-direction:column; gap:.8rem; margin-bottom:1.5rem }
+.btn-line,.btn-tiktok,.btn-note{
+  display:block; padding:.8rem 1rem; border-radius:999px; font-size:.95rem; text-decoration:none; font-weight:700; transition:.2s
+}
+.btn-line{ background:#00b900; color:#fff }
+.btn-tiktok{ background:#000; color:#fff }
+.btn-note{ background:#fff; color:#333; border:2px solid #ddd }
+
+/* Footer */
+.footer{ text-align:center; padding:2rem 1rem; font-size:.8rem; color:#999 }
+
+/* Utils */
+.hidden{ display:none !important }
+@media (max-width:480px){ .title{ font-size:1.8rem } .card-wrapper{ width:100px; height:165px } }
+
+
