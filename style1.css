@@ -1,310 +1,19 @@
-/* style.css */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Noto Serif JP', serif;
-  background: linear-gradient(135deg, #fafafa 0%, #f5f0ff 100%);
-  color: #333;
-  line-height: 1.7;
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-/* Header */
-.header {
-  text-align: center;
-  padding: 2rem 1rem 1.5rem;
-}
-
-.title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2rem;
-  color: #5d3a8a;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.05em;
-}
-
-.subtitle {
-  font-size: 0.95rem;
-  color: #666;
-  font-weight: 500;
-}
-
-/* Intro */
-.intro {
-  text-align: center;
-  padding: 2rem 1rem;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
-  margin: 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.guide {
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-  color: #444;
-}
-
-.btn-primary {
-  background: linear-gradient(45deg, #9c7cc9, #6d4ba8);
-  color: white;
-  border: none;
-  padding: 0.9rem 2rem;
-  font-size: 1.1rem;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(109, 75, 168, 0.3);
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(109, 75, 168, 0.4);
-}
-
-/* Tarot Section */
-.tarot-section {
-  padding: 2rem 1rem;
-  text-align: center;
-}
-
-.tarot-grid {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin: 2rem 0;
-}
-
-.card-wrapper {
-  perspective: 1000px;
-  width: 110px;
-  height: 180px;
-}
-
-.card-back {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-}
-
-.card-back.flipped {
-  transform: rotateY(180deg);
-}
-
-.card-back.glow {
-  animation: glow 1s ease-in-out;
-}
-
-@keyframes glow {
-  0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
-  50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.9), 0 0 40px rgba(255, 215, 0, 0.6); }
-  100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
-}
-
-.card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-}
-
-.card-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-
-.card-back-face {
-  background: linear-gradient(135deg, #6d4ba8, #9c7cc9);
-  color: white;
-  padding: 1rem;
-}
-
-.card-front-face {
-  background: white;
-  transform: rotateY(180deg);
-  border: 2px solid #e6d9ff;
-  padding: 0;
-}
-
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* カード枠ぴったり */
-  border-radius: 10px;
-}
-
-.label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-}
-
-.tap {
-  font-size: 0.78rem;
-  opacity: 0.9;
-  margin-top: 0.3rem;
-}
-
-/* Result */
-.result {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin: 2rem 1rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  text-align: left;
-}
-
-.result-item {
-  margin-bottom: 1.2rem;
-}
-
-.result-item:last-child {
-  margin-bottom: 0;
-}
-
-.result-item .icon {
-  font-size: 1.4rem;
-  margin-right: 0.5rem;
-}
-
-.result-item h3 {
-  display: inline;
-  font-size: 1.1rem;
-  color: #5d3a8a;
-  font-weight: 600;
-}
-
-.result-item p {
-  margin-top: 0.5rem;
-  font-size: 1rem;
-  color: #444;
-  padding-left: 2rem;
-}
-
-/* CTA After */
-.cta-after {
-  text-align: center;
-  padding: 1.5rem 1rem;
-}
-
-.next {
-  margin-bottom: 1rem;
-  color: #666;
-  font-size: 0.95rem;
-}
-
-.btn-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin-bottom: 1.5rem;
-}
-
-.btn-line, .btn-tiktok, .btn-note {
-  display: block;
-  padding: 0.8rem 1rem;
-  border-radius: 50px;
-  font-size: 0.95rem;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.btn-line {
-  background: #00b900;
-  color: white;
-}
-
-.btn-tiktok {
-  background: #000;
-  color: white;
-}
-
-.btn-note {
-  background: #fff;
-  color: #333;
-  border: 2px solid #ddd;
-}
-
-.btn-restart {
-  background: transparent;
-  color: #6d4ba8;
-  border: 2px solid #6d4ba8;
-  padding: 0.7rem 1.5rem;
-  border-radius: 50px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-}
-
-.btn-restart:hover {
-  background: #6d4ba8;
-  color: white;
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 2rem 1rem;
-  font-size: 0.8rem;
-  color: #999;
-}
-
-/* Hidden */
-.hidden {
-  display: none !important;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .title { font-size: 1.8rem; }
-  .card-wrapper { width: 100px; height: 165px; }
-}
-
+/* ============ Reset & Base ============ */
+*{margin:0;padding:0;box-sizing:border-box}
 :root{
   --ink:#2a2438; --muted:#6c6790; --violet:#6d4ba8; --lav:#9c7cc9; --glow:#ffd76f;
   --haloA: rgba(255,215,111,.22); --haloB: rgba(156,124,201,.18);
-  --card-back-url: url("/assets/tarot/back.png"); /* 裏面画像（置換可）*/
+  --hero-h: min(100vh, 860px);
 }
-
+html,body{height:100%}
 body{
-  font-family:'Noto Serif JP', serif;
-  color:#2b2b36; line-height:1.7; min-height:100vh;
+  font-family:'Noto Serif JP', serif; color:#2b2b36; line-height:1.7; min-height:100vh;
   background:
     radial-gradient(1400px 800px at 50% -20%, rgba(255,255,255,.35), transparent 60%),
     radial-gradient(900px 600px at 80% 110%, rgba(255,255,255,.18), transparent 65%),
     linear-gradient(135deg, #f6f3ff 0%, #f2edff 35%, #fafafa 100%);
   position:relative; overflow-x:hidden;
 }
-
 /* 星粒の薄ヴェール */
 body::before{
   content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
@@ -313,181 +22,136 @@ body::before{
     radial-gradient(circle at 60% 80%, rgba(255,255,255,.45) 0 1px, transparent 2px),
     radial-gradient(circle at 85% 20%, rgba(255,255,255,.4) 0 1px, transparent 2px);
   background-size: 3px 3px, 4px 4px, 5px 5px;
-  animation: twinkle 6s infinite ease-in-out alternate;
-  opacity:.6;
+  animation: twinkle 6s infinite ease-in-out alternate; opacity:.6;
 }
 @keyframes twinkle{ 50%{ opacity:.9 } }
 
-/* 円環のオーラ */
-.container::before{
-  content:""; position:fixed; left:50%; top:44%; transform:translate(-50%,-50%);
-  width:min(88vw,680px); height:min(88vw,680px); border-radius:50%;
-  background: radial-gradient(closest-side, rgba(255,255,255,.12), transparent 55%),
-              conic-gradient(from 0deg, var(--haloA), var(--haloB), transparent 60%);
-  filter: blur(24px) saturate(120%);
-  mix-blend-mode: screen; opacity:.55; pointer-events:none; z-index:-1;
+/* ============ Hero Temple ============ */
+.hero-temple{
+  position:relative; height:var(--hero-h); overflow:clip; isolation:isolate;
+  background:#0b0b1a; color:#fff; font-family:"Cormorant Garamond","Noto Serif JP",serif;
+}
+.hero-layer{
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  transform:scale(1.02);
+  transition:opacity 1400ms ease, transform 1800ms ease; will-change:opacity,transform;
+}
+/* 相対パスに統一（GitHub Pages のルート差異対策） */
+.hero-door{ background-image:url("./assets/temple-door.jpg"); opacity:1 }
+.hero-hall{ background-image:url("./assets/temple-hall.jpg"); opacity:0 }
+
+/* 光 */
+.hero-veil{
+  position:absolute; inset:0;
+  background: radial-gradient(120px 160px at 50% 60%, rgba(255,255,255,.85), rgba(255,255,255,0) 60%),
+              radial-gradient(60px 90px at 50% 60%, rgba(255,230,160,.75), rgba(255,230,160,0) 65%);
+  opacity:0; filter:blur(2px); pointer-events:none; transition:opacity 900ms ease;
+}
+.hero-glow{
+  position:absolute; inset:0;
+  background: radial-gradient(800px 520px at 50% 60%, rgba(255,220,160,.18), rgba(255,220,160,0) 70%),
+              radial-gradient(1200px 720px at 50% 80%, rgba(124,98,255,.15), rgba(124,98,255,0) 70%);
+  mix-blend-mode:screen; opacity:0; pointer-events:none; transition:opacity 1600ms ease 300ms;
 }
 
-/* カード裏面の常時ビジュアル */
-.card-back-face{
-  background: #221a35 url(/assets/tarot/back.png) center/cover no-repeat;
-  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+/* コピー */
+.hero-copy{
+  position:absolute; inset:0; display:grid; place-items:end center; gap:12px;
+  padding:clamp(16px,4vw,40px); text-align:center; transform:translateY(12px); opacity:0;
+  transition:opacity 700ms ease, transform 700ms ease;
+}
+.hero-copy h1{
+  font-size:clamp(24px,4vw,44px); line-height:1.25; letter-spacing:.02em;
+  text-shadow:0 6px 30px rgba(0,0,0,.45); margin:0 0 .25em;
+}
+.hero-copy p{
+  font-size:clamp(14px,2.4vw,18px); color:rgba(255,255,255,.92);
+  margin:0 0 18px; text-shadow:0 6px 24px rgba(0,0,0,.45);
 }
 
-/* 儀式オーバーレイ */
-.ritual{
-  position:fixed; inset:0; display:grid; place-items:center; gap:8px;
-  background: radial-gradient(1200px 800px at 50% 20%, rgba(255,255,255,.25), rgba(255,255,255,0) 60%),
-              rgba(10,8,18,.72);
-  backdrop-filter: blur(6px); color:#fff; text-align:center; z-index:10;
-}
-.chant{ font-family:'Cormorant Garamond', serif; font-size:1.2rem; letter-spacing:.06em }
-.ritual.hide{ animation: fadeout .8s ease forwards }
-@keyframes fadeout{ to{ opacity:0; visibility:hidden } }
+/* 状態クラス */
+.hero-temple.is-opening .hero-veil{ opacity:1 }
+.hero-temple.is-opening .hero-door{ transform:scale(1.0) }
+.hero-temple.is-revealed .hero-hall{ opacity:1; transform:scale(1.0) }
+.hero-temple.is-revealed .hero-door{ opacity:0; transform:scale(1.03) }
+.hero-temple.is-revealed .hero-glow{ opacity:1 }
+.hero-temple.is-cta .hero-copy{ opacity:1; transform:translateY(0) }
 
-/* 小さな調整（神秘トーン寄せ） */
-.title{ color:#4f3488 }
-.btn-primary{ background:linear-gradient(45deg, var(--lav), var(--violet)) }
-.btn-restart{ color:var(--violet); border-color:var(--violet) }
-.result-item h3{ color:#4f3488 }
+@media (max-width:480px){ :root{ --hero-h:92vh } }
 
-.hero{ position:relative; width:100%; aspect-ratio:16/9; overflow:hidden }
-@media (max-width:768px){ .hero{ aspect-ratio:4/5 } }
-.hero picture, .hero img{ position:absolute; inset:0; width:100%; height:100% }
-.hero img{ object-fit:cover; object-position:50% 45%; transform:translateZ(0) }
-.hero__veil{ position:absolute; inset:0;
-  background:
-    radial-gradient(80% 60% at 50% 35%, rgba(255,255,255,.15), transparent 60%),
-    linear-gradient(to bottom, rgba(10,8,18,.45), rgba(10,8,18,.15) 40%, rgba(10,8,18,.4));
-  pointer-events:none; mix-blend-mode:screen
+/* ============ Layout ============ */
+.container{ max-width:480px; margin:0 auto; padding:1rem }
+
+/* Header */
+.header{ text-align:center; padding:2rem 1rem 1.5rem }
+.title{ font-family:'Cormorant Garamond',serif; font-size:2rem; color:#4f3488; margin-bottom:.5rem; letter-spacing:.05em }
+.subtitle{ font-size:.95rem; color:#666; font-weight:500 }
+
+/* Intro */
+.intro{
+  text-align:center; padding:2rem 1rem; background:rgba(255,255,255,.8);
+  border-radius:16px; margin:1rem; box-shadow:0 4px 12px rgba(0,0,0,.05);
 }
-.hero__copy{ position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:clamp(16px,3vw,32px) }
-.hero__copy h1{ color:#f5f1ff; font-family:"Cormorant Garamond",serif;
-  font-weight:600; font-size:clamp(24px,4.2vw,54px); letter-spacing:.02em;
-  text-shadow:0 2px 14px rgba(0,0,0,.45)
-}
-.hero__copy p{ color:#efe9ff; margin:.6rem 0 1.2rem;
-  font-size:clamp(13px,2.2vw,18px); text-shadow:0 1px 10px rgba(0,0,0,.4)
-}
-.btn-primary{ background:linear-gradient(45deg,#9c7cc9,#6d4ba8); color:#fff; border:0;
-  padding:.9rem 1.6rem; border-radius:999px; font-weight:700; cursor:pointer;
+.guide{ font-size:1.1rem; margin-bottom:1.5rem; color:#444 }
+
+/* Buttons */
+.btn-primary{
+  appearance:none; border:0; background:linear-gradient(45deg,#9c7cc9,#6d4ba8); color:#fff;
+  padding:.9rem 2rem; font-size:1.1rem; border-radius:999px; cursor:pointer; font-weight:700;
   box-shadow:0 8px 22px rgba(109,75,168,.35); transition:transform .2s, box-shadow .2s
 }
 .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(109,75,168,.45) }
-/* 詠唱オーバーレイ（初期は非表示） */
-.ritual{
-  position: fixed; inset: 0; z-index: 999;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  gap: clamp(12px, 2.5vw, 20px);
-  color: #fff; text-align: center; padding: 6vh 6vw;
-  background: rgba(12,10,18,.45);
-  backdrop-filter: blur(6px);
-  opacity: 1; visibility: visible;
-  transition: opacity .35s ease, visibility .35s ease;
-  pointer-events: none;   /* 背面クリックを邪魔しない */
-}
-.ritual.hide{
-  opacity: 0; visibility: hidden;
-}
-.ritual .line{ font-size: clamp(18px, 3.8vw, 28px); text-shadow: 0 2px 12px rgba(0,0,0,.45) }
-/* ===== Temple Hero ===== */
-:root{
-  --hero-h: min(100vh, 860px);
-}
-.hero-temple{
-  position: relative;
-  height: var(--hero-h);
-  overflow: clip;
-  isolation: isolate;
-  background: #0b0b1a;
-  color: #fff;
-  font-family: "Cormorant Garamond","Noto Serif JP",serif;
-}
+.btn-restart{ background:transparent; color:#6d4ba8; border:2px solid #6d4ba8; padding:.7rem 1.5rem; border-radius:999px; font-size:.9rem; transition:.2s }
+.btn-restart:hover{ background:#6d4ba8; color:#fff }
 
-/* 背景レイヤー（2枚を重ね、扉→広間へフェード） */
-.hero-layer{
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  transform: scale(1.02);
-  transition: opacity 1400ms ease, transform 1800ms ease;
-  will-change: opacity, transform;
+/* Tarot Section */
+.tarot-section{ padding:2rem 1rem; text-align:center }
+.tarot-grid{ display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; margin:2rem 0 }
+.card-wrapper{ perspective:1000px; width:110px; height:180px }
+.card-back{ width:100%; height:100%; position:relative; cursor:pointer; transition:transform .6s; transform-style:preserve-3d }
+.card-back.flipped{ transform:rotateY(180deg) }
+.card-back.glow{ animation:glow 1s ease-in-out }
+@keyframes glow{
+  0%{ box-shadow:0 0 5px rgba(255,255,255,.5) }
+  50%{ box-shadow:0 0 25px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.6) }
+  100%{ box-shadow:0 0 5px rgba(255,255,255,.5) }
 }
-.hero-door{ background-image: url("/assets/temple-door.jpg"); opacity: 1; }
-.hero-hall{ background-image: url("/assets/temple-hall.jpg"); opacity: 0; }
-
-/* 開扉の光（中央から広がる） */
-.hero-veil{
-  position: absolute; inset: 0;
-  background: radial-gradient(120px 160px at 50% 60%, rgba(255,255,255,.85), rgba(255,255,255,.0) 60%),
-              radial-gradient(60px 90px  at 50% 60%, rgba(255,230,160,.75), rgba(255,230,160,0) 65%);
-  opacity: 0; pointer-events: none;
-  filter: blur(2px);
-  transition: opacity 900ms ease;
+.card-inner{ position:relative; width:100%; height:100%; text-align:center; transition:transform .6s; transform-style:preserve-3d }
+.card-face{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.1); overflow:hidden;
 }
-.hero-glow{
-  position: absolute; inset: 0;
-  background: radial-gradient(800px 520px at 50% 60%, rgba(255,220,160,.18), rgba(255,220,160,0) 70%),
-              radial-gradient(1200px 720px at 50% 80%, rgba(124,98,255,.15), rgba(124,98,255,0) 70%);
-  mix-blend-mode: screen; opacity: 0; pointer-events: none;
-  transition: opacity 1600ms ease 300ms;
-}
-
-/* タイトル＆CTA */
-.hero-copy{
-  position: absolute; inset: 0;
-  display: grid; place-items: end center;
-  padding: clamp(16px,4vw,40px);
-  gap: 12px;
-  text-align: center;
-  transform: translateY(12px);
-  opacity: 0;
-  transition: opacity 700ms ease, transform 700ms ease;
-}
-.hero-copy h1{
-  font-size: clamp(24px, 4vw, 44px);
-  letter-spacing: .02em; line-height: 1.25;
-  text-shadow: 0 6px 30px rgba(0,0,0,.45);
-  margin: 0 0 .25em;
-}
-.hero-copy p{
-  font-size: clamp(14px, 2.4vw, 18px);
-  color: rgba(255,255,255,.92);
-  margin: 0 0 18px;
-  text-shadow: 0 6px 24px rgba(0,0,0,.45);
-}
-.btn-primary{
-  appearance: none; border: 0;
-  background: linear-gradient(180deg, #8b72ff, #6d53ff);
-  color:#fff; font-weight:700; letter-spacing:.04em;
-  padding: 14px 26px; border-radius: 999px;
-  box-shadow: 0 12px 30px rgba(109,83,255,.35), 0 2px 0 rgba(255,255,255,.35) inset;
-  cursor: pointer;
-  transition: transform .15s ease, box-shadow .2s ease;
-}
-.btn-primary:active{ transform: translateY(1px); box-shadow: 0 8px 22px rgba(109,83,255,.35) }
-
-/* ===== アニメーション状態 ===== */
-/* 1) 読み込み直後：扉がひらめく */
-.hero-temple.is-opening .hero-veil{ opacity: 1; }
-.hero-temple.is-opening .hero-door{ transform: scale(1.0); }
-
-/* 2) 開いた後：広間へフェード（クロスフェード） */
-.hero-temple.is-revealed .hero-hall{ opacity: 1; transform: scale(1.0); }
-.hero-temple.is-revealed .hero-door{ opacity: 0; transform: scale(1.03); }
-.hero-temple.is-revealed .hero-glow{ opacity: 1; }
-
-/* 3) CTA表示 */
-.hero-temple.is-cta .hero-copy{ opacity: 1; transform: translateY(0); }
-
-/* 余白の衝突を防止（下コンテンツが隠れないように） */
-@media (max-width: 480px){
-  :root{ --hero-h: 92vh; }
-}
-/* 背景レイヤー（相対パスに変更）*/
-.hero-door{ background-image: url("./assets/temple-door.jpg"); opacity: 1; }
-.hero-hall{ background-image: url("./assets/temple-hall.jpg"); opacity: 0; }
-
-/* カード裏面（相対パスに統一）*/
 .card-back-face{
-  background: #221a35 url("./assets/tarot/back.png") center/cover no-repeat;
+  background:#221a35 url("./assets/tarot/back.png") center/cover no-repeat; color:#fff; padding:1rem;
 }
+.card-front-face{ background:#fff; transform:rotateY(180deg); border:2px solid #e6d9ff }
+.card-image{ width:100%; height:100%; object-fit:cover; border-radius:10px }
+.label{ font-size:.9rem; font-weight:600; margin-bottom:.3rem }
+.tap{ font-size:.78rem; opacity:.9; margin-top:.3rem }
+
+/* Result */
+.result{ background:#fff; border-radius:16px; padding:1.5rem; margin:2rem 1rem; box-shadow:0 6px 20px rgba(0,0,0,.08); text-align:left }
+.result-item{ margin-bottom:1.2rem }
+.result-item:last-child{ margin-bottom:0 }
+.result-item .icon{ font-size:1.4rem; margin-right:.5rem }
+.result-item h3{ display:inline; font-size:1.1rem; color:#4f3488; font-weight:600 }
+.result-item p{ margin-top:.5rem; font-size:1rem; color:#444; padding-left:2rem }
+
+/* CTA After */
+.cta-after{ text-align:center; padding:1.5rem 1rem }
+.next{ margin-bottom:1rem; color:#666; font-size:.95rem }
+.btn-group{ display:flex; flex-direction:column; gap:.8rem; margin-bottom:1.5rem }
+.btn-line,.btn-tiktok,.btn-note{
+  display:block; padding:.8rem 1rem; border-radius:999px; font-size:.95rem; text-decoration:none; font-weight:700; transition:.2s
+}
+.btn-line{ background:#00b900; color:#fff }
+.btn-tiktok{ background:#000; color:#fff }
+.btn-note{ background:#fff; color:#333; border:2px solid #ddd }
+
+/* Footer */
+.footer{ text-align:center; padding:2rem 1rem; font-size:.8rem; color:#999 }
+
+/* Utils */
+.hidden{ display:none !important }
+@media (max-width:480px){ .title{ font-size:1.8rem } .card-wrapper{ width:100px; height:165px } }
