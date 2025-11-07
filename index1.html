@@ -3,24 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="無料タロット占い。大アルカナ22枚で3枚リーディング。神秘の詩・韻・祈であなたの運命を解釈。"/>
-  <title>Mystic Verse｜無料タロット占い - 詩・韻・祈</title>
-
-  <!-- Google Fonts -->
+  <title>Mystic Verse｜無料タロット占い</title>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="/style1.css?v=1">
-
-  <!-- OGP -->
-  <meta property="og:title" content="Mystic Verse｜無料タロット占い - 詩・韻・祈"/>
-  <meta property="og:description" content="3枚のタロットがあなたの魂に響く。無料で今すぐ占う。"/>
-  <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg"/>
-  <meta property="og:url" content="https://reverse-shion.github.io"/>
+  <link rel="stylesheet" href="/style.css?v=1">
 </head>
 <body>
 
-  <!-- 星空ヒーロー -->
   <section class="hero">
     <div class="stars"></div>
     <div class="fog"></div>
@@ -29,79 +17,55 @@
       <p>言葉は星の構文。魂は光の韻。</p>
       <button id="startBtn" class="btn-glow">無料占いを始める</button>
     </div>
-    <audio id="bgm" src="assets/sound/temple-ambient.mp3" preload="auto" loop></audio>
+    <audio id="bgm" src="/assets/sound/mystic-ambient.mp3" preload="auto" loop playsinline></audio>
   </section>
 
   <div class="container">
-    <!-- イントロ -->
     <section class="intro hidden">
       <p class="guide">目を閉じて、願いを心に描いてください。<br>恋愛・仕事・未来、何でもOK。</p>
       <button id="drawBtn" class="btn-glow">タロットを引く</button>
     </section>
 
-    <!-- 儀式 -->
     <div id="ritual" class="ritual">
       <p>星が囁く――</p>
       <p>あなたの運命を、詩に。</p>
     </div>
 
-    <!-- タロット -->
     <section id="tarot" class="tarot hidden">
       <div class="tarot-grid">
         <div class="card" data-index="0">
           <div class="card-inner">
-            <div class="card-back">
-              <span>① 現在</span>
-              <p>タップ</p>
-            </div>
+            <div class="card-back"><span>① 現在</span><p>タップ</p></div>
             <div class="card-front"><img src="" alt=""></div>
           </div>
         </div>
         <div class="card" data-index="1">
           <div class="card-inner">
-            <div class="card-back">
-              <span>② 鍵</span>
-              <p>タップ</p>
-            </div>
+            <div class="card-back"><span>② 鍵</span><p>タップ</p></div>
             <div class="card-front"><img src="" alt=""></div>
           </div>
         </div>
         <div class="card" data-index="2">
           <div class="card-inner">
-            <div class="card-back">
-              <span>③ 未来</span>
-              <p>タップ</p>
-            </div>
+            <div class="card-back"><span>③ 未来</span><p>タップ</p></div>
             <div class="card-front"><img src="" alt=""></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 結果 -->
     <section id="result" class="result hidden">
-      <div class="verse">
-        <h3>詩 — <span id="poemTitle"></span></h3>
-        <p id="poem"></p>
-      </div>
-      <div class="verse">
-        <h3>韻 — <span id="rhymeTitle"></span></h3>
-        <p id="rhyme"></p>
-      </div>
-      <div class="verse">
-        <h3>祈 — <span id="prayerTitle"></span></h3>
-        <p id="prayer"></p>
-      </div>
+      <div class="verse"><h3>詩 — <span id="poemTitle"></span></h3><p id="poem"></p></div>
+      <div class="verse"><h3>韻 — <span id="rhymeTitle"></span></h3><p id="rhyme"></p></div>
+      <div class="verse"><h3>祈 — <span id="prayerTitle"></span></h3><p id="prayer"></p></div>
       <button id="shareBtn" class="btn-share">結果をシェア</button>
       <button id="restartBtn" class="btn-restart">もう一度占う</button>
     </section>
   </div>
 
-  <!-- 効果音 -->
   <audio id="flipSound" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
 
   <script>
-    // タロットデータ
     const tarot = [
       { name: "The Fool", meaning: "新たな旅立ち、無垢、可能性。", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg" },
       { name: "The Magician", meaning: "創造、意志、顕現。", img: "https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg" },
@@ -129,13 +93,11 @@
 
     let deck = [], selected = [], seed;
 
-    // シード
     const url = new URL(location.href);
     seed = url.searchParams.get('seed') ? Number(url.searchParams.get('seed')) : Date.now();
     url.searchParams.set('seed', seed);
     history.replaceState(null, '', url);
 
-    // シャッフル
     function shuffle(arr, s) {
       let a = [...arr], x = s;
       for (let i = a.length - 1; i > 0; i--) {
@@ -146,14 +108,15 @@
       return a;
     }
 
-    // 開始
     document.getElementById('startBtn').onclick = () => {
       document.querySelector('.hero').classList.add('fade');
       setTimeout(() => {
         document.querySelector('.intro').classList.remove('hidden');
         document.querySelector('.hero').style.display = 'none';
       }, 800);
-      document.getElementById('bgm').play().catch(() => {});
+      const bgm = document.getElementById('bgm');
+      bgm.volume = 0.5;
+      bgm.play().catch(() => {});
     };
 
     document.getElementById('drawBtn').onclick = () => {
@@ -167,7 +130,6 @@
       }, 2000);
     };
 
-    // カードめくり
     document.querySelectorAll('.card').forEach(card => {
       card.onclick = () => {
         if (card.classList.contains('flipped')) return;
@@ -176,8 +138,9 @@
         const img = card.querySelector('img');
         img.src = selected[idx].img;
         img.alt = selected[idx].name;
-        document.getElementById('flipSound').play();
-        if ([...document.querySelectorAll('.card.flipped')].length === 3) {
+        document.getElementById('flipSound').currentTime = 0;
+        document.getElementById('flipSound').play().catch(() => {});
+        if (document.querySelectorAll('.card.flipped').length === 3) {
           setTimeout(showResult, 800);
         }
       };
@@ -196,8 +159,8 @@
 
     document.getElementById('restartBtn').onclick = () => location.reload();
     document.getElementById('shareBtn').onclick = () => {
-      const url = location.href;
-      navigator.clipboard.writeText(url).then(() => alert('URLをコピーしました！'));
+      const shareUrl = location.href;
+      navigator.clipboard.writeText(shareUrl).then(() => alert('URLをコピーしました！'));
     };
   </script>
 </body>
