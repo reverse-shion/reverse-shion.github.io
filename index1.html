@@ -9,8 +9,8 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- External CSS（あなたのstyleファイル） -->
-  <link rel="stylesheet" href="style1.css"/>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="./style1.css"/>
 
   <!-- Open Graph -->
   <meta property="og:title" content="【無料タロット】大アルカナで運勢を詩で届ける｜詩韻Shion"/>
@@ -18,30 +18,30 @@
   <meta property="og:image" content="https://reverse-shion.github.io/ogp.jpg"/>
   <meta property="og:url" content="https://reverse-shion.github.io/"/>
   <meta property="og:type" content="website"/>
-
 </head>
 <body>
 
-  <!-- 🌌 神殿ヒーロー（自動開扉→光→クロスフェード→CTA） -->
-<section class="hero-temple" aria-label="星の神殿の門">
-  <!-- 背景レイヤー：手前＝縦構図（扉）／奥＝横構図（広間） -->
-  <div class="hero-layer hero-door" aria-hidden="true"></div>
-  <div class="hero-layer hero-hall" aria-hidden="true"></div>
+  <!-- 🌌 神殿ヒーロー（扉→光→広間→CTA） -->
+  <section class="hero-temple" aria-label="星の神殿の門">
+    <!-- 背景レイヤー -->
+    <div class="hero-layer hero-door" aria-hidden="true"></div>
+    <div class="hero-layer hero-hall" aria-hidden="true"></div>
 
-  <!-- 光のヴェール＆エフェクト -->
-  <div class="hero-veil" aria-hidden="true"></div>
-  <div class="hero-glow" aria-hidden="true"></div>
+    <!-- 光のヴェール -->
+    <div class="hero-veil" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
 
-  <!-- コピーとCTA（後からふわっと出現） -->
-  <div class="hero-copy">
-  <h1>Re:Verse Shion — The Temple of Words</h1>
-  <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
-  <button id="heroStartBtn" class="btn-primary">無料占いを始める</button>
-</div>
+    <!-- コピー＆CTA -->
+    <div class="hero-copy">
+      <h1>Re:Verse Shion — The Temple of Words</h1>
+      <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
+      <button id="heroStartBtn" class="btn-primary">無料占いを始める</button>
+    </div>
 
+    <!-- BGM（初回タップで再生） -->
+    <audio id="bgm" src="./assets/sound/temple-ambient.mp3" preload="auto" loop></audio>
+  </section>
 
-</section>
-  
   <div class="container">
     <!-- Header -->
     <header class="header">
@@ -53,8 +53,8 @@
     <section class="intro">
       <p class="guide">目を閉じて、願いをイメージしてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
       <div class="cta-start">
-  <button id="startBtn" class="btn-primary">無料占いを始める</button>
-</div>
+        <button id="startBtn" class="btn-primary">無料占いを始める</button>
+      </div>
     </section>
 
     <!-- Ritual Overlay -->
@@ -64,7 +64,7 @@
       <p class="chant line">深く息をして――タロット展開。</p>
     </div>
 
-    <!-- Tarot Area (Hidden initially) -->
+    <!-- Tarot Area -->
     <section id="tarotSection" class="tarot-section hidden" aria-live="polite">
       <div class="tarot-grid">
         <!-- Card 1 -->
@@ -148,61 +148,50 @@
     </footer>
   </div>
 
-  <!-- Audio for Flip Sound -->
+  <!-- 効果音 -->
   <audio id="flipSound" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
 
-  <!-- JavaScript（1ブロックに統合） -->
+  <!-- JavaScript -->
   <script>
-    // Hero演出
-window.addEventListener('load', () => {
-  const hero = document.querySelector('.hero-temple');
-  if (!hero) return;
-  hero.classList.add('is-opening');
-  setTimeout(() => hero.classList.add('is-revealed'), 1100);
-  setTimeout(() => hero.classList.add('is-cta'), 2200);
-});
+    /* ===========================
+       1) ヒーロー開扉アニメ
+       =========================== */
+    window.addEventListener('load', () => {
+      const hero = document.querySelector('.hero-temple');
+      if (!hero) return;
+      hero.classList.add('is-opening');
+      setTimeout(() => hero.classList.add('is-revealed'), 1100);
+      setTimeout(() => hero.classList.add('is-cta'), 2200);
+    });
 
-// nullガード＆両ボタン
-const heroStartBtn = document.getElementById('heroStartBtn');
-const startBtn     = document.getElementById('startBtn');
+    /* ===========================
+       2) ボタン＆BGM起動（iOS対応）
+       =========================== */
+    const heroStartBtn = document.getElementById('heroStartBtn');
+    const startBtn     = document.getElementById('startBtn');
+    const bgm          = document.getElementById('bgm');
 
-if (heroStartBtn) {
-  heroStartBtn.addEventListener('click', () => {
-    document.querySelector('.intro')?.scrollIntoView({ behavior: 'smooth' });
-  });
-}
+    function safePlay(audio){
+      if (!audio) return;
+      const p = audio.play();
+      if (p && typeof p.catch === 'function') p.catch(()=>{/* ユーザー操作待ち */});
+    }
 
-if (startBtn) {
-  startBtn.addEventListener('click', beginReading);
-}
+    if (heroStartBtn) {
+      heroStartBtn.addEventListener('click', () => {
+        // 初回タップでBGM開始
+        safePlay(bgm);
+        document.querySelector('.intro')?.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
 
-function beginReading(){
-  document.querySelector('.intro')?.classList.add('hidden');
-  document.getElementById('tarotSection')?.classList.remove('hidden');
+    if (startBtn) {
+      startBtn.addEventListener('click', beginReading);
+    }
 
-  const ritual = document.getElementById('ritual');
-  ritual?.classList.remove('hide');
-  setTimeout(() => ritual?.classList.add('hide'), 1100);
-
-  // ===== Hero 導線（自動開扉 → フェード → CTA） =====
-  window.addEventListener('load', () => {
-    const hero = document.querySelector('.hero-temple');
-    if(!hero) return;
-
-    // 1) 扉の光を点火
-    hero.classList.add('is-opening');
-
-    // 2) 少し後に広間へクロスフェード
-    setTimeout(()=> hero.classList.add('is-revealed'), 1100);
-
-    // 3) CTAをふわっと
-    setTimeout(()=> hero.classList.add('is-cta'), 2200);
-  });
-
-  // ✅ このボタンは既存の startBtn と同じIDなので、今の占い開始JSがそのまま動きます
-  // （もし intro セクション内にも二つ目のボタンがあるなら、重複を避けるため
-  //  そちらのボタンだけ id を削除 or 押したらスクロールにするのが安全）
-    // ===== Tarot Data: 大アルカナ22枚 =====
+    /* ===========================
+       3) タロット本体
+       =========================== */
     const tarotData = [
       { name: "The Fool", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg" },
       { name: "The Magician", meaning: "創造力、スキル、顕現。意志を現実化する力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg" },
@@ -228,26 +217,19 @@ function beginReading(){
       { name: "The World", meaning: "完成、統合、達成。サイクルの完結。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg" }
     ];
 
-    // ===== State =====
     let flippedCount = 0;
     const totalCards = 3;
     let selectedCards = [];
     let currentSeed = getSeed();
 
-    // ===== Heroボタンでintroへスクロール =====
-    document.getElementById('heroStartBtn').addEventListener('click', () => {
-      document.querySelector('.intro').scrollIntoView({ behavior: 'smooth' });
-    });
+    function beginReading(){
+      document.querySelector('.intro')?.classList.add('hidden');
+      document.getElementById('tarotSection')?.classList.remove('hidden');
 
-    // ===== Start Button =====
-    document.getElementById('startBtn').addEventListener('click', () => {
-      document.querySelector('.intro').classList.add('hidden');
-      document.getElementById('tarotSection').classList.remove('hidden');
-
-      // 詠唱オーバーレイ
+      // 詠唱
       const ritual = document.getElementById('ritual');
-      ritual.classList.remove('hide');
-      setTimeout(() => ritual.classList.add('hide'), 1100);
+      ritual?.classList.remove('hide');
+      setTimeout(() => ritual?.classList.add('hide'), 1100);
 
       flippedCount = 0;
       document.getElementById('result').classList.add('hidden');
@@ -259,9 +241,9 @@ function beginReading(){
       setSeed(currentSeed);
       const deck = seedShuffle(tarotData, currentSeed);
       selectedCards = deck.slice(0, 3);
-    });
+    }
 
-    // ===== Seeded Shuffle (xorshift32) =====
+    // Seeded Shuffle (xorshift32)
     function seedShuffle(arr, seed){
       let x = seed || 123456789;
       const a = [...arr];
@@ -282,12 +264,12 @@ function beginReading(){
       history.replaceState(null, "", u.toString());
     }
 
-    // ===== Flip Card =====
+    // Flip
     window.flipCard = function(cardElem) {
       if (cardElem.classList.contains('flipped')) return;
 
       const se = document.getElementById('flipSound');
-      try { se.currentTime = 0; se.play(); } catch(e){ /* iOS対策 */ }
+      try { se.currentTime = 0; se.play(); } catch(e){}
 
       cardElem.classList.add('glow','flipped');
       flippedCount++;
@@ -305,7 +287,7 @@ function beginReading(){
       if (flippedCount === totalCards) showFullResult();
     };
 
-    // ===== Show Result =====
+    // Result
     function showFullResult() {
       const p0 = selectedCards[0], p1 = selectedCards[1], p2 = selectedCards[2];
       const t1 = p0.meaning.split('。')[0], t2 = p1.meaning.split('。')[0], t3 = p2.meaning.split('。')[0];
@@ -324,7 +306,7 @@ function beginReading(){
       }, 700);
     }
 
-    // ===== Reset & Restart =====
+    // Reset & Restart
     function resetCards() {
       document.querySelectorAll('.card-back').forEach(card => {
         card.classList.remove('flipped','glow');
