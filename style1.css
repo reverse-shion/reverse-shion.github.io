@@ -14,6 +14,7 @@ body{
     linear-gradient(135deg, #f6f3ff 0%, #f2edff 35%, #fafafa 100%);
   position:relative; overflow-x:hidden;
 }
+/* 星粒の薄ヴェール */
 body::before{
   content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
   background:
@@ -27,36 +28,50 @@ body::before{
 
 /* ============ Hero Temple ============ */
 .hero-temple{
-  position:relative; height:var(--hero-h); overflow:hidden; isolation:isolate;
+  position:relative; height:var(--hero-h); overflow:clip; isolation:isolate;
   background:#0b0b1a; color:#fff; font-family:"Cormorant Garamond","Noto Serif JP",serif;
 }
 .hero-layer{
   position:absolute; inset:0; background-size:cover; background-position:center;
-  transform:scale(1.02); transition:opacity 1400ms ease, transform 1800ms ease;
+  transform:scale(1.02);
+  transition:opacity 1400ms ease, transform 1800ms ease; will-change:opacity,transform;
 }
-.hero-door{ background-image:url("assets/profile/shion.jpg"); opacity:1 }
-.hero-hall{ background-image:url("/assets/temple-hall.jpg"); opacity:0 }
+/* 相対パスに統一（GitHub Pages のルート差異対策） */
+）*/
+.hero-door{ background-image:url("assets/temple-door.jpg"); }
+.hero-hall{ background-image:url("assets/temple-hall.jpg"); }
+
+
+/* 光 */
 .hero-veil{
   position:absolute; inset:0;
-  background: radial-gradient(120px 160px at 50% 60%, rgba(255,255,255,.85), transparent 60%),
-              radial-gradient(60px 90px at 50% 60%, rgba(255,230,160,.75), transparent 65%);
+  background: radial-gradient(120px 160px at 50% 60%, rgba(255,255,255,.85), rgba(255,255,255,0) 60%),
+              radial-gradient(60px 90px at 50% 60%, rgba(255,230,160,.75), rgba(255,230,160,0) 65%);
   opacity:0; filter:blur(2px); pointer-events:none; transition:opacity 900ms ease;
 }
 .hero-glow{
   position:absolute; inset:0;
-  background: radial-gradient(800px 520px at 50% 60%, rgba(255,220,160,.18), transparent 70%),
-              radial-gradient(1200px 720px at 50% 80%, rgba(124,98,255,.15), transparent 70%);
+  background: radial-gradient(800px 520px at 50% 60%, rgba(255,220,160,.18), rgba(255,220,160,0) 70%),
+              radial-gradient(1200px 720px at 50% 80%, rgba(124,98,255,.15), rgba(124,98,255,0) 70%);
   mix-blend-mode:screen; opacity:0; pointer-events:none; transition:opacity 1600ms ease 300ms;
 }
+
+/* コピー */
 .hero-copy{
   position:absolute; inset:0; display:grid; place-items:end center; gap:12px;
   padding:clamp(16px,4vw,40px); text-align:center; transform:translateY(12px); opacity:0;
   transition:opacity 700ms ease, transform 700ms ease;
 }
-.hero-copy h1{ font-size:clamp(24px,4vw,44px); line-height:1.25; letter-spacing:.02em; text-shadow:0 6px 30px rgba(0,0,0,.45); margin:0 0 .25em; }
-.hero-copy p{ font-size:clamp(14px,2.4vw,18px); color:rgba(255,255,255,.92); margin:0 0 18px; text-shadow:0 6px 24px rgba(0,0,0,.45); }
+.hero-copy h1{
+  font-size:clamp(24px,4vw,44px); line-height:1.25; letter-spacing:.02em;
+  text-shadow:0 6px 30px rgba(0,0,0,.45); margin:0 0 .25em;
+}
+.hero-copy p{
+  font-size:clamp(14px,2.4vw,18px); color:rgba(255,255,255,.92);
+  margin:0 0 18px; text-shadow:0 6px 24px rgba(0,0,0,.45);
+}
 
-/* 状態 */
+/* 状態クラス */
 .hero-temple.is-opening .hero-veil{ opacity:1 }
 .hero-temple.is-opening .hero-door{ transform:scale(1.0) }
 .hero-temple.is-revealed .hero-hall{ opacity:1; transform:scale(1.0) }
@@ -68,10 +83,17 @@ body::before{
 
 /* ============ Layout ============ */
 .container{ max-width:480px; margin:0 auto; padding:1rem }
+
+/* Header */
 .header{ text-align:center; padding:2rem 1rem 1.5rem }
 .title{ font-family:'Cormorant Garamond',serif; font-size:2rem; color:#4f3488; margin-bottom:.5rem; letter-spacing:.05em }
 .subtitle{ font-size:.95rem; color:#666; font-weight:500 }
-.intro{ text-align:center; padding:2rem 1rem; background:rgba(255,255,255,.8); border-radius:16px; margin:1rem; box-shadow:0 4px 12px rgba(0,0,0,.05); }
+
+/* Intro */
+.intro{
+  text-align:center; padding:2rem 1rem; background:rgba(255,255,255,.8);
+  border-radius:16px; margin:1rem; box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
 .guide{ font-size:1.1rem; margin-bottom:1.5rem; color:#444 }
 
 /* Buttons */
@@ -84,7 +106,7 @@ body::before{
 .btn-restart{ background:transparent; color:#6d4ba8; border:2px solid #6d4ba8; padding:.7rem 1.5rem; border-radius:999px; font-size:.9rem; transition:.2s }
 .btn-restart:hover{ background:#6d4ba8; color:#fff }
 
-/* Tarot */
+/* Tarot Section */
 .tarot-section{ padding:2rem 1rem; text-align:center }
 .tarot-grid{ display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; margin:2rem 0 }
 .card-wrapper{ perspective:1000px; width:110px; height:180px }
@@ -96,14 +118,14 @@ body::before{
   50%{ box-shadow:0 0 25px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.6) }
   100%{ box-shadow:0 0 5px rgba(255,255,255,.5) }
 }
-.card-inner{ position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d }
+.card-inner{ position:relative; width:100%; height:100%; text-align:center; transition:transform .6s; transform-style:preserve-3d }
 .card-face{
   position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
   display:flex; flex-direction:column; justify-content:center; align-items:center;
   box-shadow:0 4px 12px rgba(0,0,0,.1); overflow:hidden;
 }
 .card-back-face{
-  background:#221a35 url("/assets/tarot/back.png") center/cover no-repeat; color:#fff; padding:1rem;
+  background:#221a35 url("assets/tarot/back.png") center/cover no-repeat;
 }
 .card-front-face{ background:#fff; transform:rotateY(180deg); border:2px solid #e6d9ff }
 .card-image{ width:100%; height:100%; object-fit:cover; border-radius:10px }
@@ -113,11 +135,12 @@ body::before{
 /* Result */
 .result{ background:#fff; border-radius:16px; padding:1.5rem; margin:2rem 1rem; box-shadow:0 6px 20px rgba(0,0,0,.08); text-align:left }
 .result-item{ margin-bottom:1.2rem }
+.result-item:last-child{ margin-bottom:0 }
 .result-item .icon{ font-size:1.4rem; margin-right:.5rem }
 .result-item h3{ display:inline; font-size:1.1rem; color:#4f3488; font-weight:600 }
 .result-item p{ margin-top:.5rem; font-size:1rem; color:#444; padding-left:2rem }
 
-/* CTA */
+/* CTA After */
 .cta-after{ text-align:center; padding:1.5rem 1rem }
 .next{ margin-bottom:1rem; color:#666; font-size:.95rem }
 .btn-group{ display:flex; flex-direction:column; gap:.8rem; margin-bottom:1.5rem }
