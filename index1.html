@@ -149,145 +149,156 @@
 
   <!-- JavaScript -->
   <script>
-    /* ヒーローアニメ */
-    window.addEventListener('load', () => {
-      const hero = document.querySelector('.hero-temple');
-      if (!hero) return;
-      hero.classList.add('is-opening');
-      setTimeout(() => hero.classList.add('is-revealed'), 1100);
-      setTimeout(() => hero.classList.add('is-cta'), 2200);
+  /* ヒーローアニメ */
+  window.addEventListener('load', () => {
+    const hero = document.querySelector('.hero-temple');
+    if (!hero) return;
+    hero.classList.add('is-opening');
+    setTimeout(() => hero.classList.add('is-revealed'), 1100);
+    setTimeout(() => hero.classList.add('is-cta'), 2200);
+  });
+
+  /* BGM & ボタン */
+  const heroStartBtn = document.getElementById('heroStartBtn');
+  const startBtn = document.getElementById('startBtn');
+  const bgm = document.getElementById('bgm');
+
+  function playBGM() {
+    if (!bgm) return;
+    bgm.volume = 0.6;
+    const p = bgm.play();
+    if (p) p.catch(() => {});
+  }
+
+  if (heroStartBtn) heroStartBtn.addEventListener('click', () => {
+    playBGM();
+    document.querySelector('.intro')?.scrollIntoView({ behavior: 'smooth' });
+  });
+  if (startBtn) startBtn.addEventListener('click', () => {
+    playBGM();
+    beginReading();
+  });
+
+  /* タロットデータ */
+  const tarotData = [
+    { name: "The Fool", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg" },
+    { name: "The Magician", meaning: "創造力、スキル、顕現。意志を現実化する力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg" },
+    { name: "The High Priestess", meaning: "直感、神秘、内なる知識。潜在意識の声に耳を傾ける。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
+    { name: "The Empress", meaning: "豊かさ、養育、創造性。母性と自然の恵み。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
+    { name: "The Emperor", meaning: "構造、権威、安定。秩序とリーダーシップ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
+    { name: "The Hierophant", meaning: "伝統、適合、教育。指導者からの学び。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg" },
+    { name: "The Lovers", meaning: "関係、選択、調和。愛と価値観の一致。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d5/RWS_Tarot_06_Lovers.jpg" },
+    { name: "The Chariot", meaning: "意志力、勝利、決意。目標に向かう推進力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
+    { name: "Strength", meaning: "勇気、忍耐、慈悲。内なる強さを発揮。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
+    { name: "The Hermit", meaning: "内省、導き、孤独。自己探求の旅。", image_url: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
+    { name: "Wheel of Fortune", meaning: "周期、変化、運命。人生の転機。", image_url: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg" },
+    { name: "Justice", meaning: "公正、真実、法。バランスの取れた判断。", image_url: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg" },
+    { name: "The Hanged Man", meaning: "降伏、視点、犠牲。新たな視野を得る。", image_url: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg" },
+    { name: "Death", meaning: "変容、終わり、新生。古いものを手放す。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg" },
+    { name: "Temperance", meaning: "バランス、節度、調和。統合と中庸。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg" },
+    { name: "The Devil", meaning: "束縛、物質主義、依存。影の側面に直面。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg" },
+    { name: "The Tower", meaning: "激変、啓示、混沌。突然の変化。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg" },
+    { name: "The Star", meaning: "希望、インスピレーション、平穏。未来への光。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg" },
+    { name: "The Moon", meaning: "幻想、恐れ、直感。不確実性の中の真実。", image_url: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg" },
+    { name: "The Sun", meaning: "成功、活力、ポジティブ。喜びと明晰さ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" },
+    { name: "Judgement", meaning: "再生、内なる呼び声、赦し。目覚めの瞬間。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg" },
+    { name: "The World", meaning: "完成、統合、達成。サイクルの完結。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg" }
+  ];
+
+  let flippedCount = 0;
+  const totalCards = 3;
+  let selectedCards = [];
+  let currentSeed;
+
+  /* ===== ヘルパー ===== */
+  function newSeed(){ return (crypto.getRandomValues(new Uint32Array(1))[0]) >>> 0; }
+  function updateSeedInURL(seed){
+    const u = new URL(location.href);
+    u.searchParams.set("seed", String(seed));
+    history.replaceState(null, "", u.toString());
+  }
+  function dealNew3(){
+    currentSeed = newSeed();
+    updateSeedInURL(currentSeed);
+    const deck = seedShuffle(tarotData, currentSeed);
+    selectedCards = deck.slice(0, 3);
+  }
+
+  function beginReading() {
+    document.querySelector('.intro')?.classList.add('hidden');
+    document.getElementById('tarotSection')?.classList.remove('hidden');
+    const ritual = document.getElementById('ritual');
+    ritual?.classList.remove('hide');
+    setTimeout(() => ritual?.classList.add('hide'), 1100);
+
+    flippedCount = 0;
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('ctaAfter').classList.add('hidden');
+    resetCards();
+
+    // ★必ず新しい3枚を配る
+    dealNew3();
+  }
+
+  function seedShuffle(arr, seed) {
+    let x = seed || 123456789;
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
+      const j = Math.abs(x) % (i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  window.flipCard = function(cardElem) {
+    if (cardElem.classList.contains('flipped')) return;
+    const se = document.getElementById('flipSound');
+    try { se.currentTime = 0; se.play(); } catch(e){}
+    cardElem.classList.add('glow', 'flipped');
+    flippedCount++;
+    const index = cardElem.parentElement.dataset.index;
+    const card = selectedCards[index];
+    const img = cardElem.querySelector('.card-image');
+    setTimeout(() => {
+      img.src = card.image_url;
+      img.alt = card.name;
+      cardElem.classList.remove('glow');
+    }, 300);
+    if (flippedCount === totalCards) showFullResult();
+  };
+
+  function showFullResult() {
+    const [p0, p1, p2] = selectedCards;
+    const t1 = p0.meaning.split('。')[0], t2 = p1.meaning.split('。')[0], t3 = p2.meaning.split('。')[0];
+    document.getElementById('poemTitle').textContent = `詩 — ${p0.name}`;
+    document.getElementById('rhymeTitle').textContent = `韻 — ${p1.name}`;
+    document.getElementById('prayerTitle').textContent = `祈 — ${p2.name}`;
+    document.getElementById('poem').textContent = `はじまりの息：${p0.name}。${t1}——その気づきは、あなたの現在に“言の葉”を灯す。`;
+    document.getElementById('rhyme').textContent = `共鳴の構文：${p1.name}。${t2}——行動の韻を一歩、揃えよう。`;
+    document.getElementById('prayer').textContent = `帰る祈り：${p2.name}。${t3}——結びの場所は「いま」。大丈夫だよ。`;
+    setTimeout(() => {
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('ctaAfter').classList.remove('hidden');
+    }, 700);
+  }
+
+  function resetCards() {
+    document.querySelectorAll('.card-back').forEach(card => {
+      card.classList.remove('flipped','glow');
+      const img = card.querySelector('.card-image');
+      if (img) { img.src = ''; img.alt = ''; }
     });
+  }
 
-    /* BGM & ボタン */
-    const heroStartBtn = document.getElementById('heroStartBtn');
-    const startBtn = document.getElementById('startBtn');
-    const bgm = document.getElementById('bgm');
-
-    function playBGM() {
-      if (!bgm) return;
-      bgm.volume = 0.6;
-      const p = bgm.play();
-      if (p) p.catch(() => {});
-    }
-
-    if (heroStartBtn) heroStartBtn.addEventListener('click', () => {
-      playBGM();
-      document.querySelector('.intro')?.scrollIntoView({ behavior: 'smooth' });
-    });
-    if (startBtn) startBtn.addEventListener('click', () => {
-      playBGM();
-      beginReading();
-    });
-
-    /* タロットデータ */
-    const tarotData = [
-      { name: "The Fool", meaning: "新たな始まり、無垢、冒険心。未知への一歩を踏み出す勇気。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg" },
-      { name: "The Magician", meaning: "創造力、スキル、顕現。意志を現実化する力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg" },
-      { name: "The High Priestess", meaning: "直感、神秘、内なる知識。潜在意識の声に耳を傾ける。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
-      { name: "The Empress", meaning: "豊かさ、養育、創造性。母性と自然の恵み。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
-      { name: "The Emperor", meaning: "構造、権威、安定。秩序とリーダーシップ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
-      { name: "The Hierophant", meaning: "伝統、適合、教育。指導者からの学び。", image_url: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg" },
-      { name: "The Lovers", meaning: "関係、選択、調和。愛と価値観の一致。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d5/RWS_Tarot_06_Lovers.jpg" },
-      { name: "The Chariot", meaning: "意志力、勝利、決意。目標に向かう推進力。", image_url: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
-      { name: "Strength", meaning: "勇気、忍耐、慈悲。内なる強さを発揮。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
-      { name: "The Hermit", meaning: "内省、導き、孤独。自己探求の旅。", image_url: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
-      { name: "Wheel of Fortune", meaning: "周期、変化、運命。人生の転機。", image_url: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg" },
-      { name: "Justice", meaning: "公正、真実、法。バランスの取れた判断。", image_url: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg" },
-      { name: "The Hanged Man", meaning: "降伏、視点、犠牲。新たな視野を得る。", image_url: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg" },
-      { name: "Death", meaning: "変容、終わり、新生。古いものを手放す。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg" },
-      { name: "Temperance", meaning: "バランス、節度、調和。統合と中庸。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg" },
-      { name: "The Devil", meaning: "束縛、物質主義、依存。影の側面に直面。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg" },
-      { name: "The Tower", meaning: "激変、啓示、混沌。突然の変化。", image_url: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg" },
-      { name: "The Star", meaning: "希望、インスピレーション、平穏。未来への光。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg" },
-      { name: "The Moon", meaning: "幻想、恐れ、直感。不確実性の中の真実。", image_url: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg" },
-      { name: "The Sun", meaning: "成功、活力、ポジティブ。喜びと明晰さ。", image_url: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" },
-      { name: "Judgement", meaning: "再生、内なる呼び声、赦し。目覚めの瞬間。", image_url: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg" },
-      { name: "The World", meaning: "完成、統合、達成。サイクルの完結。", image_url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg" }
-    ];
-
-    let flippedCount = 0;
-    const totalCards = 3;
-    let selectedCards = [];
-    let currentSeed = new URLSearchParams(location.search).has("seed") ? Number(new URLSearchParams(location.search).get("seed")) : undefined;
-
-    function beginReading() {
-      document.querySelector('.intro')?.classList.add('hidden');
-      document.getElementById('tarotSection')?.classList.remove('hidden');
-      const ritual = document.getElementById('ritual');
-      ritual?.classList.remove('hide');
-      setTimeout(() => ritual?.classList.add('hide'), 1100);
-
-      flippedCount = 0;
-      document.getElementById('result').classList.add('hidden');
-      document.getElementById('ctaAfter').classList.add('hidden');
-      resetCards();
-
-      if (!currentSeed) currentSeed = crypto.getRandomValues(new Uint32Array(1))[0];
-      const u = new URL(location.href);
-      u.searchParams.set("seed", String(currentSeed));
-      history.replaceState(null, "", u.toString());
-
-      const deck = seedShuffle(tarotData, currentSeed);
-      selectedCards = deck.slice(0, 3);
-    }
-
-    function seedShuffle(arr, seed) {
-      let x = seed || 123456789;
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
-        const j = Math.abs(x) % (i + 1);
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    window.flipCard = function(cardElem) {
-      if (cardElem.classList.contains('flipped')) return;
-      const se = document.getElementById('flipSound');
-      try { se.currentTime = 0; se.play(); } catch(e){}
-      cardElem.classList.add('glow', 'flipped');
-      flippedCount++;
-      const index = cardElem.parentElement.dataset.index;
-      const card = selectedCards[index];
-      const img = cardElem.querySelector('.card-image');
-      setTimeout(() => {
-        img.src = card.image_url;
-        img.alt = card.name;
-        cardElem.classList.remove('glow');
-      }, 300);
-      if (flippedCount === totalCards) showFullResult();
-    };
-
-    function showFullResult() {
-      const p0 = selectedCards[0], p1 = selectedCards[1], p2 = selectedCards[2];
-      const t1 = p0.meaning.split('。')[0], t2 = p1.meaning.split('。')[0], t3 = p2.meaning.split('。')[0];
-      document.getElementById('poemTitle').textContent = `詩 — ${p0.name}`;
-      document.getElementById('rhymeTitle').textContent = `韻 — ${p1.name}`;
-      document.getElementById('prayerTitle').textContent = `祈 — ${p2.name}`;
-      document.getElementById('poem').textContent = `はじまりの息：${p0.name}。${t1}——その気づきは、あなたの現在に“言の葉”を灯す。`;
-      document.getElementById('rhyme').textContent = `共鳴の構文：${p1.name}。${t2}——行動の韻を一歩、揃えよう。`;
-      document.getElementById('prayer').textContent = `帰る祈り：${p2.name}。${t3}——結びの場所は「いま」。大丈夫だよ。`;
-      setTimeout(() => {
-        document.getElementById('result').classList.remove('hidden');
-        document.getElementById('ctaAfter').classList.remove('hidden');
-      }, 700);
-    }
-
-    function resetCards() {
-      document.querySelectorAll('.card-back').forEach(card => {
-        card.classList.remove('flipped','glow');
-        const img = card.querySelector('.card-image');
-        if (img) { img.src = ''; img.alt = ''; }
-      });
-    }
-
-    document.getElementById('restartBtn').addEventListener('click', () => {
-      document.getElementById('result').classList.add('hidden');
-      document.getElementById('ctaAfter').classList.add('hidden');
-      document.querySelector('.tarot-section').scrollIntoView({ behavior: 'smooth' });
-      setTimeout(() => { resetCards(); flippedCount = 0; }, 400);
-    });
-  </script>
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('ctaAfter').classList.add('hidden');
+    resetCards();
+    flippedCount = 0;
+    dealNew3(); // ★新しい3枚を再配布
+    document.querySelector('.tarot-section').scrollIntoView({ behavior: 'smooth' });
+  });
+</script>
 </body>
 </html>
