@@ -1,257 +1,285 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Re:Verse Shion — The Temple of Words</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Fonts：タイトルは Zen Old Mincho、本文は Noto Serif JP -->
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet" />
+
   <style>
-    /* === 全体設定 === */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+    /* ===== Base ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root{
+      --ink: #eaf6ff;
+      --muted:#a8bfd0;
+      --glow:#7fd0ff;
+      --halo: rgba(127,208,255,.18);
+      --glass: rgba(10,20,40,.66);
+      --r: 16px;
+      --safe: env(safe-area-inset-bottom, 16px);
+    }
+    html, body { height: 100%; }
+    body{
       background: #000;
-      color: #fff;
+      color: var(--ink);
       font-family: 'Noto Serif JP', serif;
       text-align: center;
-      min-height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden; /* 演出は画面内で完結 */
     }
 
-    /* === コード雨キャンバス === */
-    #codeRain {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
+    /* 背景：コード雨 */
+    #codeRain{
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      z-index: 1; pointer-events: none;
     }
 
-    /* === テキスト（浮かび上がる）=== */
-    .content {
+    /* コンテンツラッパー（中央配置＋左右余白） */
+    .content{
       position: relative;
       z-index: 2;
-      padding: 2rem;
-    }
-    h1, h2, p {
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeUp 1.8s ease-out forwards;
-      text-shadow: 0 0 15px rgba(127, 208, 255, 0.8);
-      margin: 0.5rem 0;
-    }
-    h1 { font-size: 2.8rem; animation-delay: 0.6s; }
-    p:nth-of-type(1) { animation-delay: 1.2s; }
-    h2 { font-size: 2.2rem; animation-delay: 1.8s; }
-    p:nth-of-type(2) { animation-delay: 2.4s; }
-    p:nth-of-type(3) { animation-delay: 3.0s; }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
+      width: min(92vw, 920px);
+      padding: 24px clamp(16px, 4vw, 40px) calc(28px + var(--safe));
     }
 
-    /* === 神秘の扉 === */
-    .door-container {
-      margin-top: 4rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .door-button {
-      position: relative;
-      display: inline-block;
-      padding: 22px 55px;
-      font-size: 1.5rem;
-      color: #e0f8ff;
-      text-decoration: none;
-      border: 2px solid transparent;
-      border-radius: 60px;
-      background: rgba(10, 20, 40, 0.7);
-      backdrop-filter: blur(6px);
-      box-shadow: 
-        0 0 25px rgba(127, 208, 255, 0.4),
-        inset 0 0 20px rgba(127, 208, 255, 0.2);
-      transition: all 0.5s ease;
-      cursor: pointer;
-      overflow: hidden;
-    }
-
-    .door-text {
-      position: relative;
-      z-index: 3;
+    /* タイポ＆アニメ（控えめな神秘感） */
+    h1{
+      font-family: 'Zen Old Mincho', serif;
       font-weight: 700;
-      letter-spacing: 0.12em;
-      text-shadow: 0 0 12px rgba(127, 208, 255, 1);
+      letter-spacing: .06em;
+      font-size: clamp(22px, 4.6vw, 42px);
+      line-height: 1.2;
+      margin-bottom: .4em;
+      opacity: 0; transform: translateY(24px);
+      animation: fadeUp .9s ease-out .2s forwards;
+      text-shadow: 0 0 10px rgba(127,208,255,.35);
+    }
+    h2{
+      font-family: 'Zen Old Mincho', serif;
+      font-weight: 700;
+      font-size: clamp(16px, 3.4vw, 26px);
+      letter-spacing: .08em;
+      margin: .6em 0 .2em;
+      opacity: 0; transform: translateY(24px);
+      animation: fadeUp .9s ease-out .6s forwards;
+      text-shadow: 0 0 8px rgba(127,208,255,.28);
+    }
+    p{
+      font-size: clamp(13px, 2.8vw, 18px);
+      line-height: 1.9;
+      letter-spacing: .02em;
+      color: var(--muted);
+      text-wrap: pretty;
+      opacity: 0; transform: translateY(24px);
+      animation: fadeUp .9s ease-out .4s forwards;
+      margin: .4em 0;
+      text-shadow: 0 0 6px rgba(127,208,255,.18);
+    }
+    p.lead{ color: var(--ink); font-weight: 600; }
+    @keyframes fadeUp{ to{ opacity:1; transform:translateY(0) } }
+
+    /* 扉（ボタン） */
+    .door-container{
+      margin-top: clamp(18px, 5vw, 36px);
+      display: grid; place-items: center;
+    }
+    .door-button{
+      position: relative;
+      display: block;
+      width: min(92vw, 560px);           /* 画面からはみ出さない */
+      padding: clamp(14px, 2.4vw, 22px) clamp(18px, 5vw, 44px);
+      border-radius: 999px;
+      color: #e9fbff;
+      text-decoration: none;
+      border: 1px solid rgba(127,208,255,.45);
+      background: linear-gradient(180deg, rgba(12,24,48,.78), rgba(8,16,32,.78));
+      backdrop-filter: blur(6px);
+      box-shadow:
+        0 0 0 1px rgba(127,208,255,.18) inset,
+        0 6px 28px var(--halo),
+        0 0 80px rgba(127,208,255,.12);
+      transition: transform .18s ease, box-shadow .28s ease, border-color .28s ease;
+      overflow: clip; /* 安全にエフェクトを内側に */
+    }
+    .door-text{
+      position: relative; z-index: 2;
+      font-family: 'Zen Old Mincho', serif;
+      font-weight: 700;
+      letter-spacing: .14em;
+      font-size: clamp(14px, 2.8vw, 18px);
+      text-shadow: 0 0 12px rgba(127,208,255,.65);
+      white-space: nowrap;
     }
 
-    /* 脈動する光の輪 */
-    .pulse {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 0; height: 0;
-      border: 2px solid #7fd0ff;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      animation: pulse 2.2s infinite ease-out;
-      pointer-events: none;
-    }
-    @keyframes pulse {
-      0% { width: 0; height: 0; opacity: 1; }
-      100% { width: 420px; height: 420px; opacity: 0; }
-    }
-
-    /* 光の粒子（ホバーで集まる） */
-    .particles {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 100%; height: 100%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    .particle {
-      position: absolute;
-      width: 3px; height: 3px;
-      background: #7fd0ff;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #7fd0ff;
-      opacity: 0;
-      animation: gather 1.8s ease-out forwards;
-    }
-    @keyframes gather {
-      0% { 
-        transform: translate(calc(-50vw + (var(--x)*1vw)), calc(-50vh + (var(--y)*1vh))) scale(0);
-        opacity: 0;
+    /* ホバー演出：タッチ端末では無効化 */
+    @media (hover:hover){
+      .door-button:hover{
+        transform: translateY(-2px);
+        box-shadow:
+          0 10px 34px rgba(127,208,255,.38),
+          0 0 120px rgba(127,208,255,.18);
+        border-color: rgba(127,208,255,.75);
       }
-      60% { opacity: 1; }
-      100% { 
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0;
-      }
     }
 
-    /* ホバー効果 */
-    .door-button:hover {
-      transform: scale(1.06);
-      box-shadow: 
-        0 0 70px rgba(127, 208, 255, 0.9),
-        0 0 140px rgba(127, 208, 255, 0.5);
-      border-color: #7fd0ff;
+    /* 脈動リング（内側で完結） */
+    .pulse{
+      position:absolute; inset:0; margin:auto;
+      width: 160%; height: 160%;
+      border: 2px solid rgba(127,208,255,.28);
+      border-radius: 50%;
+      filter: blur(.2px);
+      animation: pulse 2.2s ease-out infinite;
+      z-index: 1; pointer-events:none;
+    }
+    @keyframes pulse{
+      0%{ transform: scale(.6); opacity:.75 }
+      100%{ transform: scale(1); opacity:0 }
     }
 
-    .door-button:hover .door-text {
-      text-shadow: 0 0 25px #fff, 0 0 50px #7fd0ff;
+    /* 微粒子（控えめ） */
+    .particles{ position:absolute; inset:0; pointer-events:none; }
+    .particle{
+      position:absolute; width:3px; height:3px; border-radius:50%;
+      background: var(--glow); box-shadow: 0 0 8px var(--glow);
+      opacity:0; animation: gather 1.4s ease-out forwards;
+    }
+    @keyframes gather{
+      0%{ transform: translate(var(--sx,0), var(--sy,0)) scale(0); opacity:0 }
+      60%{ opacity:1 }
+      100%{ transform: translate(0,0) scale(1); opacity:0 }
     }
 
-    /* クリックで光爆発 */
-    .light-burst {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: radial-gradient(circle at center, #7fd0ff 0%, transparent 70%);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 9999;
-      animation: burst 0.9s ease-out;
+    /* クリック閃光（画面内に控えめ） */
+    .light-burst{
+      position: fixed; inset: 0;
+      background: radial-gradient(80vmax 80vmax at 50% 50%, rgba(127,208,255,.8) 0%, rgba(127,208,255,.0) 65%);
+      opacity: 0; pointer-events: none; z-index: 9999;
+      animation: burst .8s ease-out;
     }
-    @keyframes burst {
-      0% { opacity: 0; transform: scale(0.3); }
-      50% { opacity: 1; transform: scale(1.3); }
-      100% { opacity: 0; transform: scale(2.5); }
+    @keyframes burst{
+      0%{ opacity:0; transform: scale(.7) }
+      50%{ opacity:1; transform: scale(1.05) }
+      100%{ opacity:0; transform: scale(1.8) }
+    }
+
+    /* ヒント */
+    .hint{
+      margin-top: 10px;
+      font-size: clamp(11px, 2.2vw, 13px);
+      letter-spacing: .08em;
+      color: #b9d4e6;
+      opacity: 0; transform: translateY(12px);
+      animation: fadeUp .8s ease-out .9s forwards;
+    }
+
+    /* 省エネ（モーション軽減） */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation: none !important; transition: none !important }
     }
   </style>
 </head>
 <body>
 
-  <!-- コード雨 -->
-  <canvas id="codeRain"></canvas>
+  <!-- 背景コード雨 -->
+  <canvas id="codeRain" aria-hidden="true"></canvas>
 
   <!-- コンテンツ -->
-  <div class="content">
+  <div class="content" role="main">
     <h1>Re:Verse Shion — The Temple of Words</h1>
-    <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
-    
-    <h2>詩韻 Shion</h2>
-    <p>言葉は祈りの構文 — 大アルカナタロットで“響き”を体験</p>
-    <p>目を閉じて、願いをイメージしてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
+    <p class="lead">扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
 
-    <!-- 神秘の扉 -->
+    <h2>詩韻 Shion</h2>
+    <p>言葉は祈りの構文 — 大アルカナで“響き”を体験。</p>
+    <p>目を閉じて、願いを思い描いてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
+
     <div class="door-container">
-      <a href="shion.html" class="door-button" id="door">
+      <a href="shion.html" class="door-button" id="door" aria-label="扉を開く（詩韻を授かる）">
         <span class="door-text">扉を開く → 詩韻を授かる</span>
-        <div class="pulse"></div>
-        <div class="particles" id="particles"></div>
+        <div class="pulse" aria-hidden="true"></div>
+        <div class="particles" id="particles" aria-hidden="true"></div>
       </a>
+      <div class="hint">※ タップで光の扉がひらきます</div>
     </div>
   </div>
 
   <script>
-    // ========== 0) 青いコード雨（Matrix風）==========
+    // ===== 0) 背景：青いコード雨（解像度に正しく追従）=====
     (function codeRain(){
       const cvs = document.getElementById('codeRain');
       const ctx = cvs.getContext('2d');
       const chars = '01AI∴∵⌘◇◆＊＋≡☆★◯●◎∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
-      let fontSize = 18;
-      let columns, drops, W, H;
+      let fontSize, columns, drops, vw, vh;
+
       function resize(){
-        W = cvs.width  = window.innerWidth * devicePixelRatio;
-        H = cvs.height = window.innerHeight * devicePixelRatio;
-        ctx.scale(devicePixelRatio, devicePixelRatio);
-        fontSize = Math.max(14, Math.min(22, Math.floor(window.innerWidth/48)));
-        columns = Math.ceil(window.innerWidth / fontSize);
-        drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*H));
+        vw = window.innerWidth;
+        vh = window.innerHeight;
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        cvs.width  = vw * dpr;
+        cvs.height = vh * dpr;
+        ctx.setTransform(1,0,0,1,0,0);          // リセット
+        ctx.scale(dpr, dpr);                    // CSSピクセル系に統一
+        fontSize = Math.max(12, Math.min(20, Math.floor(vw/52)));
+        columns = Math.ceil(vw / fontSize);
+        drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*vh/fontSize));
       }
+
       function draw(){
-        ctx.fillStyle = 'rgba(2,3,22,0.16)';
-        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+        ctx.fillStyle = 'rgba(2,3,22,0.14)';
+        ctx.fillRect(0,0,vw,vh);
         ctx.fillStyle = '#7fd0ff';
         ctx.font = `${fontSize}px monospace`;
         for(let i=0;i<columns;i++){
           const ch = chars[Math.floor(Math.random()*chars.length)];
           const x = i * fontSize;
-          const y = drops[i] * fontSize * .9;
+          const y = drops[i] * fontSize * .95;
           ctx.fillText(ch, x, y);
-          if(y > window.innerHeight && Math.random() > 0.975){ drops[i] = 0; }
+          if(y > vh && Math.random() > 0.975) drops[i] = 0;
           drops[i]++;
         }
         requestAnimationFrame(draw);
       }
-      window.addEventListener('resize', resize);
+      window.addEventListener('resize', resize, {passive:true});
       resize(); draw();
     })();
 
-    // ========== 光の粒子（ホバー）==========
+    // ===== 1) 粒子（ホバー or 初回だけ軽く）=====
     const door = document.getElementById('door');
     const particlesContainer = document.getElementById('particles');
-    
-    door.addEventListener('mouseenter', () => {
+
+    function spawnParticles(n=28){
       particlesContainer.innerHTML = '';
-      for (let i = 0; i < 35; i++) {
+      const rect = particlesContainer.getBoundingClientRect();
+      for(let i=0;i<n;i++){
         const p = document.createElement('div');
         p.className = 'particle';
-        p.style.setProperty('--x', Math.random() * 200 - 100);
-        p.style.setProperty('--y', Math.random() * 200 - 100);
-        p.style.animationDelay = Math.random() * 0.4 + 's';
+        // ランダム開始オフセット（ボタン外周から内側へ寄る）
+        p.style.setProperty('--sx', (Math.random()*rect.width - rect.width/2) + 'px');
+        p.style.setProperty('--sy', (Math.random()*rect.height - rect.height/2) + 'px');
+        p.style.animationDelay = (Math.random()*.25) + 's';
         particlesContainer.appendChild(p);
       }
-    });
+    }
 
-    // ========== クリックで光爆発＋遷移 ==========
+    if (matchMedia('(hover:hover)').matches){
+      door.addEventListener('mouseenter', () => spawnParticles(34));
+    } else {
+      // タッチ端末は初回だけ控えめに
+      setTimeout(() => spawnParticles(16), 600);
+    }
+
+    // ===== 2) クリック閃光 → 遷移 =====
     door.addEventListener('click', (e) => {
       e.preventDefault();
       const burst = document.createElement('div');
       burst.className = 'light-burst';
       document.body.appendChild(burst);
-      
-      setTimeout(() => {
-        window.location.href = door.getAttribute('href');
-      }, 500);
+      setTimeout(() => { window.location.href = door.getAttribute('href'); }, 420);
     });
   </script>
-
 </body>
 </html>
