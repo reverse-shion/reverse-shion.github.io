@@ -6,7 +6,6 @@
   <title>詩韻 Shion — 言葉で魂を救う Code｜無料タロット（詩・韻・祈）</title>
   <meta name="description" content="無料タロットで“詩・韻・祈”。詩韻 Shion の思想（言葉で魂を救う Code）に基づくリーディング。恋愛・復縁・連絡・進路の悩みに。">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-  <!-- 外部CSS（同じ階層に shion-tarot.css を置く） -->
   <link rel="stylesheet" href="shion-tarot.css">
   <meta property="og:type" content="website">
   <meta property="og:title" content="詩韻 Shion — 言葉で魂を救う Code｜無料タロット（詩・韻・祈）">
@@ -23,16 +22,16 @@
   <section class="hero" id="hero">
     <div class="hero__bg" aria-hidden="true"></div>
     <div class="hero__veil" aria-hidden="true"></div>
-    
 
     <div class="hero__inner">
       <h1 class="hero__title">言葉で魂を救う<span class="hero__code">Code</span></h1>
-      <p class="hero__subtitle">占い × 思想 ――<br> 詩（Poem）・韻（Rhythm）・祈（Prayer）で、<br>あなたの“今”を言葉で照らす。</p>
+      <p class="hero__subtitle">占い × 思想 ―― 詩（Poem）・韻（Rhythm）・祈（Prayer）で、あなたの“今”を言葉で照らす。</p>
+      <p class="hero__poem">恋も、仕事も、運命も。―― 大丈夫だよ。</p>
 
-      <!-- 詩韻語：思想を情緒で橋渡し -->
-      <p class="shion-poem">恋も、仕事も、運命も。―― 大丈夫だよ。</p>
-　　　　<p class="hero__note" aria-label="無料体験の注記">無料で体験できます／所要1分</p>
-      <button id="startRitualBtn" class="btn-primary" type="button" aria-label="星詠リチュアルを始める">はじめる（星詠リチュアル）</button>
+      <p class="hero__note" aria-label="無料体験の注記">無料で体験できます／所要1分</p>
+      <button id="startRitualBtn" class="btn-primary" type="button" aria-label="星詠リチュアルを始める">
+        はじめる（星詠リチュアル）
+      </button>
     </div>
 
     <!-- BGM（タップ時に起動） -->
@@ -80,11 +79,10 @@
       </div>
 
       <div class="tap-hint" id="tapHint"><div class="tap-hint__pill">カードを順にタップ</div></div>
-      <!-- 効果光（クリック不可） -->
       <div class="peel" id="peel" aria-hidden="true"></div>
     </section>
 
-    <!-- ===== 濃密リーディング（離脱防止の本丸） ===== -->
+    <!-- ===== リーディング ===== -->
     <section class="reading section" id="reading">
       <h3 class="section__title">詩・韻・祈 のリーディング</h3>
       <div class="reading__grid">
@@ -113,23 +111,17 @@
     </section>
   </main>
 
-  <!-- カード効果音（軽め） -->
+  <!-- 効果音 -->
   <audio id="flipSe" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
 
-  <!-- ====== Script（ページ専用） ====== -->
   <script>
   // ---------- BGM（iOS対策：ユーザー操作で起動） ----------
   const bgm = document.getElementById('bgm');
   function kickBgm(){
-    if(!bgm) return;
-    try {
-      bgm.volume = 0.55;
-      const p = bgm.play();
-      if (p && typeof p.catch === 'function') p.catch(()=>{ /* 端末がブロック中 */ });
-    } catch(e){}
+    try { bgm.volume = 0.55; const p = bgm.play(); if (p && p.catch) p.catch(()=>{}); } catch(e){}
   }
 
-  // ---------- データ：メジャー22 & 画像（Wikipedia安定URL） ----------
+  // ---------- 画像＆データ ----------
   const cardFrontImages = [
     'https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg',
@@ -156,31 +148,31 @@
   ];
 
   const majorArcana = [
-    { name:'The Fool',        upright:'純粋な始まりの風、冒険の翼を広げて。',  reversed:'無謀な跳躍、影に潜む落とし穴。', idx:0 },
-    { name:'The Magician',    upright:'意志の炎が現実を紡ぎ、創造の河を流す。',  reversed:'幻の鏡、欺瞞の霧に包まれて。',    idx:1 },
-    { name:'The High Priestess', upright:'内なる声のささやき、月の光が導く道。', reversed:'失われた均衡、抑圧された魂の叫び。', idx:2 },
-    { name:'The Empress',     upright:'豊穣の大地、母なる愛の抱擁。',            reversed:'枯れた花、創造の停滞。',          idx:3 },
-    { name:'The Emperor',     upright:'秩序の玉座、力強い統治の剣。',              reversed:'暴君の影、支配の崩壊。',          idx:4 },
-    { name:'The Hierophant',  upright:'伝統の灯、教えの道標。',                    reversed:'硬直した信仰、自由の抑圧。',      idx:5 },
-    { name:'The Lovers',      upright:'運命の交差、心の選択。',                    reversed:'迷いの分岐、愛の試練。',          idx:6 },
-    { name:'The Chariot',     upright:'勝利の戦車、意志の疾走。',                  reversed:'方向を見失う馬車。',              idx:7 },
-    { name:'Strength',        upright:'内なる獅子、優しさの力。',                  reversed:'弱さの咆哮、自己不信。',          idx:8 },
-    { name:'The Hermit',      upright:'孤独の灯台、魂の探求。',                    reversed:'孤立の闇、導きを拒む。',          idx:9 },
-    { name:'Wheel of Fortune',upright:'運命の輪、巡る星の流れ。',                  reversed:'停滞の歯車、予期せぬ転落。',      idx:10 },
-    { name:'Justice',         upright:'天秤の裁き、真実の剣。',                    reversed:'不正の影、偏った判断。',          idx:11 },
-    { name:'The Hanged Man',  upright:'逆さの悟り、犠牲の光。',                    reversed:'停滞の苦しみ、視野の狭さ。',      idx:12 },
-    { name:'Death',           upright:'終わりと始まり、変容の蝶。',                reversed:'変化への恐怖、過去の亡霊。',      idx:13 },
-    { name:'Temperance',      upright:'調和の天使、バランスの流れ。',              reversed:'極端な揺らぎ、衝突の炎。',        idx:14 },
-    { name:'The Devil',       upright:'鎖の誘惑、欲望の檻。',                      reversed:'解放の鍵、束縛からの脱出。',      idx:15 },
-    { name:'The Tower',       upright:'崩壊の雷、覚醒の衝撃。',                    reversed:'破壊の予兆、避けられない危機。',  idx:16 },
-    { name:'The Star',        upright:'希望の星、癒しの水。',                      reversed:'失われた光、絶望の夜。',          idx:17 },
-    { name:'The Moon',        upright:'幻想の月、潜在意識の海。',                  reversed:'真実の光、欺瞞の霧。',            idx:18 },
-    { name:'The Sun',         upright:'輝く太陽、生命の喜び。',                    reversed:'曇った陽光、一時的な幸福。',      idx:19 },
-    { name:'Judgement',       upright:'覚醒の喇叭、再生の炎。',                    reversed:'自己否定、過去の重荷。',          idx:20 },
-    { name:'The World',       upright:'調和の円舞、成就の星。',                    reversed:'未完の旅、閉ざされた門。',        idx:21 }
+    { name:'The Fool',upright:'純粋な始まりの風、冒険の翼を広げて。',reversed:'無謀な跳躍、影に潜む落とし穴。',idx:0 },
+    { name:'The Magician',upright:'意志の炎が現実を紡ぎ、創造の河を流す。',reversed:'幻の鏡、欺瞞の霧に包まれて。',idx:1 },
+    { name:'The High Priestess',upright:'内なる声のささやき、月の光が導く道。',reversed:'失われた均衡、抑圧された魂の叫び。',idx:2 },
+    { name:'The Empress',upright:'豊穣の大地、母なる愛の抱擁。',reversed:'枯れた花、創造の停滞。',idx:3 },
+    { name:'The Emperor',upright:'秩序の玉座、力強い統治の剣。',reversed:'暴君の影、支配の崩壊。',idx:4 },
+    { name:'The Hierophant',upright:'伝統の灯、教えの道標。',reversed:'硬直した信仰、自由の抑圧。',idx:5 },
+    { name:'The Lovers',upright:'運命の交差、心の選択。',reversed:'迷いの分岐、愛の試練。',idx:6 },
+    { name:'The Chariot',upright:'勝利の戦車、意志の疾走。',reversed:'方向を見失う馬車。',idx:7 },
+    { name:'Strength',upright:'内なる獅子、優しさの力。',reversed:'弱さの咆哮、自己不信。',idx:8 },
+    { name:'The Hermit',upright:'孤独の灯台、魂の探求。',reversed:'孤立の闇、導きを拒む。',idx:9 },
+    { name:'Wheel of Fortune',upright:'運命の輪、巡る星の流れ。',reversed:'停滞の歯車、予期せぬ転落。',idx:10 },
+    { name:'Justice',upright:'天秤の裁き、真実の剣。',reversed:'不正の影、偏った判断。',idx:11 },
+    { name:'The Hanged Man',upright:'逆さの悟り、犠牲の光。',reversed:'停滞の苦しみ、視野の狭さ。',idx:12 },
+    { name:'Death',upright:'終わりと始まり、変容の蝶。',reversed:'変化への恐怖、過去の亡霊。',idx:13 },
+    { name:'Temperance',upright:'調和の天使、バランスの流れ。',reversed:'極端な揺らぎ、衝突の炎。',idx:14 },
+    { name:'The Devil',upright:'鎖の誘惑、欲望の檻。',reversed:'解放の鍵、束縛からの脱出。',idx:15 },
+    { name:'The Tower',upright:'崩壊の雷、覚醒の衝撃。',reversed:'破壊の予兆、避けられない危機。',idx:16 },
+    { name:'The Star',upright:'希望の星、癒しの水。',reversed:'失われた光、絶望の夜。',idx:17 },
+    { name:'The Moon',upright:'幻想の月、潜在意識の海。',reversed:'真実の光、欺瞞の霧。',idx:18 },
+    { name:'The Sun',upright:'輝く太陽、生命の喜び。',reversed:'曇った陽光、一時的な幸福。',idx:19 },
+    { name:'Judgement',upright:'覚醒の喇叭、再生の炎。',reversed:'自己否定、過去の重荷。',idx:20 },
+    { name:'The World',upright:'調和の円舞、成就の星。',reversed:'未完の旅、閉ざされた門。',idx:21 }
   ];
 
-  // ---------- 要素参照 ----------
+  // ---------- 要素 ----------
   const startBtn  = document.getElementById('startRitualBtn');
   const ritualSec = document.getElementById('ritual');
   const mainSec   = document.getElementById('main');
@@ -189,27 +181,16 @@
   const readingEl = document.getElementById('reading');
   const retryBtn  = document.getElementById('retry');
   const flipSe    = document.getElementById('flipSe');
-
   const cardEls   = document.querySelectorAll('.card');
   const fronts    = [document.getElementById('card0'), document.getElementById('card1'), document.getElementById('card2')];
-
-  const bodies = [
-    document.getElementById('body0'),
-    document.getElementById('body1'),
-    document.getElementById('body2')
-  ];
-  const defaultBodies = [
-    'カードを開くと、ここに“詩”が現れます。',
-    'カードを開くと、ここに“韻”が現れます。',
-    'カードを開くと、ここに“祈”が現れます。'
-  ];
+  const bodies    = [document.getElementById('body0'), document.getElementById('body1'), document.getElementById('body2')];
+  const defaultBodies = ['カードを開くと、ここに“詩”が現れます。','カードを開くと、ここに“韻”が現れます。','カードを開くと、ここに“祈”が現れます。'];
 
   // ---------- 状態 ----------
-  let selected = [];     // 今回の3枚
-  let opened = 0;        // めくった枚数
+  let selected = [];
+  let opened = 0;
 
   function drawThree(){
-    // 毎回新しい乱数で3枚（被りなし）
     const pool = [...majorArcana];
     const picks = [];
     for(let i=0;i<3;i++){
@@ -221,12 +202,9 @@
 
   function resetView(){
     opened = 0;
-    // 表示リセット
-    bodies.forEach((el, i)=> el.textContent = defaultBodies[i]);
+    bodies.forEach((el,i)=> el.textContent = defaultBodies[i]);
     document.querySelector('.reading')?.classList.remove('is-active');
     tapHint.style.opacity = 1;
-
-    // カード見た目リセット
     cardEls.forEach((el,i)=>{
       el.classList.remove('is-flipped');
       el.style.pointerEvents = 'auto';
@@ -235,60 +213,41 @@
   }
 
   function beginReading(){
-    // 新しい抽選
     selected = drawThree();
     resetView();
   }
 
   function beginRitual(){
-    // BGM起動
     kickBgm();
-
-    // 儀式表示 → 2秒後に本編へ
     ritualSec.classList.remove('hidden');
-    // beginRitual 内：2秒 → 1.2秒
-setTimeout(()=>{
-  ritualSec.classList.add('hidden');
-  mainSec.classList.remove('hidden');
-  peel.classList.add('is-run');
-  peel.addEventListener('animationend', ()=> peel.classList.remove('is-run'), {once:true});
-  beginReading();
-  mainSec.scrollIntoView({behavior:'smooth', block:'start'});
-}, 1200);
-      // 抽選開始
+    // 1.2秒で本編へ
+    setTimeout(()=>{
+      ritualSec.classList.add('hidden');
+      mainSec.classList.remove('hidden');
+      peel.classList.add('is-run');
+      peel.addEventListener('animationend', ()=> peel.classList.remove('is-run'), {once:true});
       beginReading();
-
-      // スクロール
       mainSec.scrollIntoView({behavior:'smooth', block:'start'});
-    }, 2000);
+    }, 1200);
   }
 
-  // カードめくり
   function onFlip(idx){
     const cardEl = cardEls[idx];
     if(cardEl.classList.contains('is-flipped') || opened>=3) return;
 
     const data = selected[idx];
     const isReversed = (crypto.getRandomValues(new Uint32Array(1))[0] % 2) === 1;
+    fronts[idx].style.backgroundImage = `url('${cardFrontImages[data.idx]}')`;
 
-    // 画像セット
-    const imgUrl = cardFrontImages[data.idx];
-    fronts[idx].style.backgroundImage = `url('${imgUrl}')`;
-
-    // SE
     try { flipSe.currentTime = 0; flipSe.play(); } catch(e){}
 
-    // めくり
     cardEl.classList.add('is-flipped');
     opened++;
 
-    // リーディング反映（濃密・簡潔）
     const label = ['【詩】','【韻】','【祈】'][idx];
     const text  = isReversed ? data.reversed : data.upright;
-    bodies[idx].innerHTML =
-      `<strong>${label}</strong> 《${data.name}》${isReversed?'（逆位置）':'（正位置）'}<br>${text}`;
+    bodies[idx].innerHTML = `<strong>${label}</strong> 《${data.name}》${isReversed?'（逆位置）':'（正位置）'}<br>${text}`;
 
-    // 3枚すべて開いたらCTAへ
     if(opened===3){
       tapHint.style.opacity = 0;
       cardEls.forEach(c=> c.style.pointerEvents='none');
@@ -297,29 +256,25 @@ setTimeout(()=>{
     }
   }
 
-  // もう一度占う（毎回新抽選）
   function onRetry(e){
     e.preventDefault();
     document.getElementById('hero').scrollIntoView({behavior:'smooth'});
-    setTimeout(()=>{
-      beginReading(); // 新しい三枚を抽選
-    }, 600);
+    setTimeout(()=>{ beginReading(); }, 600);
   }
 
-  // 監視：初期バインド
+  // バインド
   window.addEventListener('load', ()=>{
-    // カードクリック
     cardEls.forEach((el)=> el.addEventListener('click', ()=> onFlip(Number(el.dataset.idx)), {passive:true}));
-    // はじめる
     startBtn.addEventListener('click', beginRitual, {passive:true});
-    // リトライ
     retryBtn.addEventListener('click', onRetry, false);
-    // 最初の軽いスクロール誘導
     setTimeout(()=>{ document.querySelector('.hero__veil').classList.add('is-on'); }, 350);
   });
 
   // タッチでもBGMキック（保険）
-  window.addEventListener('touchstart', function once(){ kickBgm(); window.removeEventListener('touchstart', once, {passive:true}); }, {passive:true, once:true});
+  window.addEventListener('touchstart', function once(){
+    kickBgm();
+    window.removeEventListener('touchstart', once, {passive:true});
+  }, {passive:true, once:true});
   </script>
 </body>
 </html>
