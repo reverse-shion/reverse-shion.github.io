@@ -163,6 +163,39 @@
     .door-button:hover{transform:scale(1.07);box-shadow:0 0 80px rgba(255,215,0,.8),0 0 160px rgba(127,208,255,.6);border-color:#ffd700;background:rgba(20,30,60,.9)}
     .light-burst{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at center,#ffd700 0%,#7fd0ff 50%,transparent 80%);opacity:0;pointer-events:none;z-index:9999;animation:burst 1s ease-out}
     @keyframes burst{0%{opacity:0;transform:scale(.2)}50%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(3)}}
+  /* === Boot Animation === */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #0a0a10 0%, #000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 9999;
+  animation: fadeOut 1.5s ease 2.8s forwards;
+}
+
+.boot-text {
+  font-family: 'Cinzel', 'Noto Serif JP', serif;
+  color: #e6d8ff;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 10px rgba(174,138,255,.6), 0 0 30px rgba(255,215,111,.3);
+  animation: flicker 1.2s infinite;
+}
+
+/* 起動中の微光フリッカー */
+@keyframes flicker {
+  0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(174,138,255,.6), 0 0 30px rgba(255,215,111,.3); }
+  50% { opacity: 0.7; text-shadow: 0 0 4px rgba(174,138,255,.4), 0 0 10px rgba(255,215,111,.2); }
+}
+
+/* 起動後フェードアウト */
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+  
   </style>
 </head>
 <body>
@@ -174,7 +207,9 @@
       <div class="ring-middle"></div>
       <div class="ring-core"></div>
     </div>
-    <div class="loading-text">OS -Shion 起動中...</div>
+    <div class="boot-screen">
+  <p class="boot-text">Re:Verse OS -Shion 起動中...</p>
+</div>
   </div>
 
   <canvas id="codeRain"></canvas>
