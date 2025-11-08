@@ -55,15 +55,6 @@
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-   // カード収束
-      tarotCards.forEach(card => card.classList.add('gather'));
-      // 速やかに表示
-      setTimeout(() => { loading.classList.add('fade-out'); main.classList.add('visible'); }, 600);
-      // 3秒経過で強制解除（回線が遅くても離脱しない）
-      setTimeout(() => { loading.classList.add('fade-out'); main.classList.add('visible'); }, 3000);
-    });
-
-
     /* === コード雨 === */
     #codeRain {
       position: fixed;
@@ -142,15 +133,18 @@
 
     .content { max-width: 90%; }
 
+    
+
 h1{
       font-family:'Cinzel',serif; font-weight:700;
       font-size:clamp(2.0rem,6vw,3.0rem); letter-spacing:.06em; margin-bottom:.5rem;
       background:linear-gradient(92deg,#FFE7A6 0%,#FFD76F 35%,#EEC35A 55%,#FFF5CF 75%,#FFD76F 100%);
       -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
       text-shadow:0 0 22px rgba(255,215,111,.45), 0 0 50px rgba(124,98,255,.25);
-    
+    }
 
-        h2, p {
+
+h2, p {
       opacity: 0;
       transform: translateY(25px);
       animation: fadeUp 1.6s ease-out forwards;
@@ -164,10 +158,9 @@ h1{
       font-weight: 700;
     }
 
-    h1 { font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 5vw, 2.6rem); animation-delay: 0.6s; letter-spacing: 0.08em; }
-    p:nth-of-type(1) { font-size: clamp(0.95rem, 2.8vw, 1.15rem); animation-delay: 1.2s; font-weight: 500; }
+   
     h2 { font-family: 'Cinzel', serif; font-size: clamp(1.6rem, 4.5vw, 2.2rem); animation-delay: 1.8s; color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
-    p:nth-of-type(2), p:nth-of-type(3) { font-size: clamp(0.9rem, 2.6vw, 1.1rem); animation-delay: 2.4s; color: #e0f8ff; font-weight: 500; }
+    p:nth-of-type(2), p:nth-of-type(3) { font-size: clamp(0.9rem, 2.6vw, 1.1rem); animation-delay: 2.4s; color: #ffffff; font-weight: 500; }
     p:nth-of-type(3) { animation-delay: 2.8s; }
 
     @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
@@ -287,11 +280,11 @@ h1{
   <!-- 本コンテンツ -->
   <div id="main-content">
     <div class="content">
-       <h1>Re:Verse Shion — 言葉で魂を救う Code</h1>
-      <p> 占い × 思想 —— </p>
-      <h2>詩韻 Shion</h2>
+      <h1> Re:Verse Shion — 言葉で魂を救う Code </h1>
+      <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
+      <h2> 占い × 思想 —— </h2>
       <p>言葉は祈りの構文 — 大アルカナタロットで“響き”を体験</p>
-　　<p>無料体験</p>
+　　<p>無料占い</p>
       <p>目を閉じて、願いをイメージしてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
 
       <div class="door-container">
