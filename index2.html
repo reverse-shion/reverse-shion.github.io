@@ -1,112 +1,249 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <title>詩韻 — 光の神殿へ | TAROT BREAKER × 詩韻思想</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b0b1a" />
-  <meta name="description" content="暗闇のコードから光の神殿へ。扉を開くとタロットが展開され、詩（象徴）・韻（響）・祈（導き）が示される。詳しく見るで詩韻思想の詩的解説へ。最後はLINEで個人鑑定へ。">
-  <link rel="canonical" href="/" />
-  <link rel="icon" href="/assets/icon.png" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style2.css?v=20251108" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Re:Verse Shion — The Temple of Words</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    /* === 神秘の背景 === */
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: 'Noto Serif JP', serif;
+      text-align: center;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* 星が降るアニメーション */
+    .stars {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-100px); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+
+    /* === 既存テキスト（浮かび上がる） === */
+    h1, h2, p {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 1.5s ease-out forwards;
+      position: relative;
+      z-index: 2;
+    }
+    h1 { font-size: 2.8rem; animation-delay: 0.5s; }
+    p:nth-of-type(1) { animation-delay: 1s; }
+    h2 { font-size: 2.2rem; animation-delay: 1.5s; }
+    p:nth-of-type(2) { animation-delay: 2s; }
+    p:nth-of-type(3) { animation-delay: 2.5s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === 神秘の扉ボタン === */
+    .door-container {
+      margin-top: 5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .door-button {
+      position: relative;
+      display: inline-block;
+      padding: 20px 50px;
+      font-size: 1.5rem;
+      color: #e0f8ff;
+      text-decoration: none;
+      border: 2px solid transparent;
+      border-radius: 60px;
+      overflow: hidden;
+      background: rgba(10, 20, 40, 0.6);
+      backdrop-filter: blur(4px);
+      box-shadow: 
+        0 0 20px rgba(100, 200, 255, 0.3),
+        inset 0 0 20px rgba(100, 200, 255, 0.1);
+      transition: all 0.5s ease;
+      cursor: pointer;
+    }
+
+    .door-text {
+      position: relative;
+      z-index: 3;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 10px rgba(100, 200, 255, 0.8);
+    }
+
+    /* 光の粒子（集まる） */
+    .particles {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100%; height: 100%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: #a0f3ff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: gather 2s ease-out forwards;
+    }
+    @keyframes gather {
+      0% { 
+        transform: translate(calc(-50vw + (var(--x)*1vw)), calc(-50vh + (var(--y)*1vh))) scale(0);
+        opacity: 0;
+      }
+      70% { opacity: 1; }
+      100% { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* 光の輪（脈動） */
+    .pulse {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border: 2px solid #64dcff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: pulse 2s infinite;
+      pointer-events: none;
+    }
+    @keyframes pulse {
+      0% { width: 0; height: 0; opacity: 1; }
+      100% { width: 400px; height: 400px; opacity: 0; }
+    }
+
+    /* ホバー：光が爆発 */
+    .door-button:hover {
+      transform: scale(1.05);
+      box-shadow: 
+        0 0 60px rgba(100, 200, 255, 0.8),
+        0 0 120px rgba(100, 200, 255, 0.4);
+      border-color: #64dcff;
+    }
+
+    .door-button:hover .door-text {
+      text-shadow: 0 0 20px #fff, 0 0 40px #64dcff;
+    }
+
+    /* クリック：光の爆発＋遷移 */
+    .door-button:active {
+      animation: clickBurst 0.6s ease-out;
+    }
+    @keyframes clickBurst {
+      0% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.3); filter: brightness(3); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+
+    /* クリック後に画面全体が光る */
+    .light-burst {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at center, #fff 0%, transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      animation: burst 0.8s ease-out;
+    }
+    @keyframes burst {
+      0% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0; transform: scale(2); }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ========== 0) Global Tap Ripple (星紋) ========== -->
-  <span class="ripple-root" aria-hidden="true"></span>
+  <!-- 星が降る -->
+  <div class="stars" id="stars"></div>
 
-  <!-- ========== 1) PROLOGUE — 暗闇：青いコードが縦に流れる ========== -->
-  <section id="intro" class="view view--intro" aria-label="序章：暗闇とコード">
-    <canvas id="codeRain" class="intro__canvas" aria-hidden="true"></canvas>
+  <h1>Re:Verse Shion — The Temple of Words</h1>
+  <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
+  
+  <h2>詩韻 Shion</h2>
+  <p>言葉は祈りの構文 — 大アルカナタロットで“響き”を体験</p>
+  <p>目を閉じて、願いをイメージしてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
 
-    <div class="intro__overlay">
-      <h1 class="brand">詩韻<span class="brand__sub">Shion</span></h1>
-      <p class="tag">言葉は祈りの構文。世界は、その応答。</p>
-      <button id="enterTemple" class="btn btn--primary" aria-label="光の神殿へ">光の神殿へ</button>
+  <!-- 神秘の扉 -->
+  <div class="door-container">
+    <a href="shion.html" class="door-button" id="door">
+      <span class="door-text">扉を開く → 詩韻を授かる</span>
+      <div class="pulse"></div>
+      <div class="particles" id="particles"></div>
+    </a>
+  </div>
 
-      <!-- ユーザー操作後に初回再生されるBGM（任意・差し替え可） -->
-      <audio id="bgm" preload="auto">
-        <!-- 置き換え推奨：/assets/sound/init.mp3 -->
-        <source src="/assets/sound/reverse-init.mp3" type="audio/mpeg" />
-      </audio>
-    </div>
-  </section>
+  <script>
+    // 星を降らせる
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 50; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.width = star.style.height = Math.random() * 3 + 'px';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.animationDelay = Math.random() * 5 + 's';
+      star.style.animationDuration = Math.random() * 3 + 2 + 's';
+      starsContainer.appendChild(star);
+    }
 
-  <!-- ========== 2) REVELATION — 光の神殿：啓示と導き ========== -->
-  <section id="temple" class="view view--temple" aria-label="啓示：光の神殿">
-    <div class="temple__halo" aria-hidden="true"></div>
-    <div class="temple__pillars" aria-hidden="true">
-      <span></span><span></span><span></span><span></span>
-    </div>
+    // 光の粒子（ホバー時）
+    const door = document.getElementById('door');
+    const particlesContainer = document.getElementById('particles');
+    
+    door.addEventListener('mouseenter', () => {
+      particlesContainer.innerHTML = '';
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.setProperty('--x', Math.random() * 200 - 100);
+        p.style.setProperty('--y', Math.random() * 200 - 100);
+        p.style.animationDelay = Math.random() * 0.5 + 's';
+        particlesContainer.appendChild(p);
+      }
+    });
 
-      <source src="/assets/trinity/loop.webm" type="video/webm">
-          <source src="/assets/trinity/loop.mp4"  type="video/mp4">
-    <div class="temple__inner">
-      <h2 class="temple__title">星の神殿</h2>
-      <p class="temple__lead">扉を開けば、占導は始まる。<br>「タロット展開」を押して、あなたの詩・韻・祈を受け取って。</p>
+    // クリックで光の爆発
+    door.addEventListener('click', (e) => {
+      e.preventDefault();
+      const burst = document.createElement('div');
+      burst.className = 'light-burst';
+      document.body.appendChild(burst);
+      
+      setTimeout(() => {
+        window.location.href = door.getAttribute('href');
+      }, 400);
+    });
+  </script>
 
-      <button id="startReading" class="btn btn--shine" aria-label="タロット展開">タロット展開</button>
-    </div>
-
-    <!-- 神殿→占い 画面遷移の柔らかい光 -->
-    <div class="veil" aria-hidden="true"></div>
-  </section>
-
-  <!-- ========== 3) READING — タロット・詩韻祈（簡潔）→ 詳しく見る（詩韻思想） ========== -->
-  <section id="reading" class="view view--reading" aria-label="タロット・リーディング">
-    <header class="reading__head">
-      <h3>タロット・リーディング</h3>
-      <p class="reading__note">3枚展開：<strong>詩（象徴）</strong> / <strong>韻（響き）</strong> / <strong>祈（導き）</strong></p>
-      <div class="reading__controls">
-        <button id="drawBtn" class="btn" aria-label="もう一度展開">もう一度展開</button>
-      </div>
-    </header>
-
-    <div class="cards" id="cards"></div>
-
-    <!-- 3行サマリー（カードを引いた直後に出す） -->
-    <div class="summary" id="summary" hidden>
-      <div class="summary__col">
-        <h4>詩</h4>
-        <p id="sumPoem"></p>
-      </div>
-      <div class="summary__col">
-        <h4>韻</h4>
-        <p id="sumRes"></p>
-      </div>
-      <div class="summary__col">
-        <h4>祈</h4>
-        <p id="sumPray"></p>
-      </div>
-    </div>
-
-    <!-- 詳しく見る（詩韻思想の詩的解説） -->
-    <div class="deep" id="deep" hidden>
-      <h4>詳しく見る（詩韻思想）</h4>
-      <article id="deepText"></article>
-    </div>
-  </section>
-
-  <!-- ========== 4) BRIDGE — LINE誘導 & サイトへ ========== -->
-  <section id="cta" class="view view--cta" aria-label="個人鑑定とサイト案内" hidden>
-    <div class="cta__box">
-      <h3>現実へ橋をかける</h3>
-      <p>もし、この言葉が心に灯ったなら。<br>つづきは対話で丁寧に編もう。</p>
-
-      <!-- 差し替え：あなたのLINE公式URL -->
-      <a class="btn btn--line" href="https://lin.ee/your-line-link" target="_blank" rel="noopener" aria-label="LINEで個人鑑定">
-        LINEで個人鑑定
-      </a>
-
-      <!-- 差し替え：あなたのサイトTOP -->
-      <p class="cta__link">
-        <a href="https://reverse-shion.github.io/" target="_blank" rel="noopener">サイトへ</a>
-      </p>
-    </div>
-  </section>
-
-  <script src="/app.js?v=20251108" defer></script>
 </body>
 </html>
