@@ -27,11 +27,11 @@
 
     <div class="hero__inner">
       <h1 class="hero__title">言葉で魂を救う<span class="hero__code">Code</span></h1>
-      <p class="hero__subtitle">占い × 思想 ――<br> 詩（Poem）・韻（Rhythm）・祈（Prayer）で、<br>あなたの現実を編み直す。</p>
+      <p class="hero__subtitle">占い × 思想 ――<br> 詩（Poem）・韻（Rhythm）・祈（Prayer）で、<br>あなたの“今”を言葉で照らす。</p>
 
       <!-- 詩韻語：思想を情緒で橋渡し -->
-      <p class="shion-poem">―― 言葉は光。<br>韻はその行方。祈りが、それを結ぶ。</p>
-
+      <p class="shion-poem">恋も、仕事も、運命も。―― 大丈夫だよ。</p>
+　　　　<p class="hero__note" aria-label="無料体験の注記">無料で体験できます／所要1分</p>
       <button id="startRitualBtn" class="btn-primary" type="button" aria-label="星詠リチュアルを始める">はじめる（星詠リチュアル）</button>
     </div>
 
@@ -246,14 +246,15 @@
 
     // 儀式表示 → 2秒後に本編へ
     ritualSec.classList.remove('hidden');
-    setTimeout(()=>{
-      ritualSec.classList.add('hidden');
-      mainSec.classList.remove('hidden');
-
-      // ふわっと出す
-      peel.classList.add('is-run');
-      peel.addEventListener('animationend', ()=> peel.classList.remove('is-run'), {once:true});
-
+    // beginRitual 内：2秒 → 1.2秒
+setTimeout(()=>{
+  ritualSec.classList.add('hidden');
+  mainSec.classList.remove('hidden');
+  peel.classList.add('is-run');
+  peel.addEventListener('animationend', ()=> peel.classList.remove('is-run'), {once:true});
+  beginReading();
+  mainSec.scrollIntoView({behavior:'smooth', block:'start'});
+}, 1200);
       // 抽選開始
       beginReading();
 
