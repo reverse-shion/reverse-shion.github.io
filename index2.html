@@ -11,7 +11,6 @@
       background:#000;color:#fff;font-family:'Noto Serif JP',serif;
       text-align:center;min-height:100vh;overflow:hidden;position:relative;
     }
-
     /* 背景：サイバー×神域 */
     body::before{
       content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -22,22 +21,34 @@
       mix-blend-mode:screen;
     }
 
-    /* ローディング */
+    /* ==== ローディング（動画つき） ==== */
     #loading{
-      position:fixed;top:0;left:0;width:100%;height:100%;
-      background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;
-      z-index:9999;transition:opacity .7s ease-out;
+      position:fixed;inset:0;
+      display:flex;justify-content:center;align-items:center;
+      background:#000;z-index:9999;transition:opacity .7s ease-out, visibility .7s ease-out;
     }
-    #loading.fade-out{opacity:0;pointer-events:none}
+    #loading.fade-out{opacity:0;visibility:hidden;pointer-events:none}
+    .loading-video{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+      filter:brightness(.92) saturate(1.05);
+    }
+    .loading-mask{
+      position:absolute;inset:0;
+      background:radial-gradient(60vmin 40vmin at 50% 55%, rgba(255,255,255,.25), transparent 70%),
+                 radial-gradient(120vmax 80vmax at 50% 100%, rgba(124,98,255,.18), transparent 60%);
+      mix-blend-mode:screen;pointer-events:none;
+    }
     .loading-text{
+      position:relative;z-index:1;
       font-family:'Cinzel',serif;font-size:clamp(1.4rem,5vw,2rem);
       background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      letter-spacing:.1em;text-shadow:0 0 15px rgba(255,215,0,.4);
+      letter-spacing:.1em;text-shadow:0 0 15px rgba(255,215,0,.35);
+      animation:fadeUp .9s ease-out .1s both;
     }
 
     /* コード雨 */
-    #codeRain{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
+    #codeRain{position:fixed;inset:0;z-index:1;pointer-events:none}
 
     /* 本文 */
     #main-content{
@@ -45,6 +56,7 @@
       min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1.2rem;
     }
     #main-content.visible{opacity:1}
+
     h1{
       font-family:'Cinzel',serif;font-weight:700;
       font-size:clamp(2.0rem,6vw,3.0rem);letter-spacing:.06em;margin-bottom:.8rem;
@@ -82,19 +94,27 @@
     .pulse{position:absolute;top:50%;left:50%;width:0;height:0;border:2px solid #ffd700;border-radius:50%;transform:translate(-50%,-50%);animation:pulse 2.5s infinite ease-out;pointer-events:none;box-shadow:0 0 20px #ffd700}
     @keyframes pulse{0%{width:0;height:0;opacity:1}100%{width:340px;height:340px;opacity:0}}
     .door-button:hover{transform:scale(1.07);box-shadow:0 0 80px rgba(255,215,0,.8),0 0 160px rgba(127,208,255,.6);border-color:#ffd700;background:rgba(20,30,60,.9)}
-    .light-burst{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at center,#ffd700 0%,#7fd0ff 50%,transparent 80%);opacity:0;pointer-events:none;z-index:9999;animation:burst 1s ease-out}
+    .light-burst{position:fixed;inset:0;background:radial-gradient(circle at center,#ffd700 0%,#7fd0ff 50%,transparent 80%);opacity:0;pointer-events:none;z-index:9999;animation:burst 1s ease-out}
     @keyframes burst{0%{opacity:0;transform:scale(.2)}50%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(3)}}
   </style>
 </head>
 <body>
 
-  <div id="loading">
+  <!-- 起動中：動画ローディング -->
+  <div id="loading" aria-live="polite" aria-busy="true">
+    <video id="loadingVideo" class="loading-video" muted playsinline autoplay loop preload="auto" poster="assets/video/startup-poster.jpg">
+      <source src="assets/video/startup.webm" type="video/webm">
+      <source src="assets/video/startup.mp4" type="video/mp4">
+    </video>
+    <div class="loading-mask" aria-hidden="true"></div>
     <div class="loading-text">起動中…</div>
   </div>
 
+  <!-- 背景コード雨 -->
   <canvas id="codeRain"></canvas>
 
-  <div id="main-content">
+  <!-- 本文 -->
+  <div id="main-content" aria-hidden="true">
     <h1>Re:Verse Shion</h1>
     <h2>占い × 思想</h2>
     <p>恋も、仕事も、運命も。<br>あなたの“今”を言葉で照らす。</p>
@@ -108,7 +128,7 @@
   </div>
 
   <script>
-    // コード雨（軽量版）
+    /* ===== コード雨（軽量） ===== */
     (function(){
       const cvs=document.getElementById('codeRain'),ctx=cvs.getContext('2d');
       const chars='01AI∞詩韻祈魂';let fs=18,cols,drops,W,H;
@@ -124,22 +144,54 @@
           const ch=chars[Math.floor(Math.random()*chars.length)];
           ctx.fillText(ch,i*fs,drops[i]*fs*.9);
           if(drops[i]*fs>H&&Math.random()>.975)drops[i]=0;drops[i]++;
-        }requestAnimationFrame(draw);
+        }
+        requestAnimationFrame(draw);
       }
       addEventListener('resize',resize);resize();draw();
     })();
 
-    // ローディング短縮
-    window.addEventListener('load',()=>{
-      const loading=document.getElementById('loading');
-      const main=document.getElementById('main-content');
-      setTimeout(()=>{loading.classList.add('fade-out');main.classList.add('visible');},700);
+    /* ===== ローディング動画制御（iOS対策含む） ===== */
+    const loading = document.getElementById('loading');
+    const main    = document.getElementById('main-content');
+    const v       = document.getElementById('loadingVideo');
+
+    // 再生を確実に開始（iOSは無音・playsinline・autoplayが条件）
+    function safePlay(video){
+      try{
+        const p = video.play();
+        if(p && p.catch) p.catch(()=>{ /* ユーザー操作待ちでも後続でフェード */ });
+      }catch(e){}
+    }
+    safePlay(v);
+
+    // フェードアウト：最短1.6s、最長4.5sのフォールバック
+    const MIN_SHOW = 1600, MAX_WAIT = 4500;
+    const startAt = performance.now();
+
+    function fadeOut(){
+      if(loading.classList.contains('fade-out')) return;
+      loading.classList.add('fade-out');
+      main.classList.add('visible');
+      main.setAttribute('aria-hidden','false');
+      // リソース解放（モバイル省電力）
+      setTimeout(()=>{ try{ v.pause(); v.src=''; }catch(e){} }, 900);
+    }
+
+    // 動画が読み込めたら、最低表示時間を満たしてから閉じる
+    v.addEventListener('loadeddata', ()=>{
+      const left = Math.max(0, MIN_SHOW - (performance.now()-startAt));
+      setTimeout(fadeOut, left);
     });
 
-    // 扉クリック
+    // 念のためのフォールバックタイマー
+    setTimeout(fadeOut, MAX_WAIT);
+
+    /* ===== 扉クリック演出 ===== */
     document.getElementById('door').addEventListener('click',e=>{
       e.preventDefault();
-      const burst=document.createElement('div');burst.className='light-burst';document.body.appendChild(burst);
+      const burst=document.createElement('div');
+      burst.className='light-burst';
+      document.body.appendChild(burst);
       setTimeout(()=>location.href='shion2.html',500);
     });
   </script>
