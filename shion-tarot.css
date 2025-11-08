@@ -1,0 +1,165 @@
+/* ======================================================
+   詩韻 Shion — Tarot (Poem/Rhythm/Prayer)
+   外部CSS（index.html と同じ階層に配置）
+   相対パスで運用（GitHub Pagesのサブパス対策）
+   ----------------------------------------------------- */
+
+/* 基本 */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#1e1b2b;
+  --muted:#7d78a6;
+  --violet:#6d4ba8;
+  --lav:#9c7cc9;
+  --gold:#ffd76f;
+  --bg:#080a12;
+  --glass:#ffffff1a;
+  --r:14px;
+  --card-back-url: url("assets/tarot/back.png"); /* 差し替え可 */
+}
+html,body{height:100%}
+body{
+  font-family:'Noto Serif JP', serif; color:#eef1ff; background: radial-gradient(1200px 800px at 50% -10%, #16162a 0%, #0b0b1a 55%, #080a12 100%);
+  overflow-x:hidden;
+}
+
+/* アクセシビリティ */
+.sr-only{position:absolute !important; width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+/* 星砂（軽負荷の疑似ランダム） */
+.stardust{
+  position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(2px 2px at 20% 30%, #ffffffb0 0 99%, #0000 100%),
+    radial-gradient(2px 2px at 60% 80%, #ffffff99 0 99%, #0000 100%),
+    radial-gradient(1.5px 1.5px at 85% 20%, #ffffff80 0 99%, #0000 100%);
+  animation: drift 60s linear infinite;
+  opacity:.35;
+}
+@keyframes drift{ to{ background-position: -2000px 2000px, 1200px -1600px, -1600px -1200px } }
+
+/* ===== ヒーロー ===== */
+.hero{position:relative; min-height:100svh; display:grid; place-items:center; text-align:center; isolation:isolate; z-index:1}
+.hero__bg{
+  position:absolute; inset:0; background:
+    linear-gradient(180deg, #0b0b1a 0%, #0b0b1a80 35%, #0b0b1a 100%),
+    url("assets/temple-door.jpg") center/cover no-repeat;
+  filter: saturate(1.05) brightness(.98);
+  transform: scale(1.03);
+}
+.hero__veil{
+  position:absolute; inset:0; background:
+    radial-gradient(120px 160px at 50% 60%, #ffffffc0, #ffffff00 60%),
+    radial-gradient(1200px 720px at 50% 80%, #7c62ff33, #7c62ff00 70%);
+  mix-blend-mode:screen; opacity:0; transition:opacity 1.6s ease;
+}
+.hero__veil.is-on{ opacity:1 }
+
+.hero__inner{position:relative; z-index:2; padding:clamp(16px,4vw,40px)}
+.hero__title{
+  font-family:"Cormorant Garamond",serif;
+  font-size:clamp(28px,7vw,56px); letter-spacing:.08em;
+  background:linear-gradient(92deg,#FFE7A6 0%,#FFD76F 35%,#EEC35A 55%,#FFF5CF 75%,#FFD76F 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:0 0 22px rgba(255,215,111,.45), 0 0 50px rgba(124,98,255,.25);
+}
+.hero__code{ padding-left:.15em }
+.hero__subtitle{ margin:.6rem auto 1.2rem; max-width:720px; color:#d9e6ff; opacity:.9 }
+.shion-poem{
+  font-size:.98rem; color:#b8c2ff; opacity:.85; font-style:italic; letter-spacing:.06em;
+  margin:0 auto 1.8rem; max-width:680px;
+}
+.btn-primary{
+  appearance:none; border:0; cursor:pointer;
+  padding:.9rem 2rem; border-radius:999px; font-weight:700; font-size:1.08rem;
+  background:linear-gradient(45deg,#9c7cc9,#6d4ba8); color:#fff;
+  box-shadow:0 10px 28px rgba(109,75,168,.35), inset 0 0 12px rgba(255,215,111,.18);
+  transition: transform .18s, box-shadow .22s, filter .22s;
+}
+.btn-primary:hover{ transform: translateY(-1px); box-shadow:0 14px 36px rgba(109,75,168,.5) }
+
+/* ===== 儀式 ===== */
+.hidden{ display:none !important }
+.ritual{
+  position:relative; z-index:2; padding:60px 18px; text-align:center;
+}
+.ritual__glow{
+  width:min(70vmin,420px); height:min(70vmin,420px); margin:0 auto 16px; border-radius:50%;
+  background: radial-gradient(circle, #ffd76f55, #ffd76f00 60%);
+  filter: blur(1.5px); animation: pulse 3.2s ease-in-out infinite;
+}
+@keyframes pulse{ 50%{ transform: scale(1.06); filter: blur(2px) } }
+.ritual__line{ font-size:1.1rem; letter-spacing:.08em; color:#ffe8b3; margin:.25rem 0 }
+
+/* ===== 展開 ===== */
+.main{ position:relative; z-index:1; }
+.section{ max-width:1000px; margin:0 auto; padding:28px 16px }
+.section__title{ font-size:1.1rem; color:var(--gold); letter-spacing:.12em; margin-bottom:12px }
+
+.spread{ padding:28px 12px; }
+.spread__labels{ display:flex; gap:clamp(16px,6vw,40px); justify-content:center; margin-bottom:12px; opacity:.9 }
+.label{ width:clamp(100px,22vw,150px); text-align:center; color:#cfe2ff; font-size:clamp(12px,3vw,14px); letter-spacing:.12em; text-shadow:0 0 10px rgba(174,138,255,.45) }
+
+.spread__cards{
+  display:flex; gap:clamp(12px,3vw,22px); justify-content:center; align-items:center;
+  width:min(92vw,980px); margin:0 auto 10px;
+}
+.card{ width:clamp(110px,22vw,160px); aspect-ratio:62/110; perspective:1100px; position:relative; cursor:pointer; flex:0 0 auto }
+.card__inner{
+  width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;
+  transition: transform .68s cubic-bezier(.2,.7,.2,1); transform-style: preserve-3d;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 20px rgba(255,215,111,.18);
+}
+.card__face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; background-position:center; background-size:cover }
+.card__back{ background: #0b0f18 var(--card-back-url) center/cover no-repeat }
+.card__front{ transform: rotateY(180deg); background-color:#0f1426 }
+.card.is-flipped .card__inner{ transform: rotateY(180deg) }
+
+.tap-hint{ display:flex; justify-content:center; margin:8px 0 4px; opacity:.9 }
+.tap-hint__pill{
+  font-size:.9rem; padding:8px 14px; border-radius:999px; border:1px solid rgba(255,215,111,.55);
+  background:rgba(0,0,0,.35); color:#ffe7a6; letter-spacing:.08em;
+  box-shadow:0 0 14px rgba(255,215,111,.15), inset 0 0 10px rgba(255,215,111,.08); backdrop-filter: blur(6px);
+  animation: blink 1.6s ease-in-out infinite;
+}
+@keyframes blink{ 50%{ opacity:.55 } }
+.peel{ position:relative; width:min(92vw,980px); height:0; margin:0 auto }
+.peel.is-run{
+  height:1px; /* 見た目不可。画面全体の光は擬似的に */
+  box-shadow: 0 0 80px 40px rgba(255,255,255,.2);
+  animation: peelFlash 950ms ease forwards;
+}
+@keyframes peelFlash{
+  0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0) }
+  30%{ box-shadow: 0 0 140px 80px rgba(255,240,200,.75) }
+  100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0) }
+}
+
+/* ===== 濃密リーディング ===== */
+.reading{ background: linear-gradient(180deg, rgba(8,10,18,.9), rgba(10,12,20,.96)); border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06); }
+.reading__grid{ display:grid; gap:14px; grid-template-columns: 1fr; }
+@media (min-width:760px){ .reading__grid{ grid-template-columns: repeat(3,1fr) } }
+
+.reading__item{
+  background: rgba(127,208,255,.08);
+  border:1px solid rgba(127,208,255,.25);
+  border-radius:12px; padding:14px; min-height:110px;
+}
+.reading__head{ color:#cfe2ff; font-size:.88rem; letter-spacing:.16em; margin-bottom:6px }
+.reading__body{ line-height:1.8; color:#eef1ff }
+
+.closing-line{ margin:18px 0 8px; color:#ffe8b3; opacity:.92; letter-spacing:.08em }
+
+.cta{ margin:18px 0 8px; display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+@media (min-width:680px){ .cta{ grid-template-columns: repeat(4,1fr) } }
+.cta__btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:12px 14px; border-radius:12px; text-decoration:none; color:#ffe7a6;
+  border:1px solid rgba(255,215,111,.5); background:rgba(0,0,0,.35);
+  box-shadow:0 0 16px rgba(255,215,111,.15), inset 0 0 12px rgba(255,215,111,.08);
+  transition: transform .15s, box-shadow .2s;
+}
+.cta__btn:hover{ transform: translateY(-1px) }
+.cta__btn--line{ background:#00b900; color:#fff; border-color:transparent }
+.cta__btn--tiktok{ background:#000; color:#fff; border-color:#111 }
+.cta__btn--note{ background:#fff; color:#333; border-color:#ddd }
