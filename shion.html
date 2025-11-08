@@ -2,222 +2,192 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>詩韻 Shion | あなたの運命の詩</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
 <style>
-/* ===== Reset & Base ===== */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overscroll-behavior:none}
-body{
-  font-family:'Noto Serif JP',serif;
-  background:#000; color:#eaf0ff; overflow:hidden;
-}
+body{font-family:'Noto Serif JP',serif;background:#000;color:#eaf0ff}
 
-/* ===== Stage (1画面固定) ===== */
-.stage{
-  position:relative; width:100%; height:100svh;
-  display:grid; grid-template-rows: 1fr auto 1fr;
-  justify-items:center; align-items:center;
+/* ===== 1画面：タイトル＋カード ===== */
+.hero{
+  position:relative;width:100%;height:100svh;overflow:hidden;
+  display:grid;grid-template-rows: 1fr auto 1fr;justify-items:center;align-items:center;
 }
-
-/* 背景：神殿の扉（静） */
-.bg-door{
-  position:fixed; inset:0; z-index:0;
-  background:url('temple-door.jpg') center/cover no-repeat;
-  opacity:.65; transform:scale(1.06);
-  filter:saturate(1.1) brightness(.95);
+.bg{
+  position:absolute;inset:0;z-index:0;
+  background:url('temple-door.jpg') center/cover no-repeat;opacity:.65;transform:scale(1.06)
 }
-
-/* 背景：柔らかい内側光 */
-.bg-glow{
-  position:fixed; inset:0; z-index:0; pointer-events:none;
-  background: radial-gradient(60% 60% at 50% 50%,
+.bg::after{
+  content:"";position:absolute;inset:0;mix-blend-mode:screen;pointer-events:none;
+  background:radial-gradient(60% 60% at 50% 50%,
     rgba(255,230,160,.30) 0%,
     rgba(174,138,255,.20) 40%,
-    rgba(0,0,0,.0) 70%);
-  mix-blend-mode:screen;
-  animation:glowPulse 5.5s ease-in-out infinite;
+    rgba(0,0,0,0) 70%);
+  animation:glow 5.2s ease-in-out infinite
 }
-@keyframes glowPulse{50%{opacity:.7;transform:scale(1.03)}}
+@keyframes glow{50%{opacity:.7;transform:scale(1.03)}}
 
-/* ===== タイトル（中央・金色・神々しく） ===== */
-.title-wrap{
-  z-index:2; display:flex; flex-direction:column; align-items:center;
-  gap:10px; opacity:0; animation:fadeIn .9s ease .7s forwards;
-}
+.title-wrap{z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0}
 .title{
-  font-size:clamp(28px,7vw,56px); letter-spacing:.12em;
+  font-size:clamp(28px,7vw,56px);letter-spacing:.12em;
   background:linear-gradient(92deg,#FFE7A6 0%,#FFD76F 35%,#EEC35A 55%,#FFF5CF 75%,#FFD76F 100%);
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-  text-shadow:0 0 18px rgba(255,215,111,.55), 0 0 36px rgba(174,138,255,.35);
-  filter:drop-shadow(0 4px 14px rgba(255,215,111,.25));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 18px rgba(255,215,111,.55),0 0 36px rgba(174,138,255,.35)
 }
-.subtitle{
-  font-size:clamp(14px,3.5vw,18px); color:#d9e6ff; opacity:.9;
-  text-shadow:0 0 10px rgba(255,255,255,.35);
-}
+.subtitle{font-size:clamp(14px,3.5vw,18px);color:#d9e6ff;opacity:.9;text-shadow:0 0 10px rgba(255,255,255,.35)}
 @keyframes fadeIn{to{opacity:1;transform:none}}
 
-/* 画面下のタップ案内（常に画面内／被らない） */
+.spread{
+  z-index:2;display:flex;gap:clamp(12px,3vw,22px);justify-content:center;align-items:center;
+  width:min(92vw,900px);padding:clamp(6px,2vw,10px);opacity:0;transform:translateY(10px)
+}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+.card{
+  width:clamp(100px,22vw,150px);aspect-ratio:62/110;perspective:1100px;position:relative;cursor:pointer;flex:0 0 auto
+}
+.card__inner{
+  width:100%;height:100%;position:relative;border-radius:12px;overflow:hidden;
+  transition:transform .68s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d;
+  box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 20px rgba(255,215,111,.18)
+}
+.card__face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;background-position:center;background-size:cover}
+.card__back{background-image:var(--card-back, url('back.png'));background-color:#0b0f18}
+.card__front{transform:rotateY(180deg);background-color:#0f1426}
+.card.is-flipped .card__inner{transform:rotateY(180deg)}
+
+.labels{z-index:2;display:flex;gap:clamp(16px,6vw,40px);opacity:0;transform:translateY(8px)}
+.label{width:clamp(100px,22vw,150px);text-align:center;color:#cfe2ff;font-size:clamp(12px,3vw,14px);letter-spacing:.12em;text-shadow:0 0 10px rgba(174,138,255,.45)}
+
+/* ヒント（カード表示後にだけ出す） */
 .tap-hint{
-  position:fixed; left:0; right:0; bottom:14px; z-index:3;
-  display:flex; justify-content:center;
+  position:absolute;left:0;right:0;bottom:14px;z-index:3;display:flex;justify-content:center;opacity:0
 }
 .tap-hint__pill{
-  font-size:14px; padding:10px 16px; border-radius:999px;
-  border:1px solid rgba(255,215,111,.6);
-  background:rgba(0,0,0,.35);
-  color:#ffe7a6; letter-spacing:.08em;
+  font-size:14px;padding:10px 16px;border-radius:999px;border:1px solid rgba(255,215,111,.6);
+  background:rgba(0,0,0,.35);color:#ffe7a6;letter-spacing:.08em;
   box-shadow:0 0 16px rgba(255,215,111,.28), inset 0 0 12px rgba(255,215,111,.12);
-  animation:blink 1.6s ease-in-out infinite;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);animation:blink 1.6s ease-in-out infinite
 }
 @keyframes blink{50%{opacity:.55}}
 
-/* ===== “捲れ”演出：ページピール ===== */
-.peel{
-  position:fixed; inset:0; z-index:4; pointer-events:none;
+/* ===== 捲れ演出 ===== */
+.peel{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0}
+.peel.is-run{
   background:
     radial-gradient(120% 120% at 0% 0%, #fff 0%, #f7e9c4 35%, #e8d08a 55%, rgba(255,255,255,0) 56%) no-repeat,
     linear-gradient(#111,#000);
-  background-size:0% 0%, 100% 100%;
+  background-size:0% 0%,100% 100%;
   mix-blend-mode:screen;
-  opacity:0;
-}
-.peel.is-run{
-  animation:peelOpen 950ms ease forwards;
+  animation:peelOpen 950ms ease forwards
 }
 @keyframes peelOpen{
   0%{opacity:0;background-size:0% 0%,100% 100%}
   10%{opacity:1}
-  60%{background-size:180% 180%,100% 100%; background-position:0 0, center}
+  60%{background-size:180% 180%,100% 100%}
   100%{opacity:0;background-size:180% 180%,100% 100%}
 }
 
-/* ===== カードエリア（タイトルの後に出現／非スクロール） ===== */
-.spread{
-  z-index:2; display:flex; gap:clamp(12px,3vw,22px); justify-content:center; align-items:center;
-  opacity:0; transform:translateY(10px);
-  /* 1画面で収まるようサイズ自動調整 */
-  width:min(92vw,900px);
-  padding:clamp(6px,2vw,10px);
+/* ===== 下段：リーディング＋タブ ===== */
+.section{
+  padding:48px 18px;max-width:980px;margin:0 auto;background:
+    linear-gradient(180deg, rgba(8,10,18,1) 0%, rgba(10,12,20,.9) 100%);
+  border-top:1px solid rgba(255,255,255,.06)
 }
-.spread.is-show{animation:fadeUp .6s ease forwards}
-@keyframes fadeUp{to{opacity:1;transform:none}}
+.section h2{font-weight:700;font-size:22px;letter-spacing:.08em;color:#ffd76f;margin-bottom:14px}
+.reading-grid{display:grid;gap:14px}
+.reading{
+  background:rgba(127,208,255,.08);border:1px solid rgba(127,208,255,.25);
+  border-radius:12px;padding:14px;min-height:82px
+}
+.reading .head{color:#cfe2ff;font-size:13px;letter-spacing:.18em;margin-bottom:6px}
+.reading .body{line-height:1.75}
 
-.card{
-  width:clamp(100px,22vw,150px);
-  aspect-ratio: 62/110;
-  perspective:1100px; position:relative; cursor:pointer; flex:0 0 auto;
+.tabs{
+  margin-top:22px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px
 }
-.card__inner{
-  width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;
-  transition: transform .68s cubic-bezier(.2,.7,.2,1);
-  transform-style:preserve-3d;
-  box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 20px rgba(255,215,111,.18);
+.tab{
+  display:inline-flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:12px;
+  border:1px solid rgba(255,215,111,.5);color:#ffe7a6;text-decoration:none;
+  background:rgba(0,0,0,.35);box-shadow:0 0 16px rgba(255,215,111,.15), inset 0 0 12px rgba(255,215,111,.08);
+  transition:transform .15s, box-shadow .2s
 }
-.card__face{
-  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
-  background-position:center; background-size:cover;
-}
-.card__back{
-  background-image: var(--card-back, url('back.png'));
-  background-color:#0b0f18;
-}
-.card__front{
-  transform:rotateY(180deg);
-  background-color:#0f1426; /* 画像フォールバック */
-}
-.card.is-flipped .card__inner{ transform:rotateY(180deg) }
-
-/* ラベル（過去／現在／未来）— タイトルと被らない独立配置 */
-.labels{
-  z-index:2; display:flex; gap:clamp(16px,6vw,40px);
-  opacity:0; transform:translateY(8px);
-}
-.labels.is-show{animation:fadeUp .6s ease .08s forwards}
-.label{
-  width:clamp(100px,22vw,150px); text-align:center; color:#cfe2ff;
-  font-size:clamp(12px,3vw,14px); letter-spacing:.12em;
-  text-shadow:0 0 10px rgba(174,138,255,.45);
-}
-
-/* レイアウト（グリッド3段）: 上=タイトル, 中=カード, 下=ラベル  */
-.stage__top    { grid-row:1; display:flex; align-items:flex-end }
-.stage__middle { grid-row:2; display:flex; align-items:center }
-.stage__bottom { grid-row:3; display:flex; align-items:flex-start }
-
-/* 小さな端末での調整 */
-@media (max-width:390px){
-  .title{font-size:26px}
-  .card{width:32vw}
-}
-
-/* 画面読込時：タイトル→（ユーザーのタップでピール）→カード出現 */
-/* 初期状態の表示タイミングはJSで制御 */
+.tab:active{transform:translateY(1px)}
+@media (min-width:680px){.tabs{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
 <body>
 
-<div class="bg-door" aria-hidden="true"></div>
-<div class="bg-glow" aria-hidden="true"></div>
+<!-- ===== Hero：タイトル→カード ===== -->
+<section class="hero" id="hero">
+  <div class="bg" aria-hidden="true"></div>
 
-<main class="stage" role="main" aria-label="タロット一画面ビュー">
+  <div class="title-wrap" id="titleWrap">
+    <h1 class="title">タロット展開</h1>
+    <p class="subtitle">あなたの運命の詩</p>
+  </div>
 
-  <!-- 上段：神々しいタイトル -->
-  <section class="stage__top">
-    <div class="title-wrap" id="titleWrap" aria-live="polite">
-      <h1 class="title">タロット展開</h1>
-      <p class="subtitle">あなたの運命の詩</p>
-    </div>
-  </section>
-
-  <!-- 中段：タロットスプレッド（初期は非表示） -->
-  <section class="stage__middle">
-    <div class="spread" id="spread" aria-hidden="true">
-      <div class="card" data-idx="0" aria-label="過去のカード">
-        <div class="card__inner">
-          <div class="card__face card__back"></div>
-          <div class="card__face card__front" id="card0"></div>
-        </div>
-      </div>
-      <div class="card" data-idx="1" aria-label="現在のカード">
-        <div class="card__inner">
-          <div class="card__face card__back"></div>
-          <div class="card__face card__front" id="card1"></div>
-        </div>
-      </div>
-      <div class="card" data-idx="2" aria-label="未来のカード">
-        <div class="card__inner">
-          <div class="card__face card__back"></div>
-          <div class="card__face card__front" id="card2"></div>
-        </div>
+  <div class="spread" id="spread" aria-hidden="true">
+    <div class="card" data-idx="0" aria-label="詩">
+      <div class="card__inner">
+        <div class="card__face card__back"></div>
+        <div class="card__face card__front" id="card0"></div>
       </div>
     </div>
-  </section>
-
-  <!-- 下段：ラベル（被らない独立行） -->
-  <section class="stage__bottom">
-    <div class="labels" id="labels" aria-hidden="true">
-      <div class="label">過去</div>
-      <div class="label">現在</div>
-      <div class="label">未来</div>
+    <div class="card" data-idx="1" aria-label="韻">
+      <div class="card__inner">
+        <div class="card__face card__back"></div>
+        <div class="card__face card__front" id="card1"></div>
+      </div>
     </div>
-  </section>
+    <div class="card" data-idx="2" aria-label="祈">
+      <div class="card__inner">
+        <div class="card__face card__back"></div>
+        <div class="card__face card__front" id="card2"></div>
+      </div>
+    </div>
+  </div>
 
-</main>
+  <div class="labels" id="labels" aria-hidden="true" style="opacity:0;transform:translateY(8px)">
+    <div class="label">詩</div>
+    <div class="label">韻</div>
+    <div class="label">祈</div>
+  </div>
 
-<!-- 画面下のタップ案内（タイトル表示後に出る） -->
-<div class="tap-hint" id="tapHint" aria-hidden="true">
-  <div class="tap-hint__pill">画面をタップして開く</div>
-</div>
+  <div class="tap-hint" id="tapHint"><div class="tap-hint__pill">画面をタップして開く</div></div>
 
-<!-- “捲れ”レイヤー -->
-<div class="peel" id="peel" aria-hidden="true"></div>
+  <div class="peel" id="peel" aria-hidden="true"></div>
+</section>
+
+<!-- ===== 読み取り結果（詩・韻・祈） ===== -->
+<section class="section" id="reading">
+  <h2>詩・韻・祈 のリーディング</h2>
+  <div class="reading-grid">
+    <div class="reading" id="read0">
+      <div class="head">詩</div>
+      <div class="body" id="body0">カードを開くと、ここに“詩”が現れます。</div>
+    </div>
+    <div class="reading" id="read1">
+      <div class="head">韻</div>
+      <div class="body" id="body1">カードを開くと、ここに“韻”が現れます。</div>
+    </div>
+    <div class="reading" id="read2">
+      <div class="head">祈</div>
+      <div class="body" id="body2">カードを開くと、ここに“祈”が現れます。</div>
+    </div>
+  </div>
+
+  <nav class="tabs" aria-label="次のアクション">
+    <a class="tab" href="#" id="retry">もう一度占う</a>
+    <a class="tab" href="https://line.me/" target="_blank" rel="noopener">個人鑑定</a>
+    <a class="tab" href="https://example.com/shiin-shisou" target="_blank" rel="noopener">詩韻思想</a>
+    <a class="tab" href="https://example.com/shion" target="_blank" rel="noopener">Shion</a>
+  </nav>
+</section>
 
 <script>
-/* ====== データ（大アルカナ＋画像インデックス） ====== */
+/* ===== データ ===== */
 const cardFrontImages = [
   'card-front-0.jpg','card-front-1.jpg','card-front-2.jpg','card-front-3.jpg',
   'card-front-4.jpg','card-front-5.jpg','card-front-6.jpg','card-front-7.jpg',
@@ -252,84 +222,76 @@ const majorArcana = [
   { name:'The World',       upright:'調和の円舞、成就の星',                    reversed:'未完の旅、閉ざされた門',        imageIndex:21 }
 ];
 
-/* ====== 初期：3枚ランダム選択（重複なし） ====== */
+/* ===== 抽選（重複なし） ===== */
 const selectedCards = [];
 while(selectedCards.length<3){
   const c = majorArcana[Math.floor(Math.random()*majorArcana.length)];
   if(!selectedCards.includes(c)) selectedCards.push(c);
 }
 
-/* ====== 要素参照 ====== */
+/* ===== 要素 ===== */
 const titleWrap = document.getElementById('titleWrap');
-const tapHint   = document.getElementById('tapHint');
 const peel      = document.getElementById('peel');
 const spread    = document.getElementById('spread');
 const labels    = document.getElementById('labels');
+const tapHint   = document.getElementById('tapHint');
+const readingEl = document.getElementById('reading');
 
-let isSpreadReady = false;  // “捲れ”後にカード表示可
-let firstTapDone  = false;  // タイトル後の最初のタップ検出
+const bodies = [document.getElementById('body0'), document.getElementById('body1'), document.getElementById('body2')];
+const hero   = document.getElementById('hero');
 
-/* タイトルが出たらタップ案内を有効化 */
+/* ===== 出現シーケンス ===== */
 window.addEventListener('load', () => {
-  // タイトルフェード後に案内表示
+  // 1) タイトル表示
+  titleWrap.style.animation = 'fadeIn .9s ease .4s forwards';
+  // 2) 1.2秒後：捲れ演出→カード自動出現（光とともに）
   setTimeout(() => {
-    tapHint.removeAttribute('aria-hidden');
+    peel.classList.add('is-run');
+    peel.addEventListener('animationend', () => {
+      spread.style.animation = 'fadeUp .6s ease forwards';
+      labels.style.animation = 'fadeUp .6s ease .06s forwards';
+      spread.removeAttribute('aria-hidden'); labels.removeAttribute('aria-hidden');
+      // ヒントはカード出現後にだけ表示
+      tapHint.style.opacity = 1;
+    }, { once:true });
   }, 1200);
 });
 
-/* 画面の最初のタップで“捲れ”演出→カード出現（タイトル→タップ→捲れ→スプレッド表示） */
-function handleFirstTap(){
-  if(firstTapDone) return;
-  firstTapDone = true;
-  tapHint.setAttribute('aria-hidden','true');
-
-  peel.classList.add('is-run');
-  // ピール終了後にカード＆ラベルを表示
-  peel.addEventListener('animationend', () => {
-    spread.classList.add('is-show');
-    labels.classList.add('is-show');
-    spread.removeAttribute('aria-hidden');
-    labels.removeAttribute('aria-hidden');
-    isSpreadReady = true;
-  }, { once:true });
+/* ===== 表面画像セット ===== */
+function setFrontImage(id, idx){
+  const el = document.getElementById(id);
+  el.style.backgroundImage = `url('${cardFrontImages[idx]}')`;
 }
 
-document.addEventListener('click', handleFirstTap, { once:true });
-document.addEventListener('touchend', handleFirstTap, { once:true });
-
-/* ====== カードの表面画像を適用 ====== */
-function setFrontImage(elemId, imgIdx){
-  const el = document.getElementById(elemId);
-  const url = cardFrontImages[imgIdx];
-  el.style.backgroundImage = `url('${url}')`;
-}
-
-/* ====== カードをめくる ====== */
+/* ===== カードめくり → 下段へスクロール＆結果反映 ===== */
 function flipCard(idx){
-  if(!isSpreadReady) return; // “捲れ”前は無効
   const card = document.querySelector(`.card[data-idx="${idx}"]`);
   if(!card || card.classList.contains('is-flipped')) return;
 
-  // 正逆ランダム（必要なら意味テキストの表示に使用）
-  const reversed = Math.random() < 0.5;
   const data = selectedCards[idx];
+  const reversed = Math.random() < 0.5;
 
-  // 表面画像セット
   setFrontImage(`card${idx}`, data.imageIndex);
-
-  // 反転
   card.classList.add('is-flipped');
 
-  // ここで必要なら意味テキストの表示やSE再生などを追加可能
-  // console.log(`${['過去','現在','未来'][idx]}: ${data.name} ${reversed?'(逆位置)':'(正位置)'}`);
+  const labelMap = ['詩','韻','祈'];
+  bodies[idx].innerHTML = `【${labelMap[idx]}】<br>《${data.name}》${reversed?'（逆位置）':'（正位置）'}<br>${reversed?data.reversed:data.upright}`;
+
+  // 初回めくり時に下段へ移動（要件4）
+  if([...document.querySelectorAll('.card.is-flipped')].length === 1){
+    readingEl.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
 }
 
-/* ====== 3枚すべてにクリック割り当て ====== */
+/* クリック割り当て */
 document.querySelectorAll('.card').forEach(c=>{
-  c.addEventListener('click', e=>{
-    const idx = Number(c.dataset.idx);
-    flipCard(idx);
-  }, { passive:true });
+  c.addEventListener('click', () => flipCard(Number(c.dataset.idx)), { passive:true });
+});
+
+/* もう一度占う */
+document.getElementById('retry').addEventListener('click', (e)=>{
+  e.preventDefault();
+  location.reload();
 });
 </script>
 </body>
