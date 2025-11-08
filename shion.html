@@ -207,31 +207,251 @@ const cardFrontImages = [
   'card-front-20.jpg','card-front-21.jpg'
 ];
 
+// ===== Major Arcana (Re:Verse Shion | Upright only, Philosophy-integrated) =====
 const majorArcana = [
-  { name:'The Fool',        upright:'純粋な始まりの風、冒険の翼を広げて',  reversed:'無謀な跳躍、影に潜む落とし穴', imageIndex:0 },
-  { name:'The Magician',    upright:'意志の炎が現実を紡ぎ、創造の河を流す',  reversed:'幻の鏡、欺瞞の霧に包まれて',    imageIndex:1 },
-  { name:'The High Priestess', upright:'内なる声のささやき、月の光が導く道', reversed:'失われた均衡、抑圧された魂の叫び', imageIndex:2 },
-  { name:'The Empress',     upright:'豊穣の大地、母なる愛の抱擁',            reversed:'枯れた花、創造の停滞',          imageIndex:3 },
-  { name:'The Emperor',     upright:'秩序の玉座、力強い統治の剣',              reversed:'暴君の影、支配の崩壊',          imageIndex:4 },
-  { name:'The Hierophant',  upright:'伝統の灯、教えの道標',                    reversed:'硬直した信仰、自由の抑圧',      imageIndex:5 },
-  { name:'The Lovers',      upright:'運命の交差、心の選択',                    reversed:'迷いの分岐、愛の試練',          imageIndex:6 },
-  { name:'The Chariot',     upright:'勝利の戦車、意志の疾走',                  reversed:'方向を見失う馬車',              imageIndex:7 },
-  { name:'Strength',        upright:'内なる獅子、優しさの力',                  reversed:'弱さの咆哮、自己不信',          imageIndex:8 },
-  { name:'The Hermit',      upright:'孤独の灯台、魂の探求',                    reversed:'孤立の闇、導きを拒む',          imageIndex:9 },
-  { name:'Wheel of Fortune',upright:'運命の輪、巡る星の流れ',                  reversed:'停滞の歯車、予期せぬ転落',      imageIndex:10 },
-  { name:'Justice',         upright:'天秤の裁き、真実の剣',                    reversed:'不正の影、偏った判断',          imageIndex:11 },
-  { name:'The Hanged Man',  upright:'逆さの悟り、犠牲の光',                    reversed:'停滞の苦しみ、視野の狭さ',      imageIndex:12 },
-  { name:'Death',           upright:'終わりと始まり、変容の蝶',                reversed:'変化への恐怖、過去の亡霊',      imageIndex:13 },
-  { name:'Temperance',      upright:'調和の天使、バランスの流れ',              reversed:'極端な揺らぎ、衝突の炎',        imageIndex:14 },
-  { name:'The Devil',       upright:'鎖の誘惑、欲望の檻',                      reversed:'解放の鍵、束縛からの脱出',      imageIndex:15 },
-  { name:'The Tower',       upright:'崩壊の雷、覚醒の衝撃',                    reversed:'破壊の予兆、避けられない危機',  imageIndex:16 },
-  { name:'The Star',        upright:'希望の星、癒しの水',                      reversed:'失われた光、絶望の夜',          imageIndex:17 },
-  { name:'The Moon',        upright:'幻想の月、潜在意識の海',                  reversed:'真実の光、欺瞞の霧',            imageIndex:18 },
-  { name:'The Sun',         upright:'輝く太陽、生命の喜び',                    reversed:'曇った陽光、一時的な幸福',      imageIndex:19 },
-  { name:'Judgement',       upright:'覚醒の喇叭、再生の炎',                    reversed:'自己否定、過去の重荷',          imageIndex:20 },
-  { name:'The World',       upright:'調和の円舞、成就の星',                    reversed:'未完の旅、閉ざされた門',        imageIndex:21 }
+  {
+    name:'The Fool',
+    tagline:'はじまりの息を吸う',
+    compass:'未知へ踏み出す勇気',
+    trigger:'「まず一歩」を決める',
+    route:'軽やかに試す→観察→調整',
+    step:'今日、5分だけ新しい行動を試す',
+    verse:'私は好奇心で道をつくる',
+    shion:{poem:'無垢は形', rhyme:'息は響き', prayer:'選ぶたび還る'},
+    imageIndex:0
+  },
+  {
+    name:'The Magician',
+    tagline:'意志を現実に結線する',
+    compass:'資質と道具を束ねる',
+    trigger:'目的を一文に定義',
+    route:'意図→可視化→小実験',
+    step:'目的を「一行宣言」で書く',
+    verse:'私の言は世界を結ぶ',
+    shion:{poem:'意志は型', rhyme:'集中は響', prayer:'成果は祈り'},
+    imageIndex:1
+  },
+  {
+    name:'The High Priestess',
+    tagline:'静かな確信を聴く',
+    compass:'直感と沈黙のバランス',
+    trigger:'ノイズを3つ減らす',
+    route:'内観→兆し→待つ勇気',
+    step:'5分黙想して心のメモを1行',
+    verse:'沈黙が答えを浮かべる',
+    shion:{poem:'月は形', rhyme:'気配は響', prayer:'受容は祈り'},
+    imageIndex:2
+  },
+  {
+    name:'The Empress',
+    tagline:'育てる歓びが富を呼ぶ',
+    compass:'豊かさ＝関係の循環',
+    trigger:'整える・温める・与える',
+    route:'土台づくり→小収穫',
+    step:'自分と誰かへ1つ手厚く',
+    verse:'私は育て、育てられる',
+    shion:{poem:'実りは形', rhyme:'ぬくもりは響', prayer:'感謝は祈り'},
+    imageIndex:3
+  },
+  {
+    name:'The Emperor',
+    tagline:'枠を決めると自由が増える',
+    compass:'秩序＝優しさの器',
+    trigger:'ルールを3つだけ作る',
+    route:'方針→優先→実行',
+    step:'明日のToDoを3点に削る',
+    verse:'境界は守り、道を拓く',
+    shion:{poem:'器は形', rhyme:'規律は響', prayer:'責任は祈り'},
+    imageIndex:4
+  },
+  {
+    name:'The Hierophant',
+    tagline:'伝統の梯子で次の段へ',
+    compass:'学ぶ→伝えるの循環',
+    trigger:'師と書を一つ選ぶ',
+    route:'模倣→理解→自分語',
+    step:'1つ教わり1つ誰かに渡す',
+    verse:'知は手渡すほど澄む',
+    shion:{poem:'教えは形', rhyme:'継承は響', prayer:'祈念は祈り'},
+    imageIndex:5
+  },
+  {
+    name:'The Lovers',
+    tagline:'選ぶとは、結ぶこと',
+    compass:'価値観の合意と誠実',
+    trigger:'「何を大切にするか」を言語化',
+    route:'対話→合意→共創',
+    step:'大切にする3語を相手と共有',
+    verse:'私は選び、選ばれて進む',
+    shion:{poem:'誓いは形', rhyme:'共鳴は響', prayer:'愛は祈り'},
+    imageIndex:6
+  },
+  {
+    name:'The Chariot',
+    tagline:'意志の手綱を握る',
+    compass:'集中と牽引',
+    trigger:'障害を1つだけ突破',
+    route:'一点突破→前進の維持',
+    step:'今日の最難関を最初に片づける',
+    verse:'私の進路は私が決める',
+    shion:{poem:'推進は形', rhyme:'速度は響', prayer:'勝利は祈り'},
+    imageIndex:7
+  },
+  {
+    name:'Strength',
+    tagline:'優しさは最強の力',
+    compass:'受容＋境界＝芯',
+    trigger:'自分を労わるルーチン',
+    route:'自己対話→小さな勇気',
+    step:'否定語を一つ言い換える',
+    verse:'柔らかさで獅子を撫でる',
+    shion:{poem:'慈愛は形', rhyme:'息の整いは響', prayer:'勇気は祈り'},
+    imageIndex:8
+  },
+  {
+    name:'The Hermit',
+    tagline:'ひとりの灯で群れを照らす',
+    compass:'内省→洞察→指標',
+    trigger:'静かな時間を確保',
+    route:'問いを磨く→核心を拾う',
+    step:'今日の学びを一言記録',
+    verse:'孤独は知を熟す窯',
+    shion:{poem:'灯は形', rhyme:'省察は響', prayer:'導きは祈り'},
+    imageIndex:9
+  },
+  {
+    name:'Wheel of Fortune',
+    tagline:'巡りは味方にもなる',
+    compass:'波に乗る準備',
+    trigger:'流れのサインを3つ観測',
+    route:'来た球を打つ→微修正',
+    step:'偶然の誘いに一度乗ってみる',
+    verse:'変化の輪に呼吸を合わせる',
+    shion:{poem:'巡りは形', rhyme:'タイミングは響', prayer:'受容は祈り'},
+    imageIndex:10
+  },
+  {
+    name:'Justice',
+    tagline:'整えるほど軽くなる',
+    compass:'公平・整頓・明瞭',
+    trigger:'事実と解釈を分ける',
+    route:'基準→判断→調整',
+    step:'机or心の「一箇所」だけ整える',
+    verse:'真実は静かな音で鳴る',
+    shion:{poem:'秤は形', rhyme:'均衡は響', prayer:'是正は祈り'},
+    imageIndex:11
+  },
+  {
+    name:'The Hanged Man',
+    tagline:'視点が変わると救いが来る',
+    compass:'保留の中の洞察',
+    trigger:'あえて立ち止まる',
+    route:'逆視点→気づき→解放',
+    step:'困りごとを相手視点で一行化',
+    verse:'止まる勇気が運命を動かす',
+    shion:{poem:'静止は形', rhyme:'反転は響', prayer:'赦しは祈り'},
+    imageIndex:12
+  },
+  {
+    name:'Death',
+    tagline:'終わりは始まりの条件',
+    compass:'手放し→余白→再誕',
+    trigger:'古い習慣を一つ卒業',
+    route:'完了宣言→リスタート',
+    step:'不要ファイル/感情を1つ捨てる',
+    verse:'私は終わらせ、始めなおす',
+    shion:{poem:'変容は形', rhyme:'別れは響', prayer:'再生は祈り'},
+    imageIndex:13
+  },
+  {
+    name:'Temperance',
+    tagline:'混ぜ合わせて美を作る',
+    compass:'バランス運用',
+    trigger:'足し引きの最適化',
+    route:'配合→検証→微調整',
+    step:'作業25分/休憩5分を2セット',
+    verse:'調和は流れる技術',
+    shion:{poem:'配合は形', rhyme:'中庸は響', prayer:'整いは祈り'},
+    imageIndex:14
+  },
+  {
+    name:'The Devil',
+    tagline:'魅了の鎖を見抜く',
+    compass:'欲と恐れの正体',
+    trigger:'依存を言語化して距離を置く',
+    route:'気づき→置換→自由',
+    step:'誘惑トリガーを1つ環境から外す',
+    verse:'欲は光にも闇にもなる',
+    shion:{poem:'鎖は形', rhyme:'執着は響', prayer:'自制は祈り'},
+    imageIndex:15
+  },
+  {
+    name:'The Tower',
+    tagline:'崩れて見えた本当の基礎',
+    compass:'偽りの前提の刷新',
+    trigger:'「当たり前」を疑う',
+    route:'破断→再設計→耐震化',
+    step:'今の前提を一つ検証し直す',
+    verse:'壊れた壁の向こうが空',
+    shion:{poem:'落雷は形', rhyme:'真相は響', prayer:'再建は祈り'},
+    imageIndex:16
+  },
+  {
+    name:'The Star',
+    tagline:'静かな希望が体力を戻す',
+    compass:'回復・補水・夢の再接続',
+    trigger:'小さな願いの再起動',
+    route:'癒し→微光→継続',
+    step:'就寝前に「今日の良かった」を2つ',
+    verse:'希望は喉を潤す水',
+    shion:{poem:'星は形', rhyme:'憧れは響', prayer:'祈望は祈り'},
+    imageIndex:17
+  },
+  {
+    name:'The Moon',
+    tagline:'曖昧さと賢く付き合う',
+    compass:'不安＝情報不足',
+    trigger:'検証と保留の区別',
+    route:'仮説→小実験→確度UP',
+    step:'気がかりを3つ言語化し検証案を書く',
+    verse:'影もまた道を示す',
+    shion:{poem:'霧は形', rhyme:'勘は響', prayer:'安堵は祈り'},
+    imageIndex:18
+  },
+  {
+    name:'The Sun',
+    tagline:'祝福の力で前へ',
+    compass:'可視化・共有・祝う',
+    trigger:'成果を皆で見える化',
+    route:'発表→称賛→次の挑戦',
+    step:'今日の進捗を写真or一文で共有',
+    verse:'喜びは推進力だ',
+    shion:{poem:'陽は形', rhyme:'明朗は響', prayer:'感謝は祈り'},
+    imageIndex:19
+  },
+  {
+    name:'Judgement',
+    tagline:'呼び名に応える',
+    compass:'過去の意味づけを更新',
+    trigger:'古い自責を解く',
+    route:'再評価→赦し→使命',
+    step:'「もう要らない後悔」を紙に書いて破る',
+    verse:'私は呼ばれ、いま立つ',
+    shion:{poem:'喇叭は形', rhyme:'再起は響', prayer:'赦しは祈り'},
+    imageIndex:20
+  },
+  {
+    name:'The World',
+    tagline:'一周まわって自由になる',
+    compass:'統合と完成',
+    trigger:'循環を祝って次の章へ',
+    route:'成果の束ね→次の地図',
+    step:'終えたことを3つ列挙し自分を讃える',
+    verse:'輪は扉、終わりは門出',
+    shion:{poem:'円環は形', rhyme:'調和は響', prayer:'祝福は祈り'},
+    imageIndex:21
+  }
 ];
-
 /* ===== 要素群 ===== */
 const titleWrap = document.getElementById('titleWrap');
 const peel      = document.getElementById('peel');
