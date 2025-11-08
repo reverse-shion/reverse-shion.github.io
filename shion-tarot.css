@@ -1,32 +1,35 @@
 /* ======================================================
    詩韻 Shion — Tarot (Poem/Rhythm/Prayer)
-   外部CSS（index.html と同じ階層に配置）
-   相対パスで運用（GitHub Pagesのサブパス対策）
+   外部CSS（index.html と同階層）
    ----------------------------------------------------- */
 
 /* 基本 */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --ink:#1e1b2b;
-  --muted:#7d78a6;
+  --ink-strong:#f0f3ff;
+  --muted:#8ea0c8;
   --violet:#6d4ba8;
   --lav:#9c7cc9;
   --gold:#ffd76f;
   --bg:#080a12;
   --glass:#ffffff1a;
   --r:14px;
-  --card-back-url: url("back.png"); /* 差し替え可 */
+  /* 裏面画像：同階層に back.png を置く or assets/tarot/back.png に変更 */
+  --card-back-url: url("back.png");
 }
 html,body{height:100%}
 body{
-  font-family:'Noto Serif JP', serif; color:#eef1ff; background: radial-gradient(1200px 800px at 50% -10%, #16162a 0%, #0b0b1a 55%, #080a12 100%);
+  font-family:'Noto Serif JP', serif;
+  color:#eef1ff;
+  background: radial-gradient(1200px 800px at 50% -10%, #16162a 0%, #0b0b1a 55%, #080a12 100%);
   overflow-x:hidden;
 }
 
-/* アクセシビリティ */
-.sr-only{position:absolute !important; width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+/* 視覚的な統一（タイポスケール） */
+.sr-only{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 
-/* 星砂（軽負荷の疑似ランダム） */
+/* 星砂 */
 .stardust{
   position:fixed; inset:0; pointer-events:none; z-index:0;
   background:
@@ -41,62 +44,75 @@ body{
 /* ===== ヒーロー ===== */
 .hero{position:relative; min-height:100svh; display:grid; place-items:center; text-align:center; isolation:isolate; z-index:1}
 .hero__bg{
-  position:absolute; inset:0; background:
+  position:absolute; inset:0;
+  background:
     linear-gradient(180deg, #0b0b1a 0%, #0b0b1a80 35%, #0b0b1a 100%),
-    url("temple-door.jpg") center/cover no-repeat;
+    url("assets/temple-door.jpg") center/cover no-repeat;
   filter: saturate(1.05) brightness(.98);
   transform: scale(1.03);
 }
 .hero__veil{
   position:absolute; inset:0; background:
-    radial-gradient(120px 160px at 50% 60%, #ffffffc0, #ffffff00 60%),
-    radial-gradient(1200px 720px at 50% 80%, #7c62ff33, #7c62ff00 70%);
+    radial-gradient(140px 180px at 50% 74%, #ffffffb0, #ffffff00 60%),
+    radial-gradient(1200px 720px at 50% 86%, #7c62ff33, #7c62ff00 70%);
   mix-blend-mode:screen; opacity:0; transition:opacity 1.6s ease;
 }
-.hero__veil.is-on{ opacity:1 }
+.hero__veil.is-on{ opacity:.65 }
 
-.hero__inner{position:relative; z-index:2; padding:clamp(16px,4vw,40px)}
+.hero__inner{position:relative; z-index:2; padding:clamp(16px,4vw,40px); max-width:960px}
 .hero__title{
   font-family:"Cormorant Garamond",serif;
   font-size:clamp(28px,7vw,56px); letter-spacing:.08em;
   background:linear-gradient(92deg,#FFE7A6 0%,#FFD76F 35%,#EEC35A 55%,#FFF5CF 75%,#FFD76F 100%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
-  text-shadow:0 0 22px rgba(255,215,111,.45), 0 0 50px rgba(124,98,255,.25);
+  text-shadow:0 2px 22px rgba(255,215,111,.55), 0 0 60px rgba(124,98,255,.28);
+  -webkit-text-stroke:.3px rgba(10,8,20,.35);
 }
 .hero__code{ padding-left:.15em }
-.hero__subtitle{ margin:.6rem auto 1.2rem; max-width:720px; color:#d9e6ff; opacity:.9 }
-.shion-poem{
-  font-size:.98rem; color:#b8c2ff; opacity:.85; font-style:italic; letter-spacing:.06em;
-  margin:0 auto 1.8rem; max-width:680px;
+.hero__subtitle{
+  margin:.8rem auto 0.6rem; max-width:760px;
+  color:var(--ink-strong); opacity:.98; line-height:1.7; letter-spacing:.04em;
+  text-shadow:0 0 10px rgba(20,24,44,.35);
+}
+.hero__poem{
+  margin:0 auto 1rem; max-width:720px;
+  color:#e1e6ff; font-style:italic; letter-spacing:.06em; line-height:1.7;
+  text-shadow:0 0 10px rgba(130,140,255,.25);
+}
+.hero__note{
+  display:inline-block; margin:.5rem auto 1.2rem; padding:.5rem 1rem;
+  border-radius:999px;
+  background:linear-gradient(90deg,#f9d86b,#caa8ff 60%,#8e79ff);
+  color:#231b3a; font-weight:700; letter-spacing:.06em;
+  box-shadow:0 8px 22px rgba(140,110,255,.28), inset 0 0 10px rgba(255,240,210,.35);
 }
 .btn-primary{
   appearance:none; border:0; cursor:pointer;
-  padding:.9rem 2rem; border-radius:999px; font-weight:700; font-size:1.08rem;
-  background:linear-gradient(45deg,#9c7cc9,#6d4ba8); color:#fff;
-  box-shadow:0 10px 28px rgba(109,75,168,.35), inset 0 0 12px rgba(255,215,111,.18);
+  padding:1rem 2rem; border-radius:999px; font-weight:800; font-size:1.06rem;
+  background:linear-gradient(90deg,#f9d86b,#caa8ff 55%,#8e79ff);
+  color:#201a35; text-shadow:0 1px 0 rgba(255,255,255,.4);
+  box-shadow:0 14px 34px rgba(140,110,255,.38), inset 0 0 12px rgba(255,240,200,.35);
   transition: transform .18s, box-shadow .22s, filter .22s;
 }
-.btn-primary:hover{ transform: translateY(-1px); box-shadow:0 14px 36px rgba(109,75,168,.5) }
+.btn-primary:hover{ transform: translateY(-1px); filter:saturate(1.06) }
 
 /* ===== 儀式 ===== */
 .hidden{ display:none !important }
-.ritual{
-  position:relative; z-index:2; padding:60px 18px; text-align:center;
-}
+.ritual{ position:relative; z-index:2; padding:60px 18px; text-align:center }
 .ritual__glow{
   width:min(70vmin,420px); height:min(70vmin,420px); margin:0 auto 16px; border-radius:50%;
   background: radial-gradient(circle, #ffd76f55, #ffd76f00 60%);
   filter: blur(1.5px); animation: pulse 3.2s ease-in-out infinite;
 }
 @keyframes pulse{ 50%{ transform: scale(1.06); filter: blur(2px) } }
-.ritual__line{ font-size:1.1rem; letter-spacing:.08em; color:#ffe8b3; margin:.25rem 0 }
+.ritual__line{ font-size:1.08rem; letter-spacing:.08em; color:#ffe8b3; margin:.25rem 0 }
 
 /* ===== 展開 ===== */
-.main{ position:relative; z-index:1; }
+.main{ position:relative; z-index:1 }
 .section{ max-width:1000px; margin:0 auto; padding:28px 16px }
 .section__title{ font-size:1.1rem; color:var(--gold); letter-spacing:.12em; margin-bottom:12px }
 
-.spread{ padding:28px 12px; }
+.spread{ padding:28px 12px }
 .spread__labels{ display:flex; gap:clamp(16px,6vw,40px); justify-content:center; margin-bottom:12px; opacity:.9 }
 .label{ width:clamp(100px,22vw,150px); text-align:center; color:#cfe2ff; font-size:clamp(12px,3vw,14px); letter-spacing:.12em; text-shadow:0 0 10px rgba(174,138,255,.45) }
 
@@ -125,7 +141,7 @@ body{
 @keyframes blink{ 50%{ opacity:.55 } }
 .peel{ position:relative; width:min(92vw,980px); height:0; margin:0 auto }
 .peel.is-run{
-  height:1px; /* 見た目不可。画面全体の光は擬似的に */
+  height:1px;
   box-shadow: 0 0 80px 40px rgba(255,255,255,.2);
   animation: peelFlash 950ms ease forwards;
 }
@@ -135,9 +151,12 @@ body{
   100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0) }
 }
 
-/* ===== 濃密リーディング ===== */
-.reading{ background: linear-gradient(180deg, rgba(8,10,18,.9), rgba(10,12,20,.96)); border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06); }
-.reading__grid{ display:grid; gap:14px; grid-template-columns: 1fr; }
+/* ===== リーディング ===== */
+.reading{
+  background: linear-gradient(180deg, rgba(8,10,18,.9), rgba(10,12,20,.96));
+  border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);
+}
+.reading__grid{ display:grid; gap:14px; grid-template-columns: 1fr }
 @media (min-width:760px){ .reading__grid{ grid-template-columns: repeat(3,1fr) } }
 
 .reading__item{
@@ -149,8 +168,7 @@ body{
 .reading__body{ line-height:1.8; color:#eef1ff }
 
 .closing-line{ margin:18px 0 8px; color:#ffe8b3; opacity:.92; letter-spacing:.08em }
-
-.cta{ margin:18px 0 8px; display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+.cta{ margin:18px 0 8px; display:grid; gap:10px; grid-template-columns: 1fr 1fr }
 @media (min-width:680px){ .cta{ grid-template-columns: repeat(4,1fr) } }
 .cta__btn{
   display:inline-flex; align-items:center; justify-content:center;
@@ -163,118 +181,3 @@ body{
 .cta__btn--line{ background:#00b900; color:#fff; border-color:transparent }
 .cta__btn--tiktok{ background:#000; color:#fff; border-color:#111 }
 .cta__btn--note{ background:#fff; color:#333; border-color:#ddd }
-/* ==== 視認性＆神々しさアップ：差分CSS（追記/置換） ==== */
-:root{
-  /* 右側バナーの色に合わせたグラデ */
-  --banner-a:#f9d86b;   /* 金 */
-  --banner-b:#caa8ff;   /* ライラック */
-  --banner-c:#8e79ff;   /* 紫寄りの締め */
-  --gold-strong:#ffe7a6;
-  --ink-strong:#f0f3ff;
-}
-
-/* ① ヒーローの白グレアが文字に被らないよう位置・濃度調整 */
-.hero__veil{
-  /* 光源を少し下へ、中心を小さくして字幕に被らないように */
-  background:
-    radial-gradient(140px 180px at 50% 74%, #ffffffb0, #ffffff00 60%),
-    radial-gradient(1200px 720px at 50% 86%, #7c62ff33, #7c62ff00 70%);
-  opacity:.55;                  /* 初期の眩しさを抑制 */
-}
-@media (min-width:768px){
-  .hero__veil{ opacity:.65 }    /* PCでは少しだけ強く */
-}
-
-/* ② タイトル＆テキストの発光と極細アウトラインで可読性UP（iOS強化） */
-.hero__title{
-  /* 金の輝きを強化＋薄いストロークで滲み対策 */
-  text-shadow:
-    0 2px 22px rgba(255,215,111,.55),
-    0 0 60px rgba(124,98,255,.28);
-  -webkit-text-stroke: .3px rgba(10,8,20,.35);
-}
-.hero__subtitle{
-  color: var(--ink-strong);       /* 文字色を明るく */
-  text-shadow: 0 0 10px rgba(20,24,44,.35);
-  opacity:.98;                    /* うっすら→クッキリへ */
-}
-.shion-poem{
-  color:#e1e6ff;                  /* 薄青→明るい青白 */
-  text-shadow: 0 0 10px rgba(130,140,255,.25);
-}
-
-/* ③ 右画像の“金→紫”バナー色をボタンと注記に反映 */
-.btn-primary{
-  background: linear-gradient(90deg,var(--banner-a),var(--banner-b) 55%,var(--banner-c));
-  color:#201a35;
-  text-shadow: 0 1px 0 rgba(255,255,255,.4);
-  box-shadow:
-    0 14px 34px rgba(140,110,255,.38),
-    inset 0 0 12px rgba(255,240,200,.35);
-}
-.btn-primary:hover{
-  filter: saturate(1.06);
-  transform: translateY(-1px);
-}
-
-/* “画面タップで音が流れます”バナーの配色も右と同じに */
-.tap-hint__pill{
-  background: linear-gradient(90deg,var(--banner-a),var(--banner-b) 60%,var(--banner-c));
-  color:#231b3a;
-  border-color: transparent;
-  box-shadow:
-    0 8px 22px rgba(140,110,255,.28),
-    inset 0 0 10px rgba(255,240,210,.35);
-}
-
-/* ④ ヒーローの背景を少しだけ荘厳に（薄い星環の輪） */
-.hero::after{
-  content:"";
-  position:absolute; inset:0; pointer-events:none; z-index:1;
-  background:
-    radial-gradient(600px 600px at 50% 58%, rgba(255,231,166,.12), rgba(255,231,166,0) 65%),
-    radial-gradient(900px 900px at 50% 58%, rgba(130,110,255,.10), rgba(130,110,255,0) 70%);
-  mix-blend-mode: screen;
-  opacity:.8;
-}
-
-/* ⑤ 主要コピーの行間と文字間も微調整（スマホで読みやすく） */
-.hero__subtitle, .shion-poem{
-  line-height:1.7;
-  letter-spacing:.04em;
-}
-
-/* ⑥ 万一背景画像が遅延してもコントラストを保つための保険 */
-.hero__bg{ background-color:#0b0b1a; }
-
-/* ===== ヒーローの読みやすさ強化（短文に合わせて調整） ===== */
-.hero__subtitle{
-  margin:.6rem auto .6rem; 
-  max-width:720px;
-  color:#f1f5ff;
-  opacity:.98;
-  line-height:1.75;
-  letter-spacing:.04em;
-  text-shadow:0 0 10px rgba(20,24,44,.35);
-  font-size:clamp(15px,3.6vw,18px);
-}
-.shion-poem{
-  color:#e6ecff;
-  text-shadow:0 0 10px rgba(130,140,255,.25);
-  margin:0 auto .9rem;
-  font-size:clamp(14px,3.4vw,16px);
-  letter-spacing:.05em;
-}
-
-/* 小さく“無料体験”を提示（世界観を壊さない控えめバッジ） */
-.hero__note{
-  display:inline-block;
-  margin:.2rem 0 1.4rem;
-  padding:.35rem .7rem;
-  border-radius:999px;
-  font-size:.82rem;
-  letter-spacing:.08em;
-  color:#231b3a;
-  background:linear-gradient(90deg,var(--banner-a),var(--banner-b) 60%,var(--banner-c));
-  box-shadow:0 8px 22px rgba(140,110,255,.24), inset 0 0 10px rgba(255,240,210,.28);
-}
