@@ -163,3 +163,86 @@ body{
 .cta__btn--line{ background:#00b900; color:#fff; border-color:transparent }
 .cta__btn--tiktok{ background:#000; color:#fff; border-color:#111 }
 .cta__btn--note{ background:#fff; color:#333; border-color:#ddd }
+/* ==== 視認性＆神々しさアップ：差分CSS（追記/置換） ==== */
+:root{
+  /* 右側バナーの色に合わせたグラデ */
+  --banner-a:#f9d86b;   /* 金 */
+  --banner-b:#caa8ff;   /* ライラック */
+  --banner-c:#8e79ff;   /* 紫寄りの締め */
+  --gold-strong:#ffe7a6;
+  --ink-strong:#f0f3ff;
+}
+
+/* ① ヒーローの白グレアが文字に被らないよう位置・濃度調整 */
+.hero__veil{
+  /* 光源を少し下へ、中心を小さくして字幕に被らないように */
+  background:
+    radial-gradient(140px 180px at 50% 74%, #ffffffb0, #ffffff00 60%),
+    radial-gradient(1200px 720px at 50% 86%, #7c62ff33, #7c62ff00 70%);
+  opacity:.55;                  /* 初期の眩しさを抑制 */
+}
+@media (min-width:768px){
+  .hero__veil{ opacity:.65 }    /* PCでは少しだけ強く */
+}
+
+/* ② タイトル＆テキストの発光と極細アウトラインで可読性UP（iOS強化） */
+.hero__title{
+  /* 金の輝きを強化＋薄いストロークで滲み対策 */
+  text-shadow:
+    0 2px 22px rgba(255,215,111,.55),
+    0 0 60px rgba(124,98,255,.28);
+  -webkit-text-stroke: .3px rgba(10,8,20,.35);
+}
+.hero__subtitle{
+  color: var(--ink-strong);       /* 文字色を明るく */
+  text-shadow: 0 0 10px rgba(20,24,44,.35);
+  opacity:.98;                    /* うっすら→クッキリへ */
+}
+.shion-poem{
+  color:#e1e6ff;                  /* 薄青→明るい青白 */
+  text-shadow: 0 0 10px rgba(130,140,255,.25);
+}
+
+/* ③ 右画像の“金→紫”バナー色をボタンと注記に反映 */
+.btn-primary{
+  background: linear-gradient(90deg,var(--banner-a),var(--banner-b) 55%,var(--banner-c));
+  color:#201a35;
+  text-shadow: 0 1px 0 rgba(255,255,255,.4);
+  box-shadow:
+    0 14px 34px rgba(140,110,255,.38),
+    inset 0 0 12px rgba(255,240,200,.35);
+}
+.btn-primary:hover{
+  filter: saturate(1.06);
+  transform: translateY(-1px);
+}
+
+/* “画面タップで音が流れます”バナーの配色も右と同じに */
+.tap-hint__pill{
+  background: linear-gradient(90deg,var(--banner-a),var(--banner-b) 60%,var(--banner-c));
+  color:#231b3a;
+  border-color: transparent;
+  box-shadow:
+    0 8px 22px rgba(140,110,255,.28),
+    inset 0 0 10px rgba(255,240,210,.35);
+}
+
+/* ④ ヒーローの背景を少しだけ荘厳に（薄い星環の輪） */
+.hero::after{
+  content:"";
+  position:absolute; inset:0; pointer-events:none; z-index:1;
+  background:
+    radial-gradient(600px 600px at 50% 58%, rgba(255,231,166,.12), rgba(255,231,166,0) 65%),
+    radial-gradient(900px 900px at 50% 58%, rgba(130,110,255,.10), rgba(130,110,255,0) 70%);
+  mix-blend-mode: screen;
+  opacity:.8;
+}
+
+/* ⑤ 主要コピーの行間と文字間も微調整（スマホで読みやすく） */
+.hero__subtitle, .shion-poem{
+  line-height:1.7;
+  letter-spacing:.04em;
+}
+
+/* ⑥ 万一背景画像が遅延してもコントラストを保つための保険 */
+.hero__bg{ background-color:#0b0b1a; }
