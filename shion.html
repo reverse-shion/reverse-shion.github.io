@@ -273,49 +273,7 @@
 
   </div> 
 <script>
-    // コード雨アニメーション (Canvas描画のピクセル比率のバグを修正済み)
-    (function codeRain(){
-      const cvs = document.getElementById('codeRain');
-      const ctx = cvs.getContext('2d');
-      const chars = '01AI∴∵⌘◇◆＊＋≡☆★◯●◎∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
-      let fontSize = 18;
-      let columns, drops, W, H;
-      
-      function resize(){
-        W = cvs.width  = window.innerWidth * devicePixelRatio;
-        H = cvs.height = window.innerHeight * devicePixelRatio;
-        ctx.scale(devicePixelRatio, devicePixelRatio);
-
-        fontSize = Math.max(14, Math.min(22, Math.floor(window.innerWidth/48)));
-        columns = Math.ceil(window.innerWidth / fontSize);
-        drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*window.innerHeight)); 
-      }
-      
-      function draw(){
-        ctx.fillStyle = 'rgba(2,3,22,0.16)';
-        ctx.fillRect(0,0,window.innerWidth,window.innerHeight); 
-
-        ctx.fillStyle = '#7fd0ff';
-        ctx.font = `${fontSize}px monospace`;
-        for(let i=0;i<columns;i++){
-          const ch = chars[Math.floor(Math.random()*chars.length)];
-          const x = i * fontSize;
-          const y = drops[i] * fontSize * .9;
-          ctx.fillText(ch, x, y);
-          
-          if(y > window.innerHeight && Math.random() > 0.975){ 
-            drops[i] = 0; 
-          }
-          drops[i]++;
-        }
-        requestAnimationFrame(draw);
-      }
-      
-      window.addEventListener('resize', resize);
-      resize(); 
-      draw();
-    })();
-
+  
     // カードの表面画像パス (仮指定)
     const cardFrontImages = [
       'card-front-0.jpg', 'card-front-1.jpg', 'card-front-2.jpg', 'card-front-3.jpg', 
