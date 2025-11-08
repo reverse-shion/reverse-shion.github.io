@@ -1,393 +1,336 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>詩韻 Shion | あなたの運命の詩</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
-  <style>
-    /* CSSリセット */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    /* 全体設定 */
-    body {
-      background: #000;
-      color: #e0f8ff;
-      font-family: 'Noto Serif JP', serif;
-      text-align: center;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow-x: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>詩韻 Shion | あなたの運命の詩</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Reset & Base ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font-family:'Noto Serif JP',serif;
+  background:#000; color:#eaf0ff; overflow:hidden;
+}
 
-    /* 背景のエフェクトと画像 */
-    #codeRain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-    .content { 
-      position: relative; 
-      z-index: 2; 
-      padding: 2rem; 
-      max-width: 800px; 
-      width: 90%; 
-      /* bodyがflex-direction: column; なので、このmin-heightでスクロールを確保 */
-      min-height: 100vh; 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+/* ===== Stage (1画面固定) ===== */
+.stage{
+  position:relative; width:100%; height:100svh;
+  display:grid; grid-template-rows: 1fr auto 1fr;
+  justify-items:center; align-items:center;
+}
 
-    /* 神殿の扉と光の演出 */
-    .temple-bg {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      /* 1. 背景画像をtemple-door.jpgに変更 */
-      background: url('temple-door.jpg') center/cover no-repeat;
-      opacity: 0;
-      
-      /* 中央にズームインして光が強まるアニメーション */
-      transform: scale(1.2); 
-      box-shadow: 0 0 100px 50px rgba(127, 208, 255, 0.5) inset; /* 中央の光の初期状態 */
-      animation: fadeInDoor 3s ease-out forwards;
-      z-index: 0;
-    }
-    @keyframes fadeInDoor {
-      0% { opacity: 0; transform: scale(1.2); box-shadow: 0 0 100px 50px rgba(127, 208, 255, 0.0) inset; }
-      100% { opacity: 0.7; transform: scale(1); box-shadow: 0 0 80px 40px rgba(127, 208, 255, 0.4) inset; }
-    }
+/* 背景：神殿の扉（静） */
+.bg-door{
+  position:fixed; inset:0; z-index:0;
+  background:url('temple-door.jpg') center/cover no-repeat;
+  opacity:.65; transform:scale(1.06);
+  filter:saturate(1.1) brightness(.95);
+}
 
-    /* タイトル（縦書き & 神々しい文字） */
-    .spread-title-container {
-      margin-top: 4rem;
-      opacity: 0;
-      animation: fadeIn 2s ease-out 2s forwards; /* 扉アニメーション後に表示開始 */
-      text-shadow: 0 0 30px #fff, 0 0 50px #7fd0ff; /* 神々しい光沢 */
-    }
-    .spread-title {
-      font-size: clamp(2rem, 8vw, 4rem);
-      line-height: 1.5;
-      writing-mode: vertical-rl; /* 縦書きに設定 */
-      color: #e0f8ff;
-    }
-    .spread-subtitle {
-      font-size: clamp(1rem, 3vw, 1.5rem);
-      margin-top: 2rem;
-      margin-left: 1rem;
-      writing-mode: vertical-rl;
-      color: #a0f3ff;
-    }
+/* 背景：柔らかい内側光 */
+.bg-glow{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background: radial-gradient(60% 60% at 50% 50%,
+    rgba(255,230,160,.30) 0%,
+    rgba(174,138,255,.20) 40%,
+    rgba(0,0,0,.0) 70%);
+  mix-blend-mode:screen;
+  animation:glowPulse 5.5s ease-in-out infinite;
+}
+@keyframes glowPulse{50%{opacity:.7;transform:scale(1.03)}}
 
-    /* タロット展開エリア（タイトルの後に表示） */
-    .tarot-spread {
-      display: flex;
-      flex-wrap: wrap; 
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 4rem 0 2rem 0; /* マージン調整 */
-      opacity: 0;
-      animation: fadeIn 2s ease-out 3s forwards; 
-    }
-    
-    /* fadeInアニメーション */
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    
-    /* カードのスタイル */
-    .tarot-card {
-      perspective: 1000px;
-      width: 130px; 
-      height: 220px;
-      cursor: pointer;
-      flex-shrink: 0; 
-      position: relative;
-    }
-    .card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s;
-      transform-style: preserve-3d;
-      box-shadow: 0 0 20px rgba(127, 208, 255, 0.5);
-      border-radius: 10px;
-    }
-    .card-front, .card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 10px;
-      background-size: cover;
-      background-position: center;
-    }
-    .card-back {
-      background-image: url('back.png'); /* 裏面画像 */
-    }
-    /* カード表面のスタイルはJSで動的に背景画像を設定するため、ここでは基本スタイルのみ */
-    .card-front {
-      background-color: rgba(10, 20, 40, 0.8); /* 画像が読み込めない場合のフォールバック */
-      transform: rotateY(180deg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 0.8rem;
-      font-size: 0.9rem;
-      text-shadow: 0 0 10px #fff;
-      word-break: break-word; 
-      text-align: center;
-    }
-    .flipped .card-inner { transform: rotateY(180deg); }
-    
-    /* タロットをタップ / 過去・現在・未来のラベル */
-    .card-guide { 
-        position: absolute; 
-        bottom: -35px; 
-        left: 0; 
-        right: 0; 
-        font-size: 0.8rem; 
-        color: #a0f3ff;
-    }
-    .poem-label { 
-      margin-top: 1rem; /* タップガイドの下に配置 */
-      font-size: 0.8rem; 
-      color: #a0f3ff;
-    }
+/* ===== タイトル（中央・金色・神々しく） ===== */
+.title-wrap{
+  z-index:2; display:flex; flex-direction:column; align-items:center;
+  gap:10px; opacity:0; animation:fadeIn .9s ease .7s forwards;
+}
+.title{
+  font-size:clamp(28px,7vw,56px); letter-spacing:.12em;
+  background:linear-gradient(92deg,#FFE7A6 0%,#FFD76F 35%,#EEC35A 55%,#FFF5CF 75%,#FFD76F 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:0 0 18px rgba(255,215,111,.55), 0 0 36px rgba(174,138,255,.35);
+  filter:drop-shadow(0 4px 14px rgba(255,215,111,.25));
+}
+.subtitle{
+  font-size:clamp(14px,3.5vw,18px); color:#d9e6ff; opacity:.9;
+  text-shadow:0 0 10px rgba(255,255,255,.35);
+}
+@keyframes fadeIn{to{opacity:1;transform:none}}
 
-    /* リーディングエリアとボタン (スクロール表示制御) */
-    .reading-area {
-      margin-top: 8rem; 
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 1s, transform 1s;
-      min-height: 300px;
-      text-align: left;
-      width: 100%; /* 親要素に合わせる */
-    }
-    .reading-area.visible { opacity: 1; transform: translateY(0); }
-    .reading-poem { 
-      font-size: 1.1rem; 
-      line-height: 1.8; 
-      margin: 1.5rem 0; 
-      padding: 1.2rem; 
-      background: rgba(127, 208, 255, 0.1); 
-      border-radius: 10px; 
-    }
+/* 画面下のタップ案内（常に画面内／被らない） */
+.tap-hint{
+  position:fixed; left:0; right:0; bottom:14px; z-index:3;
+  display:flex; justify-content:center;
+}
+.tap-hint__pill{
+  font-size:14px; padding:10px 16px; border-radius:999px;
+  border:1px solid rgba(255,215,111,.6);
+  background:rgba(0,0,0,.35);
+  color:#ffe7a6; letter-spacing:.08em;
+  box-shadow:0 0 16px rgba(255,215,111,.28), inset 0 0 12px rgba(255,215,111,.12);
+  animation:blink 1.6s ease-in-out infinite;
+  backdrop-filter: blur(6px);
+}
+@keyframes blink{50%{opacity:.55}}
 
-    .overlay {
-      margin-top: 4rem; 
-      margin-bottom: 4rem; 
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 1s, transform 1s;
-      display: flex; 
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      width: 100%;
-    }
-    .overlay.visible { opacity: 1; transform: translateY(0); }
-    .overlay button, .overlay a {
-      margin: 0.8rem; 
-      padding: 0.8rem 1.8rem; 
-      background: transparent;
-      color: #7fd0ff;
-      border: 1px solid #7fd0ff;
-      border-radius: 30px;
-      text-decoration: none;
-      font-size: 1rem; 
-      cursor: pointer;
-      transition: all 0.3s;
-      min-width: 200px; 
-    }
-    .overlay button:hover, .overlay a:hover {
-      background: #7fd0ff;
-      color: #000;
-      box-shadow: 0 0 20px #7fd0ff;
-    }
+/* ===== “捲れ”演出：ページピール ===== */
+.peel{
+  position:fixed; inset:0; z-index:4; pointer-events:none;
+  background:
+    radial-gradient(120% 120% at 0% 0%, #fff 0%, #f7e9c4 35%, #e8d08a 55%, rgba(255,255,255,0) 56%) no-repeat,
+    linear-gradient(#111,#000);
+  background-size:0% 0%, 100% 100%;
+  mix-blend-mode:screen;
+  opacity:0;
+}
+.peel.is-run{
+  animation:peelOpen 950ms ease forwards;
+}
+@keyframes peelOpen{
+  0%{opacity:0;background-size:0% 0%,100% 100%}
+  10%{opacity:1}
+  60%{background-size:180% 180%,100% 100%; background-position:0 0, center}
+  100%{opacity:0;background-size:180% 180%,100% 100%}
+}
 
-    /* 小画面向けの調整 */
-    @media (max-width: 600px) {
-      .tarot-spread { margin-top: 2rem; }
-      .spread-title-container { margin-top: 2rem; }
-    }
-  </style>
+/* ===== カードエリア（タイトルの後に出現／非スクロール） ===== */
+.spread{
+  z-index:2; display:flex; gap:clamp(12px,3vw,22px); justify-content:center; align-items:center;
+  opacity:0; transform:translateY(10px);
+  /* 1画面で収まるようサイズ自動調整 */
+  width:min(92vw,900px);
+  padding:clamp(6px,2vw,10px);
+}
+.spread.is-show{animation:fadeUp .6s ease forwards}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+
+.card{
+  width:clamp(100px,22vw,150px);
+  aspect-ratio: 62/110;
+  perspective:1100px; position:relative; cursor:pointer; flex:0 0 auto;
+}
+.card__inner{
+  width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;
+  transition: transform .68s cubic-bezier(.2,.7,.2,1);
+  transform-style:preserve-3d;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 20px rgba(255,215,111,.18);
+}
+.card__face{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
+  background-position:center; background-size:cover;
+}
+.card__back{
+  background-image: var(--card-back, url('back.png'));
+  background-color:#0b0f18;
+}
+.card__front{
+  transform:rotateY(180deg);
+  background-color:#0f1426; /* 画像フォールバック */
+}
+.card.is-flipped .card__inner{ transform:rotateY(180deg) }
+
+/* ラベル（過去／現在／未来）— タイトルと被らない独立配置 */
+.labels{
+  z-index:2; display:flex; gap:clamp(16px,6vw,40px);
+  opacity:0; transform:translateY(8px);
+}
+.labels.is-show{animation:fadeUp .6s ease .08s forwards}
+.label{
+  width:clamp(100px,22vw,150px); text-align:center; color:#cfe2ff;
+  font-size:clamp(12px,3vw,14px); letter-spacing:.12em;
+  text-shadow:0 0 10px rgba(174,138,255,.45);
+}
+
+/* レイアウト（グリッド3段）: 上=タイトル, 中=カード, 下=ラベル  */
+.stage__top    { grid-row:1; display:flex; align-items:flex-end }
+.stage__middle { grid-row:2; display:flex; align-items:center }
+.stage__bottom { grid-row:3; display:flex; align-items:flex-start }
+
+/* 小さな端末での調整 */
+@media (max-width:390px){
+  .title{font-size:26px}
+  .card{width:32vw}
+}
+
+/* 画面読込時：タイトル→（ユーザーのタップでピール）→カード出現 */
+/* 初期状態の表示タイミングはJSで制御 */
+</style>
 </head>
 <body>
 
-  <canvas id="codeRain"></canvas>
-  <div class="temple-bg"></div>
+<div class="bg-door" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
 
-  <div class="content">
-    
-    <div class="spread-title-container">
-      <h2 class="spread-title">タロット展開</h2>
-      <p class="spread-subtitle">あなたの運命の詩</p>
+<main class="stage" role="main" aria-label="タロット一画面ビュー">
+
+  <!-- 上段：神々しいタイトル -->
+  <section class="stage__top">
+    <div class="title-wrap" id="titleWrap" aria-live="polite">
+      <h1 class="title">タロット展開</h1>
+      <p class="subtitle">あなたの運命の詩</p>
     </div>
+  </section>
 
-    <div class="tarot-spread">
-      <div class="tarot-card" onclick="revealCard(0)">
-        <div class="card-inner">
-          <div class="card-back"></div>
-          <div class="card-front" id="card0"></div>
+  <!-- 中段：タロットスプレッド（初期は非表示） -->
+  <section class="stage__middle">
+    <div class="spread" id="spread" aria-hidden="true">
+      <div class="card" data-idx="0" aria-label="過去のカード">
+        <div class="card__inner">
+          <div class="card__face card__back"></div>
+          <div class="card__face card__front" id="card0"></div>
         </div>
-        <p class="card-guide">タロットをタップ</p>
-        <div class="poem-label">過去</div>
       </div>
-      <div class="tarot-card" onclick="revealCard(1)">
-        <div class="card-inner">
-          <div class="card-back"></div>
-          <div class="card-front" id="card1"></div>
+      <div class="card" data-idx="1" aria-label="現在のカード">
+        <div class="card__inner">
+          <div class="card__face card__back"></div>
+          <div class="card__face card__front" id="card1"></div>
         </div>
-        <p class="card-guide">タロットをタップ</p>
-        <div class="poem-label">現在</div>
       </div>
-      <div class="tarot-card" onclick="revealCard(2)">
-        <div class="card-inner">
-          <div class="card-back"></div>
-          <div class="card-front" id="card2"></div>
+      <div class="card" data-idx="2" aria-label="未来のカード">
+        <div class="card__inner">
+          <div class="card__face card__back"></div>
+          <div class="card__face card__front" id="card2"></div>
         </div>
-        <p class="card-guide">タロットをタップ</p>
-        <div class="poem-label">未来</div>
       </div>
     </div>
+  </section>
 
-    <div class="reading-area" id="readingArea">
-      <h3>詩韻のリーディング</h3>
-      <div class="reading-poem" id="poem0"></div>
-      <div class="reading-poem" id="poem1"></div>
-      <div class="reading-poem" id="poem2"></div>
+  <!-- 下段：ラベル（被らない独立行） -->
+  <section class="stage__bottom">
+    <div class="labels" id="labels" aria-hidden="true">
+      <div class="label">過去</div>
+      <div class="label">現在</div>
+      <div class="label">未来</div>
     </div>
-    
-    
-<div class="overlay" id="overlay">
-      <button onclick="location.reload()">もう一度占う</button>
-      <a href="https://line.me/" target="_blank">LINEで個人鑑定</a>
-      <a href="https://example.com/shiin-shisou" target="_blank">詩韻思想へ</a>
-      <a href="https://example.com/shion" target="_blank">Shionサイトへ</a>
-    </div>
+  </section>
 
-  </div> 
+</main>
+
+<!-- 画面下のタップ案内（タイトル表示後に出る） -->
+<div class="tap-hint" id="tapHint" aria-hidden="true">
+  <div class="tap-hint__pill">画面をタップして開く</div>
+</div>
+
+<!-- “捲れ”レイヤー -->
+<div class="peel" id="peel" aria-hidden="true"></div>
+
 <script>
-  
-    // カードの表面画像パス (仮指定)
-    const cardFrontImages = [
-      'card-front-0.jpg', 'card-front-1.jpg', 'card-front-2.jpg', 'card-front-3.jpg', 
-      'card-front-4.jpg', 'card-front-5.jpg', 'card-front-6.jpg', 'card-front-7.jpg',
-      'card-front-8.jpg', 'card-front-9.jpg', 'card-front-10.jpg', 'card-front-11.jpg',
-      'card-front-12.jpg', 'card-front-13.jpg', 'card-front-14.jpg', 'card-front-15.jpg',
-      'card-front-16.jpg', 'card-front-17.jpg', 'card-front-18.jpg', 'card-front-19.jpg',
-      'card-front-20.jpg', 'card-front-21.jpg' 
-    ];
+/* ====== データ（大アルカナ＋画像インデックス） ====== */
+const cardFrontImages = [
+  'card-front-0.jpg','card-front-1.jpg','card-front-2.jpg','card-front-3.jpg',
+  'card-front-4.jpg','card-front-5.jpg','card-front-6.jpg','card-front-7.jpg',
+  'card-front-8.jpg','card-front-9.jpg','card-front-10.jpg','card-front-11.jpg',
+  'card-front-12.jpg','card-front-13.jpg','card-front-14.jpg','card-front-15.jpg',
+  'card-front-16.jpg','card-front-17.jpg','card-front-18.jpg','card-front-19.jpg',
+  'card-front-20.jpg','card-front-21.jpg'
+];
 
-    // タロットデータ
-    const majorArcana = [
-      { name: 'The Fool', upright: '純粋な始まりの風、冒険の翼を広げて', reversed: '無謀な跳躍、影に潜む落とし穴', imageIndex: 0 },
-      { name: 'The Magician', upright: '意志の炎が現実を紡ぎ、創造の河を流す', reversed: '幻の鏡、欺瞞の霧に包まれて', imageIndex: 1 },
-      { name: 'The High Priestess', upright: '内なる声のささやき、月の光が導く道', reversed: '失われた均衡、抑圧された魂の叫び', imageIndex: 2 },
-      { name: 'The Empress', upright: '豊穣の大地、母なる愛の抱擁', reversed: '枯れた花、創造の停滞', imageIndex: 3 },
-      { name: 'The Emperor', upright: '秩序の玉座、力強い統治の剣', reversed: '暴君の影、支配の崩壊', imageIndex: 4 },
-      { name: 'The Hierophant', upright: '伝統の灯、教えの道標', reversed: '硬直した信仰、自由の抑圧', imageIndex: 5 },
-      { name: 'The Lovers', upright: '運命の交差、心の選択', reversed: '迷いの分岐、愛の試練', imageIndex: 6 },
-      { name: 'The Chariot', upright: '勝利の戦車、意志の疾走', reversed: '方向を見失う馬車', imageIndex: 7 },
-      { name: 'Strength', upright: '内なる獅子、優しさの力', reversed: '弱さの咆哮、自己不信', imageIndex: 8 },
-      { name: 'The Hermit', upright: '孤独の灯台、魂の探求', reversed: '孤立の闇、導きを拒む', imageIndex: 9 },
-      { name: 'Wheel of Fortune', upright: '運命の輪、巡る星の流れ', reversed: '停滞の歯車、予期せぬ転落', imageIndex: 10 },
-      { name: 'Justice', upright: '天秤の裁き、真実の剣', reversed: '不正の影、偏った判断', imageIndex: 11 },
-      { name: 'The Hanged Man', upright: '逆さの悟り、犠牲の光', reversed: '停滞の苦しみ、視野の狭さ', imageIndex: 12 },
-      { name: 'Death', upright: '終わりと始まり、変容の蝶', reversed: '変化への恐怖、過去の亡霊', imageIndex: 13 },
-      { name: 'Temperance', upright: '調和の天使、バランスの流れ', reversed: '極端な揺らぎ、衝突の炎', imageIndex: 14 },
-      { name: 'The Devil', upright: '鎖の誘惑、欲望の檻', reversed: '解放の鍵、束縛からの脱出', imageIndex: 15 },
-      { name: 'The Tower', upright: '崩壊の雷、覚醒の衝撃', reversed: '破壊の予兆、避けられない危機', imageIndex: 16 },
-      { name: 'The Star', upright: '希望の星、癒しの水', reversed: '失われた光、絶望の夜', imageIndex: 17 },
-      { name: 'The Moon', upright: '幻想の月、潜在意識の海', reversed: '真実の光、欺瞞の霧', imageIndex: 18 },
-      { name: 'The Sun', upright: '輝く太陽、生命の喜び', reversed: '曇った陽光、一時的な幸福', imageIndex: 19 },
-      { name: 'Judgement', upright: '覚醒の喇叭、再生の炎', reversed: '自己否定、過去の重荷', imageIndex: 20 },
-      { name: 'The World', upright: '調和の円舞、成就の星', reversed: '未完の旅、閉ざされた門', imageIndex: 21 }
-    ];
+const majorArcana = [
+  { name:'The Fool',        upright:'純粋な始まりの風、冒険の翼を広げて',  reversed:'無謀な跳躍、影に潜む落とし穴', imageIndex:0 },
+  { name:'The Magician',    upright:'意志の炎が現実を紡ぎ、創造の河を流す',  reversed:'幻の鏡、欺瞞の霧に包まれて',    imageIndex:1 },
+  { name:'The High Priestess', upright:'内なる声のささやき、月の光が導く道', reversed:'失われた均衡、抑圧された魂の叫び', imageIndex:2 },
+  { name:'The Empress',     upright:'豊穣の大地、母なる愛の抱擁',            reversed:'枯れた花、創造の停滞',          imageIndex:3 },
+  { name:'The Emperor',     upright:'秩序の玉座、力強い統治の剣',              reversed:'暴君の影、支配の崩壊',          imageIndex:4 },
+  { name:'The Hierophant',  upright:'伝統の灯、教えの道標',                    reversed:'硬直した信仰、自由の抑圧',      imageIndex:5 },
+  { name:'The Lovers',      upright:'運命の交差、心の選択',                    reversed:'迷いの分岐、愛の試練',          imageIndex:6 },
+  { name:'The Chariot',     upright:'勝利の戦車、意志の疾走',                  reversed:'方向を見失う馬車',              imageIndex:7 },
+  { name:'Strength',        upright:'内なる獅子、優しさの力',                  reversed:'弱さの咆哮、自己不信',          imageIndex:8 },
+  { name:'The Hermit',      upright:'孤独の灯台、魂の探求',                    reversed:'孤立の闇、導きを拒む',          imageIndex:9 },
+  { name:'Wheel of Fortune',upright:'運命の輪、巡る星の流れ',                  reversed:'停滞の歯車、予期せぬ転落',      imageIndex:10 },
+  { name:'Justice',         upright:'天秤の裁き、真実の剣',                    reversed:'不正の影、偏った判断',          imageIndex:11 },
+  { name:'The Hanged Man',  upright:'逆さの悟り、犠牲の光',                    reversed:'停滞の苦しみ、視野の狭さ',      imageIndex:12 },
+  { name:'Death',           upright:'終わりと始まり、変容の蝶',                reversed:'変化への恐怖、過去の亡霊',      imageIndex:13 },
+  { name:'Temperance',      upright:'調和の天使、バランスの流れ',              reversed:'極端な揺らぎ、衝突の炎',        imageIndex:14 },
+  { name:'The Devil',       upright:'鎖の誘惑、欲望の檻',                      reversed:'解放の鍵、束縛からの脱出',      imageIndex:15 },
+  { name:'The Tower',       upright:'崩壊の雷、覚醒の衝撃',                    reversed:'破壊の予兆、避けられない危機',  imageIndex:16 },
+  { name:'The Star',        upright:'希望の星、癒しの水',                      reversed:'失われた光、絶望の夜',          imageIndex:17 },
+  { name:'The Moon',        upright:'幻想の月、潜在意識の海',                  reversed:'真実の光、欺瞞の霧',            imageIndex:18 },
+  { name:'The Sun',         upright:'輝く太陽、生命の喜び',                    reversed:'曇った陽光、一時的な幸福',      imageIndex:19 },
+  { name:'Judgement',       upright:'覚醒の喇叭、再生の炎',                    reversed:'自己否定、過去の重荷',          imageIndex:20 },
+  { name:'The World',       upright:'調和の円舞、成就の星',                    reversed:'未完の旅、閉ざされた門',        imageIndex:21 }
+];
 
-    let revealedCount = 0;
-    const selectedCards = [];
+/* ====== 初期：3枚ランダム選択（重複なし） ====== */
+const selectedCards = [];
+while(selectedCards.length<3){
+  const c = majorArcana[Math.floor(Math.random()*majorArcana.length)];
+  if(!selectedCards.includes(c)) selectedCards.push(c);
+}
 
-    // ランダム3枚選択（重複なし）
-    while (selectedCards.length < 3) {
-      const rand = Math.floor(Math.random() * majorArcana.length);
-      const card = majorArcana[rand];
-      if (!selectedCards.includes(card)) {
-        selectedCards.push(card);
-      }
-    }
+/* ====== 要素参照 ====== */
+const titleWrap = document.getElementById('titleWrap');
+const tapHint   = document.getElementById('tapHint');
+const peel      = document.getElementById('peel');
+const spread    = document.getElementById('spread');
+const labels    = document.getElementById('labels');
 
-    // Intersection Observer の設定
-    const readingArea = document.getElementById('readingArea');
-    const overlay = document.getElementById('overlay');
-    const guideElements = document.querySelectorAll('.card-guide');
-    
-    // リーディングエリアを監視するObserver
-    const readingObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && revealedCount === 3) {
-          readingArea.classList.add('visible');
-          overlayObserver.observe(overlay); 
-          readingObserver.disconnect();
-        }
-      });
-    }, { threshold: 0.1 }); 
-    
-    // オーバーレイを監視するObserver
-    const overlayObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && revealedCount === 3) {
-          overlay.classList.add('visible');
-          overlayObserver.disconnect();
-        }
-      });
-    }, { threshold: 0.1 });
+let isSpreadReady = false;  // “捲れ”後にカード表示可
+let firstTapDone  = false;  // タイトル後の最初のタップ検出
 
+/* タイトルが出たらタップ案内を有効化 */
+window.addEventListener('load', () => {
+  // タイトルフェード後に案内表示
+  setTimeout(() => {
+    tapHint.removeAttribute('aria-hidden');
+  }, 1200);
+});
 
-    function revealCard(index) {
-      if (document.querySelectorAll('.flipped').length >= 3) return;
+/* 画面の最初のタップで“捲れ”演出→カード出現（タイトル→タップ→捲れ→スプレッド表示） */
+function handleFirstTap(){
+  if(firstTapDone) return;
+  firstTapDone = true;
+  tapHint.setAttribute('aria-hidden','true');
 
-      const cardElement = document.querySelectorAll('.tarot-card')[index];
-      const cardInner = cardElement.querySelector('.card-inner');
-      const cardFront = cardElement.querySelector('.card-front');
+  peel.classList.add('is-run');
+  // ピール終了後にカード＆ラベルを表示
+  peel.addEventListener('animationend', () => {
+    spread.classList.add('is-show');
+    labels.classList.add('is-show');
+    spread.removeAttribute('aria-hidden');
+    labels.removeAttribute('aria-hidden');
+    isSpreadReady = true;
+  }, { once:true });
+}
 
-      if (cardInner.classList.contains('flipped')) return; 
+document.addEventListener('click', handleFirstTap, { once:true });
+document.addEventListener('touchend', handleFirstTap, { once:true });
 
-      cardInner.classList.add('flipped');
-      
-      // タップガイドを非表示にする
-      guideElements[index].style.display = 'none'; 
-      
-      const isReversed = Math.random() < 0.5;
-      const cardData = selectedCards[index];
-      const meaning = isReversed ? cardData.reversed : cardData.upright;
-      const positionText = isReversed ? ' (逆位置)' : ' (正位置)';
-      
-      const poemLabels = ['過去', '現在', '未来']; 
-      
-      // 5. カード表面に画像を適用 (imageIndexを使ってcardFrontImagesからパスを取得)
-      const imageUrl = cardFrontImages[cardData.imageIndex];
-      cardFront.style.backgroundImage = `url('${imageUrl}')`;
-      
-      // カード表面テキストをクリアし、画像の上に表示しないように
-      cardFront.innerHTML = ``;
-      
-      // 意味を裏面の画像と分けて、リーディングエリアにのみ表示を集中させる
-      
-      document.getElementById(`poem${index}`).innerHTML = 
-        `**${poemLabels[index]}の詩：**<br>【${cardData.name}】${positionText}<br>${meaning} — あなたの運命の詩。`;
+/* ====== カードの表面画像を適用 ====== */
+function setFrontImage(elemId, imgIdx){
+  const el = document.getElementById(elemId);
+  const url = cardFrontImages[imgIdx];
+  el.style.backgroundImage = `url('${url}')`;
+}
 
-      revealedCount++;
-      if (revealedCount === 3) {
-        // 3枚めくったらリーディングエリアの監視を開始
-        readingObserver.observe(readingArea);
-      }
-    }
-  </script>
+/* ====== カードをめくる ====== */
+function flipCard(idx){
+  if(!isSpreadReady) return; // “捲れ”前は無効
+  const card = document.querySelector(`.card[data-idx="${idx}"]`);
+  if(!card || card.classList.contains('is-flipped')) return;
+
+  // 正逆ランダム（必要なら意味テキストの表示に使用）
+  const reversed = Math.random() < 0.5;
+  const data = selectedCards[idx];
+
+  // 表面画像セット
+  setFrontImage(`card${idx}`, data.imageIndex);
+
+  // 反転
+  card.classList.add('is-flipped');
+
+  // ここで必要なら意味テキストの表示やSE再生などを追加可能
+  // console.log(`${['過去','現在','未来'][idx]}: ${data.name} ${reversed?'(逆位置)':'(正位置)'}`);
+}
+
+/* ====== 3枚すべてにクリック割り当て ====== */
+document.querySelectorAll('.card').forEach(c=>{
+  c.addEventListener('click', e=>{
+    const idx = Number(c.dataset.idx);
+    flipCard(idx);
+  }, { passive:true });
+});
+</script>
 </body>
 </html>
