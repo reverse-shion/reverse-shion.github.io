@@ -22,13 +22,28 @@
       mix-blend-mode:screen;
     }
 
-    /* ローディング */
+    /* ===== ローディング（CSSスピナー） ===== */
     #loading{
-      position:fixed;top:0;left:0;width:100%;height:100%;
-      background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;
+      position:fixed;inset:0;
+      background:#000;display:flex;flex-direction:column;
+      justify-content:center;align-items:center;
       z-index:9999;transition:opacity .7s ease-out;
     }
     #loading.fade-out{opacity:0;pointer-events:none}
+
+    /* 回転する光の円 */
+    .loader-ring{
+      width:100px;height:100px;border-radius:50%;
+      border:4px solid transparent;
+      border-top:4px solid #ffd700;
+      border-right:4px solid #7fd0ff;
+      border-bottom:4px solid #ffd700;
+      animation:spin 1.6s linear infinite;
+      box-shadow:0 0 30px rgba(127,208,255,.6),0 0 45px rgba(255,215,111,.4);
+      margin-bottom:1.2rem;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
     .loading-text{
       font-family:'Cinzel',serif;font-size:clamp(1.4rem,5vw,2rem);
       background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
@@ -45,6 +60,7 @@
       min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1.2rem;
     }
     #main-content.visible{opacity:1}
+
     h1{
       font-family:'Cinzel',serif;font-weight:700;
       font-size:clamp(2.0rem,6vw,3.0rem);letter-spacing:.06em;margin-bottom:.8rem;
@@ -66,7 +82,7 @@
     }
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-    /* 扉ボタン（既存維持） */
+    /* 扉ボタン */
     .door-container{margin-top:2.5rem;width:100%;display:flex;justify-content:center}
     .door-button{
       position:relative;display:inline-block;padding:18px 40px;font-size:clamp(1rem,3vw,1.3rem);
@@ -88,7 +104,9 @@
 </head>
 <body>
 
+  <!-- 起動中 -->
   <div id="loading">
+    <div class="loader-ring"></div>
     <div class="loading-text">起動中…</div>
   </div>
 
@@ -129,17 +147,22 @@
       addEventListener('resize',resize);resize();draw();
     })();
 
-    // ローディング短縮
+    // ローディング終了処理
     window.addEventListener('load',()=>{
       const loading=document.getElementById('loading');
       const main=document.getElementById('main-content');
-      setTimeout(()=>{loading.classList.add('fade-out');main.classList.add('visible');},700);
+      setTimeout(()=>{
+        loading.classList.add('fade-out');
+        main.classList.add('visible');
+      },900);
     });
 
-    // 扉クリック
+    // 扉クリック演出
     document.getElementById('door').addEventListener('click',e=>{
       e.preventDefault();
-      const burst=document.createElement('div');burst.className='light-burst';document.body.appendChild(burst);
+      const burst=document.createElement('div');
+      burst.className='light-burst';
+      document.body.appendChild(burst);
       setTimeout(()=>location.href='shion2.html',500);
     });
   </script>
