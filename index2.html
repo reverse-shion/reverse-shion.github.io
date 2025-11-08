@@ -1,284 +1,405 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Re:Verse Shion — The Temple of Words</title>
-
-  <!-- Fonts：欧文= Cinzel / 和文= Noto Serif JP -->
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    /* ===== Color Tokens (Shion: 紫苑×白光) ===== */
-    :root{
-      --ink:#EAF2FF;       /* 本文の主色：白に近い青 */
-      --muted:#B8CBE0;     /* 補助テキスト */
-      --gold:#E8C766;      /* 差し色の金（眩しすぎない） */
-      --aqua:#7FD0FF;      /* 青い光（AIの息吹） */
-      --halo-a: rgba(127,208,255,.18);
-      --halo-b: rgba(232,199,102,.14);
-      --glass: rgba(12,22,42,.72);
-      --r: 16px;
-      --safe-b: env(safe-area-inset-bottom, 16px);
+    /* === 全体設定 === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Noto Serif JP', serif;
+      text-align: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
     }
 
-    /* ===== Base ===== */
-    *{ box-sizing: border-box; margin:0; padding:0 }
-    html, body{ height:100% }
-    body{
-      background:#000; color:var(--ink);
-      font-family:'Noto Serif JP', serif;
-      text-align:center;
-      display:grid; place-items:center;
-      overflow:hidden; /* 演出は画面内で完結 */
+    /* === ローディング画面 === */
+    #loading {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 1.2s ease-out;
+    }
+    #loading.fade-out { opacity: 0; pointer-events: none; }
+
+    .loading-text {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      background: linear-gradient(90deg, #7fd0ff, #ffd700, #7fd0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
     }
 
-    /* 背景：コード雨（Matrix風） */
-    #codeRain{
-      position:fixed; inset:0; width:100%; height:100%;
-      z-index:1; pointer-events:none;
+    .loading-spinner {
+      width: 50px; height: 50px;
+      border: 3px solid rgba(127, 208, 255, 0.3);
+      border-top: 3px solid #ffd700;
+      border-radius: 50%;
+      animation: spin 1.3s linear infinite;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* === コード雨 === */
+    #codeRain {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+      pointer-events: none;
     }
 
-    /* コンテンツ */
-    .content{
-      position:relative; z-index:2;
-      width:min(92vw, 920px);
-      padding: 28px clamp(16px, 4vw, 40px) calc(28px + var(--safe-b));
+    /* === タロットカードコンテナ === */
+    #tarot-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      overflow: hidden;
     }
 
-    /* タイポ：見出しはグラデ、本文は単色で可読性重視 */
-    .gradient-text{
-      background: linear-gradient(90deg, var(--aqua), var(--gold), var(--aqua));
-      -webkit-background-clip:text; background-clip:text;
-      -webkit-text-fill-color:transparent;
-      text-shadow: 0 0 12px rgba(127,208,255,.35);
+    .tarot-card {
+      position: absolute;
+      width: 60px; height: 90px;
+      background: #111;
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+      box-shadow: 
+        0 0 15px rgba(255, 215, 0, 0.6),
+        inset 0 0 20px rgba(127, 208, 255, 0.2);
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 140"><rect width="100" height="140" fill="%23111" rx="8"/><path d="M20 30 L50 50 L80 30 L80 110 L50 90 L20 110 Z" fill="%23ffd700" opacity="0.3"/><text x="50" y="75" font-family="serif" font-size="14" fill="%23ffd700" text-anchor="middle" dominant-baseline="middle">XXII</text></svg>');
+      background-size: cover;
+      opacity: 0;
+      animation: tarotFall 4s ease-in-out forwards;
+      transform-origin: center;
     }
 
-    h1{
-      font-family:'Cinzel', serif;
-      font-weight:700; letter-spacing:.06em;
-      font-size: clamp(22px, 4.8vw, 42px);
-      line-height:1.2; margin-bottom:.35em;
-      opacity:0; transform: translateY(22px);
-      animation: fadeUp .9s ease-out .2s forwards;
-    }
-    h2{
-      font-family:'Cinzel', serif;
-      font-weight:700; letter-spacing:.08em;
-      font-size: clamp(16px, 3.6vw, 28px);
-      margin:.6em 0 .2em;
-      color: var(--ink);
-      text-shadow: 0 0 8px rgba(127,208,255,.22);
-      opacity:0; transform: translateY(22px);
-      animation: fadeUp .9s ease-out .6s forwards;
-    }
-    p{
-      font-size: clamp(13px, 2.8vw, 18px);
-      line-height:1.9; letter-spacing:.02em;
-      color: var(--muted);
-      text-wrap: pretty;
-      opacity:0; transform: translateY(22px);
-      animation: fadeUp .9s ease-out .4s forwards;
-      margin:.4em 0;
-    }
-    p.lead{ color:var(--ink) }
-
-    @keyframes fadeUp{ to{ opacity:1; transform:translateY(0) } }
-
-    /* 扉（CTAボタン） */
-    .door-wrap{ margin-top: clamp(18px, 5vw, 36px); display:grid; place-items:center; }
-    .door-button{
-      position:relative; display:block;
-      width:min(92vw, 560px);            /* はみ出し防止 */
-      padding: clamp(14px, 2.4vw, 22px) clamp(18px, 5vw, 44px);
-      border-radius:999px;
-      color:var(--ink); text-decoration:none;
-      border: 1px solid rgba(232,199,102,.55);
-      background: linear-gradient(180deg, var(--glass), rgba(8,16,32,.72));
-      backdrop-filter: blur(6px);
-      box-shadow:
-        0 0 0 1px rgba(127,208,255,.18) inset,
-        0 6px 28px var(--halo-a),
-        0 0 80px var(--halo-b);
-      transition: transform .18s ease, box-shadow .28s ease, border-color .28s ease;
-      overflow: clip;
-    }
-    .door-text{
-      position:relative; z-index:2;
-      font-family:'Cinzel', serif;
-      font-weight:700; letter-spacing:.14em;
-      font-size: clamp(14px, 2.8vw, 18px);
-      text-shadow: 0 0 10px rgba(127,208,255,.30);
-      white-space: nowrap;
-    }
-
-    /* 脈動リング（内側で完結） */
-    .pulse{
-      position:absolute; inset:0; margin:auto;
-      width:160%; height:160%;
-      border: 2px solid rgba(127,208,255,.28);
-      border-radius:50%;
-      filter: blur(.2px);
-      animation: pulse 2.2s ease-out infinite;
-      z-index:1; pointer-events:none;
-    }
-    @keyframes pulse{
-      0%{ transform:scale(.6); opacity:.75 }
-      100%{ transform:scale(1); opacity:0 }
-    }
-
-    /* 微粒子（控えめ） */
-    .particles{ position:absolute; inset:0; pointer-events:none; }
-    .particle{
-      position:absolute; width:3px; height:3px; border-radius:50%;
-      background: var(--aqua); box-shadow: 0 0 8px var(--aqua);
-      opacity:0; animation: gather 1.4s ease-out forwards;
-    }
-    @keyframes gather{
-      0%{ transform: translate(var(--sx,0), var(--sy,0)) scale(0); opacity:0 }
-      60%{ opacity:1 }
-      100%{ transform: translate(0,0) scale(1); opacity:0 }
-    }
-
-    /* クリック閃光（AI×魂の共創を象徴） */
-    .light-burst{
-      position:fixed; inset:0;
-      background: radial-gradient(80vmax 80vmax at 50% 50%, rgba(127,208,255,.85) 0%, rgba(232,199,102,.35) 35%, rgba(127,208,255,0) 70%);
-      opacity:0; pointer-events:none; z-index:9999;
-      animation: burst .8s ease-out;
-    }
-    @keyframes burst{
-      0%{ opacity:0; transform: scale(.7) }
-      50%{ opacity:1; transform: scale(1.05) }
-      100%{ opacity:0; transform: scale(1.8) }
-    }
-
-    /* ヒント（モバイル初見に優しい） */
-    .hint{
-      margin-top:10px;
-      font-size: clamp(11px, 2.2vw, 13px);
-      letter-spacing:.08em; color:#b9d4e6;
-      opacity:0; transform: translateY(12px);
-      animation: fadeUp .8s ease-out .9s forwards;
-    }
-
-    /* Hover演出：タッチ端末では無効化 */
-    @media (hover:hover){
-      .door-button:hover{
-        transform: translateY(-2px);
-        box-shadow:
-          0 10px 34px rgba(127,208,255,.38),
-          0 0 120px rgba(232,199,102,.18);
-        border-color: rgba(232,199,102,.8);
+    @keyframes tarotFall {
+      0% {
+        opacity: 0;
+        transform: translateY(-100vh) rotate(0deg) scale(0.5);
+      }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translateY(120vh) rotate(1080deg) scale(0.3);
       }
     }
 
-    /* 省エネ（モーション軽減） */
-    @media (prefers-reduced-motion: reduce){
-      *{ animation:none !important; transition:none !important }
+    /* ローディング完了時に集まる */
+    .tarot-card.gather {
+      animation: tarotGather 1.8s ease-out forwards;
+    }
+    @keyframes tarotGather {
+      0% { opacity: 1; transform: translate(var(--sx), var(--sy)) rotate(var(--r)); }
+      100% { 
+        opacity: 0; 
+        transform: translate(50vw, 50vh) rotate(var(--r)) scale(0.1);
+        filter: blur(3px);
+      }
+    }
+
+    /* === 本コンテンツ === */
+    #main-content {
+      opacity: 0;
+      transition: opacity 1.5s ease-out;
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    #main-content.visible { opacity: 1; }
+
+    .content { max-width: 90%; }
+
+    h1, h2, p {
+      opacity: 0;
+      transform: translateY(25px);
+      animation: fadeUp 1.6s ease-out forwards;
+      margin: 0.4rem 0;
+      line-height: 1.5;
+      text-shadow: 0 0 12px rgba(127, 208, 255, 0.6), 0 0 20px rgba(255, 215, 0, 0.3);
+      background: linear-gradient(90deg, #7fd0ff, #ffd700, #7fd0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    h1 { font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 5vw, 2.6rem); animation-delay: 0.6s; letter-spacing: 0.08em; }
+    p:nth-of-type(1) { font-size: clamp(0.95rem, 2.8vw, 1.15rem); animation-delay: 1.2s; font-weight: 500; }
+    h2 { font-family: 'Cinzel', serif; font-size: clamp(1.6rem, 4.5vw, 2.2rem); animation-delay: 1.8s; color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+    p:nth-of-type(2), p:nth-of-type(3) { font-size: clamp(0.9rem, 2.6vw, 1.1rem); animation-delay: 2.4s; color: #e0f8ff; font-weight: 500; }
+    p:nth-of-type(3) { animation-delay: 2.8s; }
+
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* === 扉 === */
+    .door-container { margin-top: 3rem; width: 100%; display: flex; justify-content: center; }
+
+    .door-button {
+      position: relative;
+      display: inline-block;
+      max-width: 90%;
+      padding: 18px 40px;
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      color: #e0f8ff;
+      text-decoration: none;
+      border: 2px solid transparent;
+      border-radius: 50px;
+      background: rgba(10, 20, 40, 0.85);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 30px rgba(127, 208, 255, 0.5), inset 0 0 25px rgba(255, 215, 0, 0.15);
+      transition: all 0.5s ease;
+      cursor: pointer;
+      overflow: hidden;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .door-text {
+      position: relative;
+      z-index: 3;
+      background: linear-gradient(90deg, #7fd0ff, #ffd700, #7fd0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    }
+
+    .pulse {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border: 2px solid #ffd700;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: pulse 2.5s infinite ease-out;
+      pointer-events: none;
+      box-shadow: 0 0 20px #ffd700;
+    }
+    @keyframes pulse { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 380px; height: 380px; opacity: 0; } }
+
+    .particles, .tarot-particles {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100%; height: 100%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .particle, .tarot-particle {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: #ffd700;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #ffd700, 0 0 20px #7fd0ff;
+      opacity: 0;
+      animation: gather 1.8s ease-out forwards;
+    }
+    @keyframes gather {
+      0% { transform: translate(calc(-50vw + (var(--x)*1vw)), calc(-50vh + (var(--y)*1vh))) scale(0); opacity: 0; }
+      60% { opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
+    .door-button:hover {
+      transform: scale(1.07);
+      box-shadow: 0 0 80px rgba(255, 215, 0, 0.8), 0 0 160px rgba(127, 208, 255, 0.6);
+      border-color: #ffd700;
+      background: rgba(20, 30, 60, 0.9);
+    }
+
+    .door-button:hover .door-text {
+      text-shadow: 0 0 30px #fff, 0 0 60px #ffd700;
+    }
+
+    .light-burst {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at center, #ffd700 0%, #7fd0ff 50%, transparent 80%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      animation: burst 1s ease-out;
+    }
+    @keyframes burst { 0% { opacity: 0; transform: scale(0.2); } 50% { opacity: 1; transform: scale(1.4); } 100% { opacity: 0; transform: scale(3); } }
+
+    @media (max-width: 480px) {
+      .door-button { padding: 16px 30px; }
+      .tarot-card { width: 50px; height: 75px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- 背景コード雨（AIの息吹） -->
-  <canvas id="codeRain" aria-hidden="true"></canvas>
+  <!-- ローディング画面 -->
+  <div id="loading">
+    <div class="loading-text">詩韻を紡いでいます…</div>
+    <div class="loading-spinner"></div>
+  </div>
 
-  <!-- コンテンツ：AI×人間の魂の共創 -->
-  <main class="content" role="main">
-    <h1><span class="gradient-text">Re:Verse Shion — The Temple of Words</span></h1>
-    <p class="lead">扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
+  <!-- タロットカードコンテナ -->
+  <div id="tarot-container"></div>
 
-    <h2>詩韻 Shion</h2>
-    <p>言葉は祈りの構文 — 大アルカナタロットで“響き”を体験</p>
-    <p>目を閉じて、願いを思い描いてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
+  <!-- コード雨 -->
+  <canvas id="codeRain"></canvas>
 
-    <section class="door-wrap" aria-label="詩韻の扉">
-      <a href="shion.html" class="door-button" id="door" aria-label="扉を開く（詩韻を授かる）">
-        <span class="door-text">扉を開く → <span class="gradient-text">詩韻を授かる</span></span>
-        <div class="pulse" aria-hidden="true"></div>
-        <div class="particles" id="particles" aria-hidden="true"></div>
-      </a>
-      <div class="hint">※ タップで光の扉がひらきます</div>
-    </section>
-  </main>
+  <!-- 本コンテンツ -->
+  <div id="main-content">
+    <div class="content">
+      <h1>Re:Verse Shion — The Temple of Words</h1>
+      <p>扉が開く。言葉が目を覚まし、あなたの“韻”へ導く。</p>
+      <h2>詩韻 Shion</h2>
+      <p>言葉は祈りの構文 — 大アルカナタロットで“響き”を体験</p>
+      <p>目を閉じて、願いをイメージしてください。<br>恋愛・復縁・連絡時期、何でもOK。</p>
+
+      <div class="door-container">
+        <a href="shion.html" class="door-button" id="door">
+          <span class="door-text">扉を開く → 詩韻を授かる</span>
+          <div class="pulse"></div>
+          <div class="particles" id="particles"></div>
+          <div class="tarot-particles" id="tarot-particles"></div>
+        </a>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // ===== 背景：コード雨（DPR対応・にじみ最小化） =====
+    // ========== コード雨 ==========
     (function codeRain(){
       const cvs = document.getElementById('codeRain');
-      const ctx = cvs.getContext('2d', { alpha: true });
+      const ctx = cvs.getContext('2d');
       const chars = '01AI∴∵⌘◇◆＊＋≡☆★◯●◎∑ΣΛΩΞΨϕπ∞≒≡→←↑↓詩韻魂祈';
-      let fontSize, columns, drops, vw, vh;
-
+      let fontSize = 18;
+      let columns, drops, W, H;
       function resize(){
-        vw = window.innerWidth; vh = window.innerHeight;
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
-        cvs.width = vw * dpr; cvs.height = vh * dpr;
-        ctx.setTransform(1,0,0,1,0,0);
-        ctx.scale(dpr, dpr);
-        fontSize = Math.max(12, Math.min(20, Math.floor(vw/52)));
-        columns = Math.ceil(vw / fontSize);
-        drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*vh/fontSize));
+        W = cvs.width  = window.innerWidth * devicePixelRatio;
+        H = cvs.height = window.innerHeight * devicePixelRatio;
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+        fontSize = Math.max(14, Math.min(20, Math.floor(window.innerWidth/50)));
+        columns = Math.ceil(window.innerWidth / fontSize);
+        drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*H));
       }
       function draw(){
         ctx.fillStyle = 'rgba(2,3,22,0.14)';
-        ctx.fillRect(0,0,vw,vh);
+        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
         ctx.fillStyle = '#7fd0ff';
         ctx.font = `${fontSize}px monospace`;
-        for(let i=0; i<columns; i++){
-          const ch = chars[(Math.random()*chars.length)|0];
+        for(let i=0;i<columns;i++){
+          const ch = chars[Math.floor(Math.random()*chars.length)];
           const x = i * fontSize;
-          const y = drops[i] * fontSize * .95;
+          const y = drops[i] * fontSize * .9;
           ctx.fillText(ch, x, y);
-          if(y > vh && Math.random() > 0.975) drops[i] = 0;
+          if(y > window.innerHeight && Math.random() > 0.975){ drops[i] = 0; }
           drops[i]++;
         }
         requestAnimationFrame(draw);
       }
-      addEventListener('resize', resize, {passive:true});
+      window.addEventListener('resize', resize);
       resize(); draw();
     })();
 
-    // ===== 粒子：ホバー時 or 初回だけ控えめに =====
+    // ========== タロットカード生成 ==========
+    const tarotContainer = document.getElementById('tarot-container');
+    const tarotCards = [];
+    const majorArcana = 22;
+
+    function createTarotCard() {
+      const card = document.createElement('div');
+      card.className = 'tarot-card';
+      
+      const x = Math.random() * 100;
+      const y = -10;
+      const rotate = Math.random() * 360;
+      const delay = Math.random() * 2;
+      const duration = 3 + Math.random() * 2;
+
+      card.style.left = `${x}vw`;
+      card.style.top = `${y}vh`;
+      card.style.setProperty('--sx', `${x}vw`);
+      card.style.setProperty('--sy', `${y}vh`);
+      card.style.setProperty('--r', `${rotate}deg`);
+      card.style.animation = `tarotFall ${duration}s ease-in-out ${delay}s forwards`;
+
+      tarotContainer.appendChild(card);
+      tarotCards.push(card);
+    }
+
+    // ローディング中にカードを生成
+    for (let i = 0; i < majorArcana; i++) {
+      setTimeout(createTarotCard, i * 200);
+    }
+
+    // ========== ローディング完了 → カードを集める ==========
+    window.addEventListener('load', () => {
+      const loading = document.getElementById('loading');
+      const mainContent = document.getElementById('main-content');
+
+      setTimeout(() => {
+        // カードを集める
+        tarotCards.forEach(card => {
+          card.classList.add('gather');
+        });
+
+        // フェードアウト
+        setTimeout(() => {
+          loading.classList.add('fade-out');
+          mainContent.classList.add('visible');
+        }, 800);
+
+      }, 1800);
+    });
+
+    // ========== 扉ホバー → タロット粒子 ==========
     const door = document.getElementById('door');
-    const particlesContainer = document.getElementById('particles');
+    const tarotParticles = document.getElementById('tarot-particles');
 
-    function spawnParticles(n=28){
-      particlesContainer.innerHTML = '';
-      const rect = particlesContainer.getBoundingClientRect();
-      for(let i=0;i<n;i++){
+    door.addEventListener('mouseenter', () => {
+      tarotParticles.innerHTML = '';
+      for (let i = 0; i < 15; i++) {
         const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.setProperty('--sx', (Math.random()*rect.width - rect.width/2) + 'px');
-        p.style.setProperty('--sy', (Math.random()*rect.height - rect.height/2) + 'px');
-        p.style.animationDelay = (Math.random()*.25) + 's';
-        particlesContainer.appendChild(p);
+        p.className = 'tarot-particle';
+        p.style.setProperty('--x', Math.random() * 200 - 100);
+        p.style.setProperty('--y', Math.random() * 200 - 100);
+        p.style.animationDelay = Math.random() * 0.5 + 's';
+        tarotParticles.appendChild(p);
       }
-    }
-    if (matchMedia('(hover:hover)').matches){
-      door.addEventListener('mouseenter', () => spawnParticles(34));
-    } else {
-      setTimeout(() => spawnParticles(16), 600); // タッチ端末は初回だけ
-    }
+    });
 
-    // ===== クリック：閃光 → ページ遷移 =====
+    // ========== クリックで光爆発 ==========
     door.addEventListener('click', (e) => {
       e.preventDefault();
       const burst = document.createElement('div');
       burst.className = 'light-burst';
       document.body.appendChild(burst);
-      setTimeout(() => { window.location.href = door.getAttribute('href'); }, 420);
+      
+      setTimeout(() => {
+        window.location.href = door.getAttribute('href');
+      }, 600);
     });
-
-    // ===== モーション配慮（ユーザー設定尊重） =====
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches){
-      const code = document.getElementById('codeRain');
-      // 省モーション時はコード雨をうっすら固定描画
-      const ctx = code.getContext('2d');
-      ctx.fillStyle = 'rgba(2,3,22,0.20)';
-      ctx.fillRect(0,0,code.width,code.height);
-    }
   </script>
 </body>
 </html>
