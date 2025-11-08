@@ -1,253 +1,187 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Re:Verse Shion — 占い × 思想</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{
-      background:#000;color:#fff;font-family:'Noto Serif JP',serif;
-      text-align:center;min-height:100vh;overflow:hidden;position:relative;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:Verse Shion — 占い × 思想</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#000;color:#fff;font-family:'Noto Serif JP',serif;
+  text-align:center;min-height:100vh;overflow:hidden;position:relative;
+}
 
-    /* ===== 起動演出：金と紫の光の呼吸 ===== */
-    .boot-screen{
-      position:fixed;inset:0;
-      background:radial-gradient(circle at center,#0a0a10 0%,#000 100%);
-      display:flex;align-items:center;justify-content:center;
-      overflow:hidden;z-index:10000;
-      animation:fadeOut 1.5s ease 3.5s forwards;
-    }
-    .boot-glow{
-      position:absolute;width:200%;height:200%;
-      background:
-        radial-gradient(circle at 30% 40%,rgba(255,215,111,0.2),transparent 60%),
-        radial-gradient(circle at 70% 60%,rgba(174,138,255,0.25),transparent 70%);
-      filter:blur(80px);
-      animation:glowMove 8s ease-in-out infinite alternate;
-      z-index:0;
-    }
-    .boot-text{
-      font-family:'Cinzel','Noto Serif JP',serif;
-      font-size:1.3rem;letter-spacing:0.08em;
-      color:#e9dcff;z-index:2;
-      text-shadow:0 0 15px rgba(174,138,255,0.8),0 0 35px rgba(255,215,111,0.4);
-      animation:flicker 1.6s infinite;
-    }
-    @keyframes glowMove{
-      0%{transform:translate(0%,0%) scale(1);}
-      100%{transform:translate(-5%,5%) scale(1.1);}
-    }
-    @keyframes flicker{
-      0%,100%{opacity:1;text-shadow:0 0 15px rgba(174,138,255,0.8),0 0 35px rgba(255,215,111,0.4);}
-      50%{opacity:0.7;text-shadow:0 0 5px rgba(174,138,255,0.4),0 0 15px rgba(255,215,111,0.2);}
-    }
-    @keyframes fadeOut{to{opacity:0;visibility:hidden}}
+/* === 起動画面（金と紫の光）=== */
+.boot-screen{
+  position:fixed;inset:0;
+  background:radial-gradient(circle at center,#0a0a10 0%,#000 100%);
+  display:flex;align-items:center;justify-content:center;
+  z-index:10000;overflow:hidden;
+  animation:bootFade 1s ease 3.5s forwards;
+}
+.boot-glow{
+  position:absolute;width:200%;height:200%;
+  background:
+    radial-gradient(circle at 30% 40%,rgba(255,215,111,0.25),transparent 60%),
+    radial-gradient(circle at 70% 60%,rgba(174,138,255,0.3),transparent 70%);
+  filter:blur(80px);
+  animation:glowMove 8s ease-in-out infinite alternate;
+  z-index:0;
+}
+.boot-text{
+  font-family:'Cinzel','Noto Serif JP',serif;
+  font-size:1.3rem;letter-spacing:0.08em;
+  color:#e9dcff;z-index:2;
+  text-shadow:0 0 15px rgba(174,138,255,0.8),0 0 35px rgba(255,215,111,0.4);
+  animation:flicker 1.6s infinite;
+}
+@keyframes glowMove{0%{transform:translate(0%,0%) scale(1)}100%{transform:translate(-5%,5%) scale(1.1)}}
+@keyframes flicker{
+  0%,100%{opacity:1;text-shadow:0 0 15px rgba(174,138,255,0.8),0 0 35px rgba(255,215,111,0.4);}
+  50%{opacity:0.7;text-shadow:0 0 5px rgba(174,138,255,0.4),0 0 15px rgba(255,215,111,0.2);}
+}
+@keyframes bootFade{to{opacity:0;visibility:hidden;pointer-events:none}}
 
-    /* 背景：サイバー×神域 */
-    body::before{
-      content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-      background:
-        radial-gradient(800px 600px at 50% 80%,rgba(255,215,111,.12),transparent 70%),
-        conic-gradient(from 0deg at 50% 70%,rgba(127,208,255,.14),transparent 40%),
-        repeating-linear-gradient(90deg,rgba(127,208,255,.05) 0 1px,transparent 1px 26px);
-      mix-blend-mode:screen;
-    }
+/* === コード雨 === */
+#codeRain{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:1;pointer-events:none;
+  background:#000;
+}
 
-    /* ===== 超豪華ローディング円 ===== */
-    #loading{
-      position:fixed;inset:0;
-      background:#000;display:flex;flex-direction:column;
-      justify-content:center;align-items:center;
-      z-index:9999;transition:opacity .9s ease-out;
-    }
-    #loading.fade-out{opacity:0;pointer-events:none}
+/* === ローディング円 === */
+#loading{
+  position:fixed;inset:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  z-index:10;opacity:0;transition:opacity 1s ease;
+}
+#loading.visible{opacity:1}
+.loader-container{position:relative;width:140px;height:140px;margin-bottom:1.5rem;}
+.ring-outer{
+  position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,#ffd700,#7fd0ff,#ffd700,#7fd0ff);
+  animation:spin 3s linear infinite;filter:blur(1px);
+  box-shadow:0 0 40px rgba(255,215,0,0.8),0 0 80px rgba(127,208,255,0.6),inset 0 0 30px rgba(255,215,0,0.4);
+}
+.ring-middle{
+  position:absolute;top:15px;left:15px;right:15px;bottom:15px;border-radius:50%;
+  border:3px solid transparent;border-top:3px solid #7fd0ff;border-left:3px solid #ffd700;
+  animation:spinReverse 2s linear infinite;box-shadow:0 0 25px rgba(127,208,255,0.7);
+}
+.ring-core{
+  position:absolute;top:50%;left:50%;width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle,#fff 10%,#7fd0ff 40%,transparent 70%);
+  transform:translate(-50%,-50%);
+  animation:pulseCore 1.8s ease-in-out infinite;
+  box-shadow:0 0 20px #fff,0 0 40px #7fd0ff,0 0 60px #ffd700;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinReverse{to{transform:rotate(-360deg)}}
+@keyframes pulseCore{
+  0%,100%{box-shadow:0 0 20px #fff,0 0 40px #7fd0ff,0 0 60px #ffd700;}
+  50%{box-shadow:0 0 30px #fff,0 0 60px #7fd0ff,0 0 90px #ffd700;}
+}
 
-    .loader-container{position:relative;width:140px;height:140px;margin-bottom:1.5rem;}
-    .ring-outer{
-      position:absolute;inset:0;border-radius:50%;
-      background:conic-gradient(from 0deg,#ffd700,#7fd0ff,#ffd700,#7fd0ff);
-      animation:spin 3s linear infinite;filter:blur(1px);
-      box-shadow:0 0 40px rgba(255,215,0,0.8),0 0 80px rgba(127,208,255,0.6),inset 0 0 30px rgba(255,215,0,0.4);
-    }
-    .ring-middle{
-      position:absolute;top:15px;left:15px;right:15px;bottom:15px;
-      border-radius:50%;border:3px solid transparent;
-      border-top:3px solid #7fd0ff;border-left:3px solid #ffd700;border-right:3px solid #7fd0ff;
-      animation:spinReverse 2s linear infinite;
-      box-shadow:0 0 25px rgba(127,208,255,0.7);
-    }
-    .ring-core{
-      position:absolute;top:50%;left:50%;
-      width:30px;height:30px;
-      background:radial-gradient(circle,#fff 10%,#7fd0ff 40%,transparent 70%);
-      border-radius:50%;transform:translate(-50%,-50%);
-      box-shadow:0 0 20px #fff,0 0 40px #7fd0ff,0 0 60px #ffd700;
-      animation:pulseCore 1.8s ease-in-out infinite;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes spinReverse{to{transform:rotate(-360deg)}}
-    @keyframes pulseCore{
-      0%,100%{box-shadow:0 0 20px #fff,0 0 40px #7fd0ff,0 0 60px #ffd700;}
-      50%{box-shadow:0 0 30px #fff,0 0 60px #7fd0ff,0 0 90px #ffd700;}
-    }
-
-    .loading-text{
-      font-family:'Cinzel',serif;font-size:clamp(1.5rem,5.5vw,2.3rem);
-      background:linear-gradient(90deg,#7fd0ff,#ffd700,#fff,#ffd700,#7fd0ff);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      letter-spacing:.12em;
-      text-shadow:0 0 20px rgba(255,215,0,.8),0 0 40px rgba(127,208,255,.6);
-      animation:pulseText 2.2s infinite ease-in-out;
-    }
-    @keyframes pulseText{
-      0%,100%{text-shadow:0 0 20px rgba(255,215,0,.8),0 0 40px rgba(127,208,255,.6)}
-      50%{text-shadow:0 0 30px #fff,0 0 60px #ffd700,0 0 80px #7fd0ff}
-    }
-
-    /* 本文 */
-    #main-content{
-      opacity:0;transition:opacity 1.2s ease-out .9s;position:relative;z-index:2;
-      min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1.2rem;
-    }
-    #main-content.visible{opacity:1}
-    h1{
-      font-family:'Cinzel',serif;font-weight:700;
-      font-size:clamp(2.0rem,6vw,3.0rem);letter-spacing:.06em;margin-bottom:.8rem;
-      background:linear-gradient(92deg,#FFE7A6,#FFD76F,#FFF5CF,#FFD76F);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      text-shadow:0 0 22px rgba(255,215,111,.45),0 0 50px rgba(124,98,255,.25);
-    }
-    h2{
-      font-family:'Cinzel',serif;font-size:clamp(1.4rem,4vw,2rem);
-      margin-bottom:.8rem;background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      text-shadow:0 0 20px rgba(127,208,255,.5);
-      animation:fadeUp 1.2s ease-out forwards;
-    }
-    p{
-      font-size:clamp(0.9rem,2.8vw,1.1rem);
-      color:#eaf1ff;line-height:1.7;
-      animation:fadeUp 1.6s ease-out forwards;
-    }
-    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-    /* 扉ボタン */
-    .door-container{margin-top:2.5rem;width:100%;display:flex;justify-content:center}
-    .door-button{
-      position:relative;display:inline-block;padding:18px 40px;font-size:clamp(1rem,3vw,1.3rem);
-      color:#e0f8ff;text-decoration:none;border:2px solid transparent;border-radius:50px;
-      background:rgba(10,20,40,.85);backdrop-filter:blur(8px);
-      box-shadow:0 0 30px rgba(127,208,255,.5),inset 0 0 25px rgba(255,215,0,.15);
-      transition:all .5s ease;cursor:pointer;overflow:hidden;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.1em;
-    }
-    .door-text{
-      position:relative;z-index:3;background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 15px rgba(255,215,0,.7);
-    }
-    .pulse{position:absolute;top:50%;left:50%;width:0;height:0;border:2px solid #ffd700;border-radius:50%;transform:translate(-50%,-50%);animation:pulse 2.5s infinite ease-out;pointer-events:none;box-shadow:0 0 20px #ffd700}
-    @keyframes pulse{0%{width:0;height:0;opacity:1}100%{width:340px;height:340px;opacity:0}}
-    .door-button:hover{transform:scale(1.07);box-shadow:0 0 80px rgba(255,215,0,.8),0 0 160px rgba(127,208,255,.6);border-color:#ffd700;background:rgba(20,30,60,.9)}
-    .light-burst{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at center,#ffd700 0%,#7fd0ff 50%,transparent 80%);opacity:0;pointer-events:none;z-index:9999;animation:burst 1s ease-out}
-    @keyframes burst{0%{opacity:0;transform:scale(.2)}50%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(3)}}
-  </style>
+/* === メイン === */
+#main-content{
+  opacity:0;transition:opacity 1.2s ease-out .5s;
+  position:relative;z-index:2;
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+}
+#main-content.visible{opacity:1}
+h1{
+  font-family:'Cinzel',serif;font-size:clamp(2rem,6vw,3rem);
+  background:linear-gradient(90deg,#FFE7A6,#FFD76F,#FFF5CF,#FFD76F);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 20px rgba(255,215,111,.45);
+}
+h2{
+  font-family:'Cinzel',serif;font-size:clamp(1.3rem,4vw,1.8rem);
+  background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 20px rgba(127,208,255,.5);
+  margin:.6rem 0;
+}
+p{color:#eaf1ff;font-size:1rem;line-height:1.7;text-shadow:0 0 8px rgba(255,255,255,.2)}
+.door-button{
+  margin-top:2rem;position:relative;display:inline-block;
+  padding:16px 40px;border-radius:40px;background:rgba(20,30,60,.8);
+  color:#fff;text-decoration:none;font-family:'Cinzel',serif;
+  letter-spacing:.1em;transition:.5s;overflow:hidden;
+  box-shadow:0 0 30px rgba(127,208,255,.5);
+}
+.door-button:hover{transform:scale(1.07);box-shadow:0 0 80px rgba(255,215,0,.8)}
+</style>
 </head>
 <body>
 
-  <!-- ===== 起動演出 ===== -->
-  <div class="boot-screen">
-    <div class="boot-glow"></div>
-    <p class="boot-text">Re:Verse OS -Shion 起動中...</p>
+<!-- 起動中 -->
+<div class="boot-screen">
+  <div class="boot-glow"></div>
+  <p class="boot-text">Re:Verse OS -Shion 起動中...</p>
+</div>
+
+<!-- コード雨 -->
+<canvas id="codeRain"></canvas>
+
+<!-- ローディング円 -->
+<div id="loading">
+  <div class="loader-container">
+    <div class="ring-outer"></div>
+    <div class="ring-middle"></div>
+    <div class="ring-core"></div>
   </div>
+  <div class="loading-text">Re:Verse Shion</div>
+</div>
 
-  <!-- ===== ローディング円 ===== -->
-  <div id="loading">
-    <div class="loader-container" id="loader">
-      <div class="ring-outer"></div>
-      <div class="ring-middle"></div>
-      <div class="ring-core"></div>
-    </div>
-    <div class="loading-text">Re:Verse Shion</div>
-  </div>
+<!-- 本文 -->
+<div id="main-content">
+  <h1>Re:Verse Shion</h1>
+  <h2>占い × 思想</h2>
+  <p>恋も、仕事も、運命も。<br>あなたの“今”を言葉で照らす。</p>
+  <a href="shion2.html" class="door-button">扉を開く</a>
+</div>
 
-  <canvas id="codeRain"></canvas>
-
-  <div id="main-content">
-    <h1>Re:Verse Shion</h1>
-    <h2>占い × 思想</h2>
-    <p>恋も、仕事も、運命も。<br>あなたの“今”を言葉で照らす。</p>
-
-    <div class="door-container">
-      <a href="shion2.html" class="door-button" id="door">
-        <span class="door-text">扉を開く</span>
-        <div class="pulse"></div>
-      </a>
-    </div>
-  </div>
-
-  <script>
-    // 起動フェーズ終了後にローディング円表示
-    setTimeout(()=>{document.querySelector('.boot-screen').style.display='none';},4000);
-
-    // 光の粒子
-    const loader=document.getElementById('loader');
-    const radius=70;
-    for(let i=0;i<12;i++){
-      const angle=(i/12)*2*Math.PI;
-      const x=radius*Math.cos(angle),y=radius*Math.sin(angle);
-      const p=document.createElement('div');
-      p.className='particle';
-      p.style.left=`calc(50% + ${x}px)`;p.style.top=`calc(50% + ${y}px)`;
-      p.style.width='4px';p.style.height='4px';p.style.background='#ffd700';
-      p.style.borderRadius='50%';p.style.boxShadow='0 0 12px #ffd700';
-      p.style.animation=`sparkle 2s ease-in-out infinite ${i*0.12}s`;
-      loader.appendChild(p);
+<script>
+/* ===== コード雨 ===== */
+(function(){
+  const cvs=document.getElementById('codeRain'),ctx=cvs.getContext('2d');
+  const chars='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
+  let fs=18,cols,drops;
+  function resize(){
+    cvs.width=innerWidth; cvs.height=innerHeight;
+    fs=Math.max(14,Math.min(20,Math.floor(innerWidth/50)));
+    cols=Math.ceil(innerWidth/fs); drops=new Array(cols).fill(0);
+  }
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.1)'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    ctx.fillStyle='#7fd0ff'; ctx.font=`${fs}px monospace`;
+    for(let i=0;i<cols;i++){
+      const ch=chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(ch,i*fs,drops[i]*fs);
+      if(drops[i]*fs>innerHeight&&Math.random()>.975)drops[i]=0;
+      drops[i]++;
     }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);
+  resize(); draw();
+})();
 
-    // コード雨
-    (function(){
-      const cvs=document.createElement('canvas');cvs.id='codeRain';document.body.appendChild(cvs);
-      const ctx=cvs.getContext('2d');
-      const chars='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
-      let fs=18,cols,drops,W,H;
-      function resize(){
-        W=cvs.width=innerWidth*devicePixelRatio;H=cvs.height=innerHeight*devicePixelRatio;
-        ctx.scale(devicePixelRatio,devicePixelRatio);
-        fs=Math.max(14,Math.min(20,Math.floor(innerWidth/50)));
-        cols=Math.ceil(innerWidth/fs);drops=new Array(cols).fill(0);
-      }
-      function draw(){
-        ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,innerWidth,innerHeight);
-        ctx.fillStyle='#7fd0ff';ctx.font=`${fs}px monospace`;
-        for(let i=0;i<cols;i++){
-          const ch=chars[Math.floor(Math.random()*chars.length)];
-          ctx.fillText(ch,i*fs,drops[i]*fs*.9);
-          if(drops[i]*fs>innerHeight&&Math.random()>.975)drops[i]=0;drops[i]++;
-        }requestAnimationFrame(draw);
-      }
-      addEventListener('resize',resize);resize();draw();
-    })();
+/* ===== 起動演出完了後にロード表示 ===== */
+setTimeout(()=>{
+  document.querySelector('.boot-screen').remove();
+  document.getElementById('loading').classList.add('visible');
+},4000);
 
-    // ローディング終了
-    window.addEventListener('load',()=>{
-      const loading=document.getElementById('loading');
-      const main=document.getElementById('main-content');
-      setTimeout(()=>{
-        loading.classList.add('fade-out');
-        main.classList.add('visible');
-      },1600);
-    });
-
-    // 扉クリック
-    document.getElementById('door').addEventListener('click',e=>{
-      e.preventDefault();
-      const burst=document.createElement('div');
-      burst.className='light-burst';
-      document.body.appendChild(burst);
-      setTimeout(()=>location.href='shion2.html',500);
-    });
-  </script>
+/* ===== ページロード後にメイン表示 ===== */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loading').style.opacity=0;
+    document.getElementById('main-content').classList.add('visible');
+  },5500);
+});
+</script>
 </body>
 </html>
