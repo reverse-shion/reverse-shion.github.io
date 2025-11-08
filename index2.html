@@ -36,22 +36,19 @@
     .loading-text {
       font-family: 'Cinzel', serif;
       font-size: clamp(1.5rem, 5vw, 2.2rem);
-      background: linear-gradient(90deg, #7fd0ff, #ffd700, #7fd0ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #7fd0ff;
       letter-spacing: 0.1em;
       margin-bottom: 1.5rem;
-      text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+      text-shadow: 0 0 15px rgba(127, 208, 255, 0.8);
     }
 
     .loading-spinner {
       width: 50px; height: 50px;
       border: 3px solid rgba(127, 208, 255, 0.3);
-      border-top: 3px solid #ffd700;
+      border-top: 3px solid #7fd0ff;
       border-radius: 50%;
       animation: spin 1.3s linear infinite;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+      box-shadow: 0 0 20px rgba(127, 208, 255, 0.6);
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -64,7 +61,7 @@
       pointer-events: none;
     }
 
-    /* === タロットカードコンテナ === */
+    /* === タロットカード（サイバー青）=== */
     #tarot-container {
       position: fixed;
       top: 0; left: 0;
@@ -78,12 +75,12 @@
       position: absolute;
       width: 60px; height: 90px;
       background: #111;
-      border: 2px solid #ffd700;
+      border: 2px solid #7fd0ff;
       border-radius: 8px;
       box-shadow: 
-        0 0 15px rgba(255, 215, 0, 0.6),
-        inset 0 0 20px rgba(127, 208, 255, 0.2);
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 140"><rect width="100" height="140" fill="%23111" rx="8"/><path d="M20 30 L50 50 L80 30 L80 110 L50 90 L20 110 Z" fill="%23ffd700" opacity="0.3"/><text x="50" y="75" font-family="serif" font-size="14" fill="%23ffd700" text-anchor="middle" dominant-baseline="middle">XXII</text></svg>');
+        0 0 18px rgba(127, 208, 255, 0.8),
+        inset 0 0 25px rgba(127, 208, 255, 0.3);
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 140"><rect width="100" height="140" fill="%23111" rx="8"/><path d="M20 30 L50 50 L80 30 L80 110 L50 90 L20 110 Z" fill="%237fd0ff" opacity="0.4"/><text x="50" y="75" font-family="serif" font-size="14" fill="%237fd0ff" text-anchor="middle" dominant-baseline="middle">XXII</text></svg>');
       background-size: cover;
       opacity: 0;
       animation: tarotFall 4s ease-in-out forwards;
@@ -91,19 +88,12 @@
     }
 
     @keyframes tarotFall {
-      0% {
-        opacity: 0;
-        transform: translateY(-100vh) rotate(0deg) scale(0.5);
-      }
+      0% { opacity: 0; transform: translateY(-100vh) rotate(0deg) scale(0.5); }
       20% { opacity: 1; }
       80% { opacity: 1; }
-      100% {
-        opacity: 0;
-        transform: translateY(120vh) rotate(1080deg) scale(0.3);
-      }
+      100% { opacity: 0; transform: translateY(120vh) rotate(1080deg) scale(0.3); }
     }
 
-    /* ローディング完了時に集まる */
     .tarot-card.gather {
       animation: tarotGather 1.8s ease-out forwards;
     }
@@ -133,24 +123,34 @@
 
     .content { max-width: 90%; }
 
+    /* タイトル・説明文：純白 */
     h1, h2, p {
       opacity: 0;
       transform: translateY(25px);
       animation: fadeUp 1.6s ease-out forwards;
       margin: 0.4rem 0;
       line-height: 1.5;
-      text-shadow: 0 0 12px rgba(127, 208, 255, 0.6), 0 0 20px rgba(255, 215, 0, 0.3);
-      background: linear-gradient(90deg, #7fd0ff, #ffd700, #7fd0ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #fff;
+      text-shadow: 0 0 12px rgba(127, 208, 255, 0.6);
       font-weight: 700;
     }
 
-    h1 { font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 5vw, 2.6rem); animation-delay: 0.6s; letter-spacing: 0.08em; }
-    p:nth-of-type(1) { font-size: clamp(0.95rem, 2.8vw, 1.15rem); animation-delay: 1.2s; font-weight: 500; }
-    h2 { font-family: 'Cinzel', serif; font-size: clamp(1.6rem, 4.5vw, 2.2rem); animation-delay: 1.8s; color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
-    p:nth-of-type(2), p:nth-of-type(3) { font-size: clamp(0.9rem, 2.6vw, 1.1rem); animation-delay: 2.4s; color: #e0f8ff; font-weight: 500; }
+    h1 { 
+      font-family: 'Cinzel', serif; 
+      font-size: clamp(1.8rem, 5vw, 2.6rem); 
+      animation-delay: 0.6s; 
+      letter-spacing: 0.08em; 
+    }
+    p:nth-of-type(1) { font-size: clamp(0.95rem, 2.8vw, 1.15rem); animation-delay: 1.2s; }
+    h2 { 
+      font-family: 'Cinzel', serif; 
+      font-size: clamp(1.6rem, 4.5vw, 2.2rem); 
+      animation-delay: 1.8s; 
+    }
+    p:nth-of-type(2), p:nth-of-type(3) { 
+      font-size: clamp(0.9rem, 2.6vw, 1.1rem); 
+      animation-delay: 2.4s; 
+    }
     p:nth-of-type(3) { animation-delay: 2.8s; }
 
     @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
@@ -164,13 +164,12 @@
       max-width: 90%;
       padding: 18px 40px;
       font-size: clamp(1rem, 3vw, 1.3rem);
-      color: #e0f8ff;
       text-decoration: none;
       border: 2px solid transparent;
       border-radius: 50px;
       background: rgba(10, 20, 40, 0.85);
       backdrop-filter: blur(8px);
-      box-shadow: 0 0 30px rgba(127, 208, 255, 0.5), inset 0 0 25px rgba(255, 215, 0, 0.15);
+      box-shadow: 0 0 30px rgba(127, 208, 255, 0.5), inset 0 0 25px rgba(127, 208, 255, 0.15);
       transition: all 0.5s ease;
       cursor: pointer;
       overflow: hidden;
@@ -182,6 +181,18 @@
     .door-text {
       position: relative;
       z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .door-open { 
+      color: #fff; 
+      text-shadow: 0 0 12px rgba(127, 208, 255, 0.8);
+    }
+
+    .door-receive {
       background: linear-gradient(90deg, #7fd0ff, #ffd700, #7fd0ff);
       -webkit-background-clip: text;
       background-clip: text;
@@ -193,12 +204,12 @@
       position: absolute;
       top: 50%; left: 50%;
       width: 0; height: 0;
-      border: 2px solid #ffd700;
+      border: 2px solid #7fd0ff;
       border-radius: 50%;
       transform: translate(-50%, -50%);
       animation: pulse 2.5s infinite ease-out;
       pointer-events: none;
-      box-shadow: 0 0 20px #ffd700;
+      box-shadow: 0 0 20px #7fd0ff;
     }
     @keyframes pulse { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 380px; height: 380px; opacity: 0; } }
 
@@ -212,9 +223,9 @@
     .particle, .tarot-particle {
       position: absolute;
       width: 4px; height: 4px;
-      background: #ffd700;
+      background: #7fd0ff;
       border-radius: 50%;
-      box-shadow: 0 0 12px #ffd700, 0 0 20px #7fd0ff;
+      box-shadow: 0 0 12px #7fd0ff, 0 0 20px #7fd0ff;
       opacity: 0;
       animation: gather 1.8s ease-out forwards;
     }
@@ -226,12 +237,16 @@
 
     .door-button:hover {
       transform: scale(1.07);
-      box-shadow: 0 0 80px rgba(255, 215, 0, 0.8), 0 0 160px rgba(127, 208, 255, 0.6);
-      border-color: #ffd700;
+      box-shadow: 0 0 80px rgba(127, 208, 255, 0.9), 0 0 160px rgba(127, 208, 255, 0.5);
+      border-color: #7fd0ff;
       background: rgba(20, 30, 60, 0.9);
     }
 
-    .door-button:hover .door-text {
+    .door-button:hover .door-open {
+      text-shadow: 0 0 25px #fff, 0 0 50px #7fd0ff;
+    }
+
+    .door-button:hover .door-receive {
       text-shadow: 0 0 30px #fff, 0 0 60px #ffd700;
     }
 
@@ -239,7 +254,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: radial-gradient(circle at center, #ffd700 0%, #7fd0ff 50%, transparent 80%);
+      background: radial-gradient(circle at center, #7fd0ff 0%, transparent 70%);
       opacity: 0;
       pointer-events: none;
       z-index: 9999;
@@ -278,7 +293,11 @@
 
       <div class="door-container">
         <a href="shion.html" class="door-button" id="door">
-          <span class="door-text">扉を開く → 詩韻を授かる</span>
+          <span class="door-text">
+            <span class="door-open">扉を開く</span>
+            <span>→</span>
+            <span class="door-receive">詩韻を授かる</span>
+          </span>
           <div class="pulse"></div>
           <div class="particles" id="particles"></div>
           <div class="tarot-particles" id="tarot-particles"></div>
@@ -348,28 +367,21 @@
       tarotCards.push(card);
     }
 
-    // ローディング中にカードを生成
     for (let i = 0; i < majorArcana; i++) {
       setTimeout(createTarotCard, i * 200);
     }
 
-    // ========== ローディング完了 → カードを集める ==========
+    // ========== ローディング完了 ==========
     window.addEventListener('load', () => {
       const loading = document.getElementById('loading');
       const mainContent = document.getElementById('main-content');
 
       setTimeout(() => {
-        // カードを集める
-        tarotCards.forEach(card => {
-          card.classList.add('gather');
-        });
-
-        // フェードアウト
+        tarotCards.forEach(card => card.classList.add('gather'));
         setTimeout(() => {
           loading.classList.add('fade-out');
           mainContent.classList.add('visible');
         }, 800);
-
       }, 1800);
     });
 
