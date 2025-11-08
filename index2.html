@@ -12,6 +12,40 @@
       text-align:center;min-height:100vh;overflow:hidden;position:relative;
     }
 
+    /* ===== 起動演出：金と紫の光の呼吸 ===== */
+    .boot-screen{
+      position:fixed;inset:0;
+      background:radial-gradient(circle at center,#0a0a10 0%,#000 100%);
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;z-index:10000;
+      animation:fadeOut 1.5s ease 3.5s forwards;
+    }
+    .boot-glow{
+      position:absolute;width:200%;height:200%;
+      background:
+        radial-gradient(circle at 30% 40%,rgba(255,215,111,0.2),transparent 60%),
+        radial-gradient(circle at 70% 60%,rgba(174,138,255,0.25),transparent 70%);
+      filter:blur(80px);
+      animation:glowMove 8s ease-in-out infinite alternate;
+      z-index:0;
+    }
+    .boot-text{
+      font-family:'Cinzel','Noto Serif JP',serif;
+      font-size:1.3rem;letter-spacing:0.08em;
+      color:#e9dcff;z-index:2;
+      text-shadow:0 0 15px rgba(174,138,255,0.8),0 0 35px rgba(255,215,111,0.4);
+      animation:flicker 1.6s infinite;
+    }
+    @keyframes glowMove{
+      0%{transform:translate(0%,0%) scale(1);}
+      100%{transform:translate(-5%,5%) scale(1.1);}
+    }
+    @keyframes flicker{
+      0%,100%{opacity:1;text-shadow:0 0 15px rgba(174,138,255,0.8),0 0 35px rgba(255,215,111,0.4);}
+      50%{opacity:0.7;text-shadow:0 0 5px rgba(174,138,255,0.4),0 0 15px rgba(255,215,111,0.2);}
+    }
+    @keyframes fadeOut{to{opacity:0;visibility:hidden}}
+
     /* 背景：サイバー×神域 */
     body::before{
       content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -31,74 +65,33 @@
     }
     #loading.fade-out{opacity:0;pointer-events:none}
 
-    /* ローディングコンテナ */
-    .loader-container {
-      position: relative;
-      width: 140px; height: 140px;
-      margin-bottom: 1.5rem;
+    .loader-container{position:relative;width:140px;height:140px;margin-bottom:1.5rem;}
+    .ring-outer{
+      position:absolute;inset:0;border-radius:50%;
+      background:conic-gradient(from 0deg,#ffd700,#7fd0ff,#ffd700,#7fd0ff);
+      animation:spin 3s linear infinite;filter:blur(1px);
+      box-shadow:0 0 40px rgba(255,215,0,0.8),0 0 80px rgba(127,208,255,0.6),inset 0 0 30px rgba(255,215,0,0.4);
     }
-
-    /* 外側リング（金＋青グラデ） */
-    .ring-outer {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: conic-gradient(from 0deg, #ffd700, #7fd0ff, #ffd700, #7fd0ff);
-      animation: spin 3s linear infinite;
-      filter: blur(1px);
-      box-shadow: 
-        0 0 40px rgba(255, 215, 0, 0.8),
-        0 0 80px rgba(127, 208, 255, 0.6),
-        inset 0 0 30px rgba(255, 215, 0, 0.4);
+    .ring-middle{
+      position:absolute;top:15px;left:15px;right:15px;bottom:15px;
+      border-radius:50%;border:3px solid transparent;
+      border-top:3px solid #7fd0ff;border-left:3px solid #ffd700;border-right:3px solid #7fd0ff;
+      animation:spinReverse 2s linear infinite;
+      box-shadow:0 0 25px rgba(127,208,255,0.7);
     }
-
-    /* 中間リング（逆回転） */
-    .ring-middle {
-      position: absolute;
-      top: 15px; left: 15px; right: 15px; bottom: 15px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      border-top: 3px solid #7fd0ff;
-      border-left: 3px solid #ffd700;
-      border-right: 3px solid #7fd0ff;
-      animation: spinReverse 2s linear infinite;
-      box-shadow: 0 0 25px rgba(127, 208, 255, 0.7);
+    .ring-core{
+      position:absolute;top:50%;left:50%;
+      width:30px;height:30px;
+      background:radial-gradient(circle,#fff 10%,#7fd0ff 40%,transparent 70%);
+      border-radius:50%;transform:translate(-50%,-50%);
+      box-shadow:0 0 20px #fff,0 0 40px #7fd0ff,0 0 60px #ffd700;
+      animation:pulseCore 1.8s ease-in-out infinite;
     }
-
-    /* 中心の光核 */
-    .ring-core {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 30px; height: 30px;
-      background: radial-gradient(circle, #fff 10%, #7fd0ff 40%, transparent 70%);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 
-        0 0 20px #fff,
-        0 0 40px #7fd0ff,
-        0 0 60px #ffd700;
-      animation: pulseCore 1.8s ease-in-out infinite;
-    }
-
-    /* 光の粒子（円周を巡る） */
-    .particle {
-      position: absolute;
-      width: 4px; height: 4px;
-      background: #ffd700;
-      border-radius: 50%;
-      box-shadow: 0 0 12px #ffd700;
-      opacity: 0;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    @keyframes spinReverse {
-      to { transform: rotate(-360deg); }
-    }
-    @keyframes pulseCore {
-      0%, 100% { box-shadow: 0 0 20px #fff, 0 0 40px #7fd0ff, 0 0 60px #ffd700; }
-      50% { box-shadow: 0 0 30px #fff, 0 0 60px #7fd0ff, 0 0 90px #ffd700; }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes spinReverse{to{transform:rotate(-360deg)}}
+    @keyframes pulseCore{
+      0%,100%{box-shadow:0 0 20px #fff,0 0 40px #7fd0ff,0 0 60px #ffd700;}
+      50%{box-shadow:0 0 30px #fff,0 0 60px #7fd0ff,0 0 90px #ffd700;}
     }
 
     .loading-text{
@@ -114,16 +107,12 @@
       50%{text-shadow:0 0 30px #fff,0 0 60px #ffd700,0 0 80px #7fd0ff}
     }
 
-    /* コード雨 */
-    #codeRain{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
-
     /* 本文 */
     #main-content{
       opacity:0;transition:opacity 1.2s ease-out .9s;position:relative;z-index:2;
       min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1.2rem;
     }
     #main-content.visible{opacity:1}
-
     h1{
       font-family:'Cinzel',serif;font-weight:700;
       font-size:clamp(2.0rem,6vw,3.0rem);letter-spacing:.06em;margin-bottom:.8rem;
@@ -163,53 +152,24 @@
     .door-button:hover{transform:scale(1.07);box-shadow:0 0 80px rgba(255,215,0,.8),0 0 160px rgba(127,208,255,.6);border-color:#ffd700;background:rgba(20,30,60,.9)}
     .light-burst{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at center,#ffd700 0%,#7fd0ff 50%,transparent 80%);opacity:0;pointer-events:none;z-index:9999;animation:burst 1s ease-out}
     @keyframes burst{0%{opacity:0;transform:scale(.2)}50%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(3)}}
-  /* === Boot Animation === */
-.boot-screen {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, #0a0a10 0%, #000 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  z-index: 9999;
-  animation: fadeOut 1.5s ease 2.8s forwards;
-}
-
-.boot-text {
-  font-family: 'Cinzel', 'Noto Serif JP', serif;
-  color: #e6d8ff;
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  text-shadow: 0 0 10px rgba(174,138,255,.6), 0 0 30px rgba(255,215,111,.3);
-  animation: flicker 1.2s infinite;
-}
-
-/* 起動中の微光フリッカー */
-@keyframes flicker {
-  0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(174,138,255,.6), 0 0 30px rgba(255,215,111,.3); }
-  50% { opacity: 0.7; text-shadow: 0 0 4px rgba(174,138,255,.4), 0 0 10px rgba(255,215,111,.2); }
-}
-
-/* 起動後フェードアウト */
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
-}
-  
   </style>
 </head>
 <body>
 
-  <!-- 超豪華ローディング円 -->
+  <!-- ===== 起動演出 ===== -->
+  <div class="boot-screen">
+    <div class="boot-glow"></div>
+    <p class="boot-text">Re:Verse OS -Shion 起動中...</p>
+  </div>
+
+  <!-- ===== ローディング円 ===== -->
   <div id="loading">
     <div class="loader-container" id="loader">
       <div class="ring-outer"></div>
       <div class="ring-middle"></div>
       <div class="ring-core"></div>
     </div>
-    <div class="boot-screen">
-  <p class="boot-text">Re:Verse OS -Shion 起動中...</p>
-</div>
+    <div class="loading-text">Re:Verse Shion</div>
   </div>
 
   <canvas id="codeRain"></canvas>
@@ -228,27 +188,28 @@
   </div>
 
   <script>
-    // ========== 光の粒子生成（円周を巡る）==========
-    const loader = document.getElementById('loader');
-    const radius = 70; // 円の半径
-    for(let i = 0; i < 12; i++){
-      const angle = (i / 12) * 2 * Math.PI;
-      const x = radius * Math.cos(angle);
-      const y = radius * Math.sin(angle);
-      
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left = `calc(50% + ${x}px)`;
-      p.style.top = `calc(50% + ${y}px)`;
-      p.style.animationDelay = `${i * 0.15}s`;
-      p.style.animation = `sparkle 2s ease-in-out infinite`;
-      p.style.animationDelay = `${i * 0.12}s`;
+    // 起動フェーズ終了後にローディング円表示
+    setTimeout(()=>{document.querySelector('.boot-screen').style.display='none';},4000);
+
+    // 光の粒子
+    const loader=document.getElementById('loader');
+    const radius=70;
+    for(let i=0;i<12;i++){
+      const angle=(i/12)*2*Math.PI;
+      const x=radius*Math.cos(angle),y=radius*Math.sin(angle);
+      const p=document.createElement('div');
+      p.className='particle';
+      p.style.left=`calc(50% + ${x}px)`;p.style.top=`calc(50% + ${y}px)`;
+      p.style.width='4px';p.style.height='4px';p.style.background='#ffd700';
+      p.style.borderRadius='50%';p.style.boxShadow='0 0 12px #ffd700';
+      p.style.animation=`sparkle 2s ease-in-out infinite ${i*0.12}s`;
       loader.appendChild(p);
     }
 
-    // ========== コード雨 ==========
+    // コード雨
     (function(){
-      const cvs=document.getElementById('codeRain'),ctx=cvs.getContext('2d');
+      const cvs=document.createElement('canvas');cvs.id='codeRain';document.body.appendChild(cvs);
+      const ctx=cvs.getContext('2d');
       const chars='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
       let fs=18,cols,drops,W,H;
       function resize(){
@@ -269,20 +230,22 @@
       addEventListener('resize',resize);resize();draw();
     })();
 
-    // ========== ローディング終了 ==========
+    // ローディング終了
     window.addEventListener('load',()=>{
       const loading=document.getElementById('loading');
       const main=document.getElementById('main-content');
       setTimeout(()=>{
         loading.classList.add('fade-out');
         main.classList.add('visible');
-      },1200);
+      },1600);
     });
 
-    // ========== 扉クリック ==========
+    // 扉クリック
     document.getElementById('door').addEventListener('click',e=>{
       e.preventDefault();
-      const burst=document.createElement('div');burst.className='light-burst';document.body.appendChild(burst);
+      const burst=document.createElement('div');
+      burst.className='light-burst';
+      document.body.appendChild(burst);
       setTimeout(()=>location.href='shion2.html',500);
     });
   </script>
