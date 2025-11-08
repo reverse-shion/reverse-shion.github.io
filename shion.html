@@ -21,13 +21,17 @@ body{font-family:'Noto Serif JP',serif;background:#000;color:#eaf0ff}
 }
 .bg::after{
   content:"";position:absolute;inset:0;mix-blend-mode:screen;pointer-events:none;
-  background:radial-gradient(60% 60% at 50% 50%,
-    rgba(255,230,160,.30) 0%,
-    rgba(174,138,255,.20) 40%,
-    rgba(0,0,0,0) 70%);
-  animation:glow 5.2s ease-in-out infinite
+  /* 1. 光の輪がゆっくり広がるように調整 */
+  background:radial-gradient(40% 40% at 50% 50%,
+    rgba(255,230,160,.60) 0%,
+    rgba(174,138,255,.40) 20%,
+    rgba(0,0,0,0) 45%);
+  animation:glow 10s ease-in-out infinite alternate
 }
-@keyframes glow{50%{opacity:.7;transform:scale(1.03)}}
+@keyframes glow{
+  0%{opacity:.8;transform:scale(1.0);background-size:100% 100%}
+  100%{opacity:.6;transform:scale(1.2);background-size:150% 150%}
+}
 
 .title-wrap{z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0}
 .title{
@@ -60,7 +64,7 @@ body{font-family:'Noto Serif JP',serif;background:#000;color:#eaf0ff}
 .labels{z-index:2;display:flex;gap:clamp(16px,6vw,40px);opacity:0;transform:translateY(8px)}
 .label{width:clamp(100px,22vw,150px);text-align:center;color:#cfe2ff;font-size:clamp(12px,3vw,14px);letter-spacing:.12em;text-shadow:0 0 10px rgba(174,138,255,.45)}
 
-/* ヒント（カード表示後にだけ出す） */
+/* ヒント */
 .tap-hint{
   position:absolute;left:0;right:0;bottom:14px;z-index:3;display:flex;justify-content:center;opacity:0
 }
@@ -72,7 +76,7 @@ body{font-family:'Noto Serif JP',serif;background:#000;color:#eaf0ff}
 }
 @keyframes blink{50%{opacity:.55}}
 
-/* ===== 捲れ演出 ===== */
+/* ===== 捲れ演出（カードめくり） ===== */
 .peel{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0}
 .peel.is-run{
   background:
@@ -93,13 +97,21 @@ body{font-family:'Noto Serif JP',serif;background:#000;color:#eaf0ff}
 .section{
   padding:48px 18px;max-width:980px;margin:0 auto;background:
     linear-gradient(180deg, rgba(8,10,18,1) 0%, rgba(10,12,20,.9) 100%);
-  border-top:1px solid rgba(255,255,255,.06)
+  border-top:1px solid rgba(255,255,255,.06);
+  visibility:hidden; /* 初期状態では非表示 */
+  opacity:0;
+  transition:opacity 1s ease-out;
 }
+.section.is-active{
+  visibility:visible; /* アクティブになったら表示 */
+  opacity:1;
+}
+
 .section h2{font-weight:700;font-size:22px;letter-spacing:.08em;color:#ffd76f;margin-bottom:14px}
 .reading-grid{display:grid;gap:14px}
 .reading{
   background:rgba(127,208,255,.08);border:1px solid rgba(127,208,255,.25);
-  border-radius:12px;padding:14px;min-height:82px
+  border-radius:12px;padding:14px;min-height:82px;
 }
 .reading .head{color:#cfe2ff;font-size:13px;letter-spacing:.18em;margin-bottom:6px}
 .reading .body{line-height:1.75}
@@ -119,7 +131,6 @@ body{font-family:'Noto Serif JP',serif;background:#000;color:#eaf0ff}
 </head>
 <body>
 
-<!-- ===== Hero：タイトル→カード ===== -->
 <section class="hero" id="hero">
   <div class="bg" aria-hidden="true"></div>
 
@@ -160,7 +171,6 @@ body{font-family:'Noto Serif JP',serif;background:#000;color:#eaf0ff}
   <div class="peel" id="peel" aria-hidden="true"></div>
 </section>
 
-<!-- ===== 読み取り結果（詩・韻・祈） ===== -->
 <section class="section" id="reading">
   <h2>詩・韻・祈 のリーディング</h2>
   <div class="reading-grid">
@@ -222,77 +232,127 @@ const majorArcana = [
   { name:'The World',       upright:'調和の円舞、成就の星',                    reversed:'未完の旅、閉ざされた門',        imageIndex:21 }
 ];
 
-/* ===== 抽選（重複なし） ===== */
-const selectedCards = [];
-while(selectedCards.length<3){
-  const c = majorArcana[Math.floor(Math.random()*majorArcana.length)];
-  if(!selectedCards.includes(c)) selectedCards.push(c);
-}
-
-/* ===== 要素 ===== */
+/* ===== 要素群 ===== */
 const titleWrap = document.getElementById('titleWrap');
 const peel      = document.getElementById('peel');
 const spread    = document.getElementById('spread');
 const labels    = document.getElementById('labels');
 const tapHint   = document.getElementById('tapHint');
 const readingEl = document.getElementById('reading');
-
+const cardElements = document.querySelectorAll('.card');
+const cardFronts = document.querySelectorAll('.card__front');
+const cardInners = document.querySelectorAll('.card__inner');
 const bodies = [document.getElementById('body0'), document.getElementById('body1'), document.getElementById('body2')];
-const hero   = document.getElementById('hero');
+const defaultBodies = ['カードを開くと、ここに“詩”が現れます。', 'カードを開くと、ここに“韻”が現れます。', 'カードを開くと、ここに“祈”が現れます。'];
 
-/* ===== 出現シーケンス ===== */
-window.addEventListener('load', () => {
+
+/* ===== 状態管理と初期化 ===== */
+let selectedCards = []; // 抽選結果
+let revealedCount = 0; // めくられたカードの数
+
+function initialize(){
+  // 抽選
+  selectedCards = [];
+  const majorArcanaCopy = [...majorArcana];
+  while(selectedCards.length<3){
+    const randIndex = Math.floor(Math.random()*majorArcanaCopy.length);
+    selectedCards.push(majorArcanaCopy.splice(randIndex, 1)[0]);
+  }
+  revealedCount = 0;
+  
+  // 状態のリセット
+  readingEl.classList.remove('is-active');
+  tapHint.style.opacity = 1;
+  
+  cardElements.forEach((card, i) => {
+    card.classList.remove('is-flipped');
+    card.style.pointerEvents = 'auto'; // タップを有効化
+    cardFronts[i].style.backgroundImage = 'none'; // 表面画像を削除
+    bodies[i].innerHTML = defaultBodies[i]; // リーディング結果をリセット
+  });
+  
+  // 初回ロード時のみ実行
+  if(initialize.isFirstRun){
+    window.addEventListener('load', runInitialSequence);
+    document.getElementById('retry').addEventListener('click', retry, { passive: false });
+    cardElements.forEach(c=>{
+      c.addEventListener('click', () => flipCard(Number(c.dataset.idx)), { passive:true });
+    });
+    initialize.isFirstRun = false;
+  }
+}
+initialize.isFirstRun = true;
+
+/* ===== 初回出現シーケンス ===== */
+function runInitialSequence(){
   // 1) タイトル表示
   titleWrap.style.animation = 'fadeIn .9s ease .4s forwards';
-  // 2) 1.2秒後：捲れ演出→カード自動出現（光とともに）
+  // 2) 1.5秒後：捲れ演出→カード自動出現（光とともに）
   setTimeout(() => {
     peel.classList.add('is-run');
     peel.addEventListener('animationend', () => {
+      peel.classList.remove('is-run');
       spread.style.animation = 'fadeUp .6s ease forwards';
       labels.style.animation = 'fadeUp .6s ease .06s forwards';
       spread.removeAttribute('aria-hidden'); labels.removeAttribute('aria-hidden');
-      // ヒントはカード出現後にだけ表示
-      tapHint.style.opacity = 1;
+      tapHint.style.opacity = 1; // ヒント表示
     }, { once:true });
-  }, 1200);
-});
-
-/* ===== 表面画像セット ===== */
-function setFrontImage(id, idx){
-  const el = document.getElementById(id);
-  el.style.backgroundImage = `url('${cardFrontImages[idx]}')`;
+  }, 1500);
 }
 
-/* ===== カードめくり → 下段へスクロール＆結果反映 ===== */
+/* ===== カードめくり（要件2） ===== */
 function flipCard(idx){
-  const card = document.querySelector(`.card[data-idx="${idx}"]`);
-  if(!card || card.classList.contains('is-flipped')) return;
+  const card = cardElements[idx];
+  if(card.classList.contains('is-flipped') || revealedCount >= 3) return;
 
   const data = selectedCards[idx];
   const reversed = Math.random() < 0.5;
-
-  setFrontImage(`card${idx}`, data.imageIndex);
-  card.classList.add('is-flipped');
-
   const labelMap = ['詩','韻','祈'];
-  bodies[idx].innerHTML = `【${labelMap[idx]}】<br>《${data.name}》${reversed?'（逆位置）':'（正位置）'}<br>${reversed?data.reversed:data.upright}`;
 
-  // 初回めくり時に下段へ移動（要件4）
-  if([...document.querySelectorAll('.card.is-flipped')].length === 1){
-    readingEl.scrollIntoView({ behavior:'smooth', block:'start' });
-  }
+  // 表面画像セット
+  cardFronts[idx].style.backgroundImage = `url('${cardFrontImages[data.imageIndex]}')`;
+  
+  // めくりアニメーション開始
+  card.classList.add('is-flipped');
+  revealedCount++;
+  
+  // 完了後の処理
+  const handleFlipEnd = () => {
+    // リーディング結果の反映
+    bodies[idx].innerHTML = `**【${labelMap[idx]}】**<br>《${data.name}》${reversed?'（逆位置）':'（正位置）'}<br>${reversed?data.reversed:data.upright}`;
+
+    if(revealedCount === 3){
+      // 3枚全てめくられた
+      tapHint.style.opacity = 0; // ヒントを消す
+      cardElements.forEach(c => c.style.pointerEvents = 'none'); // カードをタップ不可に
+      
+      // リーディング結果を表示してスクロール
+      readingEl.classList.add('is-active');
+      readingEl.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+    cardInners[idx].removeEventListener('transitionend', handleFlipEnd);
+  };
+  
+  // トランジション（めくりアニメーション）終了を待つ
+  cardInners[idx].addEventListener('transitionend', handleFlipEnd, { once: true });
 }
 
-/* クリック割り当て */
-document.querySelectorAll('.card').forEach(c=>{
-  c.addEventListener('click', () => flipCard(Number(c.dataset.idx)), { passive:true });
-});
-
-/* もう一度占う */
-document.getElementById('retry').addEventListener('click', (e)=>{
+/* ===== もう一度占う（要件3） ===== */
+function retry(e){
   e.preventDefault();
-  location.reload();
-});
+  
+  // ヒーローセクションまでスクロール
+  hero.scrollIntoView({ behavior:'smooth', block:'start' });
+  
+  // スクロール完了を待ってリセット
+  // (スクロール時間を見込んで固定時間待つか、IntersectionObserverを使う方法があるが、ここでは簡略化のため固定時間で待つ)
+  setTimeout(() => {
+    initialize();
+  }, 700); 
+}
+
+// 初回実行
+initialize();
 </script>
 </body>
 </html>
