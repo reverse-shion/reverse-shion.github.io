@@ -23,7 +23,6 @@
     #codeRain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
     .content { position: relative; z-index: 2; padding: 2rem; max-width: 800px; }
 
-    /* 1. 神殿画像: 奥からフェードイン */
     .temple-bg {
       position: fixed;
       top: 0; left: 0;
@@ -38,7 +37,6 @@
       to { opacity: 0.7; transform: scale(1); }
     }
 
-    /* 3. タロット展開文字フェードイン */
     .spread-title {
       font-size: 2rem;
       opacity: 0;
@@ -47,7 +45,6 @@
       text-shadow: 0 0 20px #7fd0ff;
     }
 
-    /* 2 & 3. タロットカード (3枚展開) */
     .tarot-spread {
       display: flex;
       justify-content: center;
@@ -95,7 +92,6 @@
     .flipped .card-inner { transform: rotateY(180deg); }
     .poem-label { margin-top: 1rem; font-size: 0.9rem; color: #a0f3ff; }
 
-    /* 4. リーディング結果エリア */
     .reading-area {
       margin-top: 2rem;
       opacity: 0;
@@ -105,7 +101,6 @@
     .reading-area.visible { opacity: 1; transform: translateY(0); }
     .reading-poem { font-size: 1.2rem; line-height: 1.8; margin: 1rem 0; padding: 1rem; background: rgba(127, 208, 255, 0.1); border-radius: 10px; }
 
-    /* 5. ボタンオーバーレイ (モーダル) */
     .overlay {
       position: fixed;
       top: 0; left: 0;
@@ -115,7 +110,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 3;
+      z-index: 999;
     }
     .overlay.visible { display: flex; }
     .overlay button, .overlay a {
@@ -140,15 +135,11 @@
 <body>
 
   <canvas id="codeRain"></canvas>
-
-  <!-- 1. 神殿画像 -->
   <div class="temple-bg"></div>
 
   <div class="content">
-    <!-- 3. 展開文字 -->
     <h2 class="spread-title">タロット展開</h2>
 
-    <!-- 3. タロットカード3枚 -->
     <div class="tarot-spread">
       <div class="tarot-card" onclick="revealCard(0)">
         <div class="card-inner">
@@ -173,7 +164,6 @@
       </div>
     </div>
 
-    <!-- 4. リーディング結果 -->
     <div class="reading-area" id="readingArea">
       <h3>詩韻のリーディング</h3>
       <div class="reading-poem" id="poem0"></div>
@@ -182,7 +172,6 @@
     </div>
   </div>
 
-  <!-- 5. オーバーレイボタン -->
   <div class="overlay" id="overlay">
     <button onclick="location.reload()">もう一度占う</button>
     <a href="https://line.me/" target="_blank">LINEで個人鑑定</a>
@@ -191,7 +180,7 @@
   </div>
 
   <script>
-    // コード雨 (変更なし)
+    // コード雨
     (function codeRain(){
       const cvs = document.getElementById('codeRain');
       const ctx = cvs.getContext('2d');
@@ -225,34 +214,63 @@
       resize(); draw();
     })();
 
-    // 大アルカナデータ (参考サイトから詩的に要約)
+    // 全22枚の大アルカナ（詩風に要約）
     const majorArcana = [
       { name: 'The Fool', upright: '純粋な始まりの風、冒険の翼を広げて', reversed: '無謀な跳躍、影に潜む落とし穴' },
       { name: 'The Magician', upright: '意志の炎が現実を紡ぎ、創造の河を流す', reversed: '幻の鏡、欺瞞の霧に包まれて' },
       { name: 'The High Priestess', upright: '内なる声のささやき、月の光が導く道', reversed: '失われた均衡、抑圧された魂の叫び' },
-      // ... (全22枚。省略してますが、実際はlabyrinthosのまとめを基に全件入れてください)
-      { name: 'The World', upright: '調和の円舞、成就の星が輝く', reversed: '未完の輪、閉ざされた門の影' }
+      { name: 'The Empress', upright: '豊穣の大地、母なる愛の抱擁', reversed: '枯れた花、創造の停滞' },
+      { name: 'The Emperor', upright: '秩序の玉座、力強い統治の剣', reversed: '暴君の影、支配の崩壊' },
+      { name: 'The Hierophant', upright: '伝統の灯、教えの道標', reversed: '硬直した信仰、自由の抑圧' },
+      { name: 'The Lovers', upright: '運命の交差、心の選択', reversed: '迷いの分岐、愛の試練' },
+      { name: 'The Chariot', upright: '勝利の戦車、意志の疾走', reversed: '方向を見失う馬車' },
+      { name: 'Strength', upright: '内なる獅子、優しさの力', reversed: '弱さの咆哮、自己不信' },
+      { name: 'The Hermit', upright: '孤独の灯台、魂の探求', reversed: '孤立の闇、導きを拒む' },
+      { name: 'Wheel of Fortune', upright: '運命の輪、巡る星の流れ', reversed: '停滞の歯車、予期せぬ転落' },
+      { name: 'Justice', upright: '天秤の裁き、真実の剣', reversed: '不正の影、偏った判断' },
+      { name: 'The Hanged Man', upright: '逆さの悟り、犠牲の光', reversed: '停滞の苦しみ、視野の狭さ' },
+      { name: 'Death', upright: '終わりと始まり、変容の蝶', reversed: '変化への恐怖、過去の亡霊' },
+      { name: 'Temperance', upright: '調和の天使、バランスの流れ', reversed: '極端な揺らぎ、衝突の炎' },
+      { name: 'The Devil', upright: '鎖の誘惑、欲望の檻', reversed: '解放の鍵、束縛からの脱出' },
+      { name: 'The Tower', upright: '崩壊の雷、覚醒の衝撃', reversed: '破壊の予兆、避けられない危機' },
+      { name: 'The Star', upright: '希望の星、癒しの水', reversed: '失われた光、絶望の夜' },
+      { name: 'The Moon', upright: '幻想の月、潜在意識の海', reversed: '真実の光、欺瞞の霧' },
+      { name: 'The Sun', upright: '輝く太陽、生命の喜び', reversed: '曇った陽光、一時的な幸福' },
+      { name: 'Judgement', upright: '覚醒の喇叭、再生の炎', reversed: '自己否定、過去の重荷' },
+      { name: 'The World', upright: '調和の円舞、成就の星', reversed: '未完の旅、閉ざされた門' }
     ];
 
     let revealedCount = 0;
-
-    // ランダム3枚選択
     const selectedCards = [];
-    for (let i = 0; i < 3; i++) {
+
+    // ランダム3枚選択（重複なし）
+    while (selectedCards.length < 3) {
       const rand = Math.floor(Math.random() * majorArcana.length);
-      selectedCards.push(majorArcana[rand]);
+      const card = majorArcana[rand];
+      if (!selectedCards.includes(card)) {
+        selectedCards.push(card);
+      }
     }
 
     function revealCard(index) {
+      if (document.querySelectorAll('.flipped').length >= 3) return;
+
       const card = document.querySelectorAll('.tarot-card')[index];
       card.querySelector('.card-inner').classList.add('flipped');
-      document.getElementById(`card${index}`).innerHTML = `<strong>${selectedCards[index].name}</strong><br>${selectedCards[index].upright}`;
-      document.getElementById(`poem${index}`).innerHTML = `【${selectedCards[index].name}】<br>${selectedCards[index].upright} — 運命の糸が織りなす詩。`;
+      
+      const isReversed = Math.random() < 0.5;
+      const meaning = isReversed ? selectedCards[index].reversed : selectedCards[index].upright;
+      
+      document.getElementById(`card${index}`).innerHTML = 
+        `<strong>${selectedCards[index].name}</strong><br>${meaning}`;
+      
+      document.getElementById(`poem${index}`).innerHTML = 
+        `【${selectedCards[index].name}】<br>${meaning} — あなたの運命の詩。`;
 
       revealedCount++;
       if (revealedCount === 3) {
         document.getElementById('readingArea').classList.add('visible');
-        setTimeout(() => document.getElementById('overlay').classList.add('visible'), 1000);
+        setTimeout(() => document.getElementById('overlay').classList.add('visible'), 1500);
       }
     }
   </script>
