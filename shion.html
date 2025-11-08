@@ -6,7 +6,10 @@
   <title>詩韻 Shion | あなたの運命の詩</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
   <style>
+    /* CSSリセット */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* 全体設定 */
     body {
       background: #000;
       color: #e0f8ff;
@@ -20,6 +23,8 @@
       position: relative;
       overflow: hidden;
     }
+
+    /* 背景のエフェクトと画像 */
     #codeRain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
     .content { position: relative; z-index: 2; padding: 2rem; max-width: 800px; }
 
@@ -37,22 +42,31 @@
       to { opacity: 0.7; transform: scale(1); }
     }
 
+    /* タイトル（遅延を短縮: 1s） */
     .spread-title {
       font-size: 2rem;
       opacity: 0;
-      animation: fadeIn 2s ease-out 3s forwards;
+      animation: fadeIn 2s ease-out 1s forwards; 
       margin-bottom: 2rem;
       text-shadow: 0 0 20px #7fd0ff;
     }
 
+    /* タロット展開エリア（遅延を短縮: 1.5s） */
     .tarot-spread {
       display: flex;
       justify-content: center;
       gap: 2rem;
       margin: 2rem 0;
       opacity: 0;
-      animation: fadeIn 2s ease-out 4s forwards;
+      animation: fadeIn 2s ease-out 1.5s forwards; 
     }
+    
+    /* fadeInアニメーション */
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    
+    /* カードのスタイル（変更なし） */
     .tarot-card {
       perspective: 1000px;
       width: 150px;
@@ -92,6 +106,7 @@
     .flipped .card-inner { transform: rotateY(180deg); }
     .poem-label { margin-top: 1rem; font-size: 0.9rem; color: #a0f3ff; }
 
+    /* リーディングエリア（変更なし） */
     .reading-area {
       margin-top: 2rem;
       opacity: 0;
@@ -101,6 +116,7 @@
     .reading-area.visible { opacity: 1; transform: translateY(0); }
     .reading-poem { font-size: 1.2rem; line-height: 1.8; margin: 1rem 0; padding: 1rem; background: rgba(127, 208, 255, 0.1); border-radius: 10px; }
 
+    /* オーバーレイ（変更なし） */
     .overlay {
       position: fixed;
       top: 0; left: 0;
@@ -180,24 +196,33 @@
   </div>
 
   <script>
-    // コード雨
+    // コード雨アニメーション (Canvas描画のピクセル比率のバグを修正)
     (function codeRain(){
       const cvs = document.getElementById('codeRain');
       const ctx = cvs.getContext('2d');
       const chars = '01AI∴∵⌘◇◆＊＋≡☆★◯●◎∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
       let fontSize = 18;
       let columns, drops, W, H;
+      
       function resize(){
+        // 物理ピクセルサイズを設定
         W = cvs.width  = window.innerWidth * devicePixelRatio;
         H = cvs.height = window.innerHeight * devicePixelRatio;
+        // 描画コンテキストをCSSピクセル単位にスケール
         ctx.scale(devicePixelRatio, devicePixelRatio);
+
+        // CSSピクセル単位で計算
         fontSize = Math.max(14, Math.min(22, Math.floor(window.innerWidth/48)));
         columns = Math.ceil(window.innerWidth / fontSize);
-        drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*H));
+        // dropsの初期化はCSSピクセル単位の高さを使用
+        drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*window.innerHeight)); 
       }
+      
       function draw(){
+        // 描画はCSSピクセル単位で行う
         ctx.fillStyle = 'rgba(2,3,22,0.16)';
-        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+        ctx.fillRect(0,0,window.innerWidth,window.innerHeight); 
+
         ctx.fillStyle = '#7fd0ff';
         ctx.font = `${fontSize}px monospace`;
         for(let i=0;i<columns;i++){
@@ -205,16 +230,22 @@
           const x = i * fontSize;
           const y = drops[i] * fontSize * .9;
           ctx.fillText(ch, x, y);
-          if(y > window.innerHeight && Math.random() > 0.975){ drops[i] = 0; }
+          
+          // 画面外判定もCSSピクセル単位で行う
+          if(y > window.innerHeight && Math.random() > 0.975){ 
+            drops[i] = 0; 
+          }
           drops[i]++;
         }
         requestAnimationFrame(draw);
       }
+      
       window.addEventListener('resize', resize);
-      resize(); draw();
+      resize(); 
+      draw();
     })();
 
-    // 全22枚の大アルカナ（詩風に要約）
+    // タロットデータ（変更なし）
     const majorArcana = [
       { name: 'The Fool', upright: '純粋な始まりの風、冒険の翼を広げて', reversed: '無謀な跳躍、影に潜む落とし穴' },
       { name: 'The Magician', upright: '意志の炎が現実を紡ぎ、創造の河を流す', reversed: '幻の鏡、欺瞞の霧に包まれて' },
@@ -252,24 +283,35 @@
       }
     }
 
+    // カードをめくる関数（変更なし）
     function revealCard(index) {
-      if (document.querySelectorAll('.flipped').length >= 3) return;
+      // 既に3枚めくられていたら何もしない
+      if (document.querySelectorAll('.flipped').length >= 3) return; 
 
-      const card = document.querySelectorAll('.tarot-card')[index];
-      card.querySelector('.card-inner').classList.add('flipped');
+      const cardElement = document.querySelectorAll('.tarot-card')[index];
+      const cardInner = cardElement.querySelector('.card-inner');
+
+      // 既にめくられていたら何もしない
+      if (cardInner.classList.contains('flipped')) return; 
+
+      cardInner.classList.add('flipped');
       
+      // 正位置か逆位置かをランダムに決定
       const isReversed = Math.random() < 0.5;
-      const meaning = isReversed ? selectedCards[index].reversed : selectedCards[index].upright;
+      const cardData = selectedCards[index];
+      const meaning = isReversed ? cardData.reversed : cardData.upright;
+      const positionText = isReversed ? ' (逆位置)' : ' (正位置)';
       
       document.getElementById(`card${index}`).innerHTML = 
-        `<strong>${selectedCards[index].name}</strong><br>${meaning}`;
+        `<strong>${cardData.name}${positionText}</strong><br>${meaning}`;
       
       document.getElementById(`poem${index}`).innerHTML = 
-        `【${selectedCards[index].name}】<br>${meaning} — あなたの運命の詩。`;
+        `【${cardData.name}】${positionText}<br>${meaning} — あなたの運命の詩。`;
 
       revealedCount++;
       if (revealedCount === 3) {
         document.getElementById('readingArea').classList.add('visible');
+        // リーディング表示後にオーバーレイを表示
         setTimeout(() => document.getElementById('overlay').classList.add('visible'), 1500);
       }
     }
