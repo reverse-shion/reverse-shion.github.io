@@ -15,18 +15,18 @@
       color: #e0f8ff;
       font-family: 'Noto Serif JP', serif;
       text-align: center;
-      min-height: 100vh;
+      min-height: 100vh; /* 少なくとも画面高さいっぱい */
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden; /* 横方向のスクロールを禁止 */
     }
 
     /* 背景のエフェクトと画像 */
     #codeRain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-    .content { position: relative; z-index: 2; padding: 2rem; max-width: 800px; }
+    .content { position: relative; z-index: 2; padding: 2rem; max-width: 800px; width: 90%; /* レスポンシブ対応 */ }
 
     .temple-bg {
       position: fixed;
@@ -44,7 +44,7 @@
 
     /* タイトル（遅延を短縮: 1s） */
     .spread-title {
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 5vw, 2.5rem); /* レスポンシブフォントサイズ */
       opacity: 0;
       animation: fadeIn 2s ease-out 1s forwards; 
       margin-bottom: 2rem;
@@ -54,8 +54,9 @@
     /* タロット展開エリア（遅延を短縮: 1.5s） */
     .tarot-spread {
       display: flex;
+      flex-wrap: wrap; /* 小画面で折り返す */
       justify-content: center;
-      gap: 2rem;
+      gap: 1.5rem; /* ギャップ調整 */
       margin: 2rem 0;
       opacity: 0;
       animation: fadeIn 2s ease-out 1.5s forwards; 
@@ -66,12 +67,13 @@
       to { opacity: 1; }
     }
     
-    /* カードのスタイル（変更なし） */
+    /* カードのスタイル */
     .tarot-card {
       perspective: 1000px;
-      width: 150px;
-      height: 250px;
+      width: 130px; /* カードサイズを少し小さく */
+      height: 220px;
       cursor: pointer;
+      flex-shrink: 0; /* 折り返しても縮まないように */
     }
     .card-inner {
       position: relative;
@@ -90,7 +92,7 @@
       border-radius: 10px;
     }
     .card-back {
-      background: url('https://www.shutterstock.com/image-vector/tarot-card-back-design-celestial-260nw-2612830939.jpg') center/cover;
+      background: url('back.png') center/cover; /* ここを変更 */
     }
     .card-front {
       background: rgba(10, 20, 40, 0.8);
@@ -99,52 +101,90 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 1rem;
-      font-size: 1rem;
+      padding: 0.8rem; /* パディング調整 */
+      font-size: 0.9rem; /* フォントサイズ調整 */
       text-shadow: 0 0 10px #fff;
+      word-break: break-word; /* 長いテキストの折り返し */
     }
     .flipped .card-inner { transform: rotateY(180deg); }
-    .poem-label { margin-top: 1rem; font-size: 0.9rem; color: #a0f3ff; }
+    .poem-label { margin-top: 0.8rem; font-size: 0.8rem; color: #a0f3ff; } /* フォントサイズ調整 */
 
-    /* リーディングエリア（変更なし） */
+    /* リーディングエリア */
     .reading-area {
-      margin-top: 2rem;
+      margin-top: 4rem; /* 上のマージンを大きくしてスクロールしやすく */
       opacity: 0;
       transform: translateY(30px);
       transition: opacity 1s, transform 1s;
+      min-height: 300px; /* 内容が少なくてもスクロールできるように高さを確保 */
+      text-align: left; /* リーディングのテキストは左寄せに */
     }
     .reading-area.visible { opacity: 1; transform: translateY(0); }
-    .reading-poem { font-size: 1.2rem; line-height: 1.8; margin: 1rem 0; padding: 1rem; background: rgba(127, 208, 255, 0.1); border-radius: 10px; }
+    .reading-poem { 
+      font-size: 1.1rem; /* フォントサイズ調整 */
+      line-height: 1.8; 
+      margin: 1.5rem 0; /* マージン調整 */
+      padding: 1.2rem; 
+      background: rgba(127, 208, 255, 0.1); 
+      border-radius: 10px; 
+    }
 
-    /* オーバーレイ（変更なし） */
+    /* オーバーレイ（スクロール表示のためdisplay: flexを削除） */
     .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
+      margin-top: 4rem; /* リーディングとボタンの間にスペース */
+      margin-bottom: 4rem; /* 下にもスペース */
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s, transform 1s;
+      display: flex; /* デフォルトでflexにするが、opacityで制御 */
       flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 999;
+      width: 100%;
     }
-    .overlay.visible { display: flex; }
+    .overlay.visible { opacity: 1; transform: translateY(0); }
     .overlay button, .overlay a {
-      margin: 1rem;
-      padding: 1rem 2rem;
+      margin: 0.8rem; /* マージン調整 */
+      padding: 0.8rem 1.8rem; /* パディング調整 */
       background: transparent;
       color: #7fd0ff;
       border: 1px solid #7fd0ff;
       border-radius: 30px;
       text-decoration: none;
-      font-size: 1.2rem;
+      font-size: 1rem; /* フォントサイズ調整 */
       cursor: pointer;
       transition: all 0.3s;
+      min-width: 200px; /* ボタンの最小幅 */
     }
     .overlay button:hover, .overlay a:hover {
       background: #7fd0ff;
       color: #000;
       box-shadow: 0 0 20px #7fd0ff;
+    }
+
+    /* 小画面向けの調整 */
+    @media (max-width: 600px) {
+      .tarot-card {
+        width: 100px;
+        height: 170px;
+      }
+      .card-front {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+      }
+      .poem-label {
+        font-size: 0.7rem;
+      }
+      .reading-poem {
+        font-size: 1rem;
+        padding: 1rem;
+      }
+      .overlay button, .overlay a {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        min-width: unset;
+        width: 80%;
+      }
     }
   </style>
 </head>
@@ -162,21 +202,21 @@
           <div class="card-back"></div>
           <div class="card-front" id="card0"></div>
         </div>
-        <div class="poem-label">詩韻祈</div>
+        <div class="poem-label">過去</div>
       </div>
       <div class="tarot-card" onclick="revealCard(1)">
         <div class="card-inner">
           <div class="card-back"></div>
           <div class="card-front" id="card1"></div>
         </div>
-        <div class="poem-label">詩韻祈</div>
+        <div class="poem-label">現在</div>
       </div>
       <div class="tarot-card" onclick="revealCard(2)">
         <div class="card-inner">
           <div class="card-back"></div>
           <div class="card-front" id="card2"></div>
         </div>
-        <div class="poem-label">詩韻祈</div>
+        <div class="poem-label">未来</div>
       </div>
     </div>
 
@@ -186,17 +226,16 @@
       <div class="reading-poem" id="poem1"></div>
       <div class="reading-poem" id="poem2"></div>
     </div>
-  </div>
+    
+    <div class="overlay" id="overlay">
+      <button onclick="location.reload()">もう一度占う</button>
+      <a href="https://line.me/" target="_blank">LINEで個人鑑定</a>
+      <a href="https://example.com/shiin-shisou" target="_blank">詩韻思想へ</a>
+      <a href="https://example.com/shion" target="_blank">Shionサイトへ</a>
+    </div>
 
-  <div class="overlay" id="overlay">
-    <button onclick="location.reload()">もう一度占う</button>
-    <a href="https://line.me/" target="_blank">LINEで個人鑑定</a>
-    <a href="https://example.com/shiin-shisou" target="_blank">詩韻思想へ</a>
-    <a href="https://example.com/shion" target="_blank">Shionサイトへ</a>
-  </div>
-
-  <script>
-    // コード雨アニメーション (Canvas描画のピクセル比率のバグを修正)
+  </div> <script>
+    // コード雨アニメーション
     (function codeRain(){
       const cvs = document.getElementById('codeRain');
       const ctx = cvs.getContext('2d');
@@ -205,21 +244,16 @@
       let columns, drops, W, H;
       
       function resize(){
-        // 物理ピクセルサイズを設定
         W = cvs.width  = window.innerWidth * devicePixelRatio;
         H = cvs.height = window.innerHeight * devicePixelRatio;
-        // 描画コンテキストをCSSピクセル単位にスケール
         ctx.scale(devicePixelRatio, devicePixelRatio);
 
-        // CSSピクセル単位で計算
         fontSize = Math.max(14, Math.min(22, Math.floor(window.innerWidth/48)));
         columns = Math.ceil(window.innerWidth / fontSize);
-        // dropsの初期化はCSSピクセル単位の高さを使用
         drops = new Array(columns).fill(0).map(()=> Math.floor(Math.random()*window.innerHeight)); 
       }
       
       function draw(){
-        // 描画はCSSピクセル単位で行う
         ctx.fillStyle = 'rgba(2,3,22,0.16)';
         ctx.fillRect(0,0,window.innerWidth,window.innerHeight); 
 
@@ -231,7 +265,6 @@
           const y = drops[i] * fontSize * .9;
           ctx.fillText(ch, x, y);
           
-          // 画面外判定もCSSピクセル単位で行う
           if(y > window.innerHeight && Math.random() > 0.975){ 
             drops[i] = 0; 
           }
@@ -245,7 +278,7 @@
       draw();
     })();
 
-    // タロットデータ（変更なし）
+    // タロットデータ
     const majorArcana = [
       { name: 'The Fool', upright: '純粋な始まりの風、冒険の翼を広げて', reversed: '無謀な跳躍、影に潜む落とし穴' },
       { name: 'The Magician', upright: '意志の炎が現実を紡ぎ、創造の河を流す', reversed: '幻の鏡、欺瞞の霧に包まれて' },
@@ -283,36 +316,59 @@
       }
     }
 
-    // カードをめくる関数（変更なし）
+    // Intersection Observer の設定
+    const readingArea = document.getElementById('readingArea');
+    const overlay = document.getElementById('overlay');
+    
+    // リーディングエリアを監視するObserver
+    const readingObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && revealedCount === 3) {
+          readingArea.classList.add('visible');
+          // リーディングエリアが表示されたら、オーバーレイの監視を開始
+          overlayObserver.observe(overlay); 
+          readingObserver.disconnect(); // 一度表示されたら監視を停止
+        }
+      });
+    }, { threshold: 0.1 }); // 10%が見えたら発火
+    
+    // オーバーレイを監視するObserver
+    const overlayObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && revealedCount === 3) {
+          overlay.classList.add('visible');
+          overlayObserver.disconnect(); // 一度表示されたら監視を停止
+        }
+      });
+    }, { threshold: 0.1 }); // 10%が見えたら発火
+
+
     function revealCard(index) {
-      // 既に3枚めくられていたら何もしない
-      if (document.querySelectorAll('.flipped').length >= 3) return; 
+      if (document.querySelectorAll('.flipped').length >= 3) return;
 
       const cardElement = document.querySelectorAll('.tarot-card')[index];
       const cardInner = cardElement.querySelector('.card-inner');
 
-      // 既にめくられていたら何もしない
       if (cardInner.classList.contains('flipped')) return; 
 
       cardInner.classList.add('flipped');
       
-      // 正位置か逆位置かをランダムに決定
       const isReversed = Math.random() < 0.5;
       const cardData = selectedCards[index];
       const meaning = isReversed ? cardData.reversed : cardData.upright;
       const positionText = isReversed ? ' (逆位置)' : ' (正位置)';
       
+      const poemLabels = ['過去', '現在', '未来']; // 詩韻祈 を具体的なラベルに変更
       document.getElementById(`card${index}`).innerHTML = 
         `<strong>${cardData.name}${positionText}</strong><br>${meaning}`;
       
       document.getElementById(`poem${index}`).innerHTML = 
-        `【${cardData.name}】${positionText}<br>${meaning} — あなたの運命の詩。`;
+        `【${poemLabels[index]}：${cardData.name}】${positionText}<br>${meaning} — あなたの運命の詩。`;
 
       revealedCount++;
       if (revealedCount === 3) {
-        document.getElementById('readingArea').classList.add('visible');
-        // リーディング表示後にオーバーレイを表示
-        setTimeout(() => document.getElementById('overlay').classList.add('visible'), 1500);
+        // 3枚めくったらリーディングエリアの監視を開始
+        readingObserver.observe(readingArea);
       }
     }
   </script>
