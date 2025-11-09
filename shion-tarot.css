@@ -1,8 +1,3 @@
-/* ======================================================
-   詩韻 Shion — Tarot (Poem/Rhythm/Prayer)
-   外部CSS（index.html と同階層）
-   ----------------------------------------------------- */
-
 /* 基本 */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -15,8 +10,17 @@
   --bg:#080a12;
   --glass:#ffffff1a;
   --r:14px;
-  /* 裏面画像：同階層に back.png を置く or assets/tarot/back.png に変更 */
+
+  /* 裏面画像：同階層に back.png を置く or assets/tarot/back.png に変更可 */
   --card-back-url: url("back.png");
+
+  /* 表面（プレースホルダ）— 後でURLに差し替えOK */
+  --front0: linear-gradient(135deg,#ffe8b3,#caa8ff);
+  --front1: linear-gradient(135deg,#b3ffe3,#a8b3ff);
+  --front2: linear-gradient(135deg,#ffd1f7,#d1fff5);
+}
+@media (color-gamut: p3){
+  :root{ --gold: color(display-p3 1 0.84 0.45) }
 }
 html,body{height:100%}
 body{
@@ -26,7 +30,6 @@ body{
   overflow-x:hidden;
 }
 
-/* 視覚的な統一（タイポスケール） */
 .sr-only{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 
 /* 星砂 */
@@ -80,7 +83,7 @@ body{
   text-shadow:0 0 10px rgba(130,140,255,.25);
 }
 .hero__note{
-  display:inline-block; margin:.5rem auto 1.2rem; padding:.5rem 1rem;
+  display:inline-block; margin:.5rem auto .8rem; padding:.5rem 1rem;
   border-radius:999px;
   background:linear-gradient(90deg,#f9d86b,#caa8ff 60%,#8e79ff);
   color:#231b3a; font-weight:700; letter-spacing:.06em;
@@ -95,6 +98,8 @@ body{
   transition: transform .18s, box-shadow .22s, filter .22s;
 }
 .btn-primary:hover{ transform: translateY(-1px); filter:saturate(1.06) }
+.start-time{ margin-top:.5rem; font-size:.95rem; color:#ffe8b3; opacity:0; transition:opacity .6s ease }
+.start-time.is-on{ opacity:.9 }
 
 /* ===== 儀式 ===== */
 .hidden{ display:none !important }
@@ -128,7 +133,10 @@ body{
 }
 .card__face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; background-position:center; background-size:cover }
 .card__back{ background: #0b0f18 var(--card-back-url) center/cover no-repeat }
-.card__front{ transform: rotateY(180deg); background-color:#0f1426 }
+.card__front{ transform: rotateY(180deg); background-image: var(--front0) }
+#card0{ background-image: var(--front0) }
+#card1{ background-image: var(--front1) }
+#card2{ background-image: var(--front2) }
 .card.is-flipped .card__inner{ transform: rotateY(180deg) }
 
 .tap-hint{ display:flex; justify-content:center; margin:8px 0 4px; opacity:.9 }
@@ -151,6 +159,14 @@ body{
   100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0) }
 }
 
+/* ===== About（詩韻祈とは？） ===== */
+.about__text{
+  line-height:1.9; color:#eef1ff;
+  background: rgba(127,208,255,.06);
+  border:1px solid rgba(127,208,255,.22);
+  border-radius:12px; padding:14px;
+}
+
 /* ===== リーディング ===== */
 .reading{
   background: linear-gradient(180deg, rgba(8,10,18,.9), rgba(10,12,20,.96));
@@ -165,7 +181,16 @@ body{
   border-radius:12px; padding:14px; min-height:110px;
 }
 .reading__head{ color:#cfe2ff; font-size:.88rem; letter-spacing:.16em; margin-bottom:6px }
-.reading__body{ line-height:1.8; color:#eef1ff }
+.reading__body{ line-height:1.9; color:#eef1ff }
+.reading.is-active .reading__item{ box-shadow: 0 0 22px rgba(174,138,255,.15) }
+
+/* ===== 総合結果 ===== */
+.summary__poem{
+  background: radial-gradient(600px 240px at 50% 0%, rgba(255,215,111,.08), rgba(124,98,255,.05));
+  border:1px solid rgba(255,215,111,.18);
+  border-radius:12px; padding:16px; line-height:1.95; color:#eef1ff;
+}
+.summary__poem p{ margin:0 0 .4rem }
 
 .closing-line{ margin:18px 0 8px; color:#ffe8b3; opacity:.92; letter-spacing:.08em }
 .cta{ margin:18px 0 8px; display:grid; gap:10px; grid-template-columns: 1fr 1fr }
