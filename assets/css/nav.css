@@ -202,3 +202,44 @@ body{
   pointer-events:none;
   box-shadow:0 0 0 2px rgba(126,102,255,.22) inset;
 }
+
+/* ===== Header: Always Visible, Cross-Page Safe ===== */
+:root{ --header-h: 64px; }
+
+.header{
+  position: fixed !important;
+  top: 0; left: 0; right: 0;
+  z-index: 10000 !important;
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto;
+  background: rgba(10, 8, 20, .55);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  backdrop-filter: blur(10px) saturate(1.2);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.header-inner{
+  height: var(--header-h);
+  padding: 0 clamp(12px, 4vw, 24px);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* auto-hide系を常に無効化 */
+.header.is-hidden,
+.header.--hidden,
+.header[data-hidden="true"]{
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* 本文が隠れないように余白を必ず付与 */
+body{
+  padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px)) !important;
+}
+
+/* 上に被さる可能性のあるレイヤーを必ず下へ */
+.halo, .starfield, .glow-layer, .hero, .veil {
+  z-index: 0 !important;
+  pointer-events: none;
+}
