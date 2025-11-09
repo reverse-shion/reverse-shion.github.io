@@ -15,10 +15,10 @@
 </head>
 <body>
 
-  <!-- 星砂（離脱率低減の常時ゆらぎ） -->
+  <!-- 背景の星砂 -->
   <div class="stardust" aria-hidden="true"></div>
 
-  <!-- ===== ヒーロー：世界観の宣言 ===== -->
+  <!-- ===== ヒーロー ===== -->
   <section class="hero" id="hero">
     <div class="hero__bg" aria-hidden="true"></div>
     <div class="hero__veil" aria-hidden="true"></div>
@@ -35,11 +35,11 @@
       <p class="start-time" id="startTime" aria-live="polite"></p>
     </div>
 
-    <!-- BGM（タップ時に起動） -->
+    <!-- BGM（タップ時起動/iOS対応） -->
     <audio id="bgm" src="assets/sound/temple-ambient.mp3" preload="auto" loop playsinline></audio>
   </section>
 
-  <!-- ===== 星詠リチュアル：儀式導入 → タロットへ ===== -->
+  <!-- ===== 儀式 → 本編へ ===== -->
   <section id="ritual" class="ritual hidden" aria-live="polite" aria-atomic="true">
     <div class="ritual__glow" aria-hidden="true"></div>
     <p class="ritual__line">星の声が、あなたの言葉に触れる。</p>
@@ -83,7 +83,7 @@
       <div class="peel" id="peel" aria-hidden="true"></div>
     </section>
 
-    <!-- ===== 説明：詩韻祈とは？ ===== -->
+    <!-- 説明 -->
     <section class="about section">
       <h3 class="section__title">詩韻祈（しおんき）とは？</h3>
       <p class="about__text">
@@ -92,7 +92,7 @@
       </p>
     </section>
 
-    <!-- ===== リーディング：2行（詩・韻・祈） ===== -->
+    <!-- 2行×3枚 -->
     <section class="reading section" id="reading">
       <h3 class="section__title">詩・韻・祈 のリーディング</h3>
       <div class="reading__grid">
@@ -111,20 +111,36 @@
       </div>
     </section>
 
-    <!-- ===== 総合結果：9行詩 ===== -->
+    <!-- 総合9行詩 -->
     <section class="summary section" id="summary">
       <h3 class="section__title">総合結果 ― つまり、こういうこと。</h3>
       <div class="summary__poem" id="summaryPoem">
         カードをすべて開くと、ここに九行のメッセージが現れます。
       </div>
-
       <p class="closing-line">大丈夫だよ。言葉は、あなたの光だから。</p>
+    </section>
 
-      <nav class="cta">
-        <a class="cta__btn" href="#" id="retry">もう一度占う</a>
-        <a class="cta__btn cta__btn--line" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">LINEで個人鑑定</a>
-        <a class="cta__btn cta__btn--tiktok" href="shion.html" target="_blank" rel="noopener">Re:verse Shion</a>
-        <a class="cta__btn cta__btn--note" href="philosophy.html" target="_blank" rel="noopener">詩韻思想を読む</a>
+    <!-- ★ 次の一歩（占い完了後に出現） -->
+    <section class="next-steps section hidden" id="nextSteps" aria-live="polite" aria-atomic="true">
+      <h3 class="section__title">次の一歩 ― 扉は三つ。</h3>
+      <p class="next-steps__lead">
+        いま開いた言葉を、<strong>どう進めるか</strong>を選べます。<br>
+        おすすめは <strong>「導きを直接受け取る（LINE）」</strong> です。
+      </p>
+      <ol class="next-steps__list">
+        <li><strong>体験を続ける：</strong> 詩韻の神殿で世界観にもう一歩。</li>
+        <li><strong>意味を深く知る：</strong> 詩韻思想で結果の真意を読む。</li>
+        <li><strong>個別の導き：</strong> LINEであなただけの鑑定を受け取る。</li>
+      </ol>
+
+      <nav class="cta-grid">
+        <a class="btn-ghost" href="#" id="retry">🌌 星の声をもう一度聞く</a>
+        <a class="btn-dark" href="shion.html">🌕 詩韻の神殿へ進む</a>
+        <a class="btn-light" href="philosophy.html">🌙 言葉の真意を受け取る</a>
+        <a class="btn-line" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">
+          💚 導きを直接受け取る（LINE鑑定）
+          <span class="sub">※ 1対1で今の状況に合わせて言葉を届けます</span>
+        </a>
       </nav>
     </section>
   </main>
@@ -133,13 +149,13 @@
   <audio id="flipSe" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
 
   <script>
-  // ---------- BGM（iOS対策：ユーザー操作で起動） ----------
+  // ====== Audio Boot ======
   const bgm = document.getElementById('bgm');
   function kickBgm(){
     try { bgm.volume = 0.55; const p = bgm.play(); if (p && p.catch) p.catch(()=>{}); } catch(e){}
   }
 
-  // ---------- 大アルカナ（逆位置なし・2行詩＋要約語） ----------
+  // ====== Data ======
   const deck = [
     { name:'The Fool', idx:0, two:['最初の一歩は、恐れよりも軽い風。','失敗は合図――世界は君に開く。'], kw:'始まり' },
     { name:'The Magician', idx:1, two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。'], kw:'創造' },
@@ -165,7 +181,7 @@
     { name:'The World', idx:21, two:['輪は閉じて、道は開く。','完成形は、次のスタートライン。'], kw:'成就' }
   ];
 
-  // ---------- 要素 ----------
+  // ====== Elements ======
   const startBtn  = document.getElementById('startRitualBtn');
   const startTimeEl = document.getElementById('startTime');
   const ritualSec = document.getElementById('ritual');
@@ -180,8 +196,9 @@
   const fronts    = [document.getElementById('card0'), document.getElementById('card1'), document.getElementById('card2')];
   const bodies    = [document.getElementById('body0'), document.getElementById('body1'), document.getElementById('body2')];
   const defaultBodies = ['カードを開くと、ここに“詩”が現れます。','カードを開くと、ここに“韻”が現れます。','カードを開くと、ここに“祈”が現れます。'];
+  const nextSteps = document.getElementById('nextSteps'); // ★ 追加
 
-  // ---------- 状態 ----------
+  // ====== State ======
   let selected = [];
   let opened = 0;
 
@@ -198,13 +215,14 @@
   function resetView(){
     opened = 0;
     bodies.forEach((el,i)=> el.textContent = defaultBodies[i]);
-    document.querySelector('.reading')?.classList.remove('is-active');
+    readingEl?.classList.remove('is-active');
     summaryPoem.textContent = 'カードをすべて開くと、ここに九行のメッセージが現れます。';
     tapHint.style.opacity = 1;
+    nextSteps.classList.add('hidden');          // ★ 追加：非表示に戻す
+    nextSteps.classList.remove('is-on');        // ★ 追加：アニメ用クラスも外す
     cardEls.forEach((el,i)=>{
       el.classList.remove('is-flipped');
       el.style.pointerEvents = 'auto';
-      // ここはプレースホルダ色のまま（CSS変数で背景）→ 後でURL差し替え想定
       fronts[i].style.backgroundImage = 'var(--front' + i + ')';
     });
   }
@@ -216,14 +234,12 @@
 
   function beginRitual(){
     kickBgm();
-    // 開始時刻（JST）を表示
     const now = new Date();
     const jst = new Intl.DateTimeFormat('ja-JP', { timeZone:'Asia/Tokyo', hour:'2-digit', minute:'2-digit', year:'numeric', month:'2-digit', day:'2-digit' }).format(now);
     startTimeEl.textContent = `星が動き出した時間：${jst}`;
     startTimeEl.classList.add('is-on');
 
     ritualSec.classList.remove('hidden');
-    // 1.2秒で本編へ
     setTimeout(()=>{
       ritualSec.classList.add('hidden');
       mainSec.classList.remove('hidden');
@@ -235,13 +251,10 @@
   }
 
   function twoLineText(card){
-    // 2行の短詩を返す
     return `<span class="line">${card.two[0]}</span><br><span class="line">${card.two[1]}</span>`;
   }
 
   function buildSummaryPoem(sel){
-    // 9行の総合詩を自動生成
-    // sel: 3枚（詩・韻・祈） → 冒頭2/中段5/結び2 の構成
     const keys = sel.map(c => c.kw);
     const names = sel.map(c => c.name.replace('The ',''));
     const lines = [
@@ -262,11 +275,9 @@
     const cardEl = cardEls[idx];
     if(cardEl.classList.contains('is-flipped') || opened>=3) return;
 
-    const data = selected[idx];
-
     try { flipSe.currentTime = 0; flipSe.play(); } catch(e){}
 
- 
+    const data = selected[idx];
     cardEl.classList.add('is-flipped');
     opened++;
 
@@ -276,32 +287,33 @@
     if(opened===3){
       tapHint.style.opacity = 0;
       cardEls.forEach(c=> c.style.pointerEvents='none');
-      document.querySelector('.reading').classList.add('is-active');
-      // 総合詩を生成
+      readingEl.classList.add('is-active');
       summaryPoem.innerHTML = buildSummaryPoem(selected);
       document.getElementById('summary').scrollIntoView({behavior:'smooth', block:'start'});
+
+      // ★「次の一歩」を出現
+      nextSteps.classList.remove('hidden');
+      requestAnimationFrame(()=> nextSteps.classList.add('is-on'));
     }
   }
 
   function onRetry(e){
-  e.preventDefault();
-  // 開始時刻リセット
-  startTimeEl.textContent = '';
-  startTimeEl.classList.remove('is-on');
+    e.preventDefault();
+    startTimeEl.textContent = '';
+    startTimeEl.classList.remove('is-on');
+    document.getElementById('hero').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>{ beginReading(); }, 600);
+  }
 
-  document.getElementById('hero').scrollIntoView({behavior:'smooth'});
-  setTimeout(()=>{ beginReading(); }, 600);
-}
-
-  // バインド
+  // ====== Bindings ======
   window.addEventListener('load', ()=>{
     cardEls.forEach((el)=> el.addEventListener('click', ()=> onFlip(Number(el.dataset.idx)), {passive:true}));
     startBtn.addEventListener('click', beginRitual, {passive:true});
-    retryBtn.addEventListener('click', onRetry, false);
+    document.getElementById('retry').addEventListener('click', onRetry, false);
     setTimeout(()=>{ document.querySelector('.hero__veil').classList.add('is-on'); }, 350);
   });
 
-  // タッチでもBGMキック（保険）
+  // iOS保険
   window.addEventListener('touchstart', function once(){
     kickBgm();
     window.removeEventListener('touchstart', once, {passive:true});
