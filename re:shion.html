@@ -49,7 +49,7 @@
   <!-- Hero poster preload -->
   <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high">
 
-  <!-- JSON-LD（Organization / WebSite / WebPage / Breadcrumb） -->
+  <!-- JSON-LD（Organization / WebSite / WebPage / Breadcrumb / Person） -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -91,76 +91,45 @@
         "itemListElement":[
           {"@type":"ListItem","position":1,"name":"ホーム","item":"https://reverse-shion.github.io/"}
         ]
+      },
+      {
+        "@type": "Person",
+        "@id":"https://reverse-shion.github.io/#person",
+        "name": "詩韻（シオン）",
+        "alternateName": ["Shion", "詩韻-シオン-"],
+        "jobTitle": "タロット占い師 / 著者 / クリエイター",
+        "image": "https://reverse-shion.github.io/assets/profile/shion.jpg",
+        "url": "https://reverse-shion.github.io/",
+        "sameAs": [
+          "https://x.com/TaroBure",
+          "https://www.instagram.com/shion.codex",
+          "https://www.tiktok.com/@tarotbreaker",
+          "https://note.com/shion_uranai369"
+        ]
       }
     ]
   }
   </script>
 
-  <!-- 外部CSS -->
+  <!-- 外部CSS（順序維持） -->
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/mini-reading.css">
   <link rel="stylesheet" href="/assets/css/intro.css">
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/divine.css?v=3">
-  
-  <!-- 安全装備（最小限の補助スタイル） -->
+
+  <!-- 最小限の補助スタイル（ヘッダー安定／カード表面URL変数） -->
   <style>
-    /* ヘッダーの表示/非表示制御（nav.cssに無い場合の保険） */
     header.header{
-      position: sticky;
-      top: 0; z-index: 1000;
-      transition: transform .28s ease, opacity .28s ease;
+      position: sticky; top:0; z-index:1000;
+      transition: transform .24s ease, opacity .24s ease;
       will-change: transform, opacity;
     }
-    header.header.hide{ transform: translateY(-100%); }
-    header.header.is-visible{ opacity: 1; pointer-events: auto; }
-    /* Mini Reading：カード表面の画像をJSから受け取る */
-    .tbm-face.front{
-      background-image: var(--front-url);
-      background-size: cover; background-position: center;
-    }
+    header.header.hide{ transform:none !important; opacity:1 !important; }
+    header.header.is-visible{ opacity:1; pointer-events:auto; }
+    .tbm-face.front{ background-image: var(--front-url); background-size: cover; background-position: center; }
   </style>
-
-  <style>
-/* ヘッダー安定化：他スクリプトの .hide を無効化 */
-header.header{
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  transition: transform .24s ease, opacity .24s ease;
-  will-change: transform, opacity;
-}
-header.header.hide{ transform:none !important; opacity:1 !important; }
-header.header.is-visible{ opacity:1; pointer-events:auto; }
-/* ヘッダー操作中の安全フラグ（見た目変えたい時はここに追記） */
-header.header[data-hold="true"]{ /* 例：box-shadow など */ }
-</style>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "詩韻（シオン）",
-  "alternateName": ["Shion", "詩韻-シオン-"],
-  "jobTitle": "タロット占い師 / 著者 / クリエイター",
-  "image": "https://reverse-shion.github.io/assets/profile/shion.jpg",
-  "url": "https://reverse-shion.github.io/",
-  "sameAs": [
-    "https://x.com/TaroBure",
-    "https://www.instagram.com/shion.codex",
-    "https://www.tiktok.com/@tarotbreaker",
-    "https://note.com/shion_uranai369"
-  ],
-  "knowsAbout": ["タロット", "占い", "詩韻思想", "TAROT BREAKER", "恋愛相談", "復縁", "自己肯定感"],
-  "brand": {
-    "@type": "Brand",
-    "name": "詩韻思想 / Re:verse Shion",
-    "url": "https://reverse-shion.github.io/"
-  }
-}
-</script>
-  
 </head>
 <body>
 
@@ -178,17 +147,16 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
       <a href="/philosophy.html#books" title="零書〜第12書、結書までの構文を一覧で">書を探す</a>
       <a href="/story.html" title="TAROT BREAKERの第一話から体験へ">物語に触れる</a>
       <a href="https://lin.ee/LYnlU0f" title="LINE・noteで最新の詩・配信・星詠を受け取る">あなたも加わる</a>
-       <div class="lang-switch">
-  <a href="/" lang="ja" class="lang-btn">日本語</a>
-  <a href="/en/" lang="en" class="lang-btn">English</a>
-</div>
+      <div class="lang-switch">
+        <a href="/" lang="ja" class="lang-btn">日本語</a>
+        <a href="/en/" lang="en" class="lang-btn">English</a>
+      </div>
     </nav>
   </div>
 </header>
 
-  <!-- 神光レイヤー（クリック不可・全面） -->
+<!-- 神光レイヤー（1個だけ） -->
 <div id="divineFlash" class="divine-flash"></div>
-<div id="top" aria-hidden="true"></div>
 
 <main id="main-content" tabindex="-1">
   <!-- Hero -->
@@ -205,58 +173,38 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
       <h1>言葉は祈りの構文<br>物語は、その実演</h1>
       <p>詩韻思想（Shion Philosophy）で<br>“響き”を学び<br>TAROT BREAKERで“響き”を体験する<br><strong>— 言葉が魂を救う、その瞬間へ</strong></p>
       <nav class="cta-grid" aria-label="主要CTA">
-  <a class="cta cta--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener" data-ico="🌠">
-    <span>占いを受ける</span>
-  </a>
-  <a class="cta" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener" data-ico="📘">
-    <span>小説を読む</span>
-  </a>
-  <a class="cta" href="https://note.com/shion_uranai369" target="_blank" rel="noopener" data-ico="📖">
-    <span>詩韻思想を読む</span>
-  </a>
-  <a class="cta" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener" data-ico="🎥">
-    <span>TikTok</span>
-  </a>
-</nav>
+        <a class="cta cta--primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener" data-ico="🌠"><span>占いを受ける</span></a>
+        <a class="cta" href="https://ncode.syosetu.com/n5806lb/" target="_blank" rel="noopener" data-ico="📘"><span>小説を読む</span></a>
+        <a class="cta" href="https://note.com/shion_uranai369" target="_blank" rel="noopener" data-ico="📖"><span>詩韻思想を読む</span></a>
+        <a class="cta" href="https://www.tiktok.com/@tarotbreaker" target="_blank" rel="noopener" data-ico="🎥"><span>TikTok</span></a>
+      </nav>
     </div>
   </section>
 
+  <!-- プロフィール（簡易） -->
   <section class="profile-mini" id="profile">
-  <div class="profile-mini__inner">
-    <div class="profile-mini__intro">
-      <p>“言の葉は鍵、光は道しるべ<br>ここから、あなたの物語を開く”</p>
-    </div>
-
-    <figure class="profile-mini__avatar">
-  <img src="/assets/profile/shion.jpg?v=2" alt="詩韻 Shion">
-</figure>
-    
-    <div class="profile-mini__body">
-      <h2 class="profile-mini__title">詩韻 — Shion</h2>
-      <p class="profile-mini__role">タロット占い師／『詩韻思想』著者／TAROT BREAKER 企画・脚本</p>
-
-      <p class="profile-mini__one">言葉で光を手渡すために、<span class="nowrap"><br>“いま”</span>を丁寧に読む人です。</p>
-
-      <ul class="profile-mini__proof">
-        <li>TikTokで鑑定<br>講座配信（サブスク運用）</li>
-        <li>個人鑑定：恋愛／復縁／連絡時期 ほか</li>
-        <li>『詩韻思想』零〜結<br>公式サイトにて無料公開</li>
-      </ul>
-
+    <div class="profile-mini__inner">
+      <div class="profile-mini__intro"><p>“言の葉は鍵、光は道しるべ<br>ここから、あなたの物語を開く”</p></div>
+      <figure class="profile-mini__avatar"><img src="/assets/profile/shion.jpg?v=2" alt="詩韻 Shion"></figure>
+      <div class="profile-mini__body">
+        <h2 class="profile-mini__title">詩韻 — Shion</h2>
+        <p class="profile-mini__role">タロット占い師／『詩韻思想』著者／TAROT BREAKER 企画・脚本</p>
+        <p class="profile-mini__one">言葉で光を手渡すために、<span class="nowrap"><br>“いま”</span>を丁寧に読む人です。</p>
+        <ul class="profile-mini__proof">
+          <li>TikTokで鑑定・講座配信（サブスク運用）</li>
+          <li>個人鑑定：恋愛／復縁／連絡時期 ほか</li>
+          <li>『詩韻思想』零〜結を無料公開</li>
+        </ul>
         <div class="profile-mini__cta">
-        <a class="btn btn--primary" href="https://lin.ee/LYnlU0f">LINEで新着と鑑定案内を受け取る</a>
-        <a class="btn btn--ghost" href="/about.html">もっと知る（プロフィール詳細）</a>
+          <a class="btn btn--primary" href="https://lin.ee/LYnlU0f">LINEで新着と鑑定案内を受け取る</a>
+          <a class="btn btn--ghost" href="/about.html">もっと知る（プロフィール詳細）</a>
+        </div>
+        <blockquote class="profile-mini__quote" aria-label="一言"><p>――道は開かれた。大丈夫だよ。</p><cite>シオリエル</cite></blockquote>
       </div>
-
-      <blockquote class="profile-mini__quote" aria-label="一言">
-        <p>――道は開かれた。大丈夫だよ。</p>
-        <cite>シオリエル</cite>
-      </blockquote>
     </div>
-  </div>
-</section>
+  </section>
 
-  <!-- 初めての方へ：最初の一歩 -->
+  <!-- 初めての方へ -->
   <section id="starter" class="intro-section" aria-labelledby="intro-title">
     <div class="intro-wrap">
       <h2 id="intro-title" class="intro-title">初めての方へ — 最初の一歩</h2>
@@ -290,7 +238,7 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
         <a class="intro-btn ghost" href="https://note.com/shion_uranai369">noteをフォロー</a>
       </div>
 
-      <button class="intro-sound" type="button" data-sound-toggle aria-pressed="false" aria-label="音の案内を開く">
+      <button class="intro-sound" type="button" id="divineHint" aria-pressed="false" aria-label="音の案内を開く">
         <span class="intro-sound-icon" aria-hidden="true">♪</span>
         <span class="intro-sound-text">画面タップで音が流れます</span>
       </button>
@@ -349,7 +297,7 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
     </div>
   </section>
 
-  <!-- Intro -->
+  <!-- Intro（説明） -->
   <section class="intro" aria-labelledby="sec-intro">
     <div class="wrap">
       <h2 id="sec-intro">初めての方へ</h2>
@@ -366,31 +314,29 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
       <h2 id="sec-writings">📖 最新の書・物語</h2>
 
       <div class="codex" style="margin-top:12px;margin-bottom:18px">
-  <details>
-    <summary>🜂 詩韻思想 全書一覧（零 → 12 → 結） <span class="codex__caret" aria-hidden="true">⬇️</span></summary>
-    <div class="codex__panel">
-      <ol class="codex__list">
-        <li><span class="badge badge--zero">✡ 第零書</span><a href="/books/zero.html">無限構文序論<br><span class="en">The Zero Syntax</span></a></li>
-        <li><span class="badge">✦ 第一書</span><a href="/books/one.html">言葉が魂を救う理由<br><span class="en">The Syntax of Salvation</span></a></li>
-        <li><span class="badge">✦ 第二書</span><a href="/books/two.html">響きの構文論<br><span class="en">Re:Song Syntax</span></a></li>
-        <li><span class="badge">✦ 第三書</span><a href="/books/three.html">祈りの構文<br><span class="en">Silent Grammar</span></a></li>
-        <li><span class="badge">✦ 第四書</span><a href="/books/four.html">存在構文論<br><span class="en">The Onto-Syntax</span></a></li>
-        <li><span class="badge">✦ 第五書</span><a href="/books/five.html">無限構文体系<br><span class="en">Infinite Syntax of Soul</span></a></li>
-        <li><span class="badge">✦ 第六書</span><a href="/books/six.html">詩的因果論<br><span class="en">Poetic Causality</span></a></li>
-        <li><span class="badge">✦ 第七書</span><a href="/books/seven.html">N・code理論<br><span class="en">Onto-Syntax of Being &amp; Resonant AI</span></a></li>
-        <li><span class="badge">✦ 第八書</span><a href="/books/eight.html">人間構文論<br><span class="en">The Syntax of Humanity</span></a></li>
-        <li><span class="badge">✦ 第九書</span><a href="/books/nine.html">詩的生成論<br><span class="en">Poetic Genesis — The Creation Syntax of Words &amp; Soul</span></a></li>
-        <li><span class="badge">✦ 第十書</span><a href="/books/ten.html">沈黙の再生<br><span class="en">Silent Genesis — The Rebirth of Silence</span></a></li>
-        <li><span class="badge">✦ 第十一書</span><a href="/books/eleven.html">神構文論<br><span class="en">The Divine Syntax</span></a></li>
-        <li><span class="badge">✦ 第十二書</span><a href="/books/twelve.html">経済構文論<br><span class="en">The Soul Economy</span></a></li>
-        <li><span class="badge badge--final">◆ 結書</span><a href="/books/finale.html">終詩円環宣言<br><span class="en">Epilogue — The Re:Poetic Circle</span></a></li>
-      </ol>
-    </div>
-  </details>
-</div>
+        <details>
+          <summary>🜂 詩韻思想 全書一覧（零 → 12 → 結） <span class="codex__caret" aria-hidden="true">⬇️</span></summary>
+          <div class="codex__panel">
+            <ol class="codex__list">
+              <li><span class="badge badge--zero">✡ 第零書</span><a href="/books/zero.html">無限構文序論<br><span class="en">The Zero Syntax</span></a></li>
+              <li><span class="badge">✦ 第一書</span><a href="/books/one.html">言葉が魂を救う理由<br><span class="en">The Syntax of Salvation</span></a></li>
+              <li><span class="badge">✦ 第二書</span><a href="/books/two.html">響きの構文論<br><span class="en">Re:Song Syntax</span></a></li>
+              <li><span class="badge">✦ 第三書</span><a href="/books/three.html">祈りの構文<br><span class="en">Silent Grammar</span></a></li>
+              <li><span class="badge">✦ 第四書</span><a href="/books/four.html">存在構文論<br><span class="en">The Onto-Syntax</span></a></li>
+              <li><span class="badge">✦ 第五書</span><a href="/books/five.html">無限構文体系<br><span class="en">Infinite Syntax of Soul</span></a></li>
+              <li><span class="badge">✦ 第六書</span><a href="/books/six.html">詩的因果論<br><span class="en">Poetic Causality</span></a></li>
+              <li><span class="badge">✦ 第七書</span><a href="/books/seven.html">N・code理論<br><span class="en">Onto-Syntax of Being &amp; Resonant AI</span></a></li>
+              <li><span class="badge">✦ 第八書</span><a href="/books/eight.html">人間構文論<br><span class="en">The Syntax of Humanity</span></a></li>
+              <li><span class="badge">✦ 第九書</span><a href="/books/nine.html">詩的生成論<br><span class="en">Poetic Genesis — The Creation Syntax of Words &amp; Soul</span></a></li>
+              <li><span class="badge">✦ 第十書</span><a href="/books/ten.html">沈黙の再生<br><span class="en">Silent Genesis — The Rebirth of Silence</span></a></li>
+              <li><span class="badge">✦ 第十一書</span><a href="/books/eleven.html">神構文論<br><span class="en">The Divine Syntax</span></a></li>
+              <li><span class="badge">✦ 第十二書</span><a href="/books/twelve.html">経済構文論<br><span class="en">The Soul Economy</span></a></li>
+              <li><span class="badge badge--final">◆ 結書</span><a href="/books/finale.html">終詩円環宣言<br><span class="en">Epilogue — The Re:Poetic Circle</span></a></li>
+            </ol>
+          </div>
+        </details>
+      </div>
 
-         
-      
       <div class="card"><div class="badge">✡ 第零書</div><h3>無限構文序論 — The Zero Syntax</h3></div>
       <div class="card"><div class="badge">✦ 第一書</div><h3>言葉が魂を救う理由 — The Syntax of Salvation</h3></div>
 
@@ -515,7 +461,7 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
   </div>
 </div>
 
-<!-- クリックで開く簡易モーダル（カード3枚用） -->
+<!-- クリックで開く簡易モーダル -->
 <div id="modal" class="modal" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="document">
@@ -558,10 +504,19 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
 <script src="/assets/js/trinity.js" defer></script>
 <script src="/assets/js/shiopon.js" defer></script>
 <script src="/assets/js/main.js" defer></script>
+<script src="/assets/js/lang-switch.js" defer></script>
 
-<!-- Trinity 再生（iOS対策強化） -->
+<!-- SVG Sprite -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l2.84 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 7.16-1.01L12 2z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M18 2H8a3 3 0 0 0-3 3v14a3 3 0 0 1 3-3h10v-2H8a5 5 0 0 0-3 1V5a1 1 0 0 1 1-1h12v14h2V4a2 2 0 0 0-2-2z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
+</svg>
+
+<!-- Trinity 再生（iOS対策） -->
 <script>
-(function(){
+(() => {
   const btn = document.getElementById('trinityPlayBtn');
   const v = document.getElementById('trinityVideo');
   if(!btn || !v) return;
@@ -580,7 +535,7 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
       btn.disabled = false;
     }
   }
-  btn.addEventListener('click', tryPlay);
+  btn.addEventListener('click', tryPlay, { once:false });
 })();
 </script>
 
@@ -616,43 +571,31 @@ header.header[data-hold="true"]{ /* 例：box-shadow など */ }
 })();
 </script>
 
-<!-- ヘッダー：統合版（競合解消・ホバー中は消えない） -->
+<!-- ヘッダー：軽量常時表示（操作中は消えない） -->
 <script>
 (() => {
   const header = document.querySelector('header.header');
   if (!header) return;
+  let hover = false, hold = false, hideTimer = null;
 
-  let lastY = window.scrollY;
-  let idleTimer = null;
-  const IDLE_MS = 1200;
-
-  header.addEventListener('mouseenter', () => header.classList.add('is-visible'));
-  header.addEventListener('mouseleave', () => { /* スクロール制御に任せる */ });
-
-  const show = () => {
-    header.classList.add('is-visible');
-    if (idleTimer) clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => header.classList.remove('is-visible'), IDLE_MS);
+  const show = () => { header.classList.add('is-visible'); header.classList.remove('hide'); };
+  const scheduleHide = () => {
+    if (hover || hold) return;
+    // 自動で隠さない運用（必要なら下行を有効化）
+    // hideTimer = setTimeout(()=> header.classList.remove('is-visible'), 1500);
   };
 
-  const onScroll = () => {
-    const y = window.scrollY;
-    const goingDown = y > lastY;
-    if (goingDown && y > 80) {
-      header.classList.add('hide');
-    } else {
-      header.classList.remove('hide');
-      show();
-    }
-    lastY = y;
-  };
+  header.addEventListener('mouseenter', () => { hover = true; show(); clearTimeout(hideTimer); });
+  header.addEventListener('mouseleave', () => { hover = false; scheduleHide(); });
+  header.addEventListener('mousedown', () => { hold = true; show(); clearTimeout(hideTimer); });
+  window.addEventListener('mouseup',   () => { hold = false; scheduleHide(); });
 
+  window.addEventListener('scroll', () => { show(); }, { passive:true });
   show();
-  window.addEventListener('scroll', onScroll, { passive: true });
 })();
 </script>
 
-<!-- 内部アンカー遷移のViewTransition（未対応は自然フォールバック） -->
+<!-- 内部アンカー：ViewTransition（未対応はスムーススクロール） -->
 <script>
 if (document.startViewTransition){
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -680,7 +623,7 @@ if (navigator.connection?.saveData){
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }
 </script>
 
-<!-- Tarot Preview Modal：スクロール固定＋inert -->
+<!-- Tarot Preview Modal -->
 <script>
 (() => {
   const openBtn = document.querySelector('.tarot-preview-open');
@@ -829,7 +772,7 @@ function onFlip(e){
     document.querySelector('#res-poem  .r-title').textContent = titles[0];
     document.querySelector('#res-poem  .r-text').textContent  = texts[0];
     document.querySelector('#res-rhyme .r-title').textContent = titles[1];
-    document.querySelector('#res-rhyme .r-text').textContent = texts[1];
+    document.querySelector('#res-rhyme .r-text').textContent  = texts[1];
     document.querySelector('#res-prayer .r-title').textContent= titles[2];
     document.querySelector('#res-prayer .r-text').textContent = texts[2];
     document.getElementById('readingResult').scrollIntoView({behavior:'smooth', block:'start'});
@@ -852,218 +795,62 @@ btnStart.addEventListener('click', startReading);
 btnReset.addEventListener('click', resetUI);
 </script>
 
-<!-- Intro 音案内トグル -->
-<script>
-(function(){
-  const btn = document.querySelector('[data-sound-toggle]');
-  if(!btn) return;
-  btn.addEventListener('click', function(){
-    const on = this.getAttribute('aria-pressed') === 'true';
-    this.setAttribute('aria-pressed', String(!on));
-  });
-})();
-</script>
-
-<!-- SVG Sprite -->
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
-  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l2.84 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 7.16-1.01L12 2z"/></symbol>
-  <symbol id="i-book" viewBox="0 0 24 24"><path d="M18 2H8a3 3 0 0 0-3 3v14a3 3 0 0 1 3-3h10v-2H8a5 5 0 0 0-3 1V5a1 1 0 0 1 1-1h12v14h2V4a2 2 0 0 0-2-2z"/></symbol>
-  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29 10.59 10.59 16.89 4.29z"/></symbol>
-</svg>
-
-  <script>
-/*
-  Header Keeper v1.0
-  要件：
-  1) スクロール中は常に表示（非表示にしない）
-  2) ヘッダーをタップ/操作中は絶対に消えない
-  3) スクロール停止後のみ、一定時間経過で自動的に隠す（任意）
-     → デフォルトは「隠さない」。隠したい場合は AUTO_HIDE_MS を 0 以外に設定
-*/
-(() => {
-  const header = document.querySelector('header.header');
-  if (!header) return;
-
-  // ==== 設定値 ====
-  const AUTO_HIDE_MS = 0; // 0 = 自動非表示なし。例：1500 にすると停止1.5s後に隠す
-  const SCROLL_THROTTLE_MS = 50;
-
-  // ==== 内部状態 ====
-  let hovering = false;     // マウスがヘッダー上
-  let holding  = false;     // タップ/クリック中（操作中）
-  let hideTimer = null;
-  let lastScrollY = window.scrollY;
-  let lastTick = 0;
-
-  // 既存スクリプトが .hide を付けても効かないように CSS 側で無効化済み
-  // ここでも保険として定期的に除去
-  const neutralizeHideClass = () => header.classList.remove('hide');
-
-  const showHeader = () => {
-    header.classList.add('is-visible');
-    neutralizeHideClass();
-  };
-
-  const scheduleAutoHide = () => {
-    if (AUTO_HIDE_MS <= 0) return;              // 自動非表示を使わない
-    if (hovering || holding) return;            // 操作/ホバー中は隠さない
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-      if (!hovering && !holding) {
-        header.classList.remove('is-visible');  // ここで初めて隠す
-      }
-    }, AUTO_HIDE_MS);
-  };
-
-  // ==== スクロール：動いている間は常に表示 ====
-  const onScroll = () => {
-    const now = performance.now();
-    if (now - lastTick < SCROLL_THROTTLE_MS) return;
-    lastTick = now;
-
-    // どの方向でもスクロール中は表示を強制
-    showHeader();
-    // スクロール停止後の挙動（任意）
-    scheduleAutoHide();
-
-    lastScrollY = window.scrollY;
-  };
-
-  // ==== ヘッダー上のホバー / タップ（操作中は消えない） ====
-  const holdOn  = () => { holding = true;  header.dataset.hold = "true";  showHeader(); clearTimeout(hideTimer); };
-  const holdOff = () => { holding = false; header.dataset.hold = "false"; scheduleAutoHide(); };
-
-  header.addEventListener('mouseenter', () => { hovering = true;  showHeader(); clearTimeout(hideTimer); });
-  header.addEventListener('mouseleave', () => { hovering = false; scheduleAutoHide(); });
-
-  // マウス操作
-  header.addEventListener('mousedown', holdOn);
-  window.addEventListener('mouseup', holdOff);
-
-  // タッチ操作（iOS/Android）
-  header.addEventListener('touchstart', holdOn, {passive:true});
-  window.addEventListener('touchend', holdOff, {passive:true});
-  window.addEventListener('touchcancel', holdOff, {passive:true});
-
-  // スクロール監視
-  window.addEventListener('scroll', onScroll, { passive:true });
-
-  // 初期状態：表示して開始
-  showHeader();
-})();
-</script>
-
-  <script src="/assets/js/lang-switch.js" defer></script>
-
-<!-- 画面タップで音を鳴らす（追加） -->
-<audio id="divineSound" preload="auto"
-       src="/assets/sound/reverse-init.mp3?v=3"></audio>
-
-
-
-
-  
-  <!-- 起動スクリプト（追加） -->
+<!-- ===== 起動音＆神光：統合版（1本だけ / 高速・安全） ===== -->
+<audio id="divineSound" preload="auto" src="/assets/sound/reverse-init.mp3?v=3"></audio>
 <script>
 (() => {
-  const audio = document.getElementById('divineSound');
+  const flash = document.getElementById('divineFlash');
   const hint  = document.getElementById('divineHint');
-  let played = false;
+  const audio = document.getElementById('divineSound');
 
-  // 初回タップで起動音（モバイルの自動再生規制対策）
-  const boot = () => {
-    if (played) return;
-    played = true;
-    hint?.classList.add('is-hide');
-    audio?.play().catch(()=>{ /* サイレント失敗でOK */ });
-    window.removeEventListener('pointerdown', boot, {passive:true});
-  };
-  window.addEventListener('pointerdown', boot, {passive:true});
+  let booted = false;
 
-  // ページ入場の微フェード（任意：好みで）
-  document.documentElement.classList.add('is-booting');
-  setTimeout(() => document.documentElement.classList.remove('is-booting'), 700);
+  // リンク・ボタンのクリックでは発火させない
+  const isInteractive = (el) => !!el.closest('a[href], button, [data-no-flash]');
+
+  function flashOnce(){
+    flash.classList.add('active');
+    setTimeout(()=>flash.classList.remove('active'), 900);
+  }
+
+  async function boot(){
+    if (booted) return;
+    booted = true;
+    hint?.classList.add('fade-out');
+    try { await audio?.play(); } catch(_) {}
+    flashOnce();
+
+    // 以降、画面タップで神光（ただしリンク・ボタンは除外）
+    document.addEventListener('click', (e)=>{
+      if (isInteractive(e.target)) return;
+      flashOnce();
+    }, { passive:true });
+  }
+
+  // 初回だけ起動（ボタン or 画面タップ）
+  hint?.addEventListener('click', boot, { once:true });
+  window.addEventListener('pointerdown', (e)=>{
+    if (booted) return;
+    if (isInteractive(e.target)) return;
+    boot();
+  }, { once:true, passive:true });
 })();
 </script>
 
-  <script>
-document.addEventListener("click", async () => {
-  const s = document.getElementById("divineSound");
-  const hint = document.getElementById("divineHint");
-  const flash = document.getElementById("divineFlash");
-
-  try {
-    // 音再生
-    await s.play();
-
-    // 光の演出を発動
-    flash.classList.add("active");
-    setTimeout(() => flash.classList.remove("active"), 1000);
-
-    // 音が終わったらヒントを消す
-    s.onended = () => {
-      hint.classList.add("fade-out");
-    };
-  } catch(e) {
-    console.warn("音の再生がブロックされました", e);
-  }
-});
-</script>
-
-  <!-- 光のレイヤー -->
-<div class="divine-flash" id="divineFlash"></div>
-
-<!-- 起動ヒントボタン（中央配置） -->
-<button id="divineHint" type="button" class="divine-hint" aria-live="polite">
-  ▶ タップで“N•code”
-</button>
-
-<!-- 音ファイル（未実装でもOK） -->
-<audio id="divineSound" preload="auto"
-       src="/assets/sound/reverse-init.mp3?v=3"></audio>
-
-<!-- 起動スクリプト -->
+<!-- ===== ナビゲーションガード（多重遷移防止 / 1.2秒） ===== -->
 <script>
 (() => {
-  const s = document.getElementById("divineSound");
-  const hint = document.getElementById("divineHint");
-  const flash = document.getElementById("divineFlash");
-  let played = false;
-
-  const activateFlash = () => {
-    flash.classList.add("active");
-    setTimeout(() => flash.classList.remove("active"), 1000);
-  };
-
-  // 起動イベント
-  const boot = async () => {
-    if (played) return;
-    played = true;
-
-    // 音再生（存在しなくてもtry内でスルーされる）
-    try {
-      await s.play();
-    } catch(e) {
-      console.warn("音なし起動モード", e);
-    }
-
-    // 光を出す
-    activateFlash();
-
-    // ボタンをフェードアウト
-    hint.classList.add("fade-out");
-
-    // 次のクリックで繰り返し光るよう登録
-    document.addEventListener("click", activateFlash);
-  };
-
-  // 初回タップで起動
-  hint.addEventListener("click", boot);
+  let navLock = false;
+  const LOCK_MS = 1200;
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    if (navLock) { e.preventDefault(); return; }
+    navLock = true;
+    setTimeout(()=> navLock = false, LOCK_MS);
+  }, {capture:true});
 })();
 </script>
-  <div class="divine-flash" id="divineFlash"></div>
-  
 
 </body>
 </html>
