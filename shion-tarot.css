@@ -31,6 +31,30 @@ body{
   background: radial-gradient(1200px 800px at 50% -10%, #16162a 0%, #0b0b1a 55%, #080a12 100%);
   overflow-x:hidden;
 }
+
+/* ===== Header ===== */
+.header{
+  position:fixed; top:0; left:0; right:0; z-index:999;
+  background: rgba(8,10,18,.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.header__inner{
+  max-width:1100px; margin:0 auto; padding:10px 16px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.logo{
+  font-family:"Cormorant Garamond",serif;
+  font-size:1.35rem; text-decoration:none; color:#ffd76f;
+  text-shadow:0 0 10px rgba(255,215,111,.4);
+}
+.nav a{
+  color:#fff; text-decoration:none; margin:0 12px; font-size:.95rem;
+  transition:opacity .25s ease;
+}
+.nav a:hover{ opacity:.7 }
+.header-spacer{ height:56px } /* ヘッダー分の余白 */
+
 .sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 
 /* --- Stardust --- */
@@ -294,3 +318,15 @@ body{
 /* 出現アニメーション */
 #nextSteps{ opacity:0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease }
 #nextSteps.is-on{ opacity:1; transform: translateY(0) }
+
+/* ===== CTAクリック演出（光フェード） ===== */
+.fade-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.92), rgba(255,255,255,0) 80%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity 0.8s ease;
+}
+.fade-overlay.active { opacity: 1; }
