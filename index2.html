@@ -1,17 +1,81 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <!-- ===== 基本情報 ===== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Re:Verse Shion — 占い × 思想</title>
+  <meta name="description" content="Re:Verse Shion（詩韻）— 占い × 思想。タロットとことばで、恋・仕事・運命の“今”を照らす。無料体験から個人鑑定・講座まで。">
+
+  <!-- Canonical / Robots -->
+  <link rel="canonical" href="https://reverse-shion.github.io/">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+
+  <!-- PWA / 表示色 -->
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+
+  <!-- OGP / Twitter Card -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:site_name" content="Re:Verse Shion">
+  <meta property="og:title" content="Re:Verse Shion — 占い × 思想">
+  <meta property="og:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta property="og:url" content="https://reverse-shion.github.io/">
+  <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
+  <meta property="og:image:alt" content="Re:Verse Shion — 占い × 思想">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Re:Verse Shion — 占い × 思想">
+  <meta name="twitter:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta name="twitter:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
+
+  <!-- Favicon / Touch Icon -->
+  <link rel="icon" href="/assets/icon.png">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <!-- 速度最適化：フォント接続 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- 構造化データ（SiteLinks Search + Organization） -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://www.google.com/search?q=site%3Areverse-shion.github.io+{search_term_string}",
+      "query-input":"required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "logo":"https://reverse-shion.github.io/assets/icon.png",
+    "sameAs":[
+      "https://www.tiktok.com/@your-id",
+      "https://x.com/your-id",
+      "https://note.com/your-id"
+    ]
+  }
+  </script>
+
+  <!-- ===== クリティカルCSS（既存デザイン＋演出） ===== -->
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%}
     body{
       background:#000;color:#fff;font-family:'Noto Serif JP',serif;
       text-align:center;min-height:100vh;overflow:hidden;position:relative;
     }
-
     /* 背景：サイバー×神域 */
     body::before{
       content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -22,7 +86,7 @@
       mix-blend-mode:screen;
     }
 
-    /* ===== 超豪華ローディング円 ===== */
+    /* ===== ローディング円 ===== */
     #loading{
       position:fixed;inset:0;
       background:#000;display:flex;flex-direction:column;
@@ -30,77 +94,29 @@
       z-index:9999;transition:opacity .9s ease-out;
     }
     #loading.fade-out{opacity:0;pointer-events:none}
-
-    /* ローディングコンテナ */
-    .loader-container {
-      position: relative;
-      width: 140px; height: 140px;
-      margin-bottom: 1.5rem;
-    }
-
-    /* 外側リング（金＋青グラデ） */
+    .loader-container { position: relative; width: 140px; height: 140px; margin-bottom: 1.5rem; }
     .ring-outer {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
+      position: absolute; inset: 0; border-radius: 50%;
       background: conic-gradient(from 0deg, #ffd700, #7fd0ff, #ffd700, #7fd0ff);
-      animation: spin 3s linear infinite;
-      filter: blur(1px);
-      box-shadow: 
-        0 0 40px rgba(255, 215, 0, 0.8),
-        0 0 80px rgba(127, 208, 255, 0.6),
-        inset 0 0 30px rgba(255, 215, 0, 0.4);
+      animation: spin 3s linear infinite; filter: blur(1px);
+      box-shadow: 0 0 40px rgba(255,215,0,.8), 0 0 80px rgba(127,208,255,.6), inset 0 0 30px rgba(255,215,0,.4);
     }
-
-    /* 中間リング（逆回転） */
     .ring-middle {
-      position: absolute;
-      top: 15px; left: 15px; right: 15px; bottom: 15px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      border-top: 3px solid #7fd0ff;
-      border-left: 3px solid #ffd700;
-      border-right: 3px solid #7fd0ff;
-      animation: spinReverse 2s linear infinite;
-      box-shadow: 0 0 25px rgba(127, 208, 255, 0.7);
+      position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px;
+      border-radius: 50%; border: 3px solid transparent;
+      border-top: 3px solid #7fd0ff; border-left: 3px solid #ffd700; border-right: 3px solid #7fd0ff;
+      animation: spinReverse 2s linear infinite; box-shadow: 0 0 25px rgba(127,208,255,.7);
     }
-
-    /* 中心の光核 */
     .ring-core {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 30px; height: 30px;
+      position: absolute; top: 50%; left: 50%; width: 30px; height: 30px;
       background: radial-gradient(circle, #fff 10%, #7fd0ff 40%, transparent 70%);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 
-        0 0 20px #fff,
-        0 0 40px #7fd0ff,
-        0 0 60px #ffd700;
+      border-radius: 50%; transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px #fff, 0 0 40px #7fd0ff, 0 0 60px #ffd700;
       animation: pulseCore 1.8s ease-in-out infinite;
     }
-
-    /* 光の粒子（円周を巡る） */
-    .particle {
-      position: absolute;
-      width: 4px; height: 4px;
-      background: #ffd700;
-      border-radius: 50%;
-      box-shadow: 0 0 12px #ffd700;
-      opacity: 0;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    @keyframes spinReverse {
-      to { transform: rotate(-360deg); }
-    }
-    @keyframes pulseCore {
-      0%, 100% { box-shadow: 0 0 20px #fff, 0 0 40px #7fd0ff, 0 0 60px #ffd700; }
-      50% { box-shadow: 0 0 30px #fff, 0 0 60px #7fd0ff, 0 0 90px #ffd700; }
-    }
-
+    .particle { position: absolute; width: 4px; height: 4px; background: #ffd700; border-radius: 50%; box-shadow: 0 0 12px #ffd700; opacity: 0; }
+    @keyframes spin{to{transform:rotate(360deg)}} @keyframes spinReverse{to{transform:rotate(-360deg)}}
+    @keyframes pulseCore{0%,100%{box-shadow:0 0 20px #fff,0 0 40px #7fd0ff,0 0 60px #ffd700}50%{box-shadow:0 0 30px #fff,0 0 60px #7fd0ff,0 0 90px #ffd700}}
     .loading-text{
       font-family:'Cinzel',serif;font-size:clamp(1.5rem,5.5vw,2.3rem);
       background:linear-gradient(90deg,#7fd0ff,#ffd700,#fff,#ffd700,#7fd0ff);
@@ -109,10 +125,7 @@
       text-shadow:0 0 20px rgba(255,215,0,.8),0 0 40px rgba(127,208,255,.6);
       animation:pulseText 2.2s infinite ease-in-out;
     }
-    @keyframes pulseText{
-      0%,100%{text-shadow:0 0 20px rgba(255,215,0,.8),0 0 40px rgba(127,208,255,.6)}
-      50%{text-shadow:0 0 30px #fff,0 0 60px #ffd700,0 0 80px #7fd0ff}
-    }
+    @keyframes pulseText{0%,100%{text-shadow:0 0 20px rgba(255,215,0,.8),0 0 40px rgba(127,208,255,.6)}50%{text-shadow:0 0 30px #fff,0 0 60px #ffd700,0 0 80px #7fd0ff}}
 
     /* コード雨 */
     #codeRain{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
@@ -123,10 +136,9 @@
       min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1.2rem;
     }
     #main-content.visible{opacity:1}
-
     h1{
       font-family:'Cinzel',serif;font-weight:700;
-      font-size:clamp(2.0rem,6vw,3.0rem);letter-spacing:.06em;margin-bottom:.8rem;
+      font-size:clamp(2rem,6vw,3rem);letter-spacing:.06em;margin-bottom:.8rem;
       background:linear-gradient(92deg,#FFE7A6,#FFD76F,#FFF5CF,#FFD76F);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
       text-shadow:0 0 22px rgba(255,215,111,.45),0 0 50px rgba(124,98,255,.25);
@@ -139,20 +151,21 @@
       animation:fadeUp 1.2s ease-out forwards;
     }
     p{
-      font-size:clamp(0.9rem,2.8vw,1.1rem);
-      color:#eaf1ff;line-height:1.7;
+      font-size:clamp(0.95rem,2.8vw,1.1rem);
+      color:#eaf1ff;line-height:1.7;max-width:42rem;
       animation:fadeUp 1.6s ease-out forwards;
     }
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
     /* 扉ボタン */
-    .door-container{margin-top:2.5rem;width:100%;display:flex;justify-content:center}
+    .door-container{margin-top:2.2rem;width:100%;display:flex;justify-content:center}
     .door-button{
-      position:relative;display:inline-block;padding:18px 40px;font-size:clamp(1rem,3vw,1.3rem);
+      position:relative;display:inline-block;padding:18px 40px;font-size:clamp(1rem,3vw,1.2rem);
       color:#e0f8ff;text-decoration:none;border:2px solid transparent;border-radius:50px;
       background:rgba(10,20,40,.85);backdrop-filter:blur(8px);
       box-shadow:0 0 30px rgba(127,208,255,.5),inset 0 0 25px rgba(255,215,0,.15);
       transition:all .5s ease;cursor:pointer;overflow:hidden;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.1em;
+      min-width:12rem;
     }
     .door-text{
       position:relative;z-index:3;background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
@@ -163,13 +176,16 @@
     .door-button:hover{transform:scale(1.07);box-shadow:0 0 80px rgba(255,215,0,.8),0 0 160px rgba(127,208,255,.6);border-color:#ffd700;background:rgba(20,30,60,.9)}
     .light-burst{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at center,#ffd700 0%,#7fd0ff 50%,transparent 80%);opacity:0;pointer-events:none;z-index:9999;animation:burst 1s ease-out}
     @keyframes burst{0%{opacity:0;transform:scale(.2)}50%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(3)}}
+
+    /* アクセシビリティ */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
 </head>
 <body>
 
-  <!-- 超豪華ローディング円 -->
-  <div id="loading">
-    <div class="loader-container" id="loader">
+  <!-- ローディング -->
+  <div id="loading" aria-live="polite">
+    <div class="loader-container" id="loader" role="img" aria-label="起動中の光輪アニメーション">
       <div class="ring-outer"></div>
       <div class="ring-middle"></div>
       <div class="ring-core"></div>
@@ -177,48 +193,58 @@
     <div class="loading-text">OS -Shion 起動中...</div>
   </div>
 
-  <canvas id="codeRain"></canvas>
+  <!-- コード雨 -->
+  <canvas id="codeRain" aria-hidden="true"></canvas>
 
-  <div id="main-content">
+  <!-- メイン -->
+  <main id="main-content" role="main">
     <h1>Re:Verse Shion</h1>
     <h2>占い × 思想</h2>
     <p>恋も、仕事も、運命も。<br>あなたの“今”を言葉で照らす。</p>
 
     <div class="door-container">
-      <a href="shion2.html" class="door-button" id="door">
+      <a href="/shion2.html" class="door-button" id="door" aria-label="次のページへ">
         <span class="door-text">扉を開く</span>
-        <div class="pulse"></div>
+        <div class="pulse" aria-hidden="true"></div>
       </a>
     </div>
-  </div>
+  </main>
 
+  <noscript>
+    <p style="position:fixed;bottom:12px;left:0;right:0;color:#9fd6ff;font-size:14px">
+      JavaScriptが無効です。演出を省略して表示しています。
+    </p>
+  </noscript>
+
+  <!-- ===== スクリプト（defer相当） ===== -->
   <script>
-    // ========== 光の粒子生成（円周を巡る）==========
-    const loader = document.getElementById('loader');
-    const radius = 70; // 円の半径
-    for(let i = 0; i < 12; i++){
-      const angle = (i / 12) * 2 * Math.PI;
-      const x = radius * Math.cos(angle);
-      const y = radius * Math.sin(angle);
-      
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left = `calc(50% + ${x}px)`;
-      p.style.top = `calc(50% + ${y}px)`;
-      p.style.animationDelay = `${i * 0.15}s`;
-      p.style.animation = `sparkle 2s ease-in-out infinite`;
-      p.style.animationDelay = `${i * 0.12}s`;
-      loader.appendChild(p);
-    }
+    // 光粒子を輪に配置
+    (function() {
+      const loader = document.getElementById('loader');
+      const radius = 70;
+      for(let i=0;i<12;i++){
+        const angle = (i/12)*2*Math.PI;
+        const x = radius*Math.cos(angle);
+        const y = radius*Math.sin(angle);
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = `calc(50% + ${x}px)`;
+        p.style.top  = `calc(50% + ${y}px)`;
+        p.style.animation = `sparkle 2s ease-in-out infinite`;
+        p.style.animationDelay = `${i*0.12}s`;
+        loader.appendChild(p);
+      }
+    })();
 
-    // ========== コード雨 ==========
+    // コード雨
     (function(){
       const cvs=document.getElementById('codeRain'),ctx=cvs.getContext('2d');
       const chars='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
       let fs=18,cols,drops,W,H;
       function resize(){
-        W=cvs.width=innerWidth*devicePixelRatio;H=cvs.height=innerHeight*devicePixelRatio;
-        ctx.scale(devicePixelRatio,devicePixelRatio);
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        W=cvs.width=innerWidth*dpr;H=cvs.height=innerHeight*dpr;
+        ctx.setTransform(dpr,0,0,dpr,0,0);
         fs=Math.max(14,Math.min(20,Math.floor(innerWidth/50)));
         cols=Math.ceil(innerWidth/fs);drops=new Array(cols).fill(0);
       }
@@ -229,27 +255,34 @@
           const ch=chars[Math.floor(Math.random()*chars.length)];
           ctx.fillText(ch,i*fs,drops[i]*fs*.9);
           if(drops[i]*fs>innerHeight&&Math.random()>.975)drops[i]=0;drops[i]++;
-        }requestAnimationFrame(draw);
+        }
+        requestAnimationFrame(draw);
       }
-      addEventListener('resize',resize);resize();draw();
+      addEventListener('resize',resize,{passive:true});resize();draw();
     })();
 
-    // ========== ローディング終了 ==========
+    // ローディング終了 -> 本文表示
     window.addEventListener('load',()=>{
       const loading=document.getElementById('loading');
       const main=document.getElementById('main-content');
-      setTimeout(()=>{
-        loading.classList.add('fade-out');
-        main.classList.add('visible');
-      },1200);
+      setTimeout(()=>{ loading.classList.add('fade-out'); main.classList.add('visible'); }, 900);
     });
 
-    // ========== 扉クリック ==========
-    document.getElementById('door').addEventListener('click',e=>{
+    // 扉クリック：発光→遷移
+    document.getElementById('door').addEventListener('click',function(e){
       e.preventDefault();
-      const burst=document.createElement('div');burst.className='light-burst';document.body.appendChild(burst);
-      setTimeout(()=>location.href='shion2.html',500);
+      const burst=document.createElement('div');
+      burst.className='light-burst';
+      document.body.appendChild(burst);
+      setTimeout(()=>{ window.location.href=this.getAttribute('href'); }, 500);
     });
+
+    // きらめきキー（CSSで定義していないため追加）
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes sparkle{0%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.6)}}
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>
