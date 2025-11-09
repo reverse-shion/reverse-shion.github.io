@@ -1,4 +1,9 @@
-/* 基本 */
+/* =========================
+   shion-tarot.css 置き換え用
+   詩韻 Shion — Tarot (詩・韻・祈)
+   ========================= */
+
+/* --- Reset & Root --- */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --ink:#1e1b2b;
@@ -11,10 +16,10 @@
   --glass:#ffffff1a;
   --r:14px;
 
-  /* 裏面画像：同階層に back.png を置く or assets/tarot/back.png に変更可 */
+  /* 裏面画像（同階層 back.png / もしくは assets/tarot/back.png に変更OK） */
   --card-back-url: url("back.png");
 
-  /* 表面（プレースホルダ）— 後でURLに差し替えOK */
+  /* 表面プレースホルダ（後で URL に差し替えOK） */
   --front0: linear-gradient(135deg,#ffe8b3,#caa8ff);
   --front1: linear-gradient(135deg,#b3ffe3,#a8b3ff);
   --front2: linear-gradient(135deg,#ffd1f7,#d1fff5);
@@ -29,10 +34,9 @@ body{
   background: radial-gradient(1200px 800px at 50% -10%, #16162a 0%, #0b0b1a 55%, #080a12 100%);
   overflow-x:hidden;
 }
-
 .sr-only{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 
-/* 星砂 */
+/* --- Stardust (背景ゆらぎ) --- */
 .stardust{
   position:fixed; inset:0; pointer-events:none; z-index:0;
   background:
@@ -44,7 +48,9 @@ body{
 }
 @keyframes drift{ to{ background-position: -2000px 2000px, 1200px -1600px, -1600px -1200px } }
 
-/* ===== ヒーロー ===== */
+/* =========================
+   Hero
+   ========================= */
 .hero{position:relative; min-height:100svh; display:grid; place-items:center; text-align:center; isolation:isolate; z-index:1}
 .hero__bg{
   position:absolute; inset:0;
@@ -82,26 +88,42 @@ body{
   color:#e1e6ff; font-style:italic; letter-spacing:.06em; line-height:1.7;
   text-shadow:0 0 10px rgba(130,140,255,.25);
 }
+
+/* 案内バッジ（淡色＝第2優先） */
 .hero__note{
   display:inline-block; margin:.5rem auto .8rem; padding:.5rem 1rem;
   border-radius:999px;
-  background:linear-gradient(90deg,#f9d86b,#caa8ff 60%,#8e79ff);
-  color:#231b3a; font-weight:700; letter-spacing:.06em;
-  box-shadow:0 8px 22px rgba(140,110,255,.28), inset 0 0 10px rgba(255,240,210,.35);
+  background:linear-gradient(90deg,#2a2750,#433a7a);
+  color:#e9e6ff; font-weight:700; letter-spacing:.06em;
+  box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 0 10px rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
 }
+
+/* 最優先ボタン（はじめる）＝金色ワントーン */
 .btn-primary{
   appearance:none; border:0; cursor:pointer;
   padding:1rem 2rem; border-radius:999px; font-weight:800; font-size:1.06rem;
-  background:linear-gradient(90deg,#f9d86b,#caa8ff 55%,#8e79ff);
-  color:#201a35; text-shadow:0 1px 0 rgba(255,255,255,.4);
-  box-shadow:0 14px 34px rgba(140,110,255,.38), inset 0 0 12px rgba(255,240,200,.35);
+  background:linear-gradient(90deg,#FFD76F,#FFC944 70%);
+  color:#2a2136; text-shadow:0 1px 0 rgba(255,255,255,.5);
+  box-shadow:0 14px 34px rgba(255,215,111,.38), inset 0 0 12px rgba(255,240,200,.35);
+  position:relative; isolation:isolate;
   transition: transform .18s, box-shadow .22s, filter .22s;
 }
+.btn-primary::after{
+  content:""; position:absolute; inset:-6px; border-radius:999px; pointer-events:none;
+  box-shadow:0 0 36px 12px rgba(255,215,111,.45);
+  opacity:.75; filter: blur(2px); transition: opacity .2s ease;
+}
 .btn-primary:hover{ transform: translateY(-1px); filter:saturate(1.06) }
+.btn-primary:active{ transform: translateY(0) scale(.99) }
+
+/* 開始時刻 */
 .start-time{ margin-top:.5rem; font-size:.95rem; color:#ffe8b3; opacity:0; transition:opacity .6s ease }
 .start-time.is-on{ opacity:.9 }
 
-/* ===== 儀式 ===== */
+/* =========================
+   Ritual
+   ========================= */
 .hidden{ display:none !important }
 .ritual{ position:relative; z-index:2; padding:60px 18px; text-align:center }
 .ritual__glow{
@@ -112,7 +134,9 @@ body{
 @keyframes pulse{ 50%{ transform: scale(1.06); filter: blur(2px) } }
 .ritual__line{ font-size:1.08rem; letter-spacing:.08em; color:#ffe8b3; margin:.25rem 0 }
 
-/* ===== 展開 ===== */
+/* =========================
+   Spread (展開)
+   ========================= */
 .main{ position:relative; z-index:1 }
 .section{ max-width:1000px; margin:0 auto; padding:28px 16px }
 .section__title{ font-size:1.1rem; color:var(--gold); letter-spacing:.12em; margin-bottom:12px }
@@ -125,20 +149,30 @@ body{
   display:flex; gap:clamp(12px,3vw,22px); justify-content:center; align-items:center;
   width:min(92vw,980px); margin:0 auto 10px;
 }
+
+/* --- Card --- */
 .card{ width:clamp(110px,22vw,160px); aspect-ratio:62/110; perspective:1100px; position:relative; cursor:pointer; flex:0 0 auto }
 .card__inner{
   width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;
-  transition: transform .68s cubic-bezier(.2,.7,.2,1); transform-style: preserve-3d;
+  transition: transform .68s cubic-bezier(.2,.7,.2,1);
+  transform-style: preserve-3d; -webkit-transform-style:preserve-3d;
   box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 20px rgba(255,215,111,.18);
 }
-.card__face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; background-position:center; background-size:cover }
-.card__back{ background: #0b0f18 var(--card-back-url) center/cover no-repeat }
-.card__front{ transform: rotateY(180deg); background-image: var(--front0) }
-#card0{ background-image: var(--front0) }
-#card1{ background-image: var(--front1) }
-#card2{ background-image: var(--front2) }
+.card__face{
+  position:absolute; inset:0; border-radius:12px; background-position:center; background-size:cover;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+}
+.card__back{ background:#0b0f18 var(--card-back-url) center/cover no-repeat }
+.card__front{ transform: rotateY(180deg) }
+
+/* ★ フロント面を data-idx で固定（JSで上書きしない） */
+.card[data-idx="0"] .card__front{ background-image: var(--front0) }
+.card[data-idx="1"] .card__front{ background-image: var(--front1) }
+.card[data-idx="2"] .card__front{ background-image: var(--front2) }
+
 .card.is-flipped .card__inner{ transform: rotateY(180deg) }
 
+/* Tap ヒント */
 .tap-hint{ display:flex; justify-content:center; margin:8px 0 4px; opacity:.9 }
 .tap-hint__pill{
   font-size:.9rem; padding:8px 14px; border-radius:999px; border:1px solid rgba(255,215,111,.55);
@@ -147,6 +181,8 @@ body{
   animation: blink 1.6s ease-in-out infinite;
 }
 @keyframes blink{ 50%{ opacity:.55 } }
+
+/* Peel Flash */
 .peel{ position:relative; width:min(92vw,980px); height:0; margin:0 auto }
 .peel.is-run{
   height:1px;
@@ -159,7 +195,9 @@ body{
   100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0) }
 }
 
-/* ===== About（詩韻祈とは？） ===== */
+/* =========================
+   About（詩韻祈とは？）
+   ========================= */
 .about__text{
   line-height:1.9; color:#eef1ff;
   background: rgba(127,208,255,.06);
@@ -167,7 +205,9 @@ body{
   border-radius:12px; padding:14px;
 }
 
-/* ===== リーディング ===== */
+/* =========================
+   Reading（2行×3枚）
+   ========================= */
 .reading{
   background: linear-gradient(180deg, rgba(8,10,18,.9), rgba(10,12,20,.96));
   border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);
@@ -184,7 +224,9 @@ body{
 .reading__body{ line-height:1.9; color:#eef1ff }
 .reading.is-active .reading__item{ box-shadow: 0 0 22px rgba(174,138,255,.15) }
 
-/* ===== 総合結果 ===== */
+/* =========================
+   Summary（総合結果 9行）
+   ========================= */
 .summary__poem{
   background: radial-gradient(600px 240px at 50% 0%, rgba(255,215,111,.08), rgba(124,98,255,.05));
   border:1px solid rgba(255,215,111,.18);
@@ -193,6 +235,8 @@ body{
 .summary__poem p{ margin:0 0 .4rem }
 
 .closing-line{ margin:18px 0 8px; color:#ffe8b3; opacity:.92; letter-spacing:.08em }
+
+/* CTA（LINE / TikTok / note / 再占い） */
 .cta{ margin:18px 0 8px; display:grid; gap:10px; grid-template-columns: 1fr 1fr }
 @media (min-width:680px){ .cta{ grid-template-columns: repeat(4,1fr) } }
 .cta__btn{
