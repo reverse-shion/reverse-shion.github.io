@@ -32,6 +32,7 @@
       <button id="startRitualBtn" class="btn-primary" type="button" aria-label="星詠リチュアルを始める">
         はじめる（星詠リチュアル）
       </button>
+      <p class="start-time" id="startTime" aria-live="polite"></p>
     </div>
 
     <!-- BGM（タップ時に起動） -->
@@ -82,7 +83,16 @@
       <div class="peel" id="peel" aria-hidden="true"></div>
     </section>
 
-    <!-- ===== リーディング ===== -->
+    <!-- ===== 説明：詩韻祈とは？ ===== -->
+    <section class="about section">
+      <h3 class="section__title">詩韻祈（しおんき）とは？</h3>
+      <p class="about__text">
+        あなたの魂がいま必要としている言葉を、<strong>三つの層</strong>（詩＝核／韻＝運び／祈＝帰路）で受け取る短詩リーディングです。<br>
+        各カードは<strong>二行の詩</strong>として現れ、最後に<strong>九行の総合詩</strong>で「つまり、こういうこと」を示します。
+      </p>
+    </section>
+
+    <!-- ===== リーディング：2行（詩・韻・祈） ===== -->
     <section class="reading section" id="reading">
       <h3 class="section__title">詩・韻・祈 のリーディング</h3>
       <div class="reading__grid">
@@ -98,6 +108,14 @@
           <div class="reading__head">祈（Prayer）</div>
           <div class="reading__body" id="body2">カードを開くと、ここに“祈”が現れます。</div>
         </article>
+      </div>
+    </section>
+
+    <!-- ===== 総合結果：9行詩 ===== -->
+    <section class="summary section" id="summary">
+      <h3 class="section__title">総合結果 ― つまり、こういうこと。</h3>
+      <div class="summary__poem" id="summaryPoem">
+        カードをすべて開くと、ここに九行のメッセージが現れます。
       </div>
 
       <p class="closing-line">大丈夫だよ。言葉は、あなたの光だから。</p>
@@ -121,64 +139,41 @@
     try { bgm.volume = 0.55; const p = bgm.play(); if (p && p.catch) p.catch(()=>{}); } catch(e){}
   }
 
-  // ---------- 画像＆データ ----------
-  const cardFrontImages = [
-    'https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_00_Fool.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/d/d1/RWS_Tarot_01_Magician.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/d/d5/RWS_Tarot_06_Lovers.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg'
-  ];
-
-  const majorArcana = [
-    { name:'The Fool',upright:'純粋な始まりの風、冒険の翼を広げて。',reversed:'無謀な跳躍、影に潜む落とし穴。',idx:0 },
-    { name:'The Magician',upright:'意志の炎が現実を紡ぎ、創造の河を流す。',reversed:'幻の鏡、欺瞞の霧に包まれて。',idx:1 },
-    { name:'The High Priestess',upright:'内なる声のささやき、月の光が導く道。',reversed:'失われた均衡、抑圧された魂の叫び。',idx:2 },
-    { name:'The Empress',upright:'豊穣の大地、母なる愛の抱擁。',reversed:'枯れた花、創造の停滞。',idx:3 },
-    { name:'The Emperor',upright:'秩序の玉座、力強い統治の剣。',reversed:'暴君の影、支配の崩壊。',idx:4 },
-    { name:'The Hierophant',upright:'伝統の灯、教えの道標。',reversed:'硬直した信仰、自由の抑圧。',idx:5 },
-    { name:'The Lovers',upright:'運命の交差、心の選択。',reversed:'迷いの分岐、愛の試練。',idx:6 },
-    { name:'The Chariot',upright:'勝利の戦車、意志の疾走。',reversed:'方向を見失う馬車。',idx:7 },
-    { name:'Strength',upright:'内なる獅子、優しさの力。',reversed:'弱さの咆哮、自己不信。',idx:8 },
-    { name:'The Hermit',upright:'孤独の灯台、魂の探求。',reversed:'孤立の闇、導きを拒む。',idx:9 },
-    { name:'Wheel of Fortune',upright:'運命の輪、巡る星の流れ。',reversed:'停滞の歯車、予期せぬ転落。',idx:10 },
-    { name:'Justice',upright:'天秤の裁き、真実の剣。',reversed:'不正の影、偏った判断。',idx:11 },
-    { name:'The Hanged Man',upright:'逆さの悟り、犠牲の光。',reversed:'停滞の苦しみ、視野の狭さ。',idx:12 },
-    { name:'Death',upright:'終わりと始まり、変容の蝶。',reversed:'変化への恐怖、過去の亡霊。',idx:13 },
-    { name:'Temperance',upright:'調和の天使、バランスの流れ。',reversed:'極端な揺らぎ、衝突の炎。',idx:14 },
-    { name:'The Devil',upright:'鎖の誘惑、欲望の檻。',reversed:'解放の鍵、束縛からの脱出。',idx:15 },
-    { name:'The Tower',upright:'崩壊の雷、覚醒の衝撃。',reversed:'破壊の予兆、避けられない危機。',idx:16 },
-    { name:'The Star',upright:'希望の星、癒しの水。',reversed:'失われた光、絶望の夜。',idx:17 },
-    { name:'The Moon',upright:'幻想の月、潜在意識の海。',reversed:'真実の光、欺瞞の霧。',idx:18 },
-    { name:'The Sun',upright:'輝く太陽、生命の喜び。',reversed:'曇った陽光、一時的な幸福。',idx:19 },
-    { name:'Judgement',upright:'覚醒の喇叭、再生の炎。',reversed:'自己否定、過去の重荷。',idx:20 },
-    { name:'The World',upright:'調和の円舞、成就の星。',reversed:'未完の旅、閉ざされた門。',idx:21 }
+  // ---------- 大アルカナ（逆位置なし・2行詩＋要約語） ----------
+  const deck = [
+    { name:'The Fool', idx:0, two:['最初の一歩は、恐れよりも軽い風。','失敗は合図――世界は君に開く。'], kw:'始まり' },
+    { name:'The Magician', idx:1, two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。'], kw:'創造' },
+    { name:'The High Priestess', idx:2, two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。'], kw:'直観' },
+    { name:'The Empress', idx:3, two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。'], kw:'豊穣' },
+    { name:'The Emperor', idx:4, two:['迷いは構造で解ける。','境界線は、君を守る城。'], kw:'秩序' },
+    { name:'The Hierophant', idx:5, two:['伝統は檻ではなく、梯子。','学びは自由の準備運動。'], kw:'教え' },
+    { name:'The Lovers', idx:6, two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。'], kw:'選択' },
+    { name:'The Chariot', idx:7, two:['向かう先が速さを決める。','手綱は心、進路は意志。'], kw:'前進' },
+    { name:'Strength', idx:8, two:['優しい力は、世界を従わせない。','それでも、世界は従う。'], kw:'内なる力' },
+    { name:'The Hermit', idx:9, two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。'], kw:'探求' },
+    { name:'Wheel of Fortune', idx:10, two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。'], kw:'転機' },
+    { name:'Justice', idx:11, two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。'], kw:'均衡' },
+    { name:'The Hanged Man', idx:12, two:['世界を逆さにして、はじめて見える。','止まることが、進むことになる日もある。'], kw:'視点転換' },
+    { name:'Death', idx:13, two:['終わりは、名前の違う始まり。','脱皮の痛みは、生きている証。'], kw:'変容' },
+    { name:'Temperance', idx:14, two:['混ぜる、待つ、整える。','その中間に、答えは棲む。'], kw:'調和' },
+    { name:'The Devil', idx:15, two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。'], kw:'解放' },
+    { name:'The Tower', idx:16, two:['壊れるのは、壊すべきもの。','空いた隙間が、光の通り道。'], kw:'覚醒' },
+    { name:'The Star', idx:17, two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。'], kw:'希望' },
+    { name:'The Moon', idx:18, two:['不安は、想像力の副作用。','曙は、必ず来る。'], kw:'曙光' },
+    { name:'The Sun', idx:19, two:['喜びは戦略になる。','笑顔は、未来の先行投資。'], kw:'成功' },
+    { name:'Judgement', idx:20, two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。'], kw:'再生' },
+    { name:'The World', idx:21, two:['輪は閉じて、道は開く。','完成形は、次のスタートライン。'], kw:'成就' }
   ];
 
   // ---------- 要素 ----------
   const startBtn  = document.getElementById('startRitualBtn');
+  const startTimeEl = document.getElementById('startTime');
   const ritualSec = document.getElementById('ritual');
   const mainSec   = document.getElementById('main');
   const peel      = document.getElementById('peel');
   const tapHint   = document.getElementById('tapHint');
   const readingEl = document.getElementById('reading');
+  const summaryPoem = document.getElementById('summaryPoem');
   const retryBtn  = document.getElementById('retry');
   const flipSe    = document.getElementById('flipSe');
   const cardEls   = document.querySelectorAll('.card');
@@ -191,7 +186,7 @@
   let opened = 0;
 
   function drawThree(){
-    const pool = [...majorArcana];
+    const pool = [...deck];
     const picks = [];
     for(let i=0;i<3;i++){
       const r = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
@@ -204,11 +199,13 @@
     opened = 0;
     bodies.forEach((el,i)=> el.textContent = defaultBodies[i]);
     document.querySelector('.reading')?.classList.remove('is-active');
+    summaryPoem.textContent = 'カードをすべて開くと、ここに九行のメッセージが現れます。';
     tapHint.style.opacity = 1;
     cardEls.forEach((el,i)=>{
       el.classList.remove('is-flipped');
       el.style.pointerEvents = 'auto';
-      fronts[i].style.backgroundImage = 'none';
+      // ここはプレースホルダ色のまま（CSS変数で背景）→ 後でURL差し替え想定
+      fronts[i].style.backgroundImage = 'var(--front' + i + ')';
     });
   }
 
@@ -219,6 +216,12 @@
 
   function beginRitual(){
     kickBgm();
+    // 開始時刻（JST）を表示
+    const now = new Date();
+    const jst = new Intl.DateTimeFormat('ja-JP', { timeZone:'Asia/Tokyo', hour:'2-digit', minute:'2-digit', year:'numeric', month:'2-digit', day:'2-digit' }).format(now);
+    startTimeEl.textContent = `星が動き出した時間：${jst}`;
+    startTimeEl.classList.add('is-on');
+
     ritualSec.classList.remove('hidden');
     // 1.2秒で本編へ
     setTimeout(()=>{
@@ -231,28 +234,54 @@
     }, 1200);
   }
 
+  function twoLineText(card){
+    // 2行の短詩を返す
+    return `<span class="line">${card.two[0]}</span><br><span class="line">${card.two[1]}</span>`;
+  }
+
+  function buildSummaryPoem(sel){
+    // 9行の総合詩を自動生成
+    // sel: 3枚（詩・韻・祈） → 冒頭2/中段5/結び2 の構成
+    const keys = sel.map(c => c.kw);
+    const names = sel.map(c => c.name.replace('The ',''));
+    const lines = [
+      `きみが扉を叩いた瞬間、時間は「味方」に変わった。`,
+      `三つの言葉が、同じ方向を指している。`,
+      `「${names[0]}」は告げる――${keys[0]}は、心の中心に種を置くこと。`,
+      `「${names[1]}」は進めという――${keys[1]}は、迷いを動詞に変えること。`,
+      `「${names[2]}」は還れという――${keys[2]}は、光へ戻る手順のこと。`,
+      `だから焦らなくていい。速さより、整いを選べばいい。`,
+      `君の手の温度が、現実の速度を決めていく。`,
+      `結論はやさしい――いまの君で、はじめればいい。`,
+      `大丈夫だよ。言葉は、必ず君を連れていく。`
+    ];
+    return lines.map(l => `<p>${l}</p>`).join('');
+  }
+
   function onFlip(idx){
     const cardEl = cardEls[idx];
     if(cardEl.classList.contains('is-flipped') || opened>=3) return;
 
     const data = selected[idx];
-    const isReversed = (crypto.getRandomValues(new Uint32Array(1))[0] % 2) === 1;
-    fronts[idx].style.backgroundImage = `url('${cardFrontImages[data.idx]}')`;
 
     try { flipSe.currentTime = 0; flipSe.play(); } catch(e){}
+
+    // 表面画像はCSS変数のまま（--front0/1/2）。個別に差し替えるときはここでURL指定も可。
+    // fronts[idx].style.backgroundImage = 'url("assets/tarot/your-front.jpg")';
 
     cardEl.classList.add('is-flipped');
     opened++;
 
     const label = ['【詩】','【韻】','【祈】'][idx];
-    const text  = isReversed ? data.reversed : data.upright;
-    bodies[idx].innerHTML = `<strong>${label}</strong> 《${data.name}》${isReversed?'（逆位置）':'（正位置）'}<br>${text}`;
+    bodies[idx].innerHTML = `<strong>${label}</strong> 《${data.name}》<br>${twoLineText(data)}`;
 
     if(opened===3){
       tapHint.style.opacity = 0;
       cardEls.forEach(c=> c.style.pointerEvents='none');
       document.querySelector('.reading').classList.add('is-active');
-      readingEl.scrollIntoView({behavior:'smooth', block:'start'});
+      // 総合詩を生成
+      summaryPoem.innerHTML = buildSummaryPoem(selected);
+      document.getElementById('summary').scrollIntoView({behavior:'smooth', block:'start'});
     }
   }
 
