@@ -330,3 +330,109 @@ body{
   transition: opacity 0.8s ease;
 }
 .fade-overlay.active { opacity: 1; }
+
+/* === Golden Primary Button (神殿仕様) ============================= */
+/* 既存の .btn-line を上書きして「一番目立つ金ボタン」にします。 */
+.btn-line{
+  /* Gold palette */
+  --gold-1: #FFD76F;  /* core */
+  --gold-2: #FFC944;  /* deep */
+  --gold-3: #FFF2C1;  /* highlight */
+  --gold-edge: rgba(255,215,111,.55);
+
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:.35em;
+  padding: clamp(14px, 2.6vmin, 18px) clamp(18px, 4.2vmin, 28px);
+  min-height:56px; min-width: clamp(220px, 46vw, 560px);
+  border:none; border-radius: 14px;
+  text-decoration:none; text-align:center;
+  font-weight: 800; font-size: clamp(15px, 1.1rem, 18px);
+  letter-spacing: .04em;
+  color:#2a2136; /* 金に合う深い文字色（可読性重視） */
+
+  /* 金のグラデーション本体 */
+  background:
+    linear-gradient(92deg, var(--gold-3) 0%, var(--gold-1) 28%, var(--gold-2) 62%, var(--gold-1) 100%);
+  box-shadow:
+    0 16px 40px rgba(255,215,111,.38),
+    0 2px 0 rgba(255,255,255,.35) inset,
+    0 0 0 1px var(--gold-edge) inset;
+
+  position:relative; isolation:isolate; overflow:hidden; cursor:pointer;
+  transform: translateZ(0);
+  transition: transform .18s ease, filter .22s ease, box-shadow .22s ease;
+}
+
+/* オーラ（柔らかい発光） */
+.btn-line::before{
+  content:"";
+  position:absolute; inset:-22%;
+  background: radial-gradient(60% 60% at 50% 50%, rgba(255,243,205,.55), rgba(255,243,205,0) 70%);
+  filter: blur(18px);
+  opacity:.55; pointer-events:none;
+  transition: opacity .25s ease, filter .25s ease;
+}
+
+/* 聖なる煌めき（斜めに流れるハイライト） */
+.btn-line::after{
+  content:"";
+  position:absolute; top:-120%; left:-40%;
+  width:60%; height:340%;
+  transform: rotate(20deg);
+  background: linear-gradient( to right,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.55) 45%,
+    rgba(255,255,255,0) 100%);
+  mix-blend-mode: screen;
+  opacity:.0; pointer-events:none;
+  transition: opacity .25s ease, transform .65s ease;
+}
+
+/* hover / focus で“神々しさ”UP */
+.btn-line:hover{
+  transform: translateY(-1px);
+  filter: saturate(1.06) contrast(1.02) brightness(1.02);
+  box-shadow:
+    0 22px 54px rgba(255,215,111,.48),
+    0 0 0 1px rgba(255,225,150,.75) inset,
+    0 0 24px rgba(255,225,160,.35);
+}
+.btn-line:hover::before{ opacity:.75; filter: blur(14px) }
+.btn-line:hover::after{ opacity:.9; transform: translateX(160%) rotate(20deg) }
+
+/* クリック時はわずかに沈む */
+.btn-line:active{ transform: translateY(0) scale(.99) }
+
+/* アクセシビリティ：キーボードフォーカスの光輪 */
+.btn-line:focus{ outline: none }
+.btn-line:focus-visible{
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.85),
+    0 0 0 6px rgba(255,215,111,.55),
+    0 16px 40px rgba(255,215,111,.38),
+    0 2px 0 rgba(255,255,255,.35) inset;
+}
+
+/* サブテキスト（<span class="sub">…</span> を使う場合） */
+.btn-line .sub{
+  display:block; font-weight:700; font-size:.88rem; opacity:.9;
+  color:#2a2136;
+}
+
+/* モバイルで全幅にする場合（任意） */
+.btn-line.is-wide{ width:100%; min-width:auto }
+
+/* 低視覚効果モードの配慮 */
+@media (prefers-reduced-motion: reduce){
+  .btn-line,
+  .btn-line::after{ transition: none }
+}
+
+/* P3対応（対応端末でよりリッチな金色に） */
+@media (color-gamut: p3){
+  .btn-line{
+    --gold-1: color(display-p3 1 0.84 0.45);
+    --gold-2: color(display-p3 1 0.79 0.35);
+    --gold-3: color(display-p3 1 0.95 0.80);
+  }
+}
