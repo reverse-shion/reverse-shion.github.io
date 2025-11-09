@@ -5,15 +5,38 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>詩韻 Shion — 言葉で魂を救う Code｜無料タロット（詩・韻・祈）</title>
   <meta name="description" content="無料タロットで“詩・韻・祈”。詩韻 Shion の思想（言葉で魂を救う Code）に基づくリーディング。恋愛・復縁・連絡・進路の悩みに。">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shion-tarot.css">
   <meta property="og:type" content="website">
   <meta property="og:title" content="詩韻 Shion — 言葉で魂を救う Code｜無料タロット（詩・韻・祈）">
   <meta property="og:description" content="“詩・韻・祈”で読む、思想連動タロット。儀式（星詠リチュアル）→展開→濃密リーディング→次の一歩へ。">
   <meta property="og:image" content="assets/ogp.jpg">
   <meta property="og:url" content="./">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shion-tarot.css">
+
+  <!-- ✅（任意）GA4：測定IDを差し替えて有効化
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
 </head>
 <body>
+
+  <!-- ===== 共通ヘッダー（神殿ナビ） ===== -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <a href="/" class="logo">Re:verse Shion</a>
+      <nav class="nav" role="navigation" aria-label="メインナビゲーション">
+        <a href="/shion.html">神殿へ</a>
+        <a href="/philosophy.html">思想を読む</a>
+        <a href="/about.html">詩韻とは</a>
+      </nav>
+    </div>
+  </header>
+  <div class="header-spacer" aria-hidden="true"></div>
 
   <!-- 背景の星砂 -->
   <div class="stardust" aria-hidden="true"></div>
@@ -134,16 +157,19 @@
       </ol>
 
       <nav class="cta-grid">
-        <a class="btn-ghost" href="#" id="retry">🌌 星の声をもう一度聞く</a>
-        <a class="btn-dark" href="shion.html">🌕 詩韻の神殿へ進む</a>
-        <a class="btn-light" href="philosophy.html">🌙 言葉の真意を受け取る</a>
-        <a class="btn-line" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">
+        <a class="btn-ghost" href="#" id="retry" data-cta="retry">🌌 星の声をもう一度聞く</a>
+        <a class="btn-dark cta-link" href="shion.html" data-cta="temple">🌕 詩韻の神殿へ進む</a>
+        <a class="btn-light cta-link" href="philosophy.html" data-cta="philosophy">🌙 言葉の真意を受け取る</a>
+        <a class="btn-line cta-link" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" data-cta="line">
           💚 導きを直接受け取る（LINE鑑定）
           <span class="sub">※ 1対1で今の状況に合わせて言葉を届けます</span>
         </a>
       </nav>
     </section>
   </main>
+
+  <!-- クリック演出オーバーレイ -->
+  <div class="fade-overlay" id="fadeOverlay" aria-hidden="true"></div>
 
   <!-- 効果音 -->
   <audio id="flipSe" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
@@ -155,7 +181,7 @@
     try { bgm.volume = 0.55; const p = bgm.play(); if (p && p.catch) p.catch(()=>{}); } catch(e){}
   }
 
-  // ====== Data ======
+  // ====== Tarot Data ======
   const deck = [
     { name:'The Fool', idx:0, two:['最初の一歩は、恐れよりも軽い風。','失敗は合図――世界は君に開く。'], kw:'始まり' },
     { name:'The Magician', idx:1, two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。'], kw:'創造' },
@@ -195,8 +221,8 @@
   const cardEls   = document.querySelectorAll('.card');
   const fronts    = [document.getElementById('card0'), document.getElementById('card1'), document.getElementById('card2')];
   const bodies    = [document.getElementById('body0'), document.getElementById('body1'), document.getElementById('body2')];
-  const defaultBodies = ['カードを開くと、ここに“詩”が現れます。','カードを開くと、ここに“韻”が現れます。','カードを開くと、ここに“祈”が現れます。'];
-  const nextSteps = document.getElementById('nextSteps'); // ★ 追加
+  const nextSteps = document.getElementById('nextSteps');
+  const overlay   = document.getElementById('fadeOverlay');
 
   // ====== State ======
   let selected = [];
@@ -214,12 +240,14 @@
 
   function resetView(){
     opened = 0;
-    bodies.forEach((el,i)=> el.textContent = defaultBodies[i]);
-    readingEl?.classList.remove('is-active');
+    bodies[0].textContent = 'カードを開くと、ここに“詩”が現れます。';
+    bodies[1].textContent = 'カードを開くと、ここに“韻”が現れます。';
+    bodies[2].textContent = 'カードを開くと、ここに“祈”が現れます。';
+    readingEl.classList.remove('is-active');
     summaryPoem.textContent = 'カードをすべて開くと、ここに九行のメッセージが現れます。';
     tapHint.style.opacity = 1;
-    nextSteps.classList.add('hidden');          // ★ 追加：非表示に戻す
-    nextSteps.classList.remove('is-on');        // ★ 追加：アニメ用クラスも外す
+    nextSteps.classList.add('hidden');
+    nextSteps.classList.remove('is-on');
     cardEls.forEach((el,i)=>{
       el.classList.remove('is-flipped');
       el.style.pointerEvents = 'auto';
@@ -305,15 +333,39 @@
     setTimeout(()=>{ beginReading(); }, 600);
   }
 
+  // ====== CTA：光フェード＆計測 ======
+  function trackCTA(label){
+    // GA4（gtag）呼び出し
+    if(typeof gtag !== 'undefined'){
+      gtag('event', 'click', {event_category:'CTA', event_label:label, value:1});
+    }
+    // GTM等に渡すカスタムイベント
+    window.dispatchEvent(new CustomEvent('cta_click', { detail:{ label } }));
+  }
+
+  function glowAndGo(e){
+    const el = e.currentTarget;
+    const label = el.getAttribute('data-cta') || 'unknown';
+    overlay.classList.add('active');
+    trackCTA(label);
+    setTimeout(()=> overlay.classList.remove('active'), 800);
+    // 通常遷移はそのまま（a要素）。_blankでもOK
+  }
+
   // ====== Bindings ======
   window.addEventListener('load', ()=>{
     cardEls.forEach((el)=> el.addEventListener('click', ()=> onFlip(Number(el.dataset.idx)), {passive:true}));
     startBtn.addEventListener('click', beginRitual, {passive:true});
     document.getElementById('retry').addEventListener('click', onRetry, false);
     setTimeout(()=>{ document.querySelector('.hero__veil').classList.add('is-on'); }, 350);
+
+    // CTA演出＆計測
+    document.querySelectorAll('.cta-link').forEach(btn=>{
+      btn.addEventListener('click', glowAndGo, false);
+    });
   });
 
-  // iOS保険
+  // iOS保険（初回タップでBGM起動）
   window.addEventListener('touchstart', function once(){
     kickBgm();
     window.removeEventListener('touchstart', once, {passive:true});
