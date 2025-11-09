@@ -1,9 +1,6 @@
 /* =========================
-   shion-tarot.css 置き換え用
    詩韻 Shion — Tarot (詩・韻・祈)
    ========================= */
-
-/* --- Reset & Root --- */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --ink:#1e1b2b;
@@ -34,9 +31,9 @@ body{
   background: radial-gradient(1200px 800px at 50% -10%, #16162a 0%, #0b0b1a 55%, #080a12 100%);
   overflow-x:hidden;
 }
-.sr-only{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 
-/* --- Stardust (背景ゆらぎ) --- */
+/* --- Stardust --- */
 .stardust{
   position:fixed; inset:0; pointer-events:none; z-index:0;
   background:
@@ -88,8 +85,6 @@ body{
   color:#e1e6ff; font-style:italic; letter-spacing:.06em; line-height:1.7;
   text-shadow:0 0 10px rgba(130,140,255,.25);
 }
-
-/* 案内バッジ（淡色＝第2優先） */
 .hero__note{
   display:inline-block; margin:.5rem auto .8rem; padding:.5rem 1rem;
   border-radius:999px;
@@ -99,7 +94,7 @@ body{
   border:1px solid rgba(255,255,255,.15);
 }
 
-/* 最優先ボタン（はじめる）＝金色ワントーン */
+/* 最優先ボタン */
 .btn-primary{
   appearance:none; border:0; cursor:pointer;
   padding:1rem 2rem; border-radius:999px; font-weight:800; font-size:1.06rem;
@@ -116,8 +111,6 @@ body{
 }
 .btn-primary:hover{ transform: translateY(-1px); filter:saturate(1.06) }
 .btn-primary:active{ transform: translateY(0) scale(.99) }
-
-/* 開始時刻 */
 .start-time{ margin-top:.5rem; font-size:.95rem; color:#ffe8b3; opacity:0; transition:opacity .6s ease }
 .start-time.is-on{ opacity:.9 }
 
@@ -135,7 +128,7 @@ body{
 .ritual__line{ font-size:1.08rem; letter-spacing:.08em; color:#ffe8b3; margin:.25rem 0 }
 
 /* =========================
-   Spread (展開)
+   Spread
    ========================= */
 .main{ position:relative; z-index:1 }
 .section{ max-width:1000px; margin:0 auto; padding:28px 16px }
@@ -150,7 +143,7 @@ body{
   width:min(92vw,980px); margin:0 auto 10px;
 }
 
-/* --- Card --- */
+/* Card */
 .card{ width:clamp(110px,22vw,160px); aspect-ratio:62/110; perspective:1100px; position:relative; cursor:pointer; flex:0 0 auto }
 .card__inner{
   width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;
@@ -165,7 +158,7 @@ body{
 .card__back{ background:#0b0f18 var(--card-back-url) center/cover no-repeat }
 .card__front{ transform: rotateY(180deg) }
 
-/* ★ フロント面を data-idx で固定（JSで上書きしない） */
+/* フロント面（JS未差替え時のプレースホルダ） */
 .card[data-idx="0"] .card__front{ background-image: var(--front0) }
 .card[data-idx="1"] .card__front{ background-image: var(--front1) }
 .card[data-idx="2"] .card__front{ background-image: var(--front2) }
@@ -196,7 +189,7 @@ body{
 }
 
 /* =========================
-   About（詩韻祈とは？）
+   About
    ========================= */
 .about__text{
   line-height:1.9; color:#eef1ff;
@@ -206,7 +199,7 @@ body{
 }
 
 /* =========================
-   Reading（2行×3枚）
+   Reading
    ========================= */
 .reading{
   background: linear-gradient(180deg, rgba(8,10,18,.9), rgba(10,12,20,.96));
@@ -214,7 +207,6 @@ body{
 }
 .reading__grid{ display:grid; gap:14px; grid-template-columns: 1fr }
 @media (min-width:760px){ .reading__grid{ grid-template-columns: repeat(3,1fr) } }
-
 .reading__item{
   background: rgba(127,208,255,.08);
   border:1px solid rgba(127,208,255,.25);
@@ -225,7 +217,7 @@ body{
 .reading.is-active .reading__item{ box-shadow: 0 0 22px rgba(174,138,255,.15) }
 
 /* =========================
-   Summary（総合結果 9行）
+   Summary
    ========================= */
 .summary__poem{
   background: radial-gradient(600px 240px at 50% 0%, rgba(255,215,111,.08), rgba(124,98,255,.05));
@@ -233,20 +225,72 @@ body{
   border-radius:12px; padding:16px; line-height:1.95; color:#eef1ff;
 }
 .summary__poem p{ margin:0 0 .4rem }
-
 .closing-line{ margin:18px 0 8px; color:#ffe8b3; opacity:.92; letter-spacing:.08em }
 
-/* CTA（LINE / TikTok / note / 再占い） */
-.cta{ margin:18px 0 8px; display:grid; gap:10px; grid-template-columns: 1fr 1fr }
-@media (min-width:680px){ .cta{ grid-template-columns: repeat(4,1fr) } }
-.cta__btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:12px 14px; border-radius:12px; text-decoration:none; color:#ffe7a6;
-  border:1px solid rgba(255,215,111,.5); background:rgba(0,0,0,.35);
-  box-shadow:0 0 16px rgba(255,215,111,.15), inset 0 0 12px rgba(255,215,111,.08);
-  transition: transform .15s, box-shadow .2s;
+/* =========================
+   次の一歩（説明＋CTA）
+   ========================= */
+.next-steps__lead{
+  margin:8px 0 10px;
+  line-height:1.9;
+  color:#eef1ff;
+  background:rgba(174,138,255,.07);
+  border:1px solid rgba(174,138,255,.25);
+  border-radius:12px;
+  padding:12px 14px;
 }
-.cta__btn:hover{ transform: translateY(-1px) }
-.cta__btn--line{ background:#00b900; color:#fff; border-color:transparent }
-.cta__btn--tiktok{ background:#000; color:#fff; border-color:#111 }
-.cta__btn--note{ background:#fff; color:#333; border-color:#ddd }
+.next-steps__list{
+  margin:10px 0 14px 1.2em;
+  color:#cfe2ff;
+  line-height:1.9;
+}
+.next-steps__list li{ margin:2px 0 }
+
+.cta-grid{
+  display:grid; gap:12px; margin-top:8px;
+  grid-template-columns: 1fr 1fr;
+}
+@media (min-width:820px){
+  .cta-grid{ grid-template-columns: repeat(4,1fr) }
+}
+
+.btn-ghost, .btn-dark, .btn-light, .btn-line{
+  display:flex; align-items:center; justify-content:center;
+  text-decoration:none; text-align:center;
+  padding:12px 14px; border-radius:12px; min-height:48px;
+  font-weight:700; letter-spacing:.03em;
+  transition:transform .15s, box-shadow .2s, filter .2s;
+}
+
+/* 1. もう一度（控えめ） */
+.btn-ghost{
+  color:#ffe7a6;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,215,111,.45);
+  box-shadow:0 0 12px rgba(255,215,111,.12) inset;
+}
+/* 2. 世界観（黒×金） */
+.btn-dark{
+  color:#ffe7a6; background:#0b0b1a;
+  border:1px solid rgba(255,215,111,.55);
+  box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 0 10px rgba(255,215,111,.08);
+}
+/* 3. 思想（白×銀） */
+.btn-light{
+  color:#2a2136; background:#fff;
+  border:1px solid #ddd;
+  box-shadow:0 8px 18px rgba(255,255,255,.25);
+}
+/* 4. 最重要：LINE（強発光＋サブコピー） */
+.btn-line{
+  position:relative; flex-direction:column; gap:4px;
+  color:#fff; background:#00b900; border:0;
+  box-shadow:0 14px 30px rgba(0,185,0,.35), 0 0 24px rgba(0,185,0,.25);
+}
+.btn-line .sub{ display:block; font-weight:600; font-size:.85rem; opacity:.9 }
+
+.btn-ghost:hover, .btn-dark:hover, .btn-light:hover, .btn-line:hover{ transform:translateY(-1px) }
+
+/* 出現アニメーション */
+#nextSteps{ opacity:0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease }
+#nextSteps.is-on{ opacity:1; transform: translateY(0) }
