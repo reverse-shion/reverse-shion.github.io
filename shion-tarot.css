@@ -1,22 +1,36 @@
 /* =========================
    詩韻 Shion — Tarot (詩・韻・祈)
+   CV最適化版（安心バッジ＋レビュー帯＋固定ミニCTA）
    ========================= */
+
+/* リセット＋横ズレ防止 */
 *{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+html{overflow-x:hidden}
+body{
+  overflow-x:hidden; /* 横スクロール禁止 */
+  font-family:'Noto Serif JP',serif;
+  color:#eef1ff;
+  background:#0b0b1a;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+
+/* ルート変数 */
 :root{
   --ink:#1e1b2b;
   --ink-strong:#f0f3ff;
-  --muted:#8ea0c8;
+  --muted:#9aa6c9;
   --violet:#6d4ba8;
   --lav:#9c7cc9;
   --gold:#ffd76f;
-  --bg:#080a12;
-  --glass:#ffffff1a;
+  --bg:#0b0b1a;
+  --glass:#ffffff14;
   --r:14px;
 
-  /* 裏面画像（同階層 back.png / もしくは assets/tarot/back.png に変更OK） */
+  /* カード裏面（差し替えOK） */
   --card-back-url: url("back.png");
 
-  /* 表面プレースホルダ（後で URL に差し替えOK） */
+  /* プレースホルダ表面（後で画像URLに差替え） */
   --front0: linear-gradient(135deg,#ffe8b3,#caa8ff);
   --front1: linear-gradient(135deg,#b3ffe3,#a8b3ff);
   --front2: linear-gradient(135deg,#ffd1f7,#d1fff5);
@@ -24,72 +38,74 @@
 @media (color-gamut: p3){
   :root{ --gold: color(display-p3 1 0.84 0.45) }
 }
-html,body{height:100%}
-body{
-  font-family:'Noto Serif JP', serif;
-  color:#eef1ff;
-  background: radial-gradient(1200px 800px at 50% -10%, #16162a 0%, #0b0b1a 55%, #080a12 100%);
-  overflow-x:hidden;
-}
 
 /* ===== Header ===== */
 .header{
   position:fixed; top:0; left:0; right:0; z-index:999;
-  background: rgba(8,10,18,.7);
+  background: color-mix(in oklab, #0b0b1a 85%, #1b1440 15%);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255,255,255,.1);
+  border-bottom: 1px solid rgba(255,255,255,.08);
 }
 .header__inner{
-  max-width:1100px; margin:0 auto; padding:10px 16px;
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  max-width:1180px; margin:0 auto; padding:10px 16px;
+  display:grid; grid-template-columns: auto 1fr auto; align-items:center; gap:12px;
 }
 .logo{
   font-family:"Cormorant Garamond",serif;
   font-size:1.35rem; text-decoration:none; color:#ffd76f;
-  text-shadow:0 0 10px rgba(255,215,111,.4);
+  text-shadow:0 0 10px rgba(255,215,111,.45);
 }
+.nav{ display:flex; justify-content:center; gap:min(3vw,22px) }
 .nav a{
-  color:#fff; text-decoration:none; margin:0 12px; font-size:.95rem;
-  transition:opacity .25s ease;
+  color:#fff; text-decoration:none; font-size:.95rem; opacity:.92;
+  transition:opacity .25s ease, transform .15s ease;
 }
-.nav a:hover{ opacity:.7 }
-.header-spacer{ height:56px } /* ヘッダー分の余白 */
+.nav a:hover{ opacity:.7; transform: translateY(-1px) }
+.header-spacer{ height:56px }
 
-.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+/* ヘッダー右端ミニCTA（常時CV導線） */
+.mini-cta{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:64px; height:36px; padding:0 12px;
+  border-radius:999px; text-decoration:none; font-weight:800; letter-spacing:.04em;
+  color:#2a2136; background:linear-gradient(90deg,#FFD76F,#FFC944 70%);
+  box-shadow:0 10px 20px rgba(255,215,111,.32), inset 0 0 8px rgba(255,240,200,.25);
+  border:1px solid rgba(255,215,111,.5);
+}
+.mini-cta:hover{ filter:saturate(1.06); transform: translateY(-1px) }
+.mini-cta:active{ transform: translateY(0) }
 
-/* --- Stardust --- */
-.stardust{
-  position:fixed; inset:0; pointer-events:none; z-index:0;
+/* ===== 神殿背景 ===== */
+.temple-bg{ position:fixed; inset:0; z-index:-1; overflow:hidden; }
+.temple-orb{
+  position:absolute; top:-18vmin; left:50%; width:120vmin; height:120vmin; transform:translateX(-50%);
   background:
-    radial-gradient(2px 2px at 20% 30%, #ffffffb0 0 99%, #0000 100%),
-    radial-gradient(2px 2px at 60% 80%, #ffffff99 0 99%, #0000 100%),
-    radial-gradient(1.5px 1.5px at 85% 20%, #ffffff80 0 99%, #0000 100%);
+    radial-gradient(closest-side, rgba(124,98,255,.18), rgba(124,98,255,0)),
+    radial-gradient(closest-side, rgba(255,215,111,.18), rgba(255,215,111,0) 70%);
+  filter: blur(8px);
+}
+.grid-lines{
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 60px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 60px);
+  mask: radial-gradient(70% 60% at 50% 40%, #000 55%, transparent 90%);
+  opacity:.25;
+}
+.stardust{
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(2px 2px at 14% 30%, #ffffffb0 0 99%, #0000 100%),
+    radial-gradient(2px 2px at 68% 76%, #ffffff99 0 99%, #0000 100%),
+    radial-gradient(1.5px 1.5px at 84% 18%, #ffffff80 0 99%, #0000 100%);
   animation: drift 60s linear infinite;
-  opacity:.35;
+  opacity:.33;
 }
 @keyframes drift{ to{ background-position: -2000px 2000px, 1200px -1600px, -1600px -1200px } }
 
-/* =========================
-   Hero
-   ========================= */
-.hero{position:relative; min-height:100svh; display:grid; place-items:center; text-align:center; isolation:isolate; z-index:1}
-.hero__bg{
-  position:absolute; inset:0;
-  background:
-    linear-gradient(180deg, #0b0b1a 0%, #0b0b1a80 35%, #0b0b1a 100%),
-    url("temple-door.jpg") center/cover no-repeat;
-  filter: saturate(1.05) brightness(.98);
-  transform: scale(1.03);
-}
-.hero__veil{
-  position:absolute; inset:0; background:
-    radial-gradient(140px 180px at 50% 74%, #ffffffb0, #ffffff00 60%),
-    radial-gradient(1200px 720px at 50% 86%, #7c62ff33, #7c62ff00 70%);
-  mix-blend-mode:screen; opacity:0; transition:opacity 1.6s ease;
-}
-.hero__veil.is-on{ opacity:.65 }
-
-.hero__inner{position:relative; z-index:2; padding:clamp(16px,4vw,40px); max-width:960px}
+/* ===== Hero ===== */
+.hero{position:relative; min-height:100svh; display:grid; place-items:center; text-align:center; isolation:isolate}
+.hero__inner{position:relative; z-index:2; padding:clamp(16px,4vw,40px); max-width:960px; margin-inline:auto}
 .hero__title{
   font-family:"Cormorant Garamond",serif;
   font-size:clamp(28px,7vw,56px); letter-spacing:.08em;
@@ -100,17 +116,17 @@ body{
 }
 .hero__code{ padding-left:.15em }
 .hero__subtitle{
-  margin:.8rem auto 0.6rem; max-width:760px;
-  color:var(--ink-strong); opacity:.98; line-height:1.7; letter-spacing:.04em;
+  margin:.9rem auto .7rem; max-width:760px;
+  color:var(--ink-strong); opacity:.98; line-height:1.9; letter-spacing:.04em;
   text-shadow:0 0 10px rgba(20,24,44,.35);
 }
 .hero__poem{
-  margin:0 auto 1rem; max-width:720px;
-  color:#e1e6ff; font-style:italic; letter-spacing:.06em; line-height:1.7;
+  margin:0 auto 1.1rem; max-width:720px;
+  color:#e1e6ff; font-style:italic; letter-spacing:.06em; line-height:1.9;
   text-shadow:0 0 10px rgba(130,140,255,.25);
 }
 .hero__note{
-  display:inline-block; margin:.5rem auto .8rem; padding:.5rem 1rem;
+  display:inline-block; margin:.6rem auto 1rem; padding:.5rem 1rem;
   border-radius:999px;
   background:linear-gradient(90deg,#2a2750,#433a7a);
   color:#e9e6ff; font-weight:700; letter-spacing:.06em;
@@ -118,7 +134,20 @@ body{
   border:1px solid rgba(255,255,255,.15);
 }
 
-/* 最優先ボタン */
+/* 安心バッジ */
+.trust-badges{
+  margin:14px auto 0; padding:0; list-style:none;
+  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+  max-width:900px;
+}
+.trust-badges li{
+  padding:8px 12px; border-radius:999px;
+  background:rgba(255,215,111,.12);
+  border:1px solid rgba(255,215,111,.35);
+  color:#ffe8b3; font-weight:700; letter-spacing:.04em;
+}
+
+/* 大ボタン */
 .btn-primary{
   appearance:none; border:0; cursor:pointer;
   padding:1rem 2rem; border-radius:999px; font-weight:800; font-size:1.06rem;
@@ -128,21 +157,32 @@ body{
   position:relative; isolation:isolate;
   transition: transform .18s, box-shadow .22s, filter .22s;
 }
-.btn-primary::after{
-  content:""; position:absolute; inset:-6px; border-radius:999px; pointer-events:none;
-  box-shadow:0 0 36px 12px rgba(255,215,111,.45);
-  opacity:.75; filter: blur(2px); transition: opacity .2s ease;
-}
 .btn-primary:hover{ transform: translateY(-1px); filter:saturate(1.06) }
 .btn-primary:active{ transform: translateY(0) scale(.99) }
 .start-time{ margin-top:.5rem; font-size:.95rem; color:#ffe8b3; opacity:0; transition:opacity .6s ease }
 .start-time.is-on{ opacity:.9 }
 
-/* =========================
-   Ritual
-   ========================= */
+/* レビュー帯 */
+.social-proof{
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(180deg, rgba(8,10,18,.85), rgba(10,12,20,.96));
+}
+.proof__inner{
+  max-width:1100px; margin:0 auto; padding:10px 16px;
+  display:flex; gap:14px; align-items:center; justify-content:center; flex-wrap:wrap;
+}
+.stars{ color:#ffd76f; filter: drop-shadow(0 0 10px rgba(255,215,111,.25)) }
+.proof__text{ color:#e9edff; letter-spacing:.03em }
+.proof__text strong{ color:#fff }
+
+/* 共通セクション */
+.section{ max-width:1100px; margin:0 auto; padding:28px 16px }
+.section__title{ font-size:1.1rem; color:var(--gold); letter-spacing:.12em; margin-bottom:12px }
+
+/* 儀式 */
 .hidden{ display:none !important }
-.ritual{ position:relative; z-index:2; padding:60px 18px; text-align:center }
+.ritual{ position:relative; padding:60px 18px; text-align:center }
 .ritual__glow{
   width:min(70vmin,420px); height:min(70vmin,420px); margin:0 auto 16px; border-radius:50%;
   background: radial-gradient(circle, #ffd76f55, #ffd76f00 60%);
@@ -151,13 +191,7 @@ body{
 @keyframes pulse{ 50%{ transform: scale(1.06); filter: blur(2px) } }
 .ritual__line{ font-size:1.08rem; letter-spacing:.08em; color:#ffe8b3; margin:.25rem 0 }
 
-/* =========================
-   Spread
-   ========================= */
-.main{ position:relative; z-index:1 }
-.section{ max-width:1000px; margin:0 auto; padding:28px 16px }
-.section__title{ font-size:1.1rem; color:var(--gold); letter-spacing:.12em; margin-bottom:12px }
-
+/* 展開 */
 .spread{ padding:28px 12px }
 .spread__labels{ display:flex; gap:clamp(16px,6vw,40px); justify-content:center; margin-bottom:12px; opacity:.9 }
 .label{ width:clamp(100px,22vw,150px); text-align:center; color:#cfe2ff; font-size:clamp(12px,3vw,14px); letter-spacing:.12em; text-shadow:0 0 10px rgba(174,138,255,.45) }
@@ -212,19 +246,15 @@ body{
   100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0) }
 }
 
-/* =========================
-   About
-   ========================= */
+/* About */
 .about__text{
-  line-height:1.9; color:#eef1ff;
+  line-height:1.95; color:#eef1ff;
   background: rgba(127,208,255,.06);
   border:1px solid rgba(127,208,255,.22);
   border-radius:12px; padding:14px;
 }
 
-/* =========================
-   Reading
-   ========================= */
+/* Reading */
 .reading{
   background: linear-gradient(180deg, rgba(8,10,18,.9), rgba(10,12,20,.96));
   border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);
@@ -237,202 +267,102 @@ body{
   border-radius:12px; padding:14px; min-height:110px;
 }
 .reading__head{ color:#cfe2ff; font-size:.88rem; letter-spacing:.16em; margin-bottom:6px }
-.reading__body{ line-height:1.9; color:#eef1ff }
+.reading__body{ line-height:1.95; color:#eef1ff }
 .reading.is-active .reading__item{ box-shadow: 0 0 22px rgba(174,138,255,.15) }
 
-/* =========================
-   Summary
-   ========================= */
+/* 九行への“次へ”ボタン */
+.to-summary{ display:flex; justify-content:center; margin:14px 0 4px }
+.to-summary.hidden{ display:none }
+.btn-next{
+  padding:12px 18px; border-radius:999px; border:1px solid rgba(255,215,111,.55);
+  background:rgba(0,0,0,.35); color:#ffe7a6; font-weight:800; letter-spacing:.04em;
+  box-shadow:0 0 14px rgba(255,215,111,.15), inset 0 0 10px rgba(255,215,111,.08); backdrop-filter: blur(6px);
+}
+.btn-next:hover{ transform: translateY(-1px) }
+
+/* Summary */
 .summary__poem{
   background: radial-gradient(600px 240px at 50% 0%, rgba(255,215,111,.08), rgba(124,98,255,.05));
   border:1px solid rgba(255,215,111,.18);
   border-radius:12px; padding:16px; line-height:1.95; color:#eef1ff;
 }
-.summary__poem p{ margin:0 0 .4rem }
+.summary__poem p{ margin:0 0 .5rem }
 .closing-line{ margin:18px 0 8px; color:#ffe8b3; opacity:.92; letter-spacing:.08em }
 
-/* =========================
-   次の一歩（説明＋CTA）
-   ========================= */
+/* 次の一歩（CTAタブ） */
+.next-steps{}
 .next-steps__lead{
   margin:8px 0 10px;
-  line-height:1.9;
+  line-height:1.95;
   color:#eef1ff;
   background:rgba(174,138,255,.07);
   border:1px solid rgba(174,138,255,.25);
   border-radius:12px;
   padding:12px 14px;
 }
-.next-steps__list{
-  margin:10px 0 14px 1.2em;
-  color:#cfe2ff;
-  line-height:1.9;
-}
-.next-steps__list li{ margin:2px 0 }
 
-.cta-grid{
-  display:grid; gap:12px; margin-top:8px;
-  grid-template-columns: 1fr 1fr;
-}
-@media (min-width:820px){
-  .cta-grid{ grid-template-columns: repeat(4,1fr) }
-}
+/* CTA Tabs */
+.cta-tabs{ display:grid; gap:16px; margin-top:12px }
 
-.btn-ghost, .btn-dark, .btn-light, .btn-line{
-  display:flex; align-items:center; justify-content:center;
-  text-decoration:none; text-align:center;
-  padding:12px 14px; border-radius:12px; min-height:48px;
-  font-weight:700; letter-spacing:.03em;
-  transition:transform .15s, box-shadow .2s, filter .2s;
-}
-
-/* 1. もう一度（控えめ） */
-.btn-ghost{
-  color:#ffe7a6;
-  background:rgba(0,0,0,.35);
-  border:1px solid rgba(255,215,111,.45);
-  box-shadow:0 0 12px rgba(255,215,111,.12) inset;
-}
-/* 2. 世界観（黒×金） */
-.btn-dark{
-  color:#ffe7a6; background:#0b0b1a;
-  border:1px solid rgba(255,215,111,.55);
-  box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 0 10px rgba(255,215,111,.08);
-}
-/* 3. 思想（白×銀） */
-.btn-light{
-  color:#2a2136; background:#fff;
-  border:1px solid #ddd;
-  box-shadow:0 8px 18px rgba(255,255,255,.25);
-}
-/* 4. 最重要：LINE（強発光＋サブコピー） */
-.btn-line{
-  position:relative; flex-direction:column; gap:4px;
-  color:#fff; background:#00b900; border:0;
-  box-shadow:0 14px 30px rgba(0,185,0,.35), 0 0 24px rgba(0,185,0,.25);
-}
-.btn-line .sub{ display:block; font-weight:600; font-size:.85rem; opacity:.9 }
-
-.btn-ghost:hover, .btn-dark:hover, .btn-light:hover, .btn-line:hover{ transform:translateY(-1px) }
-
-/* 出現アニメーション */
-#nextSteps{ opacity:0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease }
-#nextSteps.is-on{ opacity:1; transform: translateY(0) }
-
-/* ===== CTAクリック演出（光フェード） ===== */
-.fade-overlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.92), rgba(255,255,255,0) 80%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transition: opacity 0.8s ease;
-}
-.fade-overlay.active { opacity: 1; }
-
-/* === Golden Primary Button (神殿仕様) ============================= */
-/* 既存の .btn-line を上書きして「一番目立つ金ボタン」にします。 */
-.btn-line{
-  /* Gold palette */
-  --gold-1: #FFD76F;  /* core */
-  --gold-2: #FFC944;  /* deep */
-  --gold-3: #FFF2C1;  /* highlight */
-  --gold-edge: rgba(255,215,111,.55);
-
-  display:inline-flex; align-items:center; justify-content:center;
-  gap:.35em;
-  padding: clamp(14px, 2.6vmin, 18px) clamp(18px, 4.2vmin, 28px);
-  min-height:56px; min-width: clamp(220px, 46vw, 560px);
-  border:none; border-radius: 14px;
-  text-decoration:none; text-align:center;
-  font-weight: 800; font-size: clamp(15px, 1.1rem, 18px);
-  letter-spacing: .04em;
-  color:#2a2136; /* 金に合う深い文字色（可読性重視） */
-
-  /* 金のグラデーション本体 */
-  background:
-    linear-gradient(92deg, var(--gold-3) 0%, var(--gold-1) 28%, var(--gold-2) 62%, var(--gold-1) 100%);
+/* ① メイン（金の大タブ） */
+.cta-primary{
+  --gold-1:#FFD76F; --gold-2:#FFC944; --gold-3:#FFF2C1; --gold-edge:rgba(255,215,111,.55);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-decoration:none; text-align:center; cursor:pointer;
+  padding: clamp(18px,3.8vmin,28px) clamp(20px,5vmin,36px);
+  border-radius:16px; min-height: clamp(84px, 16vmin, 132px);
+  color:#2a2136; font-weight:800; letter-spacing:.04em;
+  background: linear-gradient(92deg,var(--gold-3) 0%,var(--gold-1) 28%,var(--gold-2) 62%,var(--gold-1) 100%);
   box-shadow:
-    0 16px 40px rgba(255,215,111,.38),
-    0 2px 0 rgba(255,255,255,.35) inset,
-    0 0 0 1px var(--gold-edge) inset;
-
-  position:relative; isolation:isolate; overflow:hidden; cursor:pointer;
-  transform: translateZ(0);
-  transition: transform .18s ease, filter .22s ease, box-shadow .22s ease;
+    0 22px 50px rgba(255,215,111,.40),
+    0 0 0 1px var(--gold-edge) inset,
+    0 3px 0 rgba(255,255,255,.35) inset;
+  position:relative; overflow:hidden; border:none;
 }
-
-/* オーラ（柔らかい発光） */
-.btn-line::before{
-  content:"";
-  position:absolute; inset:-22%;
+.cta-primary::before{
+  content:""; position:absolute; inset:-22%;
   background: radial-gradient(60% 60% at 50% 50%, rgba(255,243,205,.55), rgba(255,243,205,0) 70%);
-  filter: blur(18px);
-  opacity:.55; pointer-events:none;
-  transition: opacity .25s ease, filter .25s ease;
+  filter: blur(18px); opacity:.55; pointer-events:none;
 }
-
-/* 聖なる煌めき（斜めに流れるハイライト） */
-.btn-line::after{
-  content:"";
-  position:absolute; top:-120%; left:-40%;
-  width:60%; height:340%;
-  transform: rotate(20deg);
-  background: linear-gradient( to right,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,.55) 45%,
-    rgba(255,255,255,0) 100%);
-  mix-blend-mode: screen;
-  opacity:.0; pointer-events:none;
-  transition: opacity .25s ease, transform .65s ease;
+.cta-primary::after{
+  content:""; position:absolute; top:-120%; left:-40%;
+  width:60%; height:340%; transform: rotate(20deg);
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 45%, rgba(255,255,255,0) 100%);
+  mix-blend-mode:screen; opacity:0; transition: transform .65s ease, opacity .28s ease;
 }
+.cta-primary:hover{ filter:saturate(1.06) contrast(1.03) }
+.cta-primary:hover::after{ opacity:.9; transform: translateX(160%) rotate(20deg) }
+.cta-primary__title{ font-size: clamp(18px, 2.2vmax, 24px) }
+.cta-primary__sub{ margin-top:6px; font-size: clamp(12px, 1.6vmax, 14px); font-weight:700; opacity:.9 }
 
-/* hover / focus で“神々しさ”UP */
-.btn-line:hover{
-  transform: translateY(-1px);
-  filter: saturate(1.06) contrast(1.02) brightness(1.02);
-  box-shadow:
-    0 22px 54px rgba(255,215,111,.48),
-    0 0 0 1px rgba(255,225,150,.75) inset,
-    0 0 24px rgba(255,225,160,.35);
+/* ② 下段 2カラム */
+.cta-list{ display:grid; gap:12px; grid-template-columns:1fr }
+@media (min-width:520px){ .cta-list{ grid-template-columns: 1fr 1fr } }
+.cta-card{
+  display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+  gap:6px; text-decoration:none; cursor:pointer; padding:14px 16px; min-height:68px;
+  border-radius:12px; background: rgba(127,208,255,.08);
+  border:1px solid rgba(127,208,255,.25);
+  color:#eef1ff;
+  box-shadow: 0 8px 18px rgba(0,0,0,.25), inset 0 0 10px rgba(174,138,255,.08);
+  transition: transform .15s ease, box-shadow .22s ease, border-color .22s ease, filter .22s ease;
 }
-.btn-line:hover::before{ opacity:.75; filter: blur(14px) }
-.btn-line:hover::after{ opacity:.9; transform: translateX(160%) rotate(20deg) }
-
-/* クリック時はわずかに沈む */
-.btn-line:active{ transform: translateY(0) scale(.99) }
-
-/* アクセシビリティ：キーボードフォーカスの光輪 */
-.btn-line:focus{ outline: none }
-.btn-line:focus-visible{
-  box-shadow:
-    0 0 0 3px rgba(255,255,255,.85),
-    0 0 0 6px rgba(255,215,111,.55),
-    0 16px 40px rgba(255,215,111,.38),
-    0 2px 0 rgba(255,255,255,.35) inset;
+.cta-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px rgba(174,138,255,.28);
+  border-color: rgba(174,138,255,.45);
+  filter: saturate(1.06);
 }
+.cta-card__title{ font-weight:800; letter-spacing:.02em }
+.cta-card__sub{ font-size:.9rem; color:#cfe2ff; opacity:.95 }
 
-/* サブテキスト（<span class="sub">…</span> を使う場合） */
-.btn-line .sub{
-  display:block; font-weight:700; font-size:.88rem; opacity:.9;
-  color:#2a2136;
-}
+/* CTAクリック演出 */
+.fade-overlay{ position:fixed; inset:0; background: radial-gradient(circle at center, rgba(255,255,255,0.92), rgba(255,255,255,0) 80%); opacity:0; pointer-events:none; z-index:9999; transition: opacity .8s ease }
+.fade-overlay.active{ opacity:1 }
 
-/* モバイルで全幅にする場合（任意） */
-.btn-line.is-wide{ width:100%; min-width:auto }
+/* 可読性（本文） */
+p{ line-height:1.95 }
+strong{ font-weight:700 }
 
-/* 低視覚効果モードの配慮 */
-@media (prefers-reduced-motion: reduce){
-  .btn-line,
-  .btn-line::after{ transition: none }
-}
-
-/* P3対応（対応端末でよりリッチな金色に） */
-@media (color-gamut: p3){
-  .btn-line{
-    --gold-1: color(display-p3 1 0.84 0.45);
-    --gold-2: color(display-p3 1 0.79 0.35);
-    --gold-3: color(display-p3 1 0.95 0.80);
-  }
-}
+/* ユーティリティ */
+.hidden{ display:none !important }
