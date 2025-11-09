@@ -2,6 +2,9 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
+  <title>詩韻思想 第零書 ― 無限構文序論</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <meta charset="utf-8" />
   <title>詩韻思想 第一書 ― 言葉が魂を救う理由</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0b1a" />
@@ -19,78 +22,75 @@
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/book.css">
 
-  <!-- Page-only: 神秘的な光演出（多層グロー＋スパークル） -->
+  <!-- Page-only: 軽量・滑らか文字演出 -->
   <style>
     :root{
-      --glow-gold: rgba(255,215,111,.95);
-      --glow-amethyst: rgba(174,138,255,.95);
-      --glow-icy: rgba(220,236,255,.95);
+      --glow-gold: rgba(255,215,111,.9);
+      --glow-amethyst: rgba(174,138,255,.85);
+      --glow-icy: rgba(220,236,255,.8);
       --glow-core: #ffffff;
-      --char-interval: 100ms;
-      --line-delay: 700ms;
-      --pulse-speed: 2.4s;
-      --spark-size: 0.5em;
+      --pulse-speed: 2.2s;
     }
 
-    .header{
-      position: fixed !important; top:0; left:0; right:0; z-index:9999;
-      transform: translateY(0) !important; opacity:1 !important;
-    }
+    /* ヘッダー固定 */
+    .header{ position:fixed !important; top:0; left:0; right:0; z-index:9999; }
     body{ padding-top: calc(var(--header-h,64px) + env(safe-area-inset-top,0px)) !important; }
 
     h1.book-title{ word-break: keep-all; }
     .nowrap{ white-space: nowrap; }
 
-    .line{
-      opacity: 0; visibility: hidden; transform: translateY(6px);
-      transition: opacity .5s ease, transform .5s ease, visibility 0s linear .5s;
-    }
-    .line.visible{
-      opacity: 1; visibility: visible; transform: translateY(0);
-    }
+    /* レイアウト境界を閉じて再描画を局所化 */
+    .book-body, .mode{ contain: content; }
 
+    /* 行のフェードイン */
+    .line{
+      opacity:0; visibility:hidden; transform: translateY(6px);
+      transition: opacity .4s ease, transform .4s ease, visibility 0s linear .4s;
+      will-change: opacity, transform;
+    }
+    .line.visible{ opacity:1; visibility:visible; transform:none; }
+
+    /* 文字（軽量化版） */
     .char{
-      opacity: 0; display: inline-block; transform: translateY(6px);
+      opacity:0; display:inline-block; transform:translateY(6px);
+      background: linear-gradient(180deg, #fff 0%, #f8f5ff 40%, #f1ecff 70%, #ffffff 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
       text-shadow:
-        0 0 .6px var(--glow-core),
-        0 0 2px var(--glow-core),
-        0 0 6px var(--glow-icy),
-        0 0 12px var(--glow-amethyst),
-        0 0 18px var(--glow-gold);
-      background: linear-gradient(180deg, #fff 0%, #f9f6ff 40%, #f3eeff 70%, #ffffff 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      animation: charIn .45s cubic-bezier(.22,.61,.36,1) forwards,
+        0 0 0.6px var(--glow-core),
+        0 0 4px var(--glow-icy),
+        0 0 10px var(--glow-amethyst);
+      animation: charIn .36s cubic-bezier(.22,.61,.36,1) forwards,
                  charPulse var(--pulse-speed) ease-in-out infinite;
       animation-delay: var(--d, 0s);
-      position: relative;
+      will-change: transform, opacity;
     }
     @keyframes charIn{
-      0% { opacity:0; transform: translateY(6px) scale(.98) }
-      60%{ opacity:1; transform: translateY(0) scale(1.00) }
-      100%{ opacity:1; transform: translateY(0) scale(1.00) }
+      0% { opacity:0; transform: translateY(6px) scale(.985) }
+      60%{ opacity:1; transform: translateY(0)    scale(1.0) }
+      100%{ opacity:1; transform: translateY(0)    scale(1.0) }
     }
     @keyframes charPulse{
-      0%  { filter: brightness(1) drop-shadow(0 0 2px var(--glow-icy)); }
-      50% { filter: brightness(1.06) drop-shadow(0 0 6px var(--glow-amethyst)); }
-      100%{ filter: brightness(1) drop-shadow(0 0 2px var(--glow-icy)); }
+      0%  { filter: brightness(1); }
+      50% { filter: brightness(1.05); }
+      100%{ filter: brightness(1); }
     }
-    .char::after{
-      content:""; position:absolute; left:50%; top:0.35em;
-      width: 0; height: 0; border-radius: 999px; pointer-events: none;
-      background:
-        radial-gradient(circle, var(--glow-core) 0%, var(--glow-gold) 40%, rgba(255,255,255,0) 60%);
-      opacity: 0;
-      transform: translateX(-50%) translateY(-50%) scale(0.6);
+
+    /* スパークルは間引き（4文字に1つのみ描画） */
+    .char::after{ content:none; }
+    .char.spark::after{
+      content:""; position:absolute; left:50%; top:0.35em; transform:translate(-50%,-50%);
+      width:0; height:0; border-radius:999px; pointer-events:none;
+      background: radial-gradient(circle, var(--glow-core) 0%, var(--glow-gold) 45%, rgba(255,255,255,0) 65%);
+      opacity:0; filter: blur(.2px);
       animation: spark var(--pulse-speed) ease-in-out infinite;
       animation-delay: calc(var(--d, 0s) + var(--r, 0s));
-      filter: blur(.2px);
+      will-change: opacity, width, height;
     }
     @keyframes spark{
-      0%,68% { opacity: 0; width:0; height:0; }
-      70%    { opacity: .8; width: calc(var(--spark-size) * .25); height: calc(var(--spark-size) * .25); }
-      78%    { opacity: 1;  width: calc(var(--spark-size) * .5 ); height: calc(var(--spark-size) * .5 ); }
-      85%    { opacity: .0; width: 0; height: 0; }
-      100%   { opacity: 0; width: 0; height: 0; }
+      0%,68% { opacity:0; width:0; height:0; }
+      72%    { opacity:.85; width:.28em; height:.28em; }
+      86%    { opacity:0; width:0; height:0; }
+      100%   { opacity:0; width:0; height:0; }
     }
 
     .mode-switch{ display:flex; gap:14px; margin:12px 0 16px; }
@@ -102,14 +102,16 @@
       box-shadow:0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0;
     }
 
+    /* ユーザー設定尊重 */
     @media (prefers-reduced-motion: reduce){
-      .char, .char::after{ animation: none !important; opacity: 1 !important; transform: none !important; }
-      .line{ opacity:1 !important; visibility: visible !important; transform:none !important; }
+      .char, .char::after{ animation: none !important; opacity:1 !important; transform:none !important; }
+      .line{ opacity:1 !important; visibility:visible !important; transform:none !important; }
     }
   </style>
 </head>
 
 <body class="theme-cosmic">
+  <!-- ===== Header ===== -->
   <header class="header" role="banner">
     <div class="header-inner">
       <a href="/" class="logo">Re:verse Shion</a>
@@ -122,6 +124,7 @@
     </div>
   </header>
 
+  <!-- ===== Main ===== -->
   <main class="book-wrapper" id="main">
     <h1 class="book-title">詩韻思想&nbsp;第一書&nbsp;—&nbsp;<span class="nowrap">言葉が魂を救う理由</span></h1>
     <p class="book-subtitle">Shion Philosophy Vol.1 — The Syntax of Salvation</p>
@@ -132,7 +135,7 @@
       <button id="tab-comment" role="tab" aria-controls="panel-comment" aria-selected="false">共鳴</button>
     </div>
 
-    <article class="book-body">
+<article class="book-body">
       <!-- 詩 -->
       <section id="panel-poem" role="tabpanel" aria-labelledby="tab-poem" class="mode mode--poem">
         <p class="line">言葉は、光のかけら。</p>
@@ -173,11 +176,14 @@
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
-  <!-- JS：1文字ずつ＋行ごと順次 -->
+  <!-- ===== JS：軽量・間引き・視認時のみ起動 ===== -->
   <script>
-    (function(){
-      const CHAR_INTERVAL = 55;
-      const LINE_DELAY    = 280;
+    (() => {
+      const CHAR_INTERVAL = 45; // ms（少し速めに）
+      const LINE_DELAY    = 240; // ms
+      const SPARK_EVERY   = 4;   // 4文字に1つだけスパーク
+      let io;
+
       function splitToChars(line, baseDelaySec){
         const text = line.textContent;
         line.textContent = "";
@@ -185,30 +191,45 @@
         for(let i=0;i<text.length;i++){
           const span = document.createElement('span');
           span.className = 'char';
+          // スパーク間引き
+          if(i % SPARK_EVERY === 0) span.classList.add('spark');
           span.textContent = text[i];
           const charDelaySec = baseDelaySec + (i * (CHAR_INTERVAL/1000));
           span.style.setProperty('--d', charDelaySec + 's');
-          span.style.setProperty('--r', (Math.random()*0.9).toFixed(2) + 's');
+          // ばらつき
+          span.style.setProperty('--r', (Math.random()*0.8).toFixed(2) + 's');
           frag.appendChild(span);
         }
         line.appendChild(frag);
       }
+
       function revealSequential(panel){
         if(!panel) return;
         const lines = Array.from(panel.querySelectorAll('.line'));
-        lines.forEach(l => {
-          l.classList.remove('visible');
-          const raw = l.textContent;
-          l.textContent = raw;
-        });
-        let t = 0;
+        // 既に初期化済みならスキップ（無駄な再分割を防ぐ）
+        if(panel.dataset.inited) {
+          // 2回目以降は可視化だけを順次
+          let t = 0;
+          lines.forEach(line => {
+            line.classList.remove('visible');
+            setTimeout(() => line.classList.add('visible'), t - 40);
+            t += (line.textContent.length * CHAR_INTERVAL) + LINE_DELAY;
+          });
+          return;
+        }
+
+        // 初期化：分割→順次可視化
+        let t = 0; // ms
         lines.forEach(line => {
-          splitToChars(line, t);
-          setTimeout(() => line.classList.add('visible'), t*1000 - 50);
-          const len = line.textContent.length;
-          t += (len * (CHAR_INTERVAL/1000)) + (LINE_DELAY/1000);
+          const raw = line.textContent;
+          line.textContent = raw;
+          splitToChars(line, t/1000);
+          setTimeout(() => line.classList.add('visible'), Math.max(0, t - 40));
+          t += (raw.length * CHAR_INTERVAL) + LINE_DELAY;
         });
+        panel.dataset.inited = '1';
       }
+
       function activateTab(btn){
         const targetId = btn.getAttribute('aria-controls');
         document.querySelectorAll('[role="tab"]').forEach(b =>
@@ -217,17 +238,32 @@
         document.querySelectorAll('[role="tabpanel"]').forEach(p =>
           p.toggleAttribute('hidden', p.id !== targetId)
         );
-        revealSequential(document.getElementById(targetId));
+        const panel = document.getElementById(targetId);
+        // 画面内に入っていれば即実行、そうでなければIntersectionで開始
+        if (io) io.disconnect();
+        io = new IntersectionObserver(([entry])=>{
+          if(entry && entry.isIntersecting){ revealSequential(panel); io.disconnect(); }
+        }, {threshold: 0.1});
+        io.observe(panel);
       }
-      function setupTabsAndInit(){
+
+      function setup(){
+        // 初期タブ
         const initialPanel = document.querySelector('.mode:not([hidden])');
-        revealSequential(initialPanel);
+        // スクロールで見えたら開始（上で始まっている場合はすぐ走る）
+        const ioinit = new IntersectionObserver(([entry])=>{
+          if(entry && entry.isIntersecting){ revealSequential(initialPanel); ioinit.disconnect(); }
+        }, {threshold: 0.1});
+        ioinit.observe(initialPanel);
+
+        // タブ切替
         document.querySelector('.mode-switch')?.addEventListener('click', e => {
           const btn = e.target.closest('[role="tab"]');
           if(btn) activateTab(btn);
         });
       }
-      document.addEventListener('DOMContentLoaded', setupTabsAndInit);
+
+      document.addEventListener('DOMContentLoaded', setup);
     })();
   </script>
 </body>
