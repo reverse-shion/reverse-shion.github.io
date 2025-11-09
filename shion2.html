@@ -286,10 +286,14 @@
   }
 
   function onRetry(e){
-    e.preventDefault();
-    document.getElementById('hero').scrollIntoView({behavior:'smooth'});
-    setTimeout(()=>{ beginReading(); }, 600);
-  }
+  e.preventDefault();
+  // 開始時刻リセット
+  startTimeEl.textContent = '';
+  startTimeEl.classList.remove('is-on');
+
+  document.getElementById('hero').scrollIntoView({behavior:'smooth'});
+  setTimeout(()=>{ beginReading(); }, 600);
+}
 
   // バインド
   window.addEventListener('load', ()=>{
