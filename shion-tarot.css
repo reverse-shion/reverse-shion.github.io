@@ -1,318 +1,415 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>詩韻 Shion — 言葉で魂を救う Code｜無料タロット（詩・韻・祈）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b1a" />
+  <meta name="description" content="無料タロットで“詩・韻・祈”。詩韻 Shion の思想（言葉で魂を救う Code）に基づくリーディング。恋愛・復縁・連絡・進路の悩みに。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="詩韻 Shion — 言葉で魂を救う Code｜無料タロット（詩・韻・祈）">
+  <meta property="og:description" content="“詩・韻・祈”で読む、思想連動タロット。儀式（星詠リチュアル）→三枚の詩→九行の総合詩。">
+  <meta property="og:image" content="assets/ogp.jpg">
+  <meta property="og:url" content="./">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shion-tarot.css">
+</head>
+<body>
+  <!-- ===== ヘッダー ===== -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <a href="/" class="logo">Re:verse Shion</a>
+      <nav class="nav" role="navigation" aria-label="メインナビゲーション">
+        <a href="/shion.html">神殿へ</a>
+        <a href="/philosophy.html">思想を読む</a>
+        <a href="/about.html">詩韻とは</a>
+      </nav>
+      <!-- 右端ミニ固定ボタン（常時CV導線） -->
+      <a class="mini-cta cta-link" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" data-cta="header-line" aria-label="個人鑑定へ">
+        鑑定
+      </a>
+    </div>
+  </header>
+  <div class="header-spacer" aria-hidden="true"></div>
 
-/* ===========================
-   Temple Poetic Hero (静寂×神聖)
-   =========================== */
+  <!-- 背景（神殿×神秘） -->
+  <div class="temple-bg" aria-hidden="true">
+    <div class="temple-orb"></div>
+    <div class="grid-lines"></div>
+    <div class="stardust"></div>
+  </div>
 
-:root{
-  --t-bg: #0b0b1a;
-  --t-ink: #eef1ff;
-  --t-muted: #a7b1d6;
-  --t-gold: #FFD76F;
-  --t-gold-soft: #FFF2C1;
-  --t-amethyst: #7c62ff;
-  --t-lav: #9c7cc9;
-  --t-r: 16px;
-}
-@media (color-gamut: p3){
-  :root{ --t-gold: color(display-p3 1 0.84 0.45) }
-}
+  <!-- ===== ヒーロー ===== -->
+  <section class="hero" id="hero">
+    <div class="hero__inner">
+      <h1 class="hero__title">言葉で魂を救う<span class="hero__code">Code</span></h1>
+      <p class="hero__subtitle">
+        占い × 思想。<br>
+        詩（Poem）・韻（Rhythm）・祈（Prayer）で、あなたの“今”を言葉で照らす。
+      </p>
+      <p class="hero__poem">恋も、仕事も、運命も。―― 大丈夫だよ。</p>
 
-.hero-temple{
-  position: relative;
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  isolation: isolate;
-  background: var(--t-bg);
-  overflow: clip;
-}
-.hero-temple__inner{
-  position: relative;
-  z-index: 2;
-  width: min(1080px, 92vw);
-  margin-inline: auto;
-  padding: clamp(18px, 5vw, 40px) 0;
-  text-align: center;
-  color: var(--t-ink);
-}
+      <p class="hero__note">無料で体験できます｜所要1分</p>
+      <button id="startRitualBtn" class="btn-primary" type="button" aria-label="星詠リチュアルを始める">
+        はじめる（星詠リチュアル）
+      </button>
+      <p class="start-time" id="startTime" aria-live="polite"></p>
 
-/* === 背景：静かな神殿演出 === */
-.t-bg{ position: absolute; inset: 0; pointer-events: none; z-index: 0 }
-.t-bg__halo{
-  background:
-    radial-gradient(60vmin 60vmin at 50% 38%, rgba(255,215,111,.24), transparent 60%),
-    radial-gradient(90vmin 40vmin at 50% 110%, rgba(124,98,255,.18), transparent 70%);
-  filter: blur(6px);
-  animation: halo-breathe 6s ease-in-out infinite;
-}
-.t-bg__pillars{
-  /* 柱＝神殿の雰囲気（細い縦グラデ） */
-  mask: linear-gradient(180deg, #000 25%, transparent 95%);
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,.045) 0 1px,
-      transparent 1px 64px
-    );
-  opacity: .22;
-}
-.t-bg__dust{
-  background:
-    radial-gradient(1.6px 1.6px at 20% 30%, #ffffffb0 0 99%, #0000 100%),
-    radial-gradient(1.4px 1.4px at 78% 68%, #ffffff99 0 99%, #0000 100%),
-    radial-gradient(1.2px 1.2px at 62% 18%, #ffffff80 0 99%, #0000 100%);
-  opacity: .33;
-  animation: dust-drift 70s linear infinite;
-}
-@keyframes halo-breathe { 50% { transform: scale(1.04); filter: blur(8px) } }
-@keyframes dust-drift    { to { background-position: -1600px 1200px, 1200px -1000px, -1000px -800px } }
+      <!-- 安心バッジ（収益化導線の補強） -->
+      <ul class="trust-badges" aria-label="安心ポイント">
+        <li>初回4,000円</li>
+        <li>24時間以内に一次返信</li>
+        <li>匿名OK</li>
+      </ul>
+    </div>
 
-/* === タイトル === */
-.t-title{
-  font-family: "Cormorant Garamond", serif;
-  line-height: 1.18;
-  margin: 0 auto .8rem;
-  max-width: 900px;
-  letter-spacing: .06em;
-}
-.t-title__lead{
-  display: block;
-  font-size: clamp(20px, 3.4vw, 28px);
-  color: #e9edff;
-  opacity: .95;
-  text-shadow: 0 0 24px rgba(124,98,255,.26);
-}
-.t-title__core{
-  display: block;
-  font-size: clamp(30px, 7vw, 60px);
-  background: linear-gradient(92deg, var(--t-gold-soft), var(--t-gold) 38%, #EEC35A 58%, var(--t-gold) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  text-shadow: 0 2px 22px rgba(255,215,111,.45), 0 0 60px rgba(124,98,255,.22);
-  -webkit-text-stroke: .35px rgba(10,8,20,.35);
-}
-.t-title em{ font-style: normal; text-shadow: 0 0 30px rgba(255,240,200,.25) }
+    <!-- BGM（タップ起動/iOS対応） -->
+    <audio id="bgm" src="assets/sound/temple-ambient.mp3" preload="auto" loop playsinline></audio>
+  </section>
 
-/* === サブ & 短い詩 === */
-.t-sub{
-  margin: .8rem auto .4rem;
-  max-width: 760px;
-  color: var(--t-ink);
-  opacity: .98;
-  line-height: 1.9;
-  letter-spacing: .04em;
-  text-shadow: 0 0 10px rgba(20,24,44,.35);
-}
-.t-sub .t-em{
-  background: linear-gradient(92deg, #e6dcff, #fff);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.t-poem{
-  margin: 0 auto 1.1rem;
-  max-width: 640px;
-  color: #e7eaff;
-  letter-spacing: .06em;
-  opacity: .95;
-  text-shadow: 0 0 10px rgba(130,140,255,.25);
-}
+  <!-- レビュー帯（信頼の一撃） -->
+  <section class="social-proof" aria-label="実績">
+    <div class="proof__inner">
+      <span class="stars" aria-hidden="true">★★★★★</span>
+      <span class="proof__text">
+        相談満足度 <strong>4.9</strong>｜総レビュー <strong>128件</strong>｜リピーター多数
+      </span>
+    </div>
+  </section>
 
-/* === CTA群 === */
-.t-ctas{
-  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-  margin: 16px 0 8px;
-}
-.t-btn{
-  position: relative;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 14px 22px;
-  border-radius: var(--t-r);
-  text-decoration: none; cursor: pointer;
-  font-weight: 800; letter-spacing: .03em;
-  transition: transform .15s ease, filter .2s ease;
-  will-change: transform, filter;
-}
-.t-btn:focus-visible{ outline: 2px solid var(--t-gold); outline-offset: 3px }
+  <!-- ===== 儀式 → 本編へ ===== -->
+  <section id="ritual" class="ritual hidden" aria-live="polite" aria-atomic="true">
+    <div class="ritual__glow" aria-hidden="true"></div>
+    <p class="ritual__line">星の声が、あなたの言葉に触れる。</p>
+    <p class="ritual__line">息を整えて――目を閉じ、一度だけ願いを呼ぶ。</p>
+    <p class="ritual__line">いま、展く。詩・韻・祈。</p>
+  </section>
 
-.t-btn--primary{
-  color: #2a2136;
-  background: linear-gradient(92deg, #FFF2C1 0%, var(--t-gold) 28%, #FFC944 62%, var(--t-gold) 100%);
-  box-shadow: 0 16px 40px rgba(255,215,111,.42), inset 0 0 12px rgba(255,240,200,.35);
-  border: 1px solid rgba(255,215,111,.55);
-  animation: breathe 1.9s ease-in-out infinite;
-}
-.t-btn--ghost{
-  color: #e9e6ff;
-  background: rgba(174,138,255,.10);
-  border: 1px solid rgba(174,138,255,.35);
-  box-shadow: inset 0 0 10px rgba(174,138,255,.08);
-}
-.t-btn small{ display:block; font-size:.85rem; opacity:.9; margin-top:4px }
-.t-btn:hover{ transform: translateY(-1px); filter: saturate(1.05) }
-@keyframes breathe { 50% { box-shadow: 0 20px 44px rgba(255,215,111,.50), inset 0 0 16px rgba(255,240,200,.45) } }
+  <!-- ===== タロット本編 ===== -->
+  <main id="main" class="main hidden" aria-labelledby="readingTitle">
+    <!-- まずは三枚へ（いきなり9行へ飛ばない） -->
+    <section class="spread" aria-label="タロット展開">
+      <h2 id="readingTitle" class="section__title">詩・韻・祈 の三枚展開</h2>
 
-/* === 信頼ラベル === */
-.t-trust{
-  margin: 12px auto 0; padding: 0; list-style: none;
-  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; max-width: 900px;
-}
-.t-trust li{
-  padding: 8px 12px; border-radius: 999px;
-  background: rgba(255,215,111,.12);
-  border: 1px solid rgba(255,215,111,.35);
-  color: #ffe8b3; font-weight: 700; letter-spacing: .04em;
-}
+      <div class="spread__labels" aria-hidden="true">
+        <div class="label">詩</div>
+        <div class="label">韻</div>
+        <div class="label">祈</div>
+      </div>
 
-/* モーション配慮 */
-@media (prefers-reduced-motion: reduce){
-  .t-bg__halo, .t-bg__dust, .t-btn--primary{ animation: none }
-}
+      <div class="spread__cards">
+        <div class="card" data-idx="0" aria-label="詩のカード">
+          <div class="card__inner">
+            <div class="card__face card__back"></div>
+            <div class="card__face card__front" id="card0" role="img" aria-label="詩のカード 表面画像"></div>
+          </div>
+        </div>
+        <div class="card" data-idx="1" aria-label="韻のカード">
+          <div class="card__inner">
+            <div class="card__face card__back"></div>
+            <div class="card__face card__front" id="card1" role="img" aria-label="韻のカード 表面画像"></div>
+          </div>
+        </div>
+        <div class="card" data-idx="2" aria-label="祈のカード">
+          <div class="card__inner">
+            <div class="card__face card__back"></div>
+            <div class="card__face card__front" id="card2" role="img" aria-label="祈のカード 表面画像"></div>
+          </div>
+        </div>
+      </div>
 
-/* ===========================
-   Temple Steps (3段階導線)
-   =========================== */
-.steps-temple{
-  position: relative;
-  z-index: 2;
-  background: radial-gradient(120vmin 80vmin at 50% 10%, rgba(255,215,111,.08), transparent 80%),
-              linear-gradient(180deg, #0b0b1a 0%, #0b0b1a 85%, #080814 100%);
-  color: var(--t-ink);
-  text-align: center;
-  padding: clamp(60px, 10vw, 120px) min(5vw, 40px);
-  border-top: 1px solid rgba(255,215,111,.08);
-}
+      <div class="tap-hint" id="tapHint"><div class="tap-hint__pill">カードを順にタップ</div></div>
+      <div class="peel" id="peel" aria-hidden="true"></div>
+    </section>
 
-.steps-title{
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(28px, 6vw, 44px);
-  background: linear-gradient(90deg, var(--t-gold-soft), var(--t-gold));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  margin: 0 0 12px;
-  text-shadow: 0 0 18px rgba(255,215,111,.25);
-}
+    <!-- 説明（読みやすく段落化） -->
+    <section class="about section">
+      <h3 class="section__title">詩韻祈（しおんき）とは？</h3>
+      <p class="about__text">
+        あなたの魂がいま必要としている言葉を、<strong>三つの層</strong>で受け取る短詩リーディングです。<br>
+        <strong>詩＝核</strong>／<strong>韻＝運び</strong>／<strong>祈＝帰路</strong>。<br>
+        各カードは<strong>二行の詩</strong>として現れ、のちに<strong>九行の総合詩</strong>へと結ばれます。
+      </p>
+    </section>
 
-.steps-lead{
-  font-size: clamp(16px, 3vw, 20px);
-  color: var(--t-muted);
-  margin-bottom: 36px;
-  letter-spacing: .05em;
-}
+    <!-- 2行×3枚 -->
+    <section class="reading section" id="reading">
+      <h3 class="section__title">詩・韻・祈 のリーディング</h3>
+      <div class="reading__grid">
+        <article class="reading__item">
+          <div class="reading__head">詩（Poem）</div>
+          <div class="reading__body" id="body0">カードを開くと、ここに“詩”が現れます。</div>
+        </article>
+        <article class="reading__item">
+          <div class="reading__head">韻（Rhythm）</div>
+          <div class="reading__body" id="body1">カードを開くと、ここに“韻”が現れます。</div>
+        </article>
+        <article class="reading__item">
+          <div class="reading__head">祈（Prayer）</div>
+          <div class="reading__body" id="body2">カードを開くと、ここに“祈”が現れます。</div>
+        </article>
+      </div>
 
-.steps-grid{
-  display: grid;
-  gap: 28px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  justify-content: center;
-  max-width: 960px;
-  margin: 0 auto 50px;
-}
+      <!-- 3枚めくり終わったら、ここに“次へ”を表示して九行へ誘導 -->
+      <div id="toSummaryWrap" class="to-summary hidden" aria-hidden="true">
+        <button id="toSummaryBtn" class="btn-next" type="button" aria-label="総合詩へ進む">総合詩へ進む（九行）</button>
+      </div>
+    </section>
 
-.step{
-  background: rgba(255,255,255,.02);
-  border: 1px solid rgba(255,215,111,.15);
-  border-radius: 18px;
-  padding: 28px 22px 36px;
-  box-shadow: inset 0 0 20px rgba(255,215,111,.05);
-  transition: transform .25s ease, box-shadow .3s ease;
-}
-.step:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 6px 22px rgba(255,215,111,.1), inset 0 0 25px rgba(255,240,200,.08);
-}
+    <!-- 総合9行詩（明示操作で到達） -->
+    <section class="summary section" id="summary">
+      <h3 class="section__title">総合結果 ― つまり、こういうこと。</h3>
+      <div class="summary__poem" id="summaryPoem">
+        カードをすべて開いて「総合詩へ進む」を押すと、ここに九行のメッセージが現れます。
+      </div>
+      <p class="closing-line">大丈夫だよ。言葉は、あなたの光だから。</p>
+    </section>
 
-.step-num{
-  font-size: 26px;
-  color: var(--t-gold);
-  font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: .1em;
-}
-.step-head{
-  font-size: 20px;
-  margin: 4px 0 10px;
-  color: var(--t-gold-soft);
-  font-weight: 700;
-}
-.step-body{
-  color: var(--t-ink);
-  opacity: .9;
-  line-height: 1.7;
-  font-size: 15px;
-  letter-spacing: .04em;
-}
+    <!-- ★ 次の一歩（CTAタブ：個人鑑定を最優先） -->
+    <section class="next-steps section" id="nextSteps" aria-live="polite" aria-atomic="true">
+      <h3 class="section__title">次の一歩 ― 扉は三つ。</h3>
+      <p class="next-steps__lead">
+        いま開いた言葉を、<strong>どう進めるか</strong>を選べます。<br>
+        おすすめは <strong>「導きを直接受け取る（LINE）」</strong> です。
+      </p>
 
-.steps-cta{
-  display: flex;
-  justify-content: center;
-}
-.steps-cta .t-btn--primary{
-  font-size: 1.05rem;
-  padding: 16px 30px;
-}
-/* === 占い結果表示 === */
-.reading-temple{
-  background:#0b0b1a;
-  color:#fff;
-  text-align:center;
-  padding:80px 20px;
-  border-top:1px solid rgba(255,215,111,.1);
-}
-.reading-temple h2{
-  font-size:clamp(28px,6vw,44px);
-  background:linear-gradient(90deg,#FFF2C1,#FFD76F);
-  -webkit-background-clip:text;
-  color:transparent;
-  margin-bottom:12px;
-}
-.reading-poem{
-  color:#ddd;
-  opacity:.9;
-  letter-spacing:.05em;
-  margin-bottom:32px;
-}
+      <!-- メイン：金色の巨大タブ -->
+      <nav class="cta-tabs" aria-label="次の一歩">
+        <a class="cta-primary cta-link"
+           href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener"
+           data-cta="line-primary" aria-label="個人鑑定を申し込む（初回4000円）">
+          <span class="cta-primary__title">💫 個人鑑定を申し込む</span>
+          <span class="cta-primary__sub">初回4,000円｜1対1で今の状況に合わせてお届け</span>
+        </a>
 
-/* === 収益化導線 === */
-.cta-temple{
-  background:linear-gradient(180deg,#0b0b1a 0%,#131025 100%);
-  color:#fff;
-  text-align:center;
-  padding:100px 20px;
-  border-top:1px solid rgba(255,215,111,.1);
-}
-.cta-title{
-  font-family:"Cormorant Garamond",serif;
-  font-size:clamp(26px,5vw,38px);
-  background:linear-gradient(90deg,var(--t-gold-soft),var(--t-gold));
-  -webkit-background-clip:text;
-  color:transparent;
-  margin-bottom:12px;
-}
-.cta-lead{
-  max-width:680px;
-  margin:0 auto 38px;
-  color:#e9e6ff;
-  opacity:.92;
-  line-height:1.9;
-}
-.cta-buttons{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:12px;
-  margin-bottom:24px;
-}
+        <!-- 下段：2列タブ（SPは1列） -->
+        <div class="cta-list">
+          <a class="cta-card cta-link" href="#" id="retry" data-cta="retry" aria-label="もう一度占う">
+            <span class="cta-card__title">🌌 もう一度占う</span>
+            <span class="cta-card__sub">シャッフルからやり直す</span>
+          </a>
+          <a class="cta-card cta-link" href="shion.html" data-cta="temple" aria-label="詩韻の神殿へ進む">
+            <span class="cta-card__title">🌕 神殿へ進む</span>
+            <span class="cta-card__sub">世界観と演出を体験</span>
+          </a>
+          <a class="cta-card cta-link" href="philosophy.html" data-cta="philosophy" aria-label="結果の真意を読む">
+            <span class="cta-card__title">🌙 思想を読む</span>
+            <span class="cta-card__sub">結果の“意味”を深く知る</span>
+          </a>
+          <a class="cta-card cta-link" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" data-cta="line-sub" aria-label="LINEで相談する">
+            <span class="cta-card__title">💚 LINEで相談</span>
+            <span class="cta-card__sub">無料で質問→個別フォロー</span>
+          </a>
+        </div>
+      </nav>
+    </section>
+  </main>
 
-/* === 終章（フッター） === */
-.temple-footer{
-  background:#080814;
-  color:#aaa;
-  text-align:center;
-  padding:60px 20px;
-  border-top:1px solid rgba(255,215,111,.08);
-  font-size:.95rem;
-}
-.temple-footer p:first-child{ color:#ffeaa8; font-weight:600; }
-.temple-footer small{
-  display:block;
-  margin-top:20px;
-  color:#666;
-  font-size:.85rem;
-}
+  <!-- クリック演出オーバーレイ -->
+  <div class="fade-overlay" id="fadeOverlay" aria-hidden="true"></div>
+
+  <!-- 効果音 -->
+  <audio id="flipSe" src="https://freesound.org/data/previews/351/351408_5665338-lq.mp3" preload="auto"></audio>
+
+  <script>
+  // ====== Audio Boot ======
+  const bgm = document.getElementById('bgm');
+  function kickBgm(){
+    try { bgm.volume = 0.55; const p = bgm.play(); if (p && p.catch) p.catch(()=>{}); } catch(e){}
+  }
+
+  // ====== Tarot Data ======
+  const deck = [
+    { name:'The Fool', idx:0, two:['最初の一歩は、恐れよりも軽い風。','失敗は合図――世界は君に開く。'], kw:'始まり' },
+    { name:'The Magician', idx:1, two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。'], kw:'創造' },
+    { name:'The High Priestess', idx:2, two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。'], kw:'直観' },
+    { name:'The Empress', idx:3, two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。'], kw:'豊穣' },
+    { name:'The Emperor', idx:4, two:['迷いは構造で解ける。','境界線は、君を守る城。'], kw:'秩序' },
+    { name:'The Hierophant', idx:5, two:['伝統は檻ではなく、梯子。','学びは自由の準備運動。'], kw:'教え' },
+    { name:'The Lovers', idx:6, two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。'], kw:'選択' },
+    { name:'The Chariot', idx:7, two:['向かう先が速さを決める。','手綱は心、進路は意志。'], kw:'前進' },
+    { name:'Strength', idx:8, two:['優しい力は、世界を従わせない。','それでも、世界は従う。'], kw:'内なる力' },
+    { name:'The Hermit', idx:9, two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。'], kw:'探求' },
+    { name:'Wheel of Fortune', idx:10, two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。'], kw:'転機' },
+    { name:'Justice', idx:11, two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。'], kw:'均衡' },
+    { name:'The Hanged Man', idx:12, two:['世界を逆さにして、はじめて見える。','止まることが、進むことになる日もある。'], kw:'視点転換' },
+    { name:'Death', idx:13, two:['終わりは、名前の違う始まり。','脱皮の痛みは、生きている証。'], kw:'変容' },
+    { name:'Temperance', idx:14, two:['混ぜる、待つ、整える。','その中間に、答えは棲む。'], kw:'調和' },
+    { name:'The Devil', idx:15, two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。'], kw:'解放' },
+    { name:'The Tower', idx:16, two:['壊れるのは、壊すべきもの。','空いた隙間が、光の通り道。'], kw:'覚醒' },
+    { name:'The Star', idx:17, two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。'], kw:'希望' },
+    { name:'The Moon', idx:18, two:['不安は、想像力の副作用。','曙は、必ず来る。'], kw:'曙光' },
+    { name:'The Sun', idx:19, two:['喜びは戦略になる。','笑顔は、未来の先行投資。'], kw:'成功' },
+    { name:'Judgement', idx:20, two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。'], kw:'再生' },
+    { name:'The World', idx:21, two:['輪は閉じて、道は開く。','完成形は、次のスタートライン。'], kw:'成就' }
+  ];
+
+  // ====== Elements ======
+  const startBtn  = document.getElementById('startRitualBtn');
+  const startTimeEl = document.getElementById('startTime');
+  const ritualSec = document.getElementById('ritual');
+  const mainSec   = document.getElementById('main');
+  const peel      = document.getElementById('peel');
+  const tapHint   = document.getElementById('tapHint');
+  const readingEl = document.getElementById('reading');
+  const toSummaryWrap = document.getElementById('toSummaryWrap');
+  const toSummaryBtn  = document.getElementById('toSummaryBtn');
+  const summaryPoem = document.getElementById('summaryPoem');
+  const retryBtn  = document.getElementById('retry');
+  const flipSe    = document.getElementById('flipSe');
+  const cardEls   = document.querySelectorAll('.card');
+  const fronts    = [document.getElementById('card0'), document.getElementById('card1'), document.getElementById('card2')];
+  const bodies    = [document.getElementById('body0'), document.getElementById('body1'), document.getElementById('body2')];
+  const nextSteps = document.getElementById('nextSteps');
+  const overlay   = document.getElementById('fadeOverlay');
+
+  // ====== State ======
+  let selected = [];
+  let opened = 0;
+
+  function drawThree(){
+    const pool = [...deck];
+    const picks = [];
+    for(let i=0;i<3;i++){
+      const r = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
+      picks.push(pool.splice(r,1)[0]);
+    }
+    return picks;
+  }
+
+  function resetView(){
+    opened = 0;
+    bodies[0].textContent = 'カードを開くと、ここに“詩”が現れます。';
+    bodies[1].textContent = 'カードを開くと、ここに“韻”が現れます。';
+    bodies[2].textContent = 'カードを開くと、ここに“祈”が現れます。';
+    readingEl.classList.remove('is-active');
+    summaryPoem.textContent = 'カードをすべて開いて「総合詩へ進む」を押すと、ここに九行のメッセージが現れます。';
+    tapHint.style.opacity = 1;
+    nextSteps.classList.remove('is-on');
+    toSummaryWrap.classList.add('hidden');
+    cardEls.forEach((el,i)=>{
+      el.classList.remove('is-flipped');
+      el.style.pointerEvents = 'auto';
+      fronts[i].style.backgroundImage = 'var(--front' + i + ')';
+    });
+  }
+
+  function beginReading(){
+    selected = drawThree();
+    resetView();
+  }
+
+  function beginRitual(){
+    kickBgm();
+    const now = new Date();
+    const jst = new Intl.DateTimeFormat('ja-JP', { timeZone:'Asia/Tokyo', hour:'2-digit', minute:'2-digit', year:'numeric', month:'2-digit', day:'2-digit' }).format(now);
+    startTimeEl.textContent = `星が動き出した時間：${jst}`;
+    startTimeEl.classList.add('is-on');
+
+    ritualSec.classList.remove('hidden');
+    setTimeout(()=>{
+      ritualSec.classList.add('hidden');
+      mainSec.classList.remove('hidden');
+      peel.classList.add('is-run');
+      peel.addEventListener('animationend', ()=> peel.classList.remove('is-run'), {once:true});
+      beginReading();
+      document.querySelector('.spread').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 1200);
+  }
+
+  function twoLineText(card){
+    return `<span class="line">${card.two[0]}</span><br><span class="line">${card.two[1]}</span>`;
+  }
+
+  function buildSummaryPoem(sel){
+    const keys = sel.map(c => c.kw);
+    const names = sel.map(c => c.name.replace('The ',''));
+    const lines = [
+      `きみが扉を叩いた瞬間、時間は「味方」に変わった。`,
+      `三つの言葉が、同じ方向を指している。`,
+      `「${names[0]}」は告げる――${keys[0]}は、心の中心に種を置くこと。`,
+      `「${names[1]}」は進めという――${keys[1]}は、迷いを動詞に変えること。`,
+      `「${names[2]}」は還れという――${keys[2]}は、光へ戻る手順のこと。`,
+      `だから焦らなくていい。速さより、整いを選べばいい。`,
+      `君の手の温度が、現実の速度を決めていく。`,
+      `結論はやさしい――いまの君で、はじめればいい。`,
+      `大丈夫だよ。言葉は、必ず君を連れていく。`
+    ];
+    return lines.map(l => `<p>${l}</p>`).join('');
+  }
+
+  function onFlip(idx){
+    const cardEl = cardEls[idx];
+    if(cardEl.classList.contains('is-flipped') || opened>=3) return;
+
+    try { flipSe.currentTime = 0; flipSe.play(); } catch(e){}
+
+    const data = selected[idx];
+    cardEl.classList.add('is-flipped');
+    opened++;
+
+    const label = ['【詩】','【韻】','【祈】'][idx];
+    bodies[idx].innerHTML = `<strong>${label}</strong> 《${data.name}》<br>${twoLineText(data)}`;
+
+    if(opened===3){
+      tapHint.style.opacity = 0;
+      cardEls.forEach(c=> c.style.pointerEvents='none');
+      readingEl.classList.add('is-active');
+      // すぐに九行へは飛ばさず、ボタンを出す
+      toSummaryWrap.classList.remove('hidden');
+      toSummaryWrap.setAttribute('aria-hidden','false');
+      // CTAセクションは九行の後にフェードイン
+    }
+  }
+
+  function onToSummary(){
+    summaryPoem.innerHTML = buildSummaryPoem(selected);
+    document.getElementById('summary').scrollIntoView({behavior:'smooth', block:'start'});
+    // 次の一歩をフェードイン
+    requestAnimationFrame(()=>{
+      nextSteps.classList.add('is-on');
+    });
+  }
+
+  function onRetry(e){
+    e.preventDefault();
+    startTimeEl.textContent = '';
+    startTimeEl.classList.remove('is-on');
+    document.getElementById('hero').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>{ beginReading(); }, 500);
+  }
+
+  // ====== CTA：光フェード＆計測 ======
+  function trackCTA(label){
+    if(typeof gtag !== 'undefined'){
+      gtag('event', 'click', {event_category:'CTA', event_label:label, value:1});
+    }
+    window.dispatchEvent(new CustomEvent('cta_click', { detail:{ label } }));
+  }
+  function glowAndGo(e){
+    const el = e.currentTarget;
+    const label = el.getAttribute('data-cta') || 'unknown';
+    document.getElementById('fadeOverlay').classList.add('active');
+    trackCTA(label);
+    setTimeout(()=> document.getElementById('fadeOverlay').classList.remove('active'), 800);
+  }
+
+  // ====== Bindings ======
+  window.addEventListener('load', ()=>{
+    cardEls.forEach((el)=> el.addEventListener('click', ()=> onFlip(Number(el.dataset.idx)), {passive:true}));
+    startBtn.addEventListener('click', beginRitual, {passive:true});
+    document.getElementById('toSummaryBtn').addEventListener('click', onToSummary, false);
+    document.getElementById('retry').addEventListener('click', onRetry, false);
+    document.querySelectorAll('.cta-link, .mini-cta').forEach(btn=>{
+      btn.addEventListener('click', glowAndGo, false);
+    });
+  });
+
+  // iOS保険（初回タップでBGM起動）
+  window.addEventListener('touchstart', function once(){
+    kickBgm();
+    window.removeEventListener('touchstart', once, {passive:true});
+  }, {passive:true, once:true});
+  </script>
+</body>
+</html>
