@@ -1,6 +1,6 @@
 /* =========================
-   詩韻 Shion — Tarot (詩・韻・祈)
-   CV最適化版（安心バッジ＋レビュー帯＋固定ミニCTA）
+   詩韻 Shion — Tarot（詩・韻・祈）
+   CV最適化版：視認性・可読性・離脱防止
    ========================= */
 
 /* リセット＋横ズレ防止 */
@@ -8,11 +8,12 @@
 html,body{height:100%}
 html{overflow-x:hidden}
 body{
-  overflow-x:hidden; /* 横スクロール禁止 */
+  overflow-x:hidden;
   font-family:'Noto Serif JP',serif;
   color:#eef1ff;
   background:#0b0b1a;
-  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
 
 /* ルート変数 */
@@ -28,7 +29,8 @@ body{
   --r:14px;
 
   /* カード裏面（差し替えOK） */
-  --card-back-url: url("back.png");
+  /* 例：/assets/tarot/back.png を置く */
+  --card-back-url: url("/assets/tarot/back.png");
 
   /* プレースホルダ表面（後で画像URLに差替え） */
   --front0: linear-gradient(135deg,#ffe8b3,#caa8ff);
@@ -289,6 +291,18 @@ body{
 .summary__poem p{ margin:0 0 .5rem }
 .closing-line{ margin:18px 0 8px; color:#ffe8b3; opacity:.92; letter-spacing:.08em }
 
+/* しおぽん誘導 */
+.shiopon__wrap{
+  display:grid; grid-template-columns: 92px 1fr; gap:14px; align-items:center;
+  background: rgba(174,138,255,.07);
+  border:1px solid rgba(174,138,255,.25);
+  border-radius:14px; padding:14px;
+}
+.shiopon__img{ width:92px; height:92px; object-fit:contain; filter: drop-shadow(0 6px 18px rgba(0,0,0,.35)) }
+.shiopon__bubble{ display:flex; flex-direction:column; gap:10px }
+.shiopon__lead{ color:#e9e6ff }
+.link-underline{ background:none; border:none; color:#cfe2ff; text-decoration:underline; cursor:pointer; align-self:flex-start }
+
 /* 次の一歩（CTAタブ） */
 .next-steps{}
 .next-steps__lead{
@@ -359,6 +373,64 @@ body{
 /* CTAクリック演出 */
 .fade-overlay{ position:fixed; inset:0; background: radial-gradient(circle at center, rgba(255,255,255,0.92), rgba(255,255,255,0) 80%); opacity:0; pointer-events:none; z-index:9999; transition: opacity .8s ease }
 .fade-overlay.active{ opacity:1 }
+
+/* Q&A（アコーディオン） */
+.accordion{ display:grid; gap:10px }
+.acc__head{
+  width:100%; text-align:left; padding:12px 14px; border-radius:12px;
+  background:rgba(0,0,0,.35); color:#e9e6ff; border:1px solid rgba(255,255,255,.12);
+  cursor:pointer; font-weight:700; letter-spacing:.02em;
+}
+.acc__head[aria-expanded="true"]{ border-color: rgba(174,138,255,.45) }
+.acc__panel{
+  overflow:hidden; max-height:0; transition:max-height .25s ease;
+  background:rgba(174,138,255,.07); border:1px solid rgba(174,138,255,.25);
+  border-radius:12px; padding:0 14px; color:#e9e6ff;
+}
+.acc__panel p{ margin:10px 0; line-height:1.9 }
+
+/* しおぽんモーダル */
+.modal{
+  border:0; padding:0; background:transparent;
+}
+.modal::backdrop{
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(2px);
+}
+.modal__card{
+  width:min(92vw,560px); margin:auto; border-radius:16px; padding:18px;
+  background: linear-gradient(180deg,#141225,#0c0a18);
+  border:1px solid rgba(255,255,255,.12);
+  color:#eef1ff;
+}
+.modal__card h3{ font-size:1.1rem; color:var(--gold); margin-bottom:8px }
+.modal__list{ margin:8px 0 14px 18px }
+.modal__list li{ margin:.25rem 0 }
+.modal__cta{ display:flex; gap:10px; justify-content:flex-end }
+.btn-line{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 14px; border-radius:999px; text-decoration:none; font-weight:800;
+  background:#00c300; color:#0b0b1a;
+}
+.btn-ghost{
+  padding:10px 14px; border-radius:999px; background:transparent; color:#e9e6ff; border:1px solid rgba(255,255,255,.18); cursor:pointer;
+}
+
+/* 下部固定バー（離脱防止） */
+.sticky-bar{
+  position:sticky; bottom:0; z-index:998;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:10px 14px; background: rgba(8,10,18,.88);
+  border-top:1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+}
+.sticky-bar__txt{ font-weight:700; letter-spacing:.02em; color:#e9edff }
+.sticky-bar__btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:8px 14px; border-radius:999px; text-decoration:none; font-weight:800;
+  color:#2a2136; background:linear-gradient(90deg,#FFD76F,#FFC944 70%);
+  border:1px solid rgba(255,215,111,.5);
+}
 
 /* 可読性（本文） */
 p{ line-height:1.95 }
