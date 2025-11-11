@@ -236,3 +236,38 @@ body::before{
 @media (prefers-reduced-motion: reduce){
   .codeRain{ display:none }
 }
+/* ===== Code Rain（両サイド限定・本文に被らない版） ===== */
+/* サイド幅をさらに細く。小画面では自動的に非表示 */
+:root{ --sidew: clamp(80px, 16vw, 180px) }
+
+.codeRain{
+  position: fixed; top: 0; height: 100svh; width: var(--sidew);
+  z-index: 1; pointer-events: none; opacity: .28;   /* 全体をさらに控えめに */
+  /* 上下も薄く：テキスト帯に被りづらくする */
+  mask:
+    linear-gradient(180deg, #000 18%, transparent 96%),
+    linear-gradient(180deg, #000 0%, #000 100%); /* 2枚で古いブラウザ保険 */
+  mix-blend-mode: screen;
+}
+
+/* 内側エッジでスッと消える（本文とかぶらない） */
+.codeRain--left{
+  left: 0;
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 70%, transparent 98%);
+          mask-image: linear-gradient(to right, #000 0%, #000 70%, transparent 98%);
+}
+.codeRain--right{
+  right: 0;
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 70%, transparent 98%);
+          mask-image: linear-gradient(to left, #000 0%, #000 70%, transparent 98%);
+}
+
+/* 小さめ画面では自動オフ（可読性優先） */
+@media (max-width: 980px){
+  .codeRain{ display: none }
+}
+
+/* さらに動きが苦手な人向け */
+@media (prefers-reduced-motion: reduce){
+  .codeRain{ display: none }
+}
