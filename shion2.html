@@ -255,5 +255,85 @@ document.getElementById('startMini2').addEventListener('click', startMini, {pass
   setup(L); setup(R);
 })();
 </script>
+
+  <script>
+/* ===== Code Rain（左右それぞれ・本文に被らない版） ===== */
+(function(){
+  const CHARS = '01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
+
+  function setup(canvas, side){ // side: 'L' | 'R'
+    const ctx = canvas.getContext('2d');
+    let W=0, H=0, fs=16, cols=0, drops=[], rafId=null;
+
+    function resize(){
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const cw = Math.max(72, canvas.clientWidth|0);
+      const ch = Math.max(200, innerHeight|0);
+
+      canvas.width  = cw * dpr;
+      canvas.height = ch * dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      W = cw; H = ch;
+      // サイド幅に対して控えめのサイズ＆列数
+      fs   = Math.max(12, Math.min(18, Math.floor(W / 14)));
+      cols = Math.max(6, Math.floor(W / fs));
+      drops = new Array(cols).fill( (Math.random()*H/fs)|0 );
+      ctx.clearRect(0,0,W,H);
+    }
+
+    function draw(){
+      // 残像をさらに薄く（読みやすさ優先）
+      ctx.fillStyle = 'rgba(0,0,0,.10)';
+      ctx.fillRect(0,0,W,H);
+
+      ctx.font = `${fs}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+
+      for(let i=0;i<cols;i++){
+        // 内側エッジに近い列ほど alpha を弱く（本文に近いほど薄く）
+        const edgeRatio = i/cols; // left: 0→1, rightも後で反転
+        const distFromInner = (side === 'L') ? edgeRatio : (1 - edgeRatio);
+        const innerFade = Math.min(1, Math.max(0, distFromInner)); // 0(内側)→1(外)
+        const alpha = 0.55 * innerFade; // 内側を薄く、外側をやや濃く
+
+        ctx.fillStyle = `rgba(127,208,255,${alpha.toFixed(3)})`;
+
+        const ch = CHARS[(Math.random()*CHARS.length)|0];
+        const x = i*fs + (Math.random()<.03 ? 1 : 0);
+        const y = drops[i]*fs*0.9;
+        ctx.fillText(ch, x, y);
+
+        if(y > H && Math.random() > .978) drops[i] = 0;
+        drops[i]++;
+      }
+      rafId = requestAnimationFrame(draw);
+    }
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+    addEventListener('resize', resize, {passive:true});
+
+    // 初期起動
+    resize();
+    draw();
+
+    // モーション配慮
+    const mq = matchMedia('(prefers-reduced-motion: reduce)');
+    function onMotion(pref){
+      if(pref.matches){ cancelAnimationFrame(rafId); ctx.clearRect(0,0,W,H); }
+      else { draw(); }
+    }
+    mq.addEventListener?.('change', onMotion);
+    onMotion(mq);
+
+    return { stop:()=> cancelAnimationFrame(rafId) };
+  }
+
+  const L = document.getElementById('codeRainL');
+  const R = document.getElementById('codeRainR');
+  if(L) setup(L, 'L');
+  if(R) setup(R, 'R');
+})();
+</script>
 </body>
 </html>
