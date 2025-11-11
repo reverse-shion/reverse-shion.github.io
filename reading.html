@@ -162,9 +162,31 @@
     @media (prefers-reduced-motion:reduce){
       .card__inner,.block h2,.poem li,.actions{ transition:none !important; animation:none !important }
     }
+    /* ===== 全画面フラッシュ（発光→自然消灯） ===== */
+.flashlayer{
+  position:fixed; inset:0; z-index:60; pointer-events:none; opacity:0;
+  mix-blend-mode:screen;
+  background:
+    radial-gradient(52vmax 38vmax at 50% 44%,
+      rgba(255,248,220,.95) 0%,
+      rgba(255,255,255,.92) 22%,
+      rgba(255,242,190,.70) 44%,
+      rgba(255,255,255,.0) 68%),
+    linear-gradient(180deg, rgba(255,240,200,.85), rgba(255,255,255,0) 60%);
+  filter: blur(.3px);
+}
+.flashlayer.is-on{ animation: templeFlash 900ms ease-out both; }
+@keyframes templeFlash{
+  0%   { opacity:0 }
+  18%  { opacity:1 }
+  55%  { opacity:.88 }
+  100% { opacity:0 }
+}
   </style>
 </head>
 <body>
+  <!-- 全画面フラッシュ（3枚目で発光） -->
+<div class="flashlayer" aria-hidden="true"></div>
   <!-- 背景：星粒 -->
   <canvas class="stars" id="stars" aria-hidden="true"></canvas>
   <!-- コード雨の残影 -->
@@ -339,6 +361,43 @@
         setTimeout(()=>actions.classList.add('is-show'),delay+400);
       }
     })();
+    // —— タイミング定数（好みに応じて調整可能） ——
+const T_FLASH = 900;   // フラッシュ演出の長さ
+const T_SY_FADE = 900; // 「— 詩・韻・祈 —」のフェード時間
+const T_PAUSE = 600;   // タイトル後に“間”を置く時間
+const LINE_DELAY = 850; // 九行の行間ディレイ
+
+function sequence(){
+  const fl = document.querySelector('.flashlayer');
+
+  // 1) 全画面フラッシュ
+  if (fl){ fl.classList.add('is-on'); setTimeout(()=> fl.classList.remove('is-on'), T_FLASH); }
+
+  // 2) 「— 詩・韻・祈 —」を顕現させ、そこへスクロール
+  title.removeAttribute('aria-hidden');
+  title.classList.add('is-show');
+  title.scrollIntoView({ behavior:'smooth', block:'center' });
+
+  // 3) 少し“間”を置いてから、九行詩の自動再生へ移行
+  const startAt = T_FLASH + T_SY_FADE + T_PAUSE;
+  setTimeout(runPoem, startAt);
+}
+
+// 九行詩の自動再生（完了後CTAを出す）
+function runPoem(){
+  const set = POEMS[(Math.random()*POEMS.length)|0];
+  poemBox.innerHTML = '';
+  let delay = 0;
+  set.forEach(line=>{
+    const li = document.createElement('li');
+    li.textContent = line;
+    poemBox.appendChild(li);
+    setTimeout(()=> li.classList.add('is-show'), delay);
+    delay += LINE_DELAY;
+  });
+  // 最後の行が出たあとにCTA
+  setTimeout(()=> actions.classList.add('is-show'), delay + 400);
+}
   </script>
 </body>
 </html>
