@@ -5,8 +5,9 @@
   <title>星界リーディング — 詩韻祈 | 詩韻 Shion</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#faf7f0" />
-  <meta name="description" content="カードをめくると、詩（Poem）・韻（Rhythm）・祈（Prayer）が顕現し、最後に九行の“星界詩”が一行ずつ降りてきます。">
+  <meta name="description" content="カードをめくると、詩（Poem）・韻（Rhythm）・祈（Prayer）が顕現し、続いて九行の“星界詩”が一行ずつ降りてきます。" />
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -20,13 +21,12 @@
       --ink:#3a3240;
       --muted:#7a6f84;
       --gold:#d0aa42;
-      --gold-soft:#f3e2a8;
       --r:16px;
       --tarot-back-url:url("assets/tarot/back.png"); /* ←差し替え可 */
     }
-    @media (color-gamut:p3){ :root{ --gold:color(display-p3 0.82 0.72 0.3) } }
+    @media (color-gamut:p3){ :root{ --gold:color(display-p3 0.82 0.72 0.30) } }
 
-    /* 背景：境界が出ない多段グラデ＋薄ノイズ */
+    /* 背景：境界が目立たない多段グラデ＋極薄ノイズ */
     body{
       color:var(--ink);
       font-family:'Noto Serif JP',serif;
@@ -36,8 +36,8 @@
         radial-gradient(120vmax 90vmax at 50% -15%, #ffffff 0%, #fffdf6 28%, #fcf5df 52%, #faf2d3 67%, #f9f0cf 82%, transparent 96%),
         radial-gradient(110vmax 80vmax at 50% 120%, #fff9e8 0%, #fff3d4 35%, #f8ecd2 60%, #f5e9d0 78%, transparent 96%),
         var(--bg);
-      background-attachment: fixed,fixed,scroll;
-      background-blend-mode: soft-light,normal,normal;
+      background-attachment:fixed,fixed,scroll;
+      background-blend-mode:soft-light,normal,normal;
     }
     body::before{
       content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -46,7 +46,7 @@
       background-size:160px 160px;
     }
 
-    /* 星粒 */
+    /* 星粒（Canvas） */
     .stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
 
     /* コード雨の残影（PCのみ） */
@@ -120,7 +120,7 @@
     }
     @keyframes glowpop{ 0%{filter:brightness(1.1)} 60%{filter:brightness(1.35)} 100%{filter:brightness(1)} }
 
-    /* 意味ボックス（カードの下で開示） */
+    /* 2行解説（カードの直下） */
     .meanings{ position:relative; z-index:2; display:grid; gap:12px; grid-template-columns:1fr;
       max-width:1100px; margin:10px auto 4px; padding:0 16px }
     @media (min-width:760px){ .meanings{ grid-template-columns:repeat(3,1fr) } }
@@ -158,35 +158,34 @@
       color:#3a2e10; background:#fff1c7; border:1px solid rgba(208,170,66,.45); border-radius:999px; padding:10px 14px;
       box-shadow:0 8px 18px rgba(208,170,66,.22), inset 0 0 10px rgba(255,240,200,.35) }
 
+    /* 全画面フラッシュ（3枚目で発光） */
+    .flashlayer{
+      position:fixed; inset:0; z-index:60; pointer-events:none; opacity:0;
+      mix-blend-mode:screen;
+      background:
+        radial-gradient(52vmax 38vmax at 50% 44%,
+          rgba(255,248,220,.95) 0%,
+          rgba(255,255,255,.92) 22%,
+          rgba(255,242,190,.70) 44%,
+          rgba(255,255,255,0) 68%),
+        linear-gradient(180deg, rgba(255,240,200,.85), rgba(255,255,255,0) 60%);
+      filter: blur(.3px);
+    }
+    .flashlayer.is-on{ animation: templeFlash 900ms ease-out both }
+    @keyframes templeFlash{
+      0%{opacity:0} 18%{opacity:1} 55%{opacity:.88} 100%{opacity:0}
+    }
+
     /* Motion care */
     @media (prefers-reduced-motion:reduce){
       .card__inner,.block h2,.poem li,.actions{ transition:none !important; animation:none !important }
     }
-    /* ===== 全画面フラッシュ（発光→自然消灯） ===== */
-.flashlayer{
-  position:fixed; inset:0; z-index:60; pointer-events:none; opacity:0;
-  mix-blend-mode:screen;
-  background:
-    radial-gradient(52vmax 38vmax at 50% 44%,
-      rgba(255,248,220,.95) 0%,
-      rgba(255,255,255,.92) 22%,
-      rgba(255,242,190,.70) 44%,
-      rgba(255,255,255,.0) 68%),
-    linear-gradient(180deg, rgba(255,240,200,.85), rgba(255,255,255,0) 60%);
-  filter: blur(.3px);
-}
-.flashlayer.is-on{ animation: templeFlash 900ms ease-out both; }
-@keyframes templeFlash{
-  0%   { opacity:0 }
-  18%  { opacity:1 }
-  55%  { opacity:.88 }
-  100% { opacity:0 }
-}
   </style>
 </head>
 <body>
-  <!-- 全画面フラッシュ（3枚目で発光） -->
-<div class="flashlayer" aria-hidden="true"></div>
+  <!-- 全画面フラッシュ -->
+  <div class="flashlayer" aria-hidden="true"></div>
+
   <!-- 背景：星粒 -->
   <canvas class="stars" id="stars" aria-hidden="true"></canvas>
   <!-- コード雨の残影 -->
@@ -201,14 +200,14 @@
         <a href="/reading.html" aria-current="page">リーディング</a>
         <a href="/about.html">詩韻とは</a>
       </nav>
-      <a class="cta" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">鑑定へ</a>
+      <a class="cta" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener noreferrer">鑑定へ</a>
     </div>
   </header>
 
   <!-- Hero -->
   <section class="hero" aria-labelledby="t">
     <h1 id="t" class="hero__title">星界の白い間〈ま〉に、言葉が目を覚ます。</h1>
-    <p class="hero__lead">カードをめくると、まず「詩」「韻」「祈」が現れます。続いて、九行の“星界詩”が一行ずつ降りてきます。</p>
+    <p class="hero__lead">カードをめくると、まず「詩」「韻」「祈」。続いて九行の“星界詩”が一行ずつ降りてきます。</p>
   </section>
 
   <!-- Cards -->
@@ -233,7 +232,7 @@
     </div>
   </section>
 
-  <!-- 2行解説（カードの直下） -->
+  <!-- 2行解説 -->
   <section class="meanings" aria-label="詩・韻・祈の意味">
     <article class="m-item"><div class="m-head">【詩】</div><div class="m-body" id="m0">カードを開くと、ここに“詩”の2行解説が現れます。</div></article>
     <article class="m-item"><div class="m-head">【韻】</div><div class="m-body" id="m1">カードを開くと、ここに“韻”の2行解説が現れます。</div></article>
@@ -245,7 +244,7 @@
     <h2 id="sy" aria-hidden="true">— 詩・韻・祈 —</h2>
     <ol class="poem" id="poem" aria-label="星界詩"></ol>
     <div class="actions" id="actions">
-      <a class="btn" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">✨ 刹那に救われる（個人鑑定へ）</a>
+      <a class="btn" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener noreferrer">✨ 刹那に救われる（個人鑑定へ）</a>
       <a class="btn btn--ghost" href="/" aria-label="神殿トップへ戻る">🔁 もう一度占うの</a>
     </div>
   </section>
@@ -254,13 +253,13 @@
   <a class="back" href="/" aria-label="神殿トップへ">⛩ 神殿へ</a>
 
   <script>
-    /* 星粒アニメ */
+    /* ===== 背景：星粒 ===== */
     (function(){
       const cvs=document.getElementById('stars'),ctx=cvs.getContext('2d');
-      let W=0,H=0,dpr=1,stars=[];
+      let dpr=1,stars=[];
       function resize(){
         dpr=Math.min(2,window.devicePixelRatio||1);
-        W=cvs.width=innerWidth*dpr; H=cvs.height=innerHeight*dpr;
+        cvs.width=innerWidth*dpr; cvs.height=innerHeight*dpr;
         cvs.style.width=innerWidth+"px"; cvs.style.height=innerHeight+"px";
         ctx.setTransform(dpr,0,0,dpr,0,0);
         stars=new Array(Math.floor(Math.min(180,innerWidth/8))).fill().map(()=>({
@@ -281,14 +280,19 @@
       addEventListener('resize',resize,{passive:true}); resize(); draw();
     })();
 
-    /* リーディング本体：カード→2行解説→九行詩→CTA */
+    /* ===== リーディング本体：3枚→解説→フラッシュ→詩韻祈→九行→CTA ===== */
     (function(){
       const cards=[...document.querySelectorAll('.card')];
       const title=document.getElementById('sy');
       const poemBox=document.getElementById('poem');
       const actions=document.getElementById('actions');
+      const flash=document.querySelector('.flashlayer');
+
       const mBodies=[document.getElementById('m0'),document.getElementById('m1'),document.getElementById('m2')];
       const mItems=[...document.querySelectorAll('.m-item')];
+
+      // タイミング
+      const T_FLASH=900, T_SY_FADE=900, T_PAUSE=600, LINE_DELAY=850;
 
       const DECK=[
         {n:'The Fool',two:['最初の一歩は、恐れより軽い。','失敗は合図——世界は君に開く。']},
@@ -327,77 +331,64 @@
       ];
 
       function drawThree(){
-        const pool=[...DECK],picks=[];
-        for(let i=0;i<3;i++){ const r=crypto.getRandomValues(new Uint32Array(1))[0]%pool.length; picks.push(pool.splice(r,1)[0]); }
+        const pool=[...DECK], picks=[];
+        for(let i=0;i<3;i++){
+          const r=crypto.getRandomValues(new Uint32Array(1))[0]%pool.length;
+          picks.push(pool.splice(r,1)[0]);
+        }
         return picks;
       }
+
       let opened=0, selected=drawThree();
 
       function flip(i){
         const el=cards[i]; if(!el||el.classList.contains('is-flipped')) return;
         el.classList.add('is-flipped','card--glow'); setTimeout(()=>el.classList.remove('card--glow'),620);
 
-        // 各カードの2行解説
+        // 2行解説
         const d=selected[i];
         mBodies[i].innerHTML=`《${d.n}》<br>${d.two[0]}<br>${d.two[1]}`;
         mItems[i].classList.add('is-show');
 
-        opened++; if(opened===3) sequence();
+        opened++; if(opened===3) runSequence();
       }
 
       cards.forEach((el,i)=>{
         el.addEventListener('click',()=>flip(i),{passive:true});
-        el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(i); }});
+        el.addEventListener('keydown',e=>{
+          if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(i); }
+        });
       });
 
-      function sequence(){
-        title.removeAttribute('aria-hidden'); title.classList.add('is-show');
-        const set=POEMS[(Math.random()*POEMS.length)|0];
-        poemBox.innerHTML=''; let delay=900;
+      // —— 3枚目の後の流れ：フラッシュ→詩韻祈→九行→CTA
+      function runSequence(){
+        // 1) フラッシュ
+        if(flash){ flash.classList.add('is-on'); setTimeout(()=>flash.classList.remove('is-on'), T_FLASH); }
+
+        // 2) 「— 詩・韻・祈 —」を顕現し、そこへスクロール
+        title.removeAttribute('aria-hidden');
+        title.classList.add('is-show');
+        title.scrollIntoView({behavior:'smooth', block:'center'});
+
+        // 3) 少し“間”を置いて九行詩へ
+        const startAt = T_FLASH + T_SY_FADE + T_PAUSE;
+        setTimeout(runPoem, startAt);
+      }
+
+      function runPoem(){
+        const set = POEMS[(Math.random()*POEMS.length)|0];
+        poemBox.innerHTML='';
+        let delay=0;
         set.forEach(line=>{
-          const li=document.createElement('li'); li.textContent=line; poemBox.appendChild(li);
-          setTimeout(()=>li.classList.add('is-show'),delay); delay+=850;
+          const li=document.createElement('li');
+          li.textContent=line;
+          poemBox.appendChild(li);
+          setTimeout(()=> li.classList.add('is-show'), delay);
+          delay += LINE_DELAY;
         });
-        setTimeout(()=>actions.classList.add('is-show'),delay+400);
+        setTimeout(()=> actions.classList.add('is-show'), delay + 400);
       }
     })();
-    // —— タイミング定数（好みに応じて調整可能） ——
-const T_FLASH = 900;   // フラッシュ演出の長さ
-const T_SY_FADE = 900; // 「— 詩・韻・祈 —」のフェード時間
-const T_PAUSE = 600;   // タイトル後に“間”を置く時間
-const LINE_DELAY = 850; // 九行の行間ディレイ
-
-function sequence(){
-  const fl = document.querySelector('.flashlayer');
-
-  // 1) 全画面フラッシュ
-  if (fl){ fl.classList.add('is-on'); setTimeout(()=> fl.classList.remove('is-on'), T_FLASH); }
-
-  // 2) 「— 詩・韻・祈 —」を顕現させ、そこへスクロール
-  title.removeAttribute('aria-hidden');
-  title.classList.add('is-show');
-  title.scrollIntoView({ behavior:'smooth', block:'center' });
-
-  // 3) 少し“間”を置いてから、九行詩の自動再生へ移行
-  const startAt = T_FLASH + T_SY_FADE + T_PAUSE;
-  setTimeout(runPoem, startAt);
-}
-
-// 九行詩の自動再生（完了後CTAを出す）
-function runPoem(){
-  const set = POEMS[(Math.random()*POEMS.length)|0];
-  poemBox.innerHTML = '';
-  let delay = 0;
-  set.forEach(line=>{
-    const li = document.createElement('li');
-    li.textContent = line;
-    poemBox.appendChild(li);
-    setTimeout(()=> li.classList.add('is-show'), delay);
-    delay += LINE_DELAY;
-  });
-  // 最後の行が出たあとにCTA
-  setTimeout(()=> actions.classList.add('is-show'), delay + 400);
-}
   </script>
 </body>
 </html>
