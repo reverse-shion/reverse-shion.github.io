@@ -16,11 +16,11 @@
 </head>
 <body>
 
-<header class="hdr" role="banner">
-  <!-- 両サイド専用：コード雨キャンバス -->
+<!-- ===== サイドのコード雨（固定・本文に被らない） ===== -->
 <canvas id="codeRainL" class="codeRain codeRain--left" aria-hidden="true"></canvas>
 <canvas id="codeRainR" class="codeRain codeRain--right" aria-hidden="true"></canvas>
-  
+
+<header class="hdr" role="banner">
   <div class="hdr__in">
     <a href="/" class="logo" aria-label="トップへ">Re:verse Shion</a>
     <nav class="nav" aria-label="メイン">
@@ -78,7 +78,6 @@
   <p class="reading-poem">詩（Poem）・韻（Rhythm）・祈（Prayer）——あなたの魂が選んだ3つの響きです。</p>
 
   <div class="tarot-row" id="tarotRow">
-    <!-- 3枚 -->
     <div class="card" data-idx="0" aria-label="詩">
       <div class="card__inner">
         <div class="card__face card__back"></div>
@@ -126,7 +125,7 @@
   <small>© 2025 Shion Philosophy — 言葉が魂を救う Code</small>
 </footer>
 
-<!-- 軽量ミニ体験用JS（トップ内） -->
+<!-- ===== ミニ体験JS ===== -->
 <script>
 const deck = [
   { n:'The Fool', two:['最初の一歩は、恐れよりも軽い風。','失敗は合図——世界は君に開く。'] },
@@ -152,13 +151,16 @@ const deck = [
   { n:'The World', two:['輪は閉じて、道は開く。','完成形は、次のスタートライン。'] }
 ];
 function drawThree(){
-  const pool = [...deck]; const picks=[];
-  for(let i=0;i<3;i++){ const r = crypto.getRandomValues(new Uint32Array(1))[0]%pool.length; picks.push(pool.splice(r,1)[0]); }
+  const pool=[...deck],picks=[];
+  for(let i=0;i<3;i++){
+    const r = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
+    picks.push(pool.splice(r,1)[0]);
+  }
   return picks;
 }
-let selected=[]; let opened=0;
-const cards = [...document.querySelectorAll('.card')];
-const bodies = [document.getElementById('r0'), document.getElementById('r1'), document.getElementById('r2')];
+let selected=[],opened=0;
+const cards=[...document.querySelectorAll('.card')];
+const bodies=[document.getElementById('r0'),document.getElementById('r1'),document.getElementById('r2')];
 function resetMini(){
   opened=0; selected=drawThree();
   bodies[0].textContent='カードを開くと、ここに“詩”が現れます。';
@@ -168,13 +170,12 @@ function resetMini(){
   cards.forEach(c=>{ c.classList.remove('is-flipped'); c.style.pointerEvents='auto'; });
 }
 function onFlip(idx){
-  const c = cards[idx]; if(c.classList.contains('is-flipped')) return;
+  const c=cards[idx]; if(c.classList.contains('is-flipped')) return;
   c.classList.add('is-flipped'); opened++;
-  bodies[idx].innerHTML = `《${selected[idx].n}》<br>${selected[idx].two[0]}<br>${selected[idx].two[1]}`;
+  bodies[idx].innerHTML=`《${selected[idx].n}》<br>${selected[idx].two[0]}<br>${selected[idx].two[1]}`;
   if(opened===3){
     cards.forEach(x=>x.style.pointerEvents='none');
     document.getElementById('toSummary').style.display='flex';
-    // 3枚めくったら“詩韻祈エリア(#reading)”に自動スクロール（要望対応）
     document.getElementById('reading').scrollIntoView({behavior:'smooth'});
   }
 }
@@ -184,156 +185,64 @@ document.getElementById('startMini').addEventListener('click', startMini, {passi
 document.getElementById('startMini2').addEventListener('click', startMini, {passive:true});
 </script>
 
-  <script>
-/* ===== Code Rain（左右それぞれに独立描画） ===== */
+<!-- ===== サイドコード雨JS（1本化／軽量） ===== -->
+<script>
 (function(){
-  const CHARSET = '01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ∞≒≡→←↑↓';
-  const L = document.getElementById('codeRainL');
-  const R = document.getElementById('codeRainR');
-  if(!L || !R) return;
+  const CHARS='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
+  const L=document.getElementById('codeRainL');
+  const R=document.getElementById('codeRainR');
+  if(!L||!R) return;
 
-  function setup(canvas){
-    const ctx = canvas.getContext('2d');
-    let W=0, H=0, fs=16, cols=0, drops=[], rafId=null;
+  function setup(canvas,side){ // side: 'L' | 'R'
+    const ctx=canvas.getContext('2d');
+    let W=0,H=0,fs=16,cols=0,drops=[],raf=0;
 
-    function resize(){
-      // サイド幅はCSSの実幅（ピクセル）から取得
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const cw = Math.max(80, canvas.clientWidth|0);
-      const ch = Math.max(200, innerHeight|0);
-
-      canvas.width  = cw * dpr;
-      canvas.height = ch * dpr;
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-
-      W = cw; H = ch;
-      // サイド幅に対して最適化：文字サイズは 14〜20px で自動
-      fs = Math.max(14, Math.min(20, Math.floor(W / 12)));
-      cols = Math.ceil(W / fs);
-      drops = new Array(cols).fill( (Math.random()*H/fs)|0 );
+    function fit(){
+      const dpr=Math.min(2,window.devicePixelRatio||1);
+      const cw=Math.max(72,canvas.clientWidth|0);
+      const ch=Math.max(200,innerHeight|0);
+      canvas.width=cw*dpr; canvas.height=ch*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+      W=cw; H=ch;
+      fs=Math.max(12,Math.min(18,Math.floor(W/14)));
+      cols=Math.max(6,Math.floor(W/fs));
+      drops=new Array(cols).fill((Math.random()*H/fs)|0);
       ctx.clearRect(0,0,W,H);
     }
 
     function draw(){
-      // 残像を残す黒の薄い板
-      ctx.fillStyle = 'rgba(0,0,0,.12)';
+      ctx.fillStyle='rgba(0,0,0,.10)';
       ctx.fillRect(0,0,W,H);
-
-      ctx.fillStyle = '#7fd0ff';
-      ctx.font = `${fs}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+      ctx.font=`${fs}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
 
       for(let i=0;i<cols;i++){
-        const ch = CHARSET[(Math.random()*CHARSET.length)|0];
-        // ほんの少しゆがみを出す（雨の揺らぎ）
-        const x = i*fs + (Math.random()<.04 ? 1 : 0);
-        const y = drops[i]*fs*0.9;
-        ctx.fillText(ch, x, y);
+        const edge=i/cols;
+        const inner=(side==='L')?edge:(1-edge);            // 0=内側, 1=外側
+        const alpha=0.55*Math.min(1,Math.max(0,inner));     // 内側ほど薄く
+        ctx.fillStyle=`rgba(127,208,255,${alpha.toFixed(3)})`;
 
-        if(y > H && Math.random() > .975) drops[i] = 0;
+        const ch=CHARS[(Math.random()*CHARS.length)|0];
+        const x=i*fs+(Math.random()<.03?1:0);
+        const y=drops[i]*fs*0.9;
+        ctx.fillText(ch,x,y);
+
+        if(y>H && Math.random()>.978) drops[i]=0;
         drops[i]++;
       }
-      rafId = requestAnimationFrame(draw);
+      raf=requestAnimationFrame(draw);
     }
 
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-    addEventListener('resize', resize, {passive:true});
+    const ro=new ResizeObserver(fit); ro.observe(canvas);
+    addEventListener('resize',fit,{passive:true});
+    fit(); draw();
 
-    // 初期起動
-    resize();
-    draw();
-
-    // アクセシビリティ：reduce-motion のとき停止
-    const mq = matchMedia('(prefers-reduced-motion: reduce)');
-    function onMotion(pref){ if(pref.matches){ cancelAnimationFrame(rafId); ctx.clearRect(0,0,W,H); } else { draw(); } }
-    mq.addEventListener?.('change', onMotion);
-    onMotion(mq);
-
-    return { stop:()=> cancelAnimationFrame(rafId) };
+    const mq=matchMedia('(prefers-reduced-motion: reduce)');
+    function onMotion(e){ if(e.matches){ cancelAnimationFrame(raf); ctx.clearRect(0,0,W,H); } else { draw(); } }
+    mq.addEventListener?.('change',onMotion); onMotion(mq);
   }
 
-  setup(L); setup(R);
+  setup(L,'L'); setup(R,'R');
 })();
 </script>
 
-  <script>
-/* ===== Code Rain（左右それぞれ・本文に被らない版） ===== */
-(function(){
-  const CHARS = '01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
-
-  function setup(canvas, side){ // side: 'L' | 'R'
-    const ctx = canvas.getContext('2d');
-    let W=0, H=0, fs=16, cols=0, drops=[], rafId=null;
-
-    function resize(){
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const cw = Math.max(72, canvas.clientWidth|0);
-      const ch = Math.max(200, innerHeight|0);
-
-      canvas.width  = cw * dpr;
-      canvas.height = ch * dpr;
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-
-      W = cw; H = ch;
-      // サイド幅に対して控えめのサイズ＆列数
-      fs   = Math.max(12, Math.min(18, Math.floor(W / 14)));
-      cols = Math.max(6, Math.floor(W / fs));
-      drops = new Array(cols).fill( (Math.random()*H/fs)|0 );
-      ctx.clearRect(0,0,W,H);
-    }
-
-    function draw(){
-      // 残像をさらに薄く（読みやすさ優先）
-      ctx.fillStyle = 'rgba(0,0,0,.10)';
-      ctx.fillRect(0,0,W,H);
-
-      ctx.font = `${fs}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
-
-      for(let i=0;i<cols;i++){
-        // 内側エッジに近い列ほど alpha を弱く（本文に近いほど薄く）
-        const edgeRatio = i/cols; // left: 0→1, rightも後で反転
-        const distFromInner = (side === 'L') ? edgeRatio : (1 - edgeRatio);
-        const innerFade = Math.min(1, Math.max(0, distFromInner)); // 0(内側)→1(外)
-        const alpha = 0.55 * innerFade; // 内側を薄く、外側をやや濃く
-
-        ctx.fillStyle = `rgba(127,208,255,${alpha.toFixed(3)})`;
-
-        const ch = CHARS[(Math.random()*CHARS.length)|0];
-        const x = i*fs + (Math.random()<.03 ? 1 : 0);
-        const y = drops[i]*fs*0.9;
-        ctx.fillText(ch, x, y);
-
-        if(y > H && Math.random() > .978) drops[i] = 0;
-        drops[i]++;
-      }
-      rafId = requestAnimationFrame(draw);
-    }
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-    addEventListener('resize', resize, {passive:true});
-
-    // 初期起動
-    resize();
-    draw();
-
-    // モーション配慮
-    const mq = matchMedia('(prefers-reduced-motion: reduce)');
-    function onMotion(pref){
-      if(pref.matches){ cancelAnimationFrame(rafId); ctx.clearRect(0,0,W,H); }
-      else { draw(); }
-    }
-    mq.addEventListener?.('change', onMotion);
-    onMotion(mq);
-
-    return { stop:()=> cancelAnimationFrame(rafId) };
-  }
-
-  const L = document.getElementById('codeRainL');
-  const R = document.getElementById('codeRainR');
-  if(L) setup(L, 'L');
-  if(R) setup(R, 'R');
-})();
-</script>
 </body>
 </html>
