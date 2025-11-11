@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>星界の間 — 詩・韻・祈（無料体験）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b1a" />
+  <meta name="description" content="3枚のカードで、詩・韻・祈。続いて“九行詩”が光の言葉として現れる。言葉で魂を救う体験へ。">
+  <link rel="icon" href="assets/favicon.png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%}
+    html{overflow-x:hidden}
+    body{
+      overflow-x:hidden; background:#0b0b1a; color:#eef1ff;
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+      font-family:'Noto Serif JP',serif;
+    }
+
+    :root{
+      --t-bg:#0b0b1a; --t-ink:#eef1ff; --t-muted:#a7b1d6;
+      --t-gold:#FFD76F; --t-gold-soft:#FFF2C1; --r:16px;
+    }
+    @media (color-gamut:p3){ :root{ --t-gold: color(display-p3 1 0.84 0.45) } }
+
+    /* Header（神殿へ戻る） */
+    header{
+      position:sticky; top:0; z-index:10; backdrop-filter: blur(10px);
+      background: rgba(11,11,26,.72); /* fallback */
+      background: color-mix(in oklab, #0b0b1a 85%, #1b1440 15%);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .h-in{ max-width:1100px; margin:0 auto; padding:10px 16px; display:flex; gap:12px; align-items:center; justify-content:space-between }
+    .logo{ color:var(--t-gold); text-decoration:none; font-family:"Cormorant Garamond",serif; font-size:1.2rem }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 16px; border-radius:999px; text-decoration:none; font-weight:800; letter-spacing:.03em;
+      border:1px solid rgba(255,215,111,.55); color:#2a2136;
+      background:linear-gradient(92deg,#FFF2C1 0%,var(--t-gold) 28%,#FFC944 62%,var(--t-gold) 100%);
+      box-shadow:0 12px 28px rgba(255,215,111,.32), inset 0 0 10px rgba(255,240,200,.3);
+    }
+
+    /* ヒーロー帯 */
+    .hero{
+      position:relative; text-align:center; padding:48px 18px 24px;
+      background:
+        radial-gradient(60vmin 40vmin at 50% 10%, rgba(255,215,111,.12), transparent 70%),
+        linear-gradient(180deg, #0b0b1a 0%, #0b0b1a 70%, #080814 100%);
+    }
+    .hero h1{ font-family:"Cormorant Garamond",serif; font-size:clamp(28px,6vw,48px); letter-spacing:.06em }
+    .hero p{ color:#e9e6ff; opacity:.95; margin-top:10px }
+
+    /* コード雨（全体・さらに薄く） */
+    #codeRain{
+      position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.12; mix-blend-mode:screen;
+      -webkit-mask-image: linear-gradient(180deg, #000 6%, #000 72%, transparent 98%); /* Safari */
+              mask-image: linear-gradient(180deg, #000 6%, #000 72%, transparent 98%);
+    }
+    @media (prefers-reduced-motion:reduce){ #codeRain{ display:none } }
+
+    /* タロット3枚 */
+    .wrap{ position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:24px 16px 60px }
+    .row{ display:flex; gap:clamp(12px,3vw,22px); justify-content:center; align-items:center; flex-wrap:nowrap; overflow:hidden }
+    .card{ width:clamp(110px,26vw,180px); aspect-ratio:62/110; perspective:1100px; position:relative; cursor:pointer; flex:0 0 auto }
+    .card__inner{ width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;
+      transition: transform .68s cubic-bezier(.2,.7,.2,1); transform-style:preserve-3d;
+      box-shadow:0 10px 30px rgba(0,0,0,.45), 0 0 20px rgba(255,215,111,.18)
+    }
+    .card__face{
+      position:absolute; inset:0; border-radius:12px; background-position:center; background-size:cover;
+      backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    }
+    .card__back{ background:#0b0f18 url("assets/tarot/back.png") center/cover no-repeat }
+    .card__front{ transform: rotateY(180deg) }
+    .card[data-idx="0"] .card__front{ background-image:linear-gradient(135deg,#ffe8b3,#caa8ff) }
+    .card[data-idx="1"] .card__front{ background-image:linear-gradient(135deg,#b3ffe3,#a8b3ff) }
+    .card[data-idx="2"] .card__front{ background-image:linear-gradient(135deg,#ffd1f7,#d1fff5) }
+    .card.is-flipped .card__inner{ transform: rotateY(180deg) }
+
+    /* 結果 */
+    .grid{ display:grid; gap:14px; grid-template-columns:1fr; max-width:1100px; margin:22px auto 0; padding:0 16px }
+    @media (min-width:760px){ .grid{ grid-template-columns: repeat(3,1fr) } }
+    .res{ background:rgba(127,208,255,.08); border:1px solid rgba(127,208,255,.25); border-radius:12px; padding:14px; min-height:120px }
+    .res .hd{ color:#cfe2ff; font-size:.9rem; letter-spacing:.16em; margin-bottom:6px }
+    .res .bd{ line-height:1.9; color:#eef1ff }
+
+    /* 九行詩（自動表示） */
+    .poem{
+      text-align:center; padding:56px 18px; margin-top:6px;
+      background:
+        radial-gradient(60vmin 40vmin at 50% 0%, rgba(255,215,111,.10), transparent 70%),
+        linear-gradient(180deg, #0b0b1a 0%, #0b0b1a 70%, #080814 100%);
+      border-top:1px solid rgba(255,215,111,.10)
+    }
+    .poem__title{
+      font-family:"Cormorant Garamond",serif; font-size:clamp(26px,5vw,38px);
+      background:linear-gradient(90deg,var(--t-gold-soft),var(--t-gold));
+      -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:12px;
+      text-shadow:0 0 18px rgba(255,215,111,.25);
+    }
+    .poem__body{
+      max-width:820px; margin:0 auto; line-height:2.05; letter-spacing:.06em;
+      color:#f7f3d9; text-shadow:0 0 16px rgba(255,215,111,.28), 0 0 8px rgba(124,98,255,.18);
+      font-size:clamp(16px,2.6vw,19px);
+    }
+
+    /* CTA */
+    .cta{
+      text-align:center; padding:40px 18px 80px;
+    }
+    .btn-ghost{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:12px 18px; border-radius:999px; text-decoration:none; font-weight:800; letter-spacing:.03em;
+      border:1px solid rgba(124,98,255,.35); color:#e9e6ff; background:rgba(124,98,255,.12);
+      box-shadow:inset 0 0 10px rgba(124,98,255,.08);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="codeRain" aria-hidden="true"></canvas>
+
+  <header>
+    <div class="h-in">
+      <a href="index.html" class="logo" aria-label="神殿へ">⟵ 神殿へ</a>
+      <a href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" class="btn">個人鑑定</a>
+    </div>
+  </header>
+
+  <section class="hero" aria-label="星界の間">
+    <h1>詩・韻・祈 — タロット展開</h1>
+    <p>3枚をめくったら、星の“九行詩”が自動で現れるよ。</p>
+  </section>
+
+  <main class="wrap">
+    <div class="row" id="cards" role="list">
+      <div class="card" data-idx="0" aria-label="詩" role="listitem" tabindex="0">
+        <div class="card__inner">
+          <div class="card__face card__back"></div>
+          <div class="card__face card__front"></div>
+        </div>
+      </div>
+      <div class="card" data-idx="1" aria-label="韻" role="listitem" tabindex="0">
+        <div class="card__inner">
+          <div class="card__face card__back"></div>
+          <div class="card__face card__front"></div>
+        </div>
+      </div>
+      <div class="card" data-idx="2" aria-label="祈" role="listitem" tabindex="0">
+        <div class="card__inner">
+          <div class="card__face card__back"></div>
+          <div class="card__face card__front"></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="grid" aria-label="結果">
+      <article class="res"><div class="hd">【詩】</div><div class="bd" id="r0">カードを開くと、ここに“詩”が現れます。</div></article>
+      <article class="res"><div class="hd">【韻】</div><div class="bd" id="r1">カードを開くと、ここに“韻”が現れます。</div></article>
+      <article class="res"><div class="hd">【祈】</div><div class="bd" id="r2">カードを開くと、ここに“祈”が現れます。</div></article>
+    </section>
+
+    <section id="poem" class="poem" hidden>
+      <h2 class="poem__title">総合詩 — 星界のことば</h2>
+      <div class="poem__body" id="poemBody"></div>
+    </section>
+
+    <div class="cta">
+      <a href="index.html#cta" class="btn-ghost">🌟 神殿の門へ（次の一歩）</a>
+    </div>
+  </main>
+
+  <script>
+    // ===== コード雨（読みやすさ優先の薄さ＋微スパーク） =====
+    (function(){
+      const cvs = document.getElementById('codeRain'); if(!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const CHARS = '01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
+      let W=0,H=0,fs=18,cols=0,drops=[], rafId=null;
+
+      function resize(){
+        const dpr = Math.min(2, window.devicePixelRatio||1);
+        const cw = innerWidth|0, ch = innerHeight|0;
+        cvs.width = cw*dpr; cvs.height = ch*dpr;
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        W=cw; H=ch;
+        fs = Math.max(14, Math.min(20, Math.floor(W/50)));
+        cols = Math.ceil(W/fs);
+        drops = new Array(cols).fill( (Math.random()*H/fs)|0 );
+        ctx.clearRect(0,0,W,H);
+      }
+      function draw(){
+        ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(0,0,W,H);
+        ctx.font = `${fs}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+        for(let i=0;i<cols;i++){
+          const ch = CHARS[(Math.random()*CHARS.length)|0];
+          const sparkle = Math.random() < .012;
+          ctx.fillStyle = sparkle ? 'rgba(200,238,255,.75)' : 'rgba(127,208,255,.38)';
+          ctx.fillText(ch, i*fs, drops[i]*fs*0.9);
+          if(drops[i]*fs>H && Math.random()>.975) drops[i]=0;
+          drops[i]++;
+        }
+        rafId = requestAnimationFrame(draw);
+      }
+      addEventListener('resize', resize, {passive:true});
+      const mq = matchMedia('(prefers-reduced-motion: reduce)');
+      function start(){ if(rafId) cancelAnimationFrame(rafId); resize(); draw(); }
+      function stop(){ if(rafId) cancelAnimationFrame(rafId); ctx.clearRect(0,0,W,H); }
+      mq.addEventListener?.('change', e=> e.matches ? stop() : start());
+      mq.matches ? stop() : start();
+    })();
+
+    // ===== タロット（3枚）→ 詩・韻・祈 → 九行詩（自動表示） =====
+    const deck = [
+      { n:'The Fool', two:['最初の一歩は、恐れよりも軽い風。','失敗は合図——世界は君に開く。'] },
+      { n:'The Magician', two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。'] },
+      { n:'The High Priestess', two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。'] },
+      { n:'The Empress', two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。'] },
+      { n:'The Emperor', two:['迷いは構造で解ける。','境界線は、君を守る城。'] },
+      { n:'The Lovers', two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。'] },
+      { n:'The Chariot', two:['向かう先が速さを決める。','手綱は心、進路は意志。'] },
+      { n:'Strength', two:['優しい力は、世界を従わせない。','それでも、世界は従う。'] },
+      { n:'The Hermit', two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。'] },
+      { n:'Wheel of Fortune', two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。'] },
+      { n:'Justice', two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。'] },
+      { n:'The Hanged Man', two:['世界を逆さにして、はじめて見える。','止まることが、進むことになる日もある。'] },
+      { n:'Death', two:['終わりは、名前の違う始まり。','脱皮の痛みは、生きている証。'] },
+      { n:'Temperance', two:['混ぜる、待つ、整える。','その中間に、答えは棲む。'] },
+      { n:'The Devil', two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。'] },
+      { n:'The Tower', two:['壊れるのは、壊すべきもの。','空いた隙間が、光の通り道。'] },
+      { n:'The Star', two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。'] },
+      { n:'The Moon', two:['不安は、想像力の副作用。','曙は、必ず来る。'] },
+      { n:'The Sun', two:['喜びは戦略になる。','笑顔は、未来の先行投資。'] },
+      { n:'Judgement', two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。'] },
+      { n:'The World', two:['輪は閉じて、道は開く。','完成形は、次のスタートライン。'] }
+    ];
+
+    const poems = [
+      [
+        '扉はすでに半分、開いている。', '迷いは風に、ため息は海に。', '君の名を呼ぶ声は、胸の内側から届く。',
+        '選ぶとは、手放すこと。', '手放すとは、受け取ること。', '受け取るとは、愛に居場所を作ること。',
+        'たった一歩で、星図は書き換わる。', '恐れの下には、必ず喜びがある。', 'だから——今の君で、始めていい。'
+      ],
+      [
+        '静けさが、地図を描く。', '言葉は鍵、沈黙は扉。', '正しさよりも、やさしさを選ぶ日に道はひらける。',
+        '遅さを恥じるな。', '芽は見えない地中で育つ。', '準備は、タイミングを愛している。',
+        '水を一杯。深呼吸を一度。', 'そのルーティンが、未来の祈り。', '大丈夫、夜明けは君の味方だ。'
+      ],
+      [
+        '願いは、君を連れていく舟だ。', 'オールは意志、羅針は笑顔。', '嵐の日は、速度よりも向きを。',
+        '比べることをやめた瞬間、海は静まる。', '弱さを抱いた腕が、いちばん強い。', '優しさは世界を従わせない、でも世界は従う。',
+        '灯台は遠くで光っている。', '戻らなくていい、進めばいい。', 'その舟の名は——今の君。'
+      ],
+      [
+        '壊れた塔の下で、空が見えた。', '失ったものは、光の通り道になった。', '涙は、視界を洗うためにある。',
+        '叫ばなくていい、歌えばいい。', '歌えない日は、鼻歌でいい。', 'それでも日々は、君を連れて行く。',
+        '赦しは、忘れることじゃない。', '呼び戻すことだ。', '自分の真ん中へ。'
+      ],
+      [
+        '選ばなかった道が、呪いになる前に。', '小さな「はい」を一つ。', '今日の太陽は、君の味方だ。',
+        '焦りは砂、意志は石。', '石を一つ積めば、足場ができる。', '足場ができれば、景色が変わる。',
+        '景色が変われば、言葉も変わる。', '言葉が変われば、世界線は動く。', 'はじまりは、いつだって小さい。'
+      ],
+      [
+        '誰にも見えないところで、善いことを一つ。', 'それは君のための祈りだ。', 'やさしさにも刃がある——自分を守るために。',
+        '境界線は、愛の形でもある。', '断ることは、未来を守ること。', '受け取ることは、今を愛すること。',
+        '混ぜる、待つ、整える。', '中間に住もう。', 'そこに、答えは棲む。'
+      ],
+      [
+        '不安は、想像力の副作用。', '物語を明るい方へ書き換えよう。', 'ペン先は、君の呼吸にある。',
+        '一行の勇気で、章は変わる。', '笑顔は、未来の先行投資。', '失敗は、編集可能なドラフトだ。',
+        '星は遠いが、光は今ここに届く。', '掌を洗うみたいに、希望をもう一度。', 'ね、行けるよ。'
+      ],
+      [
+        '独りの灯りが、群衆より遠くを照らす。', '孤独は罰じゃない、準備だ。', '聴こえるか——内なる月の声。',
+        '急がないで。', '君の歩幅でいい。', '誰も君の人生の専門家じゃない。',
+        '輪は閉じ、道は開く。', '完成はスタートラインの別名。', '今日が、いいページになる。'
+      ],
+      [
+        '鎖は内側に結ばれていた。', '鍵もまた、内側にあった。', '怖さを連れて行け、置いていくな。',
+        '影は、光の位置を教えてくれる。', '背中にではなく、横に置こう。', '影と和解した者だけが、優しく強い。',
+        '君の名を、胸の真ん中で呼ぶ。', '返事が、確かに聴こえた。', '——大丈夫だよ。'
+      ]
+    ];
+
+    function drawThree(){
+      const pool = [...deck], picks=[];
+      for(let i=0;i<3;i++){
+        const r = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
+        picks.push(pool.splice(r,1)[0]);
+      }
+      return picks;
+    }
+
+    let selected=[], opened=0;
+    const cards = [...document.querySelectorAll('.card')];
+    const bodies = [document.getElementById('r0'), document.getElementById('r1'), document.getElementById('r2')];
+    const poemSection = document.getElementById('poem');
+    const poemBody = document.getElementById('poemBody');
+
+    function resetReading(){
+      opened=0; selected=drawThree();
+      bodies[0].textContent='カードを開くと、ここに“詩”が現れます。';
+      bodies[1].textContent='カードを開くと、ここに“韻”が現れます。';
+      bodies[2].textContent='カードを開くと、ここに“祈”が現れます。';
+      poemSection.hidden = true;
+      cards.forEach(c=>{ c.classList.remove('is-flipped'); c.style.pointerEvents='auto'; });
+    }
+
+    function showPoem(){
+      const p = poems[(Math.random()*poems.length)|0];
+      poemBody.innerHTML = p.map(line => `・${line}`).join('<br>');
+      poemSection.hidden = false;
+      poemSection.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    function onFlip(idx){
+      const c = cards[idx]; if(c.classList.contains('is-flipped')) return;
+      c.classList.add('is-flipped'); opened++;
+      bodies[idx].innerHTML = `《${selected[idx].n}》<br>${selected[idx].two[0]}<br>${selected[idx].two[1]}`;
+      if(opened===3){
+        cards.forEach(x=>x.style.pointerEvents='none');
+        // 3枚開いたら自動で“九行詩”を表示
+        setTimeout(showPoem, 450);
+      }
+    }
+
+    cards.forEach((el,i)=>{
+      el.addEventListener('click', ()=> onFlip(i), {passive:true});
+      el.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' ') { e.preventDefault(); onFlip(i); } });
+    });
+
+    // 初期化
+    resetReading();
+  </script>
+</body>
+</html>
