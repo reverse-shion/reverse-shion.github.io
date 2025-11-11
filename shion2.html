@@ -14,235 +14,207 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="shion-tarot.css">
 </head>
+
 <body>
+  <!-- ★ 左右コード雨は body 直下に（重要） -->
+  <canvas id="codeRainL" class="codeRain codeRain--left" aria-hidden="true"></canvas>
+  <canvas id="codeRainR" class="codeRain codeRain--right" aria-hidden="true"></canvas>
 
-<!-- ===== サイドのコード雨（固定・本文に被らない） ===== -->
-<canvas id="codeRainL" class="codeRain codeRain--left" aria-hidden="true"></canvas>
-<canvas id="codeRainR" class="codeRain codeRain--right" aria-hidden="true"></canvas>
-
-<header class="hdr" role="banner">
-  <div class="hdr__in">
-    <a href="/" class="logo" aria-label="トップへ">Re:verse Shion</a>
-    <nav class="nav" aria-label="メイン">
-      <a href="/reading.html" title="深く読む">詳しく読む</a>
-      <a href="/line.html" title="LINE登録の手順">LINE登録</a>
-      <a href="/about.html" title="詩韻とは">詩韻とは</a>
-    </nav>
-    <a class="mini-cta" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">鑑定</a>
-  </div>
-</header>
-
-<section class="hero-temple t-sides" id="top">
-  <div class="t-bg t-bg__halo"></div>
-  <div class="t-bg t-bg__pillars"></div>
-  <div class="t-bg t-bg__dust"></div>
-
-  <div class="hero-temple__inner">
-    <h1 class="t-title">
-      <span class="t-title__lead">言葉で魂を救う、</span>
-      <span class="t-title__core">思想と占いの <em>Code</em></span>
-    </h1>
-    <p class="t-sub">詩で照らし、Codeで進む。あなたの“今”を、言葉の手順で幸せな世界線へ。</p>
-    <p class="t-poem">―― 静かな呼吸の先に、必ず光がある。大丈夫だよ。</p>
-
-    <div class="t-ctas">
-      <button id="startMini" class="t-btn t-btn--primary">🌟 無料で体験（1分）</button>
-      <a class="t-btn t-btn--ghost" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">
-        💫 個人鑑定を申し込む
-        <small>初回4,000円｜24h以内返信｜匿名OK</small>
-      </a>
+  <!-- ===== Header ===== -->
+  <header class="hdr" role="banner">
+    <div class="hdr__in">
+      <a href="/" class="logo" aria-label="トップへ">Re:verse Shion</a>
+      <nav class="nav" aria-label="メイン">
+        <a href="/reading.html" title="深く読む">詳しく読む</a>
+        <a href="/line.html" title="LINE登録の手順">LINE登録</a>
+        <a href="/about.html" title="詩韻とは">詩韻とは</a>
+      </nav>
+      <a class="mini-cta" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">鑑定</a>
     </div>
+  </header>
 
-    <ul class="t-trust" aria-label="安心ポイント">
-      <li>初回4,000円</li><li>24h以内返信</li><li>匿名OK</li>
-    </ul>
-  </div>
-</section>
+  <!-- ===== Hero（神殿 × 狭間） ===== -->
+  <section class="hero-temple" id="top">
+    <div class="t-bg t-bg__halo"></div>
+    <div class="t-bg t-bg__pillars"></div>
+    <div class="t-bg t-bg__dust"></div>
 
-<section class="steps-temple" aria-label="無料体験の流れ">
-  <h2 class="steps-title">無料体験の流れ</h2>
-  <p class="steps-lead">1分で、“詩・韻・祈”の光を感じられます。</p>
+    <div class="hero-temple__inner">
+      <h1 class="t-title">
+        <span class="t-title__lead">言葉で魂を救う、</span>
+        <span class="t-title__core">思想と占いの <em>Code</em></span>
+      </h1>
+      <p class="t-sub">詩で照らし、Codeで進む。あなたの“今”を、言葉の手順で幸せな世界線へ。</p>
+      <p class="t-poem">―― 静かな呼吸の先に、必ず光がある。大丈夫だよ。</p>
 
-  <div class="steps-grid">
-    <article class="step"><div class="step-num">①</div><h3 class="step-head">願いを思い描く</h3><p class="step-body">静かに目を閉じ、叶えたい想いを胸に置いてください。</p></article>
-    <article class="step"><div class="step-num">②</div><h3 class="step-head">カードをめくる</h3><p class="step-body">3枚のタロットが、あなたの“今”と向かい合います。</p></article>
-    <article class="step"><div class="step-num">③</div><h3 class="step-head">言葉のCodeを受け取る</h3><p class="step-body">詩・韻・祈の二行詩→九行詩へ。次の一歩が見えます。</p></article>
-  </div>
-
-  <div class="steps-cta"><button class="t-btn t-btn--primary" id="startMini2">🌟 無料で体験（1分）</button></div>
-</section>
-
-<!-- ミニ体験（トップ内で完結） -->
-<section id="reading" class="reading-temple" aria-labelledby="readingTitle">
-  <h2 id="readingTitle">星の声が届きました</h2>
-  <p class="reading-poem">詩（Poem）・韻（Rhythm）・祈（Prayer）——あなたの魂が選んだ3つの響きです。</p>
-
-  <div class="tarot-row" id="tarotRow">
-    <div class="card" data-idx="0" aria-label="詩">
-      <div class="card__inner">
-        <div class="card__face card__back"></div>
-        <div class="card__face card__front"></div>
+      <div class="t-ctas">
+        <button id="startMini" class="t-btn t-btn--primary">🌟 無料で体験（1分）</button>
+        <a class="t-btn t-btn--ghost" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">
+          💫 個人鑑定を申し込む
+          <small>初回4,000円｜24h以内返信｜匿名OK</small>
+        </a>
       </div>
+
+      <ul class="t-trust" aria-label="安心ポイント">
+        <li>初回4,000円</li><li>24h以内返信</li><li>匿名OK</li>
+      </ul>
     </div>
-    <div class="card" data-idx="1" aria-label="韻">
-      <div class="card__inner">
-        <div class="card__face card__back"></div>
-        <div class="card__face card__front"></div>
-      </div>
+  </section>
+
+  <!-- ===== Steps ===== -->
+  <section class="steps-temple" aria-label="無料体験の流れ">
+    <h2 class="steps-title">無料体験の流れ</h2>
+    <p class="steps-lead">1分で、“詩・韻・祈”の光を感じられます。</p>
+
+    <div class="steps-grid">
+      <article class="step"><div class="step-num">①</div><h3 class="step-head">願いを思い描く</h3><p class="step-body">静かに目を閉じ、叶えたい想いを胸に置いてください。</p></article>
+      <article class="step"><div class="step-num">②</div><h3 class="step-head">カードをめくる</h3><p class="step-body">3枚のタロットが、あなたの“今”と向かい合います。</p></article>
+      <article class="step"><div class="step-num">③</div><h3 class="step-head">言葉のCodeを受け取る</h3><p class="step-body">詩・韻・祈の二行詩→九行詩へ。次の一歩が見えます。</p></article>
     </div>
-    <div class="card" data-idx="2" aria-label="祈">
-      <div class="card__inner">
-        <div class="card__face card__back"></div>
-        <div class="card__face card__front"></div>
-      </div>
+
+    <div class="steps-cta"><button class="t-btn t-btn--primary" id="startMini2">🌟 無料で体験（1分）</button></div>
+  </section>
+
+  <!-- ===== Mini Reading（トップ内完結） ===== -->
+  <section id="reading" class="reading-temple" aria-labelledby="readingTitle">
+    <h2 id="readingTitle">星の声が届きました</h2>
+    <p class="reading-poem">詩（Poem）・韻（Rhythm）・祈（Prayer）——あなたの魂が選んだ3つの響きです。</p>
+
+    <div class="tarot-row" id="tarotRow">
+      <div class="card" data-idx="0" aria-label="詩"><div class="card__inner"><div class="card__face card__back"></div><div class="card__face card__front"></div></div></div>
+      <div class="card" data-idx="1" aria-label="韻"><div class="card__inner"><div class="card__face card__back"></div><div class="card__face card__front"></div></div></div>
+      <div class="card" data-idx="2" aria-label="祈"><div class="card__inner"><div class="card__face card__back"></div><div class="card__face card__front"></div></div></div>
     </div>
-  </div>
 
-  <div class="result-grid" id="resultGrid">
-    <article class="result-item"><div class="head">【詩】</div><div class="body" id="r0">カードを開くと、ここに“詩”が現れます。</div></article>
-    <article class="result-item"><div class="head">【韻】</div><div class="body" id="r1">カードを開くと、ここに“韻”が現れます。</div></article>
-    <article class="result-item"><div class="head">【祈】</div><div class="body" id="r2">カードを開くと、ここに“祈”が現れます。</div></article>
-  </div>
+    <div class="result-grid" id="resultGrid">
+      <article class="result-item"><div class="head">【詩】</div><div class="body" id="r0">カードを開くと、ここに“詩”が現れます。</div></article>
+      <article class="result-item"><div class="head">【韻】</div><div class="body" id="r1">カードを開くと、ここに“韻”が現れます。</div></article>
+      <article class="result-item"><div class="head">【祈】</div><div class="body" id="r2">カードを開くと、ここに“祈”が現れます。</div></article>
+    </div>
 
-  <div class="to-summary" id="toSummary" style="display:none">
-    <a class="t-btn t-btn--primary" href="#cta">総合詩と次の一歩へ</a>
-  </div>
-</section>
+    <div class="to-summary" id="toSummary" style="display:none">
+      <a class="t-btn t-btn--primary" href="#cta">総合詩と次の一歩へ</a>
+    </div>
+  </section>
 
-<section class="cta-temple" id="cta">
-  <h2 class="cta-title">もっと深く、あなたのために読む</h2>
-  <p class="cta-lead">無料体験の言葉に“何か”を感じたあなたへ。詩韻が、あなたの状況に合わせて具体的に導きます。</p>
-  <div class="cta-buttons">
-    <a href="/line.html" class="t-btn t-btn--primary">📩 LINE登録（特典つき）</a>
-    <a href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" class="t-btn t-btn--ghost">💫 個人鑑定を申し込む</a>
-    <a href="/reading.html" class="t-btn t-btn--ghost">🌕 詳しく読む（思想と儀式）</a>
-  </div>
-  <ul class="t-trust"><li>初回4,000円</li><li>24h以内返信</li><li>匿名OK</li></ul>
-</section>
+  <!-- ===== CTA（収益化） ===== -->
+  <section class="cta-temple" id="cta">
+    <h2 class="cta-title">もっと深く、あなたのために読む</h2>
+    <p class="cta-lead">無料体験の言葉に“何か”を感じたあなたへ。詩韻が、あなたの状況に合わせて具体的に導きます。</p>
+    <div class="cta-buttons">
+      <a href="/line.html" class="t-btn t-btn--primary">📩 LINE登録（特典つき）</a>
+      <a href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" class="t-btn t-btn--ghost">💫 個人鑑定を申し込む</a>
+      <a href="/reading.html" class="t-btn t-btn--ghost">🌕 詳しく読む（思想と儀式）</a>
+    </div>
+    <ul class="t-trust"><li>初回4,000円</li><li>24h以内返信</li><li>匿名OK</li></ul>
+  </section>
 
-<footer class="temple-footer">
-  <p>詩は言葉、韻は響き、祈りは還る場所。―― 言葉で魂を救う、それが詩韻思想。</p>
-  <small>© 2025 Shion Philosophy — 言葉が魂を救う Code</small>
-</footer>
+  <!-- ===== Footer ===== -->
+  <footer class="temple-footer">
+    <p>詩は言葉、韻は響き、祈りは還る場所。―― 言葉で魂を救う、それが詩韻思想。</p>
+    <small>© 2025 Shion Philosophy — 言葉が魂を救う Code</small>
+  </footer>
 
-<!-- ===== ミニ体験JS ===== -->
-<script>
-const deck = [
-  { n:'The Fool', two:['最初の一歩は、恐れよりも軽い風。','失敗は合図——世界は君に開く。'] },
-  { n:'The Magician', two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。'] },
-  { n:'The High Priestess', two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。'] },
-  { n:'The Empress', two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。'] },
-  { n:'The Emperor', two:['迷いは構造で解ける。','境界線は、君を守る城。'] },
-  { n:'The Lovers', two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。'] },
-  { n:'The Chariot', two:['向かう先が速さを決める。','手綱は心、進路は意志。'] },
-  { n:'Strength', two:['優しい力は、世界を従わせない。','それでも、世界は従う。'] },
-  { n:'The Hermit', two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。'] },
-  { n:'Wheel of Fortune', two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。'] },
-  { n:'Justice', two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。'] },
-  { n:'The Hanged Man', two:['世界を逆さにして、はじめて見える。','止まることが、進むことになる日もある。'] },
-  { n:'Death', two:['終わりは、名前の違う始まり。','脱皮の痛みは、生きている証。'] },
-  { n:'Temperance', two:['混ぜる、待つ、整える。','その中間に、答えは棲む。'] },
-  { n:'The Devil', two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。'] },
-  { n:'The Tower', two:['壊れるのは、壊すべきもの。','空いた隙間が、光の通り道。'] },
-  { n:'The Star', two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。'] },
-  { n:'The Moon', two:['不安は、想像力の副作用。','曙は、必ず来る。'] },
-  { n:'The Sun', two:['喜びは戦略になる。','笑顔は、未来の先行投資。'] },
-  { n:'Judgement', two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。'] },
-  { n:'The World', two:['輪は閉じて、道は開く。','完成形は、次のスタートライン。'] }
-];
-function drawThree(){
-  const pool=[...deck],picks=[];
-  for(let i=0;i<3;i++){
-    const r = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
-    picks.push(pool.splice(r,1)[0]);
+  <!-- ===== Mini Reading JS ===== -->
+  <script>
+  const deck = [
+    { n:'The Fool', two:['最初の一歩は、恐れよりも軽い風。','失敗は合図——世界は君に開く。'] },
+    { n:'The Magician', two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。'] },
+    { n:'The High Priestess', two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。'] },
+    { n:'The Empress', two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。'] },
+    { n:'The Emperor', two:['迷いは構造で解ける。','境界線は、君を守る城。'] },
+    { n:'The Lovers', two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。'] },
+    { n:'The Chariot', two:['向かう先が速さを決める。','手綱は心、進路は意志。'] },
+    { n:'Strength', two:['優しい力は、世界を従わせない。','それでも、世界は従う。'] },
+    { n:'The Hermit', two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。'] },
+    { n:'Wheel of Fortune', two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。'] },
+    { n:'Justice', two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。'] },
+    { n:'The Hanged Man', two:['世界を逆さにして、はじめて見える。','止まることが、進むことになる日もある。'] },
+    { n:'Death', two:['終わりは、名前の違う始まり。','脱皮の痛みは、生きている証。'] },
+    { n:'Temperance', two:['混ぜる、待つ、整える。','その中間に、答えは棲む。'] },
+    { n:'The Devil', two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。'] },
+    { n:'The Tower', two:['壊れるのは、壊すべきもの。','空いた隙間が、光の通り道。'] },
+    { n:'The Star', two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。'] },
+    { n:'The Moon', two:['不安は、想像力の副作用。','曙は、必ず来る。'] },
+    { n:'The Sun', two:['喜びは戦略になる。','笑顔は、未来の先行投資。'] },
+    { n:'Judgement', two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。'] },
+    { n:'The World', two:['輪は閉じて、道は開く。','完成形は、次のスタートライン。'] }
+  ];
+  function drawThree(){ const pool=[...deck],p=[]; for(let i=0;i<3;i++){ const r=crypto.getRandomValues(new Uint32Array(1))[0]%pool.length; p.push(pool.splice(r,1)[0]); } return p; }
+  let selected=[], opened=0;
+  const cards=[...document.querySelectorAll('.card')];
+  const bodies=[document.getElementById('r0'),document.getElementById('r1'),document.getElementById('r2')];
+  function resetMini(){
+    opened=0; selected=drawThree();
+    bodies[0].textContent='カードを開くと、ここに“詩”が現れます。';
+    bodies[1].textContent='カードを開くと、ここに“韻”が現れます。';
+    bodies[2].textContent='カードを開くと、ここに“祈”が現れます。';
+    document.getElementById('toSummary').style.display='none';
+    cards.forEach(c=>{ c.classList.remove('is-flipped'); c.style.pointerEvents='auto'; });
   }
-  return picks;
-}
-let selected=[],opened=0;
-const cards=[...document.querySelectorAll('.card')];
-const bodies=[document.getElementById('r0'),document.getElementById('r1'),document.getElementById('r2')];
-function resetMini(){
-  opened=0; selected=drawThree();
-  bodies[0].textContent='カードを開くと、ここに“詩”が現れます。';
-  bodies[1].textContent='カードを開くと、ここに“韻”が現れます。';
-  bodies[2].textContent='カードを開くと、ここに“祈”が現れます。';
-  document.getElementById('toSummary').style.display='none';
-  cards.forEach(c=>{ c.classList.remove('is-flipped'); c.style.pointerEvents='auto'; });
-}
-function onFlip(idx){
-  const c=cards[idx]; if(c.classList.contains('is-flipped')) return;
-  c.classList.add('is-flipped'); opened++;
-  bodies[idx].innerHTML=`《${selected[idx].n}》<br>${selected[idx].two[0]}<br>${selected[idx].two[1]}`;
-  if(opened===3){
-    cards.forEach(x=>x.style.pointerEvents='none');
-    document.getElementById('toSummary').style.display='flex';
-    document.getElementById('reading').scrollIntoView({behavior:'smooth'});
-  }
-}
-cards.forEach((el,i)=> el.addEventListener('click', ()=> onFlip(i), {passive:true}));
-function startMini(){ resetMini(); document.getElementById('reading').scrollIntoView({behavior:'smooth'}); }
-document.getElementById('startMini').addEventListener('click', startMini, {passive:true});
-document.getElementById('startMini2').addEventListener('click', startMini, {passive:true});
-</script>
-
-<!-- ===== サイドコード雨JS（1本化／軽量） ===== -->
-<script>
-(function(){
-  const CHARS='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
-  const L=document.getElementById('codeRainL');
-  const R=document.getElementById('codeRainR');
-  if(!L||!R) return;
-
-  function setup(canvas,side){ // side: 'L' | 'R'
-    const ctx=canvas.getContext('2d');
-    let W=0,H=0,fs=16,cols=0,drops=[],raf=0;
-
-    function fit(){
-      const dpr=Math.min(2,window.devicePixelRatio||1);
-      const cw=Math.max(72,canvas.clientWidth|0);
-      const ch=Math.max(200,innerHeight|0);
-      canvas.width=cw*dpr; canvas.height=ch*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
-      W=cw; H=ch;
-      fs=Math.max(12,Math.min(18,Math.floor(W/14)));
-      cols=Math.max(6,Math.floor(W/fs));
-      drops=new Array(cols).fill((Math.random()*H/fs)|0);
-      ctx.clearRect(0,0,W,H);
+  function onFlip(idx){
+    const c=cards[idx]; if(c.classList.contains('is-flipped')) return;
+    c.classList.add('is-flipped'); opened++;
+    bodies[idx].innerHTML=`《${selected[idx].n}》<br>${selected[idx].two[0]}<br>${selected[idx].two[1]}`;
+    if(opened===3){
+      cards.forEach(x=>x.style.pointerEvents='none');
+      document.getElementById('toSummary').style.display='flex';
+      document.getElementById('reading').scrollIntoView({behavior:'smooth'});
     }
+  }
+  cards.forEach((el,i)=> el.addEventListener('click', ()=> onFlip(i), {passive:true}));
+  function startMini(){ resetMini(); document.getElementById('reading').scrollIntoView({behavior:'smooth'}); }
+  document.getElementById('startMini').addEventListener('click', startMini, {passive:true});
+  document.getElementById('startMini2').addEventListener('click', startMini, {passive:true});
+  </script>
 
-    function draw(){
-      ctx.fillStyle='rgba(0,0,0,.10)';
-      ctx.fillRect(0,0,W,H);
-      ctx.font=`${fs}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
-
-      for(let i=0;i<cols;i++){
-        const edge=i/cols;
-        const inner=(side==='L')?edge:(1-edge);            // 0=内側, 1=外側
-        const alpha=0.55*Math.min(1,Math.max(0,inner));     // 内側ほど薄く
-        ctx.fillStyle=`rgba(127,208,255,${alpha.toFixed(3)})`;
-
-        const ch=CHARS[(Math.random()*CHARS.length)|0];
-        const x=i*fs+(Math.random()<.03?1:0);
-        const y=drops[i]*fs*0.9;
-        ctx.fillText(ch,x,y);
-
-        if(y>H && Math.random()>.978) drops[i]=0;
-        drops[i]++;
+  <!-- ===== Code Rain（左右・本文に被らない／iPhone対応） ===== -->
+  <script>
+  (function(){
+    const CHARS='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
+    function boot(id, side){
+      const cvs=document.getElementById(id); if(!cvs) return;
+      const ctx=cvs.getContext('2d');
+      let W=0,H=0,fs=16,cols=0,drops=[],raf=0,dpr=1;
+      function size(){
+        dpr=Math.min(2,window.devicePixelRatio||1);
+        const rect=cvs.getBoundingClientRect();
+        const cw=Math.max(72, (rect.width|0) || (innerWidth*0.16)|0);
+        const ch=Math.max(200,(rect.height|0) || innerHeight|0);
+        cvs.width=Math.floor(cw*dpr); cvs.height=Math.floor(ch*dpr);
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        W=cw; H=ch;
+        fs=Math.max(12,Math.min(18,Math.floor(W/14)));
+        cols=Math.max(6,Math.floor(W/fs));
+        drops=new Array(cols).fill((Math.random()*H/fs)|0);
+        ctx.clearRect(0,0,W,H);
       }
-      raf=requestAnimationFrame(draw);
+      function draw(){
+        ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(0,0,W,H);
+        ctx.font=`${fs}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+        for(let i=0;i<cols;i++){
+          const edgeRatio=i/cols;
+          const inner=(side==='L')? edgeRatio : (1-edgeRatio);
+          const alpha=0.55*Math.min(1,Math.max(0,inner));
+          ctx.fillStyle=`rgba(127,208,255,${alpha.toFixed(3)})`;
+          const ch=CHARS[(Math.random()*CHARS.length)|0];
+          const x=i*fs+(Math.random()<.03?1:0);
+          const y=drops[i]*fs*0.9;
+          ctx.fillText(ch,x,y);
+          if(y>H && Math.random()>.978) drops[i]=0;
+          drops[i]++;
+        }
+        raf=requestAnimationFrame(draw);
+      }
+      const ro=new ResizeObserver(size); ro.observe(cvs);
+      addEventListener('resize',size,{passive:true});
+      size(); draw();
+      const mq=matchMedia('(prefers-reduced-motion: reduce)');
+      function toggle(e){ if(e.matches){ cancelAnimationFrame(raf); ctx.clearRect(0,0,W,H);} else { draw(); } }
+      mq.addEventListener?.('change',toggle); toggle(mq);
     }
-
-    const ro=new ResizeObserver(fit); ro.observe(canvas);
-    addEventListener('resize',fit,{passive:true});
-    fit(); draw();
-
-    const mq=matchMedia('(prefers-reduced-motion: reduce)');
-    function onMotion(e){ if(e.matches){ cancelAnimationFrame(raf); ctx.clearRect(0,0,W,H); } else { draw(); } }
-    mq.addEventListener?.('change',onMotion); onMotion(mq);
-  }
-
-  setup(L,'L'); setup(R,'R');
-})();
-</script>
-
+    boot('codeRainL','L'); boot('codeRainR','R');
+  })();
+  </script>
 </body>
 </html>
