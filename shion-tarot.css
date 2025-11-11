@@ -206,3 +206,33 @@ body{
 @media (prefers-reduced-motion:reduce){
   .t-bg__halo,.t-bg__dust,.t-btn--primary{ animation:none }
 }
+
+/* ===== Code Rain（両サイド限定） ===== */
+/* サイド幅は .t-sides と同じ値に揃える */
+:root{ --sidew: min(22vw, 260px) }
+
+.codeRain{
+  position: fixed; top: 0; height: 100svh; width: var(--sidew);
+  z-index: 1; pointer-events: none;
+  /* 下方向に消えるマスク：神殿の柱マスクと整合 */
+  mask: linear-gradient(180deg, #000 20%, transparent 95%);
+  /* 背景の柱・光と馴染む */
+  mix-blend-mode: screen;
+}
+.codeRain--left{ left: 0 }
+.codeRain--right{ right: 0 }
+
+/* ベースの“サイバー×神域”の薄い光を全画面に。ヒーロー背景と相性良い */
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(800px 600px at 50% 80%, rgba(255,215,111,.12), transparent 70%),
+    conic-gradient(from 0deg at 50% 70%, rgba(127,208,255,.14), transparent 40%),
+    repeating-linear-gradient(90deg, rgba(127,208,255,.05) 0 1px, transparent 1px 26px);
+  mix-blend-mode: screen;
+}
+
+/* 動きが苦手な人への配慮：コード雨を止める */
+@media (prefers-reduced-motion: reduce){
+  .codeRain{ display:none }
+}
