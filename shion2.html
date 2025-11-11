@@ -1,181 +1,48 @@
-<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8" />
-<title>詩韻 Shion — 思想と占いのCode｜無料体験→個人鑑定</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="theme-color" content="#0b0b1a" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
-
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>コード雨ミニテスト</title>
 <style>
-/* ===== 基本 ===== */
-*{margin:0;padding:0;box-sizing:border-box}
-html{overflow-x:hidden}
-body{
-  background:#0b0b1a;color:#eef1ff;overflow-x:hidden;
-  font-family:'Noto Serif JP',serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-}
-:root{
-  --t-ink:#eef1ff;--t-muted:#a7b1d6;--t-gold:#FFD76F;--t-gold-soft:#FFF2C1;
-  --sidew:clamp(82px,16vw,180px);
-}
-@media (color-gamut:p3){ :root{ --t-gold:color(display-p3 1 0.84 0.45) }}
-
-/* ===== ヘッダー ===== */
-.hdr{position:sticky;top:0;z-index:9;backdrop-filter:blur(10px);
-  background:color-mix(in oklab,#0b0b1a 85%,#1b1440 15%);
-  border-bottom:1px solid rgba(255,255,255,.08)}
-.hdr__in{max-width:1180px;margin:0 auto;padding:10px 16px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px}
-.logo{color:var(--t-gold);text-decoration:none;font-family:"Cormorant Garamond",serif;font-size:1.28rem}
-.nav{display:flex;justify-content:center;gap:min(3vw,22px)}
-.nav a{color:#fff;text-decoration:none;font-size:.95rem;opacity:.95;transition:.2s}
-.nav a:hover{opacity:.75;transform:translateY(-1px)}
-.mini-cta{display:inline-flex;align-items:center;justify-content:center;min-width:64px;height:36px;padding:0 12px;border-radius:999px;text-decoration:none;font-weight:800;letter-spacing:.04em;color:#2a2136;background:linear-gradient(90deg,#FFF2C1,#FFD76F 70%);box-shadow:0 10px 20px rgba(255,215,111,.32), inset 0 0 8px rgba(255,240,200,.25);border:1px solid rgba(255,215,111,.5)}
-
-/* ===== ヒーロー（神殿） ===== */
-.hero{position:relative;min-height:100svh;display:grid;place-items:center;isolation:isolate;overflow:clip}
-.hero__in{position:relative;z-index:2;width:min(1080px,92vw);margin-inline:auto;padding:clamp(18px,5vw,40px) 0;text-align:center}
-.t-title{font-family:"Cormorant Garamond",serif;line-height:1.18;letter-spacing:.06em;margin:0 auto .8rem;max-width:900px}
-.t-title__lead{display:block;font-size:clamp(20px,3.4vw,28px);opacity:.95;text-shadow:0 0 24px rgba(124,98,255,.26)}
-.t-title__core{
-  display:block;font-size:clamp(30px,7vw,60px);
-  background:linear-gradient(92deg,var(--t-gold-soft),var(--t-gold) 38%,#EEC35A 58%,var(--t-gold) 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  text-shadow:0 2px 22px rgba(255,215,111,.45), 0 0 60px rgba(124,98,255,.22);-webkit-text-stroke:.35px rgba(10,8,20,.35)
-}
-.t-sub{margin:.8rem auto .4rem;max-width:760px;color:var(--t-ink);opacity:.98;line-height:1.9;letter-spacing:.04em;text-shadow:0 0 10px rgba(20,24,44,.35)}
-.t-poem{margin:0 auto 1.1rem;max-width:640px;opacity:.95;letter-spacing:.06em;text-shadow:0 0 10px rgba(130,140,255,.25)}
-
-.t-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
-.t-bg--halo{
-  background:
-   radial-gradient(60vmin 60vmin at 50% 38%, rgba(255,215,111,.24), transparent 60%),
-   radial-gradient(90vmin 40vmin at 50% 110%, rgba(124,98,255,.18), transparent 70%);
-  filter:blur(6px);animation:halo 6s ease-in-out infinite
-}
-.t-bg--pillars{mask:linear-gradient(180deg,#000 25%,transparent 95%);
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 1px,transparent 1px 64px);opacity:.22}
-.t-bg--dust{
-  background:
-   radial-gradient(1.6px 1.6px at 20% 30%, #ffffffb0 0 99%, #0000 100%),
-   radial-gradient(1.4px 1.4px at 78% 68%, #ffffff99 0 99%, #0000 100%),
-   radial-gradient(1.2px 1.2px at 62% 18%, #ffffff80 0 99%, #0000 100%);
-  opacity:.33;animation:dust 70s linear infinite}
-@keyframes halo{50%{transform:scale(1.04);filter:blur(8px)}}
-@keyframes dust{to{background-position:-1600px 1200px,1200px -1000px,-1000px -800px}}
-
-/* ===== CTA ===== */
-.t-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0 8px}
-.t-btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 22px;border-radius:16px;text-decoration:none;cursor:pointer;font-weight:800;letter-spacing:.03em;transition:.15s}
-.t-btn:focus-visible{outline:2px solid var(--t-gold);outline-offset:3px}
-.t-btn--primary{color:#2a2136;background:linear-gradient(92deg,#FFF2C1 0%,var(--t-gold) 28%,#FFC944 62%,var(--t-gold) 100%);box-shadow:0 16px 40px rgba(255,215,111,.42), inset 0 0 12px rgba(255,240,200,.35);border:1px solid rgba(255,215,111,.55);animation:breathe 1.9s ease-in-out infinite}
-.t-btn--ghost{color:#e9e6ff;background:rgba(174,138,255,.10);border:1px solid rgba(174,138,255,.35);box-shadow:inset 0 0 10px rgba(174,138,255,.08)}
-.t-btn small{display:block;font-size:.85rem;opacity:.9;margin-top:4px}
-@keyframes breathe{50%{box-shadow:0 20px 44px rgba(255,215,111,.50), inset 0 0 16px rgba(255,240,200,.45)}}
-.t-trust{margin:12px auto 0;padding:0;list-style:none;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:900px}
-.t-trust li{padding:8px 12px;border-radius:999px;background:rgba(255,215,111,.12);border:1px solid rgba(255,215,111,.35);color:#ffe8b3;font-weight:700;letter-spacing:.04em}
-
-/* ===== 両サイドのコード雨（本文に被らない） ===== */
-.codeRain{position:fixed;top:0;height:100svh;width:var(--sidew);z-index:1;pointer-events:none;opacity:.28;
-  mask:linear-gradient(180deg,#000 18%,transparent 96%);mix-blend-mode:screen}
-.codeRain--left{left:0;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 68%,transparent 98%);mask-image:linear-gradient(to right,#000 0%,#000 68%,transparent 98%)}
-.codeRain--right{right:0;-webkit-mask-image:linear-gradient(to left,#000 0%,#000 68%,transparent 98%);mask-image:linear-gradient(to left,#000 0%,#000 68%,transparent 98%)}
-@media (max-width:980px){.codeRain{display:none}}
-@media (prefers-reduced-motion:reduce){.codeRain{display:none}}
-
-/* 薄い全画面のグリッド光 */
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-   radial-gradient(800px 600px at 50% 80%, rgba(255,215,111,.12), transparent 70%),
-   conic-gradient(from 0deg at 50% 70%, rgba(127,208,255,.14), transparent 40%),
-   repeating-linear-gradient(90deg, rgba(127,208,255,.05) 0 1px, transparent 1px 26px);
-  mix-blend-mode:screen
-}
-
-/* ===== 以下は説明/CTAのベース ===== */
-.section{padding:72px 20px;text-align:center;border-top:1px solid rgba(255,215,111,.08)}
-.section h2{font-family:"Cormorant Garamond",serif;font-size:clamp(28px,6vw,44px);
-  background:linear-gradient(90deg,var(--t-gold-soft),var(--t-gold));-webkit-background-clip:text;color:transparent;margin-bottom:12px}
-.section p{max-width:760px;margin:0 auto 16px;color:#e9e6ff;opacity:.92;line-height:1.9}
+  :root{ --sidew: clamp(82px,16vw,180px) }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%} body{background:#0b0b1a;color:#eef1ff;font:16px/1.6 system-ui}
+  .center{position:relative;z-index:2;display:grid;place-items:center;min-height:100vh;text-align:center}
+  .h{font-size:clamp(22px,4vw,32px)}
+  /* 左右のコード雨 */
+  .codeRain{
+    position:fixed;top:0;height:100svh;width:var(--sidew);
+    z-index:1;pointer-events:none;opacity:.3;mix-blend-mode:screen;
+    -webkit-mask-image:linear-gradient(to right,#000 0%,#000 68%,transparent 98%);
+            mask-image:linear-gradient(to right,#000 0%,#000 68%,transparent 98%);
+  }
+  #codeRainR{
+    right:0;left:auto;
+    -webkit-mask-image:linear-gradient(to left,#000 0%,#000 68%,transparent 98%);
+            mask-image:linear-gradient(to left,#000 0%,#000 68%,transparent 98%);
+  }
+  @media (max-width:980px){ .codeRain{display:none} }
 </style>
-</head>
+</head><body>
+<canvas id="codeRainL" class="codeRain"></canvas>
+<canvas id="codeRainR" class="codeRain"></canvas>
 
-<body>
-<header class="hdr" role="banner">
-  <canvas id="codeRainL" class="codeRain codeRain--left" aria-hidden="true"></canvas>
-  <canvas id="codeRainR" class="codeRain codeRain--right" aria-hidden="true"></canvas>
-
-  <div class="hdr__in">
-    <a href="/" class="logo">Re:verse Shion</a>
-    <nav class="nav" aria-label="メイン">
-      <a href="/reading.html">詳しく読む</a>
-      <a href="/line.html">LINE登録</a>
-      <a href="/about.html">詩韻とは</a>
-    </nav>
-    <a class="mini-cta" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">鑑定</a>
-  </div>
-</header>
-
-<section class="hero" id="top">
-  <div class="t-bg t-bg--halo"></div>
-  <div class="t-bg t-bg--pillars"></div>
-  <div class="t-bg t-bg--dust"></div>
-
-  <div class="hero__in">
-    <h1 class="t-title">
-      <span class="t-title__lead">言葉で魂を救う、</span>
-      <span class="t-title__core">思想と占いの <em>Code</em></span>
-    </h1>
-    <p class="t-sub">詩で照らし、Codeで進む。あなたの“今”を、言葉の手順で幸せな世界線へ。</p>
-    <p class="t-poem">―― 静かな呼吸の先に、必ず光がある。大丈夫だよ。</p>
-
-    <div class="t-ctas">
-      <a class="t-btn t-btn--primary" href="#trial">🌟 無料で体験（1分）</a>
-      <a class="t-btn t-btn--ghost" href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener">
-        💫 個人鑑定を申し込む
-        <small>初回4,000円｜24h以内返信｜匿名OK</small>
-      </a>
-    </div>
-    <ul class="t-trust" aria-label="安心ポイント">
-      <li>初回4,000円</li><li>24h以内返信</li><li>匿名OK</li>
-    </ul>
-  </div>
-</section>
-
-<section id="trial" class="section" aria-label="無料体験の流れ">
-  <h2>無料体験の流れ</h2>
-  <p>1分で、“詩・韻・祈”の光を感じられます。カードの演出は体験ページで展開します。</p>
-  <p><a class="t-btn t-btn--primary" href="/reading.html">体験ページへ（ミニ展開）</a></p>
-</section>
-
-<section class="section">
-  <h2>もっと深く、あなたのために読む</h2>
-  <p>無料体験の言葉に“何か”を感じたあなたへ。詩韻が、あなたの状況に合わせて具体的に導きます。</p>
-  <p class="t-ctas" style="justify-content:center">
-    <a href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" class="t-btn t-btn--primary">📩 LINE登録（特典つき）</a>
-    <a href="https://lin.ee/9RBqOl4" target="_blank" rel="noopener" class="t-btn t-btn--ghost">💫 個人鑑定を申し込む</a>
-  </p>
-</section>
-
-<footer class="section" style="border-top:1px solid rgba(255,215,111,.08)">
-  <p>詩は言葉、韻は響き、祈りは還る場所。―― 言葉で魂を救う、それが詩韻思想。</p>
-  <p style="opacity:.6;font-size:.9rem">© 2025 Shion Philosophy — 言葉が魂を救う Code</p>
-</footer>
+<div class="center"><div>
+  <div class="h">左右に「コード雨」が見えますか？</div>
+  <p>見えなければ、配信設定/キャッシュ/パスの問題です。</p>
+</div></div>
 
 <script>
-/* ===== Code Rain（左右） ===== */
-(function(){
-  const CHARS = '01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
-  function setup(canvas, side){
-    const ctx = canvas.getContext('2d');
-    let W=0,H=0,fs=16,cols=0,drops=[],raf=0;
+(function(){ // 左右コード雨（最小）
+  const CHARS='01AI∞詩韻祈魂∴∵◇◆＊＋≡☆★◯●∑ΣΛΩΞΨϕπ≒→←↑↓';
+  function run(canvas,side){
+    if(!canvas) return;
+    const ctx=canvas.getContext('2d'); let W=0,H=0,fs=16,cols=0,drops=[],raf=0;
     function resize(){
-      const dpr = Math.min(2, window.devicePixelRatio||1);
-      const cw  = Math.max(72, canvas.clientWidth|0);
-      const ch  = Math.max(200, innerHeight|0);
+      const dpr=Math.min(2,window.devicePixelRatio||1);
+      // CSSが効かずclientWidth=0になる環境対策：直指定
+      if(!canvas.style.width) canvas.style.width=getComputedStyle(canvas).width||'160px';
+      const rect=canvas.getBoundingClientRect();
+      const cw=Math.max(80,rect.width|0), ch=Math.max(200,innerHeight|0);
       canvas.width=cw*dpr; canvas.height=ch*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
       W=cw; H=ch; fs=Math.max(12,Math.min(18,Math.floor(W/14)));
       cols=Math.max(6,Math.floor(W/fs)); drops=new Array(cols).fill((Math.random()*H/fs)|0);
@@ -188,23 +55,15 @@ body::before{
         const edge=i/cols, dist=(side==='L')?edge:(1-edge), alpha=0.55*Math.min(1,Math.max(0,dist));
         ctx.fillStyle=`rgba(127,208,255,${alpha.toFixed(3)})`;
         const ch=CHARS[(Math.random()*CHARS.length)|0];
-        const x=i*fs + (Math.random()<.03?1:0); const y=drops[i]*fs*0.9;
-        ctx.fillText(ch,x,y);
-        if(y>H && Math.random()>.978) drops[i]=0; drops[i]++;
+        const x=i*fs + (Math.random()<.03?1:0), y=drops[i]*fs*0.9;
+        ctx.fillText(ch,x,y); if(y>H&&Math.random()>.978) drops[i]=0; drops[i]++;
       }
       raf=requestAnimationFrame(draw);
     }
-    const ro=new ResizeObserver(resize); ro.observe(canvas);
-    addEventListener('resize',resize,{passive:true});
-    resize(); draw();
-    const mq=matchMedia('(prefers-reduced-motion: reduce)');
-    function motion(e){ if(e.matches){ cancelAnimationFrame(raf); ctx.clearRect(0,0,W,H);} else { draw(); } }
-    mq.addEventListener?.('change',motion); motion(mq);
+    addEventListener('resize',resize,{passive:true}); resize(); draw();
   }
-  const L=document.getElementById('codeRainL');
-  const R=document.getElementById('codeRainR');
-  if(L) setup(L,'L'); if(R) setup(R,'R');
+  run(document.getElementById('codeRainL'),'L');
+  run(document.getElementById('codeRainR'),'R');
 })();
 </script>
-</body>
-</html>
+</body></html>
