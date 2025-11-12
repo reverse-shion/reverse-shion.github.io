@@ -1,5 +1,10 @@
 name: Generate sitemap.xml
 
+# ← これが超重要。GITHUB_TOKEN に書き込み権限を要求
+permissions:
+  contents: write
+  pull-requests: write  # 予備（PR方式にも使える）
+
 on:
   push:
     branches: [ main ]
@@ -8,8 +13,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # 明示的に GITHUB_TOKEN を使う
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Generate sitemap.xml
         env:
@@ -17,17 +28,18 @@ jobs:
           SITE_ROOT: .
         run: |
           python3 -V
-          mkdir -p scripts
           python3 scripts/generate_sitemap.py
 
       - name: Commit sitemap.xml if changed
+        shell: bash
         run: |
           if [ -n "$(git status --porcelain sitemap.xml)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config user.name  "${{ github.actor }}"
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
             git add sitemap.xml
-            git commit -m "chore: update sitemap.xml [skip ci]" || true
-            git push
+            git commit -m "chore: update sitemap.xml [skip ci]" || exit 0
+            # 明示的に現在のブランチへ push（トークン付きURLは checkout@v4 が設定済み）
+            git push origin HEAD:${GITHUB_REF_NAME}
           else
             echo "No changes in sitemap.xml"
           fi
