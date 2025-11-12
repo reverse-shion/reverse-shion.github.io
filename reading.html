@@ -110,11 +110,15 @@
     .card__back::before{ content:""; position:absolute; inset:0;
       background: var(--tarot-back-url) center/cover no-repeat; filter:contrast(1.02) saturate(1.02) }
     .card__back > img{ width:100%; height:100%; object-fit:cover; display:block; opacity:0 } /* iOS保険 */
-    .card__front{ transform:rotateY(180deg) }
-    .card[data-i="0"] .card__front{ background:linear-gradient(135deg,#fff3bf,#ead7ff) }
-    .card[data-i="1"] .card__front{ background:linear-gradient(135deg,#e6fff3,#e0e6ff) }
-    .card[data-i="2"] .card__front{ background:linear-gradient(135deg,#ffe7f7,#effff8) }
-    .card--glow .card__inner{
+    .card__front{
+  transform:rotateY(180deg);
+  /* 画像をJSで挿入するためのデフォルト（薄い金のグラデ） */
+  background:
+    radial-gradient(120% 120% at 50% 20%, rgba(255,242,200,.75), transparent 60%),
+    linear-gradient(135deg,#fff3bf,#ead7ff);
+  background-position:center;
+  background-size:cover;
+}    .card--glow .card__inner{
       box-shadow:0 0 0 2px rgba(240,220,160,.55), 0 0 40px 14px rgba(255,240,200,.35), 0 20px 60px rgba(208,170,66,.25);
       animation: glowpop .6s ease-out
     }
@@ -294,29 +298,72 @@
       // タイミング
       const T_FLASH=900, T_SY_FADE=900, T_PAUSE=600, LINE_DELAY=850;
 
-      const DECK=[
-        {n:'The Fool',two:['最初の一歩は、恐れより軽い。','失敗は合図——世界は君に開く。']},
-        {n:'The Magician',two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。']},
-        {n:'The High Priestess',two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。']},
-        {n:'The Empress',two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。']},
-        {n:'The Emperor',two:['迷いは構造で解ける。','境界線は、君を守る城。']},
-        {n:'The Lovers',two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。']},
-        {n:'The Chariot',two:['向かう先が速さを決める。','手綱は心、進路は意志。']},
-        {n:'Strength',two:['優しい力は、世界を従わせない。','それでも、世界は従う。']},
-        {n:'The Hermit',two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。']},
-        {n:'Wheel of Fortune',two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。']},
-        {n:'Justice',two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。']},
-        {n:'The Hanged Man',two:['世界を逆さにして見よ。','止まることが進むことになる日もある。']},
-        {n:'Death',two:['終わりは名前の違う始まり。','脱皮の痛みは、生きている証。']},
-        {n:'Temperance',two:['混ぜる、待つ、整える。','その中間に、答えは棲む。']},
-        {n:'The Devil',two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。']},
-        {n:'The Tower',two:['壊れるのは壊すべきもの。','空いた隙間が光の通り道。']},
-        {n:'The Star',two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。']},
-        {n:'The Moon',two:['不安は想像力の副作用。','曙は必ず来る。']},
-        {n:'The Sun',two:['喜びは戦略になる。','笑顔は未来の先行投資。']},
-        {n:'Judgement',two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。']},
-        {n:'The World',two:['輪は閉じて、道は開く。','完成形は次のスタートライン。']}
-      ];
+      /* ===== 22枚フルマッピング：画像と2行解説を1カードに紐付け ===== */
+const MAJOR = [
+  { id:0,  key:'fool',        n:'The Fool',        img:'/assets/tarot/00_fool.jpg',        two:['最初の一歩は、恐れより軽い。','失敗は合図——世界は君に開く。']},
+  { id:1,  key:'magician',    n:'The Magician',    img:'/assets/tarot/01_magician.jpg',    two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。']},
+  { id:2,  key:'priestess',   n:'The High Priestess', img:'/assets/tarot/02_priestess.jpg', two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。']},
+  { id:3,  key:'empress',     n:'The Empress',     img:'/assets/tarot/03_empress.jpg',     two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。']},
+  { id:4,  key:'emperor',     n:'The Emperor',     img:'/assets/tarot/04_emperor.jpg',     two:['迷いは構造で解ける。','境界線は、君を守る城。']},
+  { id:5,  key:'hierophant',  n:'The Hierophant',  img:'/assets/tarot/05_hierophant.jpg',  two:['伝統は檻ではない、土壌だ。','学びは継承で強くなる。']},
+  { id:6,  key:'lovers',      n:'The Lovers',      img:'/assets/tarot/06_lovers.jpg',      two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。']},
+  { id:7,  key:'chariot',     n:'The Chariot',     img:'/assets/tarot/07_chariot.jpg',     two:['向かう先が速さを決める。','手綱は心、進路は意志。']},
+  { id:8,  key:'strength',    n:'Strength',        img:'/assets/tarot/08_strength.jpg',    two:['優しい力は、世界を従わせない。','それでも、世界は従う。']},
+  { id:9,  key:'hermit',      n:'The Hermit',      img:'/assets/tarot/09_hermit.jpg',      two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。']},
+  { id:10, key:'wheel',       n:'Wheel of Fortune',img:'/assets/tarot/10_wheel.jpg',       two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。']},
+  { id:11, key:'justice',     n:'Justice',         img:'/assets/tarot/11_justice.jpg',     two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。']},
+  { id:12, key:'hanged',      n:'The Hanged Man',  img:'/assets/tarot/12_hanged.jpg',      two:['世界を逆さにして見よ。','止まることが進むことになる日もある。']},
+  { id:13, key:'death',       n:'Death',           img:'/assets/tarot/13_death.jpg',       two:['終わりは名前の違う始まり。','脱皮の痛みは、生きている証。']},
+  { id:14, key:'temperance',  n:'Temperance',      img:'/assets/tarot/14_temperance.jpg',  two:['混ぜる、待つ、整える。','その中間に、答えは棲む。']},
+  { id:15, key:'devil',       n:'The Devil',       img:'/assets/tarot/15_devil.jpg',       two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。']},
+  { id:16, key:'tower',       n:'The Tower',       img:'/assets/tarot/16_tower.jpg',       two:['壊れるのは壊すべきもの。','空いた隙間が光の通り道。']},
+  { id:17, key:'star',        n:'The Star',        img:'/assets/tarot/17_star.jpg',        two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。']},
+  { id:18, key:'moon',        n:'The Moon',        img:'/assets/tarot/18_moon.jpg',        two:['不安は想像力の副作用。','曙は必ず来る。']},
+  { id:19, key:'sun',         n:'The Sun',         img:'/assets/tarot/19_sun.jpg',         two:['喜びは戦略になる。','笑顔は未来の先行投資。']},
+  { id:20, key:'judgement',   n:'Judgement',       img:'/assets/tarot/20_judgement.jpg',   two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。']},
+  { id:21, key:'world',       n:'The World',       img:'/assets/tarot/21_world.jpg',       two:['輪は閉じて、道は開く。','完成形は次のスタートライン。']},
+];
+
+/* 3枚引き（暗号学的乱数で重複なし） */
+function drawThree(){
+  const pool = [...MAJOR];
+  const picks = [];
+  for(let i=0;i<3;i++){
+    const r = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
+    picks.push(pool.splice(r,1)[0]);
+  }
+  return picks;
+}
+
+let opened = 0;
+let selected = drawThree();
+
+/* フロント面に対応画像を敷く */
+function setFrontImage(cardEl, imgUrl){
+  const front = cardEl.querySelector('.card__front');
+  if(!front) return;
+  front.style.backgroundImage = `url("${imgUrl}")`;
+  front.style.backgroundPosition = 'center';
+  front.style.backgroundSize = 'cover';
+}
+
+/* クリックで反転 → 画像反映 → 2行解説 → 全開時は続きへ */
+function flip(i){
+  const el = cards[i];
+  if(!el || el.classList.contains('is-flipped')) return;
+
+  const d = selected[i];                 // ← ここが「意味＝画像」のセット
+  setFrontImage(el, d.img);              // 表面画像をカードに即適用
+  el.classList.add('is-flipped','card--glow');
+  setTimeout(()=>el.classList.remove('card--glow'),620);
+
+  // 2行解説
+  mBodies[i].innerHTML = `《${d.n}》<br>${d.two[0]}<br>${d.two[1]}`;
+  mItems[i].classList.add('is-show');
+
+  opened++;
+  if(opened===3) runSequence();
+}
 
       const POEMS=[
         ["風は名を持たず、あなたの願いだけを知っている。","迷った足跡は、地図に描き直せる。","優しさは武器ではない——それでも闇を遠ざける。","涙は言葉の前奏、沈黙は祈りの本質。","選ぶことは、未来の責任を抱きしめること。","恐れの奥には、出発の鍵穴がある。","手放すとは、より大きな循環へ返す儀式。","呼吸を一度、長く。世界はそれだけで広がる。","そして、いま。小さな一歩が、あなたを救う。"],
