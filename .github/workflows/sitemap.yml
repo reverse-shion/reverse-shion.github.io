@@ -1,37 +1,33 @@
-name: Generate sitemap
+name: Generate sitemap.xml
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
+  workflow_dispatch: {}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Generate sitemap
-        uses: cicirello/generate-sitemap@v1
-        with:
-          base-url-path: /
-          path-to-root: ./
-          include-html: true
-          sitemap-format: xml
-          include-pdf: false
-          date-only: false
-          exclude-paths: |
-            /sw.js
-            /manifest.webmanifest
-            /assets/
-            /google*.html
+      - name: Generate sitemap.xml
+        env:
+          SITE_URL: https://reverse-shion.github.io
+          SITE_ROOT: .
+        run: |
+          python3 -V
+          mkdir -p scripts
+          python3 scripts/generate_sitemap.py
 
-      - name: Commit sitemap.xml
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "update sitemap.xml"
-          file_pattern: sitemap.xml
+      - name: Commit sitemap.xml if changed
+        run: |
+          if [ -n "$(git status --porcelain sitemap.xml)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add sitemap.xml
+            git commit -m "chore: update sitemap.xml [skip ci]" || true
+            git push
+          else
+            echo "No changes in sitemap.xml"
+          fi
