@@ -1,53 +1,27 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+import os
+import datetime
+from xml.etree.ElementTree import Element, SubElement, ElementTree
 
-import os, time
-from urllib.parse import quote
+SITE_URL = os.getenv("SITE_URL", "https://reverse-shion.github.io")
+SITE_ROOT = os.getenv("SITE_ROOT", ".")
 
-SITE_URL = os.environ.get("SITE_URL", "https://reverse-shion.github.io")
-ROOT = os.environ.get("SITE_ROOT", ".")
-EXTS = (".html",)  # 必要なら ".htm" など追加
+OUTPUT_PATH = os.path.join(SITE_ROOT, "sitemap.xml")
 
-def norm(loc: str) -> str:
-    loc = loc.replace("\\", "/")
-    loc = loc.replace("//", "/").replace(":/", "://")
-    return loc
+# 現在時刻をUTCで取得して <lastmod> に設定
+now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
-urls = []
-for dirpath, _, filenames in os.walk(ROOT):
-    # .git や scripts など不要なディレクトリは除外
-    if any(seg in dirpath for seg in ("/.git", "/scripts", "/node_modules")):
-        continue
-    for f in filenames:
-        if f.lower().endswith(EXTS):
-            abs_f = os.path.join(dirpath, f)
-            rel = os.path.relpath(abs_f, ROOT)
-            rel = rel.replace("\\", "/")
+urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
-            # index.html → ディレクトリURLへ正規化
-            if rel.endswith("index.html"):
-                loc = f"{SITE_URL}/{quote(rel[:-10])}"
-            else:
-                loc = f"{SITE_URL}/{quote(rel)}"
+for root, dirs, files in os.walk(SITE_ROOT):
+    for file in files:
+        if file.endswith(".html"):
+            rel_path = os.path.relpath(os.path.join(root, file), SITE_ROOT)
+            url = f"{SITE_URL}/{rel_path}".replace("index.html", "")
+            node = SubElement(urlset, "url")
+            SubElement(node, "loc").text = url
+            SubElement(node, "lastmod").text = now
 
-            loc = norm(loc)
-            # ISO8601（sitemaps.org準拠）。Googleは lastmod をクロールスケジュールに利用。 
-            # 例: 2025-11-12T12:34:56Z
-            ts = time.gmtime(os.path.getmtime(abs_f))
-            lastmod = time.strftime("%Y-%m-%dT%H:%M:%SZ", ts)
-            urls.append((loc, lastmod))
+tree = ElementTree(urlset)
+tree.write(OUTPUT_PATH, encoding="utf-8", xml_declaration=True)
 
-# 重複排除＋並び
-urls = sorted(set(urls), key=lambda x: x[0])
-
-xml = []
-xml.append('<?xml version="1.0" encoding="UTF-8"?>')
-xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-for loc, lastmod in urls:
-    xml.append(f'  <url><loc>{loc}</loc><lastmod>{lastmod}</lastmod></url>')
-xml.append('</urlset>')
-
-with open("sitemap.xml", "w", encoding="utf-8") as fp:
-    fp.write("\n".join(xml))
-
-print(f"Generated sitemap.xml with {len(urls)} URLs")
+print(f"✅ sitemap.xml generated successfully at {now}")
