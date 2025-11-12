@@ -1,52 +1,35 @@
-name: Generate sitemap.xml (Auto Commit + Debug)
-
-permissions:
-  contents: write
+name: Generate Sitemap
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
+  schedule:
+    - cron: '0 15 * * *'  # JSTで毎日0:00に自動更新（UTC15:00）
+  workflow_dispatch: {}    # 手動実行ボタンも有効化
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      # HTML が見えているかを表示（デバッグ）
-      - name: Debug - list HTML files
-        run: |
-          echo "PWD: $(pwd)"
-          echo "HTML files found:"
-          find . -type f -name "*.html" | sort || true
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Generate sitemap.xml
-        env:
-          SITE_URL: https://reverse-shion.github.io
-          SITE_ROOT: .
         run: |
-          python3 scripts/generate_sitemap.py
-
-      - name: Show first 50 lines of sitemap.xml
-        run: |
-          head -n 50 sitemap.xml || true
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
+          echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
+          find . -type f -name "*.html" | while read file; do
+            url="https://reverse-shion.github.io/${file#./}"
+            url="${url/index.html/}"
+            lastmod=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            echo "  <url><loc>$url</loc><lastmod>$lastmod</lastmod></url>" >> sitemap.xml
+          done
+          echo '</urlset>' >> sitemap.xml
 
       - name: Commit and push sitemap.xml
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add sitemap.xml
-          git commit -m "chore: auto-update sitemap.xml [skip ci]" || echo "No changes to commit"
-          git push origin main
+          git commit -m "Auto update sitemap on $(date)" || echo "No changes to commit"
+          git push
