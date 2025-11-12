@@ -1,34 +1,30 @@
-# scripts/generate_sitemap.py
-import os, datetime
+import os
+import datetime
 
-SITE_URL = os.getenv("SITE_URL", "https://reverse-shion.github.io").rstrip("/")
-SITE_ROOT = os.getenv("SITE_ROOT", ".")
-OUTPUT_FILE = "sitemap.xml"
+site_url = os.getenv("SITE_URL", "https://reverse-shion.github.io")
+site_root = os.getenv("SITE_ROOT", ".")
 
-def find_html_files(root):
-    html_files = []
-    for dirpath, _, filenames in os.walk(root):
-        for f in filenames:
-            if f.endswith(".html"):
-                path = os.path.join(dirpath, f)
-                if "/." in path or "404.html" in path:
-                    continue
-                html_files.append(os.path.relpath(path, root))
-    return sorted(html_files)
+# sitemap.xml の書き込み先
+output_file = os.path.join(site_root, "sitemap.xml")
 
-def main():
-    html_files = find_html_files(SITE_ROOT)
-    now = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+urls = []
+for root, dirs, files in os.walk(site_root):
+    for file in files:
+        if file.endswith(".html"):
+            path = os.path.relpath(os.path.join(root, file), site_root)
+            loc = f"{site_url}/{path.replace(os.sep, '/')}"
+            lastmod = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            urls.append((loc, lastmod))
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        f.write('<?xml version="1.0" encoding="utf-8"?>\n')
-        f.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
-        for file in html_files:
-            url = f"{SITE_URL}/{file.replace(os.sep, '/')}"
-            f.write(f"  <url><loc>{url}</loc><lastmod>{now}</lastmod></url>\n")
-        f.write("</urlset>\n")
+# XML構造で出力
+with open(output_file, "w", encoding="utf-8") as f:
+    f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+    f.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
+    for loc, lastmod in urls:
+        f.write("  <url>\n")
+        f.write(f"    <loc>{loc}</loc>\n")
+        f.write(f"    <lastmod>{lastmod}</lastmod>\n")
+        f.write("  </url>\n")
+    f.write("</urlset>\n")
 
-    print(f"✅ sitemap.xml generated ({len(html_files)} pages)")
-
-if __name__ == "__main__":
-    main()
+print(f"✅ Generated sitemap with {len(urls)} URLs at {output_file}")
