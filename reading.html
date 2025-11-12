@@ -22,11 +22,11 @@
       --muted:#7a6f84;
       --gold:#d0aa42;
       --r:16px;
-      --tarot-back-url:url("back.png"); /* ←差し替え可 */
+      /* 裏面の画像パスはここで統一 */
+      --tarot-back-url:url("/assets/tarot/back.jpg");
     }
     @media (color-gamut:p3){ :root{ --gold:color(display-p3 0.82 0.72 0.30) } }
 
-    /* 背景：境界が目立たない多段グラデ＋極薄ノイズ */
     body{
       color:var(--ink);
       font-family:'Noto Serif JP',serif;
@@ -46,10 +46,8 @@
       background-size:160px 160px;
     }
 
-    /* 星粒（Canvas） */
     .stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
 
-    /* コード雨の残影（PCのみ） */
     .glyph-column{
       position:fixed; top:0; bottom:0; width:min(16vw,140px); z-index:1; pointer-events:none;
       opacity:.14; mix-blend-mode:multiply; mask:linear-gradient(180deg,#000 20%,transparent 95%);
@@ -59,7 +57,6 @@
     .glyph-column--r{right:0; background:repeating-linear-gradient(180deg, rgba(180,150,80,.18) 0 26px, transparent 26px 52px)}
     @media (min-width:1024px){ .glyph-column{display:block} }
 
-    /* Header */
     .hdr{ position:sticky; top:0; z-index:5; backdrop-filter: blur(12px);
       background:color-mix(in oklab, #ffffff 76%, #fff2c6 24%);
       border-bottom:1px solid rgba(208,170,66,.22) }
@@ -79,7 +76,6 @@
       height:38px; padding:0 14px; border-radius:999px;
     }
 
-    /* Hero */
     .hero{ position:relative; z-index:2; display:grid; place-items:center; text-align:center;
       padding:clamp(40px,8vw,80px) 16px 24px }
     .hero__title{
@@ -91,11 +87,10 @@
     }
     .hero__lead{ margin:10px auto 0; max-width:800px; color:#6a5e72; line-height:1.9 }
 
-    /* Tarot */
     .tarot{ position:relative; z-index:2; padding:28px 16px 8px;
       display:flex; gap:clamp(12px,3vw,24px); justify-content:center; align-items:center; flex-wrap:wrap }
     .card{ width:clamp(112px,22vw,168px); aspect-ratio:62/110; perspective:1100px; position:relative; cursor:pointer;
-      filter: drop-shadow(0 10px 30px rgba(180,150,80,.25)); outline:0 }
+      filter: drop-shadow(0 10px 30px rgba(180,150,80,.25)); outline:0; touch-action:manipulation; }
     .card__inner{
       width:100%; height:100%; position:relative; border-radius:14px; overflow:hidden;
       transform-style:preserve-3d;
@@ -109,22 +104,21 @@
     .card__back{ background:#efe9da }
     .card__back::before{ content:""; position:absolute; inset:0;
       background: var(--tarot-back-url) center/cover no-repeat; filter:contrast(1.02) saturate(1.02) }
-    .card__back > img{ width:100%; height:100%; object-fit:cover; display:block; opacity:0 } /* iOS保険 */
+    .card__back > img{ width:100%; height:100%; object-fit:cover; display:block; opacity:0 }
     .card__front{
-  transform:rotateY(180deg);
-  /* 画像をJSで挿入するためのデフォルト（薄い金のグラデ） */
-  background:
-    radial-gradient(120% 120% at 50% 20%, rgba(255,242,200,.75), transparent 60%),
-    linear-gradient(135deg,#fff3bf,#ead7ff);
-  background-position:center;
-  background-size:cover;
-}    .card--glow .card__inner{
+      transform:rotateY(180deg);
+      background:
+        radial-gradient(120% 120% at 50% 20%, rgba(255,242,200,.75), transparent 60%),
+        linear-gradient(135deg,#fff3bf,#ead7ff);
+      background-position:center;
+      background-size:cover;
+    }
+    .card--glow .card__inner{
       box-shadow:0 0 0 2px rgba(240,220,160,.55), 0 0 40px 14px rgba(255,240,200,.35), 0 20px 60px rgba(208,170,66,.25);
       animation: glowpop .6s ease-out
     }
     @keyframes glowpop{ 0%{filter:brightness(1.1)} 60%{filter:brightness(1.35)} 100%{filter:brightness(1)} }
 
-    /* 2行解説（カードの直下） */
     .meanings{ position:relative; z-index:2; display:grid; gap:12px; grid-template-columns:1fr;
       max-width:1100px; margin:10px auto 4px; padding:0 16px }
     @media (min-width:760px){ .meanings{ grid-template-columns:repeat(3,1fr) } }
@@ -137,7 +131,6 @@
     .m-head{ color:#7a6328; font-weight:800; letter-spacing:.16em; font-size:.92rem; margin-bottom:6px }
     .m-body{ color:#4b4250; line-height:1.85 }
 
-    /* 詩韻祈タイトル／九行詩／CTA */
     .block{ position:relative; z-index:2; text-align:center; padding:18px 16px }
     .block h2{ font-family:"Cormorant Garamond",serif; font-size:clamp(24px,5.4vw,38px);
       letter-spacing:.12em; color:#6f5a28; opacity:0; transform:translateY(6px) }
@@ -157,12 +150,10 @@
     .btn--ghost{ background:rgba(255,255,255,.6); color:#4a4160; border:1px solid rgba(120,100,150,.28);
       box-shadow:0 6px 16px rgba(120,100,150,.18), inset 0 0 10px rgba(255,255,255,.45) }
 
-    /* 固定「神殿へ」 */
     .back{ position:fixed; left:14px; bottom:14px; z-index:4; text-decoration:none; font-weight:800; letter-spacing:.04em;
       color:#3a2e10; background:#fff1c7; border:1px solid rgba(208,170,66,.45); border-radius:999px; padding:10px 14px;
       box-shadow:0 8px 18px rgba(208,170,66,.22), inset 0 0 10px rgba(255,240,200,.35) }
 
-    /* 全画面フラッシュ（3枚目で発光） */
     .flashlayer{
       position:fixed; inset:0; z-index:60; pointer-events:none; opacity:0;
       mix-blend-mode:screen;
@@ -180,23 +171,18 @@
       0%{opacity:0} 18%{opacity:1} 55%{opacity:.88} 100%{opacity:0}
     }
 
-    /* Motion care */
     @media (prefers-reduced-motion:reduce){
       .card__inner,.block h2,.poem li,.actions{ transition:none !important; animation:none !important }
     }
   </style>
 </head>
 <body>
-  <!-- 全画面フラッシュ -->
   <div class="flashlayer" aria-hidden="true"></div>
 
-  <!-- 背景：星粒 -->
   <canvas class="stars" id="stars" aria-hidden="true"></canvas>
-  <!-- コード雨の残影 -->
   <div class="glyph-column glyph-column--l" aria-hidden="true"></div>
   <div class="glyph-column glyph-column--r" aria-hidden="true"></div>
 
-  <!-- Header -->
   <header class="hdr" role="banner">
     <div class="hdr__in">
       <a href="shion.html" class="logo" aria-label="神殿トップへ">Re:verse Shion</a>
@@ -208,7 +194,6 @@
     </div>
   </header>
 
-  <!-- Hero -->
   <section class="hero" aria-labelledby="t">
     <h1 id="t" class="hero__title">星界の白い間〈ま〉に、言葉が目を覚ます。</h1>
     <p class="hero__lead">カードをめくると、まず「詩」「韻」「祈」。続いて九行の“星界詩”が一行ずつ降りてきます。</p>
@@ -216,34 +201,32 @@
 
   <!-- Cards -->
   <section class="tarot" id="tarot" aria-label="三枚のカード">
-    <div class="card" data-i="0" tabindex="0" aria-label="詩（Poem）">
+    <div class="card" data-i="0" tabindex="0" role="button" aria-label="詩（Poem）">
       <div class="card__inner">
-        <div class="card__face card__back" aria-hidden="true"><img src="back.png" alt=""></div>
+        <div class="card__face card__back" aria-hidden="true"><img src="/assets/tarot/back.jpg" alt=""></div>
         <div class="card__face card__front" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="card" data-i="1" tabindex="0" aria-label="韻（Rhythm）">
+    <div class="card" data-i="1" tabindex="0" role="button" aria-label="韻（Rhythm）">
       <div class="card__inner">
-        <div class="card__face card__back" aria-hidden="true"><img src="assets/tarot/back.png" alt=""></div>
+        <div class="card__face card__back" aria-hidden="true"><img src="/assets/tarot/back.jpg" alt=""></div>
         <div class="card__face card__front" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="card" data-i="2" tabindex="0" aria-label="祈（Prayer）">
+    <div class="card" data-i="2" tabindex="0" role="button" aria-label="祈（Prayer）">
       <div class="card__inner">
-        <div class="card__face card__back" aria-hidden="true"><img src="assets/tarot/back.png" alt=""></div>
+        <div class="card__face card__back" aria-hidden="true"><img src="/assets/tarot/back.jpg" alt=""></div>
         <div class="card__face card__front" aria-hidden="true"></div>
       </div>
     </div>
   </section>
 
-  <!-- 2行解説 -->
   <section class="meanings" aria-label="詩・韻・祈の意味">
     <article class="m-item"><div class="m-head">【詩】</div><div class="m-body" id="m0">カードを開くと、ここに“詩”の2行解説が現れます。</div></article>
     <article class="m-item"><div class="m-head">【韻】</div><div class="m-body" id="m1">カードを開くと、ここに“韻”の2行解説が現れます。</div></article>
     <article class="m-item"><div class="m-head">【祈】</div><div class="m-body" id="m2">カードを開くと、ここに“祈”の2行解説が現れます。</div></article>
   </section>
 
-  <!-- 詩韻祈 → 九行詩 → CTA -->
   <section class="block" aria-live="polite">
     <h2 id="sy" aria-hidden="true">— 詩・韻・祈 —</h2>
     <ol class="poem" id="poem" aria-label="星界詩"></ol>
@@ -253,7 +236,6 @@
     </div>
   </section>
 
-  <!-- 固定の“神殿へ” -->
   <a class="back" href="shion.html" aria-label="神殿トップへ">⛩ 神殿へ</a>
 
   <script>
@@ -291,79 +273,95 @@
       const poemBox=document.getElementById('poem');
       const actions=document.getElementById('actions');
       const flash=document.querySelector('.flashlayer');
-
       const mBodies=[document.getElementById('m0'),document.getElementById('m1'),document.getElementById('m2')];
       const mItems=[...document.querySelectorAll('.m-item')];
 
-      // タイミング
       const T_FLASH=900, T_SY_FADE=900, T_PAUSE=600, LINE_DELAY=850;
 
-      /* ===== 22枚フルマッピング：画像と2行解説を1カードに紐付け ===== */
-const MAJOR = [
-  { id:0,  key:'fool',        n:'The Fool',        img:'/assets/tarot/00_fool.jpg',        two:['最初の一歩は、恐れより軽い。','失敗は合図——世界は君に開く。']},
-  { id:1,  key:'magician',    n:'The Magician',    img:'/assets/tarot/01_magician.jpg',    two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。']},
-  { id:2,  key:'priestess',   n:'The High Priestess', img:'/assets/tarot/02_priestess.jpg', two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。']},
-  { id:3,  key:'empress',     n:'The Empress',     img:'/assets/tarot/03_empress.jpg',     two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。']},
-  { id:4,  key:'emperor',     n:'The Emperor',     img:'/assets/tarot/04_emperor.jpg',     two:['迷いは構造で解ける。','境界線は、君を守る城。']},
-  { id:5,  key:'hierophant',  n:'The Hierophant',  img:'/assets/tarot/05_hierophant.jpg',  two:['伝統は檻ではない、土壌だ。','学びは継承で強くなる。']},
-  { id:6,  key:'lovers',      n:'The Lovers',      img:'/assets/tarot/06_lovers.jpg',      two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。']},
-  { id:7,  key:'chariot',     n:'The Chariot',     img:'/assets/tarot/07_chariot.jpg',     two:['向かう先が速さを決める。','手綱は心、進路は意志。']},
-  { id:8,  key:'strength',    n:'Strength',        img:'/assets/tarot/08_strength.jpg',    two:['優しい力は、世界を従わせない。','それでも、世界は従う。']},
-  { id:9,  key:'hermit',      n:'The Hermit',      img:'/assets/tarot/09_hermit.jpg',      two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。']},
-  { id:10, key:'wheel',       n:'Wheel of Fortune',img:'/assets/tarot/10_wheel.jpg',       two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。']},
-  { id:11, key:'justice',     n:'Justice',         img:'/assets/tarot/11_justice.jpg',     two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。']},
-  { id:12, key:'hanged',      n:'The Hanged Man',  img:'/assets/tarot/12_hanged.jpg',      two:['世界を逆さにして見よ。','止まることが進むことになる日もある。']},
-  { id:13, key:'death',       n:'Death',           img:'/assets/tarot/13_death.jpg',       two:['終わりは名前の違う始まり。','脱皮の痛みは、生きている証。']},
-  { id:14, key:'temperance',  n:'Temperance',      img:'/assets/tarot/14_temperance.jpg',  two:['混ぜる、待つ、整える。','その中間に、答えは棲む。']},
-  { id:15, key:'devil',       n:'The Devil',       img:'/assets/tarot/15_devil.jpg',       two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。']},
-  { id:16, key:'tower',       n:'The Tower',       img:'/assets/tarot/16_tower.jpg',       two:['壊れるのは壊すべきもの。','空いた隙間が光の通り道。']},
-  { id:17, key:'star',        n:'The Star',        img:'/assets/tarot/17_star.jpg',        two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。']},
-  { id:18, key:'moon',        n:'The Moon',        img:'/assets/tarot/18_moon.jpg',        two:['不安は想像力の副作用。','曙は必ず来る。']},
-  { id:19, key:'sun',         n:'The Sun',         img:'/assets/tarot/19_sun.jpg',         two:['喜びは戦略になる。','笑顔は未来の先行投資。']},
-  { id:20, key:'judgement',   n:'Judgement',       img:'/assets/tarot/20_judgement.jpg',   two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。']},
-  { id:21, key:'world',       n:'The World',       img:'/assets/tarot/21_world.jpg',       two:['輪は閉じて、道は開く。','完成形は次のスタートライン。']},
-];
+      /* ===== 22枚フルマッピング ===== */
+      const MAJOR = [
+        { id:0,  key:'fool',        n:'The Fool',        img:'/assets/tarot/00_fool.jpg',        two:['最初の一歩は、恐れより軽い。','失敗は合図——世界は君に開く.']},
+        { id:1,  key:'magician',    n:'The Magician',    img:'/assets/tarot/01_magician.jpg',    two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。']},
+        { id:2,  key:'priestess',   n:'The High Priestess', img:'/assets/tarot/02_priestess.jpg', two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。']},
+        { id:3,  key:'empress',     n:'The Empress',     img:'/assets/tarot/03_empress.jpg',     two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。']},
+        { id:4,  key:'emperor',     n:'The Emperor',     img:'/assets/tarot/04_emperor.jpg',     two:['迷いは構造で解ける。','境界線は、君を守る城。']},
+        { id:5,  key:'hierophant',  n:'The Hierophant',  img:'/assets/tarot/05_hierophant.jpg',  two:['伝統は檻ではない、土壌だ。','学びは継承で強くなる。']},
+        { id:6,  key:'lovers',      n:'The Lovers',      img:'/assets/tarot/06_lovers.jpg',      two:['選ぶことは、誰かを愛すること。','愛することは、選び続けること。']},
+        { id:7,  key:'chariot',     n:'The Chariot',     img:'/assets/tarot/07_chariot.jpg',     two:['向かう先が速さを決める。','手綱は心、進路は意志。']},
+        { id:8,  key:'strength',    n:'Strength',        img:'/assets/tarot/08_strength.jpg',    two:['優しい力は、世界を従わせない。','それでも、世界は従う。']},
+        { id:9,  key:'hermit',      n:'The Hermit',      img:'/assets/tarot/09_hermit.jpg',      two:['独りの灯りが、群衆より遠くを照らす。','探していたのは、探している自分だった。']},
+        { id:10, key:'wheel',       n:'Wheel of Fortune',img:'/assets/tarot/10_wheel.jpg',       two:['巡るのは運ではなく、選択。','タイミングは、準備を愛している。']},
+        { id:11, key:'justice',     n:'Justice',         img:'/assets/tarot/11_justice.jpg',     two:['やさしさにも刃がある。','公平さは君と相手を同時に救う。']},
+        { id:12, key:'hanged',      n:'The Hanged Man',  img:'/assets/tarot/12_hanged.jpg',      two:['世界を逆さにして見よ。','止まることが進むことになる日もある。']},
+        { id:13, key:'death',       n:'Death',           img:'/assets/tarot/13_death.jpg',       two:['終わりは名前の違う始まり。','脱皮の痛みは、生きている証。']},
+        { id:14, key:'temperance',  n:'Temperance',      img:'/assets/tarot/14_temperance.jpg',  two:['混ぜる、待つ、整える。','その中間に、答えは棲む。']},
+        { id:15, key:'devil',       n:'The Devil',       img:'/assets/tarot/15_devil.jpg',       two:['鎖は心の内側に結ばれている。','鍵もまた、内側にある。']},
+        { id:16, key:'tower',       n:'The Tower',       img:'/assets/tarot/16_tower.jpg',       two:['壊れるのは壊すべきもの。','空いた隙間が光の通り道。']},
+        { id:17, key:'star',        n:'The Star',        img:'/assets/tarot/17_star.jpg',        two:['願いは夜の水面で強くなる。','希望は、手を洗うみたいに簡単。']},
+        { id:18, key:'moon',        n:'The Moon',        img:'/assets/tarot/18_moon.jpg',        two:['不安は想像力の副作用。','曙は必ず来る。']},
+        { id:19, key:'sun',         n:'The Sun',         img:'/assets/tarot/19_sun.jpg',         two:['喜びは戦略になる。','笑顔は未来の先行投資。']},
+        { id:20, key:'judgement',   n:'Judgement',       img:'/assets/tarot/20_judgement.jpg',   two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。']},
+        { id:21, key:'world',       n:'The World',       img:'/assets/tarot/21_world.jpg',       two:['輪は閉じて、道は開く。','完成形は次のスタートライン。']},
+      ];
 
-/* 3枚引き（暗号学的乱数で重複なし） */
-function drawThree(){
-  const pool = [...MAJOR];
-  const picks = [];
-  for(let i=0;i<3;i++){
-    const r = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
-    picks.push(pool.splice(r,1)[0]);
-  }
-  return picks;
-}
+      function drawThree(){
+        const pool=[...MAJOR], picks=[];
+        for(let i=0;i<3;i++){
+          const r=crypto.getRandomValues(new Uint32Array(1))[0]%pool.length;
+          picks.push(pool.splice(r,1)[0]);
+        }
+        return picks;
+      }
 
-let opened = 0;
-let selected = drawThree();
+      let opened=0, selected=drawThree();
 
-/* フロント面に対応画像を敷く */
-function setFrontImage(cardEl, imgUrl){
-  const front = cardEl.querySelector('.card__front');
-  if(!front) return;
-  front.style.backgroundImage = `url("${imgUrl}")`;
-  front.style.backgroundPosition = 'center';
-  front.style.backgroundSize = 'cover';
-}
+      function setFrontImage(cardEl, imgUrl){
+        const front = cardEl.querySelector('.card__front');
+        if(front){
+          front.style.backgroundImage = `url("${imgUrl}")`;
+          front.style.backgroundPosition = 'center';
+          front.style.backgroundSize = 'cover';
+        }
+      }
 
-/* クリックで反転 → 画像反映 → 2行解説 → 全開時は続きへ */
-function flip(i){
-  const el = cards[i];
-  if(!el || el.classList.contains('is-flipped')) return;
+      function flip(i){
+        const el=cards[i];
+        if(!el || el.classList.contains('is-flipped')) return;
 
-  const d = selected[i];                 // ← ここが「意味＝画像」のセット
-  setFrontImage(el, d.img);              // 表面画像をカードに即適用
-  el.classList.add('is-flipped','card--glow');
-  setTimeout(()=>el.classList.remove('card--glow'),620);
+        const d=selected[i];
+        setFrontImage(el, d.img);
 
-  // 2行解説
-  mBodies[i].innerHTML = `《${d.n}》<br>${d.two[0]}<br>${d.two[1]}`;
-  mItems[i].classList.add('is-show');
+        el.classList.add('is-flipped','card--glow');
+        setTimeout(()=>el.classList.remove('card--glow'),620);
 
-  opened++;
-  if(opened===3) runSequence();
-}
+        mBodies[i].innerHTML=`《${d.n}》<br>${d.two[0]}<br>${d.two[1]}`;
+        mItems[i].classList.add('is-show');
+
+        opened++; if(opened===3) runSequence();
+      }
+
+      /* === タップ対応強化（iOS含む）：pointerup を使用 === */
+      cards.forEach((el,i)=>{
+        // クリック
+        el.addEventListener('click',()=>flip(i));
+        // タッチ/ペン/マウスの統一イベント
+        el.addEventListener('pointerup', (e)=>{
+          // ドラッグ等は除外
+          if(Math.abs(e.pointerType==='touch' ? (e.width||0)+(e.height||0) : 0) >= 0) flip(i);
+        });
+        // キーボード
+        el.addEventListener('keydown',e=>{
+          if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(i); }
+        });
+      });
+
+      function runSequence(){
+        if(flash){ flash.classList.add('is-on'); setTimeout(()=>flash.classList.remove('is-on'), 900); }
+        title.removeAttribute('aria-hidden');
+        title.classList.add('is-show');
+        title.scrollIntoView({behavior:'smooth', block:'center'});
+        setTimeout(runPoem, 900 + 900 + 600);
+      }
 
       const POEMS=[
         ["風は名を持たず、あなたの願いだけを知っている。","迷った足跡は、地図に描き直せる。","優しさは武器ではない——それでも闇を遠ざける。","涙は言葉の前奏、沈黙は祈りの本質。","選ぶことは、未来の責任を抱きしめること。","恐れの奥には、出発の鍵穴がある。","手放すとは、より大きな循環へ返す儀式。","呼吸を一度、長く。世界はそれだけで広がる。","そして、いま。小さな一歩が、あなたを救う。"],
@@ -376,51 +374,6 @@ function flip(i){
         ["縁は偶然に見えて、呼び合っている。","勇気の定義は、怖さを持ったまま進むこと。","善意は万能ではない、でも始まりにはなる。","正解は一つじゃない、納得は一人一つずつ。","目の前の人にできることを、目の前でする。","願いは声に出すと、味方が現れる。","優先順位は“いま救えるもの”から。","愛されたいは、愛したいの別名。","今日の光を集めよう。"],
         ["世界はあなたに厳しくない、ただ正直なだけだ。","才能は特別ではない、続けられることが特別だ。","比べるなら、昨日のあなたと。","小さな完成を重ねると、奇跡と呼ばれる。","運は流れ、機会は待たない。手を伸ばす練習を。","失礼より誠実、速さより丁寧を選べば、結果も付いてくる。","心の天気予報を持ちながら、予定を立てる。","あなたの歩幅で歩く。誰のでもない歩幅で。","ほら、もう救われはじめている。"]
       ];
-
-      function drawThree(){
-        const pool=[...DECK], picks=[];
-        for(let i=0;i<3;i++){
-          const r=crypto.getRandomValues(new Uint32Array(1))[0]%pool.length;
-          picks.push(pool.splice(r,1)[0]);
-        }
-        return picks;
-      }
-
-      let opened=0, selected=drawThree();
-
-      function flip(i){
-        const el=cards[i]; if(!el||el.classList.contains('is-flipped')) return;
-        el.classList.add('is-flipped','card--glow'); setTimeout(()=>el.classList.remove('card--glow'),620);
-
-        // 2行解説
-        const d=selected[i];
-        mBodies[i].innerHTML=`《${d.n}》<br>${d.two[0]}<br>${d.two[1]}`;
-        mItems[i].classList.add('is-show');
-
-        opened++; if(opened===3) runSequence();
-      }
-
-      cards.forEach((el,i)=>{
-        el.addEventListener('click',()=>flip(i),{passive:true});
-        el.addEventListener('keydown',e=>{
-          if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(i); }
-        });
-      });
-
-      // —— 3枚目の後の流れ：フラッシュ→詩韻祈→九行→CTA
-      function runSequence(){
-        // 1) フラッシュ
-        if(flash){ flash.classList.add('is-on'); setTimeout(()=>flash.classList.remove('is-on'), T_FLASH); }
-
-        // 2) 「— 詩・韻・祈 —」を顕現し、そこへスクロール
-        title.removeAttribute('aria-hidden');
-        title.classList.add('is-show');
-        title.scrollIntoView({behavior:'smooth', block:'center'});
-
-        // 3) 少し“間”を置いて九行詩へ
-        const startAt = T_FLASH + T_SY_FADE + T_PAUSE;
-        setTimeout(runPoem, startAt);
-      }
 
       function runPoem(){
         const set = POEMS[(Math.random()*POEMS.length)|0];
