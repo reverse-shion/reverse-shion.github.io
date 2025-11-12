@@ -571,3 +571,33 @@ main, section, footer, header {
   }
   .cta--primary{ color:#1c0e22 }
 }
+
+/* ぜったいに下のリンクをブロックさせない */
+.hero::before,
+.hero__media,
+.hero__veil,
+.trinity__figure::after,
+.sky,
+#goldDust {
+  pointer-events: none !important;
+}
+
+
+
+
+/* 位置はそのままでも、Z順で下げておくと安心 */
+.hero::before,
+.hero__media,
+.hero__veil {
+  z-index: 0 !important;
+}
+/* CTAレイヤーを最前面に固定（ヒーロー内の装飾より前） */
+.cta-grid,
+.cta {
+  position: relative;
+  z-index: 10;          /* ヒーロー装飾(0〜1)より上 */
+  pointer-events: auto; /* 念のため明示 */
+}
+
+/* iOSで擬似要素が重なってもOKにする保険 */
+.cta::before { pointer-events: none; }
