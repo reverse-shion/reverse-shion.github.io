@@ -1,32 +1,40 @@
-import os
-import datetime
-from xml.etree.ElementTree import Element, SubElement, ElementTree
+name: Generate sitemap.xml (Auto Commit)
 
-SITE_URL = os.getenv("SITE_URL", "https://reverse-shion.github.io")
-SITE_ROOT = os.getenv("SITE_ROOT", ".")
+permissions:
+  contents: write
 
-# 出力ファイル
-OUTPUT_PATH = os.path.join(SITE_ROOT, "sitemap.xml")
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
 
-# 現在時刻をISO8601形式（UTC）で取得
-now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-# XMLルート要素
-urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-# HTMLファイルを再帰的に探索
-for root, dirs, files in os.walk(SITE_ROOT):
-    for file in files:
-        if file.endswith(".html"):
-            rel_path = os.path.relpath(os.path.join(root, file), SITE_ROOT)
-            url = f"{SITE_URL}/{rel_path}".replace("index.html", "")
-            node = SubElement(urlset, "url")
-            SubElement(node, "loc").text = url
-            # 🔥 ここで常に最新時刻を設定（更新検知に頼らない）
-            SubElement(node, "lastmod").text = now
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-# XML保存
-tree = ElementTree(urlset)
-tree.write(OUTPUT_PATH, encoding="utf-8", xml_declaration=True)
+      - name: Generate sitemap.xml
+        env:
+          SITE_URL: https://reverse-shion.github.io
+          SITE_ROOT: .
+        run: |
+          python3 -V
+          python3 scripts/generate_sitemap.py
 
-print(f"✅ sitemap.xml generated successfully at {now}")
+      - name: Commit and push sitemap.xml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "chore: auto-update sitemap.xml [skip ci]" || echo "No changes to commit"
+          git push origin main
