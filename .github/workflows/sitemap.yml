@@ -1,38 +1,32 @@
-name: Generate sitemap.xml (PR)
+import os
+import datetime
+from xml.etree.ElementTree import Element, SubElement, ElementTree
 
-permissions:
-  contents: write
-  pull-requests: write
+SITE_URL = os.getenv("SITE_URL", "https://reverse-shion.github.io")
+SITE_ROOT = os.getenv("SITE_ROOT", ".")
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch: {}
+# 出力ファイル
+OUTPUT_PATH = os.path.join(SITE_ROOT, "sitemap.xml")
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# 現在時刻をISO8601形式（UTC）で取得
+now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+# XMLルート要素
+urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
-      - name: Generate sitemap.xml
-        env:
-          SITE_URL: https://reverse-shion.github.io
-          SITE_ROOT: .
-        run: |
-          python3 -V
-          python3 scripts/generate_sitemap.py
+# HTMLファイルを再帰的に探索
+for root, dirs, files in os.walk(SITE_ROOT):
+    for file in files:
+        if file.endswith(".html"):
+            rel_path = os.path.relpath(os.path.join(root, file), SITE_ROOT)
+            url = f"{SITE_URL}/{rel_path}".replace("index.html", "")
+            node = SubElement(urlset, "url")
+            SubElement(node, "loc").text = url
+            # 🔥 ここで常に最新時刻を設定（更新検知に頼らない）
+            SubElement(node, "lastmod").text = now
 
-      - name: Open PR to update sitemap.xml
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore: update sitemap.xml"
-          branch: ci/update-sitemap         # 自動作成される作業ブランチ
-          title: "Update sitemap.xml"
-          body: "Auto-generated sitemap update"
-          add-paths: |
-            sitemap.xml
+# XML保存
+tree = ElementTree(urlset)
+tree.write(OUTPUT_PATH, encoding="utf-8", xml_declaration=True)
+
+print(f"✅ sitemap.xml generated successfully at {now}")
