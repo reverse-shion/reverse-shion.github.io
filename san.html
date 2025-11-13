@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Re:verse Shion — 占い × 思想｜詩韻 Shion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#faf7f0" />
+  <meta name="description" content="占い × 思想。詩韻 Shion のタロットリーディングと詩韻思想の世界へ。星界リーディングで“今”を書き換え、言葉で魂を救う体験を。">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Re:verse Shion — 占い × 思想｜詩韻 Shion">
+  <meta property="og:description" content="星界リーディングと詩韻思想。言葉で魂を救う、“占い × 思想”の神殿へ。">
+  <meta property="og:url" content="https://reverse-shion.github.io/">
+  <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* === ベース === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Noto Serif JP", system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: #3a2b1a;
+      background: #faf7f0;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ===== 白背景 × 濃い金色 × 超スローモーションレイン ===== */
+    .gold-rain {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: #faf7f0;
+      overflow: hidden;
+    }
+    .gold-rain::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(
+          to bottom,
+          rgba(255, 215, 0, 0.0) 0%,
+          rgba(255, 185, 0, 0.25) 35%,
+          rgba(255, 185, 0, 0.55) 55%,
+          rgba(255, 185, 0, 0.0) 100%
+        );
+      background-size: 3px 420px;
+      animation: goldenRainMove 6.5s linear infinite;
+      opacity: 0.95;
+      filter: blur(0.3px);
+    }
+    .gold-rain::after {
+      content: "α λ ϕ Ω ✶ ☆ ψ Ϟ 8 詩 韻 祈 φ ∴ △ ○ ♱ ✦";
+      position: absolute;
+      top: -15%;
+      left: 50%;
+      width: 200%;
+      font-family: "Noto Serif JP", serif;
+      transform: translateX(-50%);
+      font-size: 22px;
+      line-height: 30px;
+      color: rgba(255, 185, 0, 0.45);
+      animation: codeFall 12s linear infinite;
+      white-space: nowrap;
+      opacity: 0.9;
+    }
+    @keyframes goldenRainMove {
+      from { background-position-y: -420px; }
+      to   { background-position-y: 420px; }
+    }
+    @keyframes codeFall {
+      from { transform: translate(-50%, -120%); }
+      to   { transform: translate(-50%, 120%); }
+    }
+
+    /* === レイアウト === */
+    .site {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(to bottom, rgba(250,247,240,0.95), rgba(250,247,240,0.75));
+      border-bottom: 1px solid rgba(222, 193, 130, 0.35);
+    }
+    .header-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0.6rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand {
+      font-family: "Cormorant Garamond", "Times New Roman", serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #b58420;
+      white-space: nowrap;
+    }
+    .brand span {
+      font-size: 0.76rem;
+      letter-spacing: 0.24em;
+      text-transform: none;
+      display: block;
+      color: #7b6440;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav a {
+      font-size: 0.82rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+    .nav a:hover {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(181, 132, 32, 0.35);
+      transform: translateY(-1px);
+    }
+    .nav .nav-cta {
+      background: radial-gradient(circle at 30% 0%, #ffe9aa, #f5c768);
+      box-shadow:
+        0 0 0 1px rgba(181,132,32,0.15),
+        0 8px 18px rgba(181,132,32,0.35);
+      font-weight: 600;
+      padding-inline: 1.1rem;
+      color: #5a3d12;
+    }
+    .nav .nav-cta:hover {
+      box-shadow:
+        0 0 0 1px rgba(181,132,32,0.3),
+        0 10px 24px rgba(181,132,32,0.45);
+    }
+
+    /* === ヒーロー === */
+    .hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3.5rem 1.4rem 3rem;
+    }
+    .hero-inner {
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hero-panel {
+      position: relative;
+      padding: 2.4rem 1.8rem 2.3rem;
+      background:
+        radial-gradient(circle at top center, rgba(255,255,255,0.9), rgba(250,247,240,0.96));
+      border-radius: 24px;
+      box-shadow:
+        0 0 0 1px rgba(209,180,126,0.4),
+        0 26px 60px rgba(138,96,41,0.23);
+      overflow: hidden;
+    }
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,240,190,0.65), transparent 60%),
+        radial-gradient(circle at 90% 20%, rgba(215,210,255,0.45), transparent 60%),
+        radial-gradient(circle at 50% 110%, rgba(255,220,200,0.4), transparent 65%);
+      mix-blend-mode: screen;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-kicker {
+      font-size: 0.78rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #90704b;
+      margin-bottom: 0.8rem;
+    }
+    .hero-title-main {
+      font-family: "Cormorant Garamond", "Times New Roman", serif;
+      font-size: clamp(2.1rem, 4.4vw, 2.8rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #3b2b1b;
+      margin-bottom: 0.4rem;
+    }
+    .hero-title-sub {
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      color: #7e5c3a;
+      margin-bottom: 1.4rem;
+    }
+    .hero-copy {
+      font-size: 0.96rem;
+      line-height: 1.9;
+      color: #4a3b2c;
+      margin-bottom: 1.4rem;
+    }
+    .hero-copy strong {
+      color: #8b5b1f;
+    }
+
+    .hero-note {
+      font-size: 0.82rem;
+      color: #7d6a52;
+      margin-bottom: 1.7rem;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.5rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(181,132,32,0.35);
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+      gap: 0.4rem;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+      white-space: nowrap;
+    }
+    .cta span {
+      font-size: 1.1rem;
+    }
+    .cta-primary {
+      background: radial-gradient(circle at 30% 0%, #ffe9aa, #f2b84f);
+      color: #4a2f0b;
+      font-weight: 600;
+      box-shadow:
+        0 0 0 1px rgba(181,132,32,0.32),
+        0 14px 30px rgba(181,132,32,0.45);
+    }
+    .cta-secondary {
+      background: rgba(255,255,255,0.92);
+      color: #5c4732;
+    }
+    .cta-tertiary {
+      background: rgba(250,247,240,0.9);
+      border-style: dashed;
+      border-color: rgba(181,132,32,0.45);
+      color: #6a5140;
+    }
+    .cta:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 0 1px rgba(181,132,32,0.38),
+        0 16px 34px rgba(181,132,32,0.5);
+    }
+
+    .hero-footnote {
+      font-size: 0.78rem;
+      color: #8a7a61;
+      margin-top: 0.8rem;
+    }
+
+    /* === フッター === */
+    .site-footer {
+      text-align: center;
+      padding: 1.4rem 1rem 2rem;
+      font-size: 0.78rem;
+      color: #8b7b67;
+    }
+
+    /* === レスポンシブ === */
+    @media (min-width: 768px) {
+      .hero {
+        padding: 4.5rem 1.8rem 3.5rem;
+      }
+      .hero-panel {
+        padding: 3rem 2.4rem 2.6rem;
+      }
+      .hero-cta-row {
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 599px) {
+      .header-inner {
+        padding-inline: 1rem;
+      }
+      .hero-panel {
+        border-radius: 18px;
+        padding: 2rem 1.4rem 2.1rem;
+      }
+      .hero-cta-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .cta {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="gold-rain" aria-hidden="true"></div>
+
+  <div class="site">
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand">
+          Re:verse Shion
+          <span>占い × 思想</span>
+        </div>
+        <nav class="nav" aria-label="グローバルナビゲーション">
+          <a href="/tarot.html">星界リーディング</a>
+          <a href="/books/zero.html">詩韻思想とは</a>
+          <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener" class="nav-cta">鑑定へ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="hero" id="top">
+      <div class="hero-inner">
+        <section class="hero-panel" aria-labelledby="heroTitleMain">
+          <div class="hero-content">
+            <p class="hero-kicker">WORDS &amp; STARS</p>
+            <h1 id="heroTitleMain" class="hero-title-main">Re:verse Shion</h1>
+            <p class="hero-title-sub">占い × 思想 — 言葉で、魂を書き換える。</p>
+
+            <p class="hero-copy">
+              恋も、仕事も、運命も。<br>
+              あなたの<span style="letter-spacing:0.12em;">「今」</span>は、ひとつの<strong>詩（ポエム）</strong>としてここに置かれます。<br>
+              タロットで「今」を照らし、<br>
+              詩韻思想で、その意味と祈りをほどいていく。<br>
+              言葉は扉となり、響きは道となる——<br>
+              ここは、そんな体験のための小さな神殿です。
+            </p>
+
+            <p class="hero-note">
+              まずは、星界であなたの「今」をめくってみてください。
+            </p>
+
+            <div class="hero-cta-row">
+              <a class="cta cta-primary" href="/tarot.html">
+                <span>🌌</span> 星界リーディングを始める
+              </a>
+              <a class="cta cta-secondary" href="/books/zero.html">
+                <span>📖</span> 詩韻思想を読む
+              </a>
+              <a class="cta cta-tertiary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
+                <span>🔮</span> 個人鑑定・予約（LINE）
+              </a>
+            </div>
+
+            <p class="hero-footnote">
+              ※ 無料リーディングから「もっと深く知りたい」と感じた方は、LINEの個人鑑定へご案内します。
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <small>&copy; Re:verse Shion / 詩韻 Shion — 言葉で魂を救う Code.</small>
+    </footer>
+  </div>
+</body>
+</html>
