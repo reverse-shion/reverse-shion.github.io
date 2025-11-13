@@ -145,14 +145,14 @@
     #main-content.visible{opacity:1}
     h1{
       font-family:'Cinzel',serif;font-weight:700;
-      font-size:clamp(2rem,6vw,3rem);letter-spacing:.06em;margin-bottom:.8rem;
+      font-size:clamp(2rem,6vw,3rem);letter-spacing:.06em;margin-bottom:.5rem;
       background:linear-gradient(92deg,#FFE7A6,#FFD76F,#FFF5CF,#FFD76F);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
       text-shadow:0 0 22px rgba(255,215,111,.45),0 0 50px rgba(124,98,255,.25);
     }
     h2{
       font-family:'Cinzel',serif;font-size:clamp(1.4rem,4vw,2rem);
-      margin-bottom:.8rem;background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
+      margin-bottom:.9rem;background:linear-gradient(90deg,#7fd0ff,#ffd700,#7fd0ff);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
       text-shadow:0 0 20px rgba(127,208,255,.5);
       animation:fadeUp 1.2s ease-out forwards;
@@ -162,10 +162,23 @@
       color:#eaf1ff;line-height:1.7;max-width:42rem;
       animation:fadeUp 1.6s ease-out forwards;
     }
+    p + p{
+      margin-top:0.4rem;
+    }
+    .tagline{
+      font-size:clamp(0.9rem,2.5vw,1.05rem);
+      color:#ffe6aa;
+      text-shadow:0 0 14px rgba(255,215,111,.55);
+    }
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-    /* 扉ボタン */
-    .door-container{margin-top:2.2rem;width:100%;display:flex;justify-content:center}
+    /* CTAコンテナ */
+    .door-container{
+      margin-top:2.2rem;width:100%;
+      display:flex;flex-direction:column;align-items:center;gap:0.9rem;
+    }
+
+    /* メインボタン：星界へアクセス */
     .door-button{
       position:relative;display:inline-block;padding:18px 40px;font-size:clamp(1rem,3vw,1.2rem);
       color:#e0f8ff;text-decoration:none;border:2px solid transparent;border-radius:50px;
@@ -181,6 +194,34 @@
     .pulse{position:absolute;top:50%;left:50%;width:0;height:0;border:2px solid #ffd700;border-radius:50%;transform:translate(-50%,-50%);animation:pulse 2.5s infinite ease-out;pointer-events:none;box-shadow:0 0 20px #ffd700}
     @keyframes pulse{0%{width:0;height:0;opacity:1}100%{width:340px;height:340px;opacity:0}}
     .door-button:hover{transform:scale(1.07);box-shadow:0 0 80px rgba(255,215,0,.8),0 0 160px rgba(127,208,255,.6);border-color:#ffd700;background:rgba(20,30,60,.9)}
+
+    /* サブボタン：詩韻思想を読む */
+    .philo-button{
+      display:inline-block;
+      padding:12px 30px;
+      font-size:clamp(0.9rem,2.5vw,1.05rem);
+      border-radius:999px;
+      text-decoration:none;
+      font-family:'Noto Serif JP',serif;
+      color:#e8f2ff;
+      border:1px solid rgba(127,208,255,.7);
+      background:rgba(5,10,24,.7);
+      backdrop-filter:blur(6px);
+      box-shadow:0 0 18px rgba(127,208,255,.35);
+      transition:all .35s ease;
+    }
+    .philo-button span{
+      background:linear-gradient(90deg,#b7d6ff,#fff2c2);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .philo-button:hover{
+      transform:translateY(-1px);
+      box-shadow:0 0 32px rgba(127,208,255,.6);
+      border-color:#ffd700;
+      background:rgba(18,24,48,.9);
+    }
+
     .light-burst{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at center,#ffd700 0%,#7fd0ff 50%,transparent 80%);opacity:0;pointer-events:none;z-index:9999;animation:burst 1s ease-out}
     @keyframes burst{0%{opacity:0;transform:scale(.2)}50%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(3)}}
 
@@ -208,11 +249,18 @@
     <h1>Re:Verse Shion</h1>
     <h2>占い × 思想</h2>
     <p>恋も、仕事も、運命も。<br>あなたの“今”を言葉で照らす。</p>
+    <p class="tagline">言葉は扉、響きは道。あなたの“今”は、星界で書き換えられる。</p>
 
     <div class="door-container">
-      <a href="/shion2.html" class="door-button" id="door" aria-label="次のページへ">
-        <span class="door-text">扉を開く</span>
+      <!-- メインCTA：無料占い・星界リーディングへ -->
+      <a href="/shion2.html" class="door-button" id="door" aria-label="星界へアクセス（無料占いページへ）">
+        <span class="door-text">星界へアクセス</span>
         <div class="pulse" aria-hidden="true"></div>
+      </a>
+
+      <!-- サブCTA：詩韻思想へ -->
+      <a href="/books/zero.html" class="philo-button" aria-label="詩韻思想の本文ページへ">
+        <span>詩韻思想を読む</span>
       </a>
     </div>
   </main>
@@ -237,7 +285,7 @@
         p.className = 'particle';
         p.style.left = `calc(50% + ${x}px)`;
         p.style.top  = `calc(50% + ${y}px)`;
-        p.style.animation = `sparkle 2s ease-in-out infinite`;
+        p.style.animation = `sparkle 2s.ease-in-out infinite`;
         p.style.animationDelay = `${i*0.12}s`;
         loader.appendChild(p);
       }
@@ -284,12 +332,16 @@
       setTimeout(()=>{ window.location.href=this.getAttribute('href'); }, 500);
     });
 
-    // きらめきキー（CSSで定義していないため追加）
+    // きらめきキー
     const style = document.createElement('style');
     style.textContent = `
-      @keyframes sparkle{0%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.6)}}
+      @keyframes sparkle{
+        0%{opacity:0;transform:scale(.6)}
+        50%{opacity:1;transform:scale(1)}
+        100%{opacity:0;transform:scale(.6)}
+      }
     `;
     document.head.appendChild(style);
   </script>
 </body>
-　</html>
+</html>
