@@ -22,15 +22,20 @@
       --muted:#7a6f84;
       --gold:#d0aa42;
       --r:16px;
-      /* 裏面の画像パスはここで統一 */
-      --tarot-back-url:url("back.png");
+      /* ★ 裏面カード画像（1枚共通）★ */
+      --tarot-back-url:url("/assets/tarot/back.jpg");
     }
-    @media (color-gamut:p3){ :root{ --gold:color(display-p3 0.82 0.72 0.30) } }
+    @media (color-gamut:p3){
+      :root{
+        --gold:color(display-p3 0.82 0.72 0.30);
+      }
+    }
 
     body{
       color:var(--ink);
       font-family:'Noto Serif JP',serif;
-      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
       overflow-x:hidden;
       background:
         radial-gradient(120vmax 90vmax at 50% -15%, #ffffff 0%, #fffdf6 28%, #fcf5df 52%, #faf2d3 67%, #f9f0cf 82%, transparent 96%),
@@ -40,122 +45,355 @@
       background-blend-mode:soft-light,normal,normal;
     }
     body::before{
-      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
-      opacity:.06; mix-blend-mode:multiply;
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      opacity:.06;
+      mix-blend-mode:multiply;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0.65'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size:160px 160px;
     }
 
-    .stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
+    .stars{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      opacity:.75;
+    }
 
     .glyph-column{
-      position:fixed; top:0; bottom:0; width:min(16vw,140px); z-index:1; pointer-events:none;
-      opacity:.14; mix-blend-mode:multiply; mask:linear-gradient(180deg,#000 20%,transparent 95%);
+      position:fixed;
+      top:0;
+      bottom:0;
+      width:min(16vw,140px);
+      z-index:1;
+      pointer-events:none;
+      opacity:.14;
+      mix-blend-mode:multiply;
+      mask:linear-gradient(180deg,#000 20%,transparent 95%);
       display:none;
     }
-    .glyph-column--l{left:0; background:repeating-linear-gradient(180deg, rgba(208,170,66,.22) 0 22px, transparent 22px 44px)}
-    .glyph-column--r{right:0; background:repeating-linear-gradient(180deg, rgba(180,150,80,.18) 0 26px, transparent 26px 52px)}
-    @media (min-width:1024px){ .glyph-column{display:block} }
+    .glyph-column--l{
+      left:0;
+      background:repeating-linear-gradient(180deg, rgba(208,170,66,.22) 0 22px, transparent 22px 44px);
+    }
+    .glyph-column--r{
+      right:0;
+      background:repeating-linear-gradient(180deg, rgba(180,150,80,.18) 0 26px, transparent 26px 52px);
+    }
+    @media (min-width:1024px){
+      .glyph-column{display:block}
+    }
 
-    .hdr{ position:sticky; top:0; z-index:5; backdrop-filter: blur(12px);
+    .hdr{
+      position:sticky;
+      top:0;
+      z-index:5;
+      backdrop-filter: blur(12px);
       background:color-mix(in oklab, #ffffff 76%, #fff2c6 24%);
-      border-bottom:1px solid rgba(208,170,66,.22) }
-    .hdr__in{ max-width:1100px; margin:0 auto; padding:10px 16px;
-      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
-      font-family:"Cormorant Garamond",serif }
-    .logo{ text-decoration:none; color:#8a6a12; font-weight:700; font-size:1.35rem; letter-spacing:.03em }
-    .nav{ display:flex; gap:18px; justify-content:center }
-    .nav a{ color:#5a4d24; text-decoration:none; font-weight:700; opacity:.9 }
-    .nav a:hover{ opacity:.65 }
+      border-bottom:1px solid rgba(208,170,66,.22);
+    }
+    .hdr__in{
+      max-width:1100px;
+      margin:0 auto;
+      padding:10px 16px;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:12px;
+      font-family:"Cormorant Garamond",serif;
+    }
+    .logo{
+      text-decoration:none;
+      color:#8a6a12;
+      font-weight:700;
+      font-size:1.35rem;
+      letter-spacing:.03em;
+    }
+    .nav{
+      display:flex;
+      gap:18px;
+      justify-content:center;
+    }
+    .nav a{
+      color:#5a4d24;
+      text-decoration:none;
+      font-weight:700;
+      opacity:.9;
+    }
+    .nav a:hover{
+      opacity:.65;
+    }
     .cta{
-      display:inline-flex; align-items:center; gap:8px; text-decoration:none;
-      color:#2b2510; font-weight:800; letter-spacing:.04em;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      color:#2b2510;
+      font-weight:800;
+      letter-spacing:.04em;
       background:linear-gradient(90deg,#fff2c6,#ffe493 70%);
       border:1px solid rgba(208,170,66,.45);
       box-shadow:0 8px 20px rgba(208,170,66,.25), inset 0 0 10px rgba(255,240,200,.35);
-      height:38px; padding:0 14px; border-radius:999px;
+      height:38px;
+      padding:0 14px;
+      border-radius:999px;
     }
 
-    .hero{ position:relative; z-index:2; display:grid; place-items:center; text-align:center;
-      padding:clamp(40px,8vw,80px) 16px 24px }
+    .hero{
+      position:relative;
+      z-index:2;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:clamp(40px,8vw,80px) 16px 24px;
+    }
     .hero__title{
-      font-family:"Cormorant Garamond",serif; font-size:clamp(26px,6vw,46px);
-      line-height:1.2; letter-spacing:.05em;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(26px,6vw,46px);
+      line-height:1.2;
+      letter-spacing:.05em;
       background:linear-gradient(92deg,#7d6b2b 0%, var(--gold) 35%, #e9d58a 60%, var(--gold) 100%);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow:0 0 30px rgba(240,215,140,.35)
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:0 0 30px rgba(240,215,140,.35);
     }
-    .hero__lead{ margin:10px auto 0; max-width:800px; color:#6a5e72; line-height:1.9 }
+    .hero__lead{
+      margin:10px auto 0;
+      max-width:800px;
+      color:#6a5e72;
+      line-height:1.9;
+    }
 
-    .tarot{ position:relative; z-index:2; padding:28px 16px 8px;
-      display:flex; gap:clamp(12px,3vw,24px); justify-content:center; align-items:center; flex-wrap:wrap }
-    .card{ width:clamp(112px,22vw,168px); aspect-ratio:62/110; perspective:1100px; position:relative; cursor:pointer;
-      filter: drop-shadow(0 10px 30px rgba(180,150,80,.25)); outline:0; touch-action:manipulation; }
+    /* ===== タロットカード ===== */
+    .tarot{
+      position:relative;
+      z-index:2;
+      padding:28px 16px 8px;
+      display:flex;
+      gap:clamp(12px,3vw,24px);
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .card{
+      width:clamp(112px,22vw,168px);
+      aspect-ratio:62/110;
+      perspective:1100px;
+      position:relative;
+      cursor:pointer;
+      filter: drop-shadow(0 10px 30px rgba(180,150,80,.25));
+      outline:0;
+      touch-action:manipulation;
+    }
     .card__inner{
-      width:100%; height:100%; position:relative; border-radius:14px; overflow:hidden;
+      width:100%;
+      height:100%;
+      position:relative;
+      border-radius:14px;
+      overflow:hidden;
       transform-style:preserve-3d;
       transition:transform .68s cubic-bezier(.2,.7,.2,1), box-shadow .3s;
-      box-shadow:0 8px 24px rgba(0,0,0,.08)
+      box-shadow:0 8px 24px rgba(0,0,0,.08);
     }
-    .card:focus-visible .card__inner{ box-shadow:0 0 0 3px rgba(208,170,66,.45) }
-    .card.is-flipped .card__inner{ transform:rotateY(180deg) }
-    .card__face{ position:absolute; inset:0; border-radius:14px; backface-visibility:hidden; overflow:hidden;
-      display:grid; place-items:center }
-    .card__back{ background:#efe9da }
-    .card__back::before{ content:""; position:absolute; inset:0;
-      background: var(--tarot-back-url) center/cover no-repeat; filter:contrast(1.02) saturate(1.02) }
-    .card__back > img{ width:100%; height:100%; object-fit:cover; display:block; opacity:0 }
+    .card:focus-visible .card__inner{
+      box-shadow:0 0 0 3px rgba(208,170,66,.45);
+    }
+    .card.is-flipped .card__inner{
+      transform:rotateY(180deg);
+    }
+    .card__face{
+      position:absolute;
+      inset:0;
+      border-radius:14px;
+      backface-visibility:hidden;
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+    }
+
+    /* 裏面：共通画像 */
+    .card__back{
+      background:#efe9da;
+    }
+    .card__back::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:var(--tarot-back-url) center/cover no-repeat;
+      filter:contrast(1.02) saturate(1.02);
+    }
+
+    /* 表面：JSで画像を上書き（初期は下地色のみ） */
     .card__front{
       transform:rotateY(180deg);
-      background:
-        radial-gradient(120% 120% at 50% 20%, rgba(255,242,200,.75), transparent 60%),
-        linear-gradient(135deg,#fff3bf,#ead7ff);
+      background:#fdf7ea;
       background-position:center;
       background-size:cover;
+      background-repeat:no-repeat;
     }
+
     .card--glow .card__inner{
-      box-shadow:0 0 0 2px rgba(240,220,160,.55), 0 0 40px 14px rgba(255,240,200,.35), 0 20px 60px rgba(208,170,66,.25);
-      animation: glowpop .6s ease-out
+      box-shadow:
+        0 0 0 2px rgba(240,220,160,.55),
+        0 0 40px 14px rgba(255,240,200,.35),
+        0 20px 60px rgba(208,170,66,.25);
+      animation: glowpop .6s ease-out;
     }
-    @keyframes glowpop{ 0%{filter:brightness(1.1)} 60%{filter:brightness(1.35)} 100%{filter:brightness(1)} }
+    @keyframes glowpop{
+      0%{filter:brightness(1.1)}
+      60%{filter:brightness(1.35)}
+      100%{filter:brightness(1)}
+    }
 
-    .meanings{ position:relative; z-index:2; display:grid; gap:12px; grid-template-columns:1fr;
-      max-width:1100px; margin:10px auto 4px; padding:0 16px }
-    @media (min-width:760px){ .meanings{ grid-template-columns:repeat(3,1fr) } }
+    .meanings{
+      position:relative;
+      z-index:2;
+      display:grid;
+      gap:12px;
+      grid-template-columns:1fr;
+      max-width:1100px;
+      margin:10px auto 4px;
+      padding:0 16px;
+    }
+    @media (min-width:760px){
+      .meanings{ grid-template-columns:repeat(3,1fr) }
+    }
     .m-item{
-      background:rgba(255,255,255,.55); border:1px solid rgba(208,170,66,.30);
-      border-radius:14px; padding:14px 16px; min-height:92px;
-      box-shadow:inset 0 0 18px rgba(255,240,200,.25); opacity:0; transform:translateY(6px)
+      background:rgba(255,255,255,.55);
+      border:1px solid rgba(208,170,66,.30);
+      border-radius:14px;
+      padding:14px 16px;
+      min-height:92px;
+      box-shadow:inset 0 0 18px rgba(255,240,200,.25);
+      opacity:0;
+      transform:translateY(6px);
     }
-    .m-item.is-show{ opacity:1; transform:none; transition:opacity .55s ease, transform .55s ease }
-    .m-head{ color:#7a6328; font-weight:800; letter-spacing:.16em; font-size:.92rem; margin-bottom:6px }
-    .m-body{ color:#4b4250; line-height:1.85 }
+    .m-item.is-show{
+      opacity:1;
+      transform:none;
+      transition:opacity .55s ease, transform .55s ease;
+    }
+    .m-head{
+      color:#7a6328;
+      font-weight:800;
+      letter-spacing:.16em;
+      font-size:.92rem;
+      margin-bottom:6px;
+    }
+    .m-body{
+      color:#4b4250;
+      line-height:1.85;
+    }
 
-    .block{ position:relative; z-index:2; text-align:center; padding:18px 16px }
-    .block h2{ font-family:"Cormorant Garamond",serif; font-size:clamp(24px,5.4vw,38px);
-      letter-spacing:.12em; color:#6f5a28; opacity:0; transform:translateY(6px) }
-    .block h2.is-show{ opacity:1; transform:none; transition:opacity 900ms ease, transform 900ms ease }
-    .poem{ max-width:900px; margin:10px auto 0; padding:0 16px 10px; list-style:none; display:flex; flex-direction:column; gap:10px }
-    .poem li{ color:#554a2a; line-height:1.95; letter-spacing:.04em; opacity:0; transform:translateY(6px);
-      text-shadow:0 0 18px rgba(255,240,200,.45), 0 0 4px rgba(255,255,255,.5) }
-    .poem li.is-show{ opacity:1; transform:none; transition:opacity 700ms ease, transform 700ms ease }
-    .actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:18px 0 40px; opacity:0; transform:translateY(8px) }
-    .actions.is-show{ opacity:1; transform:none; transition:opacity 650ms ease, transform 650ms ease }
-    .btn{ appearance:none; border:1px solid rgba(208,170,66,.48); border-radius:999px;
-      padding:14px 22px; font-weight:800; letter-spacing:.04em; cursor:pointer;
-      background:#fff6d6; color:#3a2e10; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    .block{
+      position:relative;
+      z-index:2;
+      text-align:center;
+      padding:18px 16px;
+    }
+    .block h2{
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(24px,5.4vw,38px);
+      letter-spacing:.12em;
+      color:#6f5a28;
+      opacity:0;
+      transform:translateY(6px);
+    }
+    .block h2.is-show{
+      opacity:1;
+      transform:none;
+      transition:opacity 900ms ease, transform 900ms ease;
+    }
+    .poem{
+      max-width:900px;
+      margin:10px auto 0;
+      padding:0 16px 10px;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .poem li{
+      color:#554a2a;
+      line-height:1.95;
+      letter-spacing:.04em;
+      opacity:0;
+      transform:translateY(6px);
+      text-shadow:0 0 18px rgba(255,240,200,.45), 0 0 4px rgba(255,255,255,.5);
+    }
+    .poem li.is-show{
+      opacity:1;
+      transform:none;
+      transition:opacity 700ms ease, transform 700ms ease;
+    }
+    .actions{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin:18px 0 40px;
+      opacity:0;
+      transform:translateY(8px);
+    }
+    .actions.is-show{
+      opacity:1;
+      transform:none;
+      transition:opacity 650ms ease, transform 650ms ease;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(208,170,66,.48);
+      border-radius:999px;
+      padding:14px 22px;
+      font-weight:800;
+      letter-spacing:.04em;
+      cursor:pointer;
+      background:#fff6d6;
+      color:#3a2e10;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       box-shadow:0 8px 22px rgba(208,170,66,.22), inset 0 0 12px rgba(255,240,200,.35);
-      transition:transform .15s ease, filter .2s ease, box-shadow .25s ease }
-    .btn:hover{ transform:translateY(-1px) }
-    .btn--ghost{ background:rgba(255,255,255,.6); color:#4a4160; border:1px solid rgba(120,100,150,.28);
-      box-shadow:0 6px 16px rgba(120,100,150,.18), inset 0 0 10px rgba(255,255,255,.45) }
+      transition:transform .15s ease, filter .2s ease, box-shadow .25s ease;
+    }
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+    .btn--ghost{
+      background:rgba(255,255,255,.6);
+      color:#4a4160;
+      border:1px solid rgba(120,100,150,.28);
+      box-shadow:0 6px 16px rgba(120,100,150,.18), inset 0 0 10px rgba(255,255,255,.45);
+    }
 
-    .back{ position:fixed; left:14px; bottom:14px; z-index:4; text-decoration:none; font-weight:800; letter-spacing:.04em;
-      color:#3a2e10; background:#fff1c7; border:1px solid rgba(208,170,66,.45); border-radius:999px; padding:10px 14px;
-      box-shadow:0 8px 18px rgba(208,170,66,.22), inset 0 0 10px rgba(255,240,200,.35) }
+    .back{
+      position:fixed;
+      left:14px;
+      bottom:14px;
+      z-index:4;
+      text-decoration:none;
+      font-weight:800;
+      letter-spacing:.04em;
+      color:#3a2e10;
+      background:#fff1c7;
+      border:1px solid rgba(208,170,66,.45);
+      border-radius:999px;
+      padding:10px 14px;
+      box-shadow:0 8px 18px rgba(208,170,66,.22), inset 0 0 10px rgba(255,240,200,.35);
+    }
 
     .flashlayer{
-      position:fixed; inset:0; z-index:60; pointer-events:none; opacity:0;
+      position:fixed;
+      inset:0;
+      z-index:60;
+      pointer-events:none;
+      opacity:0;
       mix-blend-mode:screen;
       background:
         radial-gradient(52vmax 38vmax at 50% 44%,
@@ -166,13 +404,24 @@
         linear-gradient(180deg, rgba(255,240,200,.85), rgba(255,255,255,0) 60%);
       filter: blur(.3px);
     }
-    .flashlayer.is-on{ animation: templeFlash 900ms ease-out both }
+    .flashlayer.is-on{
+      animation: templeFlash 900ms ease-out both;
+    }
     @keyframes templeFlash{
-      0%{opacity:0} 18%{opacity:1} 55%{opacity:.88} 100%{opacity:0}
+      0%{opacity:0}
+      18%{opacity:1}
+      55%{opacity:.88}
+      100%{opacity:0}
     }
 
     @media (prefers-reduced-motion:reduce){
-      .card__inner,.block h2,.poem li,.actions{ transition:none !important; animation:none !important }
+      .card__inner,
+      .block h2,
+      .poem li,
+      .actions{
+        transition:none !important;
+        animation:none !important;
+      }
     }
   </style>
 </head>
@@ -203,19 +452,19 @@
   <section class="tarot" id="tarot" aria-label="三枚のカード">
     <div class="card" data-i="0" tabindex="0" role="button" aria-label="詩（Poem）">
       <div class="card__inner">
-        <div class="card__face card__back" aria-hidden="true"><img src="/assets/tarot/back.jpg" alt=""></div>
+        <div class="card__face card__back" aria-hidden="true"></div>
         <div class="card__face card__front" aria-hidden="true"></div>
       </div>
     </div>
     <div class="card" data-i="1" tabindex="0" role="button" aria-label="韻（Rhythm）">
       <div class="card__inner">
-        <div class="card__face card__back" aria-hidden="true"><img src="/assets/tarot/back.jpg" alt=""></div>
+        <div class="card__face card__back" aria-hidden="true"></div>
         <div class="card__face card__front" aria-hidden="true"></div>
       </div>
     </div>
     <div class="card" data-i="2" tabindex="0" role="button" aria-label="祈（Prayer）">
       <div class="card__inner">
-        <div class="card__face card__back" aria-hidden="true"><img src="/assets/tarot/back.jpg" alt=""></div>
+        <div class="card__face card__back" aria-hidden="true"></div>
         <div class="card__face card__front" aria-hidden="true"></div>
       </div>
     </div>
@@ -241,46 +490,69 @@
   <script>
     /* ===== 背景：星粒 ===== */
     (function(){
-      const cvs=document.getElementById('stars'),ctx=cvs.getContext('2d');
-      let dpr=1,stars=[];
+      const cvs = document.getElementById('stars');
+      const ctx = cvs.getContext('2d');
+      let dpr = 1, stars = [];
+
       function resize(){
-        dpr=Math.min(2,window.devicePixelRatio||1);
-        cvs.width=innerWidth*dpr; cvs.height=innerHeight*dpr;
-        cvs.style.width=innerWidth+"px"; cvs.style.height=innerHeight+"px";
+        dpr = Math.min(2, window.devicePixelRatio || 1);
+        cvs.width  = innerWidth * dpr;
+        cvs.height = innerHeight * dpr;
+        cvs.style.width  = innerWidth + "px";
+        cvs.style.height = innerHeight + "px";
         ctx.setTransform(dpr,0,0,dpr,0,0);
-        stars=new Array(Math.floor(Math.min(180,innerWidth/8))).fill().map(()=>({
-          x:Math.random()*innerWidth, y:Math.random()*innerHeight,
-          r:Math.random()*1.2+.2, a:Math.random()*0.5+.2, s:Math.random()*0.3+.05
+        stars = new Array(Math.floor(Math.min(180, innerWidth/8))).fill().map(() => ({
+          x: Math.random() * innerWidth,
+          y: Math.random() * innerHeight,
+          r: Math.random() * 1.2 + .2,
+          a: Math.random() * 0.5 + .2,
+          s: Math.random() * 0.3 + .05
         }));
       }
+
       function draw(){
         ctx.clearRect(0,0,innerWidth,innerHeight);
         for(const st of stars){
-          ctx.beginPath(); ctx.arc(st.x,st.y,st.r,0,Math.PI*2);
-          ctx.fillStyle=`rgba(240,226,170,${st.a})`; ctx.fill();
-          st.y-=st.s*.12; if(st.y<-2) st.y=innerHeight+2;
-          st.x+=Math.sin(st.y*0.005)*0.05;
+          ctx.beginPath();
+          ctx.arc(st.x, st.y, st.r, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(240,226,170,${st.a})`;
+          ctx.fill();
+          st.y -= st.s * .12;
+          if(st.y < -2) st.y = innerHeight + 2;
+          st.x += Math.sin(st.y * 0.005) * 0.05;
         }
         requestAnimationFrame(draw);
       }
-      addEventListener('resize',resize,{passive:true}); resize(); draw();
-    })();
 
+      addEventListener('resize', resize, {passive:true});
+      resize();
+      draw();
+    })();
+  </script>
+
+  <script>
     /* ===== リーディング本体：3枚→解説→フラッシュ→詩韻祈→九行→CTA ===== */
     (function(){
-      const cards=[...document.querySelectorAll('.card')];
-      const title=document.getElementById('sy');
-      const poemBox=document.getElementById('poem');
-      const actions=document.getElementById('actions');
-      const flash=document.querySelector('.flashlayer');
-      const mBodies=[document.getElementById('m0'),document.getElementById('m1'),document.getElementById('m2')];
-      const mItems=[...document.querySelectorAll('.m-item')];
+      const cards   = [...document.querySelectorAll('.card')];
+      const title   = document.getElementById('sy');
+      const poemBox = document.getElementById('poem');
+      const actions = document.getElementById('actions');
+      const flash   = document.querySelector('.flashlayer');
+      const mBodies = [
+        document.getElementById('m0'),
+        document.getElementById('m1'),
+        document.getElementById('m2')
+      ];
+      const mItems = [...document.querySelectorAll('.m-item')];
 
-      const T_FLASH=900, T_SY_FADE=900, T_PAUSE=600, LINE_DELAY=850;
+      const T_FLASH    = 900;
+      const T_SY_FADE  = 900;
+      const T_PAUSE    = 600;
+      const LINE_DELAY = 850;
 
-      /* ===== 22枚フルマッピング ===== */
+      /* ===== 22枚フルマッピング（画像パス付き） ===== */
       const MAJOR = [
-        { id:0,  key:'fool',        n:'The Fool',        img:'00_fool.jpg',        two:['最初の一歩は、恐れより軽い。','失敗は合図——世界は君に開く.']},
+        { id:0,  key:'fool',        n:'The Fool',        img:'/assets/tarot/00_fool.jpg',        two:['最初の一歩は、恐れより軽い。','失敗は合図——世界は君に開く.']},
         { id:1,  key:'magician',    n:'The Magician',    img:'/assets/tarot/01_magician.jpg',    two:['意志は手を、言葉は現実を動かす。','足りないものは、すでに君の中にある。']},
         { id:2,  key:'priestess',   n:'The High Priestess', img:'/assets/tarot/02_priestess.jpg', two:['沈黙が真実の輪郭を照らす。','内なる月に、耳を澄ませ。']},
         { id:3,  key:'empress',     n:'The Empress',     img:'/assets/tarot/03_empress.jpg',     two:['優しさは力、受け取ることは創造。','育てたものが、君を育てる。']},
@@ -301,69 +573,75 @@
         { id:18, key:'moon',        n:'The Moon',        img:'/assets/tarot/18_moon.jpg',        two:['不安は想像力の副作用。','曙は必ず来る。']},
         { id:19, key:'sun',         n:'The Sun',         img:'/assets/tarot/19_sun.jpg',         two:['喜びは戦略になる。','笑顔は未来の先行投資。']},
         { id:20, key:'judgement',   n:'Judgement',       img:'/assets/tarot/20_judgement.jpg',   two:['赦すのではない、呼び戻すのだ。','いまの君で、やり直せ。']},
-        { id:21, key:'world',       n:'The World',       img:'/assets/tarot/21_world.jpg',       two:['輪は閉じて、道は開く。','完成形は次のスタートライン。']},
+        { id:21, key:'world',       n:'The World',       img:'/assets/tarot/21_world.jpg',       two:['輪は閉じて、道は開く。','完成形は次のスタートライン。']}
       ];
 
       function drawThree(){
-        const pool=[...MAJOR], picks=[];
+        const pool = [...MAJOR];
+        const picks = [];
         for(let i=0;i<3;i++){
-          const r=crypto.getRandomValues(new Uint32Array(1))[0]%pool.length;
+          const buf = new Uint32Array(1);
+          window.crypto.getRandomValues(buf);
+          const r = buf[0] % pool.length;
           picks.push(pool.splice(r,1)[0]);
         }
         return picks;
       }
 
-      let opened=0, selected=drawThree();
+      let opened  = 0;
+      let selected = drawThree();
 
+      /* ★ 表面画像を設定する関数（front の background-image をセット）★ */
       function setFrontImage(cardEl, imgUrl){
         const front = cardEl.querySelector('.card__front');
         if(front){
-          front.style.backgroundImage = `url("${imgUrl}")`;
+          front.style.backgroundImage    = `url("${imgUrl}")`;
           front.style.backgroundPosition = 'center';
-          front.style.backgroundSize = 'cover';
+          front.style.backgroundSize     = 'cover';
+          front.style.backgroundRepeat   = 'no-repeat';
         }
       }
 
       function flip(i){
-        const el=cards[i];
+        const el = cards[i];
         if(!el || el.classList.contains('is-flipped')) return;
 
-        const d=selected[i];
+        const d = selected[i];
         setFrontImage(el, d.img);
 
         el.classList.add('is-flipped','card--glow');
-        setTimeout(()=>el.classList.remove('card--glow'),620);
+        setTimeout(() => el.classList.remove('card--glow'), 620);
 
-        mBodies[i].innerHTML=`《${d.n}》<br>${d.two[0]}<br>${d.two[1]}`;
+        mBodies[i].innerHTML = `《${d.n}》<br>${d.two[0]}<br>${d.two[1]}`;
         mItems[i].classList.add('is-show');
 
-        opened++; if(opened===3) runSequence();
+        opened++;
+        if(opened === 3) runSequence();
       }
 
-      /* === タップ対応強化（iOS含む）：pointerup を使用 === */
+      /* === タップ／クリック／キーボード === */
       cards.forEach((el,i)=>{
-        // クリック
-        el.addEventListener('click',()=>flip(i));
-        // タッチ/ペン/マウスの統一イベント
-        el.addEventListener('pointerup', (e)=>{
-          // ドラッグ等は除外
-          if(Math.abs(e.pointerType==='touch' ? (e.width||0)+(e.height||0) : 0) >= 0) flip(i);
-        });
-        // キーボード
-        el.addEventListener('keydown',e=>{
-          if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(i); }
+        el.addEventListener('click', () => flip(i));
+        el.addEventListener('keydown', e=>{
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            flip(i);
+          }
         });
       });
 
       function runSequence(){
-        if(flash){ flash.classList.add('is-on'); setTimeout(()=>flash.classList.remove('is-on'), 900); }
+        if(flash){
+          flash.classList.add('is-on');
+          setTimeout(() => flash.classList.remove('is-on'), T_FLASH);
+        }
         title.removeAttribute('aria-hidden');
         title.classList.add('is-show');
         title.scrollIntoView({behavior:'smooth', block:'center'});
-        setTimeout(runPoem, 900 + 900 + 600);
+        setTimeout(runPoem, T_FLASH + T_SY_FADE + T_PAUSE);
       }
 
-      const POEMS=[
+      const POEMS = [
         ["風は名を持たず、あなたの願いだけを知っている。","迷った足跡は、地図に描き直せる。","優しさは武器ではない——それでも闇を遠ざける。","涙は言葉の前奏、沈黙は祈りの本質。","選ぶことは、未来の責任を抱きしめること。","恐れの奥には、出発の鍵穴がある。","手放すとは、より大きな循環へ返す儀式。","呼吸を一度、長く。世界はそれだけで広がる。","そして、いま。小さな一歩が、あなたを救う。"],
         ["やさしい光は、遅れて届く約束のようだ。","不安の輪郭は、確かめるほど薄くなる。","誰かを赦すたび、自分が自由になる。","願いを隠さない日、時間は味方に変わる。","間違いは、正しく進むための方位磁石。","寄りかかれる壁は、強さの証明。","希望は、手を洗うみたいに簡単だ。","未来は過去を責めない——ただ抱きしめ直す。","大丈夫。あなたは“いま”から始められる。"],
         ["孤独は敵ではない、灯台の光源だ。","足りないと感じる場所に、出会いは生まれる。","失うことは、空きをつくること。","その空きに、贈り物は入ってくる。","待つ力は、進む力と同じ重さを持つ。","愛は選択、選択は勇気、勇気は練習で育つ。","心の温度をひとつ上げたら、景色が変わった。","ありがとうは、未来を前払いする言葉。","さあ、次の一歩へ。"],
@@ -376,17 +654,17 @@
       ];
 
       function runPoem(){
-        const set = POEMS[(Math.random()*POEMS.length)|0];
-        poemBox.innerHTML='';
-        let delay=0;
-        set.forEach(line=>{
-          const li=document.createElement('li');
-          li.textContent=line;
+        const set = POEMS[(Math.random() * POEMS.length) | 0];
+        poemBox.innerHTML = '';
+        let delay = 0;
+        set.forEach(line => {
+          const li = document.createElement('li');
+          li.textContent = line;
           poemBox.appendChild(li);
-          setTimeout(()=> li.classList.add('is-show'), delay);
+          setTimeout(() => li.classList.add('is-show'), delay);
           delay += LINE_DELAY;
         });
-        setTimeout(()=> actions.classList.add('is-show'), delay + 400);
+        setTimeout(() => actions.classList.add('is-show'), delay + 400);
       }
     })();
   </script>
