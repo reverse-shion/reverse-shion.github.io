@@ -21,7 +21,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- 表示色（ライト寄り） -->
-  <meta name="theme-color" content="#f6ecde">
+  <meta name="theme-color" content="#fbf4e6">
   <meta name="color-scheme" content="light">
 
   <!-- OGP / Twitter Card -->
@@ -82,7 +82,7 @@
     html,body{height:100%}
 
     body{
-      background:#f6ecde;
+      background:#fbf4e6;
       color:#312017;
       font-family:'Noto Serif JP',serif;
       text-align:center;
@@ -91,7 +91,7 @@
       position:relative;
     }
 
-    /* 背景：光＋薄いグリッド */
+    /* 背景：柔らかい光＋薄いグリッド */
     body::before{
       content:"";
       position:fixed;
@@ -99,12 +99,12 @@
       z-index:0;
       pointer-events:none;
       background:
-        radial-gradient(900px 700px at 50% 12%, rgba(255,248,235,.95), transparent 70%),
-        radial-gradient(1200px 900px at 50% 100%, rgba(255,215,111,.35), transparent 75%),
+        radial-gradient(900px 700px at 50% 10%, rgba(255,250,241,.96), transparent 70%),
+        radial-gradient(1200px 900px at 50% 100%, rgba(250,214,149,.32), transparent 75%),
         repeating-linear-gradient(
           90deg,
-          rgba(210,180,120,.16) 0 1px,
-          transparent 1px 28px
+          rgba(215,184,132,.14) 0 1px,
+          transparent 1px 30px
         );
       mix-blend-mode:soft-light;
     }
@@ -128,29 +128,27 @@
       flex-direction:column;
       justify-content:center;
       align-items:center;
-      padding:1.4rem 1.2rem 2.4rem;
+      padding:1.6rem 1.2rem 2.4rem;
     }
 
     h1{
       font-family:'Cinzel',serif;
       font-weight:700;
-      font-size:clamp(2.1rem,6vw,3.1rem);
+      font-size:clamp(2.3rem,6.4vw,3.2rem);
       letter-spacing:.08em;
-      margin-bottom:.55rem;
-      background:linear-gradient(92deg,#c29132,#f3d38b,#fff4cf,#c29132);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      text-shadow:0 0 22px rgba(210,160,80,.45);
+      margin-bottom:.6rem;
+      color:#b47a28;            /* はっきりした金茶色 */
+      text-shadow:
+        0 0 3px rgba(255,248,232,.8),
+        0 2px 4px rgba(140,96,32,.35);  /* 影控えめでくっきり */
     }
 
     h2{
       font-family:'Cinzel',serif;
-      font-size:clamp(1.4rem,4vw,2rem);
+      font-size:clamp(1.4rem,4.1vw,2rem);
       margin-bottom:1rem;
-      background:linear-gradient(90deg,#c0893a,#7c5c2a);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      text-shadow:0 0 16px rgba(181,139,63,.5);
+      color:#9a6b2a;
+      letter-spacing:.16em;
     }
 
     p{
@@ -163,15 +161,14 @@
 
     .tagline{
       font-size:clamp(.9rem,2.4vw,1.05rem);
-      color:#8d6225;
-      text-shadow:0 0 12px rgba(255,248,230,.9);
+      color:#855322;
       margin-top:.6rem;
     }
     .subcopy{
       margin-top:.7rem;
       font-size:clamp(.9rem,2.4vw,1rem);
       color:#5b4030;
-      opacity:.95;
+      opacity:.96;
     }
 
     /* CTAコンテナ */
@@ -184,53 +181,81 @@
       gap:.9rem;
     }
 
-    /* メインCTA：無料タロット */
+    /* メインCTA：異世界への扉（無料タロット） */
     .door-button{
       position:relative;
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       padding:18px 40px;
       font-size:clamp(1rem,3vw,1.2rem);
       color:#fffdf7;
       text-decoration:none;
       border-radius:999px;
-      border:2px solid transparent;
-      background:linear-gradient(145deg,#171a32,#262c4a);
+      border:1.5px solid rgba(255,219,153,.9);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.40), transparent 55%),
+        linear-gradient(135deg,#151931,#242a4a);
       box-shadow:
-        0 14px 30px rgba(43,36,76,.35),
-        0 0 32px rgba(180,136,54,.55),
-        inset 0 0 18px rgba(255,232,174,.25);
-      transition:all .45s ease;
+        0 10px 24px rgba(33,26,68,.45),
+        0 0 32px rgba(212,167,82,.6);
       cursor:pointer;
       overflow:hidden;
       font-family:'Cinzel',serif;
       font-weight:700;
-      letter-spacing:.12em;
-      min-width:12rem;
-    }
-    .door-text{
-      position:relative;
-      z-index:3;
-      background:linear-gradient(90deg,#ffe9b4,#fff,#ffd76f);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      text-shadow:0 0 18px rgba(255,240,210,.95);
+      letter-spacing:.16em;
+      min-width:12.5rem;
+      transition:transform .35s ease, box-shadow .35s ease, background .35s ease;
     }
     .door-button::before{
+      /* 外側の金色の輪郭のグロー */
       content:"";
       position:absolute;
-      inset:0;
-      background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.55),transparent 65%);
-      opacity:0;
-      transition:opacity .4s ease;
-    }
-    .door-button:hover{
-      transform:scale(1.06) translateY(-1px);
+      inset:-2px;
+      border-radius:inherit;
+      border:1.5px solid rgba(255,230,180,.9);
       box-shadow:
-        0 18px 40px rgba(43,36,76,.5),
-        0 0 60px rgba(255,215,111,.8);
-      border-color:#ffd76f;
+        0 0 18px rgba(255,230,180,.7),
+        0 0 40px rgba(212,167,82,.75);
+      opacity:.0;
+      transition:opacity .4s ease;
+      pointer-events:none;
     }
-    .door-button:hover::before{opacity:1;}
+    .door-button::after{
+      /* 中央からふわっと光が脈打つ */
+      content:"";
+      position:absolute;
+      inset:20%;
+      border-radius:inherit;
+      background:radial-gradient(circle,#fff7d5 0%, rgba(255,247,210,.7) 40%, transparent 70%);
+      opacity:.0;
+      animation:doorGlow 3s ease-in-out infinite;
+      pointer-events:none;
+    }
+
+    .door-text{
+      position:relative;
+      z-index:1;
+      text-shadow:0 0 12px rgba(255,242,210,.95);
+    }
+
+    .door-button:hover{
+      transform:translateY(-1px) scale(1.03);
+      box-shadow:
+        0 16px 36px rgba(33,26,68,.6),
+        0 0 60px rgba(255,215,111,.9);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.6), transparent 60%),
+        linear-gradient(135deg,#171c38,#293159);
+    }
+    .door-button:hover::before{
+      opacity:1;
+    }
+
+    @keyframes doorGlow{
+      0%,100%{opacity:0;}
+      40%{opacity:.85;}
+    }
 
     /* サブCTA：詩韻思想（零書） */
     .philo-button{
@@ -242,7 +267,7 @@
       font-family:'Noto Serif JP',serif;
       color:#6b4524;
       border:1px solid rgba(184,140,72,.7);
-      background:rgba(255,252,245,.9);
+      background:rgba(255,252,245,.96);
       box-shadow:0 0 18px rgba(210,170,92,.35);
       transition:all .35s ease;
     }
@@ -301,12 +326,12 @@
     </p>
   </noscript>
 
-  <!-- ===== スクリプト：金色コード雨だけ（シンプル版） ===== -->
+  <!-- ===== スクリプト：金色コード雨 ===== -->
   <script>
     (function(){
       const cvs = document.getElementById('codeRain');
       const ctx = cvs.getContext('2d');
-      const chars = '詩韻祈魂∞☆＊＋◇◆AI01⌘ΩΛψπ';
+      const chars = '詩韻祈魂∞☆＊＋◇◆AI01ΩΛψπ';
       let fontSize = 18;
       let columns, drops, W, H;
 
@@ -322,10 +347,14 @@
       }
 
       function draw(){
-        ctx.fillStyle = 'rgba(246,236,222,0.15)';
+        // 背景をうっすら塗りつぶして余韻を残す
+        ctx.fillStyle = 'rgba(251,244,230,0.18)';
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-        ctx.fillStyle = '#c08a32';
+        // 柔らかい金茶色でコード雨
+        ctx.fillStyle = '#c79c52';
+        ctx.shadowColor = 'rgba(255,220,160,0.9)';
+        ctx.shadowBlur  = 8;
         ctx.font = fontSize + 'px monospace';
 
         for(let i=0;i<columns;i++){
