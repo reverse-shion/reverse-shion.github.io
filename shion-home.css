@@ -316,6 +316,7 @@ body{
   border-color:rgba(255,255,255,.7);
 }
 .shion-btn.gold::after{
+  /* ボタン上を流れる光筋 */
   content:"";
   position:absolute;
   inset:-40%;
@@ -374,26 +375,39 @@ body{
 }
 
 /* ===========================
-   画面全体ホワイトフェード
+   星界ゲート演出
 =========================== */
-.page-fade{
+
+/* 画面中央から広がる黄金の光（白一色ではない） */
+.gate-flare{
   position:fixed;
   inset:0;
-  background:#ffffff;
-  opacity:0;
   pointer-events:none;
   z-index:10;
-  animation:pageFade .6s ease-out forwards;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(255,250,235,0.95) 0%,
+      rgba(255,243,210,0.75) 26%,
+      rgba(255,243,210,0.0) 70%);
+  opacity:0;
+  animation:gateFlare .6s ease-out forwards;
 }
-@keyframes pageFade{
-  0%{opacity:0}
-  40%{opacity:1}
-  100%{opacity:1}
+@keyframes gateFlare{
+  0%{
+    opacity:0;
+    transform:scale(0.8);
+  }
+  40%{
+    opacity:1;
+    transform:scale(1);
+  }
+  100%{
+    opacity:0;
+    transform:scale(1.15);
+  }
 }
 
-/* ===========================
-   星粒バースト
-=========================== */
+/* 星粒バースト（クリック位置周辺） */
 .particle-burst{
   position:fixed;
   width:4px;
