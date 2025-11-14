@@ -322,119 +322,79 @@
       gap:12px;
     }
 
- /* ==== Buttons base 共通 ==== */
-.btn{
+ .btn{
   position:relative;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding:16px 32px;
-  border-radius:18px;
-  border:1px solid transparent;
+  padding:10px 32px;
+  border-radius:999px;
+  border:none;
   text-decoration:none;
-  font-size:13px;
-  letter-spacing:.22em;
+  font-size:12px;
+  letter-spacing:.24em;
   text-transform:uppercase;
   cursor:pointer;
-  min-width:min(100%,400px);
+  min-width:min(100%,420px);
   text-align:center;
   overflow:hidden;
-  transition:
-    transform .22s ease-out,
-    box-shadow .22s ease-out,
-    background .22s ease-out,
-    border-color .22s ease-out;
+  background:transparent;
 }
-.btn span.label{
-  position:relative;
-  z-index:2;
-}
+.btn span.label{position:relative;z-index:2}
 
-/* === 星界へアクセス：ゴールドクリスタル === */
-.btn-primary{
-  background:
-    linear-gradient(135deg,#fff7de 0,#ffd982 35%,#e0b44f 70%,#9f7120 100%);
-  color:#271304;
-  border-color:rgba(255,255,255,.9);
-  box-shadow:
-    0 12px 28px rgba(0,0,0,.20),
-    0 0 0 1px rgba(255,255,255,.7),
-    inset 0 1px 0 rgba(255,255,255,.9);
-}
-.btn-primary::before{
-  /* 上辺だけ光るライン */
-  content:"";
-  position:absolute;
-  left:8%;
-  right:8%;
-  top:0;
-  height:2px;
-  background:linear-gradient(90deg,transparent,#fff,transparent);
-  opacity:.9;
-}
-.btn-primary::after{
-  /* 右上→左下に流れる光筋 */
-  content:"";
-  position:absolute;
-  inset:-40%;
-  background:linear-gradient(135deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,.8) 40%,
-    rgba(255,255,255,0) 60%);
-  transform:translateX(-120%);
-  opacity:0;
-  transition:transform .75s ease-out,opacity .55s ease-out;
-}
-.btn-primary:hover{
-  transform:translateY(-1px);
-  box-shadow:
-    0 18px 34px rgba(0,0,0,.28),
-    0 0 0 1px rgba(255,255,255,.9);
-}
-.btn-primary:hover::after{
-  opacity:1;
-  transform:translateX(20%);
-}
-
-/* === 詩韻思想を読む：ガラスブルー === */
-.btn-secondary{
-  background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(245,249,255,.98));
-  border-color:rgba(95,140,255,.7);
-  box-shadow:
-    0 10px 24px rgba(95,140,255,.20),
-    inset 0 1px 0 rgba(255,255,255,.9);
-  color:#2a2635;
-}
-.btn-secondary span.label{
-  background:linear-gradient(120deg,#7ea8ff,#c0d5ff,#b8923b);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-.btn-secondary::before{
+/* レール本体 */
+.btn::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:inherit;
-  border:1px solid rgba(255,255,255,.7);
-  mix-blend-mode:screen;
-  opacity:.7;
+  background:linear-gradient(90deg,transparent,#fff8d0,#ffe19a,#fff8d0,transparent);
+  opacity:.9;
+}
+.btn::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:inherit;
+  background:rgba(255,255,255,.85);
+  box-shadow:0 0 22px rgba(255,215,111,.55);
+}
+
+/* primary：文字はゴールド寄りグラデ */
+.btn-primary span.label{
+  background:linear-gradient(90deg,#c09232,#e6b949,#f7e0a4);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.btn-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 16px 30px rgba(0,0,0,.18);
+}
+
+/* secondary：少しブルー寄りレール＆文字 */
+.btn-secondary::before{
+  background:linear-gradient(90deg,transparent,#e6efff,#d3e0ff,#e6efff,transparent);
+}
+.btn-secondary span.label{
+  background:linear-gradient(90deg,#7a9cff,#9fb7ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
 }
 .btn-secondary:hover{
   transform:translateY(-1px);
-  box-shadow:
-    0 16px 30px rgba(0,0,0,.22),
-    0 0 0 1px rgba(95,140,255,.9);
+  box-shadow:0 14px 26px rgba(0,0,0,.16);
 }
+
 @media (max-width:480px){
   .btn{
     width:100%;
-    padding:14px 18px;
-    font-size:12px;
+    padding:10px 20px;
+    font-size:11px;
     letter-spacing:.18em;
   }
 }
-
     /* きらめきフラッシュ（遷移演出） */
     .flash{
       position:fixed;
