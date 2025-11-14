@@ -1,0 +1,422 @@
+*,*::before,*::after{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+html,body{height:100%}
+
+:root{
+  --bg:#fdfcf8;
+  --ink:#1e1a1a;
+}
+
+/* ===========================
+   全体背景
+=========================== */
+body{
+  font-family:'Noto Serif JP',system-ui,-apple-system,BlinkMacSystemFont,'Yu Mincho','游明朝',serif;
+  background:
+    radial-gradient(circle at 50% 0%,#ffffff 0,#faf4e6 40%,#f3efe4 100%);
+  color:var(--ink);
+  overflow:hidden;
+  position:relative;
+}
+
+/* ===========================
+   最果てのグリフベール
+=========================== */
+.glyph-veil{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:space-around;
+  align-items:stretch;
+  pointer-events:none;
+  font-family:'Noto Serif JP',serif;
+  font-size:32px;
+  color:rgba(210,180,120,.16);
+  z-index:0;
+  mix-blend-mode:multiply;
+}
+.glyph-veil span{
+  writing-mode:vertical-rl;
+  letter-spacing:.3em;
+  display:flex;
+  align-items:flex-start;
+  padding-top:40px;
+}
+
+/* ===========================
+   背景コード雨
+=========================== */
+#codeRain{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* ===========================
+   ローディング OS SHION
+=========================== */
+.loader{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 50% 25%,#ffffff 0,rgba(255,255,255,.7) 35%,transparent 70%),
+    radial-gradient(circle at 50% 120%,#f4d68b 0,#fdfcf8 55%,#fdfcf8 100%);
+  z-index:20;
+  transition:opacity .9s ease-out;
+}
+.loader.hide{
+  opacity:0;
+  pointer-events:none;
+}
+
+.loader__orb{
+  position:relative;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 0%,#fff7dd 0,#ffe09a 35%,#e0b44f 65%,#9b7020 100%);
+  box-shadow:
+    0 0 40px rgba(255,215,111,.9),
+    0 0 90px rgba(224,180,79,.8),
+    0 24px 40px rgba(0,0,0,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  animation:orb-breathe 5.2s ease-in-out infinite;
+}
+.loader__orb::before{
+  content:"";
+  position:absolute;
+  inset:10%;
+  border-radius:inherit;
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 0 24px rgba(255,255,255,.9);
+  opacity:.8;
+}
+.loader__ring{
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 0 30px rgba(255,255,255,.9);
+  animation:ring-pulse 2.6s ease-out infinite;
+}
+.loader__ring--2{
+  inset:-16px;
+  border-color:rgba(224,180,79,.9);
+  box-shadow:0 0 40px rgba(224,180,79,.9);
+  animation-delay:.7s;
+}
+
+.loader__glyph{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  max-width:70%;
+}
+.loader__glyph-main{
+  font-family:'Cinzel',serif;
+  font-size:18px;
+  letter-spacing:.22em;
+  color:#2e1b08;
+  white-space:nowrap;
+}
+.loader__glyph-sub{
+  margin-top:4px;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:.22em;
+  color:#3d2810;
+}
+
+.loader__caption{
+  margin-top:18px;
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:rgba(70,55,25,.9);
+}
+
+@keyframes ring-pulse{
+  0%{opacity:.9;transform:scale(.4)}
+  100%{opacity:0;transform:scale(1.6)}
+}
+@keyframes orb-breathe{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-3px) scale(1.03)}
+}
+
+/* ===========================
+   ページレイアウト
+=========================== */
+.page{
+  position:relative;
+  z-index:2;
+  width:100%;
+  height:100%;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.hero{
+  width:min(880px,100%);
+  border-radius:32px;
+  background:
+    radial-gradient(circle at 0% 0%,rgba(255,255,255,.96) 0,rgba(255,255,255,.9) 40%,rgba(255,255,255,.98) 100%),
+    linear-gradient(145deg,rgba(255,255,255,.96),rgba(255,250,238,.98));
+  box-shadow:0 24px 60px rgba(0,0,0,.12);
+  padding:clamp(24px,4vw,36px);
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  border:1px solid rgba(255,255,255,.9);
+  backdrop-filter:blur(14px);
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .9s ease-out .3s,transform .9s ease-out .3s;
+}
+.hero.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+@media (max-width:840px){
+  .page{
+    align-items:flex-start;
+    padding-top:32px;
+    padding-bottom:32px;
+    overflow-y:auto;
+  }
+}
+
+/* 見出し・テキスト */
+.kicker{
+  font-size:11px;
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  color:rgba(30,26,26,.65);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.kicker::before{
+  content:"";
+  width:40px;
+  height:1px;
+  background:linear-gradient(to right,rgba(158,133,60,0),rgba(158,133,60,1));
+}
+
+.hero-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(26px,3.4vw,32px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#3a2c10;
+  text-shadow:
+    0 0 6px rgba(255,255,255,.8),
+    0 0 18px rgba(255,215,111,.8);
+  position:relative;
+  padding-bottom:8px;
+}
+.hero-title span.jp{
+  display:block;
+  font-family:'Noto Serif JP',serif;
+  font-size:15px;
+  letter-spacing:.3em;
+  margin-top:8px;
+  color:rgba(30,26,26,.7);
+}
+.hero-title::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:52px;
+  height:2px;
+  background:linear-gradient(to right,#e0b44f,rgba(224,180,79,0));
+  box-shadow:0 0 12px rgba(224,180,79,.9);
+}
+
+.hero-lead{
+  font-size:14px;
+  line-height:1.9;
+  color:rgba(30,26,26,.85);
+}
+.hero-lead strong{
+  font-weight:700;
+  background:linear-gradient(120deg,#d4a534,#5e7cff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero-lead em{
+  font-style:normal;
+  border-bottom:1px dotted rgba(30,26,26,.4);
+}
+.hero-note{
+  font-size:12px;
+  line-height:1.8;
+  color:rgba(30,26,26,.7);
+}
+
+/* ===========================
+   CTAボタン（世界観ボタン）
+=========================== */
+.cta-area{
+  margin-top:18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+}
+
+/* ベース */
+.shion-btn{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  max-width:420px;
+  margin:0 auto;
+  padding:16px 28px;
+  border-radius:20px;
+  text-decoration:none;
+  font-size:15px;
+  letter-spacing:.18em;
+  overflow:hidden;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:transform .25s ease, box-shadow .25s ease;
+  border:1px solid transparent;
+}
+.shion-btn .label{
+  position:relative;
+  z-index:2;
+}
+
+/* 星界へアクセス：黄金ゲート */
+.shion-btn.gold{
+  background:linear-gradient(135deg,#fff7e8,#f0d8a4,#caa86b,#a47b3c);
+  box-shadow:
+    0 4px 18px rgba(180,140,80,.25),
+    inset 0 1px 0 rgba(255,255,255,.8);
+  color:#2d1b0d;
+  border-color:rgba(255,255,255,.7);
+}
+.shion-btn.gold::after{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:linear-gradient(120deg,
+    transparent 0%,
+    rgba(255,255,255,.75) 45%,
+    transparent 70%);
+  transform:translateX(-180%);
+  transition:transform .9s ease;
+  pointer-events:none;
+}
+.shion-btn.gold:hover::after{
+  transform:translateX(40%);
+}
+.shion-btn.gold:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 24px rgba(150,120,60,.3);
+}
+
+/* 詩韻思想を読む：ガラスの扉 */
+.shion-btn.glass{
+  background:rgba(255,255,255,.55);
+  border-color:rgba(200,200,255,.55);
+  color:#574f42;
+  box-shadow:
+    0 8px 24px rgba(200,200,255,.25),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+.shion-btn.glass .label{
+  background:linear-gradient(120deg,#8da9ff,#c29aff,#bfa163,#d9c58d);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.shion-btn.glass:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 26px rgba(170,160,255,.3);
+}
+
+/* テキストPulse（クリック時1秒だけ光る） */
+.label-pulse{
+  animation:labelPulse .9s ease-out;
+}
+@keyframes labelPulse{
+  0%  {text-shadow:0 0 0 rgba(255,215,111,0);}
+  40% {text-shadow:0 0 12px rgba(255,215,111,.9);}
+  100%{text-shadow:0 0 0 rgba(255,215,111,0);}
+}
+
+@media (max-width:480px){
+  .shion-btn{
+    padding:14px 18px;
+    font-size:14px;
+    border-radius:18px;
+  }
+}
+
+/* ===========================
+   画面全体ホワイトフェード
+=========================== */
+.page-fade{
+  position:fixed;
+  inset:0;
+  background:#ffffff;
+  opacity:0;
+  pointer-events:none;
+  z-index:10;
+  animation:pageFade .6s ease-out forwards;
+}
+@keyframes pageFade{
+  0%{opacity:0}
+  40%{opacity:1}
+  100%{opacity:1}
+}
+
+/* ===========================
+   星粒バースト
+=========================== */
+.particle-burst{
+  position:fixed;
+  width:4px;
+  height:4px;
+  z-index:11;
+  pointer-events:none;
+}
+.particle-burst span{
+  position:absolute;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff,#ffd76f);
+  box-shadow:0 0 12px rgba(255,215,111,.8);
+  animation:particleMove .7s ease-out forwards;
+}
+@keyframes particleMove{
+  0%{
+    transform:translate(0,0) scale(1);
+    opacity:1;
+  }
+  100%{
+    transform:translate(var(--tx),var(--ty)) scale(0);
+    opacity:0;
+  }
+}
