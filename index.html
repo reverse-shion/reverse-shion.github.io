@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- ===== 基本情報 ===== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Re:Verse Shion — 占い × 思想</title>
   <meta name="description" content="Re:Verse Shion（詩韻）— 占い × 思想。タロットとことばで、恋・仕事・運命の“今”を照らす。無料体験から個人鑑定・講座まで。">
 
-  <!-- Canonical / Robots -->
   <link rel="canonical" href="https://reverse-shion.github.io/">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 
-  <!-- Icons / PWA -->
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
@@ -20,11 +17,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <!-- PWA / 表示色（白背景） -->
   <meta name="theme-color" content="#fdfcf8">
   <meta name="color-scheme" content="light">
 
-  <!-- OGP / Twitter Card -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:site_name" content="Re:Verse Shion">
@@ -38,12 +33,10 @@
   <meta name="twitter:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
   <meta name="twitter:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- 構造化データ -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -72,7 +65,6 @@
   }
   </script>
 
-  <!-- ===== デザインCSS：白の最果て × 金色コード雨 × AIゲート ===== -->
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
@@ -325,7 +317,7 @@
       text-shadow:0 0 8px rgba(255,255,255,.5);
     }
 
-    /* ===== AI鼓動ゲートボタン（他CSSと絶対に衝突しないように gate-btn 系クラス） ===== */
+    /* ===== ボタンCSS（新しいデザイン） ===== */
     .hero-cta{
       margin-top:18px;
       display:flex;
@@ -334,149 +326,115 @@
       gap:12px;
     }
 
-    a.gate-btn{
+    /* ==== Buttons base 共通 ==== */
+    .btn{
       position:relative;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:18px 40px;
-      border-radius:var(--radius-pill);
+      padding:16px 32px;
+      border-radius:18px;
       border:1px solid transparent;
       text-decoration:none;
       font-size:13px;
       letter-spacing:.22em;
       text-transform:uppercase;
       cursor:pointer;
-      min-width:min(100%,420px);
+      min-width:min(100%,400px);
       text-align:center;
       overflow:hidden;
       transition:
-        transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        background var(--transition-fast),
-        border-color var(--transition-fast);
+        transform .22s ease-out,
+        box-shadow .22s ease-out,
+        background .22s ease-out,
+        border-color .22s ease-out;
     }
-    a.gate-btn span.label{
+    .btn span.label{
       position:relative;
       z-index:2;
-      white-space:nowrap;
     }
 
-    /* メイン：星界へアクセス（鼓動する金の扉） */
-    a.gate-btn-primary{
+    /* === 星界へアクセス：ゴールドクリスタル === */
+    .btn-primary{
       background:
-        radial-gradient(circle at 20% 0%,#fff7e0 0,#ffe3a3 28%,#e0b44f 60%,#9f7120 100%);
-      border-color:rgba(255,255,255,.95);
-      color:#2c1504 !important;
+        linear-gradient(135deg,#fff7de 0,#ffd982 35%,#e0b44f 70%,#9f7120 100%);
+      color:#271304 !important; /* !importantを追加 */
+      border-color:rgba(255,255,255,.9);
       box-shadow:
-        0 0 0 0 rgba(224,180,79,.6),
-        0 16px 32px rgba(0,0,0,.22),
+        0 12px 28px rgba(0,0,0,.20),
+        0 0 0 1px rgba(255,255,255,.7),
         inset 0 1px 0 rgba(255,255,255,.9);
-      animation:gate-pulse 2.8s ease-out infinite;
     }
-    a.gate-btn-primary::before{
+    .btn-primary::before{
+      /* 上辺だけ光るライン */
       content:"";
       position:absolute;
-      inset:10px;
-      border-radius:inherit;
-      border:1px dashed rgba(255,255,255,.7);
-      mix-blend-mode:soft-light;
+      left:8%;
+      right:8%;
+      top:0;
+      height:2px;
+      background:linear-gradient(90deg,transparent,#fff,transparent);
       opacity:.9;
     }
-    a.gate-btn-primary::after{
-      /* 鼓動する光の輪 */
+    .btn-primary::after{
+      /* 右上→左下に流れる光筋 */
       content:"";
       position:absolute;
-      width:40px;
-      height:40px;
-      border-radius:50%;
-      border:1px solid rgba(255,255,255,.9);
-      box-shadow:
-        0 0 20px rgba(255,255,255,.8),
-        0 0 40px rgba(224,180,79,.7);
-      opacity:.0;
-      transform:scale(.2);
-      transition:opacity .35s ease-out,transform .35s ease-out;
+      inset:-40%;
+      background:linear-gradient(135deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.8) 40%,
+        rgba(255,255,255,0) 60%);
+      transform:translateX(-120%);
+      opacity:0;
+      transition:transform .75s ease-out,opacity .55s ease-out;
     }
-    a.gate-btn-primary:hover{
+    .btn-primary:hover{
       transform:translateY(-1px);
       box-shadow:
-        0 0 0 6px rgba(224,180,79,.25),
-        0 20px 40px rgba(0,0,0,.30),
-        inset 0 1px 0 rgba(255,255,255,.95);
+        0 18px 34px rgba(0,0,0,.28),
+        0 0 0 1px rgba(255,255,255,.9);
     }
-    a.gate-btn-primary:hover::after{
+    .btn-primary:hover::after{
       opacity:1;
-      transform:scale(2.6);
+      transform:translateX(20%);
     }
 
-    @keyframes gate-pulse{
-      0%{
-        box-shadow:
-          0 0 0 0 rgba(224,180,79,.55),
-          0 14px 30px rgba(0,0,0,.20),
-          inset 0 1px 0 rgba(255,255,255,.9);
-      }
-      55%{
-        box-shadow:
-          0 0 0 22px rgba(224,180,79,0),
-          0 18px 38px rgba(0,0,0,.28),
-          inset 0 1px 0 rgba(255,255,255,.95);
-      }
-      100%{
-        box-shadow:
-          0 0 0 0 rgba(224,180,79,0),
-          0 14px 30px rgba(0,0,0,.22),
-          inset 0 1px 0 rgba(255,255,255,.9);
-      }
+    /* === 詩韻思想を読む：ガラスブルー === */
+    .btn-secondary{
+      background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(245,249,255,.98));
+      border-color:rgba(95,140,255,.7);
+      box-shadow:
+        0 10px 24px rgba(95,140,255,.20),
+        inset 0 1px 0 rgba(255,255,255,.9);
+      color:#2a2635 !important; /* !importantを追加 */
     }
-
-    a.gate-btn-primary span.label{
-      background:linear-gradient(90deg,#b88526,#f1c866,#fff3c2);
+    .btn-secondary span.label{
+      background:linear-gradient(120deg,#7ea8ff,#c0d5ff,#b8923b);
       -webkit-background-clip:text;
       background-clip:text;
-      color:transparent !important;
-      text-shadow:0 0 12px rgba(255,215,111,.85);
+      color:transparent !important; /* !importantを追加 */
     }
-
-    /* サブ：詩韻思想を読む（白×星霊ガラス） */
-    a.gate-btn-secondary{
-      background:rgba(255,255,255,.96);
-      border-color:rgba(95,140,255,.7);
-      color:#262536 !important;
-      box-shadow:
-        0 10px 24px rgba(0,0,0,.18),
-        inset 0 1px 0 rgba(255,255,255,.95);
-      backdrop-filter:blur(10px);
-    }
-    a.gate-btn-secondary::before{
+    .btn-secondary::before{
       content:"";
       position:absolute;
       inset:0;
       border-radius:inherit;
-      background:
-        linear-gradient(135deg,rgba(151,181,255,.0),rgba(151,181,255,.35),rgba(255,255,255,.0));
+      border:1px solid rgba(255,255,255,.7);
       mix-blend-mode:screen;
-      opacity:.9;
+      opacity:.7;
     }
-    a.gate-btn-secondary span.label{
-      background:linear-gradient(120deg,#7a9cff,#b9c9ff,#c09a3b);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent !important;
-    }
-    a.gate-btn-secondary:hover{
+    .btn-secondary:hover{
       transform:translateY(-1px);
       box-shadow:
-        0 16px 30px rgba(0,0,0,.20),
-        0 0 0 4px rgba(95,140,255,.25),
-        inset 0 1px 0 rgba(255,255,255,.98);
+        0 16px 30px rgba(0,0,0,.22),
+        0 0 0 1px rgba(95,140,255,.9);
     }
 
     @media (max-width:480px){
-      a.gate-btn{
+      .btn{
         width:100%;
-        padding:16px 22px;
+        padding:14px 18px;
         font-size:12px;
         letter-spacing:.18em;
       }
@@ -501,7 +459,6 @@
 </head>
 <body>
 
-  <!-- ===== ローディング：OS SHION ===== -->
   <div class="loader" id="loader" aria-live="polite">
     <div class="loader__orb" role="img" aria-label="OS SHION 起動中">
       <div class="loader__ring"></div>
@@ -514,10 +471,8 @@
     <div class="loader__caption">BOOTING STAR-LINKED SYSTEM...</div>
   </div>
 
-  <!-- ===== 背景コード雨 ===== -->
   <canvas id="codeRain" aria-hidden="true"></canvas>
 
-  <!-- ===== メインコンテンツ ===== -->
   <main class="page" role="main">
     <section class="hero" id="hero" aria-label="詩韻思想と星界リーディングの入り口">
       <p class="kicker">SHION PHILOSOPHY × TAROT READING</p>
@@ -540,13 +495,11 @@
       </p>
 
       <div class="hero-cta" aria-label="最初の選択">
-        <!-- 星界へアクセス（占いフロー） -->
-        <a href="/shion2.html" class="gate-btn gate-btn-primary" id="gate-reading">
+        <a href="/shion2.html" class="btn btn-primary" id="gate-reading">
           <span class="label">星界へアクセス</span>
         </a>
 
-        <!-- 詩韻思想テキストへ -->
-        <a href="/books/zero.html" class="gate-btn gate-btn-secondary" id="gate-philosophy">
+        <a href="/books/zero.html" class="btn btn-secondary" id="gate-philosophy">
           <span class="label">詩韻思想を読む</span>
         </a>
       </div>
@@ -559,7 +512,6 @@
     </p>
   </noscript>
 
-  <!-- ===== スクリプト ===== -->
   <script>
     // ===== コード雨（金色・ゆっくり・先端が光る） =====
     (function(){
