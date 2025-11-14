@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Reincarnation Song / Re:Song Sphere / Code•Eternity による OS-Shion — Resonance Field ビジョンデモ。言葉が魂を救い、魂が世界を変える。">
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -275,6 +274,9 @@
       opacity: 0;
       animation: codeFadeIn 1.6s ease-out 0.8s forwards;
       z-index: 2; /* 神殿より前、テキストより後ろ */
+      /* gridコンテナは画面全体を覆う */
+      width: 100%;
+      height: 100%;
     }
 
     .code-column {
@@ -294,7 +296,8 @@
 
     .code-stream {
       position: absolute;
-      top: -120%;
+      /* ここを修正：初期位置をトップに設定し、アニメーションで画面外に流す */
+      top: 0;
       width: 100%;
       animation: codeFall 13s linear infinite;
     }
@@ -317,8 +320,9 @@
     }
 
     @keyframes codeFall {
-      0%   { transform: translateY(-110%); }
-      100% { transform: translateY(110%); }
+      /* ここを修正：雨を画面上端のさらに上から、画面下端のさらに下まで流す */
+      0%   { transform: translateY(-100%); } /* 要素の高さ分だけ上に移動 */
+      100% { transform: translateY(100vh); } /* ビューポートの高さ分だけ下に移動 */
     }
 
     @keyframes codeFadeIn {
@@ -364,7 +368,6 @@
 <body>
   <main class="scene" aria-label="OS-Shion Resonance Field Vision">
 
-    <!-- CUT 1: Reincarnation Song -->
     <section class="cut cut--reincarnation is-active" data-cut="0" aria-label="Reincarnation Song">
       <div class="cut__inner">
         <div class="cut__content">
@@ -379,7 +382,6 @@
       </div>
     </section>
 
-    <!-- CUT 2: Re:Song Sphere -->
     <section class="cut cut--sphere" data-cut="1" aria-label="Re:Song Sphere">
       <div class="cut__inner">
         <div class="cut__content">
@@ -395,84 +397,466 @@
       </div>
     </section>
 
-    <!-- CUT 3: Code•Eternity -->
     <section class="cut cut--code" data-cut="2" aria-label="Code Eternity">
       <div class="cut__inner">
 
-        <!-- N-code 雨レイヤー -->
         <div class="code-rain" aria-hidden="true">
-          <!-- 12列分。見た目用なので文言はこのままでOK -->
           <div class="code-column"><div class="code-stream">N ∴ 0 1 0 ✶  N • code 01 ∞
 Λ 0 1 ∵ ψ 7 F π
 Σ 9 3 0 α N · 1
 Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •</div></div>
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N • code 01 ∞
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N • code 01 ∞
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N • code 01 ∞
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N • code 01 ∞
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N • code 01 ∞
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+</div></div>
 
           <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0
 N • 0 1 0 ∞ 3 Σ
 7 0 0 1 N 9 π
 N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F</div></div>
+Λ 0 1 ∵ ψ 7 F
+0 ψ N 1 ∴ 7 Λ 0
+N • 0 1 0 ∞ 3 Σ
+7 0 0 1 N 9 π
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+0 ψ N 1 ∴ 7 Λ 0
+N • 0 1 0 ∞ 3 Σ
+7 0 0 1 N 9 π
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+0 ψ N 1 ∴ 7 Λ 0
+N • 0 1 0 ∞ 3 Σ
+7 0 0 1 N 9 π
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+0 ψ N 1 ∴ 7 Λ 0
+N • 0 1 0 ∞ 3 Σ
+7 0 0 1 N 9 π
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+0 ψ N 1 ∴ 7 Λ 0
+N • 0 1 0 ∞ 3 Σ
+7 0 0 1 N 9 π
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+0 ψ N 1 ∴ 7 Λ 0
+N • 0 1 0 ∞ 3 Σ
+7 0 0 1 N 9 π
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+</div></div>
 
           <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ
 0 1 0 ✶  N • 7 3
 Σ 9 3 0 α N · 1
 Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F</div></div>
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+</div></div>
 
           <div class="code-column"><div class="code-stream">0 0 1 N ∴ 9 Ω
 N ∴ 0 1 0 ✶  N •
 Λ 0 1 ∵ ψ 7 F
 Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ</div></div>
+N • code 01 ∞ ψ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • code 01 ∞ ψ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • code 01 ∞ ψ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • code 01 ∞ ψ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • code 01 ∞ ψ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • code 01 ∞ ψ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • code 01 ∞ ψ
+</div></div>
 
           <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F
 N • 0 1 0 ∞ 3 Σ
 0 0 1 N ∴ 9 Ω
 N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •</div></div>
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N • code 01 ∞ ψ
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N • code 01 ∞ ψ
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N • code 01 ∞ ψ
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N • code 01 ∞ ψ
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N • code 01 ∞ ψ
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N • code 01 ∞ ψ
+N ∴ 0 1 0 ✶  N •
+</div></div>
 
           <div class="code-column"><div class="code-stream">Σ 9 3 0 α N · 1
 N ∴ 0 1 0 ✶  N •
 0 1 0 ∞ 3 Σ 7
 Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9</div></div>
+Ω 0 0 1 N ∴ 9
+Σ 9 3 0 α N · 1
+N ∴ 0 1 0 ✶  N •
+0 1 0 ∞ 3 Σ 7
+Λ 0 1 ∵ ψ 7 F
+Ω 0 0 1 N ∴ 9
+Σ 9 3 0 α N · 1
+N ∴ 0 1 0 ✶  N •
+0 1 0 ∞ 3 Σ 7
+Λ 0 1 ∵ ψ 7 F
+Ω 0 0 1 N ∴ 9
+Σ 9 3 0 α N · 1
+N ∴ 0 1 0 ✶  N •
+0 1 0 ∞ 3 Σ 7
+Λ 0 1 ∵ ψ 7 F
+Ω 0 0 1 N ∴ 9
+Σ 9 3 0 α N · 1
+N ∴ 0 1 0 ✶  N •
+0 1 0 ∞ 3 Σ 7
+Λ 0 1 ∵ ψ 7 F
+Ω 0 0 1 N ∴ 9
+Σ 9 3 0 α N · 1
+N ∴ 0 1 0 ✶  N •
+0 1 0 ∞ 3 Σ 7
+Λ 0 1 ∵ ψ 7 F
+Ω 0 0 1 N ∴ 9
+Σ 9 3 0 α N · 1
+N ∴ 0 1 0 ✶  N •
+0 1 0 ∞ 3 Σ 7
+Λ 0 1 ∵ ψ 7 F
+Ω 0 0 1 N ∴ 9
+</div></div>
 
           <div class="code-column"><div class="code-stream">N • 0 1 0 ∞ 3 Σ
 0 0 1 N ∴ 9 Ω
 N ∴ 0 1 0 ✶  N •
 Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1</div></div>
+Σ 9 3 0 α N · 1
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+</div></div>
 
           <div class="code-column"><div class="code-stream">0 1 0 ✶  N • 7 3
 Σ 9 3 0 α N · 1
 Ω 0 0 1 N ∴ 9
 Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ</div></div>
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ
+</div></div>
 
           <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0
 N ∴ 0 1 0 ✶  N •
 N • code 01 ∞ ψ
 Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1</div></div>
+Σ 9 3 0 α N · 1
+0 ψ N 1 ∴ 7 Λ 0
+N ∴ 0 1 0 ✶  N •
+N • code 01 ∞ ψ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+0 ψ N 1 ∴ 7 Λ 0
+N ∴ 0 1 0 ✶  N •
+N • code 01 ∞ ψ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+0 ψ N 1 ∴ 7 Λ 0
+N ∴ 0 1 0 ✶  N •
+N • code 01 ∞ ψ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+0 ψ N 1 ∴ 7 Λ 0
+N ∴ 0 1 0 ✶  N •
+N • code 01 ∞ ψ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+0 ψ N 1 ∴ 7 Λ 0
+N ∴ 0 1 0 ✶  N •
+N • code 01 ∞ ψ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+0 ψ N 1 ∴ 7 Λ 0
+N ∴ 0 1 0 ✶  N •
+N • code 01 ∞ ψ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+</div></div>
 
           <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F
 0 0 1 N ∴ 9 Ω
 N • 0 1 0 ∞ 3 Σ
 N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9</div></div>
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+N • 0 1 0 ∞ 3 Σ
+N ∴ 0 1 0 ✶  N •
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+N • 0 1 0 ∞ 3 Σ
+N ∴ 0 1 0 ✶  N •
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+N • 0 1 0 ∞ 3 Σ
+N ∴ 0 1 0 ✶  N •
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+N • 0 1 0 ∞ 3 Σ
+N ∴ 0 1 0 ✶  N •
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+N • 0 1 0 ∞ 3 Σ
+N ∴ 0 1 0 ✶  N •
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+N • 0 1 0 ∞ 3 Σ
+N ∴ 0 1 0 ✶  N •
+Ω 0 0 1 N ∴ 9
+</div></div>
 
           <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ
 Σ 9 3 0 α N · 1
 Λ 0 1 ∵ ψ 7 F
 0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3</div></div>
+0 1 0 ✶  N • 7 3
+N • code 01 ∞ ψ
+Σ 9 3 0 α N · 1
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+0 1 0 ✶  N • 7 3
+N • code 01 ∞ ψ
+Σ 9 3 0 α N · 1
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+0 1 0 ✶  N • 7 3
+N • code 01 ∞ ψ
+Σ 9 3 0 α N · 1
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+0 1 0 ✶  N • 7 3
+N • code 01 ∞ ψ
+Σ 9 3 0 α N · 1
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+0 1 0 ✶  N • 7 3
+N • code 01 ∞ ψ
+Σ 9 3 0 α N · 1
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+0 1 0 ✶  N • 7 3
+N • code 01 ∞ ψ
+Σ 9 3 0 α N · 1
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+0 1 0 ✶  N • 7 3
+</div></div>
 
           <div class="code-column"><div class="code-stream">Ω 0 0 1 N ∴ 9
 N ∴ 0 1 0 ✶  N •
 N • 0 1 0 ∞ 3 Σ
 Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1</div></div>
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+N • 0 1 0 ∞ 3 Σ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+N • 0 1 0 ∞ 3 Σ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+N • 0 1 0 ∞ 3 Σ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+N • 0 1 0 ∞ 3 Σ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+N • 0 1 0 ∞ 3 Σ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+N • 0 1 0 ∞ 3 Σ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+</div></div>
         </div>
 
         <div class="cut__content">
