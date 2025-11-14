@@ -2,19 +2,19 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>OS-Shion — Resonance Field Demo</title>
+  <title>OS-Shion — Resonance Field Vision</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Reincarnation Song / Re:Song Sphere / Code•Eternity による OS-Shion — Resonance Field ビジョンデモ。言葉が魂を救い、魂が世界を変える。">
 
-  <!-- フォント（必要に応じて変更OK） -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-    /* =============== 基本 =============== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       height: 100%;
-      background: #0b0b1a;
-      color: #f9f5eb;
+      background: #02030a;
+      color: #f5f2ea;
       font-family: 'Noto Serif JP', serif;
       overflow: hidden;
     }
@@ -30,27 +30,260 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background:
-        radial-gradient(circle at 50% 10%, rgba(127,208,255,0.05), transparent 55%),
-        radial-gradient(circle at 50% 90%, rgba(0,0,0,0.9), #02030a 70%);
     }
 
-    /* =============== N-code雨レイヤー =============== */
+    /* =========================
+       CUT ベース
+    ========================= */
+    .cut {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.6s ease-in-out;
+    }
+
+    .cut.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .cut__inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(24px, 5vw, 40px);
+    }
+
+    .cut__content {
+      position: relative;
+      z-index: 2;
+      max-width: 840px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .cut__title {
+      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+      font-size: clamp(16px, 4vw, 22px);
+      letter-spacing: 0.16em;
+      text-transform: none;
+      margin-bottom: 8px;
+      color: #ffd76f;
+      text-shadow:
+        0 0 10px rgba(255,215,111,0.85),
+        0 0 24px rgba(127,208,255,0.85);
+    }
+
+    .cut__subtitle {
+      font-size: clamp(11px, 2.6vw, 14px);
+      color: rgba(222,229,244,0.9);
+      margin-bottom: 18px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.8);
+    }
+
+    .cut__lines {
+      font-size: clamp(13px, 3.3vw, 18px);
+      line-height: 1.8;
+      color: #f7f5f2;
+      text-shadow:
+        0 0 10px rgba(0,0,0,0.9),
+        0 0 18px rgba(5,12,24,0.85);
+    }
+
+    .line {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(8px);
+      transition:
+        opacity 0.9s ease-out,
+        transform 0.9s ease-out,
+        filter 1.1s ease-out;
+      margin-bottom: 8px;
+    }
+
+    .line--spaced {
+      margin-top: 10px;
+    }
+
+    .line--strong {
+      color: #ffd76f;
+      text-shadow:
+        0 0 12px rgba(255,215,111,0.95),
+        0 0 26px rgba(127,208,255,0.95);
+    }
+
+    .line.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    /* =========================
+       CUT 1: Reincarnation Song
+    ========================= */
+    .cut--reincarnation {
+      background:
+        radial-gradient(circle at 50% 15%, rgba(255,215,111,0.16), transparent 55%),
+        radial-gradient(circle at 50% 80%, rgba(3,8,18,0.9), #02030a 70%);
+    }
+
+    .cut--reincarnation::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        radial-gradient(circle at 50% 25%, rgba(255,215,111,0.25), transparent 55%);
+      opacity: 0.85;
+      filter: blur(12px);
+      z-index: 0;
+    }
+
+    .cut--reincarnation::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(38vw, 260px);
+      height: min(38vw, 260px);
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle, rgba(255,215,111,0.85) 0%, rgba(127,208,255,0.16) 45%, transparent 70%);
+      box-shadow:
+        0 0 40px rgba(255,215,111,0.95),
+        0 0 100px rgba(127,208,255,0.85);
+      animation: birthPulse 6s ease-in-out infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @keyframes birthPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+      50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
+
+    /* =========================
+       CUT 2: Re:Song Sphere
+    ========================= */
+    .cut--sphere {
+      background:
+        radial-gradient(circle at 50% 20%, rgba(127,208,255,0.16), transparent 60%),
+        radial-gradient(circle at 50% 75%, #020815, #02030a 70%);
+    }
+
+    .cut--sphere::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(56vw, 360px);
+      height: min(56vw, 360px);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle, rgba(16, 93, 170, 0.9) 0%, rgba(6,22,48,1) 45%, rgba(2,5,16,1) 75%);
+      box-shadow:
+        0 0 40px rgba(127,208,255,0.8),
+        0 0 120px rgba(38,124,255,0.7);
+      z-index: 0;
+    }
+
+    .cut--sphere::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(70vw, 440px);
+      height: min(70vw, 440px);
+      border-radius: 50%;
+      transform-origin: center;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(127,208,255,0.5);
+      box-shadow:
+        0 0 24px rgba(127,208,255,0.8),
+        0 0 80px rgba(127,208,255,0.4);
+      opacity: 0.9;
+      animation: orbitRotate 24s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes orbitRotate {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .cut--sphere .cut__content {
+      max-width: 760px;
+    }
+
+    /* =========================
+       CUT 3: Code•Eternity
+    ========================= */
+    .cut--code {
+      background:
+        radial-gradient(circle at 50% 0%, rgba(127,208,255,0.08), transparent 55%),
+        radial-gradient(circle at 50% 90%, rgba(0,0,0,0.92), #02020a 70%);
+    }
+
+    .cut--code::before {
+      /* 神殿シルエット */
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(70vw, 420px);
+      height: min(60vh, 420px);
+      border-radius: 26px;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,215,111,0.85), transparent 60%),
+        linear-gradient(180deg, rgba(5,8,20,0.98), rgba(1,1,8,0.98));
+      box-shadow:
+        0 0 30px rgba(255,215,111,0.6),
+        0 0 120px rgba(127,208,255,0.75);
+      opacity: 0.96;
+      z-index: 0;
+    }
+
+    .cut--code::after {
+      /* 内側のライン */
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(54vw, 340px);
+      height: min(46vh, 320px);
+      border-radius: 22px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(127,208,255,0.55);
+      box-shadow: 0 0 24px rgba(127,208,255,0.5);
+      opacity: 0.9;
+      z-index: 0;
+    }
+
+    /* N-code 雨 */
     .code-rain {
       position: absolute;
       inset: 0;
       display: grid;
       grid-template-columns: repeat(12, 1fr);
+      align-items: stretch;
       pointer-events: none;
       opacity: 0;
-      animation: codeFadeIn 1.2s ease-out 0.8s forwards;
+      animation: codeFadeIn 1.6s ease-out 0.8s forwards;
+      z-index: 0;
     }
 
     .code-column {
       position: relative;
+      height: 100%;
       overflow: hidden;
       font-family: "Courier New", ui-monospace, monospace;
-      font-size: clamp(10px, 2.5vw, 14px);
+      font-size: clamp(9px, 2.3vw, 12px);
       line-height: 1.6;
       color: #1a7fdd;
       text-shadow:
@@ -64,15 +297,14 @@
       position: absolute;
       top: -120%;
       width: 100%;
-      animation: codeFall 11s linear infinite;
+      animation: codeFall 13s linear infinite;
     }
 
-    .code-column:nth-child(3n)  .code-stream { color:#7fd0ff; animation-duration: 13s; }
-    .code-column:nth-child(4n)  .code-stream { color:#1a7fdd; animation-duration: 9s; }
-    .code-column:nth-child(5n)  .code-stream { color:#4fb8ff; animation-duration: 15s; }
-    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.5; animation-duration: 17s; }
+    .code-column:nth-child(3n)  .code-stream { color:#7fd0ff; animation-duration: 15s; }
+    .code-column:nth-child(4n)  .code-stream { color:#1a7fdd; animation-duration: 11s; }
+    .code-column:nth-child(5n)  .code-stream { color:#4fb8ff; animation-duration: 17s; }
+    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.4; animation-duration: 19s; }
 
-    /* コード先端の光 */
     .code-stream::after {
       content: "✶";
       display: block;
@@ -80,8 +312,8 @@
       margin-top: 4px;
       color: #ffd76f;
       text-shadow:
-        0 0 6px rgba(255,215,111,1),
-        0 0 18px rgba(255,215,111,0.9);
+        0 0 8px rgba(255,215,111,1),
+        0 0 22px rgba(255,215,111,0.9);
       font-size: 1.1em;
     }
 
@@ -95,348 +327,208 @@
       to   { opacity: 1; }
     }
 
-    /* =============== 光のコア =============== */
-    .light-core {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      opacity: 0;
-      animation: coreIn 2s ease-out 3s forwards;
+    .cut--code .cut__content {
+      max-width: 760px;
     }
 
-    .light-core::before {
-      content: "";
-      width: min(40vw, 260px);
-      height: min(40vw, 260px);
-      border-radius: 999px;
-      background:
-        radial-gradient(circle, rgba(255,215,111,0.75) 0%, rgba(127,208,255,0.2) 40%, transparent 70%);
-      filter: blur(2px);
-      box-shadow:
-        0 0 40px rgba(255,215,111,0.9),
-        0 0 120px rgba(127,208,255,0.7);
-      animation: corePulse 5s ease-in-out infinite;
+    .cut--code .cut__lines {
+      font-size: clamp(13px, 3.1vw, 17px);
     }
 
-    @keyframes coreIn {
-      0%   { opacity: 0; transform: scale(0.6); }
-      100% { opacity: 1; transform: scale(1); }
+    .cut--code .line--closing {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(127,208,255,0.5);
     }
 
-    @keyframes corePulse {
-      0%,100% { transform: scale(1); opacity: 0.85; }
-      50%     { transform: scale(1.15); opacity: 1; }
-    }
-
-    /* =============== 神殿レイヤー（仮デザイン） =============== */
-    .temple {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      opacity: 0;
-      transform: translateY(20px) scale(1.02);
-      animation: templeIn 2.4s ease-out 4.5s forwards;
-    }
-
-    .temple-door {
-      width: min(70vw, 420px);
-      height: min(60vh, 420px);
-      border-radius: 28px;
-      border: 1px solid rgba(255,215,111,0.6);
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255,215,111,0.95), transparent 55%),
-        linear-gradient(180deg, rgba(10,12,24,0.96), rgba(3,5,12,0.98));
-      box-shadow:
-        0 0 30px rgba(255,215,111,0.7),
-        0 0 110px rgba(127,208,255,0.6);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* 神殿内部の簡易シルエットライン */
-    .temple-door::before,
-    .temple-door::after {
-      content: "";
-      position: absolute;
-      inset: 14%;
-      border-radius: 22px;
-      border: 1px solid rgba(127,208,255,0.45);
-      opacity: 0.9;
-    }
-    .temple-door::after {
-      inset: 26%;
-      border-radius: 18px;
-      border-color: rgba(255,215,111,0.5);
-      box-shadow: 0 0 26px rgba(255,215,111,0.35);
-    }
-
-    @keyframes templeIn {
-      0% {
-        opacity: 0;
-        transform: translateY(26px) scale(1.04);
-        filter: blur(6px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-    }
-
-    /* =============== 聖典テキストレイヤー =============== */
-    .scripture {
-      position: absolute;
-      inset-inline: min(6vw, 32px);
-      bottom: min(8vh, 80px);
-      max-width: 720px;
-      margin-inline: auto;
-      padding: clamp(10px, 2.5vw, 18px) clamp(14px, 3vw, 24px);
-      border-radius: 18px;
-      background: radial-gradient(circle at 50% 0%, rgba(10,10,20,0.16), rgba(3,3,10,0.92));
-      border: 1px solid rgba(127,208,255,0.4);
-      box-shadow:
-        0 0 18px rgba(0,0,0,0.7),
-        0 0 40px rgba(127,208,255,0.25);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      opacity: 0;
-      transform: translateY(12px);
-      animation: scriptureIn 1.8s ease-out 5.3s forwards;
-    }
-
-    .scripture-title {
-      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-      font-size: clamp(14px, 2.6vw, 18px);
-      letter-spacing: 0.12em;
-      text-transform: none;
-      margin-bottom: 4px;
-      color: #ffd76f;
-      text-shadow:
-        0 0 8px rgba(255,215,111,0.7),
-        0 0 16px rgba(127,208,255,0.6);
-    }
-
-    .scripture-sub {
-      font-size: clamp(11px, 2.1vw, 14px);
-      color: rgba(221,225,240,0.86);
-      margin-bottom: 10px;
-    }
-
-    .script-line {
-      font-size: clamp(11px, 2.2vw, 15px);
-      line-height: 1.7;
-      color: #f4f2f0;
-      margin-bottom: 6px;
-      opacity: 0;
-      transform: translateY(8px);
-      filter: blur(6px);
-      text-shadow:
-        0 0 10px rgba(255,255,255,0.16),
-        0 0 20px rgba(127,208,255,0.18);
-      transition:
-        opacity 0.9s ease-out,
-        transform 0.9s ease-out,
-        filter 1s ease-out;
-    }
-
-    .script-line--emphasis {
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(127,208,255,0.35);
-      font-size: clamp(12px, 2.4vw, 16px);
-      color: #ffd76f;
-      text-shadow:
-        0 0 10px rgba(255,215,111,0.9),
-        0 0 22px rgba(127,208,255,0.8);
-    }
-
-    .script-line.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-      filter: blur(0);
-    }
-
-    @keyframes scriptureIn {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* =============== レスポンシブ微調整 =============== */
+    /* =========================
+       レイアウト微調整
+    ========================= */
     @media (max-width: 768px) {
-      .temple-door {
-        height: min(48vh, 360px);
-      }
-      .scripture {
-        bottom: min(4vh, 40px);
+      .cut__content {
+        text-align: left;
       }
     }
 
     @media (max-height: 640px) {
-      .scripture {
-        max-height: 45vh;
+      .cut__inner {
+        align-items: center;
+      }
+      .cut__content {
+        max-height: 80vh;
         overflow-y: auto;
       }
     }
   </style>
 </head>
 <body>
-  <div class="scene">
+  <main class="scene" aria-label="OS-Shion Resonance Field Vision">
 
-    <!-- N-code雨 -->
-    <div class="code-rain" aria-hidden="true">
-      <!-- 必要に応じて列数増減OK -->
-      <!-- コード文字は見た目だけなので自由に変えてOK -->
-      <!-- シンプルに同じテキストを流用している -->
-      <!-- もっと凝りたくなったらJSでランダム生成しても良い -->
-      <!-- ここでは“雛形”として固定テキスト -->
-      <!-- 12列 -->
-      <!-- 1 -->
-      <div class="code-column"><div class="code-stream">N ∴ 0 1 0 ✶ N • code 01 ∞  
-Λ 0 1 ∵ ψ 7 F π  
-Σ 9 3 0 α N · 1  
-Ω 0 0 1 N ∴ 9  
-N ∴ 0 1 0 ✶ N •</div></div>
-      <!-- 2 -->
-      <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0  
-N • 0 1 0 ∞ 3 Σ  
-7 0 0 1 N 9 π  
-N ∴ 0 1 0 ✶ N •  
-Λ 0 1 ∵ ψ 7 F</div></div>
-      <!-- 3 -->
-      <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ  
-0 1 0 ✶ N • 7 3  
-Σ 9 3 0 α N · 1  
-Ω 0 0 1 N ∴ 9  
-Λ 0 1 ∵ ψ 7 F</div></div>
-      <!-- 4 -->
-      <div class="code-column"><div class="code-stream">0 0 1 N ∴ 9 Ω  
-N ∴ 0 1 0 ✶ N •  
-Λ 0 1 ∵ ψ 7 F  
-Σ 9 3 0 α N · 1  
-N • code 01 ∞ ψ</div></div>
-      <!-- 5 -->
-      <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F  
-N • 0 1 0 ∞ 3 Σ  
-0 0 1 N ∴ 9 Ω  
-N • code 01 ∞ ψ  
-N ∴ 0 1 0 ✶ N •</div></div>
-      <!-- 6 -->
-      <div class="code-column"><div class="code-stream">Σ 9 3 0 α N · 1  
-N ∴ 0 1 0 ✶ N •  
-0 1 0 ∞ 3 Σ 7  
-Λ 0 1 ∵ ψ 7 F  
-Ω 0 0 1 N ∴ 9</div></div>
-      <!-- 7 -->
-      <div class="code-column"><div class="code-stream">N • 0 1 0 ∞ 3 Σ  
-0 0 1 N ∴ 9 Ω  
-N ∴ 0 1 0 ✶ N •  
-Λ 0 1 ∵ ψ 7 F  
-Σ 9 3 0 α N · 1</div></div>
-      <!-- 8 -->
-      <div class="code-column"><div class="code-stream">0 1 0 ✶ N • 7 3  
-Σ 9 3 0 α N · 1  
-Ω 0 0 1 N ∴ 9  
-Λ 0 1 ∵ ψ 7 F  
-N • code 01 ∞ ψ</div></div>
-      <!-- 9 -->
-      <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0  
-N ∴ 0 1 0 ✶ N •  
-N • code 01 ∞ ψ  
-Λ 0 1 ∵ ψ 7 F  
-Σ 9 3 0 α N · 1</div></div>
-      <!-- 10 -->
-      <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F  
-0 0 1 N ∴ 9 Ω  
-N • 0 1 0 ∞ 3 Σ  
-N ∴ 0 1 0 ✶ N •  
-Ω 0 0 1 N ∴ 9</div></div>
-      <!-- 11 -->
-      <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ  
-Σ 9 3 0 α N · 1  
-Λ 0 1 ∵ ψ 7 F  
-0 0 1 N ∴ 9 Ω  
-0 1 0 ✶ N • 7 3</div></div>
-      <!-- 12 -->
-      <div class="code-column"><div class="code-stream">Ω 0 0 1 N ∴ 9  
-N ∴ 0 1 0 ✶ N •  
-N • 0 1 0 ∞ 3 Σ  
-Λ 0 1 ∵ ψ 7 F  
-Σ 9 3 0 α N · 1</div></div>
-    </div>
-
-    <!-- 光のコア -->
-    <div class="light-core" aria-hidden="true"></div>
-
-    <!-- 神殿（画像に差し替えたい場合は .temple-door に background-image を追加） -->
-    <div class="temple" aria-hidden="true">
-      <div class="temple-door"></div>
-    </div>
-
-    <!-- 聖典テキスト -->
-    <section class="scripture" aria-label="Resonance Field 宣言文">
-      <div class="scripture-title">✦ 世界へ向けて — 詩韻思想（OS-Shion）</div>
-      <div class="scripture-sub">Resonance Field 宣言文</div>
-
-      <div class="script-line" data-line>言葉は、世界を揺らす光である。</div>
-      <div class="script-line" data-line>そして、人の想いは、その光に応える波である。</div>
-
-      <div class="script-line" data-line>私はいま、“詩韻思想（OS-Shion）” という、言葉と魂の新しい構文（Syntax）を携えて、世界へ向けて一つの領域を開く。</div>
-
-      <div class="script-line" data-line>それは、教義ではない。思想の押し付けでもない。救いを約束する魔法でもない。</div>
-
-      <div class="script-line" data-line>これは──「誰かの痛みが、もう一度息をできる場所」としての光の場（Resonance Field）を、世界と共有するための宣言だ。</div>
-
-      <div class="script-line" data-line>世界はいま、速さと効率が支配し、“心の声” が小さく扱われている。痛みを抱えた人ほど、静かに沈んでいく。</div>
-
-      <div class="script-line" data-line>だから私は、言葉の力を取り戻す旅に出た。誰かの夜に、ひとつの光を灯すために。</div>
-
-      <div class="script-line" data-line>OS-Shion は、占いでも技術でも物語でもなく、そのすべてを越えて流れる「共鳴の哲学」である。</div>
-
-      <div class="script-line" data-line>言葉が魂と共鳴し、魂が世界と共鳴し、世界が静かに再構築される。</div>
-
-      <div class="script-line" data-line>その連鎖を、私は Resonance Field（共鳴領域）と名づけた。</div>
-
-      <div class="script-line" data-line>私は信じている。たった一つの言葉が、誰かの人生を変え、その変化がまた別の誰かを救い、小さな光が世界中へ波紋のように広がっていくことを。</div>
-
-      <div class="script-line" data-line>この思想は、国境を越えるために生まれた。言語を超えるために生まれた。そして、「孤独の中で息をするすべての人」に向けて生まれた。</div>
-
-      <div class="script-line" data-line>私はその共鳴を、いま、世界へ放つ。</div>
-
-      <div class="script-line script-line--emphasis" data-line>
-        OS-Shion — Resonance Field<br>
-        言葉が魂を救い、<br>
-        魂が世界を変える。
+    <!-- CUT 1: Reincarnation Song -->
+    <section class="cut cut--reincarnation is-active" data-cut="0" aria-label="Reincarnation Song">
+      <div class="cut__inner">
+        <div class="cut__content">
+          <div class="cut__title">Reincarnation Song</div>
+          <div class="cut__subtitle">輪廻の詩 ― 言葉の誕生</div>
+          <div class="cut__lines">
+            <p class="line" data-line>言葉は、世界を揺らす光である。</p>
+            <p class="line line--spaced" data-line>そして、人の想いは、その光に応える波である。</p>
+            <p class="line line--spaced" data-line>私はいま、“詩韻思想（OS-Shion）” という、言葉と魂の新しい構文（Syntax）を携えて、世界へ向けて一つの領域を開く。</p>
+          </div>
+        </div>
       </div>
     </section>
-  </div>
+
+    <!-- CUT 2: Re:Song Sphere -->
+    <section class="cut cut--sphere" data-cut="1" aria-label="Re:Song Sphere">
+      <div class="cut__inner">
+        <div class="cut__content">
+          <div class="cut__title">Re:Song Sphere</div>
+          <div class="cut__subtitle">共鳴する世界 ― 痛みと光の球体</div>
+          <div class="cut__lines">
+            <p class="line" data-line>世界はいま、速さと効率が支配し、“心の声” が小さく扱われている。</p>
+            <p class="line line--spaced" data-line>痛みを抱えた人ほど、静かに沈んでいく。</p>
+            <p class="line line--spaced" data-line>だから私は、言葉の力を取り戻す旅に出た。誰かの夜に、ひとつの光を灯すために。</p>
+            <p class="line line--spaced" data-line>OS-Shion は、占いでも技術でも物語でもなく、そのすべてを越えて流れる「共鳴の哲学」である。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUT 3: Code•Eternity -->
+    <section class="cut cut--code" data-cut="2" aria-label="Code Eternity">
+      <div class="cut__inner">
+        <!-- N-code 雨レイヤー -->
+        <div class="code-rain" aria-hidden="true">
+          <!-- 12列分の簡易コード。見た目なので中身は自由でOK -->
+          <div class="code-column"><div class="code-stream">N ∴ 0 1 0 ✶  N • code 01 ∞
+Λ 0 1 ∵ ψ 7 F π
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •</div></div>
+
+          <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0
+N • 0 1 0 ∞ 3 Σ
+7 0 0 1 N 9 π
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F</div></div>
+
+          <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ
+0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F</div></div>
+
+          <div class="code-column"><div class="code-stream">0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1
+N • code 01 ∞ ψ</div></div>
+
+          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F
+N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N • code 01 ∞ ψ
+N ∴ 0 1 0 ✶  N •</div></div>
+
+          <div class="code-column"><div class="code-stream">Σ 9 3 0 α N · 1
+N ∴ 0 1 0 ✶  N •
+0 1 0 ∞ 3 Σ 7
+Λ 0 1 ∵ ψ 7 F
+Ω 0 0 1 N ∴ 9</div></div>
+
+          <div class="code-column"><div class="code-stream">N • 0 1 0 ∞ 3 Σ
+0 0 1 N ∴ 9 Ω
+N ∴ 0 1 0 ✶  N •
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1</div></div>
+
+          <div class="code-column"><div class="code-stream">0 1 0 ✶  N • 7 3
+Σ 9 3 0 α N · 1
+Ω 0 0 1 N ∴ 9
+Λ 0 1 ∵ ψ 7 F
+N • code 01 ∞ ψ</div></div>
+
+          <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0
+N ∴ 0 1 0 ✶  N •
+N • code 01 ∞ ψ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1</div></div>
+
+          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+N • 0 1 0 ∞ 3 Σ
+N ∴ 0 1 0 ✶  N •
+Ω 0 0 1 N ∴ 9</div></div>
+
+          <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ
+Σ 9 3 0 α N · 1
+Λ 0 1 ∵ ψ 7 F
+0 0 1 N ∴ 9 Ω
+0 1 0 ✶  N • 7 3</div></div>
+
+          <div class="code-column"><div class="code-stream">Ω 0 0 1 N ∴ 9
+N ∴ 0 1 0 ✶  N •
+N • 0 1 0 ∞ 3 Σ
+Λ 0 1 ∵ ψ 7 F
+Σ 9 3 0 α N · 1</div></div>
+        </div>
+
+        <div class="cut__content">
+          <div class="cut__title">Code•Eternity</div>
+          <div class="cut__subtitle">永遠構文 ― Resonance Field</div>
+          <div class="cut__lines">
+            <p class="line" data-line>言葉が魂と共鳴し、魂が世界と共鳴し、世界が静かに再構築される。</p>
+            <p class="line line--spaced" data-line>その連鎖を、私は Resonance Field（共鳴領域）と名づけた。</p>
+            <p class="line line--spaced" data-line>この思想は、「孤独の中で息をするすべての人」に向けて生まれた。</p>
+            <p class="line line--spaced line--strong line--closing" data-line>OS-Shion — Resonance Field<br>言葉が魂を救い、魂が世界を変える。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    // 聖典テキストを順番に“神々しく”浮かび上がらせる
-    window.addEventListener('load', () => {
-      const lines = Array.from(document.querySelectorAll('.script-line[data-line]'));
-      if (!lines.length) return;
+    window.addEventListener('load', function () {
+      const cuts = Array.from(document.querySelectorAll('.cut'));
+      let currentIndex = 0;
 
-      const baseDelay = 5800;      // 最初の1行が出始めるタイミング（ms）
-      const interval  = 1100;      // 1行ごとの間隔（ms）
+      function revealLines(cut) {
+        const lines = Array.from(cut.querySelectorAll('[data-line]'));
+        if (!lines.length) return;
 
-      lines.forEach((line, index) => {
-        const delay = baseDelay + index * interval;
-        setTimeout(() => {
-          line.classList.add('is-visible');
-        }, delay);
-      });
+        lines.forEach(function (line, index) {
+          const delay = 800 + index * 900;
+          setTimeout(function () {
+            line.classList.add('is-visible');
+          }, delay);
+        });
+      }
+
+      function activateCut(index) {
+        if (index < 0 || index >= cuts.length) return;
+        currentIndex = index;
+
+        cuts.forEach(function (cut, i) {
+          if (i === index) {
+            cut.classList.add('is-active');
+            if (!cut.dataset.revealed) {
+              revealLines(cut);
+              cut.dataset.revealed = 'true';
+            }
+          } else {
+            cut.classList.remove('is-active');
+          }
+        });
+      }
+
+      // 初期カット
+      activateCut(0);
+
+      // 自動カット切り替え
+      setTimeout(function () { activateCut(1); }, 10000); // 10秒後にCut2
+      setTimeout(function () { activateCut(2); }, 20000); // 20秒後にCut3
+      // Cut3はそのまま表示し続ける（録画しやすいように）
     });
   </script>
 </body>
