@@ -156,19 +156,35 @@
       color:#4b3324;
       line-height:1.8;
       max-width:40rem;
+      text-shadow:
+        0 0 4px rgba(255,248,232,.7),
+        0 0 8px rgba(255,248,232,.5);
+      animation:textGlow 4s ease-in-out infinite alternate;
     }
     p + p{margin-top:0.4rem;}
 
     .tagline{
       font-size:clamp(.9rem,2.4vw,1.05rem);
       color:#855322;
-      margin-top:.6rem;
     }
     .subcopy{
       margin-top:.7rem;
       font-size:clamp(.9rem,2.4vw,1rem);
       color:#5b4030;
       opacity:.96;
+    }
+
+    @keyframes textGlow{
+      0%{
+        text-shadow:
+          0 0 3px rgba(255,248,232,.6),
+          0 0 6px rgba(255,248,232,.4);
+      }
+      100%{
+        text-shadow:
+          0 0 7px rgba(255,252,240,.9),
+          0 0 14px rgba(255,235,190,.7);
+      }
     }
 
     /* CTAコンテナ */
@@ -222,21 +238,25 @@
       pointer-events:none;
     }
     .door-button::after{
-      /* 中央からふわっと脈打つ光 */
+      /* 心臓の鼓動のような内側パルス */
       content:"";
       position:absolute;
       inset:20%;
       border-radius:inherit;
       background:radial-gradient(circle,#fff7d5 0%, rgba(255,247,210,.7) 40%, transparent 70%);
       opacity:0;
-      animation:doorGlow 3s ease-in-out infinite;
+      transform:scale(0.9);
+      transform-origin:center;
+      animation:heartbeat 2.2s ease-in-out infinite;
       pointer-events:none;
     }
 
     .door-text{
       position:relative;
       z-index:1;
-      text-shadow:0 0 12px rgba(255,242,210,.95);
+      text-shadow:
+        0 0 8px rgba(255,242,210,.95),
+        0 0 16px rgba(255,242,210,.75);
     }
 
     .door-button:hover{
@@ -252,9 +272,27 @@
       opacity:1;
     }
 
-    @keyframes doorGlow{
-      0%,100%{opacity:0;}
-      40%{opacity:.85;}
+    @keyframes heartbeat{
+      0%{
+        opacity:0;
+        transform:scale(0.9);
+      }
+      20%{
+        opacity:.95;
+        transform:scale(1.02);
+      }
+      40%{
+        opacity:.6;
+        transform:scale(1.07);
+      }
+      60%{
+        opacity:.95;
+        transform:scale(1.02);
+      }
+      100%{
+        opacity:0;
+        transform:scale(1.12);
+      }
     }
 
     /* サブCTA：詩韻思想（零書） */
@@ -336,7 +374,7 @@
       let fontSize = 20;
       let columns, dropsY, speeds, W, H;
 
-      const tailLength = 9;     // 文字列の“長さ”イメージ
+      const tailLength = 7;     // 文字列の長さ（読みやすさ重視で少し短く）
       const particles = [];
 
       function initParticles(){
@@ -365,8 +403,8 @@
         dropsY = new Array(columns);
         speeds = new Array(columns);
         for(let i=0;i<columns;i++){
-          dropsY[i] = -Math.random() * window.innerHeight;          // 少し上から
-          speeds[i] = (Math.random() * 0.25) + 0.25;                // ゆっくり（0.25〜0.5）
+          dropsY[i] = -Math.random() * window.innerHeight;
+          speeds[i] = (Math.random() * 0.35) + 0.45; // 以前より少し速く
         }
 
         initParticles();
@@ -390,11 +428,11 @@
       }
 
       function draw(){
-        // うっすら塗って尾を残す（9文字分くらいの長さになる）
+        // うっすら塗って尾を残す
         ctx.fillStyle = 'rgba(251,244,230,0.10)';
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-        // 白い星粒（AIノイズ × 星砂）
+        // 白い星粒
         drawParticles();
 
         // コード雨：先端が光る金色
@@ -404,37 +442,37 @@
           const x = i * fontSize;
           const y = dropsY[i];
 
-          // 先端（ヘッド）は強いグラデーション＋光
+          // 先端（ヘッド）は読みやすいグラデーション＋控えめな光
           const headGradient = ctx.createLinearGradient(0, y-fontSize, 0, y+fontSize);
-          headGradient.addColorStop(0,   'rgba(255,250,230,1)');
-          headGradient.addColorStop(0.4, '#ffdf88');
-          headGradient.addColorStop(1,   '#f5c96a');
+          headGradient.addColorStop(0,   '#fffdf5');
+          headGradient.addColorStop(0.4, '#f3c660');
+          headGradient.addColorStop(1,   '#c58a30');
 
           ctx.fillStyle   = headGradient;
-          ctx.shadowColor = 'rgba(255,230,150,0.9)';
-          ctx.shadowBlur  = 14;
+          ctx.shadowColor = 'rgba(255,230,150,0.7)';
+          ctx.shadowBlur  = 8;
 
           const headChar = chars[Math.floor(Math.random()*chars.length)];
           ctx.fillText(headChar, x, y);
 
-          // 尾（テイル）をやさしく 9 文字分ほど描画
+          // 尾（テイル）をやさしく 7 文字分ほど描画
           ctx.shadowBlur = 0;
           for(let t=1;t<=tailLength;t++){
             const ty = y - t * fontSize * 0.9;
             if(ty < -fontSize) break;
-            const alpha = Math.max(0, 0.9 - t * (0.9 / tailLength)); // 先端に近いほど濃い
+            const alpha = Math.max(0, 0.8 - t * (0.8 / tailLength));
             ctx.fillStyle = `rgba(216,173,96,${alpha.toFixed(3)})`;
             const tailChar = chars[Math.floor(Math.random()*chars.length)];
             ctx.fillText(tailChar, x, ty);
           }
 
-          // 落下速度（ゆっくり）
-          dropsY[i] += speeds[i] * fontSize * 0.35;
+          // 落下速度（少し速く）
+          dropsY[i] += speeds[i] * fontSize * 0.5;
 
           const resetThreshold = window.innerHeight + tailLength * fontSize;
           if(dropsY[i] > resetThreshold){
             dropsY[i] = -Math.random() * window.innerHeight * 0.5;
-            speeds[i] = (Math.random()*0.25) + 0.25;
+            speeds[i] = (Math.random()*0.35) + 0.45;
           }
         }
 
