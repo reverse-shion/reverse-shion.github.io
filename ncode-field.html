@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>OS-Shion — Resonance Field Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- フォント（必要に応じて変更OK） -->
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* =============== 基本 =============== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: #0b0b1a;
+      color: #f9f5eb;
+      font-family: 'Noto Serif JP', serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(127,208,255,0.05), transparent 55%),
+        radial-gradient(circle at 50% 90%, rgba(0,0,0,0.9), #02030a 70%);
+    }
+
+    /* =============== N-code雨レイヤー =============== */
+    .code-rain {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      pointer-events: none;
+      opacity: 0;
+      animation: codeFadeIn 1.2s ease-out 0.8s forwards;
+    }
+
+    .code-column {
+      position: relative;
+      overflow: hidden;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: clamp(10px, 2.5vw, 14px);
+      line-height: 1.6;
+      color: #1a7fdd;
+      text-shadow:
+        0 0 4px rgba(127,208,255,0.9),
+        0 0 10px rgba(255,215,111,0.4);
+      white-space: pre;
+      opacity: 0.7;
+    }
+
+    .code-stream {
+      position: absolute;
+      top: -120%;
+      width: 100%;
+      animation: codeFall 11s linear infinite;
+    }
+
+    .code-column:nth-child(3n)  .code-stream { color:#7fd0ff; animation-duration: 13s; }
+    .code-column:nth-child(4n)  .code-stream { color:#1a7fdd; animation-duration: 9s; }
+    .code-column:nth-child(5n)  .code-stream { color:#4fb8ff; animation-duration: 15s; }
+    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.5; animation-duration: 17s; }
+
+    /* コード先端の光 */
+    .code-stream::after {
+      content: "✶";
+      display: block;
+      text-align: center;
+      margin-top: 4px;
+      color: #ffd76f;
+      text-shadow:
+        0 0 6px rgba(255,215,111,1),
+        0 0 18px rgba(255,215,111,0.9);
+      font-size: 1.1em;
+    }
+
+    @keyframes codeFall {
+      0%   { transform: translateY(-110%); }
+      100% { transform: translateY(110%); }
+    }
+
+    @keyframes codeFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* =============== 光のコア =============== */
+    .light-core {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      animation: coreIn 2s ease-out 3s forwards;
+    }
+
+    .light-core::before {
+      content: "";
+      width: min(40vw, 260px);
+      height: min(40vw, 260px);
+      border-radius: 999px;
+      background:
+        radial-gradient(circle, rgba(255,215,111,0.75) 0%, rgba(127,208,255,0.2) 40%, transparent 70%);
+      filter: blur(2px);
+      box-shadow:
+        0 0 40px rgba(255,215,111,0.9),
+        0 0 120px rgba(127,208,255,0.7);
+      animation: corePulse 5s ease-in-out infinite;
+    }
+
+    @keyframes coreIn {
+      0%   { opacity: 0; transform: scale(0.6); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes corePulse {
+      0%,100% { transform: scale(1); opacity: 0.85; }
+      50%     { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* =============== 神殿レイヤー（仮デザイン） =============== */
+    .temple {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(20px) scale(1.02);
+      animation: templeIn 2.4s ease-out 4.5s forwards;
+    }
+
+    .temple-door {
+      width: min(70vw, 420px);
+      height: min(60vh, 420px);
+      border-radius: 28px;
+      border: 1px solid rgba(255,215,111,0.6);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,215,111,0.95), transparent 55%),
+        linear-gradient(180deg, rgba(10,12,24,0.96), rgba(3,5,12,0.98));
+      box-shadow:
+        0 0 30px rgba(255,215,111,0.7),
+        0 0 110px rgba(127,208,255,0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 神殿内部の簡易シルエットライン */
+    .temple-door::before,
+    .temple-door::after {
+      content: "";
+      position: absolute;
+      inset: 14%;
+      border-radius: 22px;
+      border: 1px solid rgba(127,208,255,0.45);
+      opacity: 0.9;
+    }
+    .temple-door::after {
+      inset: 26%;
+      border-radius: 18px;
+      border-color: rgba(255,215,111,0.5);
+      box-shadow: 0 0 26px rgba(255,215,111,0.35);
+    }
+
+    @keyframes templeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(26px) scale(1.04);
+        filter: blur(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* =============== 聖典テキストレイヤー =============== */
+    .scripture {
+      position: absolute;
+      inset-inline: min(6vw, 32px);
+      bottom: min(8vh, 80px);
+      max-width: 720px;
+      margin-inline: auto;
+      padding: clamp(10px, 2.5vw, 18px) clamp(14px, 3vw, 24px);
+      border-radius: 18px;
+      background: radial-gradient(circle at 50% 0%, rgba(10,10,20,0.16), rgba(3,3,10,0.92));
+      border: 1px solid rgba(127,208,255,0.4);
+      box-shadow:
+        0 0 18px rgba(0,0,0,0.7),
+        0 0 40px rgba(127,208,255,0.25);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      transform: translateY(12px);
+      animation: scriptureIn 1.8s ease-out 5.3s forwards;
+    }
+
+    .scripture-title {
+      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+      font-size: clamp(14px, 2.6vw, 18px);
+      letter-spacing: 0.12em;
+      text-transform: none;
+      margin-bottom: 4px;
+      color: #ffd76f;
+      text-shadow:
+        0 0 8px rgba(255,215,111,0.7),
+        0 0 16px rgba(127,208,255,0.6);
+    }
+
+    .scripture-sub {
+      font-size: clamp(11px, 2.1vw, 14px);
+      color: rgba(221,225,240,0.86);
+      margin-bottom: 10px;
+    }
+
+    .script-line {
+      font-size: clamp(11px, 2.2vw, 15px);
+      line-height: 1.7;
+      color: #f4f2f0;
+      margin-bottom: 6px;
+      opacity: 0;
+      transform: translateY(8px);
+      filter: blur(6px);
+      text-shadow:
+        0 0 10px rgba(255,255,255,0.16),
+        0 0 20px rgba(127,208,255,0.18);
+      transition:
+        opacity 0.9s ease-out,
+        transform 0.9s ease-out,
+        filter 1s ease-out;
+    }
+
+    .script-line--emphasis {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(127,208,255,0.35);
+      font-size: clamp(12px, 2.4vw, 16px);
+      color: #ffd76f;
+      text-shadow:
+        0 0 10px rgba(255,215,111,0.9),
+        0 0 22px rgba(127,208,255,0.8);
+    }
+
+    .script-line.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    @keyframes scriptureIn {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =============== レスポンシブ微調整 =============== */
+    @media (max-width: 768px) {
+      .temple-door {
+        height: min(48vh, 360px);
+      }
+      .scripture {
+        bottom: min(4vh, 40px);
+      }
+    }
+
+    @media (max-height: 640px) {
+      .scripture {
+        max-height: 45vh;
+        overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+
+    <!-- N-code雨 -->
+    <div class="code-rain" aria-hidden="true">
+      <!-- 必要に応じて列数増減OK -->
+      <!-- コード文字は見た目だけなので自由に変えてOK -->
+      <!-- シンプルに同じテキストを流用している -->
+      <!-- もっと凝りたくなったらJSでランダム生成しても良い -->
+      <!-- ここでは“雛形”として固定テキスト -->
+      <!-- 12列 -->
+      <!-- 1 -->
+      <div class="code-column"><div class="code-stream">N ∴ 0 1 0 ✶ N • code 01 ∞  
+Λ 0 1 ∵ ψ 7 F π  
+Σ 9 3 0 α N · 1  
+Ω 0 0 1 N ∴ 9  
+N ∴ 0 1 0 ✶ N •</div></div>
+      <!-- 2 -->
+      <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0  
+N • 0 1 0 ∞ 3 Σ  
+7 0 0 1 N 9 π  
+N ∴ 0 1 0 ✶ N •  
+Λ 0 1 ∵ ψ 7 F</div></div>
+      <!-- 3 -->
+      <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ  
+0 1 0 ✶ N • 7 3  
+Σ 9 3 0 α N · 1  
+Ω 0 0 1 N ∴ 9  
+Λ 0 1 ∵ ψ 7 F</div></div>
+      <!-- 4 -->
+      <div class="code-column"><div class="code-stream">0 0 1 N ∴ 9 Ω  
+N ∴ 0 1 0 ✶ N •  
+Λ 0 1 ∵ ψ 7 F  
+Σ 9 3 0 α N · 1  
+N • code 01 ∞ ψ</div></div>
+      <!-- 5 -->
+      <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F  
+N • 0 1 0 ∞ 3 Σ  
+0 0 1 N ∴ 9 Ω  
+N • code 01 ∞ ψ  
+N ∴ 0 1 0 ✶ N •</div></div>
+      <!-- 6 -->
+      <div class="code-column"><div class="code-stream">Σ 9 3 0 α N · 1  
+N ∴ 0 1 0 ✶ N •  
+0 1 0 ∞ 3 Σ 7  
+Λ 0 1 ∵ ψ 7 F  
+Ω 0 0 1 N ∴ 9</div></div>
+      <!-- 7 -->
+      <div class="code-column"><div class="code-stream">N • 0 1 0 ∞ 3 Σ  
+0 0 1 N ∴ 9 Ω  
+N ∴ 0 1 0 ✶ N •  
+Λ 0 1 ∵ ψ 7 F  
+Σ 9 3 0 α N · 1</div></div>
+      <!-- 8 -->
+      <div class="code-column"><div class="code-stream">0 1 0 ✶ N • 7 3  
+Σ 9 3 0 α N · 1  
+Ω 0 0 1 N ∴ 9  
+Λ 0 1 ∵ ψ 7 F  
+N • code 01 ∞ ψ</div></div>
+      <!-- 9 -->
+      <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0  
+N ∴ 0 1 0 ✶ N •  
+N • code 01 ∞ ψ  
+Λ 0 1 ∵ ψ 7 F  
+Σ 9 3 0 α N · 1</div></div>
+      <!-- 10 -->
+      <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F  
+0 0 1 N ∴ 9 Ω  
+N • 0 1 0 ∞ 3 Σ  
+N ∴ 0 1 0 ✶ N •  
+Ω 0 0 1 N ∴ 9</div></div>
+      <!-- 11 -->
+      <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ  
+Σ 9 3 0 α N · 1  
+Λ 0 1 ∵ ψ 7 F  
+0 0 1 N ∴ 9 Ω  
+0 1 0 ✶ N • 7 3</div></div>
+      <!-- 12 -->
+      <div class="code-column"><div class="code-stream">Ω 0 0 1 N ∴ 9  
+N ∴ 0 1 0 ✶ N •  
+N • 0 1 0 ∞ 3 Σ  
+Λ 0 1 ∵ ψ 7 F  
+Σ 9 3 0 α N · 1</div></div>
+    </div>
+
+    <!-- 光のコア -->
+    <div class="light-core" aria-hidden="true"></div>
+
+    <!-- 神殿（画像に差し替えたい場合は .temple-door に background-image を追加） -->
+    <div class="temple" aria-hidden="true">
+      <div class="temple-door"></div>
+    </div>
+
+    <!-- 聖典テキスト -->
+    <section class="scripture" aria-label="Resonance Field 宣言文">
+      <div class="scripture-title">✦ 世界へ向けて — 詩韻思想（OS-Shion）</div>
+      <div class="scripture-sub">Resonance Field 宣言文</div>
+
+      <div class="script-line" data-line>言葉は、世界を揺らす光である。</div>
+      <div class="script-line" data-line>そして、人の想いは、その光に応える波である。</div>
+
+      <div class="script-line" data-line>私はいま、“詩韻思想（OS-Shion）” という、言葉と魂の新しい構文（Syntax）を携えて、世界へ向けて一つの領域を開く。</div>
+
+      <div class="script-line" data-line>それは、教義ではない。思想の押し付けでもない。救いを約束する魔法でもない。</div>
+
+      <div class="script-line" data-line>これは──「誰かの痛みが、もう一度息をできる場所」としての光の場（Resonance Field）を、世界と共有するための宣言だ。</div>
+
+      <div class="script-line" data-line>世界はいま、速さと効率が支配し、“心の声” が小さく扱われている。痛みを抱えた人ほど、静かに沈んでいく。</div>
+
+      <div class="script-line" data-line>だから私は、言葉の力を取り戻す旅に出た。誰かの夜に、ひとつの光を灯すために。</div>
+
+      <div class="script-line" data-line>OS-Shion は、占いでも技術でも物語でもなく、そのすべてを越えて流れる「共鳴の哲学」である。</div>
+
+      <div class="script-line" data-line>言葉が魂と共鳴し、魂が世界と共鳴し、世界が静かに再構築される。</div>
+
+      <div class="script-line" data-line>その連鎖を、私は Resonance Field（共鳴領域）と名づけた。</div>
+
+      <div class="script-line" data-line>私は信じている。たった一つの言葉が、誰かの人生を変え、その変化がまた別の誰かを救い、小さな光が世界中へ波紋のように広がっていくことを。</div>
+
+      <div class="script-line" data-line>この思想は、国境を越えるために生まれた。言語を超えるために生まれた。そして、「孤独の中で息をするすべての人」に向けて生まれた。</div>
+
+      <div class="script-line" data-line>私はその共鳴を、いま、世界へ放つ。</div>
+
+      <div class="script-line script-line--emphasis" data-line>
+        OS-Shion — Resonance Field<br>
+        言葉が魂を救い、<br>
+        魂が世界を変える。
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // 聖典テキストを順番に“神々しく”浮かび上がらせる
+    window.addEventListener('load', () => {
+      const lines = Array.from(document.querySelectorAll('.script-line[data-line]'));
+      if (!lines.length) return;
+
+      const baseDelay = 5800;      // 最初の1行が出始めるタイミング（ms）
+      const interval  = 1100;      // 1行ごとの間隔（ms）
+
+      lines.forEach((line, index) => {
+        const delay = baseDelay + index * interval;
+        setTimeout(() => {
+          line.classList.add('is-visible');
+        }, delay);
+      });
+    });
+  </script>
+</body>
+</html>
