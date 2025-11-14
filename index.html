@@ -1,519 +1,593 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <!-- ===== 基本情報 ===== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>詩韻思想 × 星界リーディング — Re:Verse Shion</title>
-  <meta name="description" content="詩韻思想 × 占い。言葉で魂を救う“詩韻思想”と、星界へアクセスするタロットリーディングを体験できるトップページ。">
 
-  <!-- Fonts -->
+  <title>Re:Verse Shion — 占い × 思想</title>
+  <meta name="description" content="Re:Verse Shion（詩韻）— 占い × 思想。タロットとことばで、恋・仕事・運命の“今”を照らす。無料体験から個人鑑定・講座まで。">
+
+  <!-- Canonical / Robots -->
+  <link rel="canonical" href="https://reverse-shion.github.io/">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+
+  <!-- Icons / PWA -->
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- PWA / 表示色（白背景） -->
+  <meta name="theme-color" content="#fdfcf8">
+  <meta name="color-scheme" content="light">
+
+  <!-- OGP / Twitter Card -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:site_name" content="Re:Verse Shion">
+  <meta property="og:title" content="Re:Verse Shion — 占い × 思想">
+  <meta property="og:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta property="og:url" content="https://reverse-shion.github.io/">
+  <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
+  <meta property="og:image:alt" content="Re:Verse Shion — 占い × 思想">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Re:Verse Shion — 占い × 思想">
+  <meta name="twitter:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta name="twitter:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
+
+  <!-- 速度最適化：フォント接続 -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
 
+  <!-- 構造化データ（SiteLinks Search + Organization） -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://www.google.com/search?q=site%3Areverse-shion.github.io+{search_term_string}",
+      "query-input":"required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "logo":"https://reverse-shion.github.io/assets/icon.png",
+    "sameAs":[
+      "https://www.tiktok.com/@your-id",
+      "https://x.com/your-id",
+      "https://note.com/your-id"
+    ]
+  }
+  </script>
+
+  <!-- ===== デザインCSS：白背景×コード雨×AIゲート ===== -->
   <style>
-    /* ========== Reset ========== */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+
+    :root{
+      --bg:#fdfcf8;
+      --ink:#1e1a1a;
+      --accent-gold:#e0b44f;
+      --accent-gold-soft:rgba(224,180,79,.35);
+      --accent-blue:#5f8cff;
+      --shadow-soft:0 24px 60px rgba(0,0,0,.12);
+      --radius-xl:32px;
+      --radius-pill:999px;
+      --transition-fast:220ms ease-out;
     }
 
-    :root {
-      --bg: #fdfcf8;
-      --ink: #1e1a1a;
-      --accent-gold: #e0b44f;
-      --accent-gold-soft: rgba(224,180,79,0.4);
-      --accent-blue: #5f8cff;
-      --shadow-soft: 0 24px 60px rgba(0,0,0,0.12);
-      --radius-xl: 32px;
-      --radius-pill: 999px;
-      --transition-fast: 220ms ease-out;
+    body{
+      font-family:'Noto Serif JP',system-ui,-apple-system,BlinkMacSystemFont,'Yu Mincho','游明朝',serif;
+      background:radial-gradient(circle at 50% 0%,#ffffff 0,#faf4e6 40%,#f3efe4 100%);
+      color:var(--ink);
+      overflow:hidden;
+      position:relative;
     }
 
-    html, body {
-      width: 100%;
-      height: 100%;
+    /* ===== 背景：金色のコード雨 ===== */
+    #codeRain{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      mix-blend-mode:multiply;
     }
 
-    body {
-      font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, '游明朝', 'Yu Mincho', serif;
-      color: var(--ink);
-      background: radial-gradient(circle at 50% 0%, #fff 0%, #f9f5ea 40%, #f3efe4 100%);
-      overflow: hidden;
-    }
-
-    /* ========== 光るロード画面 ========== */
-    .loader {
-      position: fixed;
-      inset: 0;
+    /* ===== ローディング：OS SHION ===== */
+    .loader{
+      position:fixed;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
       background:
-        radial-gradient(circle at 50% 30%, rgba(255,255,255,0.9) 0, rgba(255,255,255,0.2) 40%, transparent 70%),
-        radial-gradient(circle at 50% 120%, #e0b44f 0, #fdfcf8 55%, #fdfcf8 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      pointer-events: auto;
-      opacity: 1;
-      transition: opacity 900ms ease-in-out;
+        radial-gradient(circle at 50% 25%,#ffffff 0,rgba(255,255,255,.6) 35%,transparent 70%),
+        radial-gradient(circle at 50% 120%,#f4d68b 0,#fdfcf8 55%,#fdfcf8 100%);
+      z-index:20;
+      transition:opacity .9s ease-out;
+    }
+    .loader.hide{
+      opacity:0;
+      pointer-events:none;
     }
 
-    body.loaded .loader {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .loader__core {
-      position: relative;
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #fff 0, #ffe9a9 40%, #e0b44f 65%, #9f7a26 100%);
+    .loader__orb{
+      position:relative;
+      width:150px;
+      height:150px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 0%,#fff7dd 0,#ffe09a 35%,#e0b44f 65%,#9b7020 100%);
       box-shadow:
-        0 0 30px rgba(255,215,111,0.8),
-        0 0 70px rgba(255,215,111,0.65),
-        0 0 120px rgba(255,215,111,0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+        0 0 40px rgba(255,215,111,.9),
+        0 0 90px rgba(224,180,79,.8),
+        0 24px 40px rgba(0,0,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      animation:orb-breathe 5.2s ease-in-out infinite;
+    }
+    .loader__orb::before{
+      content:"";
+      position:absolute;
+      inset:10%;
+      border-radius:inherit;
+      border:1px solid rgba(255,255,255,.9);
+      box-shadow:0 0 24px rgba(255,255,255,.9);
+      opacity:.8;
+    }
+    .loader__glyph{
+      position:relative;
+      font-family:'Cinzel',serif;
+      text-align:center;
+      color:#2e1b08;
+      text-shadow:0 0 10px rgba(255,255,255,.9);
+    }
+    .loader__glyph-main{
+      font-size:22px;
+      letter-spacing:.25em;
+    }
+    .loader__glyph-sub{
+      margin-top:4px;
+      font-size:10px;
+      letter-spacing:.22em;
+    }
+    .loader__caption{
+      margin-top:14px;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(70,55,25,.9);
     }
 
-    .loader__ring {
-      position: absolute;
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.7);
-      box-shadow: 0 0 30px rgba(255,255,255,0.7);
-      animation: loader-ring 2.6s infinite ease-out;
+    .loader__ring{
+      position:absolute;
+      inset:-6px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.9);
+      box-shadow:0 0 30px rgba(255,255,255,.9);
+      animation:ring-pulse 2.6s ease-out infinite;
+    }
+    .loader__ring--2{
+      inset:-16px;
+      border-color:rgba(224,180,79,.9);
+      box-shadow:0 0 40px rgba(224,180,79,.9);
+      animation-delay:.7s;
     }
 
-    .loader__ring--2 {
-      width: 210px;
-      height: 210px;
-      border-color: rgba(224,180,79,0.7);
-      box-shadow: 0 0 40px rgba(224,180,79,0.75);
-      animation-delay: .7s;
+    @keyframes ring-pulse{
+      0%{opacity:.9;transform:scale(.4)}
+      100%{opacity:0;transform:scale(1.6)}
+    }
+    @keyframes orb-breathe{
+      0%,100%{transform:translateY(0) scale(1)}
+      50%{transform:translateY(-3px) scale(1.03)}
     }
 
-    .loader__glyph {
-      position: relative;
-      font-family: 'Cinzel', serif;
-      font-size: 28px;
-      letter-spacing: 0.2em;
-      color: #32200a;
-      text-shadow:
-        0 0 12px rgba(255,255,255,0.95),
-        0 0 24px rgba(255,255,255,0.95);
-      animation: loader-glyph 2.3s infinite ease-in-out;
+    /* ===== メインレイアウト ===== */
+    .page{
+      position:relative;
+      z-index:1;
+      width:100%;
+      height:100%;
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
-    .loader__sub {
-      position: absolute;
-      bottom: 12%;
-      width: 100%;
-      text-align: center;
-      font-size: 12px;
-      letter-spacing: .25em;
-      text-transform: uppercase;
-      color: rgba(80,60,20,0.9);
-    }
-
-    @keyframes loader-ring {
-      0% {
-        opacity: .9;
-        transform: scale(.5);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(1.5);
-      }
-    }
-
-    @keyframes loader-glyph {
-      0%, 100% {
-        transform: translateY(0);
-        text-shadow:
-          0 0 12px rgba(255,255,255,0.9),
-          0 0 36px rgba(255,215,111,0.9);
-      }
-      50% {
-        transform: translateY(-2px);
-        text-shadow:
-          0 0 18px rgba(255,255,255,1),
-          0 0 52px rgba(255,215,111,1);
-      }
-    }
-
-    /* ========== コード雨（背景Canvas） ========== */
-    #codeRainCanvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-    }
-
-    /* ========== メインレイアウト ========== */
-    .page {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hero {
-      width: min(780px, 100%);
-      max-height: 640px;
-      border-radius: var(--radius-xl);
+    .hero{
+      width:min(880px,100%);
+      border-radius:var(--radius-xl);
       background:
-        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.9) 0, rgba(255,255,255,0.7) 35%, rgba(255,255,255,0.9) 80%),
-        linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,250,238,0.96));
-      box-shadow: var(--shadow-soft);
-      padding: clamp(24px, 4vw, 36px);
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      border: 1px solid rgba(255,255,255,0.9);
-      backdrop-filter: blur(14px);
-      transform: translateY(18px);
-      opacity: 0;
+        radial-gradient(circle at 0% 0%,rgba(255,255,255,.95) 0,rgba(255,255,255,.85) 40%,rgba(255,255,255,.98) 100%),
+        linear-gradient(145deg,rgba(255,255,255,.96),rgba(255,250,238,.98));
+      box-shadow:var(--shadow-soft);
+      padding:clamp(24px,4vw,36px);
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      border:1px solid rgba(255,255,255,.9);
+      backdrop-filter:blur(14px);
+      opacity:0;
+      transform:translateY(24px);
+      transition:opacity .9s ease-out .3s,transform .9s ease-out .3s;
+    }
+    .hero.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    @media (max-width:840px){
+      .page{
+        align-items:flex-start;
+        padding-top:32px;
+        padding-bottom:32px;
+        overflow-y:auto;
+      }
+    }
+
+    /* 見出し・コピー */
+    .kicker{
+      font-size:11px;
+      letter-spacing:.32em;
+      text-transform:uppercase;
+      color:rgba(30,26,26,.65);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .kicker::before{
+      content:"";
+      width:40px;
+      height:1px;
+      background:linear-gradient(to right,rgba(158,133,60,0),rgba(158,133,60,1));
+    }
+
+    .hero-title{
+      font-family:'Cinzel',serif;
+      font-size:clamp(26px,3.4vw,32px);
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      color:#3a2c10;
+      text-shadow:
+        0 0 6px rgba(255,255,255,.8),
+        0 0 18px rgba(255,215,111,.8);
+      position:relative;
+      padding-bottom:8px;
+    }
+    .hero-title span.jp{
+      display:block;
+      font-family:'Noto Serif JP',serif;
+      font-size:15px;
+      letter-spacing:.3em;
+      margin-top:8px;
+      color:rgba(30,26,26,.7);
+    }
+    .hero-title::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:52px;
+      height:2px;
+      background:linear-gradient(to right,#e0b44f,rgba(224,180,79,0));
+      box-shadow:0 0 12px rgba(224,180,79,.9);
+    }
+
+    .hero-lead{
+      font-size:14px;
+      line-height:1.9;
+      color:rgba(30,26,26,.85);
+    }
+    .hero-lead strong{
+      font-weight:700;
+      background:linear-gradient(120deg,#d4a534,#5e7cff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .hero-lead em{
+      font-style:normal;
+      border-bottom:1px dotted rgba(30,26,26,.4);
+    }
+
+    .hero-note{
+      font-size:12px;
+      line-height:1.8;
+      color:rgba(30,26,26,.7);
+    }
+
+    /* ===== AI感のある2つの扉ボタン ===== */
+    .hero-cta{
+      margin-top:14px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+    }
+
+    .btn{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px 40px;
+      border-radius:var(--radius-pill);
+      text-decoration:none;
+      font-size:13px;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      border:1px solid transparent;
+      min-width:min(100%,420px);
+      text-align:center;
+      cursor:pointer;
+      overflow:hidden;
       transition:
-        opacity 700ms ease-out 250ms,
-        transform 700ms ease-out 250ms;
+        background var(--transition-fast),
+        color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast),
+        border-color var(--transition-fast);
+    }
+    .btn span.label{
+      position:relative;
+      z-index:2;
+      white-space:nowrap;
     }
 
-    body.loaded .hero {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media (max-width: 840px) {
-      .page {
-        align-items: flex-start;
-        padding-top: 32px;
-        padding-bottom: 32px;
-        overflow-y: auto;
-      }
-      .hero {
-        max-height: none;
-      }
-    }
-
-    /* ========== テキスト ========== */
-    .kicker {
-      font-size: 11px;
-      letter-spacing: .32em;
-      text-transform: uppercase;
-      color: rgba(30,26,26,0.65);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .kicker::before {
-      content: "";
-      width: 40px;
-      height: 1px;
-      background: linear-gradient(to right, rgba(158,133,60,0), rgba(158,133,60,1));
-    }
-
-    .hero-title {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(26px, 3vw, 32px);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #3a2c10;
-      text-shadow:
-        0 0 6px rgba(255,255,255,0.8),
-        0 0 18px rgba(255,215,111,0.8);
-      position: relative;
-      padding-bottom: 8px;
-    }
-
-    .hero-title span.jp {
-      display: block;
-      font-family: 'Noto Serif JP', serif;
-      font-size: 15px;
-      letter-spacing: 0.3em;
-      margin-top: 8px;
-      color: rgba(30,26,26,0.7);
-    }
-
-    .hero-title::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 48px;
-      height: 2px;
-      background: linear-gradient(to right, #e0b44f, rgba(224,180,79,0));
-      box-shadow: 0 0 12px rgba(224,180,79,0.9);
-    }
-
-    .hero-lead {
-      font-size: 14px;
-      line-height: 1.9;
-      color: rgba(30,26,26,0.82);
-    }
-
-    .hero-lead strong {
-      font-weight: 700;
-      background: linear-gradient(120deg, #d4a534, #5e7cff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-lead em {
-      font-style: normal;
-      border-bottom: 1px dotted rgba(30,26,26,0.4);
-    }
-
-    .hero-note {
-      font-size: 12px;
-      line-height: 1.8;
-      color: rgba(30,26,26,0.7);
-    }
-
-    /* ========== CTA（高級感のある大きめボタン） ========== */
-    .hero-cta {
-      margin-top: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 15px 26px;
-      border-radius: var(--radius-pill);
-      font-size: 14px;
-      line-height: 1.2;
-      letter-spacing: 0.18em;
-      text-decoration: none;
-      text-transform: uppercase;
-      border: 1px solid transparent;
-      cursor: pointer;
-      white-space: nowrap;
-      min-width: min(100%, 420px); /* 大きめボタン */
-      text-align: center;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
-    }
-
-    .btn-primary {
-      background: radial-gradient(circle at 30% 0%, #ffeab7 0, #e0b44f 45%, #c28b2b 100%);
-      color: #231307;
-      border-color: rgba(255,255,255,0.9);
+    /* 星界へアクセス（メインゲート） */
+    .btn-primary{
+      background:
+        radial-gradient(circle at 15% 0%,#fff7e0 0,#ffe19f 25%,#e0b44f 55%,#aa7a25 100%);
+      color:#231307;
+      border-color:rgba(255,255,255,.9);
       box-shadow:
-        0 0 0 0 rgba(224,180,79,0.7),
-        0 10px 24px rgba(0,0,0,0.25),
-        inset 0 1px 0 rgba(255,255,255,0.8);
-      animation: pulse-btn 2.4s infinite ease-out;
+        0 0 0 0 rgba(224,180,79,.65),
+        0 12px 26px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.85);
+      animation:btn-pulse 2.6s ease-out infinite;
+    }
+    .btn-primary::before{
+      /* AI回路っぽいライン */
+      content:"";
+      position:absolute;
+      inset:8px;
+      border-radius:inherit;
+      border:1px dashed rgba(255,255,255,.55);
+      opacity:.7;
+      mix-blend-mode:soft-light;
+    }
+    .btn-primary::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:conic-gradient(from 0deg,rgba(255,255,255,.0),rgba(255,255,255,.6),rgba(255,215,111,.8),rgba(255,255,255,.0));
+      opacity:0;
+      transform:rotate(0deg);
+      transition:opacity .45s ease-out,transform 1.2s ease-out;
     }
 
-    .btn-primary::after {
-      content: "";
-      position: absolute;
-      inset: 3px;
-      border-radius: inherit;
-      border: 1px solid rgba(255,255,255,0.8);
-      opacity: 0.85;
-      pointer-events: none;
-    }
-
-    .btn-outline {
-      background: rgba(255,255,255,0.9);
-      color: #2a2530;
-      border-color: rgba(95,140,255,0.6);
+    .btn-primary:hover{
+      transform:translateY(-1px);
       box-shadow:
-        0 8px 20px rgba(95,140,255,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.9);
+        0 0 0 6px rgba(224,180,79,.26),
+        0 18px 32px rgba(0,0,0,.32),
+        inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    .btn-primary:hover::after{
+      opacity:1;
+      transform:rotate(35deg);
     }
 
-    .btn span.label {
-      position: relative;
-      z-index: 1;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .btn-primary:hover {
-      box-shadow:
-        0 0 0 6px rgba(224,180,79,0.26),
-        0 14px 30px rgba(0,0,0,0.3),
-        inset 0 1px 0 rgba(255,255,255,0.85);
-    }
-
-    .btn-outline:hover {
-      background: #f3f6ff;
-      box-shadow:
-        0 0 0 4px rgba(95,140,255,0.16),
-        0 12px 28px rgba(0,0,0,0.22),
-        inset 0 1px 0 rgba(255,255,255,0.95);
-    }
-
-    @keyframes pulse-btn {
-      0% {
+    @keyframes btn-pulse{
+      0%{
         box-shadow:
-          0 0 0 0 rgba(224,180,79,0.64),
-          0 10px 24px rgba(0,0,0,0.25),
-          inset 0 1px 0 rgba(255,255,255,0.85);
+          0 0 0 0 rgba(224,180,79,.6),
+          0 12px 26px rgba(0,0,0,.25),
+          inset 0 1px 0 rgba(255,255,255,.85);
       }
-      70% {
+      70%{
         box-shadow:
           0 0 0 22px rgba(224,180,79,0),
-          0 14px 30px rgba(0,0,0,0.32),
-          inset 0 1px 0 rgba(255,255,255,0.85);
+          0 18px 34px rgba(0,0,0,.32),
+          inset 0 1px 0 rgba(255,255,255,.85);
       }
-      100% {
+      100%{
         box-shadow:
           0 0 0 0 rgba(224,180,79,0),
-          0 10px 24px rgba(0,0,0,0.25),
-          inset 0 1px 0 rgba(255,255,255,0.85);
+          0 12px 26px rgba(0,0,0,.25),
+          inset 0 1px 0 rgba(255,255,255,.85);
       }
     }
 
-    @media (max-width: 480px) {
-      .btn {
-        min-width: 100%;
-        font-size: 13px;
-        letter-spacing: 0.14em;
-        padding: 14px 20px;
+    /* 詩韻思想を読む（思想ゲート） */
+    .btn-secondary{
+      background:rgba(255,255,255,.9);
+      color:#2b2530;
+      border-color:rgba(95,140,255,.7);
+      box-shadow:
+        0 8px 20px rgba(95,140,255,.22),
+        inset 0 1px 0 rgba(255,255,255,.9);
+      backdrop-filter:blur(8px);
+    }
+    .btn-secondary span.label{
+      background:linear-gradient(120deg,#9ab8ff,#3f78ff,#caa44a);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .btn-secondary::before{
+      content:"";
+      position:absolute;
+      inset:10px;
+      border-radius:inherit;
+      border:1px solid rgba(255,255,255,.8);
+      opacity:.6;
+    }
+    .btn-secondary:hover{
+      transform:translateY(-1px);
+      background:#f3f6ff;
+      box-shadow:
+        0 0 0 4px rgba(95,140,255,.18),
+        0 16px 30px rgba(0,0,0,.24),
+        inset 0 1px 0 rgba(255,255,255,.95);
+    }
+
+    @media (max-width:480px){
+      .btn{
+        width:100%;
+        padding:16px 18px;
+        font-size:12px;
+        letter-spacing:.16em;
       }
+    }
+
+    /* きらめきフラッシュ（遷移演出） */
+    .flash{
+      position:fixed;
+      inset:0;
+      background:radial-gradient(circle at center,#fff8da 0,#ffe39e 30%,#fdfcf8 70%,transparent 100%);
+      opacity:0;
+      pointer-events:none;
+      z-index:30;
+      animation:flash .6s ease-out forwards;
+    }
+    @keyframes flash{
+      0%{opacity:0;transform:scale(.8)}
+      40%{opacity:1;transform:scale(1)}
+      100%{opacity:0;transform:scale(1.4)}
     }
   </style>
 </head>
 <body>
-  <!-- 光輝くロード -->
-  <div class="loader" aria-hidden="true">
-    <div class="loader__core">
+
+  <!-- ===== ローディング：OS SHION ===== -->
+  <div class="loader" id="loader" aria-live="polite">
+    <div class="loader__orb" role="img" aria-label="OS SHION 起動中">
       <div class="loader__ring"></div>
       <div class="loader__ring loader__ring--2"></div>
-      <div class="loader__glyph">SHION</div>
-      <div class="loader__sub">THE TEMPLE OF WORDS</div>
+      <div class="loader__glyph">
+        <div class="loader__glyph-main">OS&nbsp;SHION</div>
+        <div class="loader__glyph-sub">THE TEMPLE OF WORDS</div>
+      </div>
     </div>
+    <div class="loader__caption">BOOTING STAR-LINKED SYSTEM...</div>
   </div>
 
-  <!-- コード雨 Canvas -->
-  <canvas id="codeRainCanvas"></canvas>
+  <!-- ===== 背景コード雨 ===== -->
+  <canvas id="codeRain" aria-hidden="true"></canvas>
 
-  <!-- メイン -->
-  <main class="page">
-    <section class="hero" aria-label="詩韻思想 × 星界リーディング">
+  <!-- ===== メインコンテンツ ===== -->
+  <main class="page" role="main">
+    <section class="hero" id="hero" aria-label="詩韻思想と星界リーディングの入り口">
       <p class="kicker">SHION PHILOSOPHY × TAROT READING</p>
+
       <h1 class="hero-title">
         Re:Verse Shion
         <span class="jp">詩韻思想 × 星界リーディング</span>
       </h1>
 
       <p class="hero-lead">
-        <strong>「言葉が魂を救う」</strong> —— それが、詩韻思想（Shion Philosophy）。<br>
-        この場所は、<em>思想としての哲学</em>と<em>占いとしてのタロット</em>が重なり合う、時間の最果て。<br>
-        あなたの迷い・不安・願いを、星とことばのコードとして読み解き、<br>
-        物語のように未来を照らしていきます。
+        <strong>「言葉が魂を救う」</strong> —— 詩韻思想（Shion Philosophy）は、<br>
+        <em>思想としての哲学</em>と、<em>占いとしてのタロット</em>を重ね合わせた、現代の“星詠システム”です。<br>
+        恋・仕事・人間関係——あなたの“今”を、星とことばのコードとして読み解き、<br>
+        物語のように未来のシナリオを書き換えていきます。
       </p>
 
       <p class="hero-note">
-        白い世界に降り注ぐコードの雨は、忘れてしまった“本音”の断片。<br>
-        それらが一つの詩に組み上がるとき、あなたの心の星座が、そっと輪郭を帯びます。
+        白い世界に降り注ぐ金色のコードは、忘れかけた“本音”の断片。<br>
+        それらが一つの詩に組み上がるとき、あなたの心の星座は、静かに輪郭を帯びていきます。
       </p>
 
-      <div class="hero-cta" aria-label="主要な入り口">
-        <!-- ★ 星界へアクセス（占い） -->
-        <a href="#"
-           class="btn btn-primary">
+      <div class="hero-cta" aria-label="はじめの選択">
+        <!-- 星界へアクセス（占いフローへ） -->
+        <a href="/shion2.html" class="btn btn-primary" id="gate-reading">
           <span class="label">星界へアクセス</span>
         </a>
 
-        <!-- ★ 詩韻思想を読む（思想） -->
-        <a href="#"
-           class="btn btn-outline">
+        <!-- 詩韻思想を読む（哲学テキストへ） -->
+        <a href="/books/zero.html" class="btn btn-secondary" id="gate-philosophy">
           <span class="label">詩韻思想を読む</span>
         </a>
       </div>
     </section>
   </main>
 
+  <noscript>
+    <p style="position:fixed;bottom:12px;left:0;right:0;text-align:center;font-size:13px;color:#7a5f21;">
+      JavaScriptが無効のため、演出を省略して表示しています。
+    </p>
+  </noscript>
+
+  <!-- ===== スクリプト ===== -->
   <script>
-    // ===== ロード完了でフェードイン =====
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        document.body.classList.add('loaded');
-      }, 1200);
-    });
-
-    // ===== コードの雨（白背景 × 金色系） =====
-    (function() {
-      const canvas = document.getElementById('codeRainCanvas');
+    // ===== コード雨（金色×ゆっくり） =====
+    (function(){
+      const canvas = document.getElementById('codeRain');
       const ctx = canvas.getContext('2d');
-
-      const chars = '詩韻星界祈言霊∞01';
+      const chars = '詩韻星界祈言霊∞01AI理∴◯＊';
       const charList = chars.split('');
 
-      let width = canvas.width = window.innerWidth;
-      let height = canvas.height = window.innerHeight;
+      let width, height, fontSize, columns, drops;
 
-      const fontSize = 16;
-      let columns = Math.floor(width / fontSize);
-      const drops = [];
+      function resize(){
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        width = canvas.width = window.innerWidth * dpr;
+        height = canvas.height = window.innerHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      function initDrops() {
-        columns = Math.floor(width / fontSize);
-        for (let i = 0; i < columns; i++) {
-          drops[i] = Math.floor(Math.random() * -20);
-        }
+        fontSize = 16;
+        columns = Math.floor(window.innerWidth / fontSize);
+        drops = new Array(columns).fill(0).map(() => Math.random() * -20);
       }
 
-      initDrops();
-
-      window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-        initDrops();
-      });
-
-      function draw() {
-        ctx.fillStyle = 'rgba(253, 252, 248, 0.16)';
-        ctx.fillRect(0, 0, width, height);
+      function draw(){
+        ctx.fillStyle = 'rgba(253,252,248,0.16)';
+        ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
         ctx.font = fontSize + 'px "Noto Serif JP", system-ui';
 
-        for (let i = 0; i < drops.length; i++) {
+        for(let i = 0; i < columns; i++){
           const text = charList[Math.floor(Math.random() * charList.length)];
           const x = i * fontSize;
           const y = drops[i] * fontSize;
 
-          const headGradient = ctx.createLinearGradient(x, y - fontSize, x, y + fontSize);
-          headGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-          headGradient.addColorStop(0.5, 'rgba(255, 230, 160, 0.9)');
-          headGradient.addColorStop(1, 'rgba(208, 168, 64, 0.95)');
+          // 末端を強く光らせる
+          const grad = ctx.createLinearGradient(x, y - fontSize, x, y + fontSize);
+          grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+          grad.addColorStop(0.5, 'rgba(255,231,170,0.95)');
+          grad.addColorStop(1, 'rgba(208,168,64,0.98)');
 
-          ctx.fillStyle = headGradient;
-          ctx.shadowColor = 'rgba(224, 180, 79, 0.7)';
-          ctx.shadowBlur = 12;
+          ctx.fillStyle = grad;
+          ctx.shadowColor = 'rgba(224,180,79,0.75)';
+          ctx.shadowBlur = 14;
           ctx.fillText(text, x, y);
 
+          // 残像
           ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(190, 155, 70, 0.45)';
+          ctx.fillStyle = 'rgba(181,147,64,0.35)';
           ctx.fillText(text, x, y - fontSize);
 
-          const velocity = 0.55 + Math.random() * 0.25;
+          const velocity = 0.45 + Math.random() * 0.25; // ゆっくりめ
           drops[i] += velocity;
 
-          if (y > height + fontSize * 2) {
+          if (y > window.innerHeight + fontSize * 2){
             drops[i] = Math.random() * -20;
           }
         }
@@ -521,8 +595,38 @@
         requestAnimationFrame(draw);
       }
 
+      window.addEventListener('resize', resize, { passive:true });
+      resize();
       draw();
     })();
+
+    // ===== ローダー → ヒーロー表示 =====
+    window.addEventListener('load', function(){
+      const loader = document.getElementById('loader');
+      const hero = document.getElementById('hero');
+
+      setTimeout(() => {
+        loader.classList.add('hide');
+        hero.classList.add('show');
+      }, 1100);
+    });
+
+    // ===== ゲートクリック時のフラッシュ演出 =====
+    function attachGateEffect(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.addEventListener('click', function(e){
+        e.preventDefault();
+        const href = this.getAttribute('href');
+        const flash = document.createElement('div');
+        flash.className = 'flash';
+        document.body.appendChild(flash);
+        setTimeout(() => { window.location.href = href; }, 420);
+      });
+    }
+
+    attachGateEffect('gate-reading');
+    attachGateEffect('gate-philosophy');
   </script>
 </body>
 </html>
