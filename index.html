@@ -214,53 +214,55 @@
       }, 1100);
     });
 
-    // --- ボタン演出：星粒バースト＋テキストPulse＋白フェード ---
-    function attachGateEffect(id){
-      const el = document.getElementById(id);
-      if(!el) return;
+    // --- ボタン演出：星粒バースト＋テキストPulse＋黄金ゲートフレア ---
+function attachGateEffect(id){
+  const el = document.getElementById(id);
+  if(!el) return;
 
-      el.addEventListener('click', function(e){
-        e.preventDefault();
-        const href  = this.getAttribute('href');
-        const rect  = this.getBoundingClientRect();
-        const cx    = rect.left + rect.width/2;
-        const cy    = rect.top  + rect.height/2;
+  el.addEventListener('click', function(e){
+    e.preventDefault();
+    const href  = this.getAttribute('href');
+    const rect  = this.getBoundingClientRect();
+    const cx    = rect.left + rect.width/2;
+    const cy    = rect.top  + rect.height/2;
 
-        // テキストPulse
-        const label = this.querySelector('.label');
-        if(label){
-          label.classList.add('label-pulse');
-          setTimeout(()=>label.classList.remove('label-pulse'), 900);
-        }
-
-        // 星粒バースト
-        const burst = document.createElement('div');
-        burst.className = 'particle-burst';
-        burst.style.left = cx + 'px';
-        burst.style.top  = cy + 'px';
-
-        for(let i=0;i<14;i++){
-          const p = document.createElement('span');
-          const tx = (Math.random()*160 - 80) | 0;
-          const ty = (Math.random()*80  - 40) | 0;
-          p.style.setProperty('--tx', tx + 'px');
-          p.style.setProperty('--ty', ty + 'px');
-          burst.appendChild(p);
-        }
-        document.body.appendChild(burst);
-        setTimeout(()=>burst.remove(), 800);
-
-        // 画面ホワイトフェード
-        const fade = document.createElement('div');
-        fade.className = 'page-fade';
-        document.body.appendChild(fade);
-
-        setTimeout(()=>{ window.location.href = href; }, 500);
-      });
+    // テキストPulse
+    const label = this.querySelector('.label');
+    if(label){
+      label.classList.add('label-pulse');
+      setTimeout(()=>label.classList.remove('label-pulse'), 900);
     }
 
-    attachGateEffect('gate-reading');
-    attachGateEffect('gate-philosophy');
+    // 星粒バースト
+    const burst = document.createElement('div');
+    burst.className = 'particle-burst';
+    burst.style.left = cx + 'px';
+    burst.style.top  = cy + 'px';
+
+    for(let i=0;i<14;i++){
+      const p = document.createElement('span');
+      const tx = (Math.random()*180 - 90) | 0; // 左右に散る
+      const ty = (Math.random()*100 - 50) | 0; // 上下に散る
+      p.style.setProperty('--tx', tx + 'px');
+      p.style.setProperty('--ty', ty + 'px');
+      burst.appendChild(p);
+    }
+    document.body.appendChild(burst);
+    setTimeout(()=>burst.remove(), 800);
+
+    // 黄金ゲートフレア（画面中央から）
+    const flare = document.createElement('div');
+    flare.className = 'gate-flare';
+    document.body.appendChild(flare);
+    setTimeout(()=>flare.remove(), 650);
+
+    // ページ遷移（真っ白画面を長く見せない）
+    setTimeout(()=>{ window.location.href = href; }, 420);
+  });
+}
+
+attachGateEffect('gate-reading');
+attachGateEffect('gate-philosophy');  
   </script>
 </body>
 </html>
