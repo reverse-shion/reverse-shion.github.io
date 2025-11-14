@@ -33,7 +33,7 @@
     }
 
     /* =========================
-       CUT ベース
+       CUT 共通
     ========================= */
     .cut {
       position: absolute;
@@ -70,7 +70,6 @@
       font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
       font-size: clamp(16px, 4vw, 22px);
       letter-spacing: 0.16em;
-      text-transform: none;
       margin-bottom: 8px;
       color: #ffd76f;
       text-shadow:
@@ -185,7 +184,7 @@
       border-radius: 50%;
       transform: translate(-50%, -50%);
       background:
-        radial-gradient(circle, rgba(16, 93, 170, 0.9) 0%, rgba(6,22,48,1) 45%, rgba(2,5,16,1) 75%);
+        radial-gradient(circle, rgba(16,93,170,0.9) 0%, rgba(6,22,48,1) 45%, rgba(2,5,16,1) 75%);
       box-shadow:
         0 0 40px rgba(127,208,255,0.8),
         0 0 120px rgba(38,124,255,0.7);
@@ -229,8 +228,8 @@
         radial-gradient(circle at 50% 90%, rgba(0,0,0,0.92), #02020a 70%);
     }
 
+    /* 神殿シルエット（奥） */
     .cut--code::before {
-      /* 神殿シルエット */
       content: "";
       position: absolute;
       top: 50%;
@@ -246,11 +245,11 @@
         0 0 30px rgba(255,215,111,0.6),
         0 0 120px rgba(127,208,255,0.75);
       opacity: 0.96;
-      z-index: 0;
+      z-index: 0; /* 一番奥 */
     }
 
+    /* 内側のライン（その手前） */
     .cut--code::after {
-      /* 内側のライン */
       content: "";
       position: absolute;
       top: 50%;
@@ -262,10 +261,10 @@
       border: 1px solid rgba(127,208,255,0.55);
       box-shadow: 0 0 24px rgba(127,208,255,0.5);
       opacity: 0.9;
-      z-index: 0;
+      z-index: 1;
     }
 
-    /* N-code 雨 */
+    /* N-code 雨（神殿の上・文字の下） */
     .code-rain {
       position: absolute;
       inset: 0;
@@ -275,7 +274,7 @@
       pointer-events: none;
       opacity: 0;
       animation: codeFadeIn 1.6s ease-out 0.8s forwards;
-      z-index: 0;
+      z-index: 2; /* 神殿より前、テキストより後ろ */
     }
 
     .code-column {
@@ -283,14 +282,14 @@
       height: 100%;
       overflow: hidden;
       font-family: "Courier New", ui-monospace, monospace;
-      font-size: clamp(9px, 2.3vw, 12px);
+      font-size: clamp(11px, 2.8vw, 14px);
       line-height: 1.6;
-      color: #1a7fdd;
+      color: #7fd0ff;
       text-shadow:
         0 0 4px rgba(127,208,255,0.9),
         0 0 10px rgba(255,215,111,0.4);
       white-space: pre;
-      opacity: 0.7;
+      opacity: 0.85;
     }
 
     .code-stream {
@@ -303,7 +302,7 @@
     .code-column:nth-child(3n)  .code-stream { color:#7fd0ff; animation-duration: 15s; }
     .code-column:nth-child(4n)  .code-stream { color:#1a7fdd; animation-duration: 11s; }
     .code-column:nth-child(5n)  .code-stream { color:#4fb8ff; animation-duration: 17s; }
-    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.4; animation-duration: 19s; }
+    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.6; animation-duration: 19s; }
 
     .code-stream::after {
       content: "✶";
@@ -314,7 +313,7 @@
       text-shadow:
         0 0 8px rgba(255,215,111,1),
         0 0 22px rgba(255,215,111,0.9);
-      font-size: 1.1em;
+      font-size: 1.2em;
     }
 
     @keyframes codeFall {
@@ -329,6 +328,7 @@
 
     .cut--code .cut__content {
       max-width: 760px;
+      z-index: 3; /* テキストは一番手前 */
     }
 
     .cut--code .cut__lines {
@@ -398,9 +398,10 @@
     <!-- CUT 3: Code•Eternity -->
     <section class="cut cut--code" data-cut="2" aria-label="Code Eternity">
       <div class="cut__inner">
+
         <!-- N-code 雨レイヤー -->
         <div class="code-rain" aria-hidden="true">
-          <!-- 12列分の簡易コード。見た目なので中身は自由でOK -->
+          <!-- 12列分。見た目用なので文言はこのままでOK -->
           <div class="code-column"><div class="code-stream">N ∴ 0 1 0 ✶  N • code 01 ∞
 Λ 0 1 ∵ ψ 7 F π
 Σ 9 3 0 α N · 1
@@ -496,7 +497,6 @@ N • 0 1 0 ∞ 3 Σ
       function revealLines(cut) {
         const lines = Array.from(cut.querySelectorAll('[data-line]'));
         if (!lines.length) return;
-
         lines.forEach(function (line, index) {
           const delay = 800 + index * 900;
           setTimeout(function () {
@@ -508,7 +508,6 @@ N • 0 1 0 ∞ 3 Σ
       function activateCut(index) {
         if (index < 0 || index >= cuts.length) return;
         currentIndex = index;
-
         cuts.forEach(function (cut, i) {
           if (i === index) {
             cut.classList.add('is-active');
@@ -525,10 +524,10 @@ N • 0 1 0 ∞ 3 Σ
       // 初期カット
       activateCut(0);
 
-      // 自動カット切り替え
-      setTimeout(function () { activateCut(1); }, 10000); // 10秒後にCut2
-      setTimeout(function () { activateCut(2); }, 20000); // 20秒後にCut3
-      // Cut3はそのまま表示し続ける（録画しやすいように）
+      // 自動カット切り替え（録画しやすいように 10秒ごと）
+      setTimeout(function () { activateCut(1); }, 10000); // 10秒後 Cut2
+      setTimeout(function () { activateCut(2); }, 20000); // 20秒後 Cut3
+      // Cut3 はそのまま表示し続ける
     });
   </script>
 </body>
