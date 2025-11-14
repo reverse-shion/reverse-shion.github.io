@@ -43,8 +43,37 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- 外部CSS（このファイル名で保存して、パスを合わせてね） -->
-  <link rel="stylesheet" href="top.css">
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://www.google.com/search?q=site%3Areverse-shion.github.io+{search_term_string}",
+      "query-input":"required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "logo":"https://reverse-shion.github.io/assets/icon.png",
+    "sameAs":[
+      "https://www.tiktok.com/@your-id",
+      "https://x.com/your-id",
+      "https://note.com/your-id"
+    ]
+  }
+  </script>
+
+  <!-- 外部CSS -->
+  <link rel="stylesheet" href="/shion-home.css">
 </head>
 <body>
 
@@ -61,7 +90,14 @@
     <div class="loader__caption">BOOTING STAR-LINKED SYSTEM...</div>
   </div>
 
-  <!-- ===== 背景：金色コードの雨 ===== -->
+  <!-- ===== 薄いグリフのベール（最果て感） ===== -->
+  <div class="glyph-veil" aria-hidden="true">
+    <span>詩祈星言魂理</span>
+    <span>韻光影時巡声</span>
+    <span>塔門鍵路環夢</span>
+  </div>
+
+  <!-- ===== 背景コード雨 ===== -->
   <canvas id="codeRain" aria-hidden="true"></canvas>
 
   <!-- ===== メインコンテンツ ===== -->
@@ -76,124 +112,155 @@
 
       <p class="hero-lead">
         <strong>「言葉が魂を救う」</strong> —— 詩韻思想（Shion Philosophy）は、<br>
-        <em>占い</em>と<em>思想</em>を組み合わせて、あなたの物語を読み解くための<br>
-        “星とコードのタロットシステム”です。
+        <em>思想としての哲学</em>と、<em>占いとしてのタロット</em>を重ね合わせて、あなたの物語を読み解くための<br>
+        “<em>星とコードのタロットシステム</em>”です。<br>
+        恋・仕事・人間関係——あなたの“今”を、星とことばのコードとして読み解き、<br>
+        物語のように未来を照らしていきます。
       </p>
 
       <p class="hero-note">
         白い世界に降り注ぐ金色のコードは、忘れかけた“本音”のログ。<br>
-        その一つひとつが詩になり、あなたの心の星座をそっと照らします。
+        そのひとつひとつが詩になり、あなたの心の星座をそっと照らします。
       </p>
 
-      <div class="hero-cta" aria-label="最初の選択">
-        <!-- 星界へアクセス（無料占いフロー） -->
-        <a href="/shion2.html" class="btn btn-primary" id="gate-reading">
+      <section class="cta-area" aria-label="はじめの選択">
+        <a href="/shion2.html" class="shion-btn gold" id="gate-reading">
           <span class="label">星界へアクセス</span>
         </a>
 
-        <!-- 詩韻思想テキストへ -->
-        <a href="/books/zero.html" class="btn btn-secondary" id="gate-philosophy">
+        <a href="/books/zero.html" class="shion-btn glass" id="gate-philosophy">
           <span class="label">詩韻思想を読む</span>
         </a>
-      </div>
+      </section>
     </section>
   </main>
 
   <noscript>
-    <p class="nojs-note">
-      JavaScriptが無効のため、光とコードの演出を省略して表示しています。
+    <p style="position:fixed;bottom:12px;left:0;right:0;text-align:center;font-size:13px;color:#7a5f21;">
+      JavaScriptが無効のため、演出を省略して表示しています。
     </p>
   </noscript>
 
-  <!-- ===== スクリプト：コード雨・ローダー・フラッシュ遷移 ===== -->
+  <!-- ===== JS：コード雨＋演出 ===== -->
   <script>
-    // ===== コード雨（金色・ゆっくりめ・文字が読める速度） =====
+    // --- コード雨（金のコード・ゆっくり） ---
     (function(){
       const canvas = document.getElementById('codeRain');
-      if(!canvas) return;
       const ctx = canvas.getContext('2d');
-      const chars = '詩韻星界祈言霊∞01AI理';
-      const list = chars.split('');
+      const chars = '詩韻星界祈言霊∞01AI理∴◯＊';
+      const charList = chars.split('');
 
-      let width,height,fontSize,cols,drops;
+      let width, height, fontSize, columns, drops;
 
       function resize(){
         const dpr = Math.min(2, window.devicePixelRatio || 1);
-        width  = canvas.width  = window.innerWidth * dpr;
+        width  = canvas.width  = window.innerWidth  * dpr;
         height = canvas.height = window.innerHeight * dpr;
         ctx.setTransform(dpr,0,0,dpr,0,0);
 
-        fontSize = 18;
-        cols  = Math.floor(window.innerWidth / fontSize);
-        drops = new Array(cols).fill(0).map(()=>Math.random()*-20);
+        fontSize = 16;
+        columns = Math.floor(window.innerWidth / fontSize);
+        drops   = new Array(columns).fill(0).map(() => Math.random() * -20);
       }
 
       function draw(){
-        // 少し残像を残しつつ、明るさキープ
-        ctx.fillStyle = 'rgba(253,252,248,0.16)';
+        ctx.fillStyle = 'rgba(253,252,248,0.14)';
         ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
         ctx.font = fontSize + 'px "Noto Serif JP", system-ui';
 
-        for(let i=0;i<cols;i++){
-          const ch = list[Math.floor(Math.random()*list.length)];
-          const x  = i * fontSize;
-          const y  = drops[i] * fontSize;
+        for(let i=0;i<columns;i++){
+          const text = charList[Math.floor(Math.random()*charList.length)];
+          const x = i * fontSize;
+          const y = drops[i] * fontSize;
 
-          // 末端が光るグラデーション
           const grad = ctx.createLinearGradient(x, y-fontSize, x, y+fontSize);
-          grad.addColorStop(0,'rgba(255,255,255,0.95)');
-          grad.addColorStop(0.5,'rgba(255,230,160,0.98)');
-          grad.addColorStop(1,'rgba(208,168,64,0.98)');
-          ctx.fillStyle = grad;
-          ctx.shadowColor = 'rgba(224,180,79,0.8)';
-          ctx.shadowBlur = 12;
-          ctx.fillText(ch,x,y);
+          grad.addColorStop(0,   'rgba(255,255,255,0.9)');
+          grad.addColorStop(0.5, 'rgba(255,231,170,0.95)');
+          grad.addColorStop(1,   'rgba(208,168,64,0.98)');
 
-          // 残光
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(181,147,64,0.35)';
-          ctx.fillText(ch,x,y-fontSize);
+          ctx.fillStyle   = grad;
+          ctx.shadowColor = 'rgba(224,180,79,0.7)';
+          ctx.shadowBlur  = 14;
+          ctx.fillText(text,x,y);
 
-          const v = 0.45 + Math.random()*0.25; // ゆっくりめ
-          drops[i] += v;
+          ctx.shadowBlur  = 0;
+          ctx.fillStyle   = 'rgba(181,147,64,0.30)';
+          ctx.fillText(text,x,y-fontSize);
+
+          const velocity = 0.45 + Math.random()*0.25;
+          drops[i] += velocity;
+
           if(y > window.innerHeight + fontSize*2){
-            drops[i] = Math.random()*-20;
+            drops[i] = Math.random() * -20;
           }
         }
         requestAnimationFrame(draw);
       }
 
-      window.addEventListener('resize',resize,{passive:true});
+      window.addEventListener('resize', resize, {passive:true});
       resize();
       draw();
     })();
 
-    // ===== ローダー → ヒーロー表示 =====
-    window.addEventListener('load',function(){
+    // --- ローディング → ヒーロー表示 ---
+    window.addEventListener('load', function(){
       const loader = document.getElementById('loader');
       const hero   = document.getElementById('hero');
-      setTimeout(()=>{
+
+      setTimeout(() => {
         loader.classList.add('hide');
         hero.classList.add('show');
-      },1100);
+      }, 1100);
     });
 
-    // ===== ボタン押下時のフラッシュ演出＋遷移 =====
-    function attachGate(id){
+    // --- ボタン演出：星粒バースト＋テキストPulse＋白フェード ---
+    function attachGateEffect(id){
       const el = document.getElementById(id);
       if(!el) return;
-      el.addEventListener('click',function(e){
+
+      el.addEventListener('click', function(e){
         e.preventDefault();
-        const href = this.getAttribute('href');
-        const flash = document.createElement('div');
-        flash.className = 'flash';
-        document.body.appendChild(flash);
-        setTimeout(()=>{ window.location.href = href; }, 450);
+        const href  = this.getAttribute('href');
+        const rect  = this.getBoundingClientRect();
+        const cx    = rect.left + rect.width/2;
+        const cy    = rect.top  + rect.height/2;
+
+        // テキストPulse
+        const label = this.querySelector('.label');
+        if(label){
+          label.classList.add('label-pulse');
+          setTimeout(()=>label.classList.remove('label-pulse'), 900);
+        }
+
+        // 星粒バースト
+        const burst = document.createElement('div');
+        burst.className = 'particle-burst';
+        burst.style.left = cx + 'px';
+        burst.style.top  = cy + 'px';
+
+        for(let i=0;i<14;i++){
+          const p = document.createElement('span');
+          const tx = (Math.random()*160 - 80) | 0;
+          const ty = (Math.random()*80  - 40) | 0;
+          p.style.setProperty('--tx', tx + 'px');
+          p.style.setProperty('--ty', ty + 'px');
+          burst.appendChild(p);
+        }
+        document.body.appendChild(burst);
+        setTimeout(()=>burst.remove(), 800);
+
+        // 画面ホワイトフェード
+        const fade = document.createElement('div');
+        fade.className = 'page-fade';
+        document.body.appendChild(fade);
+
+        setTimeout(()=>{ window.location.href = href; }, 500);
       });
     }
-    attachGate('gate-reading');
-    attachGate('gate-philosophy');
+
+    attachGateEffect('gate-reading');
+    attachGateEffect('gate-philosophy');
   </script>
 </body>
 </html>
