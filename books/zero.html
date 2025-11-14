@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="/assets/css/nav.css">
   <link rel="stylesheet" href="/assets/css/book.css">
 
-  <!-- Page-only: 軽量・滑らか文字演出 -->
+  <!-- Page-only: 軽量・滑らか文字演出＋扉演出 -->
   <style>
     :root{
       --glow-gold: rgba(255,215,111,.9);
@@ -60,6 +60,7 @@
                  charPulse var(--pulse-speed) ease-in-out infinite;
       animation-delay: var(--d, 0s);
       will-change: transform, opacity;
+      position: relative;
     }
     @keyframes charIn{
       0% { opacity:0; transform: translateY(6px) scale(.985) }
@@ -99,10 +100,173 @@
       box-shadow:0 0 0 2px rgba(126,102,255,.25) inset; color:#6d57f0;
     }
 
+    /* ===== 深層への扉：文とボタン ===== */
+    .deep-exit{
+      margin: 60px auto 80px;
+      max-width: 720px;
+      text-align: center;
+      font-family: 'Shippori Mincho','Zen Kaku Gothic New',system-ui,serif;
+      padding: 24px 16px 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .deep-exit p{
+      font-size: 1rem;
+      line-height: 1.9;
+      color: #f8f5ff;
+      margin-bottom: 18px;
+    }
+
+    .gold-door-link{
+      display:inline-block;
+      margin-top: 8px;
+      padding: 12px 26px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,215,111,0.7);
+      color: #ffd76f;
+      text-decoration: none;
+      font-family: 'Cormorant Garamond','Shippori Mincho',serif;
+      font-size: 0.98rem;
+      letter-spacing: 0.16em;
+      text-indent: 0.16em;
+      position: relative;
+      overflow: hidden;
+      background: rgba(5,3,12,0.7);
+      transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .gold-door-link::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:inherit;
+      box-shadow:0 0 14px rgba(255,215,111,0.6);
+      opacity:0;
+      transition:opacity 0.4s ease;
+      pointer-events:none;
+    }
+    .gold-door-link::after{
+      content:"";
+      position:absolute;
+      top:0;
+      left:-130%;
+      width:60%;
+      height:100%;
+      background:linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,0.95),
+        transparent
+      );
+      transform:skewX(-20deg);
+      animation: door-shine 2.4s infinite;
+      pointer-events:none;
+    }
+    .gold-door-link:hover{
+      background: rgba(255,215,111,0.12);
+      box-shadow:0 0 18px rgba(255,215,111,0.6);
+      transform: translateY(-1px);
+    }
+    .gold-door-link:hover::before{
+      opacity:1;
+    }
+    @keyframes door-shine{
+      0% { left:-130%; opacity:0; }
+      25%{ opacity:1; }
+      60%{ left:120%; opacity:0; }
+      100%{ left:120%; opacity:0; }
+    }
+
+    /* ===== 画面全体の扉オーバーレイ ===== */
+    .door-overlay{
+      position:fixed;
+      inset:0;
+      background:radial-gradient(circle at 50% 0%, #2b2230 0, #050308 55%, #000 100%);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.6s ease;
+      z-index:9999;
+    }
+    .door-overlay__inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+    }
+    .door-overlay__panel{
+      position:absolute;
+      top:0;
+      width:50%;
+      height:100%;
+      background:radial-gradient(circle at 50% 0%, #ffd76f 0, #7f6022 32%, #100a08 80%);
+      box-shadow:0 0 24px rgba(255,215,111,0.5);
+      transform:translateX(0);
+    }
+    .door-overlay__panel--left{ left:-50%; }
+    .door-overlay__panel--right{ right:-50%; }
+
+    .door-overlay__text{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      color:#ffeec2;
+      font-family:'Shippori Mincho','Cormorant Garamond',serif;
+      letter-spacing:0.18em;
+      text-align:center;
+      font-size:0.9rem;
+      opacity:0;
+      text-indent:0.18em;
+      line-height:1.8;
+    }
+
+    .door-overlay.is-active{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .door-overlay.is-active .door-overlay__panel--left{
+      animation: door-close-left 0.7s forwards;
+    }
+    .door-overlay.is-active .door-overlay__panel--right{
+      animation: door-close-right 0.7s forwards;
+    }
+    .door-overlay.is-active .door-overlay__text{
+      animation: door-text-fade 0.9s 0.2s forwards;
+    }
+
+    @keyframes door-close-left{
+      0% { transform:translateX(-100%); }
+      100%{ transform:translateX(0); }
+    }
+    @keyframes door-close-right{
+      0% { transform:translateX(100%); }
+      100%{ transform:translateX(0); }
+    }
+    @keyframes door-text-fade{
+      0% { opacity:0; letter-spacing:0.26em; }
+      100%{ opacity:1; letter-spacing:0.18em; }
+    }
+
     /* ユーザー設定尊重 */
     @media (prefers-reduced-motion: reduce){
-      .char, .char::after{ animation: none !important; opacity:1 !important; transform:none !important; }
-      .line{ opacity:1 !important; visibility:visible !important; transform:none !important; }
+      .char, .char::after{
+        animation: none !important;
+        opacity:1 !important;
+        transform:none !important;
+      }
+      .line{
+        opacity:1 !important;
+        visibility:visible !important;
+        transform:none !important;
+      }
+      .door-overlay{
+        transition:none;
+      }
+      .door-overlay__panel,
+      .door-overlay__text{
+        animation:none !important;
+      }
     }
   </style>
 </head>
@@ -160,6 +324,24 @@
       </section>
     </article>
 
+    <!-- 深層への扉：読了後の誘導 -->
+    <section class="deep-exit" aria-label="詩韻思想の深層への案内">
+      <p>
+        ここまで読んだあなたは、<br>
+        言葉が生まれる前の“静寂”に触れた旅人です。<br><br>
+        この先には、詩韻思想の源流と、<br>
+        Re:verse Shion 全体を貫く物語が続いています。<br>
+        深層の書庫で、その光を受け取ってください。
+      </p>
+      <a
+        class="gold-door-link"
+        href="https://note.com/shion_uranai369/n/na67361352c6e"
+        data-href="https://note.com/shion_uranai369/n/na67361352c6e"
+      >
+        詩韻思想の深層へ（note）
+      </a>
+    </section>
+
     <a href="#main" class="to-top" aria-label="ページ上部へ戻る">↑ TOP</a>
   </main>
 
@@ -167,7 +349,19 @@
     <p>© Re:verse Shion / 詩韻思想</p>
   </footer>
 
-  <!-- ===== JS：軽量・間引き・視認時のみ起動 ===== -->
+  <!-- 扉オーバーレイ -->
+  <div class="door-overlay" aria-hidden="true">
+    <div class="door-overlay__inner">
+      <div class="door-overlay__panel door-overlay__panel--left"></div>
+      <div class="door-overlay__panel door-overlay__panel--right"></div>
+      <p class="door-overlay__text">
+        言葉が魂を救う世界へ<br>
+        ― Re:verse Shion ―
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== JS：文字演出＋扉リンク ===== -->
   <script>
     (() => {
       const CHAR_INTERVAL = 45; // ms（少し速めに）
@@ -182,12 +376,10 @@
         for(let i=0;i<text.length;i++){
           const span = document.createElement('span');
           span.className = 'char';
-          // スパーク間引き
           if(i % SPARK_EVERY === 0) span.classList.add('spark');
           span.textContent = text[i];
           const charDelaySec = baseDelaySec + (i * (CHAR_INTERVAL/1000));
           span.style.setProperty('--d', charDelaySec + 's');
-          // ばらつき
           span.style.setProperty('--r', (Math.random()*0.8).toFixed(2) + 's');
           frag.appendChild(span);
         }
@@ -197,9 +389,7 @@
       function revealSequential(panel){
         if(!panel) return;
         const lines = Array.from(panel.querySelectorAll('.line'));
-        // 既に初期化済みならスキップ（無駄な再分割を防ぐ）
-        if(panel.dataset.inited) {
-          // 2回目以降は可視化だけを順次
+        if(panel.dataset.inited){
           let t = 0;
           lines.forEach(line => {
             line.classList.remove('visible');
@@ -209,8 +399,7 @@
           return;
         }
 
-        // 初期化：分割→順次可視化
-        let t = 0; // ms
+        let t = 0;
         lines.forEach(line => {
           const raw = line.textContent;
           line.textContent = raw;
@@ -230,7 +419,6 @@
           p.toggleAttribute('hidden', p.id !== targetId)
         );
         const panel = document.getElementById(targetId);
-        // 画面内に入っていれば即実行、そうでなければIntersectionで開始
         if (io) io.disconnect();
         io = new IntersectionObserver(([entry])=>{
           if(entry && entry.isIntersecting){ revealSequential(panel); io.disconnect(); }
@@ -239,15 +427,12 @@
       }
 
       function setup(){
-        // 初期タブ
         const initialPanel = document.querySelector('.mode:not([hidden])');
-        // スクロールで見えたら開始（上で始まっている場合はすぐ走る）
         const ioinit = new IntersectionObserver(([entry])=>{
           if(entry && entry.isIntersecting){ revealSequential(initialPanel); ioinit.disconnect(); }
         }, {threshold: 0.1});
         ioinit.observe(initialPanel);
 
-        // タブ切替
         document.querySelector('.mode-switch')?.addEventListener('click', e => {
           const btn = e.target.closest('[role="tab"]');
           if(btn) activateTab(btn);
@@ -255,6 +440,31 @@
       }
 
       document.addEventListener('DOMContentLoaded', setup);
+    })();
+  </script>
+
+  <script>
+    // 金色ボタン → 扉 → note 遷移
+    (() => {
+      const link = document.querySelector('.gold-door-link');
+      const overlay = document.querySelector('.door-overlay');
+      if (!link || !overlay) return;
+
+      link.addEventListener('click', (e) => {
+        // 修飾キー（新しいタブで開く等）は通常通り
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        e.preventDefault();
+        const href = link.dataset.href || link.getAttribute('href');
+        if (!href) return;
+
+        overlay.classList.add('is-active');
+
+        // 扉アニメーション後に遷移
+        setTimeout(() => {
+          window.location.href = href;
+        }, 1200);
+      });
     })();
   </script>
 </body>
