@@ -91,7 +91,7 @@
       position:relative;
     }
 
-    /* 背景：柔らかい光＋薄いグリッド */
+    /* 背景：柔らかい光＋薄いグリッド（神殿ホワイト） */
     body::before{
       content:"";
       position:fixed;
@@ -99,8 +99,8 @@
       z-index:0;
       pointer-events:none;
       background:
-        radial-gradient(900px 700px at 50% 10%, rgba(255,250,241,.96), transparent 70%),
-        radial-gradient(1200px 900px at 50% 100%, rgba(250,214,149,.32), transparent 75%),
+        radial-gradient(900px 700px at 50% 10%, rgba(255,250,241,.98), transparent 70%),
+        radial-gradient(1200px 900px at 50% 100%, rgba(250,214,149,.30), transparent 75%),
         repeating-linear-gradient(
           90deg,
           rgba(215,184,132,.14) 0 1px,
@@ -109,7 +109,7 @@
       mix-blend-mode:soft-light;
     }
 
-    /* 金色コード雨 */
+    /* 金色コード雨キャンバス */
     #codeRain{
       position:fixed;
       top:0;left:0;
@@ -137,10 +137,10 @@
       font-size:clamp(2.3rem,6.4vw,3.2rem);
       letter-spacing:.08em;
       margin-bottom:.6rem;
-      color:#b47a28;            /* はっきりした金茶色 */
+      color:#b47a28;
       text-shadow:
-        0 0 3px rgba(255,248,232,.8),
-        0 2px 4px rgba(140,96,32,.35);  /* 影控えめでくっきり */
+        0 0 2px rgba(255,248,232,.9),
+        0 2px 4px rgba(140,96,32,.32);
     }
 
     h2{
@@ -208,7 +208,7 @@
       transition:transform .35s ease, box-shadow .35s ease, background .35s ease;
     }
     .door-button::before{
-      /* 外側の金色の輪郭のグロー */
+      /* 外側の金色グロー */
       content:"";
       position:absolute;
       inset:-2px;
@@ -217,18 +217,18 @@
       box-shadow:
         0 0 18px rgba(255,230,180,.7),
         0 0 40px rgba(212,167,82,.75);
-      opacity:.0;
+      opacity:0;
       transition:opacity .4s ease;
       pointer-events:none;
     }
     .door-button::after{
-      /* 中央からふわっと光が脈打つ */
+      /* 中央からふわっと脈打つ光 */
       content:"";
       position:absolute;
       inset:20%;
       border-radius:inherit;
       background:radial-gradient(circle,#fff7d5 0%, rgba(255,247,210,.7) 40%, transparent 70%);
-      opacity:.0;
+      opacity:0;
       animation:doorGlow 3s ease-in-out infinite;
       pointer-events:none;
     }
@@ -322,18 +322,36 @@
 
   <noscript>
     <p style="position:fixed;bottom:12px;left:0;right:0;color:#5b4030;font-size:14px">
-      JavaScriptが無効です。コード雨の演出なしで表示しています。
+      JavaScriptが無効です。コード雨と星粒の演出なしで表示しています。
     </p>
   </noscript>
 
-  <!-- ===== スクリプト：金色コード雨 ===== -->
+  <!-- ===== スクリプト：金色コード雨 + 白い粒子（神殿 × AI） ===== -->
   <script>
     (function(){
       const cvs = document.getElementById('codeRain');
       const ctx = cvs.getContext('2d');
+
       const chars = '詩韻祈魂∞☆＊＋◇◆AI01ΩΛψπ';
-      let fontSize = 18;
-      let columns, drops, W, H;
+      let fontSize = 20;
+      let columns, dropsY, speeds, W, H;
+
+      const tailLength = 9;     // 文字列の“長さ”イメージ
+      const particles = [];
+
+      function initParticles(){
+        particles.length = 0;
+        const count = 40;
+        for(let i=0;i<count;i++){
+          particles.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            r: Math.random() * 1.4 + 0.6,
+            vy: Math.random() * 0.25 + 0.15,
+            alpha: Math.random() * 0.5 + 0.3
+          });
+        }
+      }
 
       function resize(){
         const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -341,34 +359,85 @@
         H = cvs.height = window.innerHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        fontSize = Math.max(14, Math.min(22, Math.floor(window.innerWidth / 45)));
-        columns = Math.ceil(window.innerWidth / fontSize);
-        drops   = new Array(columns).fill(0);
+        fontSize = Math.max(16, Math.min(24, Math.floor(window.innerWidth / 40)));
+        columns  = Math.ceil(window.innerWidth / fontSize);
+
+        dropsY = new Array(columns);
+        speeds = new Array(columns);
+        for(let i=0;i<columns;i++){
+          dropsY[i] = -Math.random() * window.innerHeight;          // 少し上から
+          speeds[i] = (Math.random() * 0.25) + 0.25;                // ゆっくり（0.25〜0.5）
+        }
+
+        initParticles();
+      }
+
+      function drawParticles(){
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        particles.forEach(p=>{
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fill();
+          p.y += p.vy;
+          if(p.y - p.r > window.innerHeight){
+            p.y = -p.r;
+            p.x = Math.random() * window.innerWidth;
+          }
+        });
+        ctx.restore();
       }
 
       function draw(){
-        // 背景をうっすら塗りつぶして余韻を残す
-        ctx.fillStyle = 'rgba(251,244,230,0.18)';
+        // うっすら塗って尾を残す（9文字分くらいの長さになる）
+        ctx.fillStyle = 'rgba(251,244,230,0.10)';
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-        // 柔らかい金茶色でコード雨
-        ctx.fillStyle = '#c79c52';
-        ctx.shadowColor = 'rgba(255,220,160,0.9)';
-        ctx.shadowBlur  = 8;
+        // 白い星粒（AIノイズ × 星砂）
+        drawParticles();
+
+        // コード雨：先端が光る金色
         ctx.font = fontSize + 'px monospace';
 
         for(let i=0;i<columns;i++){
-          const ch = chars[Math.floor(Math.random() * chars.length)];
           const x = i * fontSize;
-          const y = drops[i] * fontSize * 0.95;
+          const y = dropsY[i];
 
-          ctx.fillText(ch, x, y);
+          // 先端（ヘッド）は強いグラデーション＋光
+          const headGradient = ctx.createLinearGradient(0, y-fontSize, 0, y+fontSize);
+          headGradient.addColorStop(0,   'rgba(255,250,230,1)');
+          headGradient.addColorStop(0.4, '#ffdf88');
+          headGradient.addColorStop(1,   '#f5c96a');
 
-          if(y > window.innerHeight && Math.random() > 0.975){
-            drops[i] = 0;
+          ctx.fillStyle   = headGradient;
+          ctx.shadowColor = 'rgba(255,230,150,0.9)';
+          ctx.shadowBlur  = 14;
+
+          const headChar = chars[Math.floor(Math.random()*chars.length)];
+          ctx.fillText(headChar, x, y);
+
+          // 尾（テイル）をやさしく 9 文字分ほど描画
+          ctx.shadowBlur = 0;
+          for(let t=1;t<=tailLength;t++){
+            const ty = y - t * fontSize * 0.9;
+            if(ty < -fontSize) break;
+            const alpha = Math.max(0, 0.9 - t * (0.9 / tailLength)); // 先端に近いほど濃い
+            ctx.fillStyle = `rgba(216,173,96,${alpha.toFixed(3)})`;
+            const tailChar = chars[Math.floor(Math.random()*chars.length)];
+            ctx.fillText(tailChar, x, ty);
           }
-          drops[i]++;
+
+          // 落下速度（ゆっくり）
+          dropsY[i] += speeds[i] * fontSize * 0.35;
+
+          const resetThreshold = window.innerHeight + tailLength * fontSize;
+          if(dropsY[i] > resetThreshold){
+            dropsY[i] = -Math.random() * window.innerHeight * 0.5;
+            speeds[i] = (Math.random()*0.25) + 0.25;
+          }
         }
+
         requestAnimationFrame(draw);
       }
 
@@ -376,64 +445,6 @@
       resize();
       draw();
     })();
-
-    (function(){
-  const cvs = document.getElementById('codeRain');
-  const ctx = cvs.getContext('2d');
-
-  // 文字の種類（光との相性が良い）
-  const chars = '詩韻祈魂∞☆＊＋◇◆AI01ΩΛψπ';
-
-  let fontSize = 20;
-  let columns, drops, W, H;
-
-  function resize(){
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    W = cvs.width  = window.innerWidth  * dpr;
-    H = cvs.height = window.innerHeight * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    fontSize = Math.max(16, Math.min(24, Math.floor(window.innerWidth / 40)));
-    columns = Math.ceil(window.innerWidth / fontSize);
-    drops   = new Array(columns).fill(0);
-  }
-
-  function draw(){
-    /* 光の残像：白背景に金の尾を残す */
-    ctx.fillStyle = 'rgba(254,251,246,0.10)';
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-
-    /* 金色を強く発光させる */
-    const gradient = ctx.createLinearGradient(0, 0, 0, fontSize);
-    gradient.addColorStop(0,   '#fff8e0');  // 白金発光
-    gradient.addColorStop(0.5, '#ffdf88'); // 明るい金
-    gradient.addColorStop(1,   '#f5c96a'); // 濃い金
-
-    ctx.fillStyle = gradient;
-    ctx.shadowColor = 'rgba(255,230,150,0.9)';
-    ctx.shadowBlur  = 14;
-    ctx.font = fontSize + 'px monospace';
-
-    for(let i=0;i<columns;i++){
-      const ch = chars[Math.floor(Math.random() * chars.length)];
-      const x = i * fontSize;
-      const y = drops[i] * fontSize * 0.9;
-
-      ctx.fillText(ch, x, y);
-
-      // 光が落ちていく自然なランダム性
-      if(y > window.innerHeight && Math.random() > 0.965){
-        drops[i] = 0;
-      }
-      drops[i]++;
-    }
-    requestAnimationFrame(draw);
-  }
-
-  window.addEventListener('resize', resize, {passive:true});
-  resize();
-  draw();
-})();
   </script>
 </body>
 </html>
