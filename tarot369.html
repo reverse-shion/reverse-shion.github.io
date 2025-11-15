@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Re:Verse Shion — 星詠ワンカード無料タロット</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#faf7f0" />
+  <meta name="description" content="Re:Verse Shion（詩韻）による無料ワンカードタロット。星とことばで、いまのあなたの物語を一枚のカードからほどきます。" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #fdfaf4;
+      --bg-soft: #f7f1e4;
+      --ink: #1f1712;
+      --accent: #d6a94b;
+      --accent-soft: rgba(214,169,75,0.16);
+      --border-soft: rgba(0,0,0,0.06);
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.08);
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --dur: 220ms;
+      --font-main: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, 'Yu Mincho', '游明朝', serif;
+      --font-hero: 'Cormorant Garamond', 'Times New Roman', serif;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font-main);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 0% 0%, #ffffff 0, #fdfaf4 50%, #f4ecde 100%);
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 24px 16px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.9) 0, rgba(255,255,255,0.98) 55%, #f9f4ea 100%);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-soft);
+      padding: 20px 18px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* うっすら金色のコード風ライン */
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.6) 0, transparent 55%),
+        radial-gradient(circle at 80% 0%, rgba(255,255,255,0.4) 0, transparent 55%),
+        repeating-linear-gradient(
+          135deg,
+          rgba(214,169,75,0.0) 0,
+          rgba(214,169,75,0.12) 1px,
+          rgba(214,169,75,0.0) 3px,
+          rgba(214,169,75,0.0) 8px
+        );
+      opacity: 0.28;
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .logo-sub {
+      font-family: var(--font-hero);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: rgba(0,0,0,0.55);
+      margin-bottom: 6px;
+    }
+
+    .logo-main {
+      font-family: var(--font-hero);
+      font-size: clamp(1.9rem, 4vw, 2.4rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .logo-main span {
+      background: linear-gradient(120deg, #b98b34, #e2c470, #b68b40);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .tagline {
+      font-size: 0.92rem;
+      color: rgba(0,0,0,0.7);
+      line-height: 1.6;
+    }
+
+    .tagline strong {
+      font-weight: 600;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 22px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .page {
+        padding: 18px 14px 22px;
+      }
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.9);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.8);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.04);
+      padding: 16px 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.8) 0, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(246,225,174,0.28) 0, transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .panel-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel-heading {
+      font-size: 0.86rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.55);
+      margin-bottom: 6px;
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-title-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      border: 1px solid rgba(214,169,75,0.7);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      background: radial-gradient(circle at 30% 0%, #fffbe9 0, #f3e3bc 65%, #f0e7ce 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.85);
+    }
+
+    .panel-lead {
+      font-size: 0.9rem;
+      color: rgba(0,0,0,0.7);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .panel-lead strong {
+      font-weight: 600;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: rgba(0,0,0,0.55);
+      line-height: 1.6;
+      margin-top: -4px;
+      margin-bottom: 14px;
+    }
+
+    /* CTAボタン */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform var(--dur) ease, box-shadow var(--dur) ease, background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at 30% 0%, #fff9e6 0, #f0d48d 40%, #dfb45c 100%);
+      color: #341d07;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.9),
+        0 14px 28px rgba(182,131,34,0.35);
+      border-color: rgba(199,152,63,0.9);
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,0.7);
+      pointer-events: none;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.85);
+      color: rgba(0,0,0,0.75);
+      border-color: rgba(0,0,0,0.09);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: rgba(0,0,0,0.6);
+      border-color: rgba(0,0,0,0.15);
+    }
+
+    .btn span.badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(214,169,75,0.8);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 18px 32px rgba(0,0,0,0.12),
+        0 0 0 1px rgba(255,255,255,0.7);
+    }
+
+    .btn-icon {
+      font-size: 1rem;
+    }
+
+    /* 結果パネル（カード側） */
+    .card-shell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-frame {
+      width: min(70vw, 260px);
+      aspect-ratio: 2 / 3;
+      border-radius: 16px;
+      padding: 6px;
+      background:
+        radial-gradient(circle at 0% 0%, #fffaf0 0, #f8ecd4 45%, #f0e0c0 100%);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,0.16),
+        0 0 0 1px rgba(255,255,255,0.95);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-frame::before {
+      content: "";
+      position: absolute;
+      inset: 10%;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow:
+        0 0 0 1px rgba(214,169,75,0.45),
+        inset 0 0 18px rgba(255,255,255,0.9);
+      pointer-events: none;
+    }
+
+    .card-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: radial-gradient(circle at 30% 0%, #fff 0, #f6f0e2 50%, #e8decf 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-img-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.9) 0, transparent 35%),
+        radial-gradient(circle at 90% 100%, rgba(214,169,75,0.25) 0, transparent 60%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transform: translateY(8px) scale(1.02);
+      transition: opacity 260ms ease, transform 260ms ease;
+    }
+
+    .card-img.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .card-placeholder {
+      font-family: var(--font-hero);
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      color: rgba(0,0,0,0.6);
+      text-transform: uppercase;
+    }
+
+    .card-meta {
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .card-keyword {
+      font-size: 0.8rem;
+      color: rgba(0,0,0,0.6);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .result-block {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(252,243,221,0.96));
+      border: 1px solid rgba(214,169,75,0.35);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+      font-size: 0.88rem;
+      color: rgba(0,0,0,0.8);
+      line-height: 1.7;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 260ms ease, transform 260ms ease;
+    }
+
+    .result-block.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.55);
+      margin-bottom: 4px;
+    }
+
+    .result-text-main {
+      margin-bottom: 4px;
+    }
+
+    .result-text-sub {
+      font-size: 0.8rem;
+      color: rgba(0,0,0,0.64);
+    }
+
+    .result-text-sub strong {
+      font-weight: 600;
+    }
+
+    .consult-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-start;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: rgba(0,0,0,0.55);
+      margin-top: 4px;
+    }
+
+    /* 星砂っぽい粒子（シンプル） */
+    .stardust {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .stardust span {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: radial-gradient(circle, #ffe9a8 0, rgba(255,233,168,0.1) 60%, transparent 100%);
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: floatDust linear infinite;
+    }
+
+    @keyframes floatDust {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.75;
+      }
+      80% {
+        opacity: 0.75;
+      }
+      100% {
+        transform: translateY(-40px) translateX(10px);
+        opacity: 0;
+      }
+    }
+
+    footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo-sub">FREE ONE-CARD READING</div>
+      <h1 class="logo-main"><span>Re:Verse Shion</span> 星詠システム</h1>
+      <p class="tagline">
+        <strong>言葉が魂を救う。</strong><br>
+        いまのあなたの「本音」を、一枚のカードと詩（ことば）からそっと読み解きます。
+      </p>
+    </header>
+
+    <main>
+      <!-- 左：説明＆スタートパネル -->
+      <section class="panel" aria-labelledby="intro-title">
+        <div class="panel-inner">
+          <div class="panel-heading">STEP 1</div>
+          <h2 id="intro-title" class="panel-title">
+            <span class="panel-title-icon">✶</span>
+            星詠を始める前に
+          </h2>
+          <p class="panel-lead">
+            この無料ワンカードは、<strong>「今いちばん大事なメッセージ」</strong>だけを一枚に凝縮して届けるための星詠リーディングです。<br>
+            恋愛、仕事、人間関係、テーマは決めても決めなくてもかまいません。
+          </p>
+          <p class="hint">
+            目を閉じて、ゆっくり深呼吸をひとつ。<br>
+            「いまの私に必要なメッセージを見せてください」と心の中でそっと唱えてから、ボタンを押してください。
+          </p>
+
+          <div class="btn-row">
+            <button id="startReadingBtn" class="btn btn-primary" type="button">
+              <span class="btn-icon">🃏</span>
+              <span>星詠を始める（無料）</span>
+              <span class="badge">ONE CARD</span>
+            </button>
+            <button id="resetBtn" class="btn btn-ghost" type="button" disabled>
+              もう一度占う
+            </button>
+          </div>
+
+          <p class="note">
+            ※占い結果は「決定事項」ではなく、選びなおすための地図です。<br>
+            もっと深く知りたい場合は、個人鑑定へ進むこともできます。
+          </p>
+        </div>
+      </section>
+
+      <!-- 右：カード＆結果パネル -->
+      <section class="panel" aria-labelledby="result-title">
+        <div class="panel-inner">
+          <div class="panel-heading">STEP 2</div>
+          <h2 id="result-title" class="panel-title">
+            <span class="panel-title-icon">✧</span>
+            今日あなたに降りるカード
+          </h2>
+
+          <div class="card-shell" aria-live="polite">
+            <div class="card-frame">
+              <div class="card-img-wrap">
+                <img id="cardImage" class="card-img" src="" alt="タロットカード" />
+                <div id="cardPlaceholder" class="card-placeholder">
+                  星詠<br>待機中…
+                </div>
+              </div>
+            </div>
+
+            <div class="card-meta">
+              <div id="cardName" class="card-name">カードはまだ伏せられています</div>
+              <div id="cardKeyword" class="card-keyword">深呼吸をして「星詠を始める」を押してください</div>
+            </div>
+
+            <div id="resultBlock" class="result-block" hidden>
+              <div class="result-label">SHION READING</div>
+              <div id="resultMain" class="result-text-main"></div>
+              <div id="resultSub" class="result-text-sub"></div>
+
+              <div class="consult-row">
+                <a id="consultBtn" class="btn btn-secondary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
+                  <span class="btn-icon">🌙</span>
+                  <span>この続きは個人鑑定で受け取る</span>
+                </a>
+              </div>
+              <p class="note">
+                「大丈夫だよ。」——最後は、あなた自身の選択がすべてを決めていきます。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      &copy; <span id="year"></span> Re:Verse Shion — 言葉が魂を救う世界へ
+    </footer>
+  </div>
+
+  <!-- シンプルな星砂パーティクル -->
+  <div class="stardust" aria-hidden="true"></div>
+
+  <script>
+    // 年号
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // 星砂の簡易生成
+    (function spawnStardust() {
+      const container = document.querySelector('.stardust');
+      const COUNT = 24;
+      for (let i = 0; i < COUNT; i++) {
+        const s = document.createElement('span');
+        const delay = Math.random() * 12;
+        const duration = 10 + Math.random() * 12;
+        const left = Math.random() * 100;
+        const top = 60 + Math.random() * 40; // 下側からふわっと
+        s.style.left = left + 'vw';
+        s.style.top = top + 'vh';
+        s.style.animationDuration = duration + 's';
+        s.style.animationDelay = delay + 's';
+        container.appendChild(s);
+      }
+    })();
+
+    // === タロットデータ ===
+    const cards = [
+      {
+        id: 0,
+        name: '愚者 - The Fool',
+        keyword: '始まり／自由な一歩',
+        main: '「今のままではいられない」と感じているなら、それは失敗の予感ではなく、新しい物語の“序章”です。',
+        sub: '完璧さよりも「動き出すこと」。小さな選択でかまいません。<strong>今、心が少しだけワクっとする方向</strong>に一歩だけ動いてみて。そこから、流れが変わっていきます。'
+      },
+      {
+        id: 1,
+        name: '魔術師 - The Magician',
+        keyword: '意思／創造',
+        main: 'あなたはすでに、必要な「材料」を全部持っています。足りないのは才能ではなく、はじめの宣言だけ。',
+        sub: '頭の中にあるアイデアを、言葉にしてみてください。ノートでも、SNSでも、誰かへの一通のメッセージでもいい。<strong>「こうなりたい」を一文にする</strong>ことが、魔法の最初のトリガーになります。'
+      },
+      {
+        id: 2,
+        name: '女教皇 - The High Priestess',
+        keyword: '直感／静かな確信',
+        main: '本当は、もう気づいているはず。「この人」「この場所」「この働き方は、少し違うかもしれない」と。',
+        sub: '表面の正しさよりも、心のざわつきを大切に。今日は少しだけ静かな時間をつくって、<strong>「本当はどうしたい？」と自分に問いかける</strong>ことから始めてみてください。'
+      },
+      {
+        id: 3,
+        name: '女帝 - The Empress',
+        keyword: '愛／受け取ること',
+        main: '「与えること」に慣れすぎて、自分が受け取ることに遠慮していませんか？',
+        sub: '優しさを配るだけでなく、<strong>あなた自身も大切にされていい存在</strong>です。今日は「ありがとう」と言われたとき、否定せずにそのまま受け取ってみて。そこから関係性が少しずつ変わります。'
+      },
+      {
+        id: 4,
+        name: '皇帝 - The Emperor',
+        keyword: '責任／軸を立てる',
+        main: '誰かの期待やルールの中でがんばりすぎて、「自分のルール」を見失っていませんか？',
+        sub: '今、必要なのは反抗ではなく、<strong>あなた自身の基準を決め直すこと</strong>です。「これはイヤ」「これは大事」を書き出してみて。そこから、あなたの王国が始まります。'
+      },
+      {
+        id: 5,
+        name: '法王 - The Hierophant',
+        keyword: '学び／信頼できるつながり',
+        main: '一人で抱え込んでいる悩みは、「分かち合うこと」でやわらいでいきます。',
+        sub: '信頼できる人に相談する、本や講座で学ぶ。どんな形でもかまいません。<strong>あなたの心に灯りをともしてくれる言葉</strong>を探しに行ってみてください。'
+      },
+      {
+        id: 6,
+        name: '恋人 - The Lovers',
+        keyword: '選択／心が震えるほう',
+        main: 'どちらも捨てがたい選択肢。けれど、本当は心のどこかでもう答えは出ているのかもしれません。',
+        sub: '「正しいほう」ではなく、<strong>長く続けたときに、自分を誇れるほう</strong>を選んでみて。恋も、仕事も、あなたの魂が喜ぶ選択が、未来のあなたを助けます。'
+      },
+      {
+        id: 7,
+        name: '戦車 - The Chariot',
+        keyword: '前進／突破',
+        main: '今のあなたには、もう十分な勢いがあります。あとは、迷いを“燃料”に変えるだけ。',
+        sub: '「どうせ無理」と思ったときこそ、<strong>小さな行動を1つだけ追加</strong>してみてください。その一歩が、止まって見えた現状を一気に動かします。'
+      },
+      {
+        id: 8,
+        name: '力 - Strength',
+        keyword: '優しさの強さ／自分を責めない力',
+        main: 'あなたの強さは、歯を食いしばることではなく「弱さを抱きしめてあげられる優しさ」にあります。',
+        sub: 'できなかったことよりも、<strong>今日できた小さなことを褒めてあげて</strong>ください。その積み重ねが、静かな自信になっていきます。'
+      },
+      {
+        id: 9,
+        name: '隠者 - The Hermit',
+        keyword: '内省／ひとりの時間',
+        main: '人とのつながりの中で、少し疲れが溜まっていませんか？',
+        sub: '今日は少しだけ、スマホと距離を置いてみてもいいかもしれません。静かな時間の中で、<strong>「本当は何に傷ついていたのか」</strong>を見つめることが、次の一歩のヒントになります。'
+      },
+      {
+        id: 10,
+        name: '運命の輪 - Wheel of Fortune',
+        keyword: '転機／流れの変化',
+        main: '最近起きた「予定外のこと」は、ただのトラブルではなく、運命の方向転換かもしれません。',
+        sub: 'うまくいかなかったことも、あとから振り返れば必要なズレだったと気づくはず。<strong>「この変化から何を学べる？」</strong>と問いかけてみてください。そこにチャンスが隠れています。'
+      },
+      {
+        id: 11,
+        name: '正義 - Justice',
+        keyword: 'バランス／決断',
+        main: 'どこかで「自分ばかり損している」と感じていませんか？',
+        sub: '天秤を取り戻すためには、<strong>NOと言う勇気</strong>も必要です。丁寧に、でもはっきりと。あなたの心を守ることは、わがままではありません。'
+      },
+      {
+        id: 12,
+        name: '吊るされた男 - The Hanged Man',
+        keyword: '一時停止／視点の反転',
+        main: '今の停滞は、宇宙からの「小休止」のサインかもしれません。',
+        sub: '動けない時期は、<strong>見方を変えるための準備期間</strong>です。「なぜ止められているのか？」ではなく、「今だからこそできることは？」と考えてみてください。'
+      },
+      {
+        id: 13,
+        name: '死神 - Death',
+        keyword: '終わりと始まり／手放し',
+        main: '終わりは、罰ではなく「更新通知」です。古いページを閉じるからこそ、新しい物語が開きます。',
+        sub: 'つらい出来事の中でも、<strong>もう自分には合わなくなったもの</strong>が見えてくるはず。そこに気づけたあなたは、すでに再生のステージに立っています。'
+      },
+      {
+        id: 14,
+        name: '節制 - Temperance',
+        keyword: '調和／ちょうどよさ',
+        main: 'がんばりすぎと、なまけすぎ。その真ん中に、あなたの心地よいリズムがあります。',
+        sub: '今日は「やること」と同じくらい、<strong>「やらないこと」を決めてみて</strong>ください。心と体のペースを整えることで、運もゆっくり整っていきます。'
+      },
+      {
+        id: 15,
+        name: '悪魔 - The Devil',
+        keyword: '執着／やめられないもの',
+        main: '頭では分かっているのに、やめられない。それはあなたの意思が弱いからではありません。',
+        sub: 'その行動は、何かの「代わり」になっているのかもしれません。<strong>本当に満たしたいのは何か</strong>を見つめることが、鎖をほどく第一歩です。'
+      },
+      {
+        id: 16,
+        name: '塔 - The Tower',
+        keyword: '崩壊／リセット',
+        main: '突然の出来事で、足元がぐらついているかもしれません。でも、崩れたのは「本当に必要な土台」ではないはずです。',
+        sub: 'ショックの中にこそ、<strong>本当は守りたかったもの</strong>がはっきりと浮かび上がります。そこから、あなたの新しい塔を建て直すことができます。'
+      },
+      {
+        id: 17,
+        name: '星 - The Star',
+        keyword: '希望／静かな光',
+        main: '今はまだ現実が追いついていなくても、心のどこかで「きっと大丈夫」と感じていませんか？',
+        sub: 'その感覚こそが、あなたの星から届いているサインです。すぐに結果が出なくても、<strong>少しだけ信じ続けること</strong>が、未来の光をつなぎます。'
+      },
+      {
+        id: 18,
+        name: '月 - The Moon',
+        keyword: '不安／揺れる心',
+        main: '答えの見えない夜道を歩いているような、不安と迷いの中にいるのかもしれません。',
+        sub: '不安は、あなたを守ろうとする心のアラームでもあります。<strong>「いま、何がいちばん怖い？」</strong>と紙に書き出してみて。言葉にした瞬間、影は少しだけ小さくなります。'
+      },
+      {
+        id: 19,
+        name: '太陽 - The Sun',
+        keyword: '喜び／祝福',
+        main: 'あなたの中の「子どものような無邪気さ」が、もう一度世界を信じてみたいと願っています。',
+        sub: '遠慮せずに、<strong>やってみたいことを一つだけ選んで</strong>みてください。それが小さくても、心から楽しいと思えるなら、その選択はきっと正解です。'
+      },
+      {
+        id: 20,
+        name: '審判 - Judgement',
+        keyword: '再スタート／呼びかけ',
+        main: '過去に一度あきらめたこと、封印した気持ちが、もう一度あなたを呼び起こそうとしています。',
+        sub: '「もう遅い」と切り捨てた夢に、もう一度だけ光を当ててみて。<strong>今のあなたなら、違う形で叶えられる</strong>可能性があります。'
+      },
+      {
+        id: 21,
+        name: '世界 - The World',
+        keyword: '完成／次のステージへ',
+        main: 'ひとつのサイクルが静かにまとまり、あなたは次の段階へ進む準備が整いつつあります。',
+        sub: 'ここまで歩いてきた自分を、ちゃんと労ってあげてください。<strong>「がんばったね」と自分に言うこと</strong>が、新しい世界への扉をひらく合図になります。'
+      }
+    ];
+
+    const startBtn = document.getElementById('startReadingBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const cardImg = document.getElementById('cardImage');
+    const cardPlaceholder = document.getElementById('cardPlaceholder');
+    const cardName = document.getElementById('cardName');
+    const cardKeyword = document.getElementById('cardKeyword');
+    const resultBlock = document.getElementById('resultBlock');
+    const resultMain = document.getElementById('resultMain');
+    const resultSub = document.getElementById('resultSub');
+
+    function drawCard() {
+      const index = Math.floor(Math.random() * cards.length);
+      const card = cards[index];
+
+      // 画像設定
+      const imgPath = `images/card${card.id}.png`;
+      cardImg.classList.remove('is-visible');
+      cardImg.onload = () => {
+        cardImg.classList.add('is-visible');
+      };
+      cardImg.onerror = () => {
+        // 画像が無いときはプレースホルダーのまま
+        cardImg.classList.remove('is-visible');
+      };
+      cardImg.src = imgPath;
+      cardImg.alt = `${card.name} のカード画像`;
+      cardPlaceholder.style.display = 'none';
+
+      // テキスト
+      cardName.textContent = card.name;
+      cardKeyword.textContent = card.keyword;
+      resultMain.textContent = card.main;
+      resultSub.innerHTML = card.sub;
+
+      // 結果ブロック表示
+      resultBlock.hidden = false;
+      requestAnimationFrame(() => {
+        resultBlock.classList.add('is-visible');
+      });
+
+      // ボタン制御
+      startBtn.disabled = true;
+      resetBtn.disabled = false;
+    }
+
+    function resetReading() {
+      // 画像リセット（ソフトリセット）
+      cardImg.classList.remove('is-visible');
+      cardImg.removeAttribute('src');
+      cardImg.alt = 'タロットカード';
+      cardPlaceholder.style.display = 'block';
+
+      // テキストリセット
+      cardName.textContent = 'カードはまだ伏せられています';
+      cardKeyword.textContent = '深呼吸をして「星詠を始める」を押してください';
+
+      // 結果非表示
+      resultBlock.classList.remove('is-visible');
+      setTimeout(() => {
+        resultBlock.hidden = true;
+        resultMain.textContent = '';
+        resultSub.textContent = '';
+      }, 200);
+
+      // ボタン制御
+      startBtn.disabled = false;
+      resetBtn.disabled = true;
+    }
+
+    startBtn.addEventListener('click', drawCard);
+    resetBtn.addEventListener('click', resetReading);
+  </script>
+</body>
+</html>
