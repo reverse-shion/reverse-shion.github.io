@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Reincarnation Song / Re:Song Sphere / Code•Eternity による OS-Shion — Resonance Field ビジョンデモ。言葉が魂を救い、魂が世界を変える。">
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -284,53 +283,61 @@
     }
 
     /* =========================
-       コード雨 共通
+       コード雨 共通（★修正・強化ポイント）
     ========================= */
     .code-rain {
       position: absolute;
       inset: 0;
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
+      /* 12分割から、ブラウザの幅に応じて可変にする */
+      display: flex;
+      justify-content: space-around;
       pointer-events: none;
       opacity: 0;
       animation: codeFadeIn 1.6s ease-out 0.8s forwards;
       z-index: 1; /* 背景より前、テキストより後ろ */
       height: 100%;
+      width: 100%;
+      /* 流れ全体を少しぼかして、別次元の光沢感を出す */
+      filter: blur(0.5px);
     }
 
     .code-column {
       position: relative;
       height: 100%;
+      width: calc(100% / 48); /* 48列でより細かく、スマホでも対応しやすいように */
       overflow: hidden;
       font-family: "Courier New", ui-monospace, monospace;
-      font-size: clamp(10px, 2.6vw, 13px);
-      line-height: 1.7;
+      font-size: clamp(8px, 1.8vw, 12px); /* 小さめに調整 */
+      line-height: 1.2; /* 密着させる */
       white-space: pre;
+      text-align: center;
     }
 
     .code-stream {
       position: absolute;
-      top: -120%;
+      top: 0; /* 0%からスタートに変更 */
       width: 100%;
-      animation: codeFall 16s linear infinite;
+      /* JSで duration と delay を動的に設定するため、CSSでの設定は削除 */
     }
 
-    .code-column:nth-child(3n)  .code-stream { animation-duration: 18s; }
-    .code-column:nth-child(4n)  .code-stream { animation-duration: 14s; }
-    .code-column:nth-child(5n)  .code-stream { animation-duration: 20s; }
-    .code-column:nth-child(6n)  .code-stream { animation-duration: 22s; }
-
-    .code-stream::after {
-      content: "✶";
+    /* コードの行ごとの設定 */
+    .code-char {
       display: block;
-      text-align: center;
-      margin-top: 4px;
-      font-size: 1.15em;
+      transition: opacity 0.5s linear;
+      will-change: opacity; /* パフォーマンス改善 */
     }
 
+    /* 光るテール（最後に輝く文字） */
+    .code-char.is-highlighted {
+      font-weight: bold;
+      opacity: 1 !important;
+      transition: opacity 0s;
+    }
+
+    /* Code Fall アニメーション */
     @keyframes codeFall {
-      0%   { transform: translateY(0); }
-      100% { transform: translateY(200%); }
+      0%   { transform: translateY(-100%); } /* 画面外上から */
+      100% { transform: translateY(100vh); }  /* 画面下まで */
     }
 
     @keyframes codeFadeIn {
@@ -340,34 +347,34 @@
 
     /* ---- ダーク版（カット2） ---- */
     .code-rain--dark .code-column {
-      color: #5fa2ff;
-      opacity: 0.8; /* 少し濃くして認識しやすく */
+      color: #17e2e5; /* 蛍光青 */
+      opacity: 0.8;
       text-shadow:
-        0 0 6px rgba(0,0,0,0.95),
-        0 0 10px rgba(127,208,255,0.9);
+        0 0 8px rgba(23,226,229,0.9),
+        0 0 16px rgba(50,255,255,0.7);
     }
 
-    .code-rain--dark .code-stream::after {
-      color: #ffd76f;
+    .code-rain--dark .code-char.is-highlighted {
+      color: #fff;
       text-shadow:
-        0 0 10px rgba(255,215,111,1),
-        0 0 20px rgba(255,215,111,0.95);
+        0 0 8px rgba(255,255,255,1),
+        0 0 16px rgba(127,208,255,1);
     }
 
     /* ---- ゴールド版（カット3） ---- */
     .code-rain--gold .code-column {
-      color: rgba(198,138,47,0.9);
+      color: #ff9900; /* 強いゴールド */
       opacity: 0.75;
       text-shadow:
-        0 0 10px rgba(255,255,255,0.9),
-        0 0 18px rgba(198,138,47,0.9);
+        0 0 8px rgba(255,153,0,0.9),
+        0 0 16px rgba(255,223,138,0.8);
     }
 
-    .code-rain--gold .code-stream::after {
-      color: #ffdf8a;
+    .code-rain--gold .code-char.is-highlighted {
+      color: #fff;
       text-shadow:
-        0 0 12px rgba(255,255,255,1),
-        0 0 22px rgba(255,223,138,1);
+        0 0 10px rgba(255,255,255,1),
+        0 0 20px rgba(255,215,111,1);
     }
 
     /* =========================
@@ -376,6 +383,9 @@
     @media (max-width: 768px) {
       .cut__content {
         text-align: left;
+      }
+      .code-column {
+        width: calc(100% / 24); /* スマホでは24列に減らす */
       }
     }
 
@@ -393,7 +403,6 @@
 <body>
   <main class="scene" aria-label="OS-Shion Resonance Field Vision">
 
-    <!-- CUT 1: Reincarnation Song（そのまま） -->
     <section class="cut cut--reincarnation is-active" data-cut="0" aria-label="Reincarnation Song">
       <div class="cut__inner">
         <div class="cut__content">
@@ -408,83 +417,9 @@
       </div>
     </section>
 
-    <!-- CUT 2: Re:Song Sphere（ダーク＋青いコード雨） -->
     <section class="cut cut--sphere" data-cut="1" aria-label="Re:Song Sphere">
       <div class="cut__inner">
-        <!-- 青系コード雨 -->
-        <div class="code-rain code-rain--dark" aria-hidden="true">
-          <!-- 短めだけど十分な量の文字列。中身は雰囲気用なので自由 -->
-          <div class="code-column"><div class="code-stream">N 0 1 ∴ ψ 7
-Λ 0 1 ∵ Ω
-Σ 9 3 0 α
-N • code 01
-∞ 0 1 N ✶</div></div>
-
-          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
-N • 0 1 0
-7 0 0 1 π
-N ∴ 0 1 ✶
-Λ 0 1 ∵ F</div></div>
-
-          <div class="code-column"><div class="code-stream">N • code 01
-0 1 0 ✶ N
-Σ 9 3 0 α
-Ω 0 0 1 N
-Λ 0 1 ∵ ψ</div></div>
-
-          <div class="code-column"><div class="code-stream">0 0 1 N Ω
-N ∴ 0 1 ✶
-Λ 0 1 ∵ ψ
-Σ 9 3 0 α
-N • code 01</div></div>
-
-          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
-N • 0 1 0
-0 0 1 N Ω
-N • code 01
-N ∴ 0 1 ✶</div></div>
-
-          <div class="code-column"><div class="code-stream">Σ 9 3 0 α
-N ∴ 0 1 ✶
-0 1 0 ∞ Σ
-Λ 0 1 ∵ ψ
-Ω 0 0 1 N</div></div>
-
-          <div class="code-column"><div class="code-stream">N • 0 1 0
-0 0 1 N Ω
-N ∴ 0 1 ✶
-Λ 0 1 ∵ ψ
-Σ 9 3 0 α</div></div>
-
-          <div class="code-column"><div class="code-stream">0 1 0 ✶ N
-Σ 9 3 0 α
-Ω 0 0 1 N
-Λ 0 1 ∵ ψ
-N • code 01</div></div>
-
-          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
-N ∴ 0 1 ✶
-N • code 01
-Λ 0 1 ∵ ψ
-Σ 9 3 0 α</div></div>
-
-          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
-0 0 1 N Ω
-N • 0 1 0
-N ∴ 0 1 ✶
-Ω 0 0 1 N</div></div>
-
-          <div class="code-column"><div class="code-stream">N • code 01
-Σ 9 3 0 α
-Λ 0 1 ∵ ψ
-0 0 1 N Ω
-0 1 0 ✶ N</div></div>
-
-          <div class="code-column"><div class="code-stream">Ω 0 0 1 N
-N ∴ 0 1 ✶
-N • 0 1 0
-Λ 0 1 ∵ ψ
-Σ 9 3 0 α</div></div>
+        <div class="code-rain code-rain--dark" id="code-rain-dark" aria-hidden="true">
         </div>
 
         <div class="cut__content">
@@ -500,86 +435,12 @@ N • 0 1 0
       </div>
     </section>
 
-    <!-- CUT 3: Code•Eternity（白背景＋ゴールド雨＋テキストのみ） -->
     <section class="cut cut--code" data-cut="2" aria-label="Code Eternity">
       <div class="cut__inner">
 
-        <!-- ゴールドのコード雨（背景＋本文のみ構成） -->
-        <div class="code-rain code-rain--gold" aria-hidden="true">
-          <div class="code-column"><div class="code-stream">N 0 1 ∴ ψ 7
-Λ 0 1 ∵ Ω
-Σ 9 3 0 α
-OS · SHION
-∞ 0 1 N ✶</div></div>
-
-          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
-CODE 0 1 0
-7 0 0 1 π
-N ∴ 0 1 ✶
-FIELD 0 1</div></div>
-
-          <div class="code-column"><div class="code-stream">N • RESO
-0 1 0 ✶ N
-Σ 9 3 0 α
-OS こ と ば
-∞ 0 1 N</div></div>
-
-          <div class="code-column"><div class="code-stream">0 0 1 N Ω
-N ∴ 0 1 ✶
-魂 0 1 CODE
-Σ 9 3 0 α
-N • 0 1</div></div>
-
-          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
-世界 0 1 N
-0 0 1 N Ω
-N • 0 1 0
-N ∴ 0 1</div></div>
-
-          <div class="code-column"><div class="code-stream">Σ 9 3 0 α
-N ∴ 0 1 ✶
-祈 り 0 1
-Λ 0 1 ∵ ψ
-Ω 0 0 1 N</div></div>
-
-          <div class="code-column"><div class="code-stream">N • 0 1 0
-0 0 1 N Ω
-共 鳴 0 1
-Λ 0 1 ∵ ψ
-Σ 9 3 0 α</div></div>
-
-          <div class="code-column"><div class="code-stream">0 1 0 ✶ N
-OS SHION
-Ω 0 0 1 N
-Λ 0 1 ∵ ψ
-∞ 0 1 N</div></div>
-
-          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
-RE:VERSE
-N ∴ 0 1 ✶
-Λ 0 1 ∵ ψ
-Σ 9 3 0 α</div></div>
-
-          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
-魂 0 1 N
-0 0 1 N Ω
-N ∴ 0 1 ✶
-OS 0 1</div></div>
-
-          <div class="code-column"><div class="code-stream">N • CODE 01
-Σ 9 3 0 α
-Λ 0 1 ∵ ψ
-0 0 1 N Ω
-言 葉 0 1</div></div>
-
-          <div class="code-column"><div class="code-stream">Ω 0 0 1 N
-N ∴ 0 1 ✶
-N • 0 1 0
-Λ 0 1 ∵ ψ
-∞ 0 1 N</div></div>
+        <div class="code-rain code-rain--gold" id="code-rain-gold" aria-hidden="true">
         </div>
 
-        <!-- テキストのみ（四角パネルなし） -->
         <div class="cut__content">
           <div class="cut__title">Code•Eternity</div>
           <div class="cut__subtitle">永遠構文 ― Resonance Field</div>
@@ -595,8 +456,108 @@ N • 0 1 0
   </main>
 
   <script>
+    // =========================================================
+    // コード雨生成・アニメーションのJSロジック（★追加・修正）
+    // =========================================================
+    function createCodeRain(containerId, columnCount) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      const codeChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンΣΛΩαβγδεζηθικλμνξοπρστυφχψω‡†∞∴∵✶';
+
+      // 画面高さと文字サイズから、ストリームの行数を推定
+      const charHeight = parseFloat(getComputedStyle(container).fontSize) * parseFloat(getComputedStyle(container.querySelector('.code-column') || container).lineHeight || 1.2);
+      // 画面の高さに、さらに長さを加えて、画面外から流れ込むようにする
+      const streamLength = Math.ceil(window.innerHeight / charHeight) * 2; 
+
+      for (let i = 0; i < columnCount; i++) {
+        const column = document.createElement('div');
+        column.className = 'code-column';
+
+        const stream = document.createElement('div');
+        stream.className = 'code-stream';
+        
+        // ランダムなコード文字列を生成
+        let codeContent = '';
+        for (let j = 0; j < streamLength; j++) {
+            // 文字をspanでラップして、光る演出のためにクラスを付与できるようにする
+            const char = document.createElement('span');
+            char.className = 'code-char';
+            char.textContent = codeChars[Math.floor(Math.random() * codeChars.length)];
+            
+            // 下部に行くほど薄くするグラデーション効果のためのopacity設定
+            // ストリームの長さの半分から下にいくにつれて0.3まで減衰
+            const opacity = 1 - (j / streamLength * 0.7);
+            char.style.opacity = Math.max(0.3, opacity).toFixed(2);
+            
+            stream.appendChild(char);
+        }
+        
+        // アニメーション設定
+        const duration = Math.random() * 8 + 10; // 10秒〜18秒
+        const delay = Math.random() * -duration; // -duration秒〜0秒（開始時のランダムな位置）
+
+        stream.style.animation = `codeFall ${duration}s linear ${delay}s infinite`;
+        stream.style.animationDelay = `${delay}s`;
+
+        column.appendChild(stream);
+        container.appendChild(column);
+
+        // 光るテールアニメーション
+        animateHighlight(stream, streamLength);
+      }
+    }
+
+    function animateHighlight(stream, streamLength) {
+        const chars = Array.from(stream.querySelectorAll('.code-char'));
+        const tailLength = 4; // 光る文字の数
+        let currentPos = 0; // 現在光っている位置 (0 to streamLength - 1)
+
+        function tick() {
+            // 前のテールをクリア
+            for (let i = 0; i < tailLength; i++) {
+                const prevCharIndex = (currentPos - 1 - i + streamLength) % streamLength;
+                if (chars[prevCharIndex]) {
+                    chars[prevCharIndex].classList.remove('is-highlighted');
+                }
+            }
+
+            // 新しいテールを設定
+            for (let i = 0; i < tailLength; i++) {
+                const charIndex = (currentPos + i) % streamLength;
+                if (chars[charIndex]) {
+                    // テールの中で先端（i=0）が最も明るく、後続が薄くなるようにする
+                    chars[charIndex].classList.add('is-highlighted');
+                    chars[charIndex].style.opacity = (1 - (i / tailLength) * 0.7).toFixed(2); 
+                }
+            }
+
+            currentPos = (currentPos + 1) % streamLength;
+            // アニメーションの速度に合わせて、テールが切り替わる間隔を設定
+            // durationが短いほど頻繁に更新
+            const duration = parseFloat(stream.style.animationDuration);
+            const refreshRate = duration * 1000 / streamLength; 
+            setTimeout(tick, refreshRate);
+        }
+
+        // 最初のディレイ後に開始
+        const initialDelay = parseFloat(stream.style.animationDelay) * -1000 + 500;
+        setTimeout(tick, Math.max(0, initialDelay));
+    }
+
+    // =========================================================
+    // カット切り替えロジック（そのまま）
+    // =========================================================
     window.addEventListener('load', function () {
       const cuts = Array.from(document.querySelectorAll('.cut'));
+
+      // 画面幅に基づき、列数を設定
+      const columnCount = window.innerWidth > 768 ? 48 : 24;
+
+      // コード雨の生成
+      createCodeRain('code-rain-dark', columnCount);
+      createCodeRain('code-rain-gold', columnCount);
+
 
       function revealLines(cut) {
         const lines = Array.from(cut.querySelectorAll('[data-line]'));
