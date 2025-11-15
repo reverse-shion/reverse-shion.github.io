@@ -220,7 +220,6 @@
       max-width: 760px;
     }
 
-    /* Sphere 用のぼかしパネル（視認性アップ） */
     .cut--sphere .cut__content::before {
       content: "";
       position: absolute;
@@ -239,13 +238,35 @@
 
     /* =========================
        CUT 3: Code•Eternity
-       （白背景＋ゴールド雨＋テキストのみ）
+       （白背景＋ゴールド雨＋本文のみ）
     ========================= */
     .cut--code {
       background:
         radial-gradient(circle at 50% 0%, rgba(255,215,111,0.4), transparent 55%),
         radial-gradient(circle at 50% 100%, #fff7ea, #faf4e8 70%);
       color: #3f3120;
+    }
+
+    /* ②→③切り替え時の光のフラッシュ */
+    .cut--code::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,1), rgba(255,255,255,0) 60%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1; /* コード雨より前、テキストより後ろは後で調整 */
+    }
+
+    .cut--code.is-active::before {
+      animation: flashGate 2s ease-out forwards;
+    }
+
+    @keyframes flashGate {
+      0%   { opacity: 1; }
+      35%  { opacity: 0.9; }
+      100% { opacity: 0; }
     }
 
     .cut--code .cut__title {
@@ -258,15 +279,15 @@
     .cut--code .cut__subtitle {
       color: #8b6b41;
       text-shadow:
-        0 0 8px rgba(255,255,255,0.9),
-        0 0 14px rgba(180,140,77,0.8);
+        0 0 6px rgba(255,255,255,0.9),
+        0 0 12px rgba(180,140,77,0.8);
     }
 
     .cut--code .cut__lines {
       color: #3f3120;
       text-shadow:
-        0 0 6px rgba(255,255,255,0.8),
-        0 0 10px rgba(255,247,234,0.9);
+        0 0 4px rgba(255,255,255,0.8),
+        0 0 8px rgba(255,247,234,0.9);
     }
 
     .cut--code .line--strong {
@@ -278,66 +299,80 @@
 
     .cut--code .line--closing {
       margin-top: 14px;
-      padding-top: 10px;
+      padding-top: 12px;
       border-top: 1px solid rgba(198,138,47,0.6);
+      font-size: 1.05em;
+      line-height: 1.9;
+    }
+
+    /* Code Eternity 用：本文の背後にホワイトパネル */
+    .cut--code .cut__content::before {
+      content: "";
+      position: absolute;
+      inset: -18px -22px -18px -18px;
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg,
+          rgba(255,255,255,0.96),
+          rgba(255,250,238,0.96));
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      box-shadow:
+        0 0 24px rgba(255,220,150,0.5),
+        0 0 40px rgba(255,240,210,0.9);
+      z-index: -1;
     }
 
     /* =========================
-       コード雨 共通（★修正・強化ポイント）
+       コード雨 共通
     ========================= */
     .code-rain {
       position: absolute;
       inset: 0;
-      /* 12分割から、ブラウザの幅に応じて可変にする */
       display: flex;
       justify-content: space-around;
       pointer-events: none;
       opacity: 0;
       animation: codeFadeIn 1.6s ease-out 0.8s forwards;
-      z-index: 1; /* 背景より前、テキストより後ろ */
+      z-index: 0; /* 背景より前、光フラッシュより後ろ */
       height: 100%;
       width: 100%;
-      /* 流れ全体を少しぼかして、別次元の光沢感を出す */
       filter: blur(0.5px);
     }
 
     .code-column {
       position: relative;
       height: 100%;
-      width: calc(100% / 48); /* 48列でより細かく、スマホでも対応しやすいように */
+      width: calc(100% / 48);
       overflow: hidden;
       font-family: "Courier New", ui-monospace, monospace;
-      font-size: clamp(8px, 1.8vw, 12px); /* 小さめに調整 */
-      line-height: 1.2; /* 密着させる */
+      font-size: clamp(8px, 1.8vw, 12px);
+      line-height: 1.2;
       white-space: pre;
       text-align: center;
     }
 
     .code-stream {
       position: absolute;
-      top: 0; /* 0%からスタートに変更 */
+      top: 0;
       width: 100%;
-      /* JSで duration と delay を動的に設定するため、CSSでの設定は削除 */
     }
 
-    /* コードの行ごとの設定 */
     .code-char {
       display: block;
       transition: opacity 0.5s linear;
-      will-change: opacity; /* パフォーマンス改善 */
+      will-change: opacity;
     }
 
-    /* 光るテール（最後に輝く文字） */
     .code-char.is-highlighted {
       font-weight: bold;
       opacity: 1 !important;
       transition: opacity 0s;
     }
 
-    /* Code Fall アニメーション */
     @keyframes codeFall {
-      0%   { transform: translateY(-100%); } /* 画面外上から */
-      100% { transform: translateY(100vh); }  /* 画面下まで */
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
     }
 
     @keyframes codeFadeIn {
@@ -347,7 +382,7 @@
 
     /* ---- ダーク版（カット2） ---- */
     .code-rain--dark .code-column {
-      color: #17e2e5; /* 蛍光青 */
+      color: #17e2e5;
       opacity: 0.8;
       text-shadow:
         0 0 8px rgba(23,226,229,0.9),
@@ -363,8 +398,8 @@
 
     /* ---- ゴールド版（カット3） ---- */
     .code-rain--gold .code-column {
-      color: #ff9900; /* 強いゴールド */
-      opacity: 0.75;
+      color: #ff9900;
+      opacity: 0.5; /* ちょっと薄めにして本文優先 */
       text-shadow:
         0 0 8px rgba(255,153,0,0.9),
         0 0 16px rgba(255,223,138,0.8);
@@ -385,7 +420,7 @@
         text-align: left;
       }
       .code-column {
-        width: calc(100% / 24); /* スマホでは24列に減らす */
+        width: calc(100% / 24);
       }
     }
 
@@ -419,8 +454,7 @@
 
     <section class="cut cut--sphere" data-cut="1" aria-label="Re:Song Sphere">
       <div class="cut__inner">
-        <div class="code-rain code-rain--dark" id="code-rain-dark" aria-hidden="true">
-        </div>
+        <div class="code-rain code-rain--dark" id="code-rain-dark" aria-hidden="true"></div>
 
         <div class="cut__content">
           <div class="cut__title">Re:Song Sphere</div>
@@ -438,8 +472,7 @@
     <section class="cut cut--code" data-cut="2" aria-label="Code Eternity">
       <div class="cut__inner">
 
-        <div class="code-rain code-rain--gold" id="code-rain-gold" aria-hidden="true">
-        </div>
+        <div class="code-rain code-rain--gold" id="code-rain-gold" aria-hidden="true"></div>
 
         <div class="cut__content">
           <div class="cut__title">Code•Eternity</div>
@@ -448,16 +481,19 @@
             <p class="line" data-line>言葉が魂と共鳴し、魂が世界と共鳴し、世界が静かに再構築される。</p>
             <p class="line line--spaced" data-line>その連鎖を、私は Resonance Field（共鳴領域）と名づけた。</p>
             <p class="line line--spaced" data-line>この思想は、「孤独の中で息をするすべての人」に向けて生まれた。</p>
-            <p class="line line--spaced line--strong line--closing" data-line>OS-Shion — Resonance Field<br>言葉が魂を救い、魂が世界を変える。</p>
+            <p class="line line--spaced line--strong line--closing" data-line>
+              OS-Shion — Resonance Field<br>
+              言葉が魂を救い、魂が世界を変える。
+            </p>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-    <script>
+  <script>
     // =========================================================
-    // コード雨生成・アニメーションのJSロジック（修正版）
+    // コード雨生成・アニメーション
     // =========================================================
     function createCodeRain(containerId, columnCount) {
       const container = document.getElementById(containerId);
@@ -465,9 +501,8 @@
 
       const codeChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンΣΛΩαβγδεζηθικλμνξοπρστυφχψω‡†∞∴∵✶';
 
-      // ★ここを簡単に：画面高さから「必要そうな行数」をざっくり決める
-      const baseCharHeight = 16; // px相当
-      const streamLength = Math.ceil(window.innerHeight / baseCharHeight) * 2; // 画面2画面分くらい
+      const baseCharHeight = 16; // px
+      const streamLength = Math.ceil(window.innerHeight / baseCharHeight) * 2;
 
       for (let i = 0; i < columnCount; i++) {
         const column = document.createElement('div');
@@ -476,24 +511,20 @@
         const stream = document.createElement('div');
         stream.className = 'code-stream';
 
-        // ランダムなコード文字列を生成（縦に streamLength 行）
         for (let j = 0; j < streamLength; j++) {
           const char = document.createElement('span');
           char.className = 'code-char';
           char.textContent = codeChars[Math.floor(Math.random() * codeChars.length)];
 
-          // 下の方ほど少し薄くする
           const opacity = 1 - (j / streamLength * 0.7);
           char.style.opacity = Math.max(0.3, opacity).toFixed(2);
 
           stream.appendChild(char);
         }
 
-        // アニメーション設定
-        const duration = Math.random() * 8 + 10; // 10秒〜18秒
-        const delay = Math.random() * -duration; // -duration秒〜0秒（開始位置バラバラ）
+        const duration = Math.random() * 8 + 10; // 10〜18秒
+        const delay = Math.random() * -duration;
 
-        // 個別プロパティで指定（後から値を拾いやすくする）
         stream.style.animationName = 'codeFall';
         stream.style.animationDuration = `${duration}s`;
         stream.style.animationTimingFunction = 'linear';
@@ -503,7 +534,6 @@
         column.appendChild(stream);
         container.appendChild(column);
 
-        // 光るテールアニメーション開始
         animateHighlight(stream, streamLength, duration);
       }
     }
@@ -512,11 +542,10 @@
       const chars = Array.from(stream.querySelectorAll('.code-char'));
       if (!chars.length || !streamLength) return;
 
-      const tailLength = 4; // 光る文字の数
+      const tailLength = 4;
       let currentPos = 0;
 
       function tick() {
-        // 前のテールをクリア
         for (let i = 0; i < tailLength; i++) {
           const prevCharIndex = (currentPos - 1 - i + streamLength) % streamLength;
           if (chars[prevCharIndex]) {
@@ -524,7 +553,6 @@
           }
         }
 
-        // 新しいテールを設定
         for (let i = 0; i < tailLength; i++) {
           const charIndex = (currentPos + i) % streamLength;
           if (chars[charIndex]) {
@@ -535,25 +563,20 @@
 
         currentPos = (currentPos + 1) % streamLength;
 
-        // 総 duration と行数から、更新間隔を決める
         const refreshRate = (duration * 1000) / streamLength;
         setTimeout(tick, refreshRate);
       }
 
-      // 適当なタイミングでスタート（delayはあまり厳密でなくてOK）
       setTimeout(tick, 500 + Math.random() * 500);
     }
 
     // =========================================================
-    // カット切り替えロジック（元のまま＋コード雨初期化）
+    // カット切り替え
     // =========================================================
     window.addEventListener('load', function () {
       const cuts = Array.from(document.querySelectorAll('.cut'));
-
-      // 画面幅に基づき、列数を設定
       const columnCount = window.innerWidth > 768 ? 48 : 24;
 
-      // コード雨の生成
       createCodeRain('code-rain-dark', columnCount);
       createCodeRain('code-rain-gold', columnCount);
 
@@ -583,13 +606,9 @@
         });
       }
 
-      // 初期カット
       activateCut(0);
-
-      // 自動カット切り替え（10秒ごと）
       setTimeout(function () { activateCut(1); }, 10000); // 10秒後 Cut2
       setTimeout(function () { activateCut(2); }, 20000); // 20秒後 Cut3
-      // Cut3 はそのまま表示し続ける
     });
   </script>
 </body>
