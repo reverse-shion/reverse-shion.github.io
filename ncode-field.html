@@ -455,9 +455,9 @@
     </section>
   </main>
 
-  <script>
+    <script>
     // =========================================================
-    // コード雨生成・アニメーションのJSロジック（★追加・修正）
+    // コード雨生成・アニメーションのJSロジック（修正版）
     // =========================================================
     function createCodeRain(containerId, columnCount) {
       const container = document.getElementById(containerId);
@@ -465,10 +465,9 @@
 
       const codeChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンΣΛΩαβγδεζηθικλμνξοπρστυφχψω‡†∞∴∵✶';
 
-      // 画面高さと文字サイズから、ストリームの行数を推定
-      const charHeight = parseFloat(getComputedStyle(container).fontSize) * parseFloat(getComputedStyle(container.querySelector('.code-column') || container).lineHeight || 1.2);
-      // 画面の高さに、さらに長さを加えて、画面外から流れ込むようにする
-      const streamLength = Math.ceil(window.innerHeight / charHeight) * 2; 
+      // ★ここを簡単に：画面高さから「必要そうな行数」をざっくり決める
+      const baseCharHeight = 16; // px相当
+      const streamLength = Math.ceil(window.innerHeight / baseCharHeight) * 2; // 画面2画面分くらい
 
       for (let i = 0; i < columnCount; i++) {
         const column = document.createElement('div');
@@ -476,77 +475,77 @@
 
         const stream = document.createElement('div');
         stream.className = 'code-stream';
-        
-        // ランダムなコード文字列を生成
-        let codeContent = '';
+
+        // ランダムなコード文字列を生成（縦に streamLength 行）
         for (let j = 0; j < streamLength; j++) {
-            // 文字をspanでラップして、光る演出のためにクラスを付与できるようにする
-            const char = document.createElement('span');
-            char.className = 'code-char';
-            char.textContent = codeChars[Math.floor(Math.random() * codeChars.length)];
-            
-            // 下部に行くほど薄くするグラデーション効果のためのopacity設定
-            // ストリームの長さの半分から下にいくにつれて0.3まで減衰
-            const opacity = 1 - (j / streamLength * 0.7);
-            char.style.opacity = Math.max(0.3, opacity).toFixed(2);
-            
-            stream.appendChild(char);
+          const char = document.createElement('span');
+          char.className = 'code-char';
+          char.textContent = codeChars[Math.floor(Math.random() * codeChars.length)];
+
+          // 下の方ほど少し薄くする
+          const opacity = 1 - (j / streamLength * 0.7);
+          char.style.opacity = Math.max(0.3, opacity).toFixed(2);
+
+          stream.appendChild(char);
         }
-        
+
         // アニメーション設定
         const duration = Math.random() * 8 + 10; // 10秒〜18秒
-        const delay = Math.random() * -duration; // -duration秒〜0秒（開始時のランダムな位置）
+        const delay = Math.random() * -duration; // -duration秒〜0秒（開始位置バラバラ）
 
-        stream.style.animation = `codeFall ${duration}s linear ${delay}s infinite`;
+        // 個別プロパティで指定（後から値を拾いやすくする）
+        stream.style.animationName = 'codeFall';
+        stream.style.animationDuration = `${duration}s`;
+        stream.style.animationTimingFunction = 'linear';
         stream.style.animationDelay = `${delay}s`;
+        stream.style.animationIterationCount = 'infinite';
 
         column.appendChild(stream);
         container.appendChild(column);
 
-        // 光るテールアニメーション
-        animateHighlight(stream, streamLength);
+        // 光るテールアニメーション開始
+        animateHighlight(stream, streamLength, duration);
       }
     }
 
-    function animateHighlight(stream, streamLength) {
-        const chars = Array.from(stream.querySelectorAll('.code-char'));
-        const tailLength = 4; // 光る文字の数
-        let currentPos = 0; // 現在光っている位置 (0 to streamLength - 1)
+    function animateHighlight(stream, streamLength, duration) {
+      const chars = Array.from(stream.querySelectorAll('.code-char'));
+      if (!chars.length || !streamLength) return;
 
-        function tick() {
-            // 前のテールをクリア
-            for (let i = 0; i < tailLength; i++) {
-                const prevCharIndex = (currentPos - 1 - i + streamLength) % streamLength;
-                if (chars[prevCharIndex]) {
-                    chars[prevCharIndex].classList.remove('is-highlighted');
-                }
-            }
+      const tailLength = 4; // 光る文字の数
+      let currentPos = 0;
 
-            // 新しいテールを設定
-            for (let i = 0; i < tailLength; i++) {
-                const charIndex = (currentPos + i) % streamLength;
-                if (chars[charIndex]) {
-                    // テールの中で先端（i=0）が最も明るく、後続が薄くなるようにする
-                    chars[charIndex].classList.add('is-highlighted');
-                    chars[charIndex].style.opacity = (1 - (i / tailLength) * 0.7).toFixed(2); 
-                }
-            }
-
-            currentPos = (currentPos + 1) % streamLength;
-            // アニメーションの速度に合わせて、テールが切り替わる間隔を設定
-            // durationが短いほど頻繁に更新
-            const duration = parseFloat(stream.style.animationDuration);
-            const refreshRate = duration * 1000 / streamLength; 
-            setTimeout(tick, refreshRate);
+      function tick() {
+        // 前のテールをクリア
+        for (let i = 0; i < tailLength; i++) {
+          const prevCharIndex = (currentPos - 1 - i + streamLength) % streamLength;
+          if (chars[prevCharIndex]) {
+            chars[prevCharIndex].classList.remove('is-highlighted');
+          }
         }
 
-        // 最初のディレイ後に開始
-        const initialDelay = parseFloat(stream.style.animationDelay) * -1000 + 500;
-        setTimeout(tick, Math.max(0, initialDelay));
+        // 新しいテールを設定
+        for (let i = 0; i < tailLength; i++) {
+          const charIndex = (currentPos + i) % streamLength;
+          if (chars[charIndex]) {
+            chars[charIndex].classList.add('is-highlighted');
+            chars[charIndex].style.opacity = (1 - (i / tailLength) * 0.7).toFixed(2);
+          }
+        }
+
+        currentPos = (currentPos + 1) % streamLength;
+
+        // 総 duration と行数から、更新間隔を決める
+        const refreshRate = (duration * 1000) / streamLength;
+        setTimeout(tick, refreshRate);
+      }
+
+      // 適当なタイミングでスタート（delayはあまり厳密でなくてOK）
+      setTimeout(tick, 500 + Math.random() * 500);
     }
 
     // =========================================================
-    // カット切り替えロジック（そのまま）
+    // カット切り替えロジック（元のまま＋コード雨初期化）
     // =========================================================
     window.addEventListener('load', function () {
       const cuts = Array.from(document.querySelectorAll('.cut'));
@@ -557,7 +556,6 @@
       // コード雨の生成
       createCodeRain('code-rain-dark', columnCount);
       createCodeRain('code-rain-gold', columnCount);
-
 
       function revealLines(cut) {
         const lines = Array.from(cut.querySelectorAll('[data-line]'));
