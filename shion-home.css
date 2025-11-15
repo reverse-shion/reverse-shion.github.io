@@ -165,14 +165,22 @@ body{
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.9);
   backdrop-filter: blur(10px);
-  padding: 12px 24px;
+  padding: 8px 18px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   z-index: 10;
   box-shadow: 0 2px 10px var(--shadow);
+}
+
+.nav {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .nav-logo {
@@ -180,24 +188,33 @@ body{
   font-size: 20px;
   color: var(--gold);
   text-decoration: none;
+  letter-spacing: .18em;
 }
 
 .nav-menu {
   list-style: none;
   display: flex;
-  gap: 24px;
+  gap: 20px;
+  align-items: center;
+  font-size: 13px;
 }
 
 .nav-menu a {
   text-decoration: none;
   color: var(--ink);
-  font-size: 14px;
-  letter-spacing: .1em;
+  letter-spacing: .12em;
   transition: color .2s;
 }
 
 .nav-menu a:hover {
   color: var(--gold);
+}
+
+.nav-contact a {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(224,180,79,.6);
+  background: rgba(255,252,240,0.9);
 }
 
 /* ===========================
@@ -208,13 +225,17 @@ body{
   z-index:2;
   width:100%;
   min-height:100%;
-  padding: 80px 16px 32px;
+  padding: 96px 16px 64px;
   display:flex;
   flex-direction: column;
   align-items:center;
 }
+
+/* ===========================
+   ヒーロー
+=========================== */
 .hero{
-  width:min(880px,100%);
+  width:min(960px,100%);
   border-radius:32px;
   background:
     radial-gradient(circle at 0% 0%,rgba(255,255,255,.96) 0,rgba(255,255,255,.9) 40%,rgba(255,255,255,.98) 100%),
@@ -222,8 +243,7 @@ body{
   box-shadow:0 24px 60px var(--shadow);
   padding:clamp(24px,4vw,36px);
   display:flex;
-  flex-direction:column;
-  gap:16px;
+  gap:28px;
   border:1px solid rgba(255,255,255,.9);
   backdrop-filter:blur(14px);
   opacity:0;
@@ -236,9 +256,16 @@ body{
   transform:translateY(0);
 }
 
+.hero-main{
+  flex:2;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
 /* 見出し・テキスト */
 .kicker{
-  font-size:12px;
+  font-size:11px;
   letter-spacing:.32em;
   text-transform:uppercase;
   color:rgba(30,26,26,.65);
@@ -253,24 +280,45 @@ body{
   background:linear-gradient(to right,rgba(158,133,60,0),rgba(158,133,60,1));
 }
 
+.hero-catch{
+  font-size:clamp(22px,3.4vw,26px);
+  letter-spacing:.22em;
+  color:#3a2c10;
+  font-weight:700;
+  margin-top:4px;
+  position:relative;
+}
+.hero-catch::before{
+  content:"";
+  position:absolute;
+  left:-4px;
+  top:-12px;
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff8e8 0,rgba(255,240,210,0.1) 55%,transparent 70%);
+  z-index:-1;
+}
+
 .hero-title{
   font-family:'Cinzel',serif;
-  font-size:clamp(28px,3.6vw,36px);
-  letter-spacing:.2em;
+  font-size:clamp(20px,2.5vw,24px);
+  letter-spacing:.26em;
   text-transform:uppercase;
-  color:#3a2c10;
+  color:#4b3920;
   text-shadow:
     0 0 6px rgba(255,255,255,.8),
-    0 0 18px rgba(255,215,111,.8);
+    0 0 16px rgba(255,215,111,.7);
   position:relative;
-  padding-bottom:8px;
+  padding-bottom:6px;
+  margin-top:4px;
 }
 .hero-title span.jp{
   display:block;
   font-family:'Noto Serif JP',serif;
-  font-size:16px;
+  font-size:13px;
   letter-spacing:.3em;
-  margin-top:8px;
+  margin-top:6px;
   color:rgba(30,26,26,.7);
 }
 .hero-title::after{
@@ -285,16 +333,9 @@ body{
 }
 
 .hero-lead{
-  font-size:15px;
-  line-height:1.95;
+  font-size:14px;
+  line-height:1.9;
   color:rgba(30,26,26,.85);
-}
-.hero-lead strong{
-  font-weight:700;
-  background:linear-gradient(120deg,#d4a534,#5e7cff);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
 }
 .hero-highlight{
   font-weight:700;
@@ -311,11 +352,11 @@ body{
    CTAボタン
 =========================== */
 .cta-area{
-  margin-top:24px;
+  margin-top:16px;
   display:flex;
   flex-direction:column;
-  align-items:center;
-  gap:16px;
+  align-items:flex-start;
+  gap:12px;
 }
 
 .shion-btn{
@@ -323,14 +364,14 @@ body{
   display:flex;
   flex-direction:column;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
   width:100%;
   max-width:460px;
-  margin:0 auto;
-  padding:14px 24px 12px;
+  margin:0;
+  padding:14px 22px 12px;
   border-radius:20px;
   text-decoration:none;
-  font-size:15px;
+  font-size:14px;
   letter-spacing:.18em;
   overflow:hidden;
   backdrop-filter:blur(12px);
@@ -341,7 +382,7 @@ body{
 .shion-btn .label{
   position:relative;
   z-index:2;
-  margin-bottom:4px;
+  margin-bottom:2px;
 }
 .shion-btn .hint{
   font-size:11px;
@@ -378,7 +419,7 @@ body{
 }
 
 .shion-btn.glass{
-  background:rgba(255,255,255,.55);
+  background:rgba(255,255,255,.6);
   border-color:rgba(200,200,255,.55);
   color:#574f42;
   box-shadow:
@@ -398,9 +439,10 @@ body{
 
 .shion-btn.small {
   max-width: 200px;
-  padding: 12px 20px;
-  font-size: 14px;
+  padding: 10px 18px;
+  font-size: 13px;
   flex-direction: row;
+  align-items:center;
 }
 .shion-btn.small .hint{
   display:none;
@@ -410,10 +452,10 @@ body{
    利用フロー
 =========================== */
 .flow-hints{
-  margin-top:20px;
+  margin-top:18px;
   display:flex;
   flex-wrap:wrap;
-  gap:12px;
+  gap:10px;
   justify-content:flex-start;
   font-size:11px;
 }
@@ -423,7 +465,7 @@ body{
   gap:6px;
   padding:6px 10px;
   border-radius:999px;
-  background:rgba(255,255,255,0.8);
+  background:rgba(255,255,255,0.9);
   box-shadow:0 4px 12px var(--shadow);
 }
 .flow-step{
@@ -438,6 +480,72 @@ body{
 }
 
 /* ===========================
+   ヒーロービジュアル
+=========================== */
+.hero-visual{
+  flex:1.3;
+  position:relative;
+  min-height:220px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.hero-orb{
+  position:absolute;
+  width:210px;
+  height:210px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 20%,#fffaf0 0,#fdecc5 38%,#f4d68b 62%,rgba(240,205,130,0.15) 80%,transparent 100%);
+  box-shadow:
+    0 0 40px rgba(255,230,170,.9),
+    0 30px 50px rgba(130,100,40,.35);
+  opacity:.95;
+}
+
+.hero-card{
+  position:relative;
+  width:140px;
+  height:220px;
+  border-radius:18px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.98),rgba(255,250,236,.95));
+  box-shadow:
+    0 8px 24px rgba(90,70,30,.35),
+    0 0 0 1px rgba(255,255,255,.9);
+  overflow:hidden;
+  transform:rotate(-9deg) translateY(6px);
+}
+.hero-card::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:14px;
+  border:1px solid rgba(224,180,79,.55);
+  box-shadow:0 0 18px rgba(224,180,79,.45);
+}
+.hero-card-inner{
+  position:absolute;
+  inset:22px 16px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:space-between;
+  font-family:'Cinzel',serif;
+}
+.hero-card-title{
+  font-size:15px;
+  letter-spacing:.26em;
+  color:#6a4b1c;
+}
+.hero-card-sub{
+  font-size:9px;
+  letter-spacing:.32em;
+  color:rgba(80,60,35,.8);
+}
+
+/* ===========================
    セクション共通
 =========================== */
 .section {
@@ -445,7 +553,7 @@ body{
   margin-bottom: 48px;
   padding: 24px;
   border-radius: 24px;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.95);
   box-shadow: 0 12px 30px var(--shadow);
 }
 
@@ -458,7 +566,7 @@ body{
 
 .section-title {
   font-family: 'Cinzel', serif;
-  font-size: 24px;
+  font-size: 22px;
   letter-spacing: .15em;
   color: #3a2c10;
   margin-bottom: 16px;
@@ -507,7 +615,7 @@ body{
   min-width: 220px;
   padding: 20px;
   border-radius: 16px;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.98);
   box-shadow: 0 4px 12px var(--shadow);
   text-align: center;
 }
@@ -549,12 +657,17 @@ body{
 =========================== */
 .footer {
   width: 100%;
-  padding: 24px;
+  padding: 18px 16px 22px;
   text-align: center;
-  background: rgba(255,255,255,0.8);
-  backdrop-filter: blur(10px);
+  background: #f1e3c9;
+  border-top:1px solid rgba(190,160,110,.6);
+  backdrop-filter: blur(6px);
   font-size: 13px;
-  color: rgba(30,26,26,.7);
+  color: rgba(40,32,20,.8);
+}
+
+.footer-copy{
+  letter-spacing:.12em;
 }
 
 .social-links {
@@ -562,7 +675,7 @@ body{
   display: flex;
   justify-content: center;
   gap: 16px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .social-links a {
@@ -578,31 +691,55 @@ body{
    メディアクエリ
 =========================== */
 @media (max-width:840px){
+  .header{
+    padding:8px 14px;
+  }
+  .nav{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:6px;
+  }
+  .nav-menu{
+    flex-wrap:wrap;
+    gap:12px;
+  }
   .page{
-    padding-top: 70px;
-    padding-bottom: 32px;
+    padding-top: 110px;
   }
-  .nav-menu {
-    gap: 16px;
+  .hero{
+    flex-direction:column;
   }
-  .service-cards {
-    flex-direction: column;
+  .hero-visual{
+    order:-1;
+    min-height:200px;
+  }
+  .hero-main{
+    order:1;
   }
 }
 
 @media (max-width:480px){
+  .nav-logo{
+    font-size:18px;
+  }
+  .nav-menu{
+    justify-content:flex-start;
+    font-size:12px;
+  }
+  .page{
+    padding-top: 118px;
+    padding-bottom:56px;
+  }
+  .hero{
+    padding:20px 18px;
+  }
+  .cta-area{
+    align-items:flex-start;
+  }
   .shion-btn{
     padding:12px 18px 10px;
-    font-size:14px;
+    font-size:13px;
     border-radius:18px;
-  }
-  .header {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .nav-menu {
-    flex-wrap: wrap;
-    justify-content: center;
   }
   .flow-hints{
     flex-direction:column;
