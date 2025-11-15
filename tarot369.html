@@ -60,7 +60,6 @@
       overflow: hidden;
     }
 
-    /* うっすら金色のコード風ライン */
     .page::before {
       content: "";
       position: absolute;
@@ -213,7 +212,6 @@
       margin-bottom: 14px;
     }
 
-    /* CTAボタン */
     .btn-row {
       display: flex;
       flex-wrap: wrap;
@@ -296,7 +294,11 @@
       font-size: 1rem;
     }
 
-    /* 結果パネル（カード側） */
+    .btn-sample {
+      font-size: 0.8rem;
+      padding-inline: 14px;
+    }
+
     .card-shell {
       display: flex;
       flex-direction: column;
@@ -374,6 +376,8 @@
       letter-spacing: 0.12em;
       color: rgba(0,0,0,0.6);
       text-transform: uppercase;
+      text-align: center;
+      line-height: 1.5;
     }
 
     .card-meta {
@@ -450,7 +454,6 @@
       margin-top: 4px;
     }
 
-    /* 星砂っぽい粒子（シンプル） */
     .stardust {
       position: fixed;
       inset: 0;
@@ -534,11 +537,14 @@
             <button id="resetBtn" class="btn btn-ghost" type="button" disabled>
               もう一度占う
             </button>
+            <button id="sampleBtn" class="btn btn-secondary btn-sample" type="button">
+              サンプルを見る
+            </button>
           </div>
 
           <p class="note">
-            ※占い結果は「決定事項」ではなく、選びなおすための地図です。<br>
-            もっと深く知りたい場合は、個人鑑定へ進むこともできます。
+            ※「サンプルを見る」は、実際の結果イメージを確認したい方向けのおためし表示です。<br>
+            本番の星詠は「星詠を始める」からどうぞ。
           </p>
         </div>
       </section>
@@ -608,7 +614,7 @@
         const delay = Math.random() * 12;
         const duration = 10 + Math.random() * 12;
         const left = Math.random() * 100;
-        const top = 60 + Math.random() * 40; // 下側からふわっと
+        const top = 60 + Math.random() * 40;
         s.style.left = left + 'vw';
         s.style.top = top + 'vh';
         s.style.animationDuration = duration + 's';
@@ -617,7 +623,7 @@
       }
     })();
 
-    // === タロットデータ ===
+    // === タロットデータ（詩韻版） ===
     const cards = [
       {
         id: 0,
@@ -777,6 +783,7 @@
 
     const startBtn = document.getElementById('startReadingBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
     const cardImg = document.getElementById('cardImage');
     const cardPlaceholder = document.getElementById('cardPlaceholder');
     const cardName = document.getElementById('cardName');
@@ -785,53 +792,67 @@
     const resultMain = document.getElementById('resultMain');
     const resultSub = document.getElementById('resultSub');
 
-    function drawCard() {
-      const index = Math.floor(Math.random() * cards.length);
-      const card = cards[index];
+    function renderCard(card, options = { isSample: false }) {
+      const { isSample } = options;
 
-      // 画像設定
       const imgPath = `images/card${card.id}.png`;
       cardImg.classList.remove('is-visible');
+
       cardImg.onload = () => {
         cardImg.classList.add('is-visible');
       };
       cardImg.onerror = () => {
-        // 画像が無いときはプレースホルダーのまま
+        // 画像がない場合、プレースホルダー表示のまま
         cardImg.classList.remove('is-visible');
       };
       cardImg.src = imgPath;
       cardImg.alt = `${card.name} のカード画像`;
       cardPlaceholder.style.display = 'none';
 
-      // テキスト
       cardName.textContent = card.name;
       cardKeyword.textContent = card.keyword;
       resultMain.textContent = card.main;
-      resultSub.innerHTML = card.sub;
 
-      // 結果ブロック表示
+      if (isSample) {
+        resultSub.innerHTML = card.sub +
+          '<br><br><strong style="font-size:0.78rem;">※これはサンプルです。実際の星詠は「星詠を始める」から行ってください。</strong>';
+      } else {
+        resultSub.innerHTML = card.sub;
+      }
+
       resultBlock.hidden = false;
       requestAnimationFrame(() => {
         resultBlock.classList.add('is-visible');
       });
+    }
 
-      // ボタン制御
+    function drawCard() {
+      const index = Math.floor(Math.random() * cards.length);
+      const card = cards[index];
+
+      renderCard(card, { isSample: false });
+
       startBtn.disabled = true;
       resetBtn.disabled = false;
     }
 
+    function showSample() {
+      // サンプルは「星」のカードを固定表示（なければ0番）
+      const sampleCard = cards.find(c => c.id === 17) || cards[0];
+      renderCard(sampleCard, { isSample: true });
+      resetBtn.disabled = false;
+      // 星詠本番ボタンはそのまま有効（安心して押せるように）
+    }
+
     function resetReading() {
-      // 画像リセット（ソフトリセット）
       cardImg.classList.remove('is-visible');
       cardImg.removeAttribute('src');
       cardImg.alt = 'タロットカード';
       cardPlaceholder.style.display = 'block';
 
-      // テキストリセット
       cardName.textContent = 'カードはまだ伏せられています';
       cardKeyword.textContent = '深呼吸をして「星詠を始める」を押してください';
 
-      // 結果非表示
       resultBlock.classList.remove('is-visible');
       setTimeout(() => {
         resultBlock.hidden = true;
@@ -839,13 +860,13 @@
         resultSub.textContent = '';
       }, 200);
 
-      // ボタン制御
       startBtn.disabled = false;
       resetBtn.disabled = true;
     }
 
     startBtn.addEventListener('click', drawCard);
     resetBtn.addEventListener('click', resetReading);
+    sampleBtn.addEventListener('click', showSample);
   </script>
 </body>
 </html>
