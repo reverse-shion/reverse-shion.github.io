@@ -86,10 +86,10 @@
     .cut__lines {
       font-size: clamp(13px, 3.3vw, 18px);
       line-height: 1.8;
-      color: #f7f5f2;
+      color: #fdfaf3;
       text-shadow:
-        0 0 10px rgba(0,0,0,0.9),
-        0 0 18px rgba(5,12,24,0.85);
+        0 0 6px rgba(0,0,0,0.8),
+        0 0 16px rgba(5,12,24,0.85);
     }
 
     .line {
@@ -244,10 +244,10 @@
         0 0 30px rgba(255,215,111,0.6),
         0 0 120px rgba(127,208,255,0.75);
       opacity: 0.96;
-      z-index: 0; /* 一番奥 */
+      z-index: 0;
     }
 
-    /* 内側のライン（その手前） */
+    /* 内側のライン */
     .cut--code::after {
       content: "";
       position: absolute;
@@ -263,7 +263,42 @@
       z-index: 1;
     }
 
-    /* N-code 雨（神殿の上・文字の下） */
+    /* ── Code•Eternity 用：本文の背後を少し暗く＆ぼかして視認性UP ── */
+    .cut--code .cut__content::before {
+      content: "";
+      position: absolute;
+      inset: -18px -22px -18px -18px;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(255,215,111,0.16), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(127,208,255,0.2), transparent 55%),
+        rgba(4,8,20,0.78);
+      box-shadow:
+        0 0 24px rgba(0,0,0,0.85),
+        0 0 40px rgba(10,20,40,0.9);
+      opacity: 0.96;
+      z-index: -1;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+
+    /* 本文を少し発光させる（Code•Eternity だけほんのり強く） */
+    .cut--code .cut__lines {
+      text-shadow:
+        0 0 10px rgba(0,0,0,0.95),
+        0 0 18px rgba(5,12,24,0.95),
+        0 0 12px rgba(255,255,255,0.25);
+      color: #fefbf4;
+    }
+
+    .cut--code .line--strong {
+      color: #ffe48e;
+      text-shadow:
+        0 0 14px rgba(255,215,111,1),
+        0 0 30px rgba(255,215,111,0.95);
+    }
+
+    /* N-code 雨（神聖で控えめ） */
     .code-rain {
       position: absolute;
       inset: 0;
@@ -274,8 +309,7 @@
       opacity: 0;
       animation: codeFadeIn 1.6s ease-out 0.8s forwards;
       z-index: 2; /* 神殿より前、テキストより後ろ */
-      /* gridコンテナは画面全体を覆う */
-      width: 100%;
+      /* 画面全体を確実に覆うために高さも明示 */
       height: 100%;
     }
 
@@ -284,28 +318,28 @@
       height: 100%;
       overflow: hidden;
       font-family: "Courier New", ui-monospace, monospace;
-      font-size: clamp(11px, 2.8vw, 14px);
-      line-height: 1.6;
-      color: #7fd0ff;
+      font-size: clamp(10px, 2.6vw, 13px);
+      line-height: 1.7;
+      color: #3e85cc;
       text-shadow:
-        0 0 4px rgba(127,208,255,0.9),
-        0 0 10px rgba(255,215,111,0.4);
+        0 0 4px rgba(127,208,255,0.7),
+        0 0 10px rgba(0,0,0,0.9);
       white-space: pre;
-      opacity: 0.85;
+      opacity: 0.55;
     }
 
     .code-stream {
       position: absolute;
-      /* ここを修正：初期位置をトップに設定し、アニメーションで画面外に流す */
-      top: 0;
+      /* アニメーション開始位置を上端に修正 */
+      top: -100vh;
       width: 100%;
-      animation: codeFall 13s linear infinite;
+      animation: codeFall 16s linear infinite;
     }
 
-    .code-column:nth-child(3n)  .code-stream { color:#7fd0ff; animation-duration: 15s; }
-    .code-column:nth-child(4n)  .code-stream { color:#1a7fdd; animation-duration: 11s; }
-    .code-column:nth-child(5n)  .code-stream { color:#4fb8ff; animation-duration: 17s; }
-    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.6; animation-duration: 19s; }
+    .code-column:nth-child(3n)  .code-stream { color:#6fb8ff; animation-duration: 18s; opacity:0.6; }
+    .code-column:nth-child(4n)  .code-stream { color:#356fbf; animation-duration: 14s; opacity:0.6; }
+    .code-column:nth-child(5n)  .code-stream { color:#9fd8ff; animation-duration: 20s; opacity:0.5; }
+    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.4; animation-duration: 22s; }
 
     .code-stream::after {
       content: "✶";
@@ -314,25 +348,25 @@
       margin-top: 4px;
       color: #ffd76f;
       text-shadow:
-        0 0 8px rgba(255,215,111,1),
+        0 0 10px rgba(255,215,111,1),
         0 0 22px rgba(255,215,111,0.9);
-      font-size: 1.2em;
+      font-size: 1.15em;
     }
 
     @keyframes codeFall {
-      /* ここを修正：雨を画面上端のさらに上から、画面下端のさらに下まで流す */
-      0%   { transform: translateY(-100%); } /* 要素の高さ分だけ上に移動 */
-      100% { transform: translateY(100vh); } /* ビューポートの高さ分だけ下に移動 */
+      /* アニメーションの終了位置をビューポートの高さ基準に修正 */
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(200vh); } /* 画面の上下を余裕を持ってカバー */
     }
 
     @keyframes codeFadeIn {
       from { opacity: 0; }
-      to   { opacity: 1; }
+      to   { opacity: 0.9; }
     }
 
     .cut--code .cut__content {
       max-width: 760px;
-      z-index: 3; /* テキストは一番手前 */
+      z-index: 3;
     }
 
     .cut--code .cut__lines {
@@ -876,7 +910,6 @@ N • 0 1 0 ∞ 3 Σ
   <script>
     window.addEventListener('load', function () {
       const cuts = Array.from(document.querySelectorAll('.cut'));
-      let currentIndex = 0;
 
       function revealLines(cut) {
         const lines = Array.from(cut.querySelectorAll('[data-line]'));
@@ -891,7 +924,6 @@ N • 0 1 0 ∞ 3 Σ
 
       function activateCut(index) {
         if (index < 0 || index >= cuts.length) return;
-        currentIndex = index;
         cuts.forEach(function (cut, i) {
           if (i === index) {
             cut.classList.add('is-active');
@@ -908,7 +940,7 @@ N • 0 1 0 ∞ 3 Σ
       // 初期カット
       activateCut(0);
 
-      // 自動カット切り替え（録画しやすいように 10秒ごと）
+      // 自動カット切り替え（10秒ごと）
       setTimeout(function () { activateCut(1); }, 10000); // 10秒後 Cut2
       setTimeout(function () { activateCut(2); }, 20000); // 20秒後 Cut3
       // Cut3 はそのまま表示し続ける
