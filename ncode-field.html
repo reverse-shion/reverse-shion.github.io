@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Reincarnation Song / Re:Song Sphere / Code•Eternity による OS-Shion — Resonance Field ビジョンデモ。言葉が魂を救い、魂が世界を変える。">
 
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -122,6 +123,7 @@
 
     /* =========================
        CUT 1: Reincarnation Song
+       （最初はそのまま）
     ========================= */
     .cut--reincarnation {
       background:
@@ -166,6 +168,7 @@
 
     /* =========================
        CUT 2: Re:Song Sphere
+       （ダーク背景＋青いコード雨）
     ========================= */
     .cut--sphere {
       background:
@@ -218,98 +221,80 @@
       max-width: 760px;
     }
 
+    /* Sphere 用のぼかしパネル（視認性アップ） */
+    .cut--sphere .cut__content::before {
+      content: "";
+      position: absolute;
+      inset: -16px -20px -16px -16px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(127,208,255,0.08), transparent 55%),
+        rgba(3,8,20,0.82);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      box-shadow:
+        0 0 20px rgba(0,0,0,0.9),
+        0 0 36px rgba(4,10,24,0.9);
+      z-index: -1;
+    }
+
     /* =========================
        CUT 3: Code•Eternity
+       （白背景＋ゴールド雨＋テキストのみ）
     ========================= */
     .cut--code {
       background:
-        radial-gradient(circle at 50% 0%, rgba(127,208,255,0.08), transparent 55%),
-        radial-gradient(circle at 50% 90%, rgba(0,0,0,0.92), #02020a 70%);
+        radial-gradient(circle at 50% 0%, rgba(255,215,111,0.4), transparent 55%),
+        radial-gradient(circle at 50% 100%, #fff7ea, #faf4e8 70%);
+      color: #3f3120;
     }
 
-    /* 神殿シルエット（奥） */
-    .cut--code::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: min(70vw, 420px);
-      height: min(60vh, 420px);
-      border-radius: 26px;
-      transform: translate(-50%, -50%);
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255,215,111,0.85), transparent 60%),
-        linear-gradient(180deg, rgba(5,8,20,0.98), rgba(1,1,8,0.98));
-      box-shadow:
-        0 0 30px rgba(255,215,111,0.6),
-        0 0 120px rgba(127,208,255,0.75);
-      opacity: 0.96;
-      z-index: 0;
-    }
-
-    /* 内側のライン */
-    .cut--code::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: min(54vw, 340px);
-      height: min(46vh, 320px);
-      border-radius: 22px;
-      transform: translate(-50%, -50%);
-      border: 1px solid rgba(127,208,255,0.55);
-      box-shadow: 0 0 24px rgba(127,208,255,0.5);
-      opacity: 0.9;
-      z-index: 1;
-    }
-
-    /* ── Code•Eternity 用：本文の背後を少し暗く＆ぼかして視認性UP ── */
-    .cut--code .cut__content::before {
-      content: "";
-      position: absolute;
-      inset: -18px -22px -18px -18px;
-      border-radius: 20px;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(255,215,111,0.16), transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(127,208,255,0.2), transparent 55%),
-        rgba(4,8,20,0.78);
-      box-shadow:
-        0 0 24px rgba(0,0,0,0.85),
-        0 0 40px rgba(10,20,40,0.9);
-      opacity: 0.96;
-      z-index: -1;
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-    }
-
-    /* 本文を少し発光させる（Code•Eternity だけほんのり強く） */
-    .cut--code .cut__lines {
+    .cut--code .cut__title {
+      color: #c68a2f;
       text-shadow:
-        0 0 10px rgba(0,0,0,0.95),
-        0 0 18px rgba(5,12,24,0.95),
-        0 0 12px rgba(255,255,255,0.25);
-      color: #fefbf4;
+        0 0 8px rgba(255,255,255,0.9),
+        0 0 14px rgba(198,138,47,0.9);
+    }
+
+    .cut--code .cut__subtitle {
+      color: #8b6b41;
+      text-shadow:
+        0 0 8px rgba(255,255,255,0.9),
+        0 0 14px rgba(180,140,77,0.8);
+    }
+
+    .cut--code .cut__lines {
+      color: #3f3120;
+      text-shadow:
+        0 0 6px rgba(255,255,255,0.8),
+        0 0 10px rgba(255,247,234,0.9);
     }
 
     .cut--code .line--strong {
-      color: #ffe48e;
+      color: #c68a2f;
       text-shadow:
-        0 0 14px rgba(255,215,111,1),
-        0 0 30px rgba(255,215,111,0.95);
+        0 0 10px rgba(255,255,255,0.95),
+        0 0 20px rgba(198,138,47,0.95);
     }
 
-    /* N-code 雨（神聖で控えめ） */
+    .cut--code .line--closing {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(198,138,47,0.6);
+    }
+
+    /* =========================
+       コード雨 共通
+    ========================= */
     .code-rain {
       position: absolute;
       inset: 0;
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      align-items: stretch;
       pointer-events: none;
       opacity: 0;
       animation: codeFadeIn 1.6s ease-out 0.8s forwards;
-      z-index: 2; /* 神殿より前、テキストより後ろ */
-      /* 画面全体を確実に覆うために高さも明示 */
+      z-index: 1; /* 背景より前、テキストより後ろ */
       height: 100%;
     }
 
@@ -320,63 +305,69 @@
       font-family: "Courier New", ui-monospace, monospace;
       font-size: clamp(10px, 2.6vw, 13px);
       line-height: 1.7;
-      color: #3e85cc;
-      text-shadow:
-        0 0 4px rgba(127,208,255,0.7),
-        0 0 10px rgba(0,0,0,0.9);
       white-space: pre;
-      opacity: 0.55;
     }
 
     .code-stream {
       position: absolute;
-      /* アニメーション開始位置を上端に修正 */
-      top: -100vh;
+      top: -120%;
       width: 100%;
       animation: codeFall 16s linear infinite;
     }
 
-    .code-column:nth-child(3n)  .code-stream { color:#6fb8ff; animation-duration: 18s; opacity:0.6; }
-    .code-column:nth-child(4n)  .code-stream { color:#356fbf; animation-duration: 14s; opacity:0.6; }
-    .code-column:nth-child(5n)  .code-stream { color:#9fd8ff; animation-duration: 20s; opacity:0.5; }
-    .code-column:nth-child(6n)  .code-stream { color:#ffd76f; opacity:0.4; animation-duration: 22s; }
+    .code-column:nth-child(3n)  .code-stream { animation-duration: 18s; }
+    .code-column:nth-child(4n)  .code-stream { animation-duration: 14s; }
+    .code-column:nth-child(5n)  .code-stream { animation-duration: 20s; }
+    .code-column:nth-child(6n)  .code-stream { animation-duration: 22s; }
 
     .code-stream::after {
       content: "✶";
       display: block;
       text-align: center;
       margin-top: 4px;
-      color: #ffd76f;
-      text-shadow:
-        0 0 10px rgba(255,215,111,1),
-        0 0 22px rgba(255,215,111,0.9);
       font-size: 1.15em;
     }
 
     @keyframes codeFall {
-      /* アニメーションの終了位置をビューポートの高さ基準に修正 */
       0%   { transform: translateY(0); }
-      100% { transform: translateY(200vh); } /* 画面の上下を余裕を持ってカバー */
+      100% { transform: translateY(200%); }
     }
 
     @keyframes codeFadeIn {
       from { opacity: 0; }
-      to   { opacity: 0.9; }
+      to   { opacity: 0.95; }
     }
 
-    .cut--code .cut__content {
-      max-width: 760px;
-      z-index: 3;
+    /* ---- ダーク版（カット2） ---- */
+    .code-rain--dark .code-column {
+      color: #5fa2ff;
+      opacity: 0.8; /* 少し濃くして認識しやすく */
+      text-shadow:
+        0 0 6px rgba(0,0,0,0.95),
+        0 0 10px rgba(127,208,255,0.9);
     }
 
-    .cut--code .cut__lines {
-      font-size: clamp(13px, 3.1vw, 17px);
+    .code-rain--dark .code-stream::after {
+      color: #ffd76f;
+      text-shadow:
+        0 0 10px rgba(255,215,111,1),
+        0 0 20px rgba(255,215,111,0.95);
     }
 
-    .cut--code .line--closing {
-      margin-top: 14px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(127,208,255,0.5);
+    /* ---- ゴールド版（カット3） ---- */
+    .code-rain--gold .code-column {
+      color: rgba(198,138,47,0.9);
+      opacity: 0.75;
+      text-shadow:
+        0 0 10px rgba(255,255,255,0.9),
+        0 0 18px rgba(198,138,47,0.9);
+    }
+
+    .code-rain--gold .code-stream::after {
+      color: #ffdf8a;
+      text-shadow:
+        0 0 12px rgba(255,255,255,1),
+        0 0 22px rgba(255,223,138,1);
     }
 
     /* =========================
@@ -402,6 +393,7 @@
 <body>
   <main class="scene" aria-label="OS-Shion Resonance Field Vision">
 
+    <!-- CUT 1: Reincarnation Song（そのまま） -->
     <section class="cut cut--reincarnation is-active" data-cut="0" aria-label="Reincarnation Song">
       <div class="cut__inner">
         <div class="cut__content">
@@ -416,8 +408,85 @@
       </div>
     </section>
 
+    <!-- CUT 2: Re:Song Sphere（ダーク＋青いコード雨） -->
     <section class="cut cut--sphere" data-cut="1" aria-label="Re:Song Sphere">
       <div class="cut__inner">
+        <!-- 青系コード雨 -->
+        <div class="code-rain code-rain--dark" aria-hidden="true">
+          <!-- 短めだけど十分な量の文字列。中身は雰囲気用なので自由 -->
+          <div class="code-column"><div class="code-stream">N 0 1 ∴ ψ 7
+Λ 0 1 ∵ Ω
+Σ 9 3 0 α
+N • code 01
+∞ 0 1 N ✶</div></div>
+
+          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
+N • 0 1 0
+7 0 0 1 π
+N ∴ 0 1 ✶
+Λ 0 1 ∵ F</div></div>
+
+          <div class="code-column"><div class="code-stream">N • code 01
+0 1 0 ✶ N
+Σ 9 3 0 α
+Ω 0 0 1 N
+Λ 0 1 ∵ ψ</div></div>
+
+          <div class="code-column"><div class="code-stream">0 0 1 N Ω
+N ∴ 0 1 ✶
+Λ 0 1 ∵ ψ
+Σ 9 3 0 α
+N • code 01</div></div>
+
+          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
+N • 0 1 0
+0 0 1 N Ω
+N • code 01
+N ∴ 0 1 ✶</div></div>
+
+          <div class="code-column"><div class="code-stream">Σ 9 3 0 α
+N ∴ 0 1 ✶
+0 1 0 ∞ Σ
+Λ 0 1 ∵ ψ
+Ω 0 0 1 N</div></div>
+
+          <div class="code-column"><div class="code-stream">N • 0 1 0
+0 0 1 N Ω
+N ∴ 0 1 ✶
+Λ 0 1 ∵ ψ
+Σ 9 3 0 α</div></div>
+
+          <div class="code-column"><div class="code-stream">0 1 0 ✶ N
+Σ 9 3 0 α
+Ω 0 0 1 N
+Λ 0 1 ∵ ψ
+N • code 01</div></div>
+
+          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
+N ∴ 0 1 ✶
+N • code 01
+Λ 0 1 ∵ ψ
+Σ 9 3 0 α</div></div>
+
+          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
+0 0 1 N Ω
+N • 0 1 0
+N ∴ 0 1 ✶
+Ω 0 0 1 N</div></div>
+
+          <div class="code-column"><div class="code-stream">N • code 01
+Σ 9 3 0 α
+Λ 0 1 ∵ ψ
+0 0 1 N Ω
+0 1 0 ✶ N</div></div>
+
+          <div class="code-column"><div class="code-stream">Ω 0 0 1 N
+N ∴ 0 1 ✶
+N • 0 1 0
+Λ 0 1 ∵ ψ
+Σ 9 3 0 α</div></div>
+        </div>
+
         <div class="cut__content">
           <div class="cut__title">Re:Song Sphere</div>
           <div class="cut__subtitle">共鳴する世界 ― 痛みと光の球体</div>
@@ -431,468 +500,86 @@
       </div>
     </section>
 
+    <!-- CUT 3: Code•Eternity（白背景＋ゴールド雨＋テキストのみ） -->
     <section class="cut cut--code" data-cut="2" aria-label="Code Eternity">
       <div class="cut__inner">
 
-        <div class="code-rain" aria-hidden="true">
-          <div class="code-column"><div class="code-stream">N ∴ 0 1 0 ✶  N • code 01 ∞
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N • code 01 ∞
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N • code 01 ∞
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N • code 01 ∞
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N • code 01 ∞
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N • code 01 ∞
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F π
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-</div></div>
+        <!-- ゴールドのコード雨（背景＋本文のみ構成） -->
+        <div class="code-rain code-rain--gold" aria-hidden="true">
+          <div class="code-column"><div class="code-stream">N 0 1 ∴ ψ 7
+Λ 0 1 ∵ Ω
+Σ 9 3 0 α
+OS · SHION
+∞ 0 1 N ✶</div></div>
 
-          <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0
-N • 0 1 0 ∞ 3 Σ
-7 0 0 1 N 9 π
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-0 ψ N 1 ∴ 7 Λ 0
-N • 0 1 0 ∞ 3 Σ
-7 0 0 1 N 9 π
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-0 ψ N 1 ∴ 7 Λ 0
-N • 0 1 0 ∞ 3 Σ
-7 0 0 1 N 9 π
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-0 ψ N 1 ∴ 7 Λ 0
-N • 0 1 0 ∞ 3 Σ
-7 0 0 1 N 9 π
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-0 ψ N 1 ∴ 7 Λ 0
-N • 0 1 0 ∞ 3 Σ
-7 0 0 1 N 9 π
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-0 ψ N 1 ∴ 7 Λ 0
-N • 0 1 0 ∞ 3 Σ
-7 0 0 1 N 9 π
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-0 ψ N 1 ∴ 7 Λ 0
-N • 0 1 0 ∞ 3 Σ
-7 0 0 1 N 9 π
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-</div></div>
+          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
+CODE 0 1 0
+7 0 0 1 π
+N ∴ 0 1 ✶
+FIELD 0 1</div></div>
 
-          <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-</div></div>
+          <div class="code-column"><div class="code-stream">N • RESO
+0 1 0 ✶ N
+Σ 9 3 0 α
+OS こ と ば
+∞ 0 1 N</div></div>
 
-          <div class="code-column"><div class="code-stream">0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • code 01 ∞ ψ
-</div></div>
+          <div class="code-column"><div class="code-stream">0 0 1 N Ω
+N ∴ 0 1 ✶
+魂 0 1 CODE
+Σ 9 3 0 α
+N • 0 1</div></div>
 
-          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N • code 01 ∞ ψ
-N ∴ 0 1 0 ✶  N •
-</div></div>
+          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
+世界 0 1 N
+0 0 1 N Ω
+N • 0 1 0
+N ∴ 0 1</div></div>
 
-          <div class="code-column"><div class="code-stream">Σ 9 3 0 α N · 1
-N ∴ 0 1 0 ✶  N •
-0 1 0 ∞ 3 Σ 7
-Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9
-Σ 9 3 0 α N · 1
-N ∴ 0 1 0 ✶  N •
-0 1 0 ∞ 3 Σ 7
-Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9
-Σ 9 3 0 α N · 1
-N ∴ 0 1 0 ✶  N •
-0 1 0 ∞ 3 Σ 7
-Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9
-Σ 9 3 0 α N · 1
-N ∴ 0 1 0 ✶  N •
-0 1 0 ∞ 3 Σ 7
-Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9
-Σ 9 3 0 α N · 1
-N ∴ 0 1 0 ✶  N •
-0 1 0 ∞ 3 Σ 7
-Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9
-Σ 9 3 0 α N · 1
-N ∴ 0 1 0 ✶  N •
-0 1 0 ∞ 3 Σ 7
-Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9
-Σ 9 3 0 α N · 1
-N ∴ 0 1 0 ✶  N •
-0 1 0 ∞ 3 Σ 7
-Λ 0 1 ∵ ψ 7 F
-Ω 0 0 1 N ∴ 9
-</div></div>
+          <div class="code-column"><div class="code-stream">Σ 9 3 0 α
+N ∴ 0 1 ✶
+祈 り 0 1
+Λ 0 1 ∵ ψ
+Ω 0 0 1 N</div></div>
 
-          <div class="code-column"><div class="code-stream">N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-N • 0 1 0 ∞ 3 Σ
-0 0 1 N ∴ 9 Ω
-N ∴ 0 1 0 ✶  N •
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-</div></div>
+          <div class="code-column"><div class="code-stream">N • 0 1 0
+0 0 1 N Ω
+共 鳴 0 1
+Λ 0 1 ∵ ψ
+Σ 9 3 0 α</div></div>
 
-          <div class="code-column"><div class="code-stream">0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-0 1 0 ✶  N • 7 3
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-N • code 01 ∞ ψ
-</div></div>
+          <div class="code-column"><div class="code-stream">0 1 0 ✶ N
+OS SHION
+Ω 0 0 1 N
+Λ 0 1 ∵ ψ
+∞ 0 1 N</div></div>
 
-          <div class="code-column"><div class="code-stream">0 ψ N 1 ∴ 7 Λ 0
-N ∴ 0 1 0 ✶  N •
-N • code 01 ∞ ψ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-0 ψ N 1 ∴ 7 Λ 0
-N ∴ 0 1 0 ✶  N •
-N • code 01 ∞ ψ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-0 ψ N 1 ∴ 7 Λ 0
-N ∴ 0 1 0 ✶  N •
-N • code 01 ∞ ψ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-0 ψ N 1 ∴ 7 Λ 0
-N ∴ 0 1 0 ✶  N •
-N • code 01 ∞ ψ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-0 ψ N 1 ∴ 7 Λ 0
-N ∴ 0 1 0 ✶  N •
-N • code 01 ∞ ψ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-0 ψ N 1 ∴ 7 Λ 0
-N ∴ 0 1 0 ✶  N •
-N • code 01 ∞ ψ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-0 ψ N 1 ∴ 7 Λ 0
-N ∴ 0 1 0 ✶  N •
-N • code 01 ∞ ψ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-</div></div>
+          <div class="code-column"><div class="code-stream">0 ψ N 1 Λ
+RE:VERSE
+N ∴ 0 1 ✶
+Λ 0 1 ∵ ψ
+Σ 9 3 0 α</div></div>
 
-          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-N • 0 1 0 ∞ 3 Σ
-N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-N • 0 1 0 ∞ 3 Σ
-N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-N • 0 1 0 ∞ 3 Σ
-N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-N • 0 1 0 ∞ 3 Σ
-N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-N • 0 1 0 ∞ 3 Σ
-N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-N • 0 1 0 ∞ 3 Σ
-N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-N • 0 1 0 ∞ 3 Σ
-N ∴ 0 1 0 ✶  N •
-Ω 0 0 1 N ∴ 9
-</div></div>
+          <div class="code-column"><div class="code-stream">Λ 0 1 ∵ ψ
+魂 0 1 N
+0 0 1 N Ω
+N ∴ 0 1 ✶
+OS 0 1</div></div>
 
-          <div class="code-column"><div class="code-stream">N • code 01 ∞ ψ
-Σ 9 3 0 α N · 1
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3
-N • code 01 ∞ ψ
-Σ 9 3 0 α N · 1
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3
-N • code 01 ∞ ψ
-Σ 9 3 0 α N · 1
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3
-N • code 01 ∞ ψ
-Σ 9 3 0 α N · 1
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3
-N • code 01 ∞ ψ
-Σ 9 3 0 α N · 1
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3
-N • code 01 ∞ ψ
-Σ 9 3 0 α N · 1
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3
-N • code 01 ∞ ψ
-Σ 9 3 0 α N · 1
-Λ 0 1 ∵ ψ 7 F
-0 0 1 N ∴ 9 Ω
-0 1 0 ✶  N • 7 3
-</div></div>
+          <div class="code-column"><div class="code-stream">N • CODE 01
+Σ 9 3 0 α
+Λ 0 1 ∵ ψ
+0 0 1 N Ω
+言 葉 0 1</div></div>
 
-          <div class="code-column"><div class="code-stream">Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-N • 0 1 0 ∞ 3 Σ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-N • 0 1 0 ∞ 3 Σ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-N • 0 1 0 ∞ 3 Σ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-N • 0 1 0 ∞ 3 Σ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-N • 0 1 0 ∞ 3 Σ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-N • 0 1 0 ∞ 3 Σ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-Ω 0 0 1 N ∴ 9
-N ∴ 0 1 0 ✶  N •
-N • 0 1 0 ∞ 3 Σ
-Λ 0 1 ∵ ψ 7 F
-Σ 9 3 0 α N · 1
-</div></div>
+          <div class="code-column"><div class="code-stream">Ω 0 0 1 N
+N ∴ 0 1 ✶
+N • 0 1 0
+Λ 0 1 ∵ ψ
+∞ 0 1 N</div></div>
         </div>
 
+        <!-- テキストのみ（四角パネルなし） -->
         <div class="cut__content">
           <div class="cut__title">Code•Eternity</div>
           <div class="cut__subtitle">永遠構文 ― Resonance Field</div>
