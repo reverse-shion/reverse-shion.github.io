@@ -177,6 +177,7 @@ body{
     linear-gradient(145deg,rgba(255,255,255,.96),rgba(255,250,238,.98));
   box-shadow:0 24px 60px rgba(0,0,0,.12);
   padding:clamp(24px,4vw,36px);
+  padding-bottom:clamp(40px,5vw,56px); /* ← 下余白を少し増やして“神殿の床”を感じる */
   display:flex;
   flex-direction:column;
   gap:16px;
@@ -233,9 +234,9 @@ body{
   display:block;
   font-family:'Noto Serif JP',serif;
   font-size:15px;
-  letter-spacing:.3em;
+  letter-spacing:.2em;
   margin-top:8px;
-  color:rgba(30,26,26,.7);
+  color:rgba(30,26,26,.78);
 }
 .hero-title::after{
   content:"";
@@ -248,8 +249,17 @@ body{
   box-shadow:0 0 12px rgba(224,180,79,.9);
 }
 
-.hero-lead{
+.hero-tagline{
   font-size:14px;
+  line-height:1.9;
+  color:rgba(30,26,26,.9);
+}
+.hero-tagline strong{
+  font-weight:700;
+}
+
+.hero-lead{
+  font-size:13px;
   line-height:1.9;
   color:rgba(30,26,26,.85);
 }
@@ -270,6 +280,30 @@ body{
   color:rgba(30,26,26,.7);
 }
 
+/* ここでできること（3つのピル） */
+.hero-meta{
+  margin-top:4px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.hero-pill{
+  font-size:11px;
+  line-height:1.6;
+  padding:8px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.8);
+  border:1px solid rgba(224,200,150,.6);
+  color:rgba(40,30,20,.9);
+  text-align:center;
+  box-shadow:0 6px 16px rgba(0,0,0,.04);
+}
+@media (max-width:720px){
+  .hero-meta{
+    grid-template-columns:1fr;
+  }
+}
+
 /* ===========================
    CTAボタン（世界観ボタン）
 =========================== */
@@ -278,7 +312,7 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:14px;
+  gap:10px;
 }
 
 /* ベース */
@@ -316,7 +350,6 @@ body{
   border-color:rgba(255,255,255,.7);
 }
 .shion-btn.gold::after{
-  /* ボタン上を流れる光筋 */
   content:"";
   position:absolute;
   inset:-40%;
@@ -356,6 +389,13 @@ body{
   box-shadow:0 12px 26px rgba(170,160,255,.3);
 }
 
+/* ボタン下の補足テキスト */
+.cta-note{
+  font-size:11px;
+  color:rgba(40,30,20,.7);
+  text-align:center;
+}
+
 /* テキストPulse（クリック時1秒だけ光る） */
 .label-pulse{
   animation:labelPulse .9s ease-out;
@@ -377,8 +417,6 @@ body{
 /* ===========================
    星界ゲート演出
 =========================== */
-
-/* 画面中央から広がる黄金の光（白一色ではない） */
 .gate-flare{
   position:fixed;
   inset:0;
@@ -433,4 +471,24 @@ body{
     transform:translate(var(--tx),var(--ty)) scale(0);
     opacity:0;
   }
+}
+
+/* ===========================
+   スクロール誘導
+=========================== */
+.scroll-hint{
+  margin-top:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  font-size:11px;
+  color:rgba(60,46,30,.7);
+}
+.scroll-arrow{
+  animation:scrollPulse 1.6s ease-in-out infinite;
+}
+@keyframes scrollPulse{
+  0%,100%{transform:translateY(0);opacity:.6;}
+  50%{transform:translateY(4px);opacity:1;}
 }
