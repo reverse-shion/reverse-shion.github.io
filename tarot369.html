@@ -307,78 +307,131 @@
     }
 
     .card-frame {
-      width: min(70vw, 260px);
-      aspect-ratio: 2 / 3;
-      border-radius: 16px;
-      padding: 6px;
-      background:
-        radial-gradient(circle at 0% 0%, #fffaf0 0, #f8ecd4 45%, #f0e0c0 100%);
-      box-shadow:
-        0 12px 28px rgba(0,0,0,0.16),
-        0 0 0 1px rgba(255,255,255,0.95);
-      position: relative;
-      overflow: hidden;
-    }
+  width: min(70vw, 260px);
+  aspect-ratio: 2 / 3;
+  border-radius: 16px;
+  padding: 6px;
+  background:
+    radial-gradient(circle at 0% 0%, #fffaf0 0, #f8ecd4 45%, #f0e0c0 100%);
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.16),
+    0 0 0 1px rgba(255,255,255,0.95);
+  position: relative;
+  overflow: hidden;
+  /* ★ フリップ用 */
+  perspective: 1200px;
+}
 
-    .card-frame::before {
-      content: "";
-      position: absolute;
-      inset: 10%;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.7);
-      box-shadow:
-        0 0 0 1px rgba(214,169,75,0.45),
-        inset 0 0 18px rgba(255,255,255,0.9);
-      pointer-events: none;
-    }
+.card-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: radial-gradient(circle at 30% 0%, #fff 0, #f6f0e2 50%, #e8decf 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* ★ 3Dフリップ用 */
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+}
 
-    .card-img-wrap {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      background: radial-gradient(circle at 30% 0%, #fff 0, #f6f0e2 50%, #e8decf 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.card-frame.is-flipped .card-img-wrap {
+  transform: rotateY(180deg);
+}
 
-    .card-img-wrap::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.9) 0, transparent 35%),
-        radial-gradient(circle at 90% 100%, rgba(214,169,75,0.25) 0, transparent 60%);
-      mix-blend-mode: screen;
-      pointer-events: none;
-    }
+/* 裏面・表面の共通スタイル */
+.card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+}
 
-    .card-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      opacity: 0;
-      transform: translateY(8px) scale(1.02);
-      transition: opacity 260ms ease, transform 260ms ease;
-    }
+/* 表面は180度回転させておく（親が回転したら見える） */
+.card-face--front {
+  transform: rotateY(180deg);
+}
 
-    .card-img.is-visible {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+/* プレースホルダーをカード中央に重ねる */
+.card-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  font-family: var(--font-hero);
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: rgba(0,0,0,0.6);
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.5;
+}
 
-    .card-placeholder {
-      font-family: var(--font-hero);
-      font-size: 1.1rem;
-      letter-spacing: 0.12em;
-      color: rgba(0,0,0,0.6);
-      text-transform: uppercase;
-      text-align: center;
-      line-height: 1.5;
-    }
+/* 既存の .card-img アニメーションはそのまま使える */
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transform: translateY(8px) scale(1.02);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+.card-img.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ★ カードが光る演出 */
+.card-frame.card-glow::after {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.9) 0, transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(214,169,75,0.45) 0, transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: cardGlow 1s ease-out 1;
+}
+
+@keyframes cardGlow {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ★ 個人鑑定ボタンが一度だけ「キラッ」と光る */
+.result-block.is-visible .consult-row .btn-secondary {
+  animation: consultGlow 1.4s ease-out 1 0.8s;
+}
+
+@keyframes consultGlow {
+  0% {
+    box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+    transform: translateY(0);
+  }
+  40% {
+    box-shadow:
+      0 0 0 3px rgba(214,169,75,0.4),
+      0 0 24px rgba(214,169,75,0.9);
+    transform: translateY(-1px);
+  }
+  100% {
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    transform: translateY(0);
+  }
 
     .card-meta {
       text-align: center;
@@ -558,37 +611,65 @@
             今日あなたに降りるカード
           </h2>
 
-          <div class="card-shell" aria-live="polite">
-            <div class="card-frame">
-              <div class="card-img-wrap">
-                <img id="cardImage" class="card-img" src="" alt="タロットカード" />
-                <div id="cardPlaceholder" class="card-placeholder">
-                  星詠<br>待機中…
-                </div>
-              </div>
-            </div>
+        <div class="card-shell" aria-live="polite">
+  <div class="card-frame" id="cardFrame">
+    <div class="card-img-wrap">
+      <!-- 裏面 -->
+      <div class="card-face card-face--back">
+        <img
+          id="cardBackImage"
+          class="card-img"
+          src="images/card-back.png"
+          alt="タロットカードの裏面"
+        >
+      </div>
 
-            <div class="card-meta">
-              <div id="cardName" class="card-name">カードはまだ伏せられています</div>
-              <div id="cardKeyword" class="card-keyword">深呼吸をして「星詠を始める」を押してください</div>
-            </div>
+      <!-- 表面（占い結果で差し替え） -->
+      <div class="card-face card-face--front">
+        <img
+          id="cardFrontImage"
+          class="card-img"
+          src=""
+          alt="タロットカードの表面"
+        >
+      </div>
 
-            <div id="resultBlock" class="result-block" hidden>
-              <div class="result-label">SHION READING</div>
-              <div id="resultMain" class="result-text-main"></div>
-              <div id="resultSub" class="result-text-sub"></div>
+      <!-- 初期の「星詠待機中」表示 -->
+      <div id="cardPlaceholder" class="card-placeholder">
+        星詠<br>待機中…
+      </div>
+    </div>
+  </div>
 
-              <div class="consult-row">
-                <a id="consultBtn" class="btn btn-secondary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">
-                  <span class="btn-icon">🌙</span>
-                  <span>この続きは個人鑑定で受け取る</span>
-                </a>
-              </div>
-              <p class="note">
-                「大丈夫だよ。」——最後は、あなた自身の選択がすべてを決めていきます。
-              </p>
-            </div>
-          </div>
+  <div class="card-meta">
+    <div id="cardName" class="card-name">カードはまだ伏せられています</div>
+    <div id="cardKeyword" class="card-keyword">
+      深呼吸をして「星詠を始める」を押してください
+    </div>
+  </div>
+
+  <div id="resultBlock" class="result-block" hidden>
+    <div class="result-label">SHION READING</div>
+    <div id="resultMain" class="result-text-main"></div>
+    <div id="resultSub" class="result-text-sub"></div>
+
+    <div class="consult-row">
+      <a
+        id="consultBtn"
+        class="btn btn-secondary"
+        href="https://lin.ee/LYnlU0f"
+        target="_blank"
+        rel="noopener"
+      >
+        <span class="btn-icon">🌙</span>
+        <span>この続きは個人鑑定で受け取る</span>
+      </a>
+    </div>
+    <p class="note">
+      「大丈夫だよ。」——最後は、あなた自身の選択がすべてを決めていきます。
+    </p>
+  </div>
+</div>
         </div>
       </section>
     </main>
@@ -782,91 +863,120 @@
     ];
 
     const startBtn = document.getElementById('startReadingBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const sampleBtn = document.getElementById('sampleBtn');
-    const cardImg = document.getElementById('cardImage');
-    const cardPlaceholder = document.getElementById('cardPlaceholder');
-    const cardName = document.getElementById('cardName');
-    const cardKeyword = document.getElementById('cardKeyword');
-    const resultBlock = document.getElementById('resultBlock');
-    const resultMain = document.getElementById('resultMain');
-    const resultSub = document.getElementById('resultSub');
+const resetBtn = document.getElementById('resetBtn');
+const sampleBtn = document.getElementById('sampleBtn');
 
-    function renderCard(card, options = { isSample: false }) {
-      const { isSample } = options;
+const cardFrame = document.getElementById('cardFrame');
+const cardBackImg = document.getElementById('cardBackImage');
+const cardFrontImg = document.getElementById('cardFrontImage');
+const cardPlaceholder = document.getElementById('cardPlaceholder');
 
-      const imgPath = `images/card${card.id}.png`;
-      cardImg.classList.remove('is-visible');
+const cardName = document.getElementById('cardName');
+const cardKeyword = document.getElementById('cardKeyword');
+const resultBlock = document.getElementById('resultBlock');
+const resultMain = document.getElementById('resultMain');
+const resultSub = document.getElementById('resultSub');
+const consultBtn = document.getElementById('consultBtn');
 
-      cardImg.onload = () => {
-        cardImg.classList.add('is-visible');
-      };
-      cardImg.onerror = () => {
-        // 画像がない場合、プレースホルダー表示のまま
-        cardImg.classList.remove('is-visible');
-      };
-      cardImg.src = imgPath;
-      cardImg.alt = `${card.name} のカード画像`;
-      cardPlaceholder.style.display = 'none';
+/**
+ * カードを実際に表示する処理
+ * card: cards配列の1要素
+ * options.isSample: サンプル表示かどうか
+ */
+function revealCard(card, options) {
+  const opts = Object.assign({ isSample: false }, options || {});
 
-      cardName.textContent = card.name;
-      cardKeyword.textContent = card.keyword;
-      resultMain.textContent = card.main;
+  // STEP2へ自動スクロール
+  cardFrame.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-      if (isSample) {
-        resultSub.innerHTML = card.sub +
-          '<br><br><strong style="font-size:0.78rem;">※これはサンプルです。実際の星詠は「星詠を始める」から行ってください。</strong>';
-      } else {
-        resultSub.innerHTML = card.sub;
-      }
+  // フリップ初期化（いったん裏面に戻す）
+  cardFrame.classList.remove('is-flipped', 'card-glow');
+  cardPlaceholder.style.display = 'none';
 
-      resultBlock.hidden = false;
-      requestAnimationFrame(() => {
-        resultBlock.classList.add('is-visible');
-      });
-    }
+  // 表面画像の読み込み
+  cardFrontImg.classList.remove('is-visible');
+  cardFrontImg.onload = () => {
+    cardFrontImg.classList.add('is-visible');
+  };
+  cardFrontImg.onerror = () => {
+    cardFrontImg.classList.remove('is-visible');
+  };
+  cardFrontImg.src = `images/card${card.id}.png`;
+  cardFrontImg.alt = `${card.name} のカード画像`;
 
-    function drawCard() {
-      const index = Math.floor(Math.random() * cards.length);
-      const card = cards[index];
+  // 少し間をおいてからフリップ＆光演出
+  setTimeout(() => {
+    cardFrame.classList.add('is-flipped', 'card-glow');
+  }, 500);
 
-      renderCard(card, { isSample: false });
+  // テキスト類
+  cardName.textContent = card.name;
+  cardKeyword.textContent = card.keyword;
+  resultMain.textContent = card.main;
 
-      startBtn.disabled = true;
-      resetBtn.disabled = false;
-    }
+  if (opts.isSample) {
+    resultSub.innerHTML = card.sub +
+      '<br><br><strong style="font-size:0.78rem;">※これはサンプルです。実際の星詠は「星詠を始める」から行ってください。</strong>';
+  } else {
+    resultSub.innerHTML = card.sub;
+  }
 
-    function showSample() {
-      // サンプルは「星」のカードを固定表示（なければ0番）
-      const sampleCard = cards.find(c => c.id === 17) || cards[0];
-      renderCard(sampleCard, { isSample: true });
-      resetBtn.disabled = false;
-      // 星詠本番ボタンはそのまま有効（安心して押せるように）
-    }
+  // 結果ブロック表示
+  resultBlock.hidden = false;
+  requestAnimationFrame(() => {
+    resultBlock.classList.add('is-visible');
+  });
 
-    function resetReading() {
-      cardImg.classList.remove('is-visible');
-      cardImg.removeAttribute('src');
-      cardImg.alt = 'タロットカード';
-      cardPlaceholder.style.display = 'block';
+  // ボタン状態
+  if (!opts.isSample) {
+    startBtn.disabled = true;
+  }
+  resetBtn.disabled = false;
+}
 
-      cardName.textContent = 'カードはまだ伏せられています';
-      cardKeyword.textContent = '深呼吸をして「星詠を始める」を押してください';
+/** ランダムに1枚引く（本番） */
+function drawCard() {
+  const index = Math.floor(Math.random() * cards.length);
+  const card = cards[index];
+  revealCard(card, { isSample: false });
+}
 
-      resultBlock.classList.remove('is-visible');
-      setTimeout(() => {
-        resultBlock.hidden = true;
-        resultMain.textContent = '';
-        resultSub.textContent = '';
-      }, 200);
+/** 星のカード固定でサンプル表示 */
+function showSample() {
+  const sampleCard = cards.find(c => c.id === 17) || cards[0]; // STAR優先
+  revealCard(sampleCard, { isSample: true });
+}
 
-      startBtn.disabled = false;
-      resetBtn.disabled = true;
-    }
+/** リセットして裏面＋「待機中」に戻す */
+function resetReading() {
+  // カードを裏面に戻す
+  cardFrame.classList.remove('is-flipped', 'card-glow');
+  cardFrontImg.classList.remove('is-visible');
+  cardFrontImg.removeAttribute('src');
+  cardFrontImg.alt = 'タロットカードの表面';
+  cardPlaceholder.style.display = 'block';
 
-    startBtn.addEventListener('click', drawCard);
-    resetBtn.addEventListener('click', resetReading);
-    sampleBtn.addEventListener('click', showSample);
+  // テキストをリセット
+  cardName.textContent = 'カードはまだ伏せられています';
+  cardKeyword.textContent = '深呼吸をして「星詠を始める」を押してください';
+
+  // 結果ブロックを隠す
+  resultBlock.classList.remove('is-visible');
+  setTimeout(() => {
+    resultBlock.hidden = true;
+    resultMain.textContent = '';
+    resultSub.textContent = '';
+  }, 200);
+
+  // ボタン状態
+  startBtn.disabled = false;
+  resetBtn.disabled = true;
+}
+
+// イベント登録
+startBtn.addEventListener('click', drawCard);
+resetBtn.addEventListener('click', resetReading);
+sampleBtn.addEventListener('click', showSample);
   </script>
 </body>
 </html>
