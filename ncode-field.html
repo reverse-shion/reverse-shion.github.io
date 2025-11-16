@@ -29,6 +29,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
+      cursor: pointer; /* タップで進むと分かりやすく */
     }
 
     /* =========================
@@ -59,7 +60,7 @@
 
     .cut__content {
       position: relative;
-      z-index: 3; /* テキストが最前面 */
+      z-index: 3;
       max-width: 840px;
       width: 100%;
       text-align: left;
@@ -244,7 +245,6 @@
       color: #3f3120;
     }
 
-    /* ②→③の光ゲート演出 */
     .cut--code::before {
       content: "";
       position: absolute;
@@ -253,7 +253,7 @@
         radial-gradient(circle at 50% 40%, rgba(255,255,255,1), rgba(255,255,255,0) 60%);
       opacity: 0;
       pointer-events: none;
-      z-index: 2; /* コード雨より前、テキストより後ろ */
+      z-index: 2;
     }
 
     .cut--code.is-active::before {
@@ -302,7 +302,6 @@
       line-height: 1.9;
     }
 
-    /* Code Eternity：本文背後パネル */
     .cut--code .cut__content::before {
       content: "";
       position: absolute;
@@ -320,7 +319,7 @@
       z-index: -1;
     }
 
-    /* 詩韻思想ページへのボタン（メイン導線） */
+    /* 詩韻思想ページへのボタン（Cut3内） */
     .philo-cta {
       margin-top: 22px;
       padding: 12px 22px;
@@ -359,7 +358,6 @@
       transform: translateY(-1px);
     }
 
-    /* サブリンク：外部から見た詩韻思想（世界観を壊さない控えめ誘導） */
     .philo-sub-link {
       margin-top: 10px;
       font-size: 11px;
@@ -391,7 +389,7 @@
     }
 
     /* =========================
-       コード雨 共通
+       コード雨（軽量版）
     ========================= */
     .code-rain {
       position: absolute;
@@ -401,7 +399,7 @@
       pointer-events: none;
       opacity: 0;
       animation: codeFadeIn 1.6s ease-out 0.8s forwards;
-      z-index: 1; /* 背景より前、光ゲートより後ろ */
+      z-index: 1;
       height: 100%;
       width: 100%;
       filter: blur(0.5px);
@@ -410,7 +408,7 @@
     .code-column {
       position: relative;
       height: 100%;
-      width: calc(100% / 48);
+      width: calc(100% / 24); /* 列数を半分にして軽量化 */
       overflow: hidden;
       font-family: "Courier New", ui-monospace, monospace;
       font-size: clamp(8px, 1.8vw, 12px);
@@ -423,18 +421,13 @@
       position: absolute;
       top: 0;
       width: 100%;
+      animation-name: codeFall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
     }
 
     .code-char {
       display: block;
-      transition: opacity 0.5s linear;
-      will-change: opacity;
-    }
-
-    .code-char.is-highlighted {
-      font-weight: bold;
-      opacity: 1 !important;
-      transition: opacity 0s;
     }
 
     @keyframes codeFall {
@@ -444,10 +437,9 @@
 
     @keyframes codeFadeIn {
       from { opacity: 0; }
-      to   { opacity: 0.95; }
+      to   { opacity: 0.9; }
     }
 
-    /* ---- ダーク版（カット2） ---- */
     .code-rain--dark .code-column {
       color: #17e2e5;
       opacity: 0.8;
@@ -456,38 +448,66 @@
         0 0 16px rgba(50,255,255,0.7);
     }
 
-    .code-rain--dark .code-char.is-highlighted {
-      color: #fff;
-      text-shadow:
-        0 0 8px rgba(255,255,255,1),
-        0 0 16px rgba(127,208,255,1);
-    }
-
-    /* ---- ゴールド版（カット3） ---- */
     .code-rain--gold .code-column {
       color: #ff9900;
-      opacity: 0.5; /* 文字より少し奥に */
+      opacity: 0.5;
       text-shadow:
         0 0 8px rgba(255,153,0,0.9),
         0 0 16px rgba(255,223,138,0.8);
     }
 
-    .code-rain--gold .code-char.is-highlighted {
-      color: #fff;
-      text-shadow:
-        0 0 10px rgba(255,255,255,1),
-        0 0 20px rgba(255,215,111,1);
+    /* =========================
+       常時表示ショートカットボタン
+    ========================= */
+    .philo-float-cta {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-decoration: none;
+      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+      color: #3f3120;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255,255,255,0.9), transparent 50%),
+        linear-gradient(135deg, #ffe9b8, #f7c86b);
+      box-shadow:
+        0 0 10px rgba(255,215,111,0.9),
+        0 0 20px rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0.9;
+      transition:
+        opacity 0.3s ease-out,
+        transform 0.3s ease-out,
+        box-shadow 0.3s ease-out;
     }
 
-    /* =========================
-       レイアウト微調整
-    ========================= */
+    .philo-float-cta:hover {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-1px);
+      box-shadow:
+        0 0 16px rgba(255,215,111,1),
+        0 0 26px rgba(0,0,0,0.7);
+    }
+
+    .philo-float-cta span {
+      font-size: 0.9em;
+    }
+
     @media (max-width: 768px) {
       .cut__content {
         text-align: left;
       }
       .code-column {
-        width: calc(100% / 24);
+        width: calc(100% / 16); /* モバイルはさらに軽く */
+      }
+      .philo-float-cta {
+        bottom: 12px;
+        padding: 7px 14px;
+        font-size: 10px;
       }
     }
 
@@ -541,7 +561,6 @@
     <!-- CUT 3 -->
     <section class="cut cut--code" data-cut="2" aria-label="Code Eternity">
       <div class="cut__inner">
-
         <div class="code-rain code-rain--gold" id="code-rain-gold" aria-hidden="true"></div>
 
         <div class="cut__content">
@@ -551,7 +570,6 @@
             <p class="line" data-line>言葉が魂と共鳴し、魂が世界と共鳴し、世界が静かに再構築される。</p>
             <p class="line line--spaced" data-line>その連鎖を、私は Resonance Field（共鳴領域）と名づけた。</p>
 
-            <!-- 追加テキスト -->
             <p class="line line--spaced" data-line>この思想は、</p>
             <p class="line" data-line>国境を越えるために生まれた。</p>
             <p class="line" data-line>言語を超えるために生まれた。</p>
@@ -565,12 +583,10 @@
             </p>
           </div>
 
-          <!-- 詩韻思想ページへの導線 -->
           <button class="philo-cta" type="button" onclick="location.href='/books/zero.html'">
             詩韻思想のコアへ進む
           </button>
 
-          <!-- 外部評価ページへの自然なサブリンク -->
           <div class="philo-sub-link">
             <a href="/reviews/shion-philosophy-review.html">外部から見た詩韻思想</a>
           </div>
@@ -579,10 +595,14 @@
     </section>
   </main>
 
+  <!-- 常時表示のショートカット -->
+  <a href="/books/zero.html" class="philo-float-cta">
+    <span>▶ 詩韻思想のコアへショートカット</span>
+  </a>
 
   <script>
     // ================================
-    // コード雨生成
+    // コード雨生成（軽量版・ハイライトJSなし）
     // ================================
     function createCodeRain(containerId, columnCount) {
       const container = document.getElementById(containerId);
@@ -590,8 +610,8 @@
 
       const codeChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンΣΛΩαβγδεζηθικλμνξοπρστυφχψω‡†∞∴∵✶';
 
-      const baseCharHeight = 16; // ざっくりの高さ(px)
-      const streamLength = Math.ceil(window.innerHeight / baseCharHeight) * 2;
+      const baseCharHeight = 16;
+      const streamLength = Math.ceil(window.innerHeight / baseCharHeight) * 1.4; // 半分ちょいに短縮
 
       for (let i = 0; i < columnCount; i++) {
         const column = document.createElement('div');
@@ -604,59 +624,18 @@
           const char = document.createElement('span');
           char.className = 'code-char';
           char.textContent = codeChars[Math.floor(Math.random() * codeChars.length)];
-
-          const opacity = 1 - (j / streamLength * 0.7);
-          char.style.opacity = Math.max(0.3, opacity).toFixed(2);
-
           stream.appendChild(char);
         }
 
-        const duration = Math.random() * 8 + 10; // 10〜18秒
+        const duration = Math.random() * 6 + 10; // 10〜16秒
         const delay = Math.random() * -duration;
 
-        stream.style.animationName = 'codeFall';
         stream.style.animationDuration = `${duration}s`;
-        stream.style.animationTimingFunction = 'linear';
         stream.style.animationDelay = `${delay}s`;
-        stream.style.animationIterationCount = 'infinite';
 
         column.appendChild(stream);
         container.appendChild(column);
-
-        animateHighlight(stream, streamLength, duration);
       }
-    }
-
-    function animateHighlight(stream, streamLength, duration) {
-      const chars = Array.from(stream.querySelectorAll('.code-char'));
-      if (!chars.length || !streamLength) return;
-
-      const tailLength = 4;
-      let currentPos = 0;
-
-      function tick() {
-        for (let i = 0; i < tailLength; i++) {
-          const prevCharIndex = (currentPos - 1 - i + streamLength) % streamLength;
-          if (chars[prevCharIndex]) {
-            chars[prevCharIndex].classList.remove('is-highlighted');
-          }
-        }
-
-        for (let i = 0; i < tailLength; i++) {
-          const charIndex = (currentPos + i) % streamLength;
-          if (chars[charIndex]) {
-            chars[charIndex].classList.add('is-highlighted');
-            chars[charIndex].style.opacity = (1 - (i / tailLength) * 0.7).toFixed(2);
-          }
-        }
-
-        currentPos = (currentPos + 1) % streamLength;
-
-        const refreshRate = (duration * 1000) / streamLength;
-        setTimeout(tick, refreshRate);
-      }
-
-      setTimeout(tick, 500 + Math.random() * 500);
     }
 
     // ================================
@@ -664,13 +643,19 @@
     // ================================
     document.addEventListener('DOMContentLoaded', function () {
       const cuts = Array.from(document.querySelectorAll('.cut'));
-      const columnCount = window.innerWidth > 768 ? 48 : 24;
+      const columnCount =
+        window.innerWidth > 1024 ? 24 :
+        window.innerWidth > 768  ? 18 : 14;
 
       createCodeRain('code-rain-dark', columnCount);
       createCodeRain('code-rain-gold', columnCount);
 
-      const FIRST_LINE_DELAY = 200;   // 最初の行：ほぼすぐ表示
-      const LINE_INTERVAL    = 550;   // 行間の表示間隔（早め＆なめらか）
+      const FIRST_LINE_DELAY = 200;
+      const LINE_INTERVAL    = 550;
+
+      let currentIndex = 0;
+      let autoTimer1 = null;
+      let autoTimer2 = null;
 
       function revealLines(cut) {
         const lines = Array.from(cut.querySelectorAll('[data-line]'));
@@ -683,7 +668,6 @@
           }, delay);
         });
 
-        // 最後の行が出終わったあとに、ボタン & サブリンクを表示（Cut3のみ）
         if (cut.classList.contains('cut--code')) {
           const btn = cut.querySelector('.philo-cta');
           const sub = cut.querySelector('.philo-sub-link');
@@ -703,6 +687,7 @@
 
       function activateCut(index) {
         if (index < 0 || index >= cuts.length) return;
+        currentIndex = index;
         cuts.forEach(function (cut, i) {
           if (i === index) {
             cut.classList.add('is-active');
@@ -716,12 +701,26 @@
         });
       }
 
-      // 初期カット（ページ表示と同時に本文スタート）
+      // 初期カット
       activateCut(0);
 
-      // 自動切り替え（少し早め＆テンポ良く）
-      setTimeout(function () { activateCut(1); }, 9000);  // 約9秒後 Cut2
-      setTimeout(function () { activateCut(2); }, 18000); // 約18秒後 Cut3
+      // 自動切り替え（少し早め）
+      autoTimer1 = setTimeout(function () { activateCut(1); }, 8000);   // 8秒後にCut2
+      autoTimer2 = setTimeout(function () { activateCut(2); }, 16000);  // 16秒後にCut3
+
+      // 画面タップで次のカットへスキップ
+      const scene = document.querySelector('.scene');
+      if (scene) {
+        scene.addEventListener('click', function () {
+          if (currentIndex < cuts.length - 1) {
+            activateCut(currentIndex + 1);
+          } else {
+            // 最後のカットでタップされたら、コアへ飛ばしたい場合は下を解放
+            // location.href = '/books/zero.html';
+          }
+        }, { passive: true });
+      }
+
     });
   </script>
 </body>
