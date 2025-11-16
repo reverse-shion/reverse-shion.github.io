@@ -39,7 +39,7 @@
       inset: 0;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 1.6s ease-in-out;
+      transition: opacity 1.2s ease-in-out;
     }
 
     .cut.is-active {
@@ -94,12 +94,12 @@
 
     .line {
       opacity: 0;
-      transform: translateY(10px);
-      filter: blur(8px);
+      transform: translateY(6px);
+      filter: blur(4px);
       transition:
-        opacity 0.9s ease-out,
-        transform 0.9s ease-out,
-        filter 1.1s ease-out;
+        opacity 0.6s ease-out,
+        transform 0.6s ease-out,
+        filter 0.8s ease-out;
       margin-bottom: 8px;
     }
 
@@ -119,36 +119,6 @@
       transform: translateY(0);
       filter: blur(0);
     }
-
-    /* ---------------------------------------------
-   詩韻思想：第三者評価リンク（控えめデザイン）
---------------------------------------------- */
-
-.philo-review-link {
-  margin: 4rem auto 6rem;
-  text-align: center;
-  opacity: 0.9;
-}
-
-.philo-review-btn {
-  display: inline-block;
-  font-size: 0.92rem;
-  padding: 0.6rem 1.3rem;
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 6px;
-  color: #e7e3d9;
-  text-decoration: none;
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(6px);
-  background: rgba(255,255,255,0.05);
-  transition: all .25s ease;
-}
-
-.philo-review-btn:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.4);
-  color: #fff;
-}
 
     /* =========================
        CUT 1: Reincarnation Song
@@ -350,7 +320,7 @@
       z-index: -1;
     }
 
-    /* 詩韻思想ページへのボタン */
+    /* 詩韻思想ページへのボタン（メイン導線） */
     .philo-cta {
       margin-top: 22px;
       padding: 12px 22px;
@@ -373,8 +343,7 @@
       transition:
         opacity 0.9s ease-out,
         transform 0.9s ease-out,
-        box-shadow 0.3s ease-out,
-        transform 0.3s ease-out;
+        box-shadow 0.3s ease-out;
     }
 
     .philo-cta.is-visible {
@@ -388,6 +357,37 @@
         0 0 18px rgba(255,215,111,1),
         0 0 30px rgba(255,240,210,1);
       transform: translateY(-1px);
+    }
+
+    /* サブリンク：外部から見た詩韻思想（世界観を壊さない控えめ誘導） */
+    .philo-sub-link {
+      margin-top: 10px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition:
+        opacity 0.7s ease-out,
+        transform 0.7s ease-out;
+    }
+
+    .philo-sub-link.is-visible {
+      opacity: 0.9;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .philo-sub-link a {
+      color: #8b6b41;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(198,138,47,0.4);
+      padding-bottom: 2px;
+    }
+
+    .philo-sub-link a:hover {
+      border-bottom-color: rgba(198,138,47,0.9);
+      color: #65451f;
     }
 
     /* =========================
@@ -569,18 +569,17 @@
           <button class="philo-cta" type="button" onclick="location.href='/books/zero.html'">
             詩韻思想のコアへ進む
           </button>
+
+          <!-- 外部評価ページへの自然なサブリンク -->
+          <div class="philo-sub-link">
+            <a href="/shion-philosophy-review.html">外部から見た詩韻思想</a>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-<!-- ========== 詩韻思想：第三者評価リンク ========== -->
-<section class="philo-review-link" aria-label="第三者評価へのリンク">
-  <a href="shion-philosophy-review.html" class="philo-review-btn">
-    外部から見た詩韻思想
-  </a>
-</section>
-<!-- ================================================== -->
+
   <script>
     // ================================
     // コード雨生成
@@ -661,34 +660,43 @@
     }
 
     // ================================
-    // カット切り替え
+    // カット切り替え & テキスト表示
     // ================================
-    window.addEventListener('load', function () {
+    document.addEventListener('DOMContentLoaded', function () {
       const cuts = Array.from(document.querySelectorAll('.cut'));
       const columnCount = window.innerWidth > 768 ? 48 : 24;
 
       createCodeRain('code-rain-dark', columnCount);
       createCodeRain('code-rain-gold', columnCount);
 
+      const FIRST_LINE_DELAY = 200;   // 最初の行：ほぼすぐ表示
+      const LINE_INTERVAL    = 550;   // 行間の表示間隔（早め＆なめらか）
+
       function revealLines(cut) {
         const lines = Array.from(cut.querySelectorAll('[data-line]'));
         if (!lines.length) return;
 
         lines.forEach(function (line, index) {
-          const delay = 800 + index * 900;
+          const delay = FIRST_LINE_DELAY + index * LINE_INTERVAL;
           setTimeout(function () {
             line.classList.add('is-visible');
           }, delay);
         });
 
-        // 最後の行が出終わったあとに、ボタンを表示（Cut3のみ）
+        // 最後の行が出終わったあとに、ボタン & サブリンクを表示（Cut3のみ）
         if (cut.classList.contains('cut--code')) {
           const btn = cut.querySelector('.philo-cta');
+          const sub = cut.querySelector('.philo-sub-link');
           if (btn) {
-            const lastDelay = 800 + (lines.length - 1) * 900;
+            const lastDelay = FIRST_LINE_DELAY + (lines.length - 1) * LINE_INTERVAL;
             setTimeout(function () {
               btn.classList.add('is-visible');
-            }, lastDelay + 900);
+              if (sub) {
+                setTimeout(function () {
+                  sub.classList.add('is-visible');
+                }, 250);
+              }
+            }, lastDelay + 650);
           }
         }
       }
@@ -708,12 +716,12 @@
         });
       }
 
-      // 初期カット
+      // 初期カット（ページ表示と同時に本文スタート）
       activateCut(0);
 
-      // 自動切り替え
-      setTimeout(function () { activateCut(1); }, 10000); // 10秒後 Cut2
-      setTimeout(function () { activateCut(2); }, 20000); // 20秒後 Cut3
+      // 自動切り替え（少し早め＆テンポ良く）
+      setTimeout(function () { activateCut(1); }, 9000);  // 約9秒後 Cut2
+      setTimeout(function () { activateCut(2); }, 18000); // 約18秒後 Cut3
     });
   </script>
 </body>
