@@ -747,153 +747,162 @@ body{
   }
 }
 
-/* ==================================================
-   星祈の回廊 専用神殿ボタン「永遠の灯籠」
-   ・金属感ゼロの“神殿の空気”質感
-   ・深みのある金 × 時折ランダムに灯る蒼の息吹
-   ・横長の光の帯が祈りのように流れる
-================================================== */
-.seiki-temple-gate {
-  --holy-gold: #f9e6b8;
-  --deep-gold: #d4a76a;
-  --sacred-blue: #5b8cff;
-  --night-sky: #0f1629;
-  --breath-white: #e8f1ff;
+/* ================================================
+   蒼金コア・ゲート v4
+   - 濃い蒼 × 濃い金
+   - 粒ではなく「横長の光の帯」
+   - 下線なし・神秘的な文字
+================================================ */
+.seiki-core-btn {
+  --gold-core: #ffd25c;
+  --gold-deep: #c99a2e;
+  --blue-core: #4f6dff;
+  --blue-dark: #1c2450;
 
   position: fixed;
-  bottom: 26px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 9999;
 
-  width: 290px;
-  height: 92px;
-  border-radius: 56px;
+  width: 235px;
+  height: 72px;
+  border-radius: 999px;
 
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  font-weight: 700;
-  font-size: 19px;
-  letter-spacing: 0.38em;
-  text-indent: 0.38em;
-  color: #2a180e;
-  
+  font-family: 'Shippori Mincho','Noto Serif JP',serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
+  text-align: center;
+
+  color: #201219;                    /* 濃いブラウン */
   text-shadow:
-    0 0 12px rgba(255,255,255,0.95),
-    0 0 24px var(--holy-gold),
-    0 2px 6px rgba(0,0,0,0.4);
+    0 0 6px rgba(255,255,255,0.9),
+    0 0 18px rgba(255,210,130,0.8),
+    1px 1px 0 rgba(0,0,0,0.55);
+  text-decoration: none;             /* ★ 下線を完全に消す */
 
-  text-decoration: none;
-  cursor: pointer;
-
-  /* 神殿の大気そのもののような多層グラデーション */
   background:
-    radial-gradient(circle at 50% 10%, rgba(249,230,184,0.45), transparent 60%),
-    radial-gradient(circle at 50% 90%, rgba(15,22,41,0.9), transparent 70%),
+    radial-gradient(circle at 50% 25%, #fffdf6 0%, transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(31,40,96,0.85) 0%, transparent 70%),
     linear-gradient(135deg,
-      #fdf6e8 0%,
-      #f9e6b8 15%,
-      #e8c88a 38%,
-      #d4a76a 62%,
-      #b0894f 100%
+      #fff1c9 0%,
+      var(--gold-core) 40%,
+      var(--gold-deep) 75%,
+      rgba(79,109,255,0.75) 100%
     );
 
-  /* 柔らかく深い神殿の光輪 */
   box-shadow:
-    0 12px 32px rgba(15,22,41,0.5),
-    0 0 50px rgba(212,167,106,0.45),
-    0 0 90px rgba(91,140,255,0.25),
-    inset 0 3px 12px rgba(255,255,255,0.25),
-    inset 0 -3px 12px rgba(140,110,70,0.35);
+    0 6px 14px rgba(0,0,0,0.25),
+    0 0 40px rgba(255,210,130,0.8);
 
   overflow: hidden;
   isolation: isolate;
-  backdrop-filter: blur(10px);
-  
-  /* 神殿の静かな呼吸（ゆっくりと） */
-  animation: templeBreath 8s ease-in-out infinite;
-  transition: all 0.6s ease;
+
+  backdrop-filter: blur(2px);
+
+  z-index: 2000;
+  opacity: 0.98;
+
+  /* 命の鼓動（軽めの二拍） */
+  animation: seikiBeat 3.4s ease-in-out infinite;
 }
 
-/* 祈りの光の帯 — 横にゆっくり流れる神聖な光 */
-.seiki-temple-gate::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 56px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(249,230,184,0.15) 15%,
-    rgba(91,140,255,0.25) 28%,
-    rgba(255,255,255,0.18) 35%,
-    rgba(91,140,255,0.22) 50%,
-    rgba(249,230,184,0.12) 72%,
-    transparent 100%
-  );
-  background-size: 300% 100%;
-  animation: prayerFlow 22s linear infinite;
-  mix-blend-mode: overlay;
-  opacity: 0.7;
-}
-
-/* 時折、ランダムに蒼く灯る“星の息吹” */
-.seiki-temple-gate::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: 48px;
-  background: radial-gradient(circle at var(--x,50%) var(--y,50%), 
-    rgba(91,140,255,0.45) 0%, transparent 60%);
-  opacity: 0;
-  animation: sacredBlueFlash 12s ease-in-out infinite;
-}
-
-@keyframes prayerFlow {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
-}
-
-@keyframes sacredBlueFlash {
-  0%, 15%, 30%, 100% { opacity: 0; }
-  8%, 24%, 38% { 
-    opacity: 0.4; 
-    --x: 20%; --y: 30%;
-  }
-  18%, 45% { 
-    opacity: 0.55; 
-    --x: 75%; --y: 70%;
-  }
-  28% { 
-    opacity: 0.35; 
-    --x: 40%; --y: 50%;
-  }
-}
-
-@keyframes templeBreath {
+@keyframes seikiBeat {
   0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.025); }
+  10%, 14% { transform: translateX(-50%) scale(1.05); }
+  25%      { transform: translateX(-50%) scale(1.01); }
+  32%, 36% { transform: translateX(-50%) scale(1.06); }
+  50%      { transform: translateX(-50%) scale(1); }
 }
 
-/* ホバー：神殿の扉が静かに開くような感覚 */
-.seiki-temple-gate:hover {
-  transform: translateX(-50%) scale(1.04);
-  box-shadow:
-    0 20px 50px rgba(15,22,41,0.7),
-    0 0 80px rgba(212,167,106,0.65),
-    0 0 140px rgba(91,140,255,0.45);
+/* 蒼金リング（神秘的な外輪） */
+.seiki-core-btn::before {
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:999px;
+
+  border:1px solid rgba(255,240,190,0.8);
+  background:
+    radial-gradient(circle, rgba(79,109,255,0.35), transparent 70%);
+
+  mix-blend-mode:screen;
+  opacity:0.95;
+  animation: seikiRing 18s linear infinite;
 }
 
-/* スマホ最適化 */
+@keyframes seikiRing {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+
+/* =============================================
+   横長コードレイン（光の帯）
+   - 細い水平ラインがずっと横に流れる
+============================================= */
+.seiki-core-btn .flow {
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+
+  background-image:
+    /* 白い光の帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.95) 0px,
+      rgba(255,255,255,0.95) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    /* 金色の帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,215,130,0.9) 0px,
+      rgba(255,215,130,0.9) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    /* 蒼い帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(79,109,255,0.85) 0px,
+      rgba(79,109,255,0.85) 1px,
+      transparent 1px,
+      transparent 9px
+    );
+
+  background-size:
+    180% 100%,
+    200% 100%,
+    220% 100%;
+
+  mix-blend-mode:screen;
+  opacity:0.5;
+
+  animation: seikiFlow 10s linear infinite;
+}
+
+@keyframes seikiFlow {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 140px 0, 200px 0, 260px 0;
+  }
+}
+
+/* スマホ調整 */
 @media (max-width: 768px) {
-  .seiki-temple-gate {
-    width: 270px;
-    height: 84px;
-    font-size: 17px;
-    letter-spacing: 0.34em;
-    bottom: 20px;
+  .seiki-core-btn {
+    width: 215px;
+    height: 62px;
+    font-size: 14px;
+    bottom: 14px;
   }
 }
