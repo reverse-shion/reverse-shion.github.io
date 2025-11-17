@@ -319,47 +319,8 @@
       z-index: -1;
     }
 
-    /* 詩韻思想ページへのボタン（Cut3内） */
-    .philo-cta {
-      margin-top: 22px;
-      padding: 12px 22px;
-      border-radius: 999px;
-      border: none;
-      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-      font-size: 14px;
-      letter-spacing: 0.12em;
-      background:
-        radial-gradient(circle at 30% 0%, rgba(255,255,255,0.9), transparent 55%),
-        linear-gradient(135deg, #ffdd99, #c68a2f);
-      color: #4a3312;
-      box-shadow:
-        0 0 12px rgba(255,215,111,0.9),
-        0 0 24px rgba(255,205,140,0.8);
-      cursor: pointer;
-      opacity: 0;
-      transform: translateY(12px);
-      pointer-events: none;
-      transition:
-        opacity 0.9s ease-out,
-        transform 0.9s ease-out,
-        box-shadow 0.3s ease-out;
-    }
-
-    .philo-cta.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .philo-cta:hover {
-      box-shadow:
-        0 0 18px rgba(255,215,111,1),
-        0 0 30px rgba(255,240,210,1);
-      transform: translateY(-1px);
-    }
-
     .philo-sub-link {
-      margin-top: 10px;
+      margin-top: 16px;
       font-size: 11px;
       letter-spacing: 0.12em;
       opacity: 0;
@@ -377,15 +338,26 @@
     }
 
     .philo-sub-link a {
+      display: inline-block;
+      padding: 7px 18px;
+      border-radius: 999px;
       color: #8b6b41;
       text-decoration: none;
-      border-bottom: 1px solid rgba(198,138,47,0.4);
-      padding-bottom: 2px;
+      border: 1px solid rgba(198,138,47,0.6);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255,255,255,0.9), transparent 55%),
+        linear-gradient(135deg, #fff4d7, #ffe7b3);
+      box-shadow:
+        0 0 10px rgba(255,220,160,0.7),
+        0 0 20px rgba(255,240,210,0.8);
     }
 
     .philo-sub-link a:hover {
-      border-bottom-color: rgba(198,138,47,0.9);
+      border-color: rgba(198,138,47,0.9);
       color: #65451f;
+      box-shadow:
+        0 0 14px rgba(255,220,160,1),
+        0 0 26px rgba(255,240,210,1);
     }
 
     /* =========================
@@ -457,56 +429,136 @@
     }
 
     /* =========================
-       常時表示ショートカットボタン
+       詩韻思想へアクセス（常時表示ボタン）
+       ※ 神々しい楕円ボタン
     ========================= */
-    .philo-float-cta {
+    .shion-sigil-btn {
+      --outer-glow: rgba(255, 245, 210, 0.95);
+      --inner-glow: rgba(190, 220, 255, 0.65);
+      --core-gold:  rgba(255, 215, 160, 1);
+
       position: fixed;
       bottom: 18px;
       left: 50%;
       transform: translateX(-50%);
-      padding: 8px 18px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 260px;
+      height: 110px;
       border-radius: 999px;
-      font-size: 11px;
-      letter-spacing: 0.14em;
+      padding: 0;
       text-decoration: none;
-      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-      color: #3f3120;
+      color: #fff;
       background:
-        radial-gradient(circle at 20% 0%, rgba(255,255,255,0.9), transparent 50%),
-        linear-gradient(135deg, #ffe9b8, #f7c86b);
+        radial-gradient(circle at 30% 0%, rgba(255,255,255,0.8), transparent 55%),
+        radial-gradient(circle at 70% 100%, rgba(158,197,255,0.9), transparent 65%),
+        radial-gradient(circle at 50% 50%, rgba(10,25,60,1), rgba(0,0,0,1));
       box-shadow:
-        0 0 10px rgba(255,215,111,0.9),
-        0 0 20px rgba(0,0,0,0.5);
-      z-index: 999;
+        0 0 35px var(--outer-glow),
+        0 0 90px rgba(255, 255, 255, 0.9),
+        0 0 160px rgba(140, 190, 255, 0.85);
+      overflow: hidden;
+      isolation: isolate;
+      z-index: 2000;
+      opacity: 0.96;
+      transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.3s ease;
+    }
+
+    .shion-sigil-btn::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow:
+        0 0 20px rgba(255,255,255,0.9),
+        inset 0 0 25px rgba(255,255,255,0.8),
+        inset 0 0 45px rgba(140,190,255,0.8);
+      background:
+        radial-gradient(circle at 50% 50%,
+          rgba(255,255,255,0.9),
+          rgba(255,215,160,0.2) 35%,
+          transparent 60%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .shion-sigil-btn::after {
+      content: "";
+      position: absolute;
+      inset: 24px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 50% 50%, var(--core-gold), transparent 55%),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.7), transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(190,220,255,0.7), transparent 55%);
       opacity: 0.9;
-      transition:
-        opacity 0.3s ease-out,
-        transform 0.3s ease-out,
-        box-shadow 0.3s ease-out;
+      filter: blur(1px);
+      mix-blend-mode: screen;
+      pointer-events: none;
     }
 
-    .philo-float-cta:hover {
-      opacity: 1;
-      transform: translateX(-50%) translateY(-1px);
+    .shion-sigil-btn .spark {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.9) 0, transparent 55%),
+        radial-gradient(circle, rgba(255,255,255,0.7) 0, transparent 55%),
+        radial-gradient(circle, rgba(255,255,255,0.6) 0, transparent 55%);
+      background-size: 12px 12px, 8px 8px, 6px 6px;
+      background-repeat: repeat;
+      background-position: -200px 0, -260px 20px, -220px -20px;
+      opacity: 0.5;
+      mix-blend-mode: screen;
+      animation: shionSpark 4s linear infinite;
+      pointer-events: none;
+    }
+
+    .shion-sigil-btn .label {
+      position: relative;
+      z-index: 5;
+      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      text-align: center;
+      text-shadow:
+        0 0 8px rgba(255,255,255,0.95),
+        0 0 14px rgba(255,245,220,0.95);
+    }
+
+    .shion-sigil-btn:hover {
+      transform: translateX(-50%) translateY(-1px) scale(1.02);
       box-shadow:
-        0 0 16px rgba(255,215,111,1),
-        0 0 26px rgba(0,0,0,0.7);
+        0 0 45px var(--outer-glow),
+        0 0 140px rgba(255,255,255,1),
+        0 0 220px rgba(140,190,255,0.95);
+      opacity: 1;
     }
 
-    .philo-float-cta span {
-      font-size: 0.9em;
+    @keyframes shionSpark {
+      0% {
+        background-position: -220px 0, -260px 20px, -240px -20px;
+      }
+      100% {
+        background-position: 220px 0, 260px 20px, 240px -20px;
+      }
     }
 
     @media (max-width: 768px) {
       .cut__content {
-        text-align: left;
+        text-align: le ft;
       }
       .code-column {
         width: calc(100% / 16); /* モバイルはさらに軽く */
       }
-      .philo-float-cta {
+      .shion-sigil-btn {
+        width: 220px;
+        height: 90px;
         bottom: 12px;
-        padding: 7px 14px;
+      }
+      .shion-sigil-btn .label {
         font-size: 10px;
       }
     }
@@ -583,10 +635,7 @@
             </p>
           </div>
 
-          <button class="philo-cta" type="button" onclick="location.href='/books/zero.html'">
-            詩韻思想のコアへ進む
-          </button>
-
+          <!-- 外部から見た詩韻思想：最後に表示されるリンク -->
           <div class="philo-sub-link">
             <a href="/reviews/shion-philosophy-review.html">外部から見た詩韻思想</a>
           </div>
@@ -595,9 +644,10 @@
     </section>
   </main>
 
-  <!-- 常時表示のショートカット -->
-  <a href="/books/zero.html" class="philo-float-cta">
-    <span>▶ 詩韻思想のコアへショートカット</span>
+  <!-- 1. 詩韻思想へアクセス：常時表示ボタン -->
+  <a href="/books/zero.html" class="shion-sigil-btn">
+    <span class="spark"></span>
+    <span class="label">詩韻思想へアクセス</span>
   </a>
 
   <script>
@@ -668,18 +718,13 @@
           }, delay);
         });
 
+        // CUT3 の最後に「外部から見た詩韻思想」を表示
         if (cut.classList.contains('cut--code')) {
-          const btn = cut.querySelector('.philo-cta');
           const sub = cut.querySelector('.philo-sub-link');
-          if (btn) {
+          if (sub) {
             const lastDelay = FIRST_LINE_DELAY + (lines.length - 1) * LINE_INTERVAL;
             setTimeout(function () {
-              btn.classList.add('is-visible');
-              if (sub) {
-                setTimeout(function () {
-                  sub.classList.add('is-visible');
-                }, 250);
-              }
+              sub.classList.add('is-visible');
             }, lastDelay + 650);
           }
         }
