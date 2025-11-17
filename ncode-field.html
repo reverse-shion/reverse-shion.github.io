@@ -339,7 +339,7 @@
     .code-column {
       position: relative;
       height: 100%;
-      width: calc(100% / 24); /* 列数を半分にして軽量化 */
+      width: calc(100% / 24);
       overflow: hidden;
       font-family: "Courier New", ui-monospace, monospace;
       font-size: clamp(8px, 1.8vw, 12px);
@@ -388,53 +388,68 @@
     }
 
     /* =========================
-       グローバル固定ボタン
-       （詩韻思想のコアへ進む）
+       詩韻思想メインボタン（神々しい版）
+       ＋ 常時固定コンテナ
     ========================= */
     .philo-fixed {
       position: fixed;
       left: 50%;
-      bottom: clamp(14px, 4vh, 26px);
+      bottom: calc(18px + env(safe-area-inset-bottom, 0px));
       transform: translateX(-50%);
-      z-index: 50;
-      pointer-events: none; /* 中のボタンだけクリック可能にする */
+      z-index: 998;
+      text-align: center;
+      padding: 0 16px;
+      pointer-events: none; /* 中の要素だけ反応させる */
+    }
+
+    .philo-fixed-inner {
+      pointer-events: auto;
     }
 
     .shion-button {
       display: inline-block;
-      padding: 14px 30px;
+      padding: 14px 32px;
       font-family: 'Shippori Mincho', serif;
       font-weight: 600;
       font-size: 1.05rem;
-      color: #513c2d;
+      letter-spacing: 0.18em;
+      color: #3b2818;
       text-decoration: none;
       border-radius: 999px;
 
-      background: radial-gradient(circle at 50% 40%,
-        #fff9ec 0%,
-        #f5e4cd 55%,
-        #e8d3b4 100%
-      );
+      background:
+        radial-gradient(circle at 50% 30%, #fffaf0 0%, rgba(255,250,240,0.85) 35%, transparent 65%),
+        radial-gradient(circle at 50% 120%, #e0b878 0%, #c79b58 40%, #b1833f 75%);
+      
+      border: 1px solid rgba(210, 176, 120, 0.95);
 
-      border: 1.2px solid rgba(140, 110, 80, 0.4);
       box-shadow:
-        0 2px 4px rgba(90, 70, 50, 0.25),
-        0 0 16px rgba(255, 236, 200, 0.8),
-        inset 0 1px 3px rgba(255, 255, 255, 0.7);
+        0 0 0 1px rgba(255, 255, 255, 0.35),
+        0 10px 26px rgba(92, 62, 34, 0.45),
+        0 0 40px rgba(255, 235, 200, 0.85),
+        inset 0 1px 3px rgba(255, 255, 255, 0.75),
+        inset 0 -2px 4px rgba(171, 119, 50, 0.4);
 
-      transition: all 0.35s ease;
       position: relative;
       overflow: hidden;
+      transition:
+        box-shadow 0.4s ease,
+        transform 0.3s ease,
+        background 0.4s ease,
+        color 0.3s ease,
+        letter-spacing 0.3s ease;
+      
       opacity: 0;
       transform: translateY(14px);
-      pointer-events: auto;
-      animation: philoBtnIn 1.4s ease-out 1.4s forwards;
+      animation: philoBtnIn 1.4s ease-out 1.0s forwards,
+                 shionAura 8s ease-in-out 2.0s infinite;
+      cursor: pointer;
     }
 
     .shion-button::before {
       content: "▶";
-      font-size: 0.8em;
-      margin-right: 0.6em;
+      font-size: 0.82em;
+      margin-right: 0.7em;
       transform: translateY(1px);
       display: inline-block;
     }
@@ -442,40 +457,93 @@
     .shion-button::after {
       content: "";
       position: absolute;
-      inset: -50% 0 0 0;
-      margin: auto;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle,
-        rgba(255, 247, 230, 0.45) 0%,
-        rgba(255, 247, 230, 0) 60%
-      );
-      opacity: 0;
-      transition: opacity 0.5s ease;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 30% 0%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle at 80% 120%, rgba(255,224,180,0.65) 0%, rgba(255,224,180,0) 60%);
+      opacity: 0.0;
+      pointer-events: none;
+      transition: opacity 0.55s ease;
     }
 
     .shion-button:hover {
-      color: #3c2b1f;
+      color: #2f2116;
+      letter-spacing: 0.2em;
+      transform: translateY(10px);
       box-shadow:
-        0 0 22px rgba(255, 236, 200, 0.95),
-        0 3px 6px rgba(100, 80, 60, 0.3),
-        inset 0 0 10px rgba(255, 245, 230, 0.95);
-      transform: translateY(11px);
+        0 0 0 1px rgba(255, 255, 255, 0.5),
+        0 14px 30px rgba(92, 62, 34, 0.55),
+        0 0 52px rgba(255, 240, 210, 0.95),
+        inset 0 1px 4px rgba(255, 255, 255, 0.9),
+        inset 0 -2px 5px rgba(171, 119, 50, 0.55);
     }
 
     .shion-button:hover::after {
       opacity: 1;
     }
 
+    @keyframes shionAura {
+      0% {
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.35),
+          0 10px 24px rgba(92, 62, 34, 0.40),
+          0 0 30px rgba(255, 230, 195, 0.75),
+          inset 0 1px 3px rgba(255, 255, 255, 0.75),
+          inset 0 -2px 4px rgba(171, 119, 50, 0.4);
+      }
+      50% {
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.5),
+          0 12px 28px rgba(92, 62, 34, 0.5),
+          0 0 46px rgba(255, 238, 205, 0.9),
+          inset 0 1px 4px rgba(255, 255, 255, 0.85),
+          inset 0 -2px 5px rgba(171, 119, 50, 0.5);
+      }
+      100% {
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.35),
+          0 10px 24px rgba(92, 62, 34, 0.40),
+          0 0 30px rgba(255, 230, 195, 0.75),
+          inset 0 1px 3px rgba(255, 255, 255, 0.75),
+          inset 0 -2px 4px rgba(171, 119, 50, 0.4);
+      }
+    }
+
     @keyframes philoBtnIn {
       from {
         opacity: 0;
-        transform: translateY(14px);
+        transform: translateY(20px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(14px);
       }
+    }
+
+    .philo-fixed-sub {
+      margin-top: 8px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: philoSubIn 1.0s ease-out 1.4s forwards;
+    }
+
+    @keyframes philoSubIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 0.9; transform: translateY(0); }
+    }
+
+    .philo-fixed-sub a {
+      color: #8b6b41;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(198,138,47,0.4);
+      padding-bottom: 2px;
+    }
+
+    .philo-fixed-sub a:hover {
+      border-bottom-color: rgba(198,138,47,0.9);
+      color: #65451f;
     }
 
     @media (max-width: 768px) {
@@ -483,7 +551,7 @@
         text-align: left;
       }
       .code-column {
-        width: calc(100% / 16); /* モバイルはさらに軽く */
+        width: calc(100% / 16);
       }
       .shion-button {
         width: 100%;
@@ -568,11 +636,16 @@
     </section>
   </main>
 
-  <!-- どのカットからでも押せる固定ボタン -->
-  <div class="philo-fixed">
-    <a href="/books/zero.html" class="shion-button">
-      詩韻思想のコアへ進む
-    </a>
+  <!-- 常時表示：詩韻思想への導線＋外部レビュー -->
+  <div class="philo-fixed" aria-label="詩韻思想へのメイン導線">
+    <div class="philo-fixed-inner">
+      <button class="shion-button" type="button" onclick="location.href='/books/zero.html'">
+        詩韻思想のコアへ進む
+      </button>
+      <div class="philo-fixed-sub">
+        <a href="/reviews/shion-philosophy-review.html">外部から見た詩韻思想</a>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -673,9 +746,6 @@
         scene.addEventListener('click', function () {
           if (currentIndex < cuts.length - 1) {
             activateCut(currentIndex + 1);
-          } else {
-            // 最後まで見た後にタップでコアへ飛ばしたい場合は下を有効化
-            // location.href = '/books/zero.html';
           }
         }, { passive: true });
       }
