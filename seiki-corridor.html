@@ -27,7 +27,6 @@
       --accent-muted: #7f8aa8;
       --error: #ff9b9b;
       --radius-card: 18px;
-      --shadow-soft: 0 0 24px rgba(0, 0, 0, 0.75);
       --blur-bg: 16px;
     }
 
@@ -37,7 +36,8 @@
       color: var(--text-main);
       font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont,
         'Yu Mincho', '游明朝体', 'YuMincho', serif;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     body {
@@ -75,24 +75,20 @@
     }
 
     @keyframes drift-stars {
-      0% {
-        transform: translate3d(0, 0, 0);
-      }
-      100% {
-        transform: translate3d(-60px, -120px, 0);
-      }
+      0% { transform: translate3d(0, 0, 0); }
+      100%{ transform: translate3d(-60px, -120px, 0); }
     }
 
-    /* ページ全体ラッパ（横回廊） */
+    /* ページ全体ラッパ */
     .corridor-shell {
       position: relative;
       z-index: 1;
-      height: 100%;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* タイトルヘッダー（上部固定） */
+    /* ヘッダー */
     header.site-header {
       padding: 12px 20px 6px;
       display: flex;
@@ -114,7 +110,6 @@
       font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
       font-size: clamp(1.3rem, 2.2vw, 1.8rem);
       letter-spacing: 0.12em;
-      text-transform: none;
       color: var(--gold-soft);
       text-shadow: 0 0 16px rgba(255, 215, 122, 0.65);
     }
@@ -132,7 +127,6 @@
       opacity: 0.9;
     }
 
-    /* 下部に細いゴールドライン（道の起点） */
     .header-line {
       width: 100%;
       height: 1px;
@@ -145,7 +139,7 @@
       opacity: 0.8;
     }
 
-    /* 回廊本体（横スクロール） */
+    /* 横スクロール回廊 */
     .corridor-track {
       position: relative;
       flex: 1;
@@ -154,7 +148,7 @@
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
       scroll-behavior: smooth;
-      padding: 26px 12vw 28px;
+      padding: 26px 12vw 96px; /* 下にヒント分の余白 */
       gap: 22vw;
       align-items: center;
     }
@@ -178,13 +172,12 @@
       top: 48%;
       height: 2px;
       background: radial-gradient(circle at 50% 50%, rgba(255, 215, 122, 0.6), transparent 70%);
-      opacity: 0.35; /* 少し控えめに */
+      opacity: 0.35;
       pointer-events: none;
       z-index: 1;
       overflow: visible;
     }
 
-    /* 道が静かに伸びる動的な光 */
     .path-glow {
       position: absolute;
       left: 0;
@@ -206,7 +199,7 @@
       100% { transform: translateY(-50%) scaleX(1.2); }
     }
 
-    /* 各セクション（挨拶・第一灯籠・ユーザー灯籠群） */
+    /* 各セクション */
     .corridor-section {
       position: relative;
       min-width: min(90vw, 680px);
@@ -216,7 +209,7 @@
       justify-content: center;
     }
 
-    /* カード（灯籠）共通 */
+    /* カード */
     .card {
       position: relative;
       padding: 22px 20px 20px;
@@ -243,10 +236,7 @@
       border-radius: 999px;
     }
 
-    /* 挨拶カード */
-    .card-intro {
-      max-width: 620px;
-    }
+    .card-intro { max-width: 620px; }
 
     .intro-label {
       font-size: 0.78rem;
@@ -272,14 +262,9 @@
       white-space: pre-line;
     }
 
-    .intro-body p + p {
-      margin-top: 10px;
-    }
+    .intro-body p + p { margin-top: 10px; }
 
-    /* 第一灯籠カード */
-    .card-lantern-main {
-      max-width: 620px;
-    }
+    .card-lantern-main { max-width: 620px; }
 
     .card-lantern-main .lantern-tag {
       font-size: 0.8rem;
@@ -317,7 +302,6 @@
       opacity: 0.85;
     }
 
-    /* ユーザー灯籠エリア */
     .card-user {
       max-width: 640px;
       display: flex;
@@ -344,7 +328,6 @@
       line-height: 1.7;
     }
 
-    /* 祈り入力フォーム */
     .prayer-form {
       margin-top: 4px;
       display: flex;
@@ -414,10 +397,7 @@
       transition: opacity 0.15s ease-out;
     }
 
-    .btn-primary span {
-      position: relative;
-      z-index: 1;
-    }
+    .btn-primary span { position: relative; z-index: 1; }
 
     .btn-primary:hover {
       transform: translateY(-1px);
@@ -435,9 +415,7 @@
       filter: saturate(0.95);
     }
 
-    .btn-primary:hover::after {
-      opacity: 0.5;
-    }
+    .btn-primary:hover::after { opacity: 0.5; }
 
     .btn-primary[disabled] {
       cursor: default;
@@ -455,7 +433,6 @@
       min-height: 1.2em;
     }
 
-    /* 既存灯籠リスト */
     .lantern-list {
       display: flex;
       flex-direction: column;
@@ -502,7 +479,7 @@
       text-align: right;
     }
 
-    /* 下部静かなナビ */
+    /* 下部ナビ（デスクトップは固定、スマホは通常配置） */
     footer.site-footer {
       position: fixed;
       bottom: 8px;
@@ -548,6 +525,46 @@
       background: radial-gradient(circle at 50% 0, rgba(88, 69, 158, 0.95), rgba(30, 23, 70, 0.98));
     }
 
+    /* 横スクロールの光る道標 */
+    .scroll-hint {
+      position: fixed;
+      left: 50%;
+      bottom: 64px;
+      transform: translateX(-50%);
+      z-index: 4;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 215, 122, 0.8);
+      background:
+        radial-gradient(circle at 50% 0, rgba(255, 245, 210, 0.18), rgba(18, 12, 32, 0.96));
+      color: var(--gold-soft);
+      font-size: 0.78rem;
+      box-shadow:
+        0 0 18px rgba(255, 215, 122, 0.9),
+        0 0 26px rgba(0, 0, 0, 0.9);
+      pointer-events: none;
+      animation: hint-pulse 2.4s ease-in-out infinite;
+    }
+
+    .scroll-hint .arrow {
+      font-size: 0.9rem;
+    }
+
+    @keyframes hint-pulse {
+      0%   { opacity: 0;   transform: translateX(-50%) translateY(6px); }
+      20%  { opacity: 1;   transform: translateX(-50%) translateY(0); }
+      80%  { opacity: 0.7; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0;   transform: translateX(-50%) translateY(6px); }
+    }
+
+    .scroll-hint.scroll-hint--hide {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+
     /* 灯籠点灯時の光粒子 */
     .sparkles {
       position: fixed;
@@ -578,20 +595,27 @@
       }
     }
 
-    /* レスポンシブ微調整 */
+    /* レスポンシブ調整 */
     @media (max-width: 768px) {
-      header.site-header {
-        padding: 10px 14px 6px;
-      }
+      header.site-header { padding: 10px 14px 6px; }
       .corridor-track {
         padding-inline: 8vw;
         gap: 14vw;
+        padding-bottom: 32px;
       }
-      .card {
-        max-height: 68vh;
+      .card { max-height: 68vh; }
+      .path-line { top: 52%; }
+
+      /* スマホではフッターを通常の位置に置く（かぶらない） */
+      footer.site-footer {
+        position: static;
+        transform: none;
+        margin: 8px auto 16px;
       }
-      .path-line {
-        top: 52%;
+
+      /* ヒントは少し上に */
+      .scroll-hint {
+        bottom: 96px;
       }
     }
 
@@ -603,27 +627,23 @@
       .card {
         padding: 18px 16px 16px;
       }
-      .card-intro h2 {
-        font-size: 1.08rem;
-      }
+      .card-intro h2 { font-size: 1.08rem; }
       .lantern-body,
-      .intro-body p {
-        font-size: 0.88rem;
-      }
+      .intro-body p { font-size: 0.88rem; }
     }
   </style>
 </head>
 <body>
   <div class="starfield" aria-hidden="true"></div>
 
-  <!-- 光の道＋伸びるグロー -->
+  <!-- 光の道 -->
   <div class="path-line" aria-hidden="true">
     <div class="path-glow"></div>
   </div>
 
   <div class="corridor-shell">
 
-    <!-- 上部ヘッダー -->
+    <!-- ヘッダー -->
     <header class="site-header">
       <div class="title-block">
         <h1>星祈の回廊</h1>
@@ -633,10 +653,10 @@
       <div class="header-line" aria-hidden="true"></div>
     </header>
 
-    <!-- 横スクロールの回廊 -->
+    <!-- 横スクロール回廊 -->
     <main class="corridor-track" aria-label="星祈の回廊">
 
-      <!-- 1. 挨拶セクション -->
+      <!-- 1. 挨拶 -->
       <section class="corridor-section" aria-label="回廊の入口">
         <article class="card card-intro">
           <div class="intro-label">Seiki Corridor — Entrance</div>
@@ -658,7 +678,7 @@
         </article>
       </section>
 
-      <!-- 2. 第一灯籠セクション -->
+      <!-- 2. 第一灯籠 -->
       <section class="corridor-section" aria-label="第一灯籠">
         <article class="card card-lantern-main">
           <div class="lantern-tag">星祈の回廊：第一灯籠 ✧</div>
@@ -684,7 +704,7 @@
         </article>
       </section>
 
-      <!-- 3. あなたの灯籠セクション（ローカル保存） -->
+      <!-- 3. あなたの灯籠 -->
       <section class="corridor-section" aria-label="あなたの灯籠">
         <article class="card card-user">
           <div class="card-user-header">
@@ -729,7 +749,13 @@
     </main>
   </div>
 
-  <!-- 下部ナビゲーション（控えめな導線） -->
+  <!-- 横スクロールの道標 -->
+  <div class="scroll-hint" id="scrollHint">
+    <span>指で右へ進めます</span>
+    <span class="arrow">➝➝</span>
+  </div>
+
+  <!-- 下部ナビ -->
   <footer class="site-footer" aria-label="星祈の回廊ナビゲーション">
     <span class="footer-label">他の星への扉：</span>
     <nav class="footer-links">
@@ -740,7 +766,7 @@
   </footer>
 
   <script>
-    // 星祈の回廊：ローカル灯籠 ＋ エフェクト管理
+    // 星祈の回廊：ローカル灯籠＋エフェクト
     (function() {
       const STORAGE_KEY = 'seiki_corridor_prayers_v1';
       const form = document.getElementById('prayerForm');
@@ -748,12 +774,14 @@
       const errorEl = document.getElementById('prayerError');
       const listEl = document.getElementById('lanternList');
       const submitBtn = document.getElementById('submitPrayer');
+      const corridorTrack = document.querySelector('.corridor-track');
+      const scrollHint = document.getElementById('scrollHint');
 
       // ささやき音（1インスタンス使い回し）
       let whisperAudio = null;
       function getWhisperAudio() {
         if (!whisperAudio) {
-          // 必要に応じてパスを書き換えてね
+          // 必要ならパスを変更
           whisperAudio = new Audio('https://reverse-shion.github.io/assets/whisper-thanks.mp3');
           whisperAudio.volume = 0.15;
         }
@@ -769,7 +797,7 @@
         for (let i = 0; i < 18; i++) {
           const s = document.createElement('div');
           s.className = 'sparkle';
-          const offsetX = Math.random() * 120 - 60; // 左右に散る
+          const offsetX = Math.random() * 120 - 60;
           s.style.left = (x + offsetX) + 'px';
           s.style.top  = y + 'px';
           sparkles.appendChild(s);
@@ -869,7 +897,7 @@
         textarea.value = '';
         renderList();
 
-        // ボタン位置から光粒子を立ち上げる
+        // ボタン位置から光が立ち上がる
         if (submitBtn) {
           const rect = submitBtn.getBoundingClientRect();
           const x = rect.left + rect.width / 2;
@@ -880,6 +908,28 @@
 
       // 初期表示
       renderList();
+
+      // 横スクロールの道標制御
+      if (corridorTrack && scrollHint) {
+        let hintHidden = false;
+        const hideHint = () => {
+          if (hintHidden) return;
+          hintHidden = true;
+          scrollHint.classList.add('scroll-hint--hide');
+          setTimeout(() => {
+            scrollHint.style.display = 'none';
+          }, 450);
+        };
+
+        corridorTrack.addEventListener('scroll', () => {
+          if (corridorTrack.scrollLeft > 24) {
+            hideHint();
+          }
+        });
+
+        // 10秒たっても動かなければ自動で消す
+        setTimeout(hideHint, 10000);
+      }
     })();
   </script>
 </body>
