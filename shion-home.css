@@ -817,117 +817,105 @@ body{
   40% {text-shadow:0 0 12px rgba(255,215,111,.9);}
   100%{text-shadow:0 0 0 rgba(255,215,111,0);}
 }
-/* =============================================
-   星祈の回廊 専用サイバー聖域ボタン
-   蒼×金の粒子が降り注ぎ、祈りが星になる瞬間を表現
-============================================= */
 .seiki-core-btn {
-  --blue-star: #4185F4;
-  --deep-cosmo: #0C1445;
-  --gold-star: #FFD700;
-  --holy-glow: #E6F0FF;
-  --text-light: #F0F6FF;
+  --blue-star: #3f68e8;       /* ほんのり落ち着いた蒼 */
+  --deep-cosmo: #10163d;
+  --gold-star: #ffd986;
+  --text-light: #f5f7ff;
 
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   
-  width: 280px;
-  height: 86px;
+  width: 260px;
+  height: 80px;
   border-radius: 50px;
-  margin: 20px auto;
+  margin: 22px auto;
 
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 0.32em;
-  text-indent: 0.32em;
+  font-size: 17px;
+  letter-spacing: 0.30em;
+  text-indent: 0.30em;
   color: var(--text-light);
   text-decoration: none;
-  text-shadow: 0 0 12px rgba(65, 133, 244, 0.8);
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.9),
+    0 0 16px rgba(255,217,134,0.6);
 
-  /* 宇宙の深淵＋聖なる蒼金グラデーション */
-  background: 
-    radial-gradient(circle at 30% 30%, rgba(65,133,244,0.25), transparent 60%),
-    linear-gradient(135deg, #0F1A3A 0%, #112255 30%, #1E40AF 70%, #1E3A8A 100%),
-    conic-gradient(from 180deg at 50% 50%, #4185F4, #FFD700, #4185F4, #0C1445, #4185F4);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.28), transparent 60%),
+    linear-gradient(135deg, #141a3f 0%, #182657 35%, #2143a8 75%, #1b2f7f 100%);
 
-  box-shadow: 
-    0 8px 32px rgba(12, 20, 69, 0.6),
-    0 0 40px rgba(65, 133, 244, 0.4),
-    inset 0 2px 10px rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 26px rgba(0,0,0,0.35),
+    0 0 40px rgba(63,104,232,0.55);
 
   overflow: hidden;
   isolation: isolate;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
 }
 
-/* 流れる蒼い光の帯（回廊の道筋） */
+/* 蒼い道筋（メイン演出） */
 .seiki-core-btn .flow {
-  position: absolute;
-  inset: 4px;
-  border-radius: 48px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(65,133,244,0.3) 30%, 
-    rgba(255,215,0,0.4) 50%, 
-    rgba(65,133,244,0.3) 70%, 
-    transparent 100%);
-  animation: seikiFlow 6s linear infinite;
+  position:absolute;
+  inset:5px;
+  border-radius:inherit;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,217,134,0.4) 35%,
+    rgba(63,104,232,0.55) 60%,
+    transparent 100%
+  );
+  opacity:0.9;
+  mix-blend-mode:screen;
+  animation: seikiFlow 7s linear infinite;
 }
 
-/* 降り注ぐ星の粒子（これが本命） */
+/* 控えめな星粒 */
 .seiki-core-btn .particles {
-  position: absolute;
-  inset: 0;
-  border-radius: 50px;
-  background: 
-    radial-gradient(circle 2px at 20% 10%, #FFD700 0%, transparent 70%),
-    radial-gradient(circle 1.5px at 80% 80%, #FFF8E1 0%, transparent 70%),
-    radial-gradient(circle 2.5px at 50% 20%, #4185F4 0%, transparent 70%),
-    radial-gradient(circle 1px at 30% 70%, #E6F0FF 0%, transparent 70%);
-  background-size: 60px 60px;
-  background-repeat: repeat;
-  animation: seikiStarfall 14s linear infinite;
-  opacity: 0.7;
-  pointer-events: none;
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle 1.5px at 20% 15%, #ffd986 0, transparent 70%),
+    radial-gradient(circle 1px at 80% 70%, #ffffff 0, transparent 70%),
+    radial-gradient(circle 1.5px at 50% 30%, #b9c8ff 0, transparent 70%);
+  background-size: 70px 70px;
+  background-repeat:repeat;
+  opacity:0.55;
+  mix-blend-mode:screen;
+  animation: seikiStarfall 16s linear infinite;
 }
 
-/* ホバー時：星が爆ぜて祈りが届く演出 */
-.seiki-core-btn:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 
-    0 20px 50px rgba(12, 20, 69, 0.8),
-    0 0 80px rgba(65, 133, 244, 0.7),
-    0 0 120px rgba(255, 215, 0, 0.4);
-}
-
-.seiki-core-btn:hover .particles {
-  animation-duration: 3s;
-  opacity: 1;
-}
-
-/* アニメーション */
 @keyframes seikiFlow {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(110%); }
 }
 
 @keyframes seikiStarfall {
-  0% { background-position: 0 0, 30px 30px, 60px 10px, 10px 50px; }
-  100% { background-position: 0 200px, 30px 230px, 60px 210px, 10px 250px; }
+  0% { background-position: 0 0, 30px 40px, 60px 10px; }
+  100% { background-position: 0 180px, 30px 220px, 60px 190px; }
 }
 
-/* スマホ最適化 */
-@media (max-width: 768px) {
-  .seiki-core-btn {
-    width: 260px;
-    height: 78px;
+/* ホバー（PCのみ） */
+@media (pointer:fine) {
+  .seiki-core-btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 16px 40px rgba(0,0,0,0.45),
+      0 0 70px rgba(63,104,232,0.7);
+  }
+}
+
+/* スマホ */
+@media (max-width:768px){
+  .seiki-core-btn{
+    width: 240px;
+    height: 74px;
     font-size: 16px;
-    letter-spacing: 0.28em;
   }
 }
