@@ -818,18 +818,16 @@ body{
   100%{text-shadow:0 0 0 rgba(255,215,111,0);}
 }
 /* =============================================
-   詩韻思想 最終進化ボタン「金色の刻印」
-   ・視認性：ほぼ100%（黒背景でも白背景でも完璧に読める）
-   ・神々しさ：光の柱が降り注ぐような立体感
-   ・負荷：GPU加速のみで超軽量
-   ・詩韻思想らしさ：文字が「降りてくる」瞬間を表現
+   詩韻思想「星砂ゲートボタン」
+   - 金属感より「光の砂」
+   - 文字の視認性を最優先
+   - 軽量：transform + background-position のみ
 ============================================= */
 .shion-divine-btn {
-  --gold: #FFD700;
-  --deep-gold: #B8860B;
-  --holy-light: #FFF8E1;
-  --text-glow: #FFFDF5;
-  --shadow-gold: rgba(255, 215, 0, 0.6);
+  --gold-soft: #fbe7b8;
+  --gold-core: #f3c971;
+  --gold-deep: #b37b2b;
+  --halo: rgba(255, 232, 185, 0.9);
 
   position: fixed;
   bottom: 24px;
@@ -838,123 +836,129 @@ body{
   z-index: 9999;
 
   width: 260px;
-  height: 84px;
-  border-radius: 50px;
-  
+  height: 80px;
+  border-radius: 999px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+
+  font-family: "Shippori Mincho","Noto Serif JP",serif;
   font-weight: 700;
-  font-size: 16px;           /* 視認性最優先で大きめに */
-  letter-spacing: 0.28em;
-  text-indent: 0.28em;
-  color: #2C1810;            /* 深みのある焦げ茶（金色に最も映える） */
-  
-  text-decoration: none;
+  font-size: 15px;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
   text-align: center;
+  text-decoration: none;
   cursor: pointer;
-  
-  /* 本物の金箔のような多層グラデーション */
-  background: 
-    radial-gradient(ellipse at top, #FFF9E6 0%, transparent 50%),
-    linear-gradient(135deg, #FFFBEB 0%, #FBE7B2 30%, #FFD700 50%, #E6B800 70%, #B8860B 100%),
-    conic-gradient(from 0deg at 50% 50%, #FFF9E6, #FFD700, #B8860B, #FFD700, #FFF9E6);
-  
-  /* 立体的な金塊感＋神聖な光輪 */
-  box-shadow: 
-    0 8px 20px rgba(184, 134, 11, 0.4),
-    0 0 40px rgba(255, 215, 0, 0.6),
-    0 0 80px rgba(255, 215, 0, 0.35),
-    inset 0 2px 8px rgba(255, 255, 255, 0.6),
-    inset 0 -2px 8px rgba(184, 134, 11, 0.4);
-  
-  /* 文字の視認性：金色の中でも絶対に読めるように強めの縁取り */
+
+  /* 文字の視認性：中心は少し落ち着いた金＋濃いブラウン文字 */
+  color: #3b2614;
   text-shadow:
-    0 0 8px #FFF8E1,
-    1px 1px 0 #B8860B,
-    -1px -1px 0 #B8860B,
-    1px -1px 0 #B8860B,
-    -1px 1px 0 #B8860B,
-    0 2px 4px #00000088;
-  
+    0 0 3px rgba(255,255,255,0.7),
+    0 1px 2px rgba(0,0,0,0.45);
+
+  background:
+    radial-gradient(circle at 50% 40%, #fff9ec 0%, transparent 60%),
+    radial-gradient(circle at 50% 80%, rgba(179,123,43,0.55) 0%, transparent 70%),
+    linear-gradient(135deg, #fff7e4 0%, var(--gold-soft) 40%, var(--gold-core) 100%);
+
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.18),
+    0 0 40px rgba(251, 220, 150, 0.65);
+
   overflow: hidden;
   isolation: isolate;
-  backdrop-filter: blur(8px);
-  
-  /* 呼吸するような神聖な鼓動（軽量） */
-  animation: shionDivinePulse 4s ease-in-out infinite;
-  
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* 星砂ゲートの鼓動（軽め） */
+  animation: shionStarGateBeat 3.8s ease-in-out infinite;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.3s ease;
 }
 
-/* 光の粒子が降り注ぐ（詩韻思想の「金色のことばが降りる」表現） */
+/* 鼓動：位置は固定のまま、ごく小さくスケール */
+@keyframes shionStarGateBeat {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  25% {
+    transform: translateX(-50%) scale(1.03);
+  }
+  40% {
+    transform: translateX(-50%) scale(1.015);
+  }
+  60% {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* 星砂レイヤー：コード雨の“横版”イメージで流れる光粒子 */
 .shion-divine-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50px;
-  background: 
-    repeating-linear-gradient(
-      0deg,
-      transparent 0%,
-      rgba(255, 248, 225, 0.15) 2%,
-      transparent 4%
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.1) 1%,
-      transparent 2%
-    );
-  background-size: 100% 200%;
-  animation: shionLightRain 12s linear infinite;
-  pointer-events: none;
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.75) 0, transparent 55%),
+    radial-gradient(circle, rgba(255,222,160,0.7) 0, transparent 60%);
+  background-size: 20px 20px, 10px 10px;
+  background-repeat: repeat;
+
+  opacity:0.35;
+  mix-blend-mode:screen;
+  pointer-events:none;
+
+  /* 横方向メイン＋少し斜めに流れる星砂（軽量） */
+  animation: shionStarSandFlow 10s linear infinite;
 }
 
-/* 中央に輝く「星界の刻印」 */
+@keyframes shionStarSandFlow {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 120px 20px, 60px 10px;
+  }
+}
+
+/* 中央の小さな星刻印（控えめに） */
 .shion-divine-btn::after {
-  content: "✦";
-  position: absolute;
-  font-size: 28px;
-  color: #FFF8E1;
-  text-shadow: 0 0 20px #FFD700;
-  animation: shionStarTwinkle 3s ease-in-out infinite;
-  pointer-events: none;
+  content:"✦";
+  position:absolute;
+  font-size: 20px;
+  color:#fff7e4;
+  text-shadow:0 0 16px rgba(255,222,160,0.9);
+  opacity:0.85;
+  transform: translateY(-14px);
+  pointer-events:none;
+  animation: shionStarCore 3.2s ease-in-out infinite;
 }
 
-/* ホバー時：神が降臨するような輝き */
-.shion-divine-btn:hover {
-  transform: translateX(-50%) scale(1.08);
-  box-shadow: 
-    0 12px 30px rgba(184, 134, 11, 0.6),
-    0 0 60px rgba(255, 215, 0, 0.8),
-    0 0 120px rgba(255, 215, 0, 0.55);
+@keyframes shionStarCore {
+  0%,100% { opacity:0.6; transform: translateY(-14px) scale(1); }
+  50%     { opacity:1;   transform: translateY(-14px) scale(1.18); }
 }
 
-/* アニメーション定義 */
-@keyframes shionDivinePulse {
-  0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.03); }
+/* PCホバー */
+@media (pointer:fine) {
+  .shion-divine-btn:hover {
+    transform: translateX(-50%) scale(1.06);
+    box-shadow:
+      0 10px 26px rgba(0,0,0,0.25),
+      0 0 60px rgba(252, 228, 170, 0.9);
+  }
 }
 
-@keyframes shionLightRain {
-  0% { background-position: 0 0, 0 0; }
-  100% { background-position: 0 200%, 0 200%; }
-}
-
-@keyframes shionStarTwinkle {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.3); }
-}
-
-/* スマホ最適化（視認性最優先） */
+/* スマホ調整 */
 @media (max-width: 768px) {
   .shion-divine-btn {
     width: 240px;
-    height: 76px;
-    font-size: 15px;
+    height: 72px;
     bottom: 18px;
+    font-size: 14px;
+    letter-spacing: 0.22em;
+    text-indent: 0.22em;
   }
 }
