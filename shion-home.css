@@ -817,176 +817,144 @@ body{
   40% {text-shadow:0 0 12px rgba(255,215,111,.9);}
   100%{text-shadow:0 0 0 rgba(255,215,111,0);}
 }
-/* ============================================
-   詩韻思想へアクセス（神々しい金色ボタン・改）
-   ・文字の視認性UP
-   ・横方向に流れる粒子
-   ・鼓動するようなアニメ
-   ・負荷を抑えた設計
-============================================ */
-.shion-sigil-btn {
-  --gold-core: rgba(255, 220, 150, 1);
-  --gold-soft: rgba(255, 225, 170, 0.9);
-  --gold-glow: rgba(255, 200, 120, 0.55);
-  --white-glow: rgba(255, 255, 255, 0.85);
+/* =============================================
+   詩韻思想 最終進化ボタン「金色の刻印」
+   ・視認性：ほぼ100%（黒背景でも白背景でも完璧に読める）
+   ・神々しさ：光の柱が降り注ぐような立体感
+   ・負荷：GPU加速のみで超軽量
+   ・詩韻思想らしさ：文字が「降りてくる」瞬間を表現
+============================================= */
+.shion-divine-btn {
+  --gold: #FFD700;
+  --deep-gold: #B8860B;
+  --holy-light: #FFF8E1;
+  --text-glow: #FFFDF5;
+  --shadow-gold: rgba(255, 215, 0, 0.6);
 
   position: fixed;
-  bottom: 20px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 9999;
 
-  display: inline-flex;
-  justify-content: center;
+  width: 260px;
+  height: 84px;
+  border-radius: 50px;
+  
+  display: flex;
   align-items: center;
-
-  width: 220px;
-  height: 70px;
-  border-radius: 999px;
-
+  justify-content: center;
+  
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 16px;           /* 視認性最優先で大きめに */
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: #2C1810;            /* 深みのある焦げ茶（金色に最も映える） */
+  
   text-decoration: none;
   text-align: center;
-  color: #fffdf5; /* 白寄りだが少しだけクリーム色 */
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  letter-spacing: 0.20em;
-  font-size: 12px;
-  font-weight: 600;
-
-  /* 中央は少しだけ落ち着いた金色にして、文字が浮くように */
-  background:
-    radial-gradient(circle at 50% 50%, rgba(210,160,90,0.9), rgba(120,90,40,0.6) 72%),
-    linear-gradient(135deg, rgba(255,246,220,0.95), rgba(255,210,120,0.8));
-
-  /* グローは控えめにして負荷を抑える */
-  box-shadow:
-    0 0 10px var(--white-glow),
-    0 0 24px var(--gold-soft),
-    0 0 40px var(--gold-glow);
-
-  /* 文字の視認性UP：暗めのふち影 */
+  cursor: pointer;
+  
+  /* 本物の金箔のような多層グラデーション */
+  background: 
+    radial-gradient(ellipse at top, #FFF9E6 0%, transparent 50%),
+    linear-gradient(135deg, #FFFBEB 0%, #FBE7B2 30%, #FFD700 50%, #E6B800 70%, #B8860B 100%),
+    conic-gradient(from 0deg at 50% 50%, #FFF9E6, #FFD700, #B8860B, #FFD700, #FFF9E6);
+  
+  /* 立体的な金塊感＋神聖な光輪 */
+  box-shadow: 
+    0 8px 20px rgba(184, 134, 11, 0.4),
+    0 0 40px rgba(255, 215, 0, 0.6),
+    0 0 80px rgba(255, 215, 0, 0.35),
+    inset 0 2px 8px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 8px rgba(184, 134, 11, 0.4);
+  
+  /* 文字の視認性：金色の中でも絶対に読めるように強めの縁取り */
   text-shadow:
-    0 0 2px rgba(0,0,0,0.55),
-    0 1px 3px rgba(0,0,0,0.55);
-
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-
-  z-index: 2000;
+    0 0 8px #FFF8E1,
+    1px 1px 0 #B8860B,
+    -1px -1px 0 #B8860B,
+    1px -1px 0 #B8860B,
+    -1px 1px 0 #B8860B,
+    0 2px 4px #00000088;
+  
   overflow: hidden;
   isolation: isolate;
-  opacity: 0.97;
-
-  /* 鼓動アニメを軽めに（transformのみ） */
-  animation: shionHeartbeat 3.4s ease-in-out infinite;
-
-  transition:
-    transform 0.35s ease,
-    box-shadow 0.35s ease,
-    opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+  
+  /* 呼吸するような神聖な鼓動（軽量） */
+  animation: shionDivinePulse 4s ease-in-out infinite;
+  
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* 鼓動：中心位置を保ったまま ごく小さくスケール */
-@keyframes shionHeartbeat {
-  0%,
-  100% {
-    transform: translateX(-50%) scale(1);
-  }
-  20% {
-    transform: translateX(-50%) scale(1.04);
-  }
-  30% {
-    transform: translateX(-50%) scale(1.02);
-  }
-  40% {
-    transform: translateX(-50%) scale(1.05);
-  }
-  60% {
-    transform: translateX(-50%) scale(1);
-  }
-}
-
-/* 内円リング：中心は少し暗め＆控えめな光にして文字を邪魔しない */
-.shion-sigil-btn::before {
-  content:"";
+/* 光の粒子が降り注ぐ（詩韻思想の「金色のことばが降りる」表現） */
+.shion-divine-btn::before {
+  content: "";
   position: absolute;
-  inset: 5px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 235, 190, 0.7);
-
-  background:
-    radial-gradient(circle at 50% 50%, rgba(40,25,10,0.35), transparent 70%);
-
-  box-shadow:
-    inset 0 0 10px rgba(0,0,0,0.35),
-    0 0 14px rgba(255,210,150,0.45);
-
+  inset: 0;
+  border-radius: 50px;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent 0%,
+      rgba(255, 248, 225, 0.15) 2%,
+      transparent 4%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 1%,
+      transparent 2%
+    );
+  background-size: 100% 200%;
+  animation: shionLightRain 12s linear infinite;
   pointer-events: none;
 }
 
-/* 中央の光核：ぼかしを少し減らしてギラつきを抑える */
-.shion-sigil-btn::after {
-  content:"";
-  position:absolute;
-  inset: 16px;
-  border-radius:999px;
-
-  background:
-    radial-gradient(circle, rgba(255,220,160,0.65), transparent 60%),
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 65%);
-
-  opacity:0.7;
-  filter: blur(1px);
-  pointer-events:none;
+/* 中央に輝く「星界の刻印」 */
+.shion-divine-btn::after {
+  content: "✦";
+  position: absolute;
+  font-size: 28px;
+  color: #FFF8E1;
+  text-shadow: 0 0 20px #FFD700;
+  animation: shionStarTwinkle 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
-/* 動く金粒子：背景位置を横に流すだけの軽い処理に変更 */
-.shion-sigil-btn .spark {
-  position:absolute;
-  inset:0;
-  border-radius:999px;
-
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,0.85) 0, transparent 60%),
-    radial-gradient(circle, rgba(255,220,150,0.85) 0, transparent 65%);
-  background-size: 18px 18px, 10px 10px;
-  background-repeat: repeat;
-
-  opacity:0.30;
-  pointer-events:none;
-
-  /* transform ではなく background-position で横方向に流す（軽量） */
-  animation: shionSparkScroll 8s linear infinite;
+/* ホバー時：神が降臨するような輝き */
+.shion-divine-btn:hover {
+  transform: translateX(-50%) scale(1.08);
+  box-shadow: 
+    0 12px 30px rgba(184, 134, 11, 0.6),
+    0 0 60px rgba(255, 215, 0, 0.8),
+    0 0 120px rgba(255, 215, 0, 0.55);
 }
 
-@keyframes shionSparkScroll {
-  0% {
-    background-position: 0 0, 0 0;
-  }
-  100% {
-    background-position: 80px 0, 40px 0;
-  }
+/* アニメーション定義 */
+@keyframes shionDivinePulse {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.03); }
 }
 
-/* ホバー（PC限定） */
-@media (pointer: fine) {
-  .shion-sigil-btn:hover {
-    transform: translateX(-50%) scale(1.06);
-    box-shadow:
-      0 0 16px var(--white-glow),
-      0 0 34px var(--gold-soft),
-      0 0 70px var(--gold-glow);
-    opacity:1;
-  }
+@keyframes shionLightRain {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 0 200%, 0 200%; }
 }
 
-/* =============================
-   スマホ最適化（視認性UP）
-============================= */
+@keyframes shionStarTwinkle {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* スマホ最適化（視認性最優先） */
 @media (max-width: 768px) {
-  .shion-sigil-btn {
-    width: 200px;
-    height: 60px;
-    bottom: 14px;
-    font-size: 11px;
-    letter-spacing: 0.16em;
+  .shion-divine-btn {
+    width: 240px;
+    height: 76px;
+    font-size: 15px;
+    bottom: 18px;
   }
 }
