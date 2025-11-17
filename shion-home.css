@@ -817,3 +817,176 @@ body{
   40% {text-shadow:0 0 12px rgba(255,215,111,.9);}
   100%{text-shadow:0 0 0 rgba(255,215,111,0);}
 }
+/* ============================================
+   詩韻思想へアクセス（神々しい金色ボタン・改）
+   ・文字の視認性UP
+   ・横方向に流れる粒子
+   ・鼓動するようなアニメ
+   ・負荷を抑えた設計
+============================================ */
+.shion-sigil-btn {
+  --gold-core: rgba(255, 220, 150, 1);
+  --gold-soft: rgba(255, 225, 170, 0.9);
+  --gold-glow: rgba(255, 200, 120, 0.55);
+  --white-glow: rgba(255, 255, 255, 0.85);
+
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 220px;
+  height: 70px;
+  border-radius: 999px;
+
+  text-decoration: none;
+  text-align: center;
+  color: #fffdf5; /* 白寄りだが少しだけクリーム色 */
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  letter-spacing: 0.20em;
+  font-size: 12px;
+  font-weight: 600;
+
+  /* 中央は少しだけ落ち着いた金色にして、文字が浮くように */
+  background:
+    radial-gradient(circle at 50% 50%, rgba(210,160,90,0.9), rgba(120,90,40,0.6) 72%),
+    linear-gradient(135deg, rgba(255,246,220,0.95), rgba(255,210,120,0.8));
+
+  /* グローは控えめにして負荷を抑える */
+  box-shadow:
+    0 0 10px var(--white-glow),
+    0 0 24px var(--gold-soft),
+    0 0 40px var(--gold-glow);
+
+  /* 文字の視認性UP：暗めのふち影 */
+  text-shadow:
+    0 0 2px rgba(0,0,0,0.55),
+    0 1px 3px rgba(0,0,0,0.55);
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  z-index: 2000;
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 0.97;
+
+  /* 鼓動アニメを軽めに（transformのみ） */
+  animation: shionHeartbeat 3.4s ease-in-out infinite;
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    opacity 0.3s ease;
+}
+
+/* 鼓動：中心位置を保ったまま ごく小さくスケール */
+@keyframes shionHeartbeat {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+  20% {
+    transform: translateX(-50%) scale(1.04);
+  }
+  30% {
+    transform: translateX(-50%) scale(1.02);
+  }
+  40% {
+    transform: translateX(-50%) scale(1.05);
+  }
+  60% {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* 内円リング：中心は少し暗め＆控えめな光にして文字を邪魔しない */
+.shion-sigil-btn::before {
+  content:"";
+  position: absolute;
+  inset: 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 235, 190, 0.7);
+
+  background:
+    radial-gradient(circle at 50% 50%, rgba(40,25,10,0.35), transparent 70%);
+
+  box-shadow:
+    inset 0 0 10px rgba(0,0,0,0.35),
+    0 0 14px rgba(255,210,150,0.45);
+
+  pointer-events: none;
+}
+
+/* 中央の光核：ぼかしを少し減らしてギラつきを抑える */
+.shion-sigil-btn::after {
+  content:"";
+  position:absolute;
+  inset: 16px;
+  border-radius:999px;
+
+  background:
+    radial-gradient(circle, rgba(255,220,160,0.65), transparent 60%),
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 65%);
+
+  opacity:0.7;
+  filter: blur(1px);
+  pointer-events:none;
+}
+
+/* 動く金粒子：背景位置を横に流すだけの軽い処理に変更 */
+.shion-sigil-btn .spark {
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.85) 0, transparent 60%),
+    radial-gradient(circle, rgba(255,220,150,0.85) 0, transparent 65%);
+  background-size: 18px 18px, 10px 10px;
+  background-repeat: repeat;
+
+  opacity:0.30;
+  pointer-events:none;
+
+  /* transform ではなく background-position で横方向に流す（軽量） */
+  animation: shionSparkScroll 8s linear infinite;
+}
+
+@keyframes shionSparkScroll {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 80px 0, 40px 0;
+  }
+}
+
+/* ホバー（PC限定） */
+@media (pointer: fine) {
+  .shion-sigil-btn:hover {
+    transform: translateX(-50%) scale(1.06);
+    box-shadow:
+      0 0 16px var(--white-glow),
+      0 0 34px var(--gold-soft),
+      0 0 70px var(--gold-glow);
+    opacity:1;
+  }
+}
+
+/* =============================
+   スマホ最適化（視認性UP）
+============================= */
+@media (max-width: 768px) {
+  .shion-sigil-btn {
+    width: 200px;
+    height: 60px;
+    bottom: 14px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+  }
+}
