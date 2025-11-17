@@ -319,22 +319,46 @@
       z-index: -1;
     }
 
-    /* 詩韻思想ページへのボタン（Cut3内） */
+    /* ===== コアへのボタン（1つだけ） ===== */
+    .philo-cta-wrap {
+      position: relative;
+      margin-top: 24px;
+      padding-top: 18px;
+      text-align: center;
+    }
+
+    .philo-cta-wrap::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(72%, 360px);
+      height: 1px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0),
+        rgba(198,138,47,0.9),
+        rgba(255,255,255,0));
+      opacity: 0.9;
+    }
+
     .philo-cta {
-      margin-top: 22px;
-      padding: 12px 22px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6em;
+      padding: 12px 26px;
       border-radius: 999px;
-      border: none;
+      border: 1px solid rgba(198,138,47,0.9);
       font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
       font-size: 14px;
       letter-spacing: 0.12em;
       background:
-        radial-gradient(circle at 30% 0%, rgba(255,255,255,0.9), transparent 55%),
-        linear-gradient(135deg, #ffdd99, #c68a2f);
+        radial-gradient(circle at 30% 0%, rgba(255,255,255,0.98), transparent 55%),
+        linear-gradient(135deg, #ffefc7, #f4c36a);
       color: #4a3312;
       box-shadow:
-        0 0 12px rgba(255,215,111,0.9),
-        0 0 24px rgba(255,205,140,0.8);
+        0 0 14px rgba(255,215,111,0.9),
+        0 0 26px rgba(255,235,200,0.9);
       cursor: pointer;
       opacity: 0;
       transform: translateY(12px);
@@ -342,7 +366,14 @@
       transition:
         opacity 0.9s ease-out,
         transform 0.9s ease-out,
-        box-shadow 0.3s ease-out;
+        box-shadow 0.3s ease-out,
+        transform 0.25s ease-out;
+    }
+
+    .philo-cta::before {
+      content: "▶";
+      font-size: 0.8em;
+      transform: translateY(1px);
     }
 
     .philo-cta.is-visible {
@@ -354,7 +385,7 @@
     .philo-cta:hover {
       box-shadow:
         0 0 18px rgba(255,215,111,1),
-        0 0 30px rgba(255,240,210,1);
+        0 0 32px rgba(255,240,210,1);
       transform: translateY(-1px);
     }
 
@@ -456,47 +487,6 @@
         0 0 16px rgba(255,223,138,0.8);
     }
 
-    /* =========================
-       常時表示ショートカットボタン
-    ========================= */
-    .philo-float-cta {
-      position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 8px 18px;
-      border-radius: 999px;
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-decoration: none;
-      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-      color: #3f3120;
-      background:
-        radial-gradient(circle at 20% 0%, rgba(255,255,255,0.9), transparent 50%),
-        linear-gradient(135deg, #ffe9b8, #f7c86b);
-      box-shadow:
-        0 0 10px rgba(255,215,111,0.9),
-        0 0 20px rgba(0,0,0,0.5);
-      z-index: 999;
-      opacity: 0.9;
-      transition:
-        opacity 0.3s ease-out,
-        transform 0.3s ease-out,
-        box-shadow 0.3s ease-out;
-    }
-
-    .philo-float-cta:hover {
-      opacity: 1;
-      transform: translateX(-50%) translateY(-1px);
-      box-shadow:
-        0 0 16px rgba(255,215,111,1),
-        0 0 26px rgba(0,0,0,0.7);
-    }
-
-    .philo-float-cta span {
-      font-size: 0.9em;
-    }
-
     @media (max-width: 768px) {
       .cut__content {
         text-align: left;
@@ -504,10 +494,13 @@
       .code-column {
         width: calc(100% / 16); /* モバイルはさらに軽く */
       }
-      .philo-float-cta {
-        bottom: 12px;
-        padding: 7px 14px;
-        font-size: 10px;
+      .philo-cta-wrap {
+        padding-top: 16px;
+      }
+      .philo-cta {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
       }
     }
 
@@ -583,26 +576,24 @@
             </p>
           </div>
 
-          <button class="philo-cta" type="button" onclick="location.href='/books/zero.html'">
-            詩韻思想のコアへ進む
-          </button>
-
-          <div class="philo-sub-link">
-            <a href="/reviews/shion-philosophy-review.html">外部から見た詩韻思想</a>
+          <!-- コアへのボタンはここだけ -->
+          <div class="philo-cta-wrap">
+            <button class="philo-cta" type="button" onclick="location.href='/books/zero.html'">
+              詩韻思想のコアへ進む
+            </button>
+            <div class="philo-sub-link">
+              <a href="/reviews/shion-philosophy-review.html">外部から見た詩韻思想</a>
+            </div>
           </div>
+
         </div>
       </div>
     </section>
   </main>
 
-  <!-- 常時表示のショートカット -->
-  <a href="/books/zero.html" class="philo-float-cta">
-    <span>▶ 詩韻思想のコアへショートカット</span>
-  </a>
-
   <script>
     // ================================
-    // コード雨生成（軽量版・ハイライトJSなし）
+    // コード雨生成（軽量版）
     // ================================
     function createCodeRain(containerId, columnCount) {
       const container = document.getElementById(containerId);
@@ -611,7 +602,7 @@
       const codeChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンΣΛΩαβγδεζηθικλμνξοπρστυφχψω‡†∞∴∵✶';
 
       const baseCharHeight = 16;
-      const streamLength = Math.ceil(window.innerHeight / baseCharHeight) * 1.4; // 半分ちょいに短縮
+      const streamLength = Math.ceil(window.innerHeight / baseCharHeight) * 1.4;
 
       for (let i = 0; i < columnCount; i++) {
         const column = document.createElement('div');
