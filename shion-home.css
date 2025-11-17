@@ -818,22 +818,22 @@ body{
   100%{text-shadow:0 0 0 rgba(255,215,111,0);}
 }
 /* ================================================
-   蒼金コア・ゲート v3
-   ・濃いめの蒼＋濃いめの金
-   ・細粒子（星砂）
-   ・神秘的な光輪文字
+   蒼金コア・ゲート v4
+   - 濃い蒼 × 濃い金
+   - 粒ではなく「横長の光の帯」
+   - 下線なし・神秘的な文字
 ================================================ */
 .seiki-core-btn {
-  --gold-core: #FFD370;
-  --gold-deep: #D4A640;
-  --blue-core: #8AB8FF;
-  --blue-dark: #2B3A69;
+  --gold-core: #ffd25c;
+  --gold-deep: #c99a2e;
+  --blue-core: #4f6dff;
+  --blue-dark: #1c2450;
 
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  
+
   width: 235px;
   height: 72px;
   border-radius: 999px;
@@ -844,24 +844,31 @@ body{
 
   font-family: 'Shippori Mincho','Noto Serif JP',serif;
   font-weight: 600;
-  font-size: 15px;             /* ← 大きくして神秘性UP */
-  letter-spacing: 0.25em;
-  text-indent: 0.25em;
+  font-size: 15px;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
+  text-align: center;
 
-  color: #1c130c;              /* 金と相性が良い深色 */
+  color: #201219;                    /* 濃いブラウン */
   text-shadow:
     0 0 6px rgba(255,255,255,0.9),
-    0 0 20px rgba(255,215,130,0.6),
-    1px 1px 0 rgba(0,0,0,0.45);
+    0 0 18px rgba(255,210,130,0.8),
+    1px 1px 0 rgba(0,0,0,0.55);
+  text-decoration: none;             /* ★ 下線を完全に消す */
 
   background:
-    radial-gradient(circle at 50% 30%, #fffdf4 0%, transparent 60%),
-    linear-gradient(135deg, #FFF3D0 0%, var(--gold-core) 45%, var(--gold-deep) 90%),
-    linear-gradient(180deg, rgba(138,184,255,0.4), rgba(43,58,105,0.55));
+    radial-gradient(circle at 50% 25%, #fffdf6 0%, transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(31,40,96,0.85) 0%, transparent 70%),
+    linear-gradient(135deg,
+      #fff1c9 0%,
+      var(--gold-core) 40%,
+      var(--gold-deep) 75%,
+      rgba(79,109,255,0.75) 100%
+    );
 
   box-shadow:
-    0 5px 12px rgba(40,40,70,0.25),
-    0 0 40px rgba(255,215,130,0.65);
+    0 6px 14px rgba(0,0,0,0.25),
+    0 0 40px rgba(255,210,130,0.8);
 
   overflow: hidden;
   isolation: isolate;
@@ -871,66 +878,32 @@ body{
   z-index: 2000;
   opacity: 0.98;
 
+  /* 命の鼓動（軽めの二拍） */
   animation: seikiBeat 3.4s ease-in-out infinite;
 }
 
-
-/* =============================
-   細粒子（星砂）
-============================= */
-.seiki-core-btn .flow {
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,0.95) 0, transparent 55%),
-    radial-gradient(circle, rgba(255,220,150,0.95) 0, transparent 60%),
-    radial-gradient(circle, rgba(111,162,255,0.8) 0, transparent 65%);
-  
-  /* 星砂サイズ：2〜4px */
-  background-size: 4px 4px, 3px 3px, 2px 2px;
-  background-repeat: repeat;
-
-  opacity:0.42;
-  mix-blend-mode: screen;
-
-  animation: seikiFlow 12s linear infinite;
-}
-
-@keyframes seikiFlow {
-  0% { background-position: 0 0, 0 6px, 0 -5px; }
-  100% { background-position: 160px 0, 90px 6px, 210px -5px; }
-}
-
-
-/* =============================
-   命の鼓動
-============================= */
 @keyframes seikiBeat {
   0%, 100% { transform: translateX(-50%) scale(1); }
   10%, 14% { transform: translateX(-50%) scale(1.05); }
-  25% { transform: translateX(-50%) scale(1.01); }
+  25%      { transform: translateX(-50%) scale(1.01); }
   32%, 36% { transform: translateX(-50%) scale(1.06); }
-  50% { transform: translateX(-50%) scale(1); }
+  50%      { transform: translateX(-50%) scale(1); }
 }
 
-
-/* =============================
-   蒼金リング（神秘性UP）
-============================= */
+/* 蒼金リング（神秘的な外輪） */
 .seiki-core-btn::before {
   content:"";
   position:absolute;
   inset:8px;
   border-radius:999px;
-  border:1px solid rgba(255,240,190,0.7);
 
+  border:1px solid rgba(255,240,190,0.8);
   background:
-    radial-gradient(circle, rgba(138,184,255,0.4), transparent 70%);
-  
-  mix-blend-mode: screen;
-  animation: seikiRing 16s linear infinite;
+    radial-gradient(circle, rgba(79,109,255,0.35), transparent 70%);
+
+  mix-blend-mode:screen;
+  opacity:0.95;
+  animation: seikiRing 18s linear infinite;
 }
 
 @keyframes seikiRing {
@@ -938,14 +911,68 @@ body{
   to   { transform:rotate(360deg); }
 }
 
+/* =============================================
+   横長コードレイン（光の帯）
+   - 細い水平ラインがずっと横に流れる
+============================================= */
+.seiki-core-btn .flow {
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
 
-/* =============================
-   スマホ対応
-============================= */
+  background-image:
+    /* 白い光の帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.95) 0px,
+      rgba(255,255,255,0.95) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    /* 金色の帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,215,130,0.9) 0px,
+      rgba(255,215,130,0.9) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    /* 蒼い帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(79,109,255,0.85) 0px,
+      rgba(79,109,255,0.85) 1px,
+      transparent 1px,
+      transparent 9px
+    );
+
+  background-size:
+    180% 100%,
+    200% 100%,
+    220% 100%;
+
+  mix-blend-mode:screen;
+  opacity:0.5;
+
+  animation: seikiFlow 10s linear infinite;
+}
+
+@keyframes seikiFlow {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 140px 0, 200px 0, 260px 0;
+  }
+}
+
+/* スマホ調整 */
 @media (max-width: 768px) {
   .seiki-core-btn {
     width: 215px;
     height: 62px;
     font-size: 14px;
+    bottom: 14px;
   }
 }
