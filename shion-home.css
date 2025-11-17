@@ -747,175 +747,176 @@ body{
   }
 }
 
-/* ===========================
-   星界ゲート演出
-=========================== */
-
-/* 画面中央から広がる黄金の光 */
-.gate-flare{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:10;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(255,250,235,0.95) 0%,
-      rgba(255,243,210,0.75) 26%,
-      rgba(255,243,210,0.0) 70%);
-  opacity:0;
-  animation:gateFlare .6s ease-out forwards;
-}
-@keyframes gateFlare{
-  0%{
-    opacity:0;
-    transform:scale(0.8);
-  }
-  40%{
-    opacity:1;
-    transform:scale(1);
-  }
-  100%{
-    opacity:0;
-    transform:scale(1.15);
-  }
-}
-
-/* 星粒バースト（クリック位置周辺） */
-.particle-burst{
-  position:fixed;
-  width:4px;
-  height:4px;
-  z-index:11;
-  pointer-events:none;
-}
-.particle-burst span{
-  position:absolute;
-  width:4px;
-  height:4px;
-  border-radius:50%;
-  background:radial-gradient(circle,#fff,#ffd76f);
-  box-shadow:0 0 12px rgba(255,215,111,.8);
-  animation:particleMove .7s ease-out forwards;
-}
-@keyframes particleMove{
-  0%{
-    transform:translate(0,0) scale(1);
-    opacity:1;
-  }
-  100%{
-    transform:translate(var(--tx),var(--ty)) scale(0);
-    opacity:0;
-  }
-}
-
-/* テキストPulse（クリック時1秒だけ光る） */
-.label-pulse{
-  animation:labelPulse .9s ease-out;
-}
-@keyframes labelPulse{
-  0%  {text-shadow:0 0 0 rgba(255,215,111,0);}
-  40% {text-shadow:0 0 12px rgba(255,215,111,.9);}
-  100%{text-shadow:0 0 0 rgba(255,215,111,0);}
-}
+/* =============================================
+   星祈の回廊ゲート（詩韻ハイブリッド仕様）
+   金ベース × 白 × 蒼 × 星砂ライン
+============================================= */
 .seiki-core-btn {
-  --blue-star: #3f68e8;       /* ほんのり落ち着いた蒼 */
-  --deep-cosmo: #10163d;
-  --gold-star: #ffd986;
-  --text-light: #f5f7ff;
+  --gold-soft: #fbe2b2;
+  --gold-core: #f4c368;
+  --gold-deep: #e3a944;
+  --blue-halo: #6fa2ff;
+  --text-ink: #3a2418;
 
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  
-  width: 260px;
-  height: 80px;
-  border-radius: 50px;
-  margin: 22px auto;
 
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  width: 260px;
+  height: 78px;
+  margin: 24px auto;
+  border-radius: 999px;
+
+  font-family: 'Shippori Mincho','Noto Serif JP',serif;
   font-weight: 700;
   font-size: 17px;
   letter-spacing: 0.30em;
   text-indent: 0.30em;
-  color: var(--text-light);
+  color: var(--text-ink);
   text-decoration: none;
-  text-shadow:
-    0 0 6px rgba(255,255,255,0.9),
-    0 0 16px rgba(255,217,134,0.6);
+  text-align: center;
 
+  /* 文字は濃いブラウン＋やわらかい光輪 */
+  text-shadow:
+    0 0 5px rgba(255,255,255,0.9),
+    0 1px 2px rgba(0,0,0,0.45);
+
+  /* 上：白い光、中央：金、下：蒼のハロー */
   background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.28), transparent 60%),
-    linear-gradient(135deg, #141a3f 0%, #182657 35%, #2143a8 75%, #1b2f7f 100%);
+    radial-gradient(circle at 50% 18%, #fffdf6 0%, transparent 55%),
+    radial-gradient(circle at 50% 110%, rgba(111,162,255,0.45) 0%, transparent 65%),
+    linear-gradient(135deg,
+      #fff2d3 0%,
+      var(--gold-soft) 30%,
+      var(--gold-core) 65%,
+      var(--gold-deep) 100%
+    );
 
   box-shadow:
-    0 8px 26px rgba(0,0,0,0.35),
-    0 0 40px rgba(63,104,232,0.55);
+    0 8px 22px rgba(0,0,0,0.28),
+    0 0 40px rgba(244,195,104,0.65);
 
   overflow: hidden;
   isolation: isolate;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(4px);
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+
+  /* やさしい鼓動アニメ */
+  animation: seikiGateBeat 3.6s ease-in-out infinite;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-/* 蒼い道筋（メイン演出） */
+@keyframes seikiGateBeat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  12%, 16% { transform: translateY(-1px) scale(1.03); }
+  30%      { transform: translateY(0) scale(1); }
+  38%, 42% { transform: translateY(-1px) scale(1.035); }
+}
+
+/* 内輪：蒼金リング（ごく控えめ） */
+.seiki-core-btn::before {
+  content:"";
+  position:absolute;
+  inset:7px;
+  border-radius:inherit;
+  border:1px solid rgba(255,240,200,0.9);
+  background:
+    radial-gradient(circle, rgba(111,162,255,0.32), transparent 70%);
+  mix-blend-mode:screen;
+  opacity:0.9;
+  animation: seikiGateRing 18s linear infinite;
+}
+
+@keyframes seikiGateRing {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ============================
+   flow：蒼と白の「横長コードレイン」
+============================ */
 .seiki-core-btn .flow {
   position:absolute;
   inset:5px;
   border-radius:inherit;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255,217,134,0.4) 35%,
-    rgba(63,104,232,0.55) 60%,
-    transparent 100%
-  );
-  opacity:0.9;
+  pointer-events:none;
   mix-blend-mode:screen;
-  animation: seikiFlow 7s linear infinite;
+  opacity:0.85;
+
+  /* 横に流れる光の帯（線状） */
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.95) 0px,
+      rgba(255,255,255,0.95) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,223,160,0.9) 0px,
+      rgba(255,223,160,0.9) 1px,
+      transparent 1px,
+      transparent 9px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(111,162,255,0.75) 0px,
+      rgba(111,162,255,0.75) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+
+  background-size: 180% 100%, 200% 100%, 220% 100%;
+  animation: seikiGateFlow 11s linear infinite;
 }
 
-/* 控えめな星粒 */
+@keyframes seikiGateFlow {
+  0%   { background-position: 0 0, 0 0, 0 0; }
+  100% { background-position: 160px 0, 220px 0, 280px 0; }
+}
+
+/* ============================
+   星砂（控えめなきらめき）
+============================ */
 .seiki-core-btn .particles {
   position:absolute;
   inset:0;
   border-radius:inherit;
-  background:
-    radial-gradient(circle 1.5px at 20% 15%, #ffd986 0, transparent 70%),
-    radial-gradient(circle 1px at 80% 70%, #ffffff 0, transparent 70%),
-    radial-gradient(circle 1.5px at 50% 30%, #b9c8ff 0, transparent 70%);
-  background-size: 70px 70px;
-  background-repeat:repeat;
-  opacity:0.55;
+  pointer-events:none;
   mix-blend-mode:screen;
-  animation: seikiStarfall 16s linear infinite;
+  opacity:0.5;
+
+  background:
+    radial-gradient(circle 1.3px at 20% 25%, #ffffff 0, transparent 70%),
+    radial-gradient(circle 1.5px at 78% 65%, #ffe6b4 0, transparent 70%),
+    radial-gradient(circle 1.2px at 48% 35%, #cfd8ff 0, transparent 70%);
+  background-size: 70px 70px;
+  background-repeat: repeat;
+  animation: seikiGateStar 18s linear infinite;
 }
 
-@keyframes seikiFlow {
-  0% { transform: translateX(-110%); }
-  100% { transform: translateX(110%); }
+@keyframes seikiGateStar {
+  0%   { background-position: 0 0, 30px 40px, 60px 15px; }
+  100% { background-position: 0 160px, 30px 200px, 60px 180px; }
 }
 
-@keyframes seikiStarfall {
-  0% { background-position: 0 0, 30px 40px, 60px 10px; }
-  100% { background-position: 0 180px, 30px 220px, 60px 190px; }
-}
-
-/* ホバー（PCのみ） */
+/* PCホバーで少しだけ強調 */
 @media (pointer:fine) {
   .seiki-core-btn:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px) scale(1.02);
     box-shadow:
-      0 16px 40px rgba(0,0,0,0.45),
-      0 0 70px rgba(63,104,232,0.7);
+      0 14px 32px rgba(0,0,0,0.35),
+      0 0 60px rgba(244,195,104,0.9);
   }
 }
 
-/* スマホ */
+/* スマホ最適化 */
 @media (max-width:768px){
   .seiki-core-btn{
     width: 240px;
-    height: 74px;
+    height: 72px;
     font-size: 16px;
   }
 }
