@@ -10,277 +10,253 @@
 
   <!-- Canonical / Robots -->
   <link rel="canonical" href="https://reverse-shion.github.io/">
-  <meta name="robots" content="index,follow">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 
   <!-- Icons / PWA -->
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+  <!-- PWA / 表示色（白背景） -->
   <meta name="theme-color" content="#fdfcf8">
   <meta name="color-scheme" content="light">
+
+  <!-- OGP / Twitter Card -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:site_name" content="Re:Verse Shion">
+  <meta property="og:title" content="Re:Verse Shion — 占い × 思想">
+  <meta property="og:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta property="og:url" content="https://reverse-shion.github.io/">
+  <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
+  <meta property="og:image:alt" content="Re:Verse Shion — 占い × 思想">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Re:Verse Shion — 占い × 思想">
+  <meta name="twitter:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta name="twitter:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&family=Shippori+Mincho:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- OGP -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Re:Verse Shion">
-  <meta property="og:description" content="言葉が魂を救う。詩韻思想 × タロット占い">
-  <meta property="og:url" content="https://reverse-shion.github.io/">
-  <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
-
-  <style>
-    /* ================================
-       RESET
-    ================================= */
-    *,*::before,*::after {
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://www.google.com/search?q=site%3Areverse-shion.github.io+{search_term_string}",
+      "query-input":"required name=search_term_string"
     }
-    html, body {
-      height:100%;
-    }
-    body {
-      background:#fdfcf8;
-      font-family:"Noto Serif JP", serif;
-      overflow-x:hidden;
-      color:#2b2420;
-    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"Re:Verse Shion",
+    "url":"https://reverse-shion.github.io/",
+    "logo":"https://reverse-shion.github.io/assets/icon.png",
+    "sameAs":[
+      "https://www.tiktok.com/@your-id",
+      "https://x.com/your-id",
+      "https://note.com/your-id"
+    ]
+  }
+  </script>
 
-    a { color:#8b6b3c; }
-
-    /* ================================
-       背景コード雨（トップ／回廊と同期色）
-    ================================= */
-    #codeRain {
-      position:fixed;
-      inset:0;
-      z-index:1;
-    }
-
-    /* ================================
-       星祈ゲート（画面中央の入口ボタン）
-    ================================= */
-    .shion-corridor-btn {
-      --gold-core: rgba(255,226,160,1);
-      --gold-glow: rgba(255,210,130,0.85);
-      --gold-soft: rgba(255,235,190,0.70);
-      --white-glow: rgba(255,255,255,0.75);
-
-      position: fixed;
-      top: 52%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 7000;
-
-      width: 260px;
-      height: 85px;
-      border-radius: 50px;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      text-decoration: none;
-      color: #fff8e1;
-      font-family: "Shippori Mincho", serif;
-      font-size: 15px;
-      letter-spacing: 0.24em;
-      font-weight: 600;
-
-      background:
-        radial-gradient(circle at 50% 50%, rgba(255,240,210,1), rgba(160,120,60,0.45) 80%),
-        linear-gradient(135deg, rgba(255,250,230,1), rgba(255,210,110,0.85));
-
-      box-shadow:
-        0 0 20px var(--gold-soft),
-        0 0 40px var(--gold-glow),
-        0 0 100px var(--white-glow);
-
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      overflow:hidden;
-      cursor:pointer;
-
-      opacity:0;
-      animation: gateAppear 1.6s ease forwards 1.0s,
-                 goldPulse 4.2s ease-in-out infinite;
-      transition: opacity 0.4s ease;
-    }
-
-    @keyframes gateAppear {
-      0% {
-        opacity:0;
-        transform:translate(-50%,-40%) scale(0.85);
-      }
-      100% {
-        opacity:0.95;
-        transform:translate(-50%,-50%) scale(1);
-      }
-    }
-
-    @keyframes goldPulse {
-      0%   { opacity:0.85; transform:translate(-50%,-50%) scale(1); }
-      50%  { opacity:1;    transform:translate(-50%,-50%) scale(1.06); }
-      100% { opacity:0.85; transform:translate(-50%,-50%) scale(1); }
-    }
-
-    /* 星粒子レイヤー（内側を流れる光） */
-    .shion-corridor-btn .stars {
-      position:absolute;
-      inset:0;
-      border-radius:inherit;
-
-      background-image:
-        radial-gradient(circle, rgba(255,255,255,0.9) 0, transparent 60%),
-        radial-gradient(circle, rgba(255,222,150,0.8) 0, transparent 65%);
-      background-size:12px 12px, 6px 6px;
-      background-repeat:repeat;
-
-      mix-blend-mode:screen;
-      opacity:0.4;
-      animation: starFlow 9s linear infinite;
-    }
-
-    @keyframes starFlow {
-      from { transform:translateY(20%) translateX(-20%); }
-      to   { transform:translateY(-20%) translateX(20%); }
-    }
-
-    @media (max-width:768px){
-      .shion-corridor-btn {
-        width:220px;
-        height:70px;
-        font-size:13px;
-        letter-spacing:0.20em;
-        top:56%;
-      }
-    }
-
-    /* ================================
-       ワープ用・白い閃光オーバーレイ
-    ================================= */
-    .warp-flash {
-      position:fixed;
-      inset:0;
-      z-index:8000;
-      background:
-        radial-gradient(circle at 50% 50%,
-          rgba(255,255,255,1) 0%,
-          rgba(255,255,255,1) 45%,
-          rgba(255,244,220,1) 75%,
-          rgba(253,252,248,0.9) 100%);
-      opacity:0;
-      pointer-events:none;
-      animation: warpFlash 0.45s ease-out forwards;
-    }
-
-    @keyframes warpFlash {
-      0%   { opacity:0;   transform:scale(0.9); }
-      40%  { opacity:1;   transform:scale(1); }
-      100% { opacity:1;   transform:scale(1.05); }
-    }
-
-    /* ================================
-       メインコンテンツ
-       （回廊を通ったあとに読む領域）
-    ================================= */
-    main {
-      position:relative;
-      z-index:200;
-      padding: 120vh 16px 40px;
-    }
-
-    .content {
-      max-width:880px;
-      margin:0 auto;
-      background:rgba(253,252,248,0.94);
-      border-radius:16px;
-      box-shadow:0 18px 40px rgba(0,0,0,0.08);
-      padding:32px 20px 36px;
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-    }
-
-    .content h1 {
-      font-family:"Cinzel","Shippori Mincho",serif;
-      font-size:26px;
-      letter-spacing:0.18em;
-      text-align:center;
-      margin-bottom:18px;
-    }
-
-    .content p {
-      line-height:1.9;
-      font-size:15px;
-      margin-bottom:12px;
-    }
-
-    .content-links {
-      margin-top:18px;
-      padding-top:12px;
-      border-top:1px solid rgba(120,100,70,0.25);
-    }
-
-    .content-links p {
-      margin-bottom:6px;
-    }
-
-    /* スマホ調整 */
-    @media (max-width: 600px) {
-      .content {
-        padding:24px 16px 28px;
-      }
-      .content h1 {
-        font-size:20px;
-        letter-spacing:0.14em;
-      }
-      .content p {
-        font-size:14px;
-      }
-    }
-  </style>
+  <!-- 外部CSS -->
+  <link rel="stylesheet" href="/shion-home.css">
 </head>
 <body>
+
+  <!-- ===== ローディング：OS SHION ===== -->
+  <div class="loader" id="loader" aria-live="polite">
+    <div class="loader__orb" role="img" aria-label="OS SHION 起動中">
+      <div class="loader__ring"></div>
+      <div class="loader__ring loader__ring--2"></div>
+      <div class="loader__glyph">
+        <div class="loader__glyph-main">OS&nbsp;SHION</div>
+        <div class="loader__glyph-sub">THE TEMPLE OF WORDS</div>
+      </div>
+    </div>
+    <div class="loader__caption">BOOTING STAR-LINKED SYSTEM...</div>
+  </div>
+
+  <!-- ===== 薄いグリフのベール（最果て感） ===== -->
+  <div class="glyph-veil" aria-hidden="true">
+    <span>詩祈星言魂理</span>
+    <span>韻光影時巡声</span>
+    <span>塔門鍵路環夢</span>
+  </div>
 
   <!-- ===== 背景コード雨 ===== -->
   <canvas id="codeRain" aria-hidden="true"></canvas>
 
-  <!-- ===== 星祈の回廊：中央ゲート ===== -->
-  <a href="https://reverse-shion.github.io/seiki-corridor.html"
-     class="shion-corridor-btn"
-     id="entry-corridor">
-    星祈の回廊へ
-    <div class="stars"></div>
-  </a>
+  <!-- ===== ヘッダー ===== -->
+  <header class="header" role="banner">
+    <nav class="nav" aria-label="メインナビゲーション">
+      <a href="/" class="nav-logo">Re:Verse Shion</a>
+      <ul class="nav-menu">
+        <li><a href="/shion2.html">無料占い</a></li>
+        <li><a href="#services">個人鑑定・講座</a></li>
+        <li><a href="ncode-field.html">詩韻思想</a></li>
+        <li class="nav-contact"><a href="#contact">お問い合わせ</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <!-- ===== 回廊通過後に読むゾーン ===== -->
-  <main>
-    <section class="content">
-      <h1>RE:VERSE SHION — 星界 × 思想</h1>
-      <p>
-        ここは、星祈の回廊をくぐったあとに辿り着く「地上のホール」です。<br>
-        無料占い・詩韻思想・個人鑑定など、今のあなたに必要な扉だけを選んでください。
+  <!-- ===== メインコンテンツ ===== -->
+  <main class="page" role="main">
+    <!-- ヒーロー：無料占いへのゲートを明示 -->
+    <section class="hero" id="hero" aria-label="星界リーディング（無料占い）への入り口">
+      <div class="hero-main">
+        <p class="kicker">SHION PHILOSOPHY × TAROT READING</p>
+
+        <p class="hero-catch">言葉が魂を救う。</p>
+
+        <h1 class="hero-title">
+          RE:VERSE SHION
+          <span class="jp">詩韻思想 × 星界リーディング</span>
+        </h1>
+
+        <p class="hero-lead">
+          詩韻思想（Shion Philosophy）にもとづき、タロットとことばで恋愛・仕事・人間関係の“今”を読み解く占いサイトです。<br>
+          まずは <span class="hero-highlight">無料の「星界リーディング」</span> で、今のあなたの物語を一枚のカードから受け取ってください。
+        </p>
+
+        <p class="hero-note">
+          このトップページは「星界への玄関ホール」。一歩進めば、白いカードがめくられ、金色の言葉としてあなたの心のログが降りてきます。
+        </p>
+
+        <section class="cta-area" aria-label="はじめての方への案内">
+          <!-- メイン：無料占い -->
+          <a href="tarot369.html" class="shion-btn gold" id="gate-reading">
+            <span class="label">星界リーディングを始める（無料）</span>
+            <span class="hint">はじめての方におすすめ｜カードをめくる無料占い</span>
+          </a>
+          <!-- サブ：思想を読む -->
+          <a href="seiki-corridor.html " class="shion-btn glass" id="gate-philosophy">
+            <span class="label">詩韻思想をじっくり読む</span>
+            <span class="hint">世界観や哲学を文章で深く知りたい方向け</span>
+          </a>
+        </section>
+
+        <!-- シンプルなステップ案内 -->
+        <div class="flow-hints" aria-label="利用の流れ">
+          <div class="flow-item">
+            <span class="flow-step">STEP 1</span>
+            <span class="flow-label">星界リーディング（無料）</span>
+          </div>
+          <div class="flow-item">
+            <span class="flow-step">STEP 2</span>
+            <span class="flow-label">気になる結果は個人鑑定で深掘り</span>
+          </div>
+          <div class="flow-item">
+            <span class="flow-step">STEP 3</span>
+            <span class="flow-label">さらに詩韻思想で“言葉の世界”へ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ビジュアル：光輪＋タロットカードのイメージ -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-orb"></div>
+        <div class="hero-card">
+          <div class="hero-card-inner">
+            <span class="hero-card-title">STAR CODE</span>
+            <span class="hero-card-sub">TAROT READING</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 詩韻思想とは -->
+    <section class="section about" id="about">
+      <p class="section-kicker">はじめて来てくれた方へ</p>
+      <h2 class="section-title">詩韻思想とは</h2>
+      <p class="section-text">
+        詩韻思想は、「言葉が魂を救う」という前提から生まれたオリジナルの哲学です。タロット占いと組み合わせることで、あなたの本音や迷いを“星のログ”として読み解き、未来の選択肢をそっと増やしていきます。<br>
+        一般的な占いのように「当たる／当たらない」だけではなく、<strong>「どう受け取り、どう生きるか」</strong>までを一緒に考えていくための思想でもあります。
       </p>
-      <div class="content-links">
-        <p><a href="/shion2.html">★ 無料占い「星界リーディング」を試す</a></p>
-        <p><a href="/ncode-field.html">★ 詩韻思想のガイドページへ進む</a></p>
-        <p><a href="https://reverse-shion.github.io/seiki-corridor.html">★ 星祈の回廊に戻る</a></p>
-        <p><a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">★ 個人鑑定・相談（公式LINE）</a></p>
+      <ul class="feature-list">
+        <li>タロットカードを使って「今のあなた」の物語を読む</li>
+        <li>哲学的な視点から、状況の意味や学びを整理する</li>
+        <li>詩のような言葉で、心が少し軽くなるメッセージを届ける</li>
+      </ul>
+    </section>
+
+    <!-- サービス -->
+    <section class="section services" id="services">
+      <h2 class="section-title">サービス</h2>
+      <div class="service-cards">
+        <!-- 1：無料占い -->
+        <div class="card">
+          <h3>星界リーディング（無料）</h3>
+          <p>一枚のカードをめくり、今のあなたの「星の物語」を受け取る無料占いです。</p>
+          <p class="card-tag">まずはここから</p>
+          <a href="/shion2.html" class="shion-btn small">無料で占う</a>
+        </div>
+        <!-- 2：個人鑑定 -->
+        <div class="card">
+          <h3>個人鑑定</h3>
+          <p>恋愛・復縁・仕事など、具体的なテーマに合わせてじっくりリーディングします。</p>
+          <p class="card-tag">もっと深く知りたい方へ</p>
+          <a href="#contact" class="shion-btn small">相談したい内容を送る</a>
+        </div>
+        <!-- 3：講座 -->
+        <div class="card">
+          <h3>講座・ワークショップ</h3>
+          <p>詩韻思想やタロットの読み方を学び、自分や大切な人を占えるようになるための講座です。</p>
+          <a href="https://shion369.base.shop/items/114617833" target="_blank" rel="noopener" class="shion-btn small">詳細を見る</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- お問い合わせ（今はシンプルに導線用） -->
+    <section class="section contact" id="contact">
+      <h2 class="section-title">お問い合わせ・個人鑑定のご相談</h2>
+      <p class="section-text">
+        個人鑑定のご希望やご質問は、公式LINEまたは各種プラットフォームからお受けしています。<br>
+        日時の相談やメニューの選び方など、「これって聞いていいのかな？」という段階でもお気軽にどうぞ。
+      </p>
+      <div class="contact-links">
+        <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener" class="shion-btn gold">
+          <span class="label">公式LINEで相談する</span>
+        </a>
+        <a href="https://coconala.com/users/5518007" target="_blank" rel="noopener" class="shion-btn glass">
+          <span class="label">ココナラの出品を見る</span>
+        </a>
       </div>
     </section>
   </main>
 
-  <!-- ================================
-       JS：コード雨 ＋ ゲート演出
-  ================================= -->
+  <!-- ===== フッター ===== -->
+  <footer class="footer">
+    <p class="footer-copy">&copy; 2025 Re:Verse Shion. All rights reserved.</p>
+    <ul class="social-links">
+      <li><a href="https://www.tiktok.com/@shion_369?_r=1&_t=ZS-91Q43Z2qm9v">TikTok</a></li>
+      <li><a href="https://x.com/TaroBure">X</a></li>
+      <li><a href="https://note.com/shion_uranai369/n/na67361352c6e">Note</a></li>
+    </ul>
+  </footer>
+
+  <noscript>
+    <p style="position:fixed;bottom:12px;left:0;right:0;text-align:center;font-size:13px;color:#7a5f21;">
+      JavaScriptが無効のため、演出を省略して表示しています。
+    </p>
+  </noscript>
+
+  <!-- ===== JS：コード雨＋演出 ===== -->
   <script>
-    // --- コード雨（金色・ゆっくり同期演出) ---
+    // --- コード雨（金のコード・ゆっくり） ---
     (function(){
       const canvas = document.getElementById('codeRain');
       const ctx = canvas.getContext('2d');
@@ -296,30 +272,38 @@
         ctx.setTransform(dpr,0,0,dpr,0,0);
 
         fontSize = 16;
-        columns  = Math.floor(window.innerWidth / fontSize);
-        drops    = new Array(columns).fill(0).map(()=>Math.random()*-20);
+        columns = Math.floor(window.innerWidth / fontSize);
+        drops   = new Array(columns).fill(0).map(() => Math.random() * -20);
       }
 
       function draw(){
         ctx.fillStyle = 'rgba(253,252,248,0.14)';
         ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
-        ctx.font = fontSize + 'px "Noto Serif JP"';
+        ctx.font = fontSize + 'px "Noto Serif JP", system-ui';
 
         for(let i=0;i<columns;i++){
           const text = charList[Math.floor(Math.random()*charList.length)];
           const x = i * fontSize;
           const y = drops[i] * fontSize;
 
-          const grad = ctx.createLinearGradient(x,y-fontSize,x,y+fontSize);
-          grad.addColorStop(0,'rgba(255,255,255,0.95)');
-          grad.addColorStop(0.5,'rgba(255,231,170,0.96)');
-          grad.addColorStop(1,'rgba(208,168,64,0.99)');
+          const grad = ctx.createLinearGradient(x, y-fontSize, x, y+fontSize);
+          grad.addColorStop(0,   'rgba(255,255,255,0.95)');
+          grad.addColorStop(0.5, 'rgba(255,231,170,0.96)');
+          grad.addColorStop(1,   'rgba(208,168,64,0.99)');
 
-          ctx.fillStyle = grad;
+          ctx.fillStyle   = grad;
+          ctx.shadowColor = 'rgba(224,180,79,0.8)';
+          ctx.shadowBlur  = 14;
           ctx.fillText(text,x,y);
 
-          drops[i] += 0.4 + Math.random()*0.2;
+          ctx.shadowBlur  = 0;
+          ctx.fillStyle   = 'rgba(181,147,64,0.30)';
+          ctx.fillText(text,x,y-fontSize);
+
+          const velocity = 0.4 + Math.random()*0.2;
+          drops[i] += velocity;
+
           if(y > window.innerHeight + fontSize*2){
             drops[i] = Math.random() * -20;
           }
@@ -332,48 +316,66 @@
       draw();
     })();
 
-    // --- 星祈ゲート：白い閃光ワープ＋スクロールでフェードアウト ---
-    (function(){
-      const gate = document.getElementById('entry-corridor');
-      if(!gate) return;
+    // --- ローディング → ヒーロー表示 ---
+    window.addEventListener('load', function(){
+      const loader = document.getElementById('loader');
+      const hero   = document.getElementById('hero');
 
-      // クリックで白い閃光ワープ
-      gate.addEventListener('click', function(e){
+      setTimeout(() => {
+        loader.classList.add('hide');
+        hero.classList.add('show');
+      }, 1100);
+    });
+
+    // --- ボタン演出：星粒バースト＋テキストPulse＋黄金ゲートフレア ---
+    function attachGateEffect(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+
+      el.addEventListener('click', function(e){
         e.preventDefault();
-        const href = this.getAttribute('href');
+        const href  = this.getAttribute('href');
+        const rect  = this.getBoundingClientRect();
+        const cx    = rect.left + rect.width/2;
+        const cy    = rect.top  + rect.height/2;
 
-        // 白い閃光オーバーレイ生成
-        const flash = document.createElement('div');
-        flash.className = 'warp-flash';
-        document.body.appendChild(flash);
-
-        // 少し待ってから遷移（真っ白時間は短く）
-        setTimeout(()=> {
-          window.location.href = href;
-        }, 420);
-      });
-
-      // スクロールでゲートがゆっくり消える
-      function onScroll(){
-        const max = window.innerHeight * 0.5;  // フェードアウトし始める長さ
-        const y   = window.scrollY || window.pageYOffset;
-        const t   = Math.min(1, y / max);
-        const baseOpacity = 0.95;
-        const nextOpacity = baseOpacity * (1 - t);
-
-        gate.style.opacity = String(nextOpacity);
-
-        // ほぼ消えたらクリック無効
-        if(nextOpacity < 0.12){
-          gate.style.pointerEvents = 'none';
-        } else {
-          gate.style.pointerEvents = 'auto';
+        // テキストPulse
+        const label = this.querySelector('.label');
+        if(label){
+          label.classList.add('label-pulse');
+          setTimeout(()=>label.classList.remove('label-pulse'), 900);
         }
-      }
 
-      window.addEventListener('scroll', onScroll, {passive:true});
-    })();
+        // 星粒バースト
+        const burst = document.createElement('div');
+        burst.className = 'particle-burst';
+        burst.style.left = cx + 'px';
+        burst.style.top  = cy + 'px';
+
+        for(let i=0;i<14;i++){
+          const p = document.createElement('span');
+          const tx = (Math.random()*180 - 90) | 0;
+          const ty = (Math.random()*100 - 50) | 0;
+          p.style.setProperty('--tx', tx + 'px');
+          p.style.setProperty('--ty', ty + 'px');
+          burst.appendChild(p);
+        }
+        document.body.appendChild(burst);
+        setTimeout(()=>burst.remove(), 800);
+
+        // 黄金ゲートフレア
+        const flare = document.createElement('div');
+        flare.className = 'gate-flare';
+        document.body.appendChild(flare);
+        setTimeout(()=>flare.remove(), 650);
+
+        // ページ遷移（真っ白画面を長く見せない）
+        setTimeout(()=>{ window.location.href = href; }, 420);
+      });
+    }
+
+    attachGateEffect('gate-reading');
+    attachGateEffect('gate-philosophy');
   </script>
-
 </body>
 </html>
