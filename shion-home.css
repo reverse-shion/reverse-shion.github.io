@@ -747,148 +747,162 @@ body{
   }
 }
 
-/* =============================================
-   詩韻思想「星砂ゲートボタン」
-   - 金属感より「光の砂」
-   - 文字の視認性を最優先
-   - 軽量：transform + background-position のみ
-============================================= */
-.shion-divine-btn {
-  --gold-soft: #fbe7b8;
-  --gold-core: #f3c971;
-  --gold-deep: #b37b2b;
-  --halo: rgba(255, 232, 185, 0.9);
+/* ================================================
+   蒼金コア・ゲート v4
+   - 濃い蒼 × 濃い金
+   - 粒ではなく「横長の光の帯」
+   - 下線なし・神秘的な文字
+================================================ */
+.seiki-core-btn {
+  --gold-core: #ffd25c;
+  --gold-deep: #c99a2e;
+  --blue-core: #4f6dff;
+  --blue-dark: #1c2450;
 
   position: fixed;
-  bottom: 24px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 9999;
 
-  width: 260px;
-  height: 80px;
+  width: 235px;
+  height: 72px;
   border-radius: 999px;
 
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
-  font-family: "Shippori Mincho","Noto Serif JP",serif;
-  font-weight: 700;
+  font-family: 'Shippori Mincho','Noto Serif JP',serif;
+  font-weight: 600;
   font-size: 15px;
   letter-spacing: 0.26em;
   text-indent: 0.26em;
   text-align: center;
-  text-decoration: none;
-  cursor: pointer;
 
-  /* 文字の視認性：中心は少し落ち着いた金＋濃いブラウン文字 */
-  color: #3b2614;
+  color: #201219;                    /* 濃いブラウン */
   text-shadow:
-    0 0 3px rgba(255,255,255,0.7),
-    0 1px 2px rgba(0,0,0,0.45);
+    0 0 6px rgba(255,255,255,0.9),
+    0 0 18px rgba(255,210,130,0.8),
+    1px 1px 0 rgba(0,0,0,0.55);
+  text-decoration: none;             /* ★ 下線を完全に消す */
 
   background:
-    radial-gradient(circle at 50% 40%, #fff9ec 0%, transparent 60%),
-    radial-gradient(circle at 50% 80%, rgba(179,123,43,0.55) 0%, transparent 70%),
-    linear-gradient(135deg, #fff7e4 0%, var(--gold-soft) 40%, var(--gold-core) 100%);
+    radial-gradient(circle at 50% 25%, #fffdf6 0%, transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(31,40,96,0.85) 0%, transparent 70%),
+    linear-gradient(135deg,
+      #fff1c9 0%,
+      var(--gold-core) 40%,
+      var(--gold-deep) 75%,
+      rgba(79,109,255,0.75) 100%
+    );
 
   box-shadow:
-    0 8px 20px rgba(0,0,0,0.18),
-    0 0 40px rgba(251, 220, 150, 0.65);
+    0 6px 14px rgba(0,0,0,0.25),
+    0 0 40px rgba(255,210,130,0.8);
 
   overflow: hidden;
   isolation: isolate;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 
-  /* 星砂ゲートの鼓動（軽め） */
-  animation: shionStarGateBeat 3.8s ease-in-out infinite;
-  transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.3s ease;
+  backdrop-filter: blur(2px);
+
+  z-index: 2000;
+  opacity: 0.98;
+
+  /* 命の鼓動（軽めの二拍） */
+  animation: seikiBeat 3.4s ease-in-out infinite;
 }
 
-/* 鼓動：位置は固定のまま、ごく小さくスケール */
-@keyframes shionStarGateBeat {
-  0%, 100% {
-    transform: translateX(-50%) scale(1);
-  }
-  25% {
-    transform: translateX(-50%) scale(1.03);
-  }
-  40% {
-    transform: translateX(-50%) scale(1.015);
-  }
-  60% {
-    transform: translateX(-50%) scale(1);
-  }
+@keyframes seikiBeat {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  10%, 14% { transform: translateX(-50%) scale(1.05); }
+  25%      { transform: translateX(-50%) scale(1.01); }
+  32%, 36% { transform: translateX(-50%) scale(1.06); }
+  50%      { transform: translateX(-50%) scale(1); }
 }
 
-/* 星砂レイヤー：コード雨の“横版”イメージで流れる光粒子 */
-.shion-divine-btn::before {
+/* 蒼金リング（神秘的な外輪） */
+.seiki-core-btn::before {
   content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:999px;
+
+  border:1px solid rgba(255,240,190,0.8);
+  background:
+    radial-gradient(circle, rgba(79,109,255,0.35), transparent 70%);
+
+  mix-blend-mode:screen;
+  opacity:0.95;
+  animation: seikiRing 18s linear infinite;
+}
+
+@keyframes seikiRing {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+
+/* =============================================
+   横長コードレイン（光の帯）
+   - 細い水平ラインがずっと横に流れる
+============================================= */
+.seiki-core-btn .flow {
   position:absolute;
   inset:0;
   border-radius:inherit;
+  pointer-events:none;
 
   background-image:
-    radial-gradient(circle, rgba(255,255,255,0.75) 0, transparent 55%),
-    radial-gradient(circle, rgba(255,222,160,0.7) 0, transparent 60%);
-  background-size: 20px 20px, 10px 10px;
-  background-repeat: repeat;
+    /* 白い光の帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.95) 0px,
+      rgba(255,255,255,0.95) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    /* 金色の帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,215,130,0.9) 0px,
+      rgba(255,215,130,0.9) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    /* 蒼い帯 */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(79,109,255,0.85) 0px,
+      rgba(79,109,255,0.85) 1px,
+      transparent 1px,
+      transparent 9px
+    );
 
-  opacity:0.35;
+  background-size:
+    180% 100%,
+    200% 100%,
+    220% 100%;
+
   mix-blend-mode:screen;
-  pointer-events:none;
+  opacity:0.5;
 
-  /* 横方向メイン＋少し斜めに流れる星砂（軽量） */
-  animation: shionStarSandFlow 10s linear infinite;
+  animation: seikiFlow 10s linear infinite;
 }
 
-@keyframes shionStarSandFlow {
+@keyframes seikiFlow {
   0% {
-    background-position: 0 0, 0 0;
+    background-position: 0 0, 0 0, 0 0;
   }
   100% {
-    background-position: 120px 20px, 60px 10px;
-  }
-}
-
-/* 中央の小さな星刻印（控えめに） */
-.shion-divine-btn::after {
-  content:"✦";
-  position:absolute;
-  font-size: 20px;
-  color:#fff7e4;
-  text-shadow:0 0 16px rgba(255,222,160,0.9);
-  opacity:0.85;
-  transform: translateY(-14px);
-  pointer-events:none;
-  animation: shionStarCore 3.2s ease-in-out infinite;
-}
-
-@keyframes shionStarCore {
-  0%,100% { opacity:0.6; transform: translateY(-14px) scale(1); }
-  50%     { opacity:1;   transform: translateY(-14px) scale(1.18); }
-}
-
-/* PCホバー */
-@media (pointer:fine) {
-  .shion-divine-btn:hover {
-    transform: translateX(-50%) scale(1.06);
-    box-shadow:
-      0 10px 26px rgba(0,0,0,0.25),
-      0 0 60px rgba(252, 228, 170, 0.9);
+    background-position: 140px 0, 200px 0, 260px 0;
   }
 }
 
 /* スマホ調整 */
 @media (max-width: 768px) {
-  .shion-divine-btn {
-    width: 240px;
-    height: 72px;
-    bottom: 18px;
+  .seiki-core-btn {
+    width: 215px;
+    height: 62px;
     font-size: 14px;
-    letter-spacing: 0.22em;
-    text-indent: 0.22em;
+    bottom: 14px;
   }
 }
