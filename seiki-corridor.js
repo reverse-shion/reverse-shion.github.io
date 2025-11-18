@@ -252,4 +252,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // });
 });
 
-
+document.addEventListener('DOMContentLoaded', () => {
+  const particlesContainer = document.getElementById('awakenParticles');
+  if (particlesContainer) {
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement('div');
+      p.className = 'awaken-particle';
+      p.style.setProperty('--i', i);
+      particlesContainer.appendChild(p);
+    }
+  }
+});
