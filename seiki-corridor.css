@@ -28,8 +28,37 @@ body {
 
 body {
   background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,0.04) 0, transparent 40%),
-    linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
+    /* 微かな星屑の光 */
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(255,215,122,0.06) 0%, transparent 50%),
+    
+    /* ここからが本命：超多段グラデーションで「徐々に蒼白く輝く」表現 */
+    linear-gradient(to bottom,
+      #050308 0%,
+      #0a0e1f 15%,
+      #111526 28%,
+      #141a2f 38%,
+      #16213a 46%,
+      #182944 53%,
+      #1a3052 60%,
+      #1d3860 67%,
+      #22406e 73%,
+      #284a7c 79%,
+      #3088b6 85%,   /* ここから明らかに蒼白方向へ */
+      #3a9ce1 91%,
+      #5ab3ff 95%,
+      #73c8ff 97%,
+      #a8e0ff 100%    /* 最下部は淡い氷のような蒼白光 */
+    ),
+    
+    /* 最下層にほのかな輝きを追加（画面下部が光っているように見せる） */
+    radial-gradient(ellipse at 50% 120%, 
+      rgba(120, 200, 255, 0.25) 0%, 
+      rgba(80, 160, 255, 0.15) 30%, 
+      transparent 70%
+    );
+
+  background-attachment: fixed; /* スクロールしても下部の光が残る */
   color: var(--text-main);
   font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont,
     'Yu Mincho', '游明朝体', 'YuMincho', serif;
@@ -37,7 +66,18 @@ body {
   overflow-y: auto;
   position: relative;
 }
-
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  bottom: -30%;
+  background: radial-gradient(ellipse at 50% 100%, 
+    rgba(140, 220, 255, 0.35) 0%, 
+    transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
 /* 星の粒子背景 */
 .starfield {
   position: fixed;
