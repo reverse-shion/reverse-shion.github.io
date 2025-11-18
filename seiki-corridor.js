@@ -215,3 +215,41 @@ for(let i=0;i<40;i++){
         p.style.setProperty('--i', i);
         document.currentScript.parentNode.appendChild(p);
       }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('awakeningOverlay');
+  const gateBtn = document.getElementById('awakenGate');
+  const particlesContainer = document.getElementById('awakenParticles');
+
+  // ★ 星粒子を40個生成（超軽量）
+  if (particlesContainer) {
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.className = 'awaken-particle';
+      p.style.setProperty('--i', i);
+      particlesContainer.appendChild(p);
+    }
+  }
+
+  // ★ 「祈りボタン」からオーバーレイを開く
+  // 祈りボタン側に data-awaken-open を付けておけばOK
+  document.querySelectorAll('[data-awaken-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      overlay.classList.add('active');   // ← CSSの .active が効く
+    });
+  });
+
+  // ★ クリスタルの外側（暗い部分）をタップで閉じる
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+    }
+  });
+
+  // 必要ならゲートタップでも閉じる
+  // gateBtn.addEventListener('click', () => {
+  //   overlay.classList.remove('active');
+  // });
+});
+
+
