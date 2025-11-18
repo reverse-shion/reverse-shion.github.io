@@ -811,20 +811,40 @@ body::after {
 }
 
 /* ===========================
-   セレフィアス覚醒ゲート
-   （カード内に後から出現するピラー型ゲート）
+   SRG — セレフィアス覚醒ゲート
+   （祈りボタンのあとに出現するピラー型ゲート）
 =========================== */
 
-/* 祈りボタンを押すまでゲートは完全非表示 */
+/* 祈りボタンを押すまでは完全に非表示 */
 .card-gate .srg-gate-wrapper {
-  margin-top: 20px;
-  display: none;                 /* ★ 最初は隠す */
+  position: relative;
+  margin-top: 22px;
+  display: none;                 /* ★ここがポイント */
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .card-gate .srg-gate-wrapper.is-open {
-  display: flex;                 /* ★ JSで .is-open が付いた時だけ出現 */
+  display: flex;                 /* ★JSで .is-open を付けたときだけ出現 */
+}
+
+/* 足元のハロー（ポータルのような光の輪） */
+.card-gate .srg-gate-wrapper::before {
+  content: "";
+  position: absolute;
+  width: 220px;
+  max-width: 70vw;
+  height: 60px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 30%,
+      rgba(255, 245, 220, 0.85) 0%,
+      rgba(255, 245, 220, 0.2) 40%,
+      transparent 70%);
+  filter: blur(2px);
+  opacity: 0.85;
+  pointer-events: none;
+  bottom: 6px;
 }
 
 /* ======== クリスタル柱ゲート本体 ======== */
@@ -892,24 +912,6 @@ body::after {
   filter: blur(1px);
   mix-blend-mode: screen;
   animation: awaken-core-pulse 3.4s ease-in-out infinite;
-}
-
-/* 足元のハロー（ポータルのような円形光） */
-.srg-gate-wrapper::before {
-  content: "";
-  position: absolute;
-  width: 220px;
-  max-width: 70vw;
-  height: 60px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 30%,
-      rgba(255, 245, 220, 0.85) 0%,
-      rgba(255, 245, 220, 0.2) 40%,
-      transparent 70%);
-  filter: blur(2px);
-  opacity: 0.85;
-  pointer-events: none;
 }
 
 /* ======== テキスト（SEREPHIAS / AWAKEN / GATE） ======== */
@@ -1005,6 +1007,7 @@ body::after {
     font-size: 0.82rem;
     padding-inline: 8px;
   }
+}
 }/* フッター */
 .site-footer {
   margin: 28px auto 8px;
