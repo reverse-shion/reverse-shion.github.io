@@ -236,61 +236,87 @@
             </p>
           </div>
 
-          <div class="gate-inner">
-            <!-- STEP1：祈りボタン -->
-            <button type="button" class="gate-pray-btn" id="gatePrayButton">
-              <span class="gate-pray-main">祈りを捧げる</span>
-              <span class="gate-pray-sub">
-                タップすると、セレフィアスからの詩がひとつ降ります
-              </span>
-            </button>
+     <div class="gate-inner">
+  <!-- STEP1：祈りボタン -->
+  <button
+    type="button"
+    class="gate-pray-btn"
+    id="gatePrayButton"
+    aria-controls="serephiasPoem"
+    aria-expanded="false"
+  >
+    <span class="gate-pray-main">祈りを捧げる</span>
+    <span class="gate-pray-sub">
+      タップすると、セレフィアスからの詩がひとつ降ります
+    </span>
+  </button>
 
-            <!-- STEP2：セレフィアスの詩（JSで表示） -->
-            <div class="serephias-poem" id="serephiasPoem">
-              <p class="serephias-poem-label">SEREPHIAS MESSAGE</p>
-              <p class="serephias-poem-body" id="serephiasPoemBody">
-                <!-- JSで詩が入る -->
-              </p>
-            </div>
-          </div>
-        </article>
-      </section>
-    </main>
-
-    <!-- フッター -->
-    <footer class="site-footer">
-      <span class="footer-label">他の星への入口</span>
-      <div class="footer-links">
-        <a href="https://reverse-shion.github.io/" class="footer-link" target="_blank" rel="noopener">
-          Re:Verse Shion トップ
-        </a>
-        <a href="https://note.com/shion_uranai369" class="footer-link" target="_blank" rel="noopener">
-          note（詩韻思想の書）
-        </a>
-      </div>
-    </footer>
+  <!-- STEP2：セレフィアスの詩（JSで表示） -->
+  <div class="serephias-poem" id="serephiasPoem" aria-live="polite">
+    <p class="serephias-poem-label">SEREPHIAS MESSAGE</p>
+    <p class="serephias-poem-body" id="serephiasPoemBody">
+      <!-- JSで詩が入る -->
+    </p>
   </div>
+</div>
+</article>
+</section>
+</main>
 
-  <!-- 覚醒モード：セレフィアス星環ゲート（画面中央オーバーレイ） -->
-  <div class="awakening-overlay" id="awakeningOverlay">
-    <div class="awakening-gate-shell">
-      <button type="button" class="awakening-gate" id="awakeningGateButton">
-        <div class="aw-ring aw-ring--outer"></div>
-        <div class="aw-ring aw-ring--inner"></div>
-        <div class="aw-core">
-          <div class="aw-core-inner">
-            <span class="aw-label-top">SEREPHIAS</span>
-            <span class="aw-label-mid">AWAKEN</span>
-            <span class="aw-label-bottom">GATE</span>
-          </div>
+<!-- フッター -->
+<footer class="site-footer">
+  <span class="footer-label">他の星への入口</span>
+  <div class="footer-links">
+    <a
+      href="https://reverse-shion.github.io/"
+      class="footer-link"
+      target="_blank"
+      rel="noopener"
+    >
+      Re:Verse Shion トップ
+    </a>
+    <a
+      href="https://note.com/shion_uranai369"
+      class="footer-link"
+      target="_blank"
+      rel="noopener"
+    >
+      note（詩韻思想の書）
+    </a>
+  </div>
+</footer>
+</div>
+
+<!-- 覚醒モード：セレフィアス星環ゲート（画面中央オーバーレイ） -->
+<div
+  class="awakening-overlay"
+  id="awakeningOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="awakeningCaption"
+>
+  <div class="awakening-gate-shell">
+    <button
+      type="button"
+      class="awakening-gate"
+      id="awakeningGateButton"
+    >
+      <div class="aw-ring aw-ring--outer"></div>
+      <div class="aw-ring aw-ring--inner"></div>
+      <div class="aw-core">
+        <div class="aw-core-inner">
+          <span class="aw-label-top">SEREPHIAS</span>
+          <span class="aw-label-mid">AWAKEN</span>
+          <span class="aw-label-bottom">GATE</span>
         </div>
-        <div class="aw-stars"></div>
-      </button>
-      <p class="awakening-caption">
-        このゲートに触れると、詩韻思想の中枢〈Re:Verse Shion Core〉へ転送されます。
-      </p>
-    </div>
+      </div>
+      <div class="aw-stars"></div>
+    </button>
+    <p class="awakening-caption" id="awakeningCaption">
+      このゲートに触れると、セレフィアスのいる星環へ行ける。
+    </p>
   </div>
+</div>
 
   <!-- 灯籠点灯エフェクト -->
   <div class="sparkles" id="sparkles"></div>
