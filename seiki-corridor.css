@@ -815,7 +815,7 @@ body::after {
    （祈りボタンのあとに出現するピラー型ゲート）
 =========================== */
 
-/* 祈りボタンを押すまでは完全に非表示 */
+/* 祈りボタンを押すまではラッパーごと非表示 */
 .card-gate .srg-gate-wrapper {
   position: relative;
   margin-top: 22px;
@@ -824,6 +824,7 @@ body::after {
   align-items: flex-end;
 }
 
+/* JS で .is-open が付いたときだけ出現 */
 .card-gate .srg-gate-wrapper.is-open {
   display: flex;
 }
@@ -863,15 +864,6 @@ body::after {
   align-items: center;
   justify-content: flex-start;
   animation: awaken-pillar-breathe 6s ease-in-out infinite;
-}
-
-/* ★ 星祈の回廊内では最初は隠す */
-.card-gate .awaken-gate {
-  display: none;
-}
-
-.card-gate .srg-gate-wrapper.is-open .awaken-gate {
-  display: flex;
 }
 
 /* 柱のメインボディ（六角クリスタルっぽいシルエット） */
@@ -922,7 +914,7 @@ body::after {
   animation: awaken-core-pulse 3.4s ease-in-out infinite;
 }
 
-/* ======== テキスト（SEREPHIAS / AWAKEN / GATE） ======== */
+/* テキスト（SEREPHIAS / AWAKEN / GATE） */
 
 .awaken-gate-label {
   position: relative;
@@ -955,7 +947,7 @@ body::after {
   color: rgba(18, 10, 8, 0.95);
 }
 
-/* ======== アニメーション ======== */
+/* アニメーション */
 
 @keyframes awaken-pillar-breathe {
   0%, 100% {
@@ -980,8 +972,7 @@ body::after {
   transform: translateY(2px) scale(0.99);
 }
 
-/* ======== キャプション（ゲート下の説明文） ======== */
-
+/* キャプション（ゲート下の説明文） */
 .awaken-caption {
   max-width: 540px;
   font-size: 0.9rem;
@@ -991,8 +982,7 @@ body::after {
   text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
 }
 
-/* ======== モバイル調整（ゲート） ======== */
-
+/* モバイル調整 */
 @media (max-width: 480px) {
   .awaken-gate {
     width: 72vw;
