@@ -810,42 +810,22 @@ body::after {
   text-shadow: 0 0 14px rgba(255, 215, 122, 0.7);
 }
 
-/* ===========================
-   SRG — セレフィアス覚醒ゲート
-   （祈りボタンのあとに出現するピラー型ゲート）
-=========================== */
+/* ======== 背景全体（覚醒モード画面） ======== */
 
-/* 祈りボタンを押すまではラッパーごと非表示 */
-.card-gate .srg-gate-wrapper {
-  position: relative;
-  margin-top: 22px;
-  display: none;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-/* JS で .is-open が付いたときだけ出現 */
-.card-gate .srg-gate-wrapper.is-open {
+.awaken-screen {
+  min-height: 100vh;
+  padding: 72px 16px 56px;
   display: flex;
-}
-
-/* 足元のハロー（ポータルのような光の輪） */
-.card-gate .srg-gate-wrapper::before {
-  content: "";
-  position: absolute;
-  width: 220px;
-  max-width: 70vw;
-  height: 60px;
-  border-radius: 50%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
   background:
-    radial-gradient(circle at 50% 30%,
-      rgba(255, 245, 220, 0.85) 0%,
-      rgba(255, 245, 220, 0.2) 40%,
-      transparent 70%);
-  filter: blur(2px);
-  opacity: 0.85;
-  pointer-events: none;
-  bottom: 6px;
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04) 0, transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(255, 215, 122, 0.08) 0, transparent 55%),
+    radial-gradient(circle at 50% 110%, rgba(120, 200, 255, 0.35) 0, transparent 65%),
+    linear-gradient(180deg, #120f2a 0%, #0b0c1c 40%, #050308 100%);
+  color: #f8f2e9;
 }
 
 /* ======== クリスタル柱ゲート本体 ======== */
@@ -859,10 +839,7 @@ body::after {
   background: transparent;
   cursor: pointer;
   outline: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  /* ゆっくり浮き沈みする鼓動 */
   animation: awaken-pillar-breathe 6s ease-in-out infinite;
 }
 
@@ -873,13 +850,13 @@ body::after {
   inset: 6% 24%;
   border-radius: 999px;
   background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 245, 220, 0.9) 26%,
-    rgba(255, 217, 138, 0.95) 45%,
-    rgba(149, 194, 255, 0.95) 68%,
-    rgba(40, 60, 120, 1) 100%
-  );
+      180deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 245, 220, 0.9) 26%,
+      rgba(255, 217, 138, 0.95) 45%,
+      rgba(149, 194, 255, 0.95) 68%,
+      rgba(40, 60, 120, 1) 100%
+    );
   box-shadow:
     0 0 30px rgba(255, 245, 220, 0.95),
     0 0 60px rgba(0, 0, 0, 0.96),
@@ -902,19 +879,39 @@ body::after {
   position: absolute;
   inset: 16% 38%;
   border-radius: 999px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 230, 180, 0.0) 45%,
-    rgba(127, 192, 255, 0.35) 70%,
-    rgba(16, 28, 72, 0.0) 100%
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 230, 180, 0.0) 45%,
+      rgba(127, 192, 255, 0.35) 70%,
+      rgba(16, 28, 72, 0.0) 100%
+    );
   filter: blur(1px);
   mix-blend-mode: screen;
   animation: awaken-core-pulse 3.4s ease-in-out infinite;
 }
 
-/* テキスト（SEREPHIAS / AWAKEN / GATE） */
+/* 台座の光輪（足元のポータル） */
+.awaken-gate-floor {
+  /* HTMLに追加しない場合は未使用。必要なら別要素で使ってOK */
+}
+
+/* ボタン下の光輪を pseudo で表現 */
+.awaken-gate::marker {}
+
+/* 足元に広がる円形ハロー */
+.awaken-gate-shadow {
+  /* 別要素を使う場合用。今回は下の ::before2 でまとめて表現 */
+}
+
+/* 足元ハロー（ボタンの下） */
+.awaken-gate-container::before,
+.awaken-gate-container::after {
+  /* もしラッパーを作るならここで */
+}
+
+/* ======== テキスト（SEREPHIAS / AWAKEN / GATE） ======== */
 
 .awaken-gate-label {
   position: relative;
@@ -947,7 +944,15 @@ body::after {
   color: rgba(18, 10, 8, 0.95);
 }
 
-/* アニメーション */
+/* 背景側の円形ハロー（クリスタルの背後） */
+.awaken-gate-background-halo {
+  /* もし別要素を取る場合用 */
+}
+
+/* ゲート全体の外側光輪（body 背景に対して） */
+.awaken-gate-wrapper::before {}
+
+/* ======== アニメーション ======== */
 
 @keyframes awaken-pillar-breathe {
   0%, 100% {
@@ -959,8 +964,12 @@ body::after {
 }
 
 @keyframes awaken-core-pulse {
-  0%, 100% { opacity: 0.85; }
-  50%      { opacity: 1; }
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* クリック時のフィードバック */
@@ -972,7 +981,8 @@ body::after {
   transform: translateY(2px) scale(0.99);
 }
 
-/* キャプション（ゲート下の説明文） */
+/* ======== キャプション ======== */
+
 .awaken-caption {
   max-width: 540px;
   font-size: 0.9rem;
@@ -982,8 +992,14 @@ body::after {
   text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
 }
 
-/* モバイル調整 */
+/* ======== モバイル調整 ======== */
+
 @media (max-width: 480px) {
+  .awaken-screen {
+    padding-top: 64px;
+    padding-bottom: 40px;
+  }
+
   .awaken-gate {
     width: 72vw;
     height: 65vh;
@@ -1108,6 +1124,10 @@ body::after {
   .sp-br {
     display: inline;
   }
+
+  .awakening-gate {
+    width: min(230px, 80vw);
+  }
 }
 
 @media (min-width: 769px) {
@@ -1122,26 +1142,55 @@ body::after {
   }
 }
 
-/* ===========================
-   セレフィアス覚醒ゲートの表示制御（強制版）
-   最初は完全に非表示 → is-open でだけ出す
-=========================== */
 
-/* どこに書いてあっても、初期状態では隠す */
-.awaken-gate {
-  display: none !important;
+/* 最初は完全に非表示にするクラス */
+.awaken-gate-container {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(60px);
+  transition: 
+    opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.6s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 1.6s; /* visibilityはアニメーション終了後にhiddenに戻すため遅延 */
 }
 
-/* ラッパーに is-open が付いた時だけ表示 */
-.srg-gate-wrapper.is-open .awaken-gate {
-  display: flex !important;
+/* 表示された状態 */
+.awaken-gate-container.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: 
+    opacity 1.6s cubic-bezier(0.16,1,.3,1),
+    transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ラッパー自体も同じく制御 */
-.srg-gate-wrapper {
-  display: none !important;
+/* ボタン（ゲートを開く用）のスタイル例 */
+.open-gate-btn {
+  padding: 14px 32px;
+ 16px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  color: #f8f2e9;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 220, 160, 0.3);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: all 0.4s ease;
+  text-transform: uppercase;
 }
 
-.srg-gate-wrapper.is-open {
-  display: flex !important;
+.open-gate-btn:hover {
+  background: rgba(255, 220, 160, 0.15);
+  box-shadow: 0 0 20px rgba(255, 220, 160, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ボタンを押した後は非表示にする（任意） */
+.open-gate-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-20px);
+  transition: all 0.8s ease 0.3s;
 }
