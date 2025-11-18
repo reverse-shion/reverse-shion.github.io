@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -20,19 +22,19 @@
 
 html, body {
   height: 100%;
+}
+
+body {
   background: radial-gradient(circle at 20% 0%, #261b3d 0, #050308 45%, #010108 100%);
   color: var(--text-main);
   font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont,
     'Yu Mincho', '游明朝体', 'YuMincho', serif;
   overflow-x: hidden;
   overflow-y: auto;
-}
-
-body {
   position: relative;
 }
 
-/* 星の粒子 */
+/* 星の粒子背景 */
 .starfield {
   position: fixed;
   inset: 0;
@@ -63,28 +65,62 @@ body {
 }
 
 @keyframes drift-stars {
-  0% { transform: translate3d(0, 0, 0); }
-  100%{ transform: translate3d(-60px, -120px, 0); }
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-60px, -120px, 0); }
+}
+
+/* 縦にのびる回廊の光ライン */
+.path-line {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 215, 122, 0.5), transparent 70%);
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.path-glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 5px;
+  height: 120px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255,215,122,0.95) 0, rgba(255,215,122,0.0) 70%);
+  animation: path-descend 14s linear infinite;
+}
+
+@keyframes path-descend {
+  0%   { transform: translate(-50%, -10%); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { transform: translate(-50%, 110%); opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* ページ全体ラッパ */
 .corridor-shell {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-bottom: 32px;
 }
 
 /* ヘッダー */
-header.site-header {
-  padding: 12px 20px 10px;
+.site-header {
+  padding: 12px 20px 8px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 14px;
-  background: linear-gradient(to bottom, rgba(5, 3, 16, 0.9), transparent);
+  flex-direction: column;
+  gap: 6px;
+  background: linear-gradient(to bottom, rgba(5, 3, 16, 0.96), transparent);
   backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
   z-index: 5;
 }
 
@@ -97,20 +133,20 @@ header.site-header {
 .title-block h1 {
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-size: clamp(1.3rem, 2.2vw, 1.8rem);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   color: var(--gold-soft);
   text-shadow: 0 0 16px rgba(255, 215, 122, 0.65);
 }
 
 .title-block .en {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--accent-muted);
 }
 
 .subtitle {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--text-soft);
   opacity: 0.9;
 }
@@ -123,69 +159,31 @@ header.site-header {
     rgba(255, 215, 122, 0.65),
     transparent
   );
-  margin-top: 6px;
+  margin-top: 4px;
   opacity: 0.8;
 }
 
-/* 光の道（背景ライン） */
-.path-line {
-  position: fixed;
-  left: 10%;
-  right: 10%;
-  top: 50%;
-  height: 2px;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 215, 122, 0.6), transparent 70%);
-  opacity: 0.28;
-  pointer-events: none;
-  z-index: 1;
-  overflow: visible;
-}
-
-.path-glow {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right,
-    rgba(255,215,122,0.9) 0%,
-    rgba(255,215,122,0.4) 40%,
-    transparent 100%);
-  transform: translateY(-50%) scaleX(0.15);
-  transform-origin: left;
-  opacity: 0.9;
-  animation: path-extend 120s linear infinite;
-}
-
-@keyframes path-extend {
-  0%   { transform: translateY(-50%) scaleX(0.15); }
-  100% { transform: translateY(-50%) scaleX(1.3); }
-}
-
-/* 縦スクロール回廊 */
+/* メイン：縦回廊 */
 .corridor-main {
-  position: relative;
   flex: 1;
-  width: 100%;
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 24px 20px 40px;
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 40px;
+  padding: 28px 10vw 20px;
 }
 
-/* 各セクション */
+/* セクション共通 */
 .corridor-section {
-  position: relative;
   display: flex;
-  align-items: stretch;
   justify-content: center;
 }
 
+/* カード共通 */
 .card {
   position: relative;
-  padding: 22px 20px 20px;
+  max-width: 720px;
+  width: 100%;
+  padding: 22px 22px 20px;
   border-radius: var(--radius-card);
   color: var(--text-main);
   background:
@@ -197,22 +195,11 @@ header.site-header {
     0 0 30px rgba(255, 215, 122, 0.15);
   border: 1px solid rgba(255, 235, 196, 0.14);
   backdrop-filter: blur(var(--blur-bg));
-  width: 100%;
-  max-width: 680px;
-}
-
-/* ステップラベル */
-.card-step {
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent-muted);
-  margin-bottom: 4px;
 }
 
 /* 入口カード */
 .card-intro {
-  max-width: 620px;
+  max-width: 640px;
 }
 
 .intro-label {
@@ -220,7 +207,7 @@ header.site-header {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--accent-muted);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .card-intro h2 {
@@ -234,158 +221,77 @@ header.site-header {
 
 .intro-body p {
   font-size: 0.92rem;
-  line-height: 1.8;
+  line-height: 1.9;
   color: var(--text-soft);
   white-space: pre-line;
 }
 
-.intro-body p + p { margin-top: 10px; }
-
-.corridor-section--intro {
-  padding-top: 4px;
+.intro-body p + p {
+  margin-top: 10px;
 }
 
-/* スクロールヒント */
-.intro-hint {
+.scroll-down-hint {
   margin-top: 18px;
+  font-size: 0.8rem;
+  color: var(--accent-muted);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 215, 122, 0.8);
-  background:
-    radial-gradient(circle at 50% 0, rgba(255, 245, 210, 0.18), rgba(18, 12, 32, 0.96));
-  color: var(--gold-soft);
-  font-size: 0.78rem;
-  box-shadow:
-    0 0 18px rgba(255, 215, 122, 0.9),
-    0 0 26px rgba(0, 0, 0, 0.9);
-  animation: hint-pulse 2.4s ease-in-out infinite;
+  gap: 4px;
 }
 
-.intro-hint-arrow {
+.scroll-down-hint .arrow {
   font-size: 1rem;
 }
 
-@keyframes hint-pulse {
-  0%   { opacity: 0;   transform: translateY(4px); }
-  20%  { opacity: 1;   transform: translateY(0); }
-  80%  { opacity: 0.8; transform: translateY(0); }
-  100% { opacity: 0;   transform: translateY(4px); }
+/* 回廊コンセプト */
+.card-lantern-concept {
+  max-width: 660px;
 }
 
-.scroll-hint--hide {
-  opacity: 0;
-  transition: opacity 0.4s ease-out;
-}
-
-/* 誰かの灯籠 */
-.card-others h3 {
-  font-size: 1.02rem;
-  margin-bottom: 10px;
+.card-lantern-concept h3 {
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: 1.05rem;
   letter-spacing: 0.08em;
+  margin-bottom: 12px;
   color: var(--gold-soft);
 }
 
-.others-lead {
-  font-size: 0.86rem;
-  line-height: 1.8;
+.lantern-concept-body p {
+  font-size: 0.9rem;
+  line-height: 1.9;
   color: var(--text-soft);
-  margin-bottom: 10px;
-}
-
-/* 共通：灯籠リスト */
-.lantern-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 4px;
-  max-height: 220px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.lantern-list::-webkit-scrollbar {
-  width: 5px;
-}
-.lantern-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 215, 122, 0.5);
-  border-radius: 999px;
-}
-
-.lantern-item {
-  position: relative;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.1), transparent 70%),
-    linear-gradient(to bottom right, rgba(12, 8, 22, 0.96), rgba(10, 6, 18, 0.98));
-  border: 1px solid rgba(255, 235, 196, 0.16);
-  box-shadow: 0 0 14px rgba(0, 0, 0, 0.75);
-  font-size: 0.84rem;
-  color: var(--text-soft);
-  line-height: 1.7;
-}
-
-.lantern-item::before {
-  content: "✶";
-  position: absolute;
-  left: 10px;
-  top: 8px;
-  font-size: 0.7rem;
-  color: var(--gold-strong);
-  opacity: 0.9;
-}
-
-.lantern-item--empty::before {
-  content: "…";
-  color: var(--accent-muted);
-}
-
-.lantern-text {
-  padding-left: 15px;
   white-space: pre-line;
 }
 
-.lantern-meta {
-  margin-top: 4px;
-  font-size: 0.7rem;
-  color: var(--accent-muted);
-  text-align: right;
+.lantern-concept-body p + p {
+  margin-top: 10px;
 }
 
 /* あなたの灯籠カード */
 .card-user {
-  max-width: 680px;
+  max-width: 700px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .card-user-header h3 {
-  font-size: 0.98rem;
+  font-size: 1.02rem;
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   letter-spacing: 0.08em;
   color: var(--gold-soft);
 }
 
 .card-user-header p {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: var(--text-soft);
-  line-height: 1.7;
-}
-
-.card-user-note {
+  line-height: 1.8;
   margin-top: 4px;
-  font-size: 0.76rem;
-  color: var(--accent-muted);
 }
 
 /* フォーム */
 .prayer-form {
-  margin-top: 4px;
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -393,7 +299,7 @@ header.site-header {
 
 .prayer-form textarea {
   width: 100%;
-  min-height: 80px;
+  min-height: 90px;
   resize: vertical;
   padding: 10px 12px;
   border-radius: 12px;
@@ -423,7 +329,6 @@ header.site-header {
   color: var(--accent-muted);
 }
 
-/* ボタン */
 .btn-primary {
   position: relative;
   border: none;
@@ -454,7 +359,10 @@ header.site-header {
   transition: opacity 0.15s ease-out;
 }
 
-.btn-primary span { position: relative; z-index: 1; }
+.btn-primary span {
+  position: relative;
+  z-index: 1;
+}
 
 .btn-primary:hover {
   transform: translateY(-1px);
@@ -472,77 +380,261 @@ header.site-header {
   filter: saturate(0.95);
 }
 
-.btn-primary:hover::after { opacity: 0.5; }
-
 .btn-primary[disabled] {
   cursor: default;
   opacity: 0.65;
-  box-shadow:
-    0 0 12px rgba(255, 215, 122, 0.35),
-    0 0 18px rgba(0, 0, 0, 0.75);
   transform: none;
   filter: saturate(0.9);
 }
 
-/* エラー */
 .prayer-error {
   font-size: 0.78rem;
   color: var(--error);
   min-height: 1.2em;
 }
 
-/* あなたの灯籠ログ */
-.lantern-log-head {
-  margin-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+/* 灯籠リスト */
+.lantern-list-block {
+  margin-top: 4px;
 }
 
-.lantern-log-title {
+.lantern-list-title {
+  font-size: 0.82rem;
+  color: var(--accent-muted);
+  margin-bottom: 6px;
+}
+
+.lantern-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.lantern-item {
+  position: relative;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.1), transparent 70%),
+    linear-gradient(to bottom right, rgba(12, 8, 22, 0.96), rgba(10, 6, 18, 0.98));
+  border: 1px solid rgba(255, 235, 196, 0.16);
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.75);
   font-size: 0.84rem;
   color: var(--text-soft);
+  line-height: 1.7;
 }
 
-.lantern-log-count {
-  font-size: 0.76rem;
+.lantern-item::before {
+  content: "✶";
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  font-size: 0.7rem;
+  color: var(--gold-strong);
+  opacity: 0.9;
+}
+
+.lantern-item--empty::before {
+  content: "…";
+}
+
+.lantern-text {
+  padding-left: 15px;
+  white-space: pre-line;
+}
+
+.lantern-meta {
+  margin-top: 4px;
+  font-size: 0.7rem;
   color: var(--accent-muted);
+  text-align: right;
 }
 
-.lantern-log-note {
-  margin-top: 10px;
+/* シェアブロック */
+.share-block {
+  margin-top: 16px;
+  padding: 12px 12px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 235, 196, 0.4);
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.07), transparent 70%),
+    linear-gradient(to bottom right, rgba(14, 10, 26, 0.96), rgba(8, 5, 18, 0.98));
+  box-shadow: 0 0 18px rgba(0,0,0,0.8);
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  display: none;
+}
+
+.share-block.is-active {
+  display: block;
+}
+
+.share-title {
+  font-size: 0.9rem;
+  color: var(--gold-soft);
+  margin-bottom: 4px;
+}
+
+.share-text {
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
+.share-preview {
   font-size: 0.8rem;
   line-height: 1.8;
-  color: var(--text-soft);
+  white-space: pre-line;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 235, 196, 0.4);
+  background: rgba(8, 5, 18, 0.9);
+  margin-bottom: 8px;
 }
 
-/* 奥の間 */
-.card-inner h3 {
-  font-size: 1.0rem;
-  margin-bottom: 12px;
+.share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.btn-secondary {
+  border-radius: 999px;
+  border: 1px solid rgba(160, 150, 210, 0.7);
+  background: radial-gradient(circle at 50% 0, rgba(56, 45, 108, 0.9), rgba(25, 19, 55, 0.96));
+  color: var(--text-main);
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, background 0.12s ease-out;
+}
+
+.btn-secondary--accent {
+  border-color: rgba(255, 215, 122, 0.85);
+  background: radial-gradient(circle at 50% 0, rgba(255, 228, 170, 0.95), rgba(186, 138, 66, 0.96));
+  color: #25130c;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(118, 101, 196, 0.8);
+}
+
+.btn-secondary--accent:hover {
+  box-shadow: 0 0 16px rgba(255, 215, 122, 0.9);
+}
+
+.share-status {
+  font-size: 0.78rem;
+  color: var(--accent-muted);
+  min-height: 1em;
+}
+
+/* 星環のゲートカード */
+.card-gate {
+  max-width: 640px;
+}
+
+.gate-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-muted);
+  margin-bottom: 6px;
+}
+
+.card-gate h3 {
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  letter-spacing: 0.08em;
+  font-size: 1.08rem;
+  letter-spacing: 0.12em;
   color: var(--gold-soft);
+  margin-bottom: 12px;
 }
 
-.inner-body {
-  font-size: 0.86rem;
+.gate-body p {
+  font-size: 0.9rem;
   line-height: 1.9;
   color: var(--text-soft);
   white-space: pre-line;
 }
 
-/* 下部ナビ */
-footer.site-footer {
-  position: relative;
-  z-index: 4;
+.gate-body p + p {
+  margin-top: 8px;
+}
+
+/* 星環のゲートボタン */
+.gate-button {
+  margin-top: 18px;
   display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 215, 122, 0.9);
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 248, 218, 0.2), rgba(40, 26, 8, 0.96));
+  box-shadow:
+    0 0 20px rgba(255, 215, 122, 0.8),
+    0 0 30px rgba(0, 0, 0, 0.9);
+  color: var(--gold-soft);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.14s ease-out, box-shadow 0.14s ease-out, background 0.14s ease-out;
+}
+
+.gate-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0 50%, rgba(255,255,255,0.4), transparent 55%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+  transform: translateX(-40%);
+}
+
+.gate-button-label {
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gate-button-sub {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+.gate-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 24px rgba(255, 230, 180, 0.95),
+    0 0 34px rgba(0, 0, 0, 0.96);
+}
+
+.gate-button:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* フッター */
+.site-footer {
+  margin: 28px auto 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 0, rgba(18, 12, 32, 0.96), rgba(5, 3, 12, 0.96));
+  border: 1px solid rgba(110, 95, 155, 0.5);
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(16px);
   font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .footer-label {
@@ -578,7 +670,6 @@ footer.site-footer {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  overflow: visible;
 }
 
 .sparkle {
@@ -588,7 +679,7 @@ footer.site-footer {
   background: #ffd77a;
   border-radius: 50%;
   box-shadow: 0 0 12px #ffffff;
-  animation: sparkle-rise 2.5s ease-out forwards;
+  animation: sparkle-rise 2.4s ease-out forwards;
 }
 
 @keyframes sparkle-rise {
@@ -604,37 +695,36 @@ footer.site-footer {
 
 /* レスポンシブ */
 @media (max-width: 768px) {
-  header.site-header {
-    padding: 10px 14px 8px;
+  .site-header {
+    padding: 10px 14px 6px;
   }
+
   .corridor-main {
-    padding: 20px 14px 28px;
-    gap: 22px;
+    padding-inline: 6vw;
   }
+
   .card {
     padding: 18px 16px 16px;
   }
-  .path-line {
-    left: 5%;
-    right: 5%;
-    top: 52%;
+
+  .card-intro h2 {
+    font-size: 1.08rem;
+  }
+
+  .card-user-header p,
+  .lantern-concept-body p,
+  .gate-body p {
+    font-size: 0.88rem;
+  }
+
+  .site-footer {
+    margin-top: 20px;
+    margin-bottom: 12px;
   }
 }
 
 @media (max-width: 480px) {
-  .title-block h1 {
-    font-size: 1.2rem;
-  }
-  .card-intro h2 {
-    font-size: 1.08rem;
-  }
-  .intro-body p,
-  .others-lead,
-  .lantern-log-note,
-  .inner-body {
-    font-size: 0.86rem;
-  }
-  .lantern-text {
-    font-size: 0.82rem;
+  .corridor-main {
+    padding-inline: 5vw;
   }
 }
