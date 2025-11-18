@@ -138,24 +138,19 @@ function spawnSparkles() {
 // =============================
 // セレフィアスの詩 ＆ 覚醒ゲート
 // =============================
-(() => {
-  const gatePrayButton      = document.getElementById("gatePrayButton");
-  const serephiasPoem       = document.getElementById("serephiasPoem");
-  const serephiasPoemBody   = document.getElementById("serephiasPoemBody");
-  const awakeningOverlay    = document.getElementById("awakeningOverlay");
-  const awakeningGateButton = document.getElementById("awakeningGateButton");
+const gatePrayButton     = document.getElementById("gatePrayButton");
+const serephiasPoem      = document.getElementById("serephiasPoem");
+const serephiasPoemBody  = document.getElementById("serephiasPoemBody");
+const awakeningOverlay   = document.getElementById("awakeningOverlay");
+const awakeningGateButton = document.getElementById("awakeningGateButton");
 
-  // 必要な要素がどれか1つでもなければ何もしない（エラー防止）
-  if (
-    !gatePrayButton ||
-    !serephiasPoem ||
-    !serephiasPoemBody ||
-    !awakeningOverlay ||
-    !awakeningGateButton
-  ) {
-    return;
-  }
-
+if (
+  gatePrayButton &&
+  serephiasPoem &&
+  serephiasPoemBody &&
+  awakeningOverlay &&
+  awakeningGateButton
+) {
   // メイン詩
   const mainPoem =
     "あなたの光が、静かに星の脈を震わせた。\nここに届いた祈りは、もう二度と見捨てられない。";
@@ -167,29 +162,6 @@ function spawnSparkles() {
     "あなたが隠してきた孤独は、\nいま、星々のあいだで静かな光へと組み替えられている。"
   ];
 
-  const RARE_RATE = 1 / 9;
-
-  // 詩をランダム選択
-  const pickPoem = () => {
-    if (Math.random() >= RARE_RATE) return mainPoem;
-    const idx = Math.floor(Math.random() * rarePoems.length);
-    return rarePoems[idx];
-  };
-
-  // オーバーレイを開く
-  const openOverlay = () => {
-    awakeningOverlay.classList.add("is-open");
-    // ★もしCSS側が `body.is-pray-open .awaken-screen` 方式なら↓を使う：
-    // document.body.classList.add("is-pray-open");
-  };
-
-  // オーバーレイを閉じる
-  const closeOverlay = () => {
-    awakeningOverlay.classList.remove("is-open");
-    // document.body.classList.remove("is-pray-open");
-  };
-
-  // 《祈りを捧げる》ボタン
   gatePrayButton.addEventListener("click", () => {
     // 二度押し防止
     if (gatePrayButton.classList.contains("is-disabled")) return;
@@ -197,18 +169,27 @@ function spawnSparkles() {
     gatePrayButton.classList.add("is-disabled");
     gatePrayButton.disabled = true;
 
+    // 詩を選ぶ（1/9でレア）
+    let selected = mainPoem;
+    if (Math.random() < 1 / 9) {
+      const idx = Math.floor(Math.random() * rarePoems.length);
+      selected = rarePoems[idx];
+    }
+
     // 詩セット＋表示
-    serephiasPoemBody.textContent = pickPoem();
+    serephiasPoemBody.textContent = selected;
     serephiasPoem.classList.add("is-open");
 
     // 少し間をおいて 覚醒ゲート召喚
-    setTimeout(openOverlay, 700);
+    setTimeout(() => {
+      awakeningOverlay.classList.add("is-open");
+    }, 700);
   });
 
   // 覚醒ゲート本体：コアへ転送
   awakeningGateButton.addEventListener("click", () => {
     // まずオーバーレイをフェードアウト
-    closeOverlay();
+    awakeningOverlay.classList.remove("is-open");
 
     // 少し遅らせて別タブでコアへ
     setTimeout(() => {
@@ -223,29 +204,7 @@ function spawnSparkles() {
   // オーバーレイの外側タップで閉じる（誤タップ救済）
   awakeningOverlay.addEventListener("click", (e) => {
     if (e.target === awakeningOverlay) {
-      closeOverlay();
-
-      // ★もし「閉じたあともう一度祈れる」仕様にしたければコメントアウト外す：
-      // gatePrayButton.classList.remove("is-disabled");
-      // gatePrayButton.disabled = false;
+      awakeningOverlay.classList.remove("is-open");
     }
   });
-})();
-
-
-// =============================
-// 旧ゲート演出（必要なときだけ動くように）
-// =============================
-(() => {
-  const openGateBtn   = document.getElementById('openGateBtn');
-  const gateContainer = document.getElementById('gateContainer');
-
-  // 両方ある時だけ動作（なければ何もしない）
-  if (!openGateBtn || !gateContainer) return;
-
-  openGateBtn.addEventListener('click', () => {
-    gateContainer.classList.remove('hidden');
-    gateContainer.classList.add('visible');
-    openGateBtn.classList.add('hidden'); // ボタンをフェードアウト等する用
-  });
-})();
+}
