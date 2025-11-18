@@ -7,25 +7,29 @@
 }
 
 :root {
-  --bg-deep: #050308;
-  --bg-deeper: #010108;
-  --gold-soft: #ffebc4;
+  --bg-top:    #050308;
+  --bg-mid:    #14182a;
+  --bg-bottom: #262e46; /* 下へ行くほど、少し蒼白寄りに */
+  --gold-soft:   #ffebc4;
   --gold-strong: #ffd77a;
-  --gold-deep: #c08f3a;
-  --text-main: #f8f2e9;
-  --text-soft: #e0d7c8;
-  --accent-muted: #7f8aa8;
-  --error: #ff9b9b;
+  --gold-deep:   #c08f3a;
+  --text-main:   #f8f2e9;
+  --text-soft:   #e0d7c8;
+  --accent-muted:#7f8aa8;
+  --error:       #ff9b9b;
   --radius-card: 18px;
-  --blur-bg: 16px;
+  --blur-bg:     16px;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
-  background: radial-gradient(circle at 20% 0%, #261b3d 0, #050308 45%, #010108 100%);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,0.04) 0, transparent 40%),
+    linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
   color: var(--text-main);
   font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont,
     'Yu Mincho', '游明朝体', 'YuMincho', serif;
@@ -54,14 +58,14 @@ body {
   inset: -10%;
   background-image: radial-gradient(circle, rgba(255,255,255,0.7) 0, transparent 55%);
   background-size: 2px 2px;
-  opacity: 0.5;
+  opacity: 0.45;
   animation: drift-stars 60s linear infinite;
 }
 
 .starfield::after {
   opacity: 0.25;
   animation-duration: 110s;
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
 @keyframes drift-stars {
@@ -77,8 +81,8 @@ body {
   left: 50%;
   width: 2px;
   transform: translateX(-50%);
-  background: radial-gradient(circle at 50% 50%, rgba(255, 215, 122, 0.5), transparent 70%);
-  opacity: 0.4;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 215, 122, 0.45), transparent 70%);
+  opacity: 0.45;
   pointer-events: none;
   z-index: 1;
 }
@@ -87,8 +91,8 @@ body {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 5px;
-  height: 120px;
+  width: 6px;
+  height: 130px;
   transform: translateX(-50%);
   background: radial-gradient(circle, rgba(255,215,122,0.95) 0, rgba(255,215,122,0.0) 70%);
   animation: path-descend 14s linear infinite;
@@ -199,7 +203,7 @@ body {
 
 /* 入口カード */
 .card-intro {
-  max-width: 640px;
+  max-width: 660px;
 }
 
 .intro-label {
@@ -219,15 +223,70 @@ body {
   text-shadow: 0 0 15px rgba(255, 215, 122, 0.7);
 }
 
-.intro-body p {
+/* オープニング 3フェーズ */
+.intro-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.intro-phase {
+  position: relative;
+  padding: 10px 0 2px;
+  border-top: 1px solid rgba(255, 235, 196, 0.18);
+}
+
+.intro-phase:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.intro-phase-title {
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 235, 196, 0.78);
+  margin-bottom: 6px;
+}
+
+.intro-phase p {
   font-size: 0.92rem;
   line-height: 1.9;
   color: var(--text-soft);
   white-space: pre-line;
 }
 
-.intro-body p + p {
-  margin-top: 10px;
+.intro-phase p + p {
+  margin-top: 6px;
+}
+
+/* 儀式パートは少し内側に */
+.intro-phase--ritual {
+  padding-left: 4px;
+  border-left: 1px solid rgba(255, 235, 196, 0.15);
+}
+
+/* セレフィアスの息吹（黄金・ふわっと出る） */
+.intro-phase--breath {
+  margin-top: 2px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 215, 122, 0.4);
+  animation: intro-breath 1.8s ease-out 0.4s both;
+}
+
+.intro-phase--breath p {
+  color: var(--gold-soft);
+  text-shadow: 0 0 14px rgba(255, 215, 122, 0.55);
+}
+
+.intro-phase-title--breath {
+  color: var(--gold-strong);
+}
+
+@keyframes intro-breath {
+  0%   { opacity: 0; transform: translateY(8px); }
+  40%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .scroll-down-hint {
@@ -241,6 +300,52 @@ body {
 
 .scroll-down-hint .arrow {
   font-size: 1rem;
+}
+
+/* BGM ブロック */
+.bgm-block {
+  margin-top: 14px;
+}
+
+.btn-bgm {
+  border: 1px solid rgba(255, 215, 122, 0.7);
+  border-radius: 999px;
+  padding: 7px 14px;
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 245, 210, 0.16), rgba(35, 24, 12, 0.96));
+  color: var(--gold-soft);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  box-shadow:
+    0 0 14px rgba(255, 215, 122, 0.75),
+    0 0 22px rgba(0, 0, 0, 0.9);
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, background 0.12s ease-out;
+}
+
+.btn-bgm-main {
+  letter-spacing: 0.12em;
+}
+
+.btn-bgm-sub {
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  opacity: 0.9;
+}
+
+.btn-bgm:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 18px rgba(255, 230, 180, 0.9),
+    0 0 26px rgba(0, 0, 0, 0.95);
+}
+
+.btn-bgm.is-playing {
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 250, 220, 0.26), rgba(60, 40, 18, 0.98));
 }
 
 /* 回廊コンセプト */
