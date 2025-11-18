@@ -721,10 +721,11 @@ body::after {
   box-shadow:
     0 0 20px rgba(255, 215, 122, 0.9),
     0 0 34px rgba(0, 0, 0, 0.95);
-  transition: transform 0.12s ease-out,
-              box-shadow 0.12s ease-out,
-              filter 0.12s ease-out,
-              opacity 0.2s ease-out;
+  transition:
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out,
+    filter 0.12s ease-out,
+    opacity 0.2s ease-out;
   position: relative;
   overflow: hidden;
 }
@@ -785,9 +786,10 @@ body::after {
   max-height: 0;
   transform: translateY(10px);
   overflow: hidden;
-  transition: opacity 0.6s ease-out,
-              max-height 0.6s ease-out,
-              transform 0.6s ease-out;
+  transition:
+    opacity 0.6s ease-out,
+    max-height 0.6s ease-out,
+    transform 0.6s ease-out;
 }
 
 .serephias-poem.is-open {
@@ -810,22 +812,47 @@ body::after {
   text-shadow: 0 0 14px rgba(255, 215, 122, 0.7);
 }
 
-/* ======== 背景全体（覚醒モード画面） ======== */
+/* ===================================== */
+/*      覚醒オーバーレイ（暗転 + ゲート） */
+/* ===================================== */
 
+/* 画面全体を覆う暗転レイヤー ＋ クリスタルゲート */
 .awaken-screen {
-  min-height: 100vh;
-  padding: 72px 16px 56px;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  padding: 72px 16px 56px;
+
+  /* もとの覚醒グラデ + 画面暗転 */
   background:
     radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04) 0, transparent 40%),
     radial-gradient(circle at 80% 0%, rgba(255, 215, 122, 0.08) 0, transparent 55%),
     radial-gradient(circle at 50% 110%, rgba(120, 200, 255, 0.35) 0, transparent 65%),
-    linear-gradient(180deg, #120f2a 0%, #0b0c1c 40%, #050308 100%);
+    linear-gradient(180deg, #050308 0%, #05030c 40%, #000000 100%);
+  background-color: rgba(0,0,0,0.92);
+  backdrop-filter: blur(4px);
   color: #f8f2e9;
+
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity 0.5s ease-out,
+    visibility 0s linear 0.5s;
+}
+
+/* 祈り発動中：body に .is-pray-open を付ける */
+body.is-pray-open .awaken-screen {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition:
+    opacity 0.5s ease-out,
+    visibility 0s;
 }
 
 /* ======== クリスタル柱ゲート本体 ======== */
@@ -839,8 +866,21 @@ body::after {
   background: transparent;
   cursor: pointer;
   outline: none;
-  /* ゆっくり浮き沈みする鼓動 */
+
+  /* 登場アニメ（最初は少し下＋小さく＋半透明） */
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
   animation: awaken-pillar-breathe 6s ease-in-out infinite;
+  animation-play-state: paused;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+
+body.is-pray-open .awaken-gate {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation-play-state: running;
 }
 
 /* 柱のメインボディ（六角クリスタルっぽいシルエット） */
@@ -850,13 +890,13 @@ body::after {
   inset: 6% 24%;
   border-radius: 999px;
   background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 245, 220, 0.9) 26%,
-      rgba(255, 217, 138, 0.95) 45%,
-      rgba(149, 194, 255, 0.95) 68%,
-      rgba(40, 60, 120, 1) 100%
-    );
+    180deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 245, 220, 0.9) 26%,
+    rgba(255, 217, 138, 0.95) 45%,
+    rgba(149, 194, 255, 0.95) 68%,
+    rgba(40, 60, 120, 1) 100%
+  );
   box-shadow:
     0 0 30px rgba(255, 245, 220, 0.95),
     0 0 60px rgba(0, 0, 0, 0.96),
@@ -892,26 +932,7 @@ body::after {
   animation: awaken-core-pulse 3.4s ease-in-out infinite;
 }
 
-/* 台座の光輪（足元のポータル） */
-.awaken-gate-floor {
-  /* HTMLに追加しない場合は未使用。必要なら別要素で使ってOK */
-}
-
-/* ボタン下の光輪を pseudo で表現 */
-.awaken-gate::marker {}
-
-/* 足元に広がる円形ハロー */
-.awaken-gate-shadow {
-  /* 別要素を使う場合用。今回は下の ::before2 でまとめて表現 */
-}
-
-/* 足元ハロー（ボタンの下） */
-.awaken-gate-container::before,
-.awaken-gate-container::after {
-  /* もしラッパーを作るならここで */
-}
-
-/* ======== テキスト（SEREPHIAS / AWAKEN / GATE） ======== */
+/* ======== テキスト ======== */
 
 .awaken-gate-label {
   position: relative;
@@ -944,13 +965,36 @@ body::after {
   color: rgba(18, 10, 8, 0.95);
 }
 
-/* 背景側の円形ハロー（クリスタルの背後） */
-.awaken-gate-background-halo {
-  /* もし別要素を取る場合用 */
+/* クリック時のフィードバック */
+.awaken-gate:active::before {
+  box-shadow:
+    0 0 40px rgba(255, 250, 230, 1),
+    0 0 80px rgba(0, 0, 0, 1),
+    inset 0 0 24px rgba(6, 4, 16, 1);
+  transform: translateY(2px) scale(0.99);
 }
 
-/* ゲート全体の外側光輪（body 背景に対して） */
-.awaken-gate-wrapper::before {}
+/* キャプション */
+.awaken-caption {
+  max-width: 540px;
+  margin-top: 18px;
+  font-size: 0.9rem;
+  line-height: 1.9;
+  text-align: center;
+  color: #e5dbcf;
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
+
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s ease-out 0.08s,
+    transform 0.6s ease-out 0.08s;
+}
+
+body.is-pray-open .awaken-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 /* ======== アニメーション ======== */
 
@@ -970,26 +1014,6 @@ body::after {
   50% {
     opacity: 1;
   }
-}
-
-/* クリック時のフィードバック */
-.awaken-gate:active::before {
-  box-shadow:
-    0 0 40px rgba(255, 250, 230, 1),
-    0 0 80px rgba(0, 0, 0, 1),
-    inset 0 0 24px rgba(6, 4, 16, 1);
-  transform: translateY(2px) scale(0.99);
-}
-
-/* ======== キャプション ======== */
-
-.awaken-caption {
-  max-width: 540px;
-  font-size: 0.9rem;
-  line-height: 1.9;
-  text-align: center;
-  color: #e5dbcf;
-  text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
 }
 
 /* ======== モバイル調整 ======== */
