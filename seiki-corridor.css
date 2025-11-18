@@ -855,188 +855,196 @@ body::after {
   padding: 18px 20px;
 }
 
-/* 覚醒ゲート本体（円形ボタン） */
-.awakening-gate {
+/* ======== クリスタル柱ゲート本体 ======== */
+
+.awaken-gate {
   position: relative;
-  width: min(260px, 76vw);
-  aspect-ratio: 1 / 1;
+  width: min(260px, 70vw);
+  height: min(420px, 70vh);
   border: none;
   padding: 0;
   background: transparent;
   cursor: pointer;
-  border-radius: 50%;
-  animation: aw-pulse 4.4s ease-in-out infinite;
+  outline: none;
+  /* ゆっくり浮き沈みする鼓動 */
+  animation: awaken-pillar-breathe 6s ease-in-out infinite;
 }
 
-/* 外側の光輪 */
-.awakening-gate::before {
+/* 柱のメインボディ（六角クリスタルっぽいシルエット） */
+.awaken-gate::before {
   content: "";
   position: absolute;
-  inset: 4%;
-  border-radius: 50%;
+  inset: 6% 24%;
+  border-radius: 999px;
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 245, 220, 0.9) 26%,
+      rgba(255, 217, 138, 0.95) 45%,
+      rgba(149, 194, 255, 0.95) 68%,
+      rgba(40, 60, 120, 1) 100%
+    );
+  box-shadow:
+    0 0 30px rgba(255, 245, 220, 0.95),
+    0 0 60px rgba(0, 0, 0, 0.96),
+    inset 0 0 18px rgba(12, 8, 22, 0.9);
+  clip-path: polygon(
+    50% 0%,
+    88% 10%,
+    100% 50%,
+    88% 90%,
+    50% 100%,
+    12% 90%,
+    0% 50%,
+    12% 10%
+  );
+}
+
+/* 柱の内側の光の筋（縦に走るコア） */
+.awaken-gate::after {
+  content: "";
+  position: absolute;
+  inset: 16% 38%;
+  border-radius: 999px;
   background:
-    radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%),
-    radial-gradient(circle at 30% 10%, rgba(255, 215, 122, 0.45), transparent 65%),
-    radial-gradient(circle at 70% 90%, rgba(140, 210, 255, 0.3), transparent 70%);
-  box-shadow:
-    0 0 36px rgba(255, 245, 220, 0.95),
-    0 0 60px rgba(0, 0, 0, 1);
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 230, 180, 0.0) 45%,
+      rgba(127, 192, 255, 0.35) 70%,
+      rgba(16, 28, 72, 0.0) 100%
+    );
+  filter: blur(1px);
+  mix-blend-mode: screen;
+  animation: awaken-core-pulse 3.4s ease-in-out infinite;
 }
 
-/* 回転リング */
-.aw-ring {
-  position: absolute;
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+/* 台座の光輪（足元のポータル） */
+.awaken-gate-floor {
+  /* HTMLに追加しない場合は未使用。必要なら別要素で使ってOK */
 }
 
-.aw-ring--outer {
-  width: 90%;
-  height: 90%;
-  border: 2px solid rgba(255, 235, 196, 0.85);
-  background: conic-gradient(
-    from 0deg,
-    rgba(127, 192, 255, 0.0) 0%,
-    rgba(255, 215, 122, 0.4) 36%,
-    rgba(127, 192, 255, 0.0) 82%,
-    rgba(127, 192, 255, 0.0) 100%
-  );
-  box-shadow:
-    0 0 22px rgba(255, 215, 122, 0.8),
-    inset 0 0 16px rgba(80, 130, 210, 0.5);
-  animation: aw-rotate 24s linear infinite;
+/* ボタン下の光輪を pseudo で表現 */
+.awaken-gate::marker {}
+
+/* 足元に広がる円形ハロー */
+.awaken-gate-shadow {
+  /* 別要素を使う場合用。今回は下の ::before2 でまとめて表現 */
 }
 
-.aw-ring--inner {
-  width: 64%;
-  height: 64%;
-  border: 2px solid rgba(120, 190, 255, 0.9);
-  background: conic-gradient(
-    from 180deg,
-    rgba(120, 185, 255, 0.0) 0%,
-    rgba(120, 185, 255, 0.3) 50%,
-    rgba(120, 185, 255, 0.0) 100%
-  );
-  box-shadow:
-    0 0 18px rgba(120, 185, 255, 0.7),
-    inset 0 0 18px rgba(20, 30, 70, 0.95);
-  animation: aw-rotate-reverse 16s linear infinite;
+/* 足元ハロー（ボタンの下） */
+.awaken-gate-container::before,
+.awaken-gate-container::after {
+  /* もしラッパーを作るならここで */
 }
 
-/* 中央コア */
-.aw-core {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 46%;
-  height: 46%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    #fff9e5 0%,
-    #ffd98a 36%,
-    #7fc0ff 100%
-  );
-  box-shadow:
-    0 0 34px rgba(255, 244, 218, 1),
-    0 0 58px rgba(0, 0, 0, 0.98);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* ======== テキスト（SEREPHIAS / AWAKEN / GATE） ======== */
 
-.aw-core-inner {
-  width: 80%;
-  height: 80%;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow:
-    inset 0 0 18px rgba(12, 8, 22, 0.96),
-    0 0 20px rgba(255, 255, 255, 0.8);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  font-size: 0.76rem;
-  letter-spacing: 0.18em;
+.awaken-gate-label {
+  position: relative;
+  display: block;
+  text-align: center;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: #050815;
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  z-index: 1;
+  text-shadow:
+    0 0 10px rgba(0, 0, 0, 0.9),
+    0 0 16px rgba(255, 255, 255, 0.75);
 }
 
-.aw-label-top {
-  font-size: 0.62rem;
-  opacity: 0.9;
+.awaken-gate-label-top {
+  font-size: 0.78rem;
+  margin-top: 38%;
+  color: rgba(8, 8, 24, 0.9);
 }
 
-.aw-label-mid {
-  font-size: 0.82rem;
+.awaken-gate-label-mid {
+  font-size: 0.9rem;
+  margin-top: 10px;
+  color: #140c08;
 }
 
-.aw-label-bottom {
-  font-size: 0.62rem;
-  opacity: 0.9;
+.awaken-gate-label-bottom {
+  font-size: 0.78rem;
+  margin-top: 8px;
+  color: rgba(18, 10, 8, 0.95);
 }
 
-/* 星粒子 */
-.aw-stars {
-  position: absolute;
-  inset: 14%;
-  border-radius: 50%;
-  pointer-events: none;
-  background-image:
-    radial-gradient(2px 2px at 18% 32%, #ffffff, transparent),
-    radial-gradient(2px 2px at 76% 64%, rgba(255, 215, 122, 1), transparent),
-    radial-gradient(1px 1px at 42% 80%, rgba(160, 205, 255, 0.95), transparent);
-  opacity: 0.8;
-  animation: aw-stars-orbit 18s linear infinite;
+/* 背景側の円形ハロー（クリスタルの背後） */
+.awaken-gate-background-halo {
+  /* もし別要素を取る場合用 */
 }
 
-/* 覚醒ゲート下の説明文 */
-.awakening-caption {
-  margin-top: 14px;
-  font-size: 0.8rem;
-  color: var(--text-soft);
-  max-width: 480px;
-  margin-inline: auto;
+/* ゲート全体の外側光輪（body 背景に対して） */
+.awaken-gate-wrapper::before {}
+
+/* ======== アニメーション ======== */
+
+@keyframes awaken-pillar-breathe {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.02);
+  }
 }
 
-/* 覚醒ゲートのアニメーション */
-@keyframes aw-pulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.04); }
+@keyframes awaken-core-pulse {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-@keyframes aw-rotate {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes aw-rotate-reverse {
-  from { transform: translate(-50%, -50%) rotate(360deg); }
-  to   { transform: translate(-50%, -50%) rotate(0deg); }
-}
-
-@keyframes aw-stars-orbit {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ホバー／タップでコアを少し強調 */
-.awakening-gate:hover .aw-core,
-.awakening-gate:active .aw-core {
+/* クリック時のフィードバック */
+.awaken-gate:active::before {
   box-shadow:
-    0 0 40px rgba(255, 247, 225, 1),
-    0 0 68px rgba(0, 0, 0, 1);
+    0 0 40px rgba(255, 250, 230, 1),
+    0 0 80px rgba(0, 0, 0, 1),
+    inset 0 0 24px rgba(6, 4, 16, 1);
+  transform: translateY(2px) scale(0.99);
 }
 
-.awakening-gate:active .aw-core-inner {
-  transform: scale(0.97);
+/* ======== キャプション ======== */
+
+.awaken-caption {
+  max-width: 540px;
+  font-size: 0.9rem;
+  line-height: 1.9;
+  text-align: center;
+  color: #e5dbcf;
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
+}
+
+/* ======== モバイル調整 ======== */
+
+@media (max-width: 480px) {
+  .awaken-screen {
+    padding-top: 64px;
+    padding-bottom: 40px;
+  }
+
+  .awaken-gate {
+    width: 72vw;
+    height: 65vh;
+  }
+
+  .awaken-gate-label-top,
+  .awaken-gate-label-bottom {
+    font-size: 0.7rem;
+  }
+
+  .awaken-gate-label-mid {
+    font-size: 0.86rem;
+  }
+
+  .awaken-caption {
+    font-size: 0.82rem;
+    padding-inline: 8px;
+  }
 }
 
 /* フッター */
