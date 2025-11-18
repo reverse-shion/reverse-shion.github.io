@@ -831,15 +831,58 @@ body::after {
     backdrop-filter 0.6s ease-out;
 }
 
-.awakening-overlay::before {
+/* ▼ オーバーレイ全体を中央に固定する */
+.awakening-overlay {
+  position: fixed;          /* 画面に固定 */
+  inset: 0;                 /* 四方を 0 にして全体を覆う */
+  display: flex;           
+  flex-direction: column;
+  justify-content: center;  /* 垂直中央 */
+  align-items: center;      /* 水平中央 */
+  
+  background: rgba(0,0,0,0.32);  /* 後ろをうっすら暗く */
+  backdrop-filter: blur(10px);   /* ブラーで別世界感 */
+  
+  z-index: 9999;            /* すべての上に配置 */
+  
+  opacity: 0;               /* 初期は非表示 */
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+/* ▼ 覚醒オーバーレイ：動く星の粒子 */
+.awakening-overlay::before,
+.awakening-overlay::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(255, 215, 122, 0.12), transparent 55%),
-    radial-gradient(circle at 80% 90%, rgba(120, 200, 255, 0.16), transparent 60%);
+  inset: -15%;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.7) 0, transparent 55%);
+  background-size: 2px 2px;
+  opacity: 0.45;
   mix-blend-mode: screen;
-  opacity: 0.9;
+  animation: awakening-stars-1 60s linear infinite;
+}
+
+.awakening-overlay::after {
+  opacity: 0.25;
+  transform: scale(1.2);
+  animation: awakening-stars-2 110s linear infinite;
+}
+
+@keyframes awakening-stars-1 {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-60px, -120px, 0); }
+}
+
+@keyframes awakening-stars-2 {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(60px, -90px, 0); }
+}
+
+.awakening-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .awakening-overlay.is-open {
@@ -849,10 +892,44 @@ body::after {
 }
 
 .awakening-gate-shell {
+   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: relative;
   z-index: 1;
   text-align: center;
   padding: 18px 20px;
+}
+/* ▼ クリスタルの足元ハロー */
+.awakening-gate-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+}
+
+.awakening-gate-shell::before {
+  content: "";
+  position: absolute;
+  bottom: 22px;          /* キャプションより少し上 */
+  width: 260px;
+  max-width: 70vw;
+  height: 70px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 30%,
+      rgba(255, 245, 220, 0.85) 0%,
+      rgba(255, 245, 220, 0.18) 40%,
+      transparent 72%);
+  filter: blur(3px);
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
 }
 /* ======== 背景全体（覚醒モード画面） ======== */
 
@@ -884,8 +961,35 @@ body::after {
   background: transparent;
   cursor: pointer;
   outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   /* ゆっくり浮き沈みする鼓動 */
   animation: awaken-pillar-breathe 6s ease-in-out infinite;
+}
+/* ▼ クリスタルの基本スタイルはそのまま */
+
+/* 押している間だけ光の柱に変形させる */
+.awaken-gate:active::after {
+  inset: -40% 42%;   /* 上下にぐっと伸ばす／少し細くする */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.0) 0%,
+    rgba(255, 245, 220, 0.95) 20%,
+    rgba(255, 230, 180, 0.9) 40%,
+    rgba(160, 200, 255, 0.85) 60%,
+    rgba(120, 190, 255, 0.0) 100%
+  );
+  box-shadow:
+    0 0 32px rgba(255, 245, 220, 1),
+    0 0 70px rgba(140, 200, 255, 0.9);
+  animation: awaken-beam-pulse 0.5s ease-out;
+}
+
+@keyframes awaken-beam-pulse {
+  0%   { opacity: 0;   transform: scaleY(0.7); }
+  40%  { opacity: 1;   transform: scaleY(1.05); }
+  100% { opacity: 0.8; transform: scaleY(1); }
 }
 
 /* 柱のメインボディ（六角クリスタルっぽいシルエット） */
