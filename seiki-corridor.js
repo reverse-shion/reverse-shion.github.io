@@ -134,19 +134,28 @@ function spawnSparkles() {
     });
   }
 }
-// =============================
-// セレフィアスの詩 ＆ SRGゲート
-// =============================
-const gatePrayButton    = document.getElementById("gatePrayButton");
-const serephiasPoem     = document.getElementById("serephiasPoem");
-const serephiasPoemBody = document.getElementById("serephiasPoemBody");
-const srgWrapper        = document.querySelector(".srg-gate-wrapper");
-const starRingGateButton = document.getElementById("srgGateButton");
 
-if (gatePrayButton && serephiasPoem && serephiasPoemBody && srgWrapper && starRingGateButton) {
+// =============================
+// セレフィアスの詩 ＆ 覚醒ゲート
+// =============================
+const gatePrayButton     = document.getElementById("gatePrayButton");
+const serephiasPoem      = document.getElementById("serephiasPoem");
+const serephiasPoemBody  = document.getElementById("serephiasPoemBody");
+const awakeningOverlay   = document.getElementById("awakeningOverlay");
+const awakeningGateButton = document.getElementById("awakeningGateButton");
+
+if (
+  gatePrayButton &&
+  serephiasPoem &&
+  serephiasPoemBody &&
+  awakeningOverlay &&
+  awakeningGateButton
+) {
+  // メイン詩
   const mainPoem =
     "あなたの光が、静かに星の脈を震わせた。\nここに届いた祈りは、もう二度と見捨てられない。";
 
+  // レア詩
   const rarePoems = [
     "今、ひとつの痛みが、そっと星に預けられた。\nあなたの心は、ほんの少しだけ軽くなっている。",
     "まだ名前を持たない祈りが、\n静かな環となって、あなたを包みはじめている。",
@@ -154,30 +163,48 @@ if (gatePrayButton && serephiasPoem && serephiasPoemBody && srgWrapper && starRi
   ];
 
   gatePrayButton.addEventListener("click", () => {
+    // 二度押し防止
     if (gatePrayButton.classList.contains("is-disabled")) return;
 
     gatePrayButton.classList.add("is-disabled");
     gatePrayButton.disabled = true;
 
+    // 詩を選ぶ（1/9でレア）
     let selected = mainPoem;
     if (Math.random() < 1 / 9) {
       const idx = Math.floor(Math.random() * rarePoems.length);
       selected = rarePoems[idx];
     }
 
-    // 詩をセット
+    // 詩セット＋表示
     serephiasPoemBody.textContent = selected;
     serephiasPoem.classList.add("is-open");
 
-    // 少し遅れて SRG ゲート出現
+    // 少し間をおいて 覚醒ゲート召喚
     setTimeout(() => {
-      srgWrapper.classList.add("is-open");
-      srgWrapper.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 600);
+      awakeningOverlay.classList.add("is-open");
+    }, 700);
   });
 
-  // SRGゲート → コアへ
-  starRingGateButton.addEventListener("click", () => {
-    window.open("https://reverse-shion.github.io/shion2.html", "_blank", "noopener");
+  // 覚醒ゲート本体：コアへ転送
+  awakeningGateButton.addEventListener("click", () => {
+    // まずオーバーレイをフェードアウト
+    awakeningOverlay.classList.remove("is-open");
+
+    // 少し遅らせて別タブでコアへ
+    setTimeout(() => {
+      window.open(
+        "https://reverse-shion.github.io/shion2.html",
+        "_blank",
+        "noopener"
+      );
+    }, 260);
+  });
+
+  // オーバーレイの外側タップで閉じる（誤タップ救済）
+  awakeningOverlay.addEventListener("click", (e) => {
+    if (e.target === awakeningOverlay) {
+      awakeningOverlay.classList.remove("is-open");
+    }
   });
 }
