@@ -208,3 +208,10 @@ if (
     }
   });
 }
+
+for(let i=0;i<40;i++){
+        const p=document.createElement('div');
+        p.className='awaken-particle';
+        p.style.setProperty('--i', i);
+        document.currentScript.parentNode.appendChild(p);
+      }
