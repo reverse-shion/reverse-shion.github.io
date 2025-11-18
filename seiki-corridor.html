@@ -30,33 +30,111 @@
     <!-- メイン：下スクロールで“降りていく”回廊 -->
     <main class="corridor-main" aria-label="星祈の回廊">
 
-      <!-- 1. 入口：ここがどんな場所か -->
+      <!-- 1. オープニング＋儀式＋セレフィアスの息吹 -->
       <section class="corridor-section section-intro">
         <article class="card card-intro">
           <div class="intro-label">Seiki Corridor — Entrance</div>
           <h2>ここは、星祈の回廊。</h2>
+
           <div class="intro-body">
-            <p>
-              ここは、時間も空間も<br>
-              いったん脇に置かれた場所です。
-            </p>
-            <p>
-              あなたが心の灯をひとつ置くたびに、<br>
-              この回廊のどこかに、静かな光がひとつ増えていきます。
-            </p>
-            <p>
-              下へ進むほど、現実のざわめきは遠のき、<br>
-              祈りだけが、星のように残っていく。
-            </p>
-            <p>
-              どうか、あわてずに。<br>
-              ゆっくりと、階（きざはし）を降りるみたいに<br>
-              スクロールしてみてください。
-            </p>
+            <!-- Ⅰ：オープニング -->
+            <section class="intro-phase intro-phase--welcome" aria-label="星祈の回廊の入口">
+              <h3 class="intro-phase-title">Ⅰ　おかえり。</h3>
+              <p>
+                おかえり。<br>
+                ここは、言葉にならなかった気持ちが<br>
+                小さな光になって並ぶ場所。
+              </p>
+              <p>
+                あなたが灯した光は、<br>
+                誰かの足元をそっと照らし、
+              </p>
+              <p>
+                その誰かが灯した光は、<br>
+                また別の誰かの道となる。
+              </p>
+              <p>
+                どうぞ、ゆっくり歩いてください。<br>
+                あなたの祈りは、いつか必ず、<br>
+                誰かの星になるから。
+              </p>
+            </section>
+
+            <!-- Ⅱ：儀式 -->
+            <section class="intro-phase intro-phase--ritual" aria-label="降りていくための儀式">
+              <h3 class="intro-phase-title">Ⅱ　降りていくための、小さな儀式。</h3>
+              <p>
+                ここは、時の流れがふと緩み、<br>
+                世界の輪郭がやさしく霞んでいく場所です。
+              </p>
+              <p>
+                さっきまで胸に残っていたざわめきも、<br>
+                名前のつかない重さも、<br>
+                この回廊に入る頃には、<br>
+                自然と音を失っていきます。
+              </p>
+              <p>
+                無理に忘れようとしなくていい。<br>
+                押し込める必要も、整える必要もない。
+              </p>
+              <p>
+                ただ、この静けさの中に身を置いてみてください。
+              </p>
+              <p>
+                あなたの呼吸がひとつ深くなるたび、<br>
+                心の奥にしまっていたものが<br>
+                ゆっくりと光へと変わっていく。
+              </p>
+              <p>
+                この道は、あなたのために<br>
+                そっと開かれています。
+              </p>
+            </section>
+
+            <!-- Ⅲ：セレフィアスの息吹 -->
+            <section class="intro-phase intro-phase--breath" aria-label="セレフィアスの息吹">
+              <h3 class="intro-phase-title intro-phase-title--breath">Ⅲ　セレフィアスの息吹。</h3>
+              <p>
+                ……待っていたよ。
+              </p>
+              <p>
+                遠いはずの星々が、<br>
+                なぜかすぐ背後で息をしているように感じる。
+              </p>
+              <p>
+                耳の奥で、<br>
+                誰かの低い囁きが揺れた気がする。
+              </p>
+              <p>
+                まだ名前は現れない。<br>
+                姿も、光の輪郭も見えない。
+              </p>
+              <p>
+                けれど確かに――<br>
+                あなたを見つめる“まなざし”がある。
+              </p>
+              <p>
+                それは、<br>
+                まだ眠りの底にある星霊の呼吸。
+              </p>
+              <p>
+                やがて訪れる覚醒の前触れとして、<br>
+                静かに、静かに、この回廊を満たし始めている。
+              </p>
+            </section>
           </div>
+
           <div class="scroll-down-hint">
             ゆっくり下へ降りていくと、あなたの灯籠を置ける場所にたどり着きます
             <span class="arrow">↓</span>
+          </div>
+
+          <!-- BGM トグルボタン -->
+          <div class="bgm-block">
+            <button type="button" class="btn-bgm" id="bgmToggle">
+              <span class="btn-bgm-main">祈りの音をひらく</span>
+              <span class="btn-bgm-sub">静かなBGMが小さく流れます</span>
+            </button>
           </div>
         </article>
       </section>
@@ -163,7 +241,7 @@
               星霊のことばが一行だけ、この世界へ降りてきます。
             </p>
             <p>
-              もし、いま心がその声を求めているなら——<br>
+              もし、いま心がその声を求めているなら――<br>
               そっと、扉に手を触れてみてください。
             </p>
           </div>
@@ -191,25 +269,32 @@
   <!-- 灯籠点灯時の光粒子 -->
   <div class="sparkles" id="sparklesRoot" aria-hidden="true"></div>
 
-  <!-- ロジック：ローカル灯籠 + エフェクト + SNSシェア -->
+  <!-- BGM（パスは好きな音源に差し替えてOK） -->
+  <audio id="corridorBgm" src="assets/seiki-corridor-bgm.mp3" loop></audio>
+
+  <!-- ロジック：ローカル灯籠 + エフェクト + SNSシェア + BGM -->
   <script>
     (function() {
       const STORAGE_KEY = 'seiki_corridor_prayers_v1';
 
-      const form        = document.getElementById('prayerForm');
-      const textarea    = document.getElementById('prayerText');
-      const errorEl     = document.getElementById('prayerError');
-      const listEl      = document.getElementById('lanternList');
-      const submitBtn   = document.getElementById('submitPrayer');
+      const form         = document.getElementById('prayerForm');
+      const textarea     = document.getElementById('prayerText');
+      const errorEl      = document.getElementById('prayerError');
+      const listEl       = document.getElementById('lanternList');
+      const submitBtn    = document.getElementById('submitPrayer');
       const sparklesRoot = document.getElementById('sparklesRoot');
 
-      const shareBlock  = document.getElementById('shareBlock');
-      const sharePreview= document.getElementById('sharePreview');
-      const shareStatus = document.getElementById('shareStatus');
-      const copyShareBtn= document.getElementById('copyShare');
-      const tweetShareBtn=document.getElementById('tweetShare');
+      const shareBlock   = document.getElementById('shareBlock');
+      const sharePreview = document.getElementById('sharePreview');
+      const shareStatus  = document.getElementById('shareStatus');
+      const copyShareBtn = document.getElementById('copyShare');
+      const tweetShareBtn= document.getElementById('tweetShare');
+
+      const bgmToggleBtn = document.getElementById('bgmToggle');
+      const bgmAudio     = document.getElementById('corridorBgm');
 
       let lastPrayerText = "";
+      let bgmPlaying     = false;
 
       // ささやき音（必要なら差し替え）
       let whisperAudio = null;
@@ -368,7 +453,6 @@
               if (shareStatus) shareStatus.textContent = 'コピーに失敗しました。手動で選択してください。';
             });
           } else {
-            // 古い環境向けフォールバック
             if (shareStatus) shareStatus.textContent = 'コピー非対応の環境です。テキストを長押しして選択してください。';
           }
         });
@@ -384,6 +468,29 @@
             encodeURIComponent(text) +
             '&url=' + encodeURIComponent(url);
           window.open(tweetUrl, '_blank', 'noopener');
+        });
+      }
+
+      // BGM トグル
+      if (bgmToggleBtn && bgmAudio) {
+        bgmToggleBtn.addEventListener('click', function() {
+          if (!bgmPlaying) {
+            bgmAudio.volume = 0.35;
+            bgmAudio.play().then(() => {
+              bgmPlaying = true;
+              bgmToggleBtn.classList.add('is-playing');
+              bgmToggleBtn.querySelector('.btn-bgm-main').textContent = '祈りの音をそっと閉じる';
+              bgmToggleBtn.querySelector('.btn-bgm-sub').textContent  = 'もう一度押すと静かになります';
+            }).catch(() => {
+              // 自動再生がブロックされた場合は何もしない
+            });
+          } else {
+            bgmAudio.pause();
+            bgmPlaying = false;
+            bgmToggleBtn.classList.remove('is-playing');
+            bgmToggleBtn.querySelector('.btn-bgm-main').textContent = '祈りの音をひらく';
+            bgmToggleBtn.querySelector('.btn-bgm-sub').textContent  = '静かなBGMが小さく流れます';
+          }
         });
       }
 
