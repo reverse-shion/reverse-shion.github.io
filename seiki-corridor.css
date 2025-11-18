@@ -615,19 +615,6 @@ body::after {
   color: var(--accent-muted);
   min-height: 1em;
 }
-.card-gate h3 {
-  position: relative;
-  z-index: 1;
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  font-size: 1.16rem;
-  letter-spacing: 0.16em;
-  color: var(--gold-soft);
-  margin-bottom: 16px;
-  text-shadow:
-    0 0 22px rgba(255, 255, 255, 0.5),
-    0 0 34px rgba(120, 200, 255, 0.7);
-}
-
 
 /* 星環のゲートカード（特別エリア） */
 .card-gate {
@@ -637,7 +624,6 @@ body::after {
   position: relative;
   overflow: hidden;
   color: var(--text-main);
-  /* 上側の画面と馴染む、深い紺ベース */
   background:
     radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.16), transparent 60%),
     radial-gradient(circle at 0 120%, rgba(120, 200, 255, 0.16), transparent 55%),
@@ -648,7 +634,6 @@ body::after {
   border: 1px solid rgba(170, 220, 255, 0.45);
 }
 
-/* 上部の“神域”ハロー */
 .card-gate::before {
   content: "";
   position: absolute;
@@ -682,6 +667,7 @@ body::after {
 
 .card-gate h3 {
   position: relative;
+  z-index: 1;
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-size: 1.12rem;
   letter-spacing: 0.13em;
@@ -690,7 +676,6 @@ body::after {
   text-shadow:
     0 0 18px rgba(255, 215, 122, 0.8),
     0 0 32px rgba(120, 200, 255, 0.7);
-  z-index: 1;
 }
 
 .gate-body p {
@@ -826,60 +811,80 @@ body::after {
 }
 
 /* ===========================
-   SRG — セレフィアス 星環ゲート
+   セレフィアス覚醒ゲート（画面中央オーバーレイ）
 =========================== */
 
-.card-gate .srg-gate-wrapper {
-  margin-top: 18px;
+.awakening-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
   display: flex;
-  justify-content: center;
   align-items: center;
-  opacity: 0;                 /* 最初は隠す（JSで .is-open を付与） */
-  transform: scale(0.9);
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(40, 32, 96, 0.9), rgba(6, 4, 16, 0.98));
+  backdrop-filter: blur(0px);
+  opacity: 0;
   pointer-events: none;
   transition:
-    opacity 0.7s ease-out 0.2s,
-    transform 0.7s ease-out 0.2s;
+    opacity 0.6s ease-out,
+    backdrop-filter 0.6s ease-out;
 }
 
-.card-gate .srg-gate-wrapper.is-open {
+.awakening-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 215, 122, 0.12), transparent 55%),
+    radial-gradient(circle at 80% 90%, rgba(120, 200, 255, 0.16), transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+.awakening-overlay.is-open {
   opacity: 1;
-  transform: scale(1);
   pointer-events: auto;
+  backdrop-filter: blur(18px);
 }
 
-.srg-gate {
+.awakening-gate-shell {
   position: relative;
-  width: min(230px, 65vw);
+  z-index: 1;
+  text-align: center;
+  padding: 18px 20px;
+}
+
+/* 覚醒ゲート本体（円形ボタン） */
+.awakening-gate {
+  position: relative;
+  width: min(260px, 76vw);
   aspect-ratio: 1 / 1;
   border: none;
   padding: 0;
   background: transparent;
   cursor: pointer;
-  animation: srg-gate-pulse 4s ease-in-out infinite;
+  border-radius: 50%;
+  animation: aw-pulse 4.4s ease-in-out infinite;
 }
 
-/* 外側ハロー（淡い光の輪） */
-.srg-gate::before {
+/* 外側の光輪 */
+.awakening-gate::before {
   content: "";
   position: absolute;
-  inset: 6%;
+  inset: 4%;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 215, 122, 0.18) 40%,
-    rgba(124, 190, 255, 0.05) 80%,
-    transparent 100%
-  );
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%),
+    radial-gradient(circle at 30% 10%, rgba(255, 215, 122, 0.45), transparent 65%),
+    radial-gradient(circle at 70% 90%, rgba(140, 210, 255, 0.3), transparent 70%);
   box-shadow:
-    0 0 26px rgba(255, 235, 196, 0.9),
-    0 0 40px rgba(0, 0, 0, 0.9);
+    0 0 36px rgba(255, 245, 220, 0.95),
+    0 0 60px rgba(0, 0, 0, 1);
 }
 
-/* 回転する二重リング ----------------------- */
-
-.srg-ring {
+/* 回転リング */
+.aw-ring {
   position: absolute;
   border-radius: 50%;
   top: 50%;
@@ -888,155 +893,152 @@ body::after {
   pointer-events: none;
 }
 
-.srg-ring--outer {
-  width: 86%;
-  height: 86%;
+.aw-ring--outer {
+  width: 90%;
+  height: 90%;
   border: 2px solid rgba(255, 235, 196, 0.85);
   background: conic-gradient(
     from 0deg,
     rgba(127, 192, 255, 0.0) 0%,
-    rgba(255, 215, 122, 0.30) 40%,
-    rgba(127, 192, 255, 0.0) 80%,
+    rgba(255, 215, 122, 0.4) 36%,
+    rgba(127, 192, 255, 0.0) 82%,
     rgba(127, 192, 255, 0.0) 100%
   );
   box-shadow:
-    0 0 18px rgba(255, 215, 122, 0.6),
-    inset 0 0 16px rgba(80, 130, 210, 0.35);
-  animation: srg-rotate 22s linear infinite;
+    0 0 22px rgba(255, 215, 122, 0.8),
+    inset 0 0 16px rgba(80, 130, 210, 0.5);
+  animation: aw-rotate 24s linear infinite;
 }
 
-.srg-ring--inner {
+.aw-ring--inner {
   width: 64%;
   height: 64%;
-  border: 2px solid rgba(120, 185, 255, 0.85);
+  border: 2px solid rgba(120, 190, 255, 0.9);
   background: conic-gradient(
     from 180deg,
     rgba(120, 185, 255, 0.0) 0%,
-    rgba(120, 185, 255, 0.25) 50%,
+    rgba(120, 185, 255, 0.3) 50%,
     rgba(120, 185, 255, 0.0) 100%
   );
   box-shadow:
-    0 0 16px rgba(120, 185, 255, 0.6),
-    inset 0 0 14px rgba(20, 30, 70, 0.9);
-  animation: srg-rotate-reverse 16s linear infinite;
+    0 0 18px rgba(120, 185, 255, 0.7),
+    inset 0 0 18px rgba(20, 30, 70, 0.95);
+  animation: aw-rotate-reverse 16s linear infinite;
 }
 
-/* 中央コア（蒼→ゴールドの球体）------------- */
-
-.srg-core {
+/* 中央コア */
+.aw-core {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 44%;
-  height: 44%;
+  width: 46%;
+  height: 46%;
   border-radius: 50%;
   background: radial-gradient(
     circle,
     #fff9e5 0%,
-    #ffd98a 38%,
+    #ffd98a 36%,
     #7fc0ff 100%
   );
   box-shadow:
-    0 0 28px rgba(255, 240, 210, 1),
-    0 0 40px rgba(0, 0, 0, 0.95);
+    0 0 34px rgba(255, 244, 218, 1),
+    0 0 58px rgba(0, 0, 0, 0.98);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.srg-core-inner {
-  width: 78%;
-  height: 78%;
+.aw-core-inner {
+  width: 80%;
+  height: 80%;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    inset 0 0 14px rgba(12, 8, 22, 0.9),
-    0 0 16px rgba(255, 255, 255, 0.7);
+    inset 0 0 18px rgba(12, 8, 22, 0.96),
+    0 0 20px rgba(255, 255, 255, 0.8);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 0.78rem;
-  letter-spacing: 0.24em;
+  gap: 2px;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #050815;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
 }
 
-.srg-core-inner span {
-  transform: translateY(1px);
+.aw-label-top {
+  font-size: 0.62rem;
+  opacity: 0.9;
 }
 
-/* 星粒子：時計回りにゆっくり漂う ---------------- */
+.aw-label-mid {
+  font-size: 0.82rem;
+}
 
-.srg-stars {
+.aw-label-bottom {
+  font-size: 0.62rem;
+  opacity: 0.9;
+}
+
+/* 星粒子 */
+.aw-stars {
   position: absolute;
-  inset: 12%;
+  inset: 14%;
   border-radius: 50%;
   pointer-events: none;
   background-image:
     radial-gradient(2px 2px at 18% 32%, #ffffff, transparent),
-    radial-gradient(2px 2px at 76% 64%, rgba(255, 215, 122, 0.95), transparent),
-    radial-gradient(1px 1px at 40% 82%, rgba(160, 205, 255, 0.95), transparent);
-  opacity: 0.75;
-  animation: srg-stars-float 14s linear infinite;
+    radial-gradient(2px 2px at 76% 64%, rgba(255, 215, 122, 1), transparent),
+    radial-gradient(1px 1px at 42% 80%, rgba(160, 205, 255, 0.95), transparent);
+  opacity: 0.8;
+  animation: aw-stars-orbit 18s linear infinite;
 }
 
-/* アニメーション ------------------------------ */
-
-@keyframes srg-rotate {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
+/* 覚醒ゲート下の説明文 */
+.awakening-caption {
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  max-width: 480px;
+  margin-inline: auto;
 }
 
-@keyframes srg-rotate-reverse {
-  from { transform: translate(-50%, -50%) rotate(360deg); }
-  to   { transform: translate(-50%, -50%) rotate(0deg); }
-}
-
-@keyframes srg-gate-pulse {
+/* 覚醒ゲートのアニメーション */
+@keyframes aw-pulse {
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.04); }
 }
 
-@keyframes srg-stars-float {
+@keyframes aw-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes aw-rotate-reverse {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to   { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes aw-stars-orbit {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* ホバー＆タップ（PC は hover、スマホは active） */
-
-.srg-gate:hover .srg-core,
-.srg-gate:active .srg-core {
+/* ホバー／タップでコアを少し強調 */
+.awakening-gate:hover .aw-core,
+.awakening-gate:active .aw-core {
   box-shadow:
-    0 0 34px rgba(255, 245, 220, 1),
-    0 0 52px rgba(0, 0, 0, 1);
+    0 0 40px rgba(255, 247, 225, 1),
+    0 0 68px rgba(0, 0, 0, 1);
 }
 
-.srg-gate:active .srg-core-inner {
+.awakening-gate:active .aw-core-inner {
   transform: scale(0.97);
 }
 
-/* モバイルサイズ調整 */
-@media (max-width: 480px) {
-  .srg-gate {
-    width: 210px;
-  }
-}
-}/* スマホ調整 */
-@media (max-width: 768px) {
-  .card-gate {
-    padding: 20px 16px 22px;
-  }
-
-  .gate-inner {
-    gap: 16px;
-  }
-
-  .serephias-poem {
-    padding-inline: 11px;
-  }
-}
 /* フッター */
 .site-footer {
   margin: 28px auto 8px;
@@ -1140,6 +1142,10 @@ body::after {
 
   .sp-br {
     display: inline;
+  }
+
+  .awakening-gate {
+    width: min(230px, 80vw);
   }
 }
 
