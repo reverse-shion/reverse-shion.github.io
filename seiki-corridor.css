@@ -1014,7 +1014,37 @@ body::after {
 /* =============================================
    テキスト
 ============================================= */
+.awakening-gate-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  .awaken-glow {
+  position: absolute;
+  bottom: 12%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,250,200,0.3), transparent 70%);
+  filter: blur(40px);
+  animation: pulse 6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+}
 
+.serephias-poem {
+  display: none;
+  text-align: center;
+  color: #fff;
+  animation: fadeIn 1.5s ease forwards;
+}
+.serephias-poem.is-open {
+  display: block;
+}
 .awaken-gate-label {
   position: relative;
   display: block;
