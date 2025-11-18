@@ -819,13 +819,13 @@ body::after {
 .card-gate .srg-gate-wrapper {
   position: relative;
   margin-top: 22px;
-  display: none;                 /* ★ここがポイント */
+  display: none;
   justify-content: center;
   align-items: flex-end;
 }
 
 .card-gate .srg-gate-wrapper.is-open {
-  display: flex;                 /* ★JSで .is-open を付けたときだけ出現 */
+  display: flex;
 }
 
 /* 足元のハロー（ポータルのような光の輪） */
@@ -862,8 +862,16 @@ body::after {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  /* ゆっくり浮き沈みする鼓動 */
   animation: awaken-pillar-breathe 6s ease-in-out infinite;
+}
+
+/* ★ 星祈の回廊内では最初は隠す */
+.card-gate .awaken-gate {
+  display: none;
+}
+
+.card-gate .srg-gate-wrapper.is-open .awaken-gate {
+  display: flex;
 }
 
 /* 柱のメインボディ（六角クリスタルっぽいシルエット） */
@@ -929,21 +937,18 @@ body::after {
     0 0 16px rgba(255, 255, 255, 0.75);
 }
 
-/* 上段 SEREPHIAS */
 .awaken-gate-label-top {
   font-size: 0.78rem;
-  margin-top: 38%;              /* クリスタル中央より少し上 */
+  margin-top: 38%;
   color: rgba(8, 8, 24, 0.9);
 }
 
-/* 中段 AWAKEN */
 .awaken-gate-label-mid {
   font-size: 0.9rem;
   margin-top: 10px;
   color: #140c08;
 }
 
-/* 下段 GATE */
 .awaken-gate-label-bottom {
   font-size: 0.78rem;
   margin-top: 8px;
@@ -986,7 +991,7 @@ body::after {
   text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
 }
 
-/* ======== モバイル調整 ======== */
+/* ======== モバイル調整（ゲート） ======== */
 
 @media (max-width: 480px) {
   .awaken-gate {
@@ -1008,7 +1013,8 @@ body::after {
     padding-inline: 8px;
   }
 }
-}/* フッター */
+
+/* フッター */
 .site-footer {
   margin: 28px auto 8px;
   padding: 6px 14px;
@@ -1111,10 +1117,6 @@ body::after {
 
   .sp-br {
     display: inline;
-  }
-
-  .awakening-gate {
-    width: min(230px, 80vw);
   }
 }
 
