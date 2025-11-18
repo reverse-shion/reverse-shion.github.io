@@ -238,7 +238,7 @@
 
           <div class="gate-inner">
             <!-- STEP1：祈りボタン -->
-            <button type="button" class="gate-pray-btn" id="gatePrayButton">
+            <button type="button" class="gate-pray-btn" id="gatePrayButton" data-awaken-open>
               <span class="gate-pray-main">祈りを捧げる</span>
               <span class="gate-pray-sub">
                 タップすると、セレフィアスからの詩がひとつ降ります
@@ -271,46 +271,22 @@
     </footer>
   </div>
 
- <div class="awakening-overlay" id="awakeningOverlay">
+ <!-- ★ 覚醒オーバーレイ（bodyの一番下あたりに置く） -->
+<div class="awakening-overlay" id="awakeningOverlay">
+  <!-- 星粒子レイヤー -->
+  <div class="awaken-particles" id="awakenParticles"></div>
 
-<!-- ★ 星粒子上昇レイヤー -->
-  <div class="awaken-particles">
-<!-- 40個の粒子 -->
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <div class="awaken-particle"></div>
-    <!-- 必要ならもっと追加OK（軽い） -->
-  </div>
-    <!-- 外側のエフェクト用ラッパー -->
-    <div class="awakening-gate" id="awakeningGateButton">
-      <div class="aw-ring aw-ring--outer"></div>
-      <div class="aw-ring aw-ring--inner"></div>
+  <!-- ゲート本体 -->
+  <div class="awakening-gate-shell">
+    <button class="awaken-gate" id="awakenGate">
+      <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
+      <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
+      <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
+    </button>
 
-      <div class="aw-core">
-        <div class="aw-core-inner">
-          <!-- 実際にクリックできるゲート本体（ボタンは1つだけ） -->
-          <button class="awaken-gate" id="awakenGate" type="button">
-            <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
-            <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
-            <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="aw-stars"></div>
-    </div>
-
-    <p class="awakening-caption">
+    <p class="awaken-caption">
       このゲートに触れると、星環へと転送されます。
     </p>
-
   </div>
 </div>
 
