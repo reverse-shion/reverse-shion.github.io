@@ -208,3 +208,18 @@ if (
     }
   });
 }
+
+
+
+document.getElementById('openGateBtn').addEventListener('click', function() {
+  const container = document.getElementById('gateContainer');
+  const btn = this;
+
+  // ゲートを表示
+  container.classList.remove('hidden');
+  container.classList.add('visible');
+
+  // ボタンをフェードアウトさせて消す（不要なら削除してOK）
+  btn.classList.add('hidden');
+});
+
