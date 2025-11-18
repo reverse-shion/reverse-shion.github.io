@@ -134,3 +134,57 @@ function spawnSparkles() {
     });
   }
 }
+// =============================
+// セレフィアスの詩 ＆ SRGゲート
+// =============================
+const gatePrayButton = document.getElementById("gatePrayButton");
+const serephiasPoem = document.getElementById("serephiasPoem");
+const serephiasPoemBody = document.getElementById("serephiasPoemBody");
+const srgWrapper = document.getElementById("srgWrapper");
+const starRingGateButton = document.getElementById("starRingGateButton");
+
+if (gatePrayButton && serephiasPoem && serephiasPoemBody && srgWrapper && starRingGateButton) {
+  // メインの詩（毎回これが基本で出る）
+  const mainPoem =
+    "あなたの光が、静かに星の脈を震わせた。\nここに届いた祈りは、もう二度と見捨てられない。";
+
+  // レア詩（1/9の確率で、この中からランダム）
+  const rarePoems = [
+    "今、ひとつの痛みが、そっと星に預けられた。\nあなたの心は、ほんの少しだけ軽くなっている。",
+    "まだ名前を持たない祈りが、\n静かな環となって、あなたを包みはじめている。",
+    "あなたが隠してきた孤独は、\nいま、星々のあいだで静かな光へと組み替えられている。"
+  ];
+
+  gatePrayButton.addEventListener("click", () => {
+    // 一度押したら儀式完了扱い
+    if (gatePrayButton.classList.contains("is-disabled")) return;
+
+    gatePrayButton.classList.add("is-disabled");
+    gatePrayButton.disabled = true;
+
+    // レア判定：1/9で rarePoems から選ぶ
+    let selected = mainPoem;
+    if (Math.random() < 1 / 9 && rarePoems.length > 0) {
+      const idx = Math.floor(Math.random() * rarePoems.length);
+      selected = rarePoems[idx];
+    }
+
+    // 詩をセットして表示
+    serephiasPoemBody.textContent = selected;
+    serephiasPoem.classList.add("is-open");
+
+    // 少し間をおいてゲート出現＆中心にスクロール
+    setTimeout(() => {
+      srgWrapper.classList.add("is-open");
+      srgWrapper.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }, 600);
+  });
+
+  // SRGゲートを押したら コアへ（別タブ）
+  starRingGateButton.addEventListener("click", () => {
+    window.open("https://reverse-shion.github.io/shion2.html", "_blank", "noopener");
+  });
+}
