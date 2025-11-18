@@ -237,22 +237,24 @@
           </div>
 
           <div class="gate-inner">
-            <!-- STEP1：祈りボタン -->
-            <button type="button" class="gate-pray-btn" id="gatePrayButton">
-              <span class="gate-pray-main">祈りを捧げる</span>
-              <span class="gate-pray-sub">
-                タップすると、セレフィアスからの詩がひとつ降ります
-              </span>
-            </button>
+  <button class="gate-pray-btn" id="prayButton">
+    <span class="gate-pray-main">祈りを捧げる</span>
+    <span class="gate-pray-sub">タップすると、セレフィアスの詩がひとつ降ります</span>
+  </button>
 
-            <!-- STEP2：セレフィアスの詩（JSで表示） -->
-            <div class="serephias-poem" id="serephiasPoem">
-              <p class="serephias-poem-label">SEREPHIAS MESSAGE</p>
-              <p class="serephias-poem-body" id="serephiasPoemBody">
-                <!-- JSで詩が入る -->
-              </p>
-            </div>
-          </div>
+  <div class="serephias-poem" id="serephiasPoem">…</div>
+
+  <div class="srg-gate-wrapper">
+    <button class="awaken-gate" type="button" onclick="location.href='https://reverse-shion.github.io/shion2.html'">
+      <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
+      <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
+      <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
+    </button>
+    <p class="awaken-caption">
+      このゲートに触れると、詩韻思想の中核〈Re:Verse Shion Core〉へ転送されます。
+    </p>
+  </div>
+</div>
         </article>
       </section>
     </main>
@@ -289,5 +291,16 @@
   <div class="sparkles" id="sparkles"></div>
 
   <script src="seiki-corridor.js"></script>
+  <script>
+  const prayBtn     = document.querySelector('.gate-pray-btn');
+  const gateWrapper = document.querySelector('.srg-gate-wrapper');
+
+  prayBtn?.addEventListener('click', () => {
+    // 詩を出す処理がここにあるはず（省略）
+
+    // 詩が出た後でゲートを開く
+    gateWrapper?.classList.add('is-open');
+  });
+</script>
 </body>
 </html>
