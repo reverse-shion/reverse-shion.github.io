@@ -1131,3 +1131,27 @@ body::after {
     padding-inline: 5vw;
   }
 }
+
+/* ===========================
+   セレフィアス覚醒ゲートの表示制御（強制版）
+   最初は完全に非表示 → is-open でだけ出す
+=========================== */
+
+/* どこに書いてあっても、初期状態では隠す */
+.awaken-gate {
+  display: none !important;
+}
+
+/* ラッパーに is-open が付いた時だけ表示 */
+.srg-gate-wrapper.is-open .awaken-gate {
+  display: flex !important;
+}
+
+/* ラッパー自体も同じく制御 */
+.srg-gate-wrapper {
+  display: none !important;
+}
+
+.srg-gate-wrapper.is-open {
+  display: flex !important;
+}
