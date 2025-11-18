@@ -616,25 +616,99 @@ body::after {
   min-height: 1em;
 }
 
-/* 星環のゲートカード */
+/* =========================
+   星環のゲートカード（神域エリア）
+========================= */
 .card-gate {
-  max-width: 640px;
+  max-width: 720px;
+  margin-top: 4px;
+  padding: 26px 22px 26px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.18), transparent 65%),
+    radial-gradient(circle at 0 120%, rgba(96, 180, 255, 0.3), transparent 70%),
+    linear-gradient(to bottom right, rgba(6, 10, 30, 0.98), rgba(4, 7, 20, 0.98));
+  box-shadow:
+    0 0 40px rgba(0, 0, 0, 0.95),
+    0 0 60px rgba(120, 200, 255, 0.45);
+  border: 1px solid rgba(180, 215, 255, 0.65);
+  position: relative;
+  overflow: hidden;
 }
 
+/* 背景に漂う星輪のオーラ */
+.card-gate::before,
+.card-gate::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.card-gate::before {
+  width: 380px;
+  height: 380px;
+  left: 50%;
+  top: -140px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle,
+    rgba(110, 190, 255, 0.36) 0%,
+    rgba(110, 190, 255, 0.12) 45%,
+    transparent 72%);
+  filter: blur(2px);
+}
+
+.card-gate::after {
+  width: 520px;
+  height: 520px;
+  left: 50%;
+  bottom: -260px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle,
+    rgba(255, 215, 122, 0.25) 0%,
+    rgba(255, 215, 122, 0.05) 40%,
+    transparent 80%);
+}
+
+/* ラベル・見出し */
 .gate-label {
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
+  position: relative;
+  z-index: 1;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--accent-muted);
-  margin-bottom: 6px;
+  color: rgba(171, 189, 227, 0.95);
+  margin-bottom: 8px;
 }
 
 .card-gate h3 {
+  position: relative;
+  z-index: 1;
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  font-size: 1.08rem;
-  letter-spacing: 0.12em;
+  font-size: 1.16rem;
+  letter-spacing: 0.16em;
   color: var(--gold-soft);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  text-shadow:
+    0 0 22px rgba(255, 255, 255, 0.5),
+    0 0 34px rgba(120, 200, 255, 0.7);
+}
+
+/* セレフィアスの説明テキスト */
+.gate-body {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 12px 12px 2px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.12), transparent 70%),
+    radial-gradient(circle at 100% 100%, rgba(96, 160, 255, 0.2), transparent 70%),
+    linear-gradient(to bottom right, rgba(8, 11, 32, 0.92), rgba(6, 8, 24, 0.96));
+  border: 1px solid rgba(181, 207, 255, 0.5);
+  box-shadow: 0 0 26px rgba(0, 0, 0, 0.85);
 }
 
 .gate-body p {
@@ -642,50 +716,121 @@ body::after {
   line-height: 1.9;
   color: var(--text-soft);
   white-space: pre-line;
+  text-align: left;
 }
 
 .gate-body p + p {
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
-/* 星環のゲートボタン */
+/* 強調用 */
+.gate-body strong {
+  color: var(--gold-strong);
+}
+
+/* =========================
+   星環ゲートボタン（円形）
+========================= */
 .gate-button {
-  margin-top: 18px;
+  position: relative;
+  z-index: 2;
+  margin: 26px auto 6px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
+  justify-content: center;
+  align-items: center;
   text-decoration: none;
-  border-radius: 999px;
-  padding: 10px 18px;
-  border: 1px solid rgba(255, 215, 122, 0.9);
+  text-align: center;
+  padding: 0 20px;
+  color: var(--text-main);
   background:
-    radial-gradient(circle at 50% 0, rgba(255, 248, 218, 0.2), rgba(40, 26, 8, 0.96));
+    radial-gradient(circle at 50% 30%, #ffeec5 0%, #ffd77a 26%, #f0c05c 40%, transparent 70%),
+    radial-gradient(circle at 50% 120%, rgba(110, 190, 255, 0.5) 0%, rgba(20, 40, 90, 0.98) 55%, #050814 100%);
   box-shadow:
-    0 0 20px rgba(255, 215, 122, 0.8),
-    0 0 30px rgba(0, 0, 0, 0.9);
-  color: var(--gold-soft);
-  position: relative;
+    0 0 35px rgba(255, 215, 122, 0.9),
+    0 0 60px rgba(100, 190, 255, 0.75),
+    0 0 80px rgba(0, 0, 0, 1);
+  border: 1px solid rgba(255, 240, 210, 0.9);
   overflow: hidden;
-  transition: transform 0.14s ease-out, box-shadow 0.14s ease-out, background 0.14s ease-out;
+  transition:
+    transform 0.18s ease-out,
+    box-shadow 0.18s ease-out,
+    filter 0.18s ease-out;
+}
+
+/* 外側のリング光 */
+.gate-button::before,
+.gate-button::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.gate-button::before {
+  inset: 10px;
+  border: 1px solid rgba(255, 250, 230, 0.7);
+  box-shadow:
+    0 0 18px rgba(255, 255, 255, 0.8),
+    0 0 32px rgba(255, 215, 122, 0.9);
+  opacity: 0.9;
+}
+
+.gate-button::after {
+  inset: 22px;
+  border: 1px solid rgba(110, 190, 255, 0.7);
+  box-shadow: 0 0 22px rgba(110, 190, 255, 0.95);
+  opacity: 0.65;
+  animation: ring-breathe 5.2s ease-in-out infinite;
+}
+
+@keyframes ring-breathe {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  50%  { transform: scale(1.06); opacity: 0.95; }
+  100% { transform: scale(1);   opacity: 0.55; }
 }
 
 .gate-button-label {
+  position: relative;
+  z-index: 1;
   font-size: 0.9rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  margin-bottom: 6px;
+  color: #221207;
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.7),
+    0 0 24px rgba(255, 215, 122, 0.9);
 }
 
 .gate-button-sub {
-  font-size: 0.78rem;
-  color: var(--text-soft);
+  position: relative;
+  z-index: 1;
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: rgba(250, 245, 235, 0.92);
 }
 
+/* ホバー時：少し近づく感覚 */
 .gate-button:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
   box-shadow:
-    0 0 24px rgba(255, 230, 180, 0.95),
-    0 0 34px rgba(0, 0, 0, 0.96);
+    0 0 42px rgba(255, 230, 190, 1),
+    0 0 80px rgba(120, 210, 255, 0.9),
+    0 0 96px rgba(0, 0, 0, 1);
+  filter: saturate(1.1);
+}
+
+/* スマホでは酔わないよう控えめに */
+@media (max-width: 480px) {
+  .gate-button {
+    width: 190px;
+    height: 190px;
+    padding: 0 16px;
+  }
 }
 
 /* フッター */
