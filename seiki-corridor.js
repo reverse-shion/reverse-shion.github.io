@@ -183,22 +183,39 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 700);
     });
 
-    // ★ 覚醒ゲート本体：コアへ転送
+      // ★ 覚醒ゲート本体：星環コアへ転送（演出付き）
     awakeningGateButton.addEventListener("click", () => {
-      // オーバーレイをフェードアウト
-      awakeningOverlay.classList.remove("active");
+      // 1) クリスタル本体を「覚醒モード」に
+      awakeningGateButton.classList.add("is-opening");
 
+      // 2) オーバーレイにフラッシュ効果を付与
+      awakeningOverlay.classList.add("is-flash");
+
+      // 3) バックグラウンドタップで閉じられないように一時ロック（任意）
+      const handleBgTap = (e) => {
+        if (e.target === awakeningOverlay) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      };
+      awakeningOverlay.addEventListener("click", handleBgTap, true);
+
+      // 4) 演出が走った後に、セレフィアスの星環へ遷移
       setTimeout(() => {
         window.open(
           "https://reverse-shion.github.io/shion2.html",
           "_blank",
           "noopener"
         );
-      }, 260);
+      }, 1000); // 光の柱アニメ時間(0.9s)＋少し余韻
     });
 
+    
     // ★ クリスタルの外側（暗い部分）をタップで閉じる
-    awakeningOverlay.addEventListener('click', (e) => {
+        awakeningOverlay.addEventListener('click', (e) => {
+      // フラッシュ中は閉じない
+      if (awakeningOverlay.classList.contains("is-flash")) return;
+
       if (e.target === awakeningOverlay) {
         awakeningOverlay.classList.remove('active');
       }
