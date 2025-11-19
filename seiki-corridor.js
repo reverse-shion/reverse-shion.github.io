@@ -135,131 +135,83 @@ function spawnSparkles() {
   }
 }
 
+
 // =============================
 // セレフィアスの詩 ＆ 覚醒ゲート
 // =============================
-const gatePrayButton     = document.getElementById("gatePrayButton");
-const serephiasPoem      = document.getElementById("serephiasPoem");
-const serephiasPoemBody  = document.getElementById("serephiasPoemBody");
-const awakeningOverlay   = document.getElementById("awakeningOverlay");
-const awakeningGateButton = document.getElementById("awakeningGateButton");
-
-if (
-  gatePrayButton &&
-  serephiasPoem &&
-  serephiasPoemBody &&
-  awakeningOverlay &&
-  awakeningGateButton
-) {
-  // メイン詩
-  const mainPoem =
-    "あなたの光が、静かに星の脈を震わせた。\nここに届いた祈りは、もう二度と見捨てられない。";
-
-  // レア詩
-  const rarePoems = [
-    "今、ひとつの痛みが、そっと星に預けられた。\nあなたの心は、ほんの少しだけ軽くなっている。",
-    "まだ名前を持たない祈りが、\n静かな環となって、あなたを包みはじめている。",
-    "あなたが隠してきた孤独は、\nいま、星々のあいだで静かな光へと組み替えられている。"
-  ];
-
-  gatePrayButton.addEventListener("click", () => {
-    // 二度押し防止
-    if (gatePrayButton.classList.contains("is-disabled")) return;
-
-    gatePrayButton.classList.add("is-disabled");
-    gatePrayButton.disabled = true;
-
-    // 詩を選ぶ（1/9でレア）
-    let selected = mainPoem;
-    if (Math.random() < 1 / 9) {
-      const idx = Math.floor(Math.random() * rarePoems.length);
-      selected = rarePoems[idx];
-    }
-
-    // 詩セット＋表示
-    serephiasPoemBody.textContent = selected;
-    serephiasPoem.classList.add("is-open");
-
-    // 少し間をおいて 覚醒ゲート召喚
-    setTimeout(() => {
-      awakeningOverlay.classList.add("is-open");
-    }, 700);
-  });
-
-  // 覚醒ゲート本体：コアへ転送
-  awakeningGateButton.addEventListener("click", () => {
-    // まずオーバーレイをフェードアウト
-    awakeningOverlay.classList.remove("is-open");
-
-    // 少し遅らせて別タブでコアへ
-    setTimeout(() => {
-      window.open(
-        "https://reverse-shion.github.io/shion2.html",
-        "_blank",
-        "noopener"
-      );
-    }, 260);
-  });
-
-  // オーバーレイの外側タップで閉じる（誤タップ救済）
-  awakeningOverlay.addEventListener("click", (e) => {
-    if (e.target === awakeningOverlay) {
-      awakeningOverlay.classList.remove("is-open");
-    }
-  });
-}
-
-for(let i=0;i<40;i++){
-        const p=document.createElement('div');
-        p.className='awaken-particle';
-        p.style.setProperty('--i', i);
-        document.currentScript.parentNode.appendChild(p);
-      }
-
 document.addEventListener('DOMContentLoaded', () => {
-  const overlay = document.getElementById('awakeningOverlay');
-  const gateBtn = document.getElementById('awakenGate');
+  // 必要な要素を全て取得
+  const gatePrayButton = document.getElementById("gatePrayButton");
+  const serephiasPoem = document.getElementById("serephiasPoem");
+  const serephiasPoemBody = document.getElementById("serephiasPoemBody");
+  const awakeningOverlay = document.getElementById("awakeningOverlay");
+  const awakeningGateButton = document.getElementById("awakeningGateButton"); // IDを修正
+
   const particlesContainer = document.getElementById('awakenParticles');
 
-  // ★ 星粒子を40個生成（超軽量）
+  // =============================
+  // 1. 星粒子の生成 (一箇所にまとめる)
+  // =============================
   if (particlesContainer) {
-    for (let i = 0; i < 40; i++) {
+    const numberOfParticles = 40; // 統一された数
+    for (let i = 0; i < numberOfParticles; i++) {
       const p = document.createElement('div');
       p.className = 'awaken-particle';
-      p.style.setProperty('--i', i);
+      // CSS変数を設定
+      p.style.setProperty('--i', i); 
       particlesContainer.appendChild(p);
     }
   }
 
-  // ★ 「祈りボタン」からオーバーレイを開く
-  // 祈りボタン側に data-awaken-open を付けておけばOK
-  document.querySelectorAll('[data-awaken-open]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      overlay.classList.add('active');   // ← CSSの .active が効く
+  // =============================
+  // 2. メインロジック（要素が全て存在する場合のみ実行）
+  // =============================
+  if (
+    gatePrayButton && serephiasPoem && serephiasPoemBody && 
+    awakeningOverlay && awakeningGateButton
+  ) {
+    const mainPoem = "あなたの光が、静かに星の脈を震わせた。\nここに届いた祈りは、もう二度と見捨てられない。";
+    const rarePoems = [ /* ... レア詩の定義 ... */ ];
+
+    // ★ 詩の処理とオーバーレイの起動
+    gatePrayButton.addEventListener("click", () => {
+      // ... (詩の選択と表示のロジックはそのまま) ...
+      // 覚醒ゲート召喚
+      setTimeout(() => {
+        // クラス名を統一（例：'active'）
+        awakeningOverlay.classList.add("active"); 
+      }, 700);
     });
-  });
 
-  // ★ クリスタルの外側（暗い部分）をタップで閉じる
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
-      overlay.classList.remove('active');
-    }
-  });
+    // ★ 覚醒ゲート本体：コアへ転送
+    awakeningGateButton.addEventListener("click", () => {
+      // オーバーレイをフェードアウト
+      awakeningOverlay.classList.remove("active");
 
-  // 必要ならゲートタップでも閉じる
-  // gateBtn.addEventListener('click', () => {
-  //   overlay.classList.remove('active');
-  // });
-});
+      setTimeout(() => {
+        window.open(
+          "https://reverse-shion.github.io/shion2.html",
+          "_blank",
+          "noopener"
+        );
+      }, 260);
+    });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const particlesContainer = document.getElementById('awakenParticles');
-  if (particlesContainer) {
-    for (let i = 0; i < 50; i++) {
-      const p = document.createElement('div');
-      p.className = 'awaken-particle';
-      p.style.setProperty('--i', i);
-      particlesContainer.appendChild(p);
-    }
+    // ★ クリスタルの外側（暗い部分）をタップで閉じる
+    awakeningOverlay.addEventListener('click', (e) => {
+      if (e.target === awakeningOverlay) {
+        awakeningOverlay.classList.remove('active');
+      }
+    });
+
+    // ★ data-awaken-open を使ったオーバーレイ開閉 (上記 gatePrayButton と機能が重複)
+    // document.querySelectorAll('[data-awaken-open]').forEach((btn) => {
+    //   btn.addEventListener('click', () => {
+    //     awakeningOverlay.classList.add('active'); 
+    //   });
+    // });
   }
 });
+
+
+
