@@ -857,8 +857,13 @@ body::after {
   background: radial-gradient(circle, #ffffff, #d6b5ff, #9f80ff);
   border-radius: 50%;
   opacity: 0;
-  animation: riseParticles 4.5s linear infinite;
   filter: blur(0.5px);
+  animation: riseParticles 5s linear infinite both;
+  
+  /* JSで設定した --i をそのまま使う */
+  left: calc(var(--i) * 2.5%);
+  bottom: -40px;
+  animation-delay: calc(var(--i) * -0.12s);
 }
 
 .awaken-particle:nth-child(n) {
