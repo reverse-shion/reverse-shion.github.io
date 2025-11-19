@@ -814,12 +814,12 @@ body::after {
    セレフィアス覚醒ゲート — 完全調整版
 ============================================ */
 
-/* ▼ 覚醒オーバーレイ（背景：紫グラデーション） */
+/* ▼ 覚醒オーバーレイ */
 .awakening-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  display: flex;
+  display: flex; /* flexのまま維持して中央寄せ */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -835,23 +835,19 @@ body::after {
   transition: opacity .55s ease;
 }
 
-/* オープン状態 */
 .awakening-overlay.active {
   opacity: 1;
   pointer-events: auto;
-  display: block !important; 
+  /* displayはflexのまま。ここでは触らない */
 }
 
-/* =============================================
-   ★ 上昇する星粒子（オーバーレイ全面）
-============================================= */
-
+/* ▼ 星粒子（ゲートの「少し後ろ」に置く） */
 .awaken-particles {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2; /* シェル(5)より後ろ・背景より前くらいが無難 */
 }
 
 .awaken-particle {
@@ -865,32 +861,18 @@ body::after {
   filter: blur(0.5px);
 }
 
-/* 40粒子だけで軽い・自動ランダム */
 .awaken-particle:nth-child(n) {
   left: calc(var(--i) * 2.5%);
   animation-delay: calc(var(--i) * -0.12s);
 }
 
-/* 上昇アニメーション */
 @keyframes riseParticles {
   0%   { transform: translateY(40px) scale(0.6); opacity: 0; }
   25%  { opacity: 0.9; }
   100% { transform: translateY(-120vh) scale(1); opacity: 0; }
 }
 
-
-.awaken-particles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 9999 !important;
-}
-
-/* =============================================
-   ゲートシェル（中央揃え）
-============================================= */
-
+/* ▼ ゲートシェル（中央揃え） */
 .awakening-gate-shell {
   position: relative;
   z-index: 5;
@@ -898,11 +880,11 @@ body::after {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
   padding: 24px 20px;
+  text-align: center;
 }
 
-/* ▼ 下部の“祈りの台座”ハロー */
+/* 下のハロー */
 .awakening-gate-shell::before {
   content: "";
   position: absolute;
@@ -922,32 +904,32 @@ body::after {
   z-index: 0;
 }
 
-/* =============================================
-   覚醒クリスタル本体
-============================================= */
-
+/* 浮遊クリスタルボタン（テキスト中央寄せ込み） */
 .awaken-gate {
   position: relative;
-  width: min(260px, 70vw);
-  height: min(420px, 70vh);
-  background: transparent;
   border: none;
-  outline: none;
-  cursor: pointer;
+  padding: 0;
+  background: transparent;
+
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 0.2em;
+
+  width: min(260px, 70vw);
+  aspect-ratio: 1 / 2.4;
+  cursor: pointer;
 
   animation: awakenFloat 6s ease-in-out infinite;
 }
 
-/* 浮き沈み */
 @keyframes awakenFloat {
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(-8px); }
 }
 
-/* ▼ 外側のクリスタルボディ */
+/* 外側クリスタルボディ */
 .awaken-gate::before {
   content: "";
   position: absolute;
@@ -971,7 +953,7 @@ body::after {
     inset 0 0 16px rgba(12, 8, 22, .85);
 }
 
-/* ▼ 内側のコア光 */
+/* 内側コア光 */
 .awaken-gate::after {
   content: "";
   position: absolute;
@@ -995,148 +977,28 @@ body::after {
   50%     { opacity: 1; }
 }
 
-/* =============================================
-   ★ 押した瞬間だけ光の柱
-============================================= */
-
-.awaken-gate:active::after {
-  inset: -40% 40%;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.0) 0%,
-    rgba(255,245,230,1) 20%,
-    rgba(255,220,200,0.9) 40%,
-    rgba(180,210,255,0.9) 60%,
-    rgba(100,160,255,0.0) 100%
-  );
-  box-shadow:
-    0 0 48px rgba(255,245,230,1),
-    0 0 120px rgba(160,200,255,0.85);
-  animation: beamFlash .45s ease-out;
-}
-
-@keyframes beamFlash {
-  0%   { opacity: 0; transform: scaleY(0.7); }
-  40%  { opacity: 1; transform: scaleY(1.08); }
-  100% { opacity: .85; transform: scaleY(1); }
-}
-
-/* =============================================
-   テキスト
-============================================= */
-.awakening-gate-shell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  text-align: center;
-  .awaken-glow {
-  position: absolute;
-  bottom: 12%;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255,250,200,0.3), transparent 70%);
-  filter: blur(40px);
-  animation: pulse 6s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%,100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.1); }
-}
-}
-
-.serephias-poem {
-  display: none;
-  text-align: center;
-  color: #fff;
-  animation: fadeIn 1.5s ease forwards;
-}
-.serephias-poem.is-open {
-  display: block;
-}
-/* クリスタル本体のボタン */
-.awaken-gate {
+/* テキスト（3行をくっきり中央に） */
+.awaken-gate-label {
   position: relative;
-  border: none;
-  padding: 0;
-  background: transparent;
-  
-  /* ここで中身を中央寄せ */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2em;
-
-  width: min(260px, 60vw);
-  aspect-ratio: 1 / 2.4; /* 縦長比率。好きに調整OK */
-  cursor: pointer;
-}
-
-/* テキスト3行の共通スタイル */
-.awaken-gate-label {
-  position: static;          /* ← ここがポイント：absoluteをやめる */
-  display: block;
-  text-align: center;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  font-size: clamp(10px, 2.1vw, 13px);
-  color: #fdfaf8;
-  text-shadow:
-    0 0 10px rgba(0,0,0,0.85),
-    0 0 16px rgba(255,255,255,0.6);
-}
-
-/* もし前のCSSで top / left / transform を書いていたら、ここで無効化 */
-.awaken-gate-label-top,
-.awaken-gate-label-mid,
-.awaken-gate-label-bottom {
-  position: static;
-  transform: none;
-}
-
-.awaken-gate-label {
-  position: static;
   display: block;
   text-align: center;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-size: clamp(11px, 2.4vw, 15px);
-  color: rgba(255, 255, 255, 0.95); /* 白寄りの発光色 */
-
-  /* 発光＆グローエフェクト */
-  text-shadow:
-    0 0 8px rgba(255, 255, 255, 0.9),
-    0 0 20px rgba(187, 180, 255, 0.6),
-    0 0 40px rgba(150, 120, 255, 0.4);
-  transition: all 0.6s ease;
-}
-
-.awaken-gate:hover .awaken-gate-label {
-  /* 触れたとき、少し強めに光る */
-  color: #fff;
-  text-shadow:
-    0 0 12px rgba(255, 255, 255, 1),
-    0 0 24px rgba(200, 180, 255, 0.8),
-    0 0 60px rgba(150, 120, 255, 0.6);
-}
-/* === 強制上書き（どんな状態でも文字をくっきり表示） === */
-.awaken-gate-label {
-  position: relative !important;
-  color: #ffffff !important;
-  opacity: 1 !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-
+  color: #ffffff;
   text-shadow:
     0 0 6px rgba(0,0,0,0.9),
     0 0 14px rgba(0,0,0,0.8),
-    0 0 20px rgba(0,0,0,0.9) !important;
+    0 0 20px rgba(0,0,0,0.9);
+  z-index: 10;
+}
 
-  z-index: 9999 !important;
+.awaken-gate-label-top,
+.awaken-gate-label-mid,
+.awaken-gate-label-bottom {
+  position: static;
+  transform: none;
 }
 /* =============================================
    キャプション（説明文）
