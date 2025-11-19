@@ -384,5 +384,39 @@
     attachGateEffect('gate-reading');
     attachGateEffect('gate-philosophy');
   </script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('awakeningOverlay');
+  const gateBtn = document.getElementById('awakeningGateButton');
+
+  // ★ 祈りボタン → オーバーレイ表示
+  document.querySelectorAll('[data-awaken-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!overlay) return;
+      overlay.classList.add('active');
+    });
+  });
+
+  // ★ 背景タップで閉じる
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('active');
+      }
+    });
+  }
+
+  // ★ ゲートタップ → 星環へ転送
+  if (gateBtn) {
+    gateBtn.addEventListener('click', () => {
+      gateBtn.classList.add('is-opening');
+      setTimeout(() => {
+        window.location.href = 'https://reverse-shion.github.io/shion2.html';
+      }, 700);
+    });
+  }
+});
+</script>
 </body>
 </html>
