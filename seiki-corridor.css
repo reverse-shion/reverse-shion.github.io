@@ -845,7 +845,7 @@ body::after {
 .awaken-particles {
   position: absolute;
   inset: 0;
-  
+  overflow: hidden; /* コンテナ外の粒子を隠すために推奨 */
   pointer-events: none;
   z-index: 2; /* シェル(5)より後ろ・背景より前くらいが無難 */
 }
@@ -858,23 +858,18 @@ body::after {
   border-radius: 50%;
   opacity: 0;
   filter: blur(0.5px);
-  animation: riseParticles 5s linear infinite both;
+  
+  /* keyframesアニメーションを設定 */
+  animation: riseParticles 5s linear infinite both; 
   
   /* JSで設定した --i をそのまま使う */
   left: calc(var(--i) * 2.5%);
-  bottom: -40px;
-  animation-delay: calc(var(--i) * -0.12s);
-}
-.awaken-particle {
-  /* ちょっとランダム感を出す */
-  animation-duration: calc(3s + var(--i) * 0.1s));
+  bottom: -40px; /* 画面下からスタート */
+  
+  /* ランダム感を出すための設定 (文法エラー修正済み) */
+  animation-duration: calc(3s + var(--i) * 0.1s); /* 括弧を修正 */
   animation-delay: calc(var(--i) * -0.08s);
   transform: translateX(calc(var(--i) * 1px - 20px)); /* 少し横ブレも */
-}
-
-.awaken-particle:nth-child(n) {
-  left: calc(var(--i) * 2.5%);
-  animation-delay: calc(var(--i) * -0.12s);
 }
 
 /* keyframesはそのまま */
