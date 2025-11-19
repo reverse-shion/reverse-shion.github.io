@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>セレフィアス覚醒ゲート テスト</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 0%, #f8f4ff, #241632 70%);
+      font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, serif;
+      color: #fff;
+    }
+
+    /* ===========================
+       覚醒オーバーレイ
+    =========================== */
+    .awakening-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;                    /* 最初は非表示 */
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(145, 120, 255, 0.42), transparent 70%),
+        radial-gradient(circle at 30% 80%, rgba(255, 200, 255, 0.25), transparent 65%),
+        linear-gradient(180deg, #2d2053 0%, #0e0a1c 100%);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .55s ease;
+    }
+
+    .awakening-overlay.active {
+      display: flex;            /* flex のまま表示 */
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ===========================
+       星粒子
+    =========================== */
+    .awaken-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 2; /* 背景より前、ゲートより少し後ろ */
+    }
+
+    .awaken-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, #ffffff, #d6b5ff, #9f80ff);
+      border-radius: 50%;
+      opacity: 0;
+      animation: riseParticles 4.5s linear infinite;
+      filter: blur(0.5px);
+    }
+
+    .awaken-particle:nth-child(n) {
+      left: calc(var(--i) * 2.5%);
+      animation-delay: calc(var(--i) * -0.12s);
+    }
+
+    @keyframes riseParticles {
+      0%   { transform: translateY(40px) scale(0.6); opacity: 0; }
+      25%  { opacity: 0.9; }
+      100% { transform: translateY(-120vh) scale(1); opacity: 0; }
+    }
+
+    /* ===========================
+       ゲートシェル
+    =========================== */
+    .awakening-gate-shell {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .awakening-gate-shell::before {
+      content: "";
+      position: absolute;
+      bottom: -30px;
+      width: 320px;
+      max-width: 70vw;
+      height: 80px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 40%,
+          rgba(255, 245, 230, 0.85) 0%,
+          rgba(255, 235, 200, 0.25) 40%,
+          transparent 75%);
+      filter: blur(4px);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===========================
+       クリスタルボタン
+    =========================== */
+    .awaken-gate {
+      position: relative;
+      border: none;
+      padding: 0;
+      background: transparent;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2em;
+
+      width: min(260px, 70vw);
+      aspect-ratio: 1 / 2.4;
+      cursor: pointer;
+
+      animation: awakenFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes awakenFloat {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-8px); }
+    }
+
+    .awaken-gate::before {
+      content: "";
+      position: absolute;
+      inset: 6% 24%;
+      border-radius: 999px;
+      background: linear-gradient(
+          180deg,
+          rgba(255,255,255,0.26) 0%,
+          rgba(255,245,220,0.9) 22%,
+          rgba(217,173,255,0.95) 50%,
+          rgba(138,159,255,0.95) 75%,
+          rgba(30,40,120,1) 100%
+      );
+      clip-path: polygon(
+        50% 0%, 88% 10%, 100% 50%, 88% 90%,
+        50% 100%, 12% 90%, 0% 50%, 12% 10%
+      );
+      box-shadow:
+        0 0 28px rgba(255, 245, 220, .95),
+        0 0 60px rgba(182, 149, 255, .65),
+        inset 0 0 16px rgba(12, 8, 22, .85);
+    }
+
+    .awaken-gate::after {
+      content: "";
+      position: absolute;
+      inset: 15% 38%;
+      border-radius: 999px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,0.95) 0%,
+          rgba(255,215,180,0.05) 45%,
+          rgba(140,190,255,0.4) 70%,
+          rgba(16,28,72,0.0) 100%
+        );
+      mix-blend-mode: screen;
+      filter: blur(1px);
+      animation: corePulse 3.2s ease-in-out infinite;
+    }
+
+    @keyframes corePulse {
+      0%,100% { opacity: .85; }
+      50%     { opacity: 1; }
+    }
+
+    .awaken-gate:active::after {
+      inset: -40% 40%;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.0) 0%,
+        rgba(255,245,230,1) 20%,
+        rgba(255,220,200,0.9) 40%,
+        rgba(180,210,255,0.9) 60%,
+        rgba(100,160,255,0.0) 100%
+      );
+      box-shadow:
+        0 0 48px rgba(255,245,230,1),
+        0 0 120px rgba(160,200,255,0.85);
+      animation: beamFlash .45s ease-out;
+    }
+
+    @keyframes beamFlash {
+      0%   { opacity: 0; transform: scaleY(0.7); }
+      40%  { opacity: 1; transform: scaleY(1.08); }
+      100% { opacity: .85; transform: scaleY(1); }
+    }
+
+    .awaken-gate-label {
+      position: relative;
+      display: block;
+      text-align: center;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+      font-size: clamp(11px, 2.4vw, 15px);
+      color: #ffffff;
+      text-shadow:
+        0 0 6px rgba(0,0,0,0.9),
+        0 0 14px rgba(0,0,0,0.8),
+        0 0 20px rgba(0,0,0,0.9);
+      z-index: 10;
+    }
+
+    .awaken-caption {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: rgba(240, 230, 255, 0.9);
+      text-shadow: 0 0 8px rgba(0,0,0,0.9);
+    }
+
+    /* テスト用ボタン */
+    .gate-pray-btn {
+      padding: 1rem 1.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(120,90,200,0.6);
+      background: radial-gradient(circle at 50% 0%, #fff7e0, #d2c2ff);
+      color: #3b234a;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow:
+        0 0 16px rgba(255,255,255,0.8),
+        0 0 26px rgba(180,150,255,0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ★ トリガーボタン -->
+  <button type="button" class="gate-pray-btn" data-awaken-open>
+    祈りを捧げる（テスト）
+  </button>
+
+  <!-- ★ 覚醒オーバーレイ -->
+  <div class="awakening-overlay" id="awakeningOverlay">
+    <div class="awaken-particles" id="awakenParticles"></div>
+
+    <div class="awakening-gate-shell">
+      <button class="awaken-gate" id="awakeningGateButton">
+        <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
+        <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
+        <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
+      </button>
+
+      <p class="awaken-caption">
+        このゲートに触れると、星環へと転送されます。
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const overlay = document.getElementById('awakeningOverlay');
+      const particlesContainer = document.getElementById('awakenParticles');
+
+      // 粒子 40 個生成
+      if (particlesContainer) {
+        for (let i = 0; i < 40; i++) {
+          const p = document.createElement('div');
+          p.className = 'awaken-particle';
+          p.style.setProperty('--i', i);
+          particlesContainer.appendChild(p);
+        }
+      }
+
+      // トリガーボタンでオーバーレイを開く
+      document.querySelectorAll('[data-awaken-open]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (!overlay) return;
+          overlay.classList.add('active');
+        });
+      });
+
+      // 黒背景タップで閉じる
+      if (overlay) {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) {
+            overlay.classList.remove('active');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
