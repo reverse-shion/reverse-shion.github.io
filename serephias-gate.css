@@ -1,6 +1,6 @@
 /* ===========================
    SENSHUAN AWAKEN GATE
-   Ultimate Complete CSS (Final Ver.)
+   Refined Final Version (Fixed Transition)
 =========================== */
 
 /* ===========================
@@ -168,7 +168,7 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 
 /* ===========================
    5. 覚醒オーバーレイ & 転送フェード
-   ※クラス名をJS(.awakening-overlay)に合わせて統一
+   ※【重要】アニメーション廃止→Transitionへ変更
 =========================== */
 .awakening-overlay {
   position: fixed; inset: 0; z-index: 9999;
@@ -192,15 +192,14 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 .awakening-overlay.is-flash::after { opacity: 1; }
 
-/* ★白→黒の転送フェード（JSがここに .to-void を付与） */
+/* ★【修正】白→黒の転送フェード（Safari対応シンプル版） */
 .awakening-overlay.to-void {
-  animation: fadeToVoid 1.6s ease-in forwards;
+  animation: none;
+  background: #000000; /* 強制的に黒へ */
+  transition: background 0.8s ease-in;
 }
-@keyframes fadeToVoid {
-  0%   { background: rgba(255,255,255,0.0); }
-  35%  { background: rgba(255,255,255,1); }
-  100% { background: rgba(0,0,0,1); }
-}
+/* 以前の @keyframes fadeToVoid は削除済み */
+
 
 /* 星粒子 */
 .awaken-particles {
@@ -224,16 +223,15 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 
 /* ===========================
    6. 光の柱と逆流星（Reverse Flow）
-   ※ここが最後のミッシングリンク！
 =========================== */
-/* 光柱コンテナ（ゲートの後ろ、粒子の手前） */
+/* 光柱コンテナ */
 .light-column {
   position: absolute;
   inset: 0;
   display: flex;
   justify-content: center;
   pointer-events: none;
-  z-index: 3; /* Particles(2) < Light Column(3) < Gate(5) */
+  z-index: 3;
 }
 
 /* 中央の細いレーン */
@@ -275,13 +273,21 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 
 /* ===========================
    7. クリスタルゲート & 神気演出
-   ※JSが付与するクラス(.awaken-gate)にターゲットを修正
 =========================== */
 .awakening-gate-shell {
   position: relative; z-index: 5;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 24px 20px; text-align: center; min-height: 80vh;
 }
+
+/* 【追加】暗転(.to-void)時に中身ごとフェードアウトさせる */
+.awakening-overlay.to-void .awakening-gate-shell {
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* ハロー */
 .awakening-gate-shell::before {
   content: ""; position: absolute; bottom: -30px;
   width: 320px; max-width: 70vw; height: 80px; border-radius: 50%;
@@ -355,7 +361,6 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 
 /* --- ★神気開放：オーラ (.phase-aura) --- */
-/* ::beforeのボディをオーラで上書き */
 .awaken-gate.phase-aura::before {
   content: ""; position: absolute; inset: -40%;
   background: radial-gradient(circle, rgba(255,240,255,0.9), rgba(190,160,255,0.45), rgba(120,90,255,0));
@@ -370,13 +375,10 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 
 /* --- ★神気開放：紋章 (.phase-seal) --- */
-/* ::afterのビームを紋章で上書き */
 .awaken-gate.phase-seal::after {
   content: ""; position: absolute; top: 50%; left: 50%;
   width: 160px; height: 160px;
-  /* 以前の設定をリセット */
   inset: auto; border-radius: 0; background: none; box-shadow: none;
-  /* 紋章設定 */
   transform: translate(-50%, -50%) scale(0.3);
   background: url("assets/emblem.png") center/contain no-repeat;
   opacity: 0; pointer-events: none;
