@@ -409,3 +409,35 @@ div.bg-black.bg-opacity-80 {
     display: none !important;
     pointer-events: none !important;
 }
+
+/* ===========================
+   ★ Safari下部バー完全同化用 黒マスク
+   =========================== */
+
+/* 暗転開始したら、背景を強制的に純黒へ */
+.awakening-overlay.to-void {
+  background: #000 !important;
+  opacity: 1 !important;
+}
+
+/* 中の要素も黒化フェード */
+.awakening-overlay.to-void * {
+  opacity: 0 !important;
+  transition: opacity .4s ease-out;
+}
+
+/* ページ全体も黒で塗りつぶして下部バー同化 */
+html, body {
+  background: #000 !important;
+}
+
+/* Safari 固有の余白を純黒で塗る */
+body::after {
+  content: "";
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 40px;  /* Safariのナビゲーション高さを覆う */
+  background: #000;
+  z-index: 999999;
+  pointer-events: none;
+}
