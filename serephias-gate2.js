@@ -1,4 +1,6 @@
-
+// ===============================
+// SEREPHIAS AWAKEN GATE SCRIPT
+// ===============================
 document.addEventListener('DOMContentLoaded', () => {
   const body            = document.body;
   const prayBtn         = document.getElementById('gatePrayButton');
@@ -9,18 +11,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay         = document.getElementById('awakeningOverlay');
   const particlesLayer  = document.getElementById('awakenParticles');
   const lightColumn     = document.getElementById('lightColumn');
-  const gateVisual      = document.getElementById('gateVisual');
-  const crystalWrap     = document.getElementById('crystalWrap');
-  const awakenGate      = document.getElementById('awakeningGate');
   const overlayPoem     = document.getElementById('overlayPoem');
   const overlayMessage  = document.getElementById('overlayMessage');
+
+  const crystalWrap     = document.getElementById('crystalWrap');
+  const awakenGate      = document.getElementById('awakeningGate');
   const resonateBtn     = document.getElementById('resonateButton');
+
   const bgm             = document.getElementById('gateBgm');
 
   const NEXT_URL        = 'https://reverse-shion.github.io/shion2.html';
 
   // =========================
-  // 星粒子
+  // 1. 星粒子を生成
   // =========================
   if (particlesLayer) {
     const STAR_COUNT = 40;
@@ -33,51 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================
-  // テキストタイプ
-  // =========================
-  function typeText(text, element, speed = 45) {
-    return new Promise(resolve => {
-      if (!element) { resolve(); return; }
-      element.textContent = '';
-      let i = 0;
-      const timer = setInterval(() => {
-        element.textContent += text[i] ?? '';
-        i++;
-        if (i >= text.length) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, speed);
-    });
-  }
-
-  // =========================
-  // BGMフェードイン
-  // =========================
-  function fadeInBgm(targetVol = 0.7, step = 0.05, interval = 120) {
-    if (!bgm) return;
-    bgm.currentTime = 0;
-    bgm.volume = 0;
-
-    const playPromise = bgm.play();
-    if (playPromise && typeof playPromise.then === 'function') {
-      playPromise.catch(() => {});
-    }
-
-    let v = 0;
-    const id = setInterval(() => {
-      v += step;
-      if (v >= targetVol) {
-        bgm.volume = targetVol;
-        clearInterval(id);
-      } else {
-        bgm.volume = v;
-      }
-    }, interval);
-  }
-
-  // =========================
-  // 詩テキスト
+  // 2. テキスト
   // =========================
   const pagePoemText = [
     '我が名は、セレフィアス。',
@@ -103,13 +62,54 @@ document.addEventListener('DOMContentLoaded', () => {
     'あなたの共鳴を。'
   ].join('\n');
 
+  function typeText(text, element, speed = 45) {
+    return new Promise(resolve => {
+      if (!element) { resolve(); return; }
+      element.textContent = '';
+      let i = 0;
+      const timer = setInterval(() => {
+        element.textContent += text[i] ?? '';
+        i++;
+        if (i >= text.length) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, speed);
+    });
+  }
+
   // =========================
-  // フロー制御
+  // 3. BGMフェードイン
+  // =========================
+  function fadeInBgm(targetVol = 0.7, step = 0.05, interval = 120) {
+    if (!bgm) return;
+    bgm.currentTime = 0;
+    bgm.volume = 0;
+
+    const playPromise = bgm.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise.catch(() => {});
+    }
+
+    let v = 0;
+    const id = setInterval(() => {
+      v += step;
+      if (v >= targetVol) {
+        bgm.volume = targetVol;
+        clearInterval(id);
+      } else {
+        bgm.volume = v;
+      }
+    }, interval);
+  }
+
+  // =========================
+  // 4. FLOW
+  // 祈りボタン → ページ詩 → オーバーレイ詩 → クリスタル
   // =========================
   let hasPrayed  = false;
   let gateOpened = false;
 
-  // 祈りボタン
   if (prayBtn) {
     prayBtn.addEventListener('click', async () => {
       if (hasPrayed) return;
@@ -120,42 +120,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
       fadeInBgm();
 
-      // ページ内の詩
       if (poemBox) poemBox.classList.add('is-open');
       await typeText(pagePoemText, poemBody, 42);
 
-      // 少し間をあけてオーバーレイ
+      // ページ詩の後、オーバーレイ演出へ
       setTimeout(async () => {
-        if (!overlay) return;
-
         overlay.classList.add('active');
         body.classList.add('gate-active');
 
-        // 詩を中央に表示
-        overlayPoem.classList.remove('is-fadeout');
-        overlayPoem.style.display = 'block';
-        await typeText(overlayPoemText, overlayPoem, 46);
+        // 詩を画面中央に表示
         overlayPoem.classList.add('is-visible');
+        await typeText(overlayPoemText, overlayPoem, 46);
 
-        // 読む時間 → ふわっと消える
+        // 少し遅らせてメッセージ点灯
         setTimeout(() => {
-          overlayPoem.classList.add('is-fadeout');
+          overlayMessage.classList.add('is-visible');
+        }, 400);
+
+        // さらに数秒後：テキストをフェードアウト → クリスタル出現
+        setTimeout(() => {
+          overlayPoem.classList.remove('is-visible');
+          overlayMessage.classList.remove('is-visible');
+
           setTimeout(() => {
-            overlayPoem.style.display = 'none';
-
-            // 詩が消えたあとでメッセージ＆クリスタル登場
-            overlayMessage.classList.add('is-visible');
-            gateVisual.classList.add('is-visible');
-          }, 800);
-        }, 1800); // 読み時間
-
+            crystalWrap.classList.add('is-visible');
+          }, 700); // テキストが消えきったあと
+        }, 2600);
       }, 800);
     });
   }
 
-  // 共鳴ボタン → 覚醒 → 転送
+  // =========================
+  // 5. 共鳴ボタン → 覚醒 → 転送
+  // =========================
   if (resonateBtn) {
-    resonateBtn.addEventListener('click', () => {
+    resonateBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
       if (gateOpened) return;
       gateOpened = true;
 
@@ -178,11 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lightColumn.classList.add('phase-flow');
       }
       overlay.classList.add('is-flash');
-
-      // クリスタル一式を親ごとフェードアウト
-      if (crystalWrap) {
-        crystalWrap.classList.add('is-hidden');
-      }
 
       // 少し遅らせて暗転
       setTimeout(() => {
