@@ -1,0 +1,646 @@
+/* ===========================
+   ベースレイアウト
+=========================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Noto Serif JP', system-ui, -apple-system,
+               BlinkMacSystemFont, 'Yu Mincho', '游明朝', serif;
+  background:
+    radial-gradient(circle at 50% 0%, #372964 0%, #160f2b 36%, #05030b 100%);
+  color: #f5efe5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.page-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===========================
+   ヘッダー & フッター
+=========================== */
+
+.site-header {
+  padding: 14px 18px 4px;
+  display: flex;
+  justify-content: center;
+}
+
+.site-title-block {
+  text-align: center;
+}
+
+.site-title-en {
+  display: block;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  color: rgba(230, 220, 255, 0.82);
+}
+
+.site-title-sub {
+  display: block;
+  font-size: 0.76rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 236, 210, 0.88);
+}
+
+.site-footer {
+  padding: 14px 14px 18px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(240, 230, 220, 0.8);
+  margin-top: auto;
+}
+
+.footer-label {
+  display: block;
+  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  color: rgba(190, 210, 255, 0.9);
+}
+
+.footer-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-link {
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(210, 200, 255, 0.5);
+  color: #f9f3ea;
+  font-size: 0.78rem;
+  background: radial-gradient(circle at 0 0,
+              rgba(255, 255, 255, 0.12), transparent 60%);
+  transition: background 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.footer-link:hover {
+  transform: translateY(-1px);
+  background: radial-gradient(circle at 50% 0,
+              rgba(255, 240, 210, 0.25), transparent 65%);
+}
+
+/* ===========================
+   祈りセクション
+=========================== */
+
+.gate-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px 8px;
+}
+
+.gate-hero {
+  width: 100%;
+  max-width: 640px;
+}
+
+.gate-inner {
+  text-align: center;
+}
+
+.gate-heading {
+  font-size: 1.18rem;
+  letter-spacing: 0.28em;
+  margin-bottom: 6px;
+}
+
+.gate-lead {
+  font-size: 0.9rem;
+  line-height: 1.9;
+  color: rgba(245, 235, 225, 0.9);
+  margin-bottom: 18px;
+}
+
+/* 《祈りを捧げる》ボタン */
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.gate-pray-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  background:
+    radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
+  color: #25130c;
+  font-family: inherit;
+  font-size: 0.9rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  box-shadow:
+    0 0 20px rgba(255, 215, 122, 0.9),
+    0 0 34px rgba(0, 0, 0, 0.95);
+  transition: transform 0.12s ease-out,
+              box-shadow 0.12s ease-out,
+              filter 0.12s ease-out,
+              opacity 0.2s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.gate-pray-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0 50%,
+              rgba(255, 255, 255, 0.5), transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+  transform: translateX(-30%);
+}
+
+.gate-pray-main {
+  letter-spacing: 0.18em;
+}
+
+.gate-pray-sub {
+  font-size: 0.76rem;
+  color: rgba(60, 38, 22, 0.9);
+}
+
+.gate-pray-btn:hover:not(.is-disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 26px rgba(255, 230, 180, 1),
+    0 0 36px rgba(0, 0, 0, 0.98);
+  filter: saturate(1.08);
+}
+
+.gate-pray-btn:hover:not(.is-disabled)::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.gate-pray-btn.is-disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+
+.gate-audio-note {
+  font-size: 0.75rem;
+  margin-top: 8px;
+  color: rgba(220, 220, 255, 0.8);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.gate-audio-note.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* セレフィアスの詩エリア */
+
+:root {
+  --gold-soft: #ffe0a8;
+  --text-soft: #f4ece0;
+}
+
+.serephias-poem {
+  width: 100%;
+  max-width: 540px;
+  margin: 10px auto 0;
+  padding: 12px 14px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(170, 215, 255, 0.7);
+  background:
+    radial-gradient(circle at 0 0, rgba(255,255,255,0.12), transparent 70%),
+    linear-gradient(135deg, rgba(8, 14, 40, 0.96),
+                           rgba(6, 20, 46, 0.98));
+  box-shadow: 0 0 22px rgba(80, 150, 255, 0.7);
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(10px);
+  overflow: hidden;
+  transition: opacity 0.6s ease-out,
+              max-height 0.6s ease-out,
+              transform 0.6s ease-out;
+}
+
+.serephias-poem.is-open {
+  opacity: 1;
+  max-height: 260px;
+  transform: translateY(0);
+}
+
+.serephias-poem-label {
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  color: rgba(180, 215, 255, 0.95);
+  margin-bottom: 4px;
+}
+
+.serephias-poem-body {
+  font-size: 0.9rem;
+  line-height: 1.9;
+  color: var(--gold-soft);
+  text-shadow: 0 0 14px rgba(255, 215, 122, 0.7);
+  white-space: pre-wrap;
+}
+
+/* ===========================
+   覚醒オーバーレイ（星環レイヤー）
+=========================== */
+
+.awakening-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    radial-gradient(circle at 50% 10%, rgba(145, 120, 255, 0.42), transparent 70%),
+    radial-gradient(circle at 30% 80%, rgba(255, 200, 255, 0.25), transparent 65%),
+    linear-gradient(180deg, #2d2053 0%, #0e0a1c 100%);
+
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease;
+}
+
+.awakening-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ベース：画面全体フラッシュ用フィルム */
+.awakening-overlay::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 40%,
+      rgba(255,255,255,1),
+      rgba(255,255,255,0.2));
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 0.7s ease-out;
+  z-index: 20;
+}
+
+/* フラッシュ発動 */
+.awakening-overlay.is-flash::after {
+  opacity: 1;
+}
+
+/* 異界転送：白 → 黒へ溶ける */
+.awakening-overlay.to-void {
+  animation: fadeToVoid 1.6s ease-in forwards;
+}
+
+@keyframes fadeToVoid {
+  0%   { background: rgba(255,255,255,0.0); }
+  40%  { background: rgba(255,255,255,1); }
+  100% { background: rgba(0,0,0,1); }
+}
+
+/* 背景の柔らかいオーラ */
+.awaken-bg-glow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,0.18), transparent 70%),
+    radial-gradient(circle at 10% 80%, rgba(160,130,255,0.3), transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(255,220,210,0.2), transparent 60%);
+  opacity: 0.9;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+/* 星粒子コンテナ */
+.awaken-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+  background: rgba(255,255,255,0.02);
+  backdrop-filter: blur(1px);
+}
+
+/* 一つ一つの粒子 */
+.awaken-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, #dfc6ff, #9f80ff);
+  filter: blur(0.6px);
+  animation:
+    driftFloat calc(12s + var(--i) * .2s) linear infinite,
+    starPulse  calc(3.5s + var(--i) * .05s) ease-in-out infinite;
+  left: calc(var(--i) * 2.5%);
+  bottom: -40px;
+  transform: translateX(-20px) translateY(0);
+  animation-delay: calc(var(--i) * -0.15s);
+}
+
+/* 星が“呼吸する”ように淡く光る */
+@keyframes starPulse {
+  0%,100% {
+    opacity: 0.15;
+    transform: scale(.85);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.35);
+  }
+}
+
+/* 漂いながら上へ昇る */
+@keyframes driftFloat {
+  0% {
+    transform: translateX(0px) translateY(0px) scale(.9);
+  }
+  40% {
+    transform: translateX(12px) translateY(-40vh) scale(1.05);
+  }
+  100% {
+    transform: translateX(-6px) translateY(-120vh) scale(1);
+    opacity: 0;
+  }
+}
+
+/* ゲートシェル */
+
+.awakening-gate-shell {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+/* 下のハロー */
+.awakening-gate-shell::before {
+  content: "";
+  position: absolute;
+  bottom: -30px;
+  width: 320px;
+  max-width: 70vw;
+  height: 80px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 40%,
+      rgba(255, 245, 230, 0.85) 0%,
+      rgba(255, 235, 200, 0.25) 40%,
+      transparent 75%);
+  filter: blur(4px);
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* セレフィアス紋章（PNG透過画像） */
+
+.serephias-seal {
+  position: absolute;
+  width: min(220px, 60vw);
+  aspect-ratio: 1 / 1;
+  background:
+    url("assets/serephias-emblem.png") center/contain no-repeat;
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 12px rgba(255,240,220,0.95))
+    drop-shadow(0 0 40px rgba(170,140,255,0.9));
+  transform: scale(0.86);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* オーバーレイが開いたら、ゆっくり呼吸しはじめる */
+.awakening-overlay.active .serephias-seal {
+  opacity: 0.8;
+  animation: sealIdle 10s ease-in-out infinite;
+}
+
+@keyframes sealIdle {
+  0%,100% { transform: scale(0.86) rotate(0deg); opacity: 0.7; }
+  40%     { transform: scale(0.95) rotate(2deg); opacity: 0.9; }
+}
+
+/* 神化トリガー時：一度だけ強くパルス */
+.serephias-seal.is-awakening {
+  animation:
+    sealPulse 1.4s ease-out forwards,
+    sealIdle 10s ease-in-out infinite 1.4s;
+}
+
+@keyframes sealPulse {
+  0% {
+    transform: scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.1) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+/* 浮遊クリスタルボタン */
+
+.awaken-gate {
+  position: relative;
+  border: none;
+  padding: 0;
+  background: transparent;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
+
+  width: min(260px, 70vw);
+  aspect-ratio: 1 / 2.4;
+  cursor: pointer;
+
+  animation: awakenFloat 6s ease-in-out infinite;
+  transition: transform .5s ease, box-shadow .5s ease;
+  overflow: visible;
+}
+
+@keyframes awakenFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-8px); }
+}
+
+/* 外側クリスタルボディ */
+.awaken-gate::before {
+  content: "";
+  position: absolute;
+  inset: 6% 24%;
+  border-radius: 999px;
+  background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0.26) 0%,
+      rgba(255,245,220,0.9) 22%,
+      rgba(217,173,255,0.95) 50%,
+      rgba(138,159,255,0.95) 75%,
+      rgba(30,40,120,1) 100%
+  );
+  clip-path: polygon(
+    50% 0%, 88% 10%, 100% 50%, 88% 90%,
+    50% 100%, 12% 90%, 0% 50%, 12% 10%
+  );
+  box-shadow:
+    0 0 28px rgba(255, 245, 220, .95),
+    0 0 60px rgba(182, 149, 255, .65),
+    inset 0 0 16px rgba(12, 8, 22, .85);
+}
+
+/* 内側コア光 */
+.awaken-gate::after {
+  content: "";
+  position: absolute;
+  inset: 15% 38%;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,215,180,0.05) 45%,
+      rgba(140,190,255,0.4) 70%,
+      rgba(16,28,72,0.0) 100%
+    );
+  mix-blend-mode: screen;
+  filter: blur(1px);
+  animation: corePulse 3.2s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+  0%,100% { opacity: .85; }
+  50%     { opacity: 1; }
+}
+
+/* テキスト（3行を中央に） */
+.awaken-gate-label {
+  position: relative;
+  display: block;
+  text-align: center;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(11px, 2.4vw, 15px);
+  color: #ffffff;
+  text-shadow:
+    0 0 6px rgba(0,0,0,0.9),
+    0 0 14px rgba(0,0,0,0.8),
+    0 0 20px rgba(0,0,0,0.9);
+  z-index: 10;
+}
+
+/* クリスタル覚醒アニメーション（タップ時） */
+
+.awaken-gate.is-opening {
+  animation: none;
+  transform: scale(1.05);
+  box-shadow:
+    0 0 36px rgba(255, 245, 220, 1),
+    0 0 120px rgba(190, 170, 255, 1);
+}
+
+/* 光の柱（縦方向ビーム） */
+.awaken-gate.is-opening::after {
+  inset: -60% 45%;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.0) 0%,
+    rgba(255,250,240,1) 12%,
+    rgba(255,230,200,0.95) 35%,
+    rgba(190,210,255,0.95) 70%,
+    rgba(110,150,255,0.0) 100%
+  );
+  box-shadow:
+    0 0 50px rgba(255,245,230,1),
+    0 0 140px rgba(180,210,255,0.95);
+  animation: beamRise 0.9s ease-out forwards;
+}
+
+@keyframes beamRise {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scaleY(0.2);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-40vh) scaleY(1.4);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translateY(-60vh) scaleY(1.8);
+  }
+}
+
+/* 覚醒キャプション */
+
+.awaken-caption {
+  margin-top: 16px;
+  color: #e8e0d6;
+  text-shadow: 0 0 12px rgba(0,0,0,0.65);
+  font-size: .9rem;
+  line-height: 1.8;
+  max-width: 480px;
+}
+
+/* モバイル調整 */
+
+@media (max-width: 480px) {
+  .gate-main {
+    padding-inline: 12px;
+  }
+  .awaken-gate {
+    width: 75vw;
+    height: 64vh;
+  }
+  .awaken-caption {
+    padding-inline: 12px;
+    font-size: .82rem;
+  }
+}
