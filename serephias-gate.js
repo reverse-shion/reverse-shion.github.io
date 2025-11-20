@@ -1,8 +1,10 @@
 // ===============================
 // SEREPHIAS AWAKEN GATE SCRIPT
+// (Refined + gate-active 対応版)
 // ===============================
-
 document.addEventListener('DOMContentLoaded', () => {
+  const body           = document.body;
+
   const prayBtn        = document.getElementById('gatePrayButton');
   const audioNote      = document.getElementById('gateAudioNote');
   const poemBox        = document.getElementById('serephiasPoem');
@@ -12,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const particlesLayer = document.getElementById('awakenParticles');
   const lightColumn    = document.getElementById('lightColumn');
   const gateBtn        = document.getElementById('awakeningGateButton');
-  const seal           = document.getElementById('serephiasSeal');
 
   const bgm            = document.getElementById('gateBgm');
 
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const playPromise = bgm.play();
     if (playPromise && typeof playPromise.then === 'function') {
-      playPromise.catch(() => { /* 自動再生ブロック時はスルー */ });
+      playPromise.catch(() => { /* 自動再生ブロック時は無視 */ });
     }
 
     let v = 0;
@@ -100,23 +101,28 @@ document.addEventListener('DOMContentLoaded', () => {
   let hasPrayed  = false;
   let gateOpened = false;
 
-  // 祈りボタン
   if (prayBtn) {
     prayBtn.addEventListener('click', async () => {
       if (hasPrayed) return;
       hasPrayed = true;
 
+      // ボタン状態
       prayBtn.classList.add('is-disabled');
       if (audioNote) audioNote.classList.add('is-visible');
 
+      // BGM
       fadeInBgm();
 
+      // 詩のボックス開いてタイピング
       if (poemBox) poemBox.classList.add('is-open');
       await typeText(serephiasPoemText, poemBody, 42);
 
-      // 詩を読み終わって少し間をおいてゲート顕現
+      // 少し間をおいてゲート顕現＆スクロールロック
       setTimeout(() => {
-        if (overlay) overlay.classList.add('active');
+        if (overlay) {
+          overlay.classList.add('active');
+          body.classList.add('gate-active');
+        }
       }, 800);
     });
   }
@@ -124,44 +130,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================
   // 5. 覚醒ゲートタップ → 神化 → 転送
   // =========================
-  if (gateBtn) {
+  if (gateBtn && overlay) {
     gateBtn.addEventListener('click', () => {
       if (gateOpened) return;
       gateOpened = true;
 
-      // クリスタルの覚醒
+      // クリスタルの覚醒（※overlay.active はいじらない）
       gateBtn.classList.add('is-opening');
-
-      // ★ 神気のオーラ（phase-aura）
       gateBtn.classList.add('phase-aura');
-      setTimeout(() => {
-        gateBtn.classList.remove('phase-aura');
-      }, 900);
+      gateBtn.classList.add('phase-seal');
 
-      // ★ 紋章ホログラム（phase-seal）
-      setTimeout(() => {
-        gateBtn.classList.add('phase-seal');
-        setTimeout(() => {
-          gateBtn.classList.remove('phase-seal');
-        }, 900);
-      }, 250);
+      // 光柱の逆流ビーム
+      if (lightColumn) {
+        lightColumn.classList.add('phase-flow');
+      }
 
       // 画面全体フラッシュ
-      if (overlay) overlay.classList.add('is-flash');
+      overlay.classList.add('is-flash');
 
-      // 紋章の神話級パルス
-      if (seal) seal.classList.add('is-awakening');
-
-      // 光柱の逆流ビームを起動
-      if (lightColumn) lightColumn.classList.add('phase-flow');
-
-      // 少し遅らせて「白 → 黒」への転送演出
+      // 白 → 黒の転送演出（CSS: .awakening-overlay.to-void）
       setTimeout(() => {
-        if (overlay) overlay.classList.add('to-void');
+        overlay.classList.add('to-void');
       }, 700);
 
-      // 最終的に星環ページへ遷移
+      // 星環ページへ転送
       setTimeout(() => {
+        // 念のためスクロールロック解除
+        body.classList.remove('gate-active');
         window.location.href = NEXT_URL;
       }, 2100);
     });
