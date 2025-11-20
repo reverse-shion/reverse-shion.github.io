@@ -52,6 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function typeText(text, element, speed = 45) {
     return new Promise(resolve => {
+      if (!element) {
+        resolve();
+        return;
+      }
       element.textContent = '';
       let i = 0;
       const timer = setInterval(() => {
@@ -93,8 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================
   // 4. 「祈りを捧げる」 → 詩 → 覚醒ゲート
   // =========================
-  let hasPrayed = false;
+  let hasPrayed  = false;
+  let gateOpened = false;
 
+  // 祈りボタン
   if (prayBtn) {
     prayBtn.addEventListener('click', async () => {
       if (hasPrayed) return;
@@ -118,8 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================
   // 5. 覚醒ゲートタップ → 神化 → 転送
   // =========================
-  let gateOpened = false;
-
   if (gateBtn) {
     gateBtn.addEventListener('click', () => {
       if (gateOpened) return;
@@ -127,6 +131,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // クリスタルの覚醒
       gateBtn.classList.add('is-opening');
+
+      // ★ 神気のオーラ（phase-aura）
+      gateBtn.classList.add('phase-aura');
+      setTimeout(() => {
+        gateBtn.classList.remove('phase-aura');
+      }, 900);
+
+      // ★ 紋章ホログラム（phase-seal）
+      setTimeout(() => {
+        gateBtn.classList.add('phase-seal');
+        setTimeout(() => {
+          gateBtn.classList.remove('phase-seal');
+        }, 900);
+      }, 250);
 
       // 画面全体フラッシュ
       if (overlay) overlay.classList.add('is-flash');
