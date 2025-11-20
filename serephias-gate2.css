@@ -183,10 +183,7 @@ button, a {
 /* ===========================
    4. セレフィアスの詩（本文ブロック）
 =========================== */
-:root {
-  --gold-soft: #ffe0a8;
-  --text-soft: #f4ece0;
-}
+:root { --gold-soft: #ffe0a8; --text-soft: #f4ece0; }
 
 .serephias-poem {
   width: 100%;
@@ -360,7 +357,7 @@ button, a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 20px 40px;
+  padding: 32px 20px 40px;
   text-align: center;
   min-height: 80vh;
 }
@@ -374,8 +371,8 @@ button, a {
 
 .overlay-poem {
   max-width: 520px;
-  font-size: 0.92rem;
-  line-height: 2;
+  font-size: 0.9rem;
+  line-height: 1.9;
   color: #f7efe4;
   text-shadow: 0 0 16px rgba(0,0,0,0.6);
   margin-bottom: 18px;
@@ -383,19 +380,26 @@ button, a {
   transform: translateY(8px);
   transition: opacity .6s ease-out, transform .6s ease-out;
   white-space: pre-line;
+  word-break: break-word;
+  padding: 0 18px;
 }
 .overlay-poem.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
+/* 消えるとき用 */
+.overlay-poem.is-fadeout {
+  opacity: 0;
+  transform: translateY(-4px);
+}
 
 .overlay-message {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   letter-spacing: 0.16em;
   color: #ffe5a6;
   text-shadow: 0 0 18px rgba(255, 210, 130, 0.9);
-  margin-top: 6px;
-  margin-bottom: 30px;
+  margin-top: 10px;
+  margin-bottom: 28px;
   opacity: 0;
   transform: translateY(8px);
   transition: opacity .7s ease-out, transform .7s ease-out;
@@ -408,22 +412,6 @@ button, a {
 /* ===========================
    7. クリスタル本体＋親コンテナ
 =========================== */
-
-/* ★ 中央の光＋四角パネルをまとめるラッパー */
-.crystal-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  opacity: 1;
-  transition: opacity 0.7s ease-out;
-}
-.crystal-wrap.is-hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .awakening-gate-shell::before {
   content: "";
   position: absolute;
@@ -453,6 +441,21 @@ button, a {
   opacity: 0.9;
 }
 
+/* ★ クリスタル全体を包む親コンテナ */
+.crystal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 1;
+  transition: opacity 0.7s ease-out;
+  pointer-events: auto;
+}
+.crystal-wrap.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .awaken-gate {
   position: relative;
   border: none;
@@ -465,11 +468,11 @@ button, a {
   gap: 0.2em;
   width: min(260px, 70vw);
   aspect-ratio: 1 / 2.4;
-  cursor: default; /* ここは押さない */
+  cursor: default; /* 押さないので pointer にはしない */
   animation: awakenFloat 6s ease-in-out infinite;
   transition: transform .5s ease, box-shadow .5s ease;
   overflow: visible;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   pointer-events: none; /* 完全に飾り */
 }
 @media (max-width: 480px) {
@@ -583,7 +586,7 @@ button, a {
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
 }
 
-/* 見た目用のボタン枠 */
+/* 見た目用のボタン枠（大きく光らせる） */
 .resonate-btn-shell {
   width: 72px;
   height: 72px;
@@ -597,7 +600,7 @@ button, a {
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  pointer-events: none; /* 中のホットスポットだけ反応 */
+  pointer-events: none; /* 枠自体はタップ不可 */
 }
 
 /* 実際に反応する小さな四角（安全サイズ） */
@@ -624,7 +627,7 @@ button, a {
     inset 0 0 4px rgba(255,255,255,0.6);
   position: relative;
   overflow: hidden;
-  pointer-events: auto;
+  pointer-events: auto; /* ここだけタップ有効 */
 }
 .resonate-hotspot::after {
   content: "";
