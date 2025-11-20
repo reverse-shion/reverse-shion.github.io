@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const particlesLayer  = document.getElementById('awakenParticles');
   const lightColumn     = document.getElementById('lightColumn');
   const gateVisual      = document.getElementById('gateVisual');
-  const crystalWrap     = document.getElementById('crystalWrap'); // ★ 親コンテナ
+  const crystalWrap     = document.getElementById('crystalWrap');
   const awakenGate      = document.getElementById('awakeningGate');
   const overlayPoem     = document.getElementById('overlayPoem');
   const overlayMessage  = document.getElementById('overlayMessage');
@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     'やがてあなたの未来を塗り替える序章となるだろう。'
   ].join('\n');
 
-  // オーバーレイ用は「確実に出す」ことを優先してタイプライター無しにする
   const overlayPoemText = [
     '星に触れし心よ――',
     'その痛みは、光の欠片。',
@@ -106,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // =========================
   // 4. FLOW
-  // 祈りボタン → ページ詩 → オーバーレイ詩
+  // 祈りボタン → ページ詩 → オーバーレイ詩 → クリスタル
   // =========================
   let hasPrayed  = false;
   let gateOpened = false;
@@ -121,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       fadeInBgm();
 
-      // ページ内の詩はこれまで通りタイプライター
+      // ページ内の詩（タイプライター）
       if (poemBox) poemBox.classList.add('is-open');
       await typeText(pagePoemText, poemBody, 42);
 
@@ -132,25 +131,32 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.classList.add('active');
         body.classList.add('gate-active');
 
-        // ★ オーバーレイの詩は「一気に出す」
+        // オーバーレイ詩を中央に表示
         if (overlayPoem) {
           overlayPoem.textContent = overlayPoemText;
           overlayPoem.classList.add('is-visible');
         }
 
-        // 星環メッセージ
+        // しばらく表示 → フェードアウト
+        setTimeout(() => {
+          if (overlayPoem) {
+            overlayPoem.classList.add('is-fadeout');
+          }
+        }, 2600);
+
+        // 詩が消えたあとにメッセージ
         setTimeout(() => {
           if (overlayMessage) {
             overlayMessage.classList.add('is-visible');
           }
-        }, 400);
+        }, 2800);
 
-        // クリスタル＋共鳴ボタン表示
+        // 詩が消えてからクリスタル出現
         setTimeout(() => {
           if (gateVisual) {
             gateVisual.classList.add('is-visible');
           }
-        }, 1000);
+        }, 3600);
       }, 800);
     });
   }
@@ -190,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.classList.add('is-flash');
       }
 
-      // ★ 中央の光＋四角パネルを「親コンテナごと」フェードアウト
+      // 中央クリスタル＋四角ボタンを親ごとフェードアウト
       if (crystalWrap) {
         crystalWrap.classList.remove('is-visible');
         crystalWrap.classList.add('is-hidden');
