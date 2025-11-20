@@ -249,7 +249,7 @@ button, a {
   opacity: 0;
   pointer-events: none;
   transition: opacity .55s ease;
-  overflow-y: auto;
+  overflow: hidden;  /* オーバーレイ中はスクロールさせない */
 }
 .awakening-overlay.active {
   opacity: 1;
@@ -276,6 +276,9 @@ button, a {
 .awakening-overlay.to-void {
   background: #000;
   transition: background 0.8s ease-in;
+}
+.awakening-overlay.to-void::after {
+  opacity: 0;
 }
 
 /* 星粒子 */
@@ -373,6 +376,7 @@ button, a {
   margin-bottom: 32px;
 }
 
+/* 詩：中央表示 → フェードアウト用 */
 .overlay-poem {
   font-size: 0.92rem;
   line-height: 2;
@@ -388,7 +392,12 @@ button, a {
   opacity: 1;
   transform: translateY(0);
 }
+.overlay-poem.is-fadeout {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 
+/* メッセージ：詩のあとで表示 */
 .overlay-message {
   font-size: 0.92rem;
   letter-spacing: 0.16em;
@@ -404,28 +413,40 @@ button, a {
 }
 
 /* ===========================
-   7. クリスタル本体（親で一括フェード）
+   7. クリスタル本体 & ゲート表示
 =========================== */
-.crystal-wrap {
+
+/* 詩が終わるまで非表示 */
+.gate-visual {
   opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .8s ease-out, transform .8s ease-out;
   pointer-events: none;
-  transition: opacity 0.7s ease-out;
+}
+.gate-visual.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* クリスタル一式をまとめる親 */
+.crystal-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
-}
-.crystal-wrap.is-visible {
   opacity: 1;
-  pointer-events: auto;
-}
-.awakening-overlay.to-void .crystal-wrap {
-  opacity: 0;
+  transition: opacity 0.7s ease-out;
 }
 
-/* 下のぼんやり光（四角エリア問題を避けるため控えめに） */
-.crystal-wrap::before {
+/* 下の光の楕円（白い四角っぽいもの対策：クリスタルの下に固定） */
+.crystal-wrap::after {
   content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  transform: translateX(-50%);
   width: 260px;
   max-width: 70vw;
   height: 70px;
@@ -434,6 +455,11 @@ button, a {
   filter: blur(4px);
   opacity: 0.9;
   pointer-events: none;
+}
+
+/* 黒転送時にクリスタル＆光ごと消える */
+.awakening-overlay.to-void .crystal-wrap {
+  opacity: 0;
 }
 
 /* クリスタル本体（飾りのみ） */
@@ -453,6 +479,7 @@ button, a {
   animation: awakenFloat 6s ease-in-out infinite;
   transition: transform .5s ease, box-shadow .5s ease;
   overflow: visible;
+  pointer-events: none; /* タップ不可（ボタンだけ反応） */
 }
 @media (max-width: 480px) {
   .awaken-gate { width: 75vw; height: 64vh; aspect-ratio: unset; }
@@ -565,11 +592,6 @@ button, a {
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
 }
 
-/* クリスタルは飾りだけ（タップ不可） */
-.awaken-gate {
-  pointer-events: none;
-}
-
 /* ===========================
    8. 共鳴ボタン（安全仕様）
 =========================== */
@@ -586,7 +608,7 @@ button, a {
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  pointer-events: none;
+  pointer-events: none; /* 枠はタップ不可 */
 }
 
 .resonate-hotspot {
@@ -611,7 +633,7 @@ button, a {
     inset 0 0 4px rgba(255,255,255,0.6);
   position: relative;
   overflow: hidden;
-  pointer-events: auto;
+  pointer-events: auto; /* ここだけタップ有効 */
 }
 
 .resonate-hotspot::after {
