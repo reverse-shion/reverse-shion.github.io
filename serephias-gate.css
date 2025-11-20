@@ -841,6 +841,35 @@ a {
   line-height: 1.8;
   max-width: 480px;
 }
+/* ===== スクロールできない問題の修正 ===== */
+
+/* bodyとhtmlを自動高さに戻す */
+html, body {
+  height: auto !important;
+  min-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+/* ページ全体ラップが固定されないようにする */
+.page-wrap {
+  min-height: 100vh;  /* 全画面分は確保するけど固定しない */
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* オーバーレイを使う場合も背後がスクロールできるよう調整 */
+.awakening-overlay {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  pointer-events: none; /* 表示中のみJSで操作できるようにする */
+}
+
+/* ゲートが開いていないときは通常のスクロール */
+body:not(.gate-active) {
+  overflow-y: auto;
+}
 
 /* =============================================
    モバイル調整
