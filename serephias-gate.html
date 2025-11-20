@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>SEREPHIAS AWAKEN GATE | 詩韻 Shion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="セレフィアス覚醒ゲート。祈りの言葉が光となり、光がゲートを呼び覚まし、あなたを星環へと転送する儀式ページ。">
+  <link rel="stylesheet" href="serephias-gate.css" />
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="site-header">
+      <div class="site-title-block">
+        <span class="site-title-en">Re:Verse Shion</span>
+        <span class="site-title-sub">SEREPHIAS AWAKEN GATE</span>
+      </div>
+    </header>
+
+    <main class="gate-main">
+      <section class="gate-hero">
+        <div class="gate-inner">
+          <h1 class="gate-heading">
+            セレフィアス覚醒ゲート
+          </h1>
+          <p class="gate-lead">
+            言葉は光となり、光は世界となる。<br>
+            ここは、詩と祈りがひとつの星環へと結晶する「はじまりの門」です。
+          </p>
+
+          <!-- STEP1：祈りボタン -->
+          <button type="button"
+                  class="gate-pray-btn"
+                  id="gatePrayButton"
+                  data-awaken-open>
+            <span class="gate-pray-main">祈りを捧げる</span>
+            <span class="gate-pray-sub">
+              タップすると、セレフィアスからの詩がひとつ降ります
+            </span>
+          </button>
+
+          <p class="gate-audio-note" id="gateAudioNote">
+            ※ タップすると BGM が流れます
+          </p>
+
+          <!-- STEP2：セレフィアスの詩（JSで中身を差し込み） -->
+          <div class="serephias-poem" id="serephiasPoem">
+            <p class="serephias-poem-label">SEREPHIAS MESSAGE</p>
+            <p class="serephias-poem-body" id="serephiasPoemBody"></p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="site-footer">
+      <span class="footer-label">他の星への入口</span>
+      <div class="footer-links">
+        <a href="https://reverse-shion.github.io/" class="footer-link"
+           target="_blank" rel="noopener">
+          Re:Verse Shion トップ
+        </a>
+        <a href="https://note.com/shion_uranai369" class="footer-link"
+           target="_blank" rel="noopener">
+          note（詩韻思想の書）
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ★ 覚醒オーバーレイ（ゲート儀式レイヤー） -->
+  <div class="awakening-overlay" id="awakeningOverlay">
+    <!-- 星の薄い背景フィルム -->
+    <div class="awaken-bg-glow"></div>
+
+    <!-- 星粒子レイヤー -->
+    <div class="awaken-particles" id="awakenParticles"></div>
+
+    <!-- ゲート本体 -->
+    <div class="awakening-gate-shell">
+      <!-- セレフィアス紋章（PNG透過のせる場所） -->
+      <div class="serephias-seal" id="serephiasSeal"></div>
+
+      <!-- 覚醒クリスタル -->
+      <button class="awaken-gate" id="awakeningGateButton">
+        <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
+        <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
+        <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
+      </button>
+
+      <p class="awaken-caption">
+        このゲートに触れると、星環へと転送されます。
+      </p>
+    </div>
+  </div>
+
+  <!-- BGM（好きな音源に差し替えてOK） -->
+  <audio id="gateBgm" preload="auto">
+    <source src="gate-bgm.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script src="serephias-gate.js"></script>
+</body>
+</html>
