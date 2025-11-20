@@ -1,4 +1,9 @@
 /* ===========================
+   SENSHUAN AWAKEN GATE
+   Ultimate Complete CSS (Final Ver.)
+=========================== */
+
+/* ===========================
    1. ベースレイアウト
 =========================== */
 *, *::before, *::after {
@@ -10,7 +15,7 @@
 html, body {
   width: 100%;
   min-height: 100vh;
-  /* 基本はスクロール可能に設定 */
+  /* 基本はスクロール可能、演出時のみJSで制御 */
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
@@ -30,7 +35,7 @@ body {
   position: relative;
 }
 
-/* ゲート開放演出中だけスクロールを止める場合はJSでbodyにこのクラスをつける */
+/* ゲート開放中などスクロールを止めたい時にJSで付与 */
 body.gate-active {
   overflow: hidden;
 }
@@ -39,9 +44,7 @@ body.gate-active {
    2. ヘッダー & フッター
 =========================== */
 .site-header {
-  padding: 14px 18px 4px;
-  display: flex;
-  justify-content: center;
+  padding: 14px 18px 4px; display: flex; justify-content: center;
 }
 .site-title-block { text-align: center; }
 .site-title-en {
@@ -125,23 +128,17 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 
 /* ===========================
    4. セレフィアスの詩（展開アニメーション）
-   ※矛盾を解消し、アニメーションが効くように修正
 =========================== */
 :root { --gold-soft: #ffe0a8; --text-soft: #f4ece0; }
 
 .serephias-poem {
   width: 100%; max-width: 540px; margin: 10px auto 0;
-  /* 閉じた状態 */
-  padding: 0 14px; /* 上下のパディングを0にして完全に閉じる */
-  border: 1px solid rgba(170, 215, 255, 0); /* ボーダーも最初は透明に */
+  padding: 0 14px; /* 初期：閉 */
+  border: 1px solid rgba(170, 215, 255, 0);
   background: radial-gradient(circle at 0 0, rgba(255,255,255,0.12), transparent 70%),
               linear-gradient(135deg, rgba(8, 14, 40, 0.96), rgba(6, 20, 46, 0.98));
   font-size: 0.9rem; color: var(--text-soft);
-  
-  /* アニメーション設定 */
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
+  opacity: 0; max-height: 0; overflow: hidden;
   transform: translateY(10px);
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   box-sizing: border-box;
@@ -149,9 +146,8 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 
 /* 開いた状態 */
 .serephias-poem.is-open {
-  opacity: 1;
-  max-height: 1000px; /* 十分大きな値を指定 */
-  padding: 20px 22px 28px; /* 開いた時のパディング */
+  opacity: 1; max-height: 1000px;
+  padding: 20px 22px 28px;
   border-color: rgba(170, 215, 255, 0.7);
   box-shadow: 0 0 22px rgba(80, 150, 255, 0.7);
   transform: translateY(0);
@@ -166,13 +162,13 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   text-shadow: 0 0 14px rgba(255, 215, 122, 0.7);
   white-space: pre-line; word-break: break-word;
 }
-
 @media (max-width: 480px) {
   .serephias-poem.is-open { padding: 16px 18px 26px; }
 }
 
 /* ===========================
-   5. 覚醒オーバーレイ（背景演出）
+   5. 覚醒オーバーレイ & 転送フェード
+   ※クラス名をJS(.awakening-overlay)に合わせて統一
 =========================== */
 .awakening-overlay {
   position: fixed; inset: 0; z-index: 9999;
@@ -183,7 +179,7 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   backdrop-filter: blur(12px);
   opacity: 0; pointer-events: none;
   transition: opacity .55s ease;
-  overflow-y: auto; /* オーバーレイ自体もスクロール可能に */
+  overflow-y: auto;
 }
 .awakening-overlay.active { opacity: 1; pointer-events: auto; }
 
@@ -195,6 +191,16 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   transition: opacity 0.7s ease-out; z-index: 20;
 }
 .awakening-overlay.is-flash::after { opacity: 1; }
+
+/* ★白→黒の転送フェード（JSがここに .to-void を付与） */
+.awakening-overlay.to-void {
+  animation: fadeToVoid 1.6s ease-in forwards;
+}
+@keyframes fadeToVoid {
+  0%   { background: rgba(255,255,255,0.0); }
+  35%  { background: rgba(255,255,255,1); }
+  100% { background: rgba(0,0,0,1); }
+}
 
 /* 星粒子 */
 .awaken-particles {
@@ -210,7 +216,6 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   animation-delay: calc(var(--i) * -0.08s);
   transform: translateX(calc(var(--i) * 1px - 20px));
 }
-
 @keyframes riseParticles {
   0%   { transform: translateY(0) scale(0.4); opacity: 0; }
   15%  { opacity: 0.9; }
@@ -218,18 +223,65 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 
 /* ===========================
-   6. クリスタルゲート（Awaken Gate）
-   ※重複記述を統合
+   6. 光の柱と逆流星（Reverse Flow）
+   ※ここが最後のミッシングリンク！
+=========================== */
+/* 光柱コンテナ（ゲートの後ろ、粒子の手前） */
+.light-column {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3; /* Particles(2) < Light Column(3) < Gate(5) */
+}
+
+/* 中央の細いレーン */
+.light-column .reverse-stars {
+  position: relative;
+  top: -20vh;
+  width: 4px;
+  height: 140vh;
+  overflow: hidden;
+}
+
+/* レーンの中を上に走る光 */
+.light-column .reverse-stars::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 100vh;
+  width: 100%;
+  height: 300vh;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.0) 16px
+  );
+  filter: blur(1px);
+  opacity: 0;
+}
+
+/* JSで .phase-flow が付くと逆流アニメ起動 */
+.light-column.phase-flow .reverse-stars::before {
+  animation: reverseFlow 1.2s linear forwards;
+}
+
+@keyframes reverseFlow {
+  0%   { transform: translateY(0);      opacity: 0; }
+  30%  { transform: translateY(-60vh);  opacity: 1; }
+  100% { transform: translateY(-220vh); opacity: 0; }
+}
+
+/* ===========================
+   7. クリスタルゲート & 神気演出
+   ※JSが付与するクラス(.awaken-gate)にターゲットを修正
 =========================== */
 .awakening-gate-shell {
   position: relative; z-index: 5;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 24px 20px; text-align: center;
-  /* 必要に応じて高さ確保 */
-  min-height: 80vh; 
+  padding: 24px 20px; text-align: center; min-height: 80vh;
 }
-
-/* 下のハロー */
 .awakening-gate-shell::before {
   content: ""; position: absolute; bottom: -30px;
   width: 320px; max-width: 70vw; height: 80px; border-radius: 50%;
@@ -237,7 +289,7 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   filter: blur(4px); opacity: 0.9; pointer-events: none; z-index: 0;
 }
 
-/* クリスタルボタン本体 */
+/* クリスタル本体 */
 .awaken-gate {
   position: relative; border: none; padding: 0; background: transparent;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -248,56 +300,47 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   transition: transform .5s ease, box-shadow .5s ease;
   overflow: visible;
 }
-
-/* スマホ調整 */
 @media (max-width: 480px) {
   .awaken-gate { width: 75vw; height: 64vh; aspect-ratio: unset; }
 }
-
 @keyframes awakenFloat {
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(-8px); }
 }
 
-/* 外側ボディ */
+/* --- 通常時の見た目 --- */
+/* 外側ボディ (::before) */
 .awaken-gate::before {
   content: ""; position: absolute; inset: 6% 24%; border-radius: 999px;
   background: linear-gradient(180deg, rgba(255,255,255,0.26) 0%, rgba(255,245,220,0.9) 22%, rgba(217,173,255,0.95) 50%, rgba(138,159,255,0.95) 75%, rgba(30,40,120,1) 100%);
   clip-path: polygon(50% 0%, 88% 10%, 100% 50%, 88% 90%, 50% 100%, 12% 90%, 0% 50%, 12% 10%);
   box-shadow: 0 0 28px rgba(255, 245, 220, .95), 0 0 60px rgba(182, 149, 255, .65), inset 0 0 16px rgba(12, 8, 22, .85);
 }
-
-/* 内側コア */
+/* 内側コア (::after) */
 .awaken-gate::after {
   content: ""; position: absolute; inset: 15% 38%; border-radius: 999px;
   background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,215,180,0.05) 45%, rgba(140,190,255,0.4) 70%, rgba(16,28,72,0.0) 100%);
   mix-blend-mode: screen; filter: blur(1px);
   animation: corePulse 3.2s ease-in-out infinite;
-  /* 初期状態のBeam変形用リセット */
-  transform: none; opacity: 1;
 }
 @keyframes corePulse {
   0%,100% { opacity: .85; }
   50%     { opacity: 1; }
 }
-
-/* テキストラベル */
+/* ラベル */
 .awaken-gate-label {
   position: relative; display: block; text-align: center; letter-spacing: 0.28em;
   text-transform: uppercase; font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-size: clamp(11px, 2.4vw, 15px); color: #ffffff;
-  text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 14px rgba(0,0,0,0.8);
-  z-index: 10;
+  text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 14px rgba(0,0,0,0.8); z-index: 10;
 }
 
-/* --- タップ時の発動アニメーション (.is-opening) --- */
+/* --- タップ後：光の柱 (.is-opening) --- */
 .awaken-gate.is-opening {
-  animation: none; /* 浮遊停止 */
-  transform: scale(1.05);
+  animation: none; transform: scale(1.05);
   box-shadow: 0 0 36px rgba(255, 245, 220, 1), 0 0 120px rgba(190, 170, 255, 1);
 }
-
-/* 光の柱ビーム (::afterを再利用して変形させる) */
+/* 光の柱 (::afterをコアからビームへ変化させる) */
 .awaken-gate.is-opening::after {
   inset: -60% 45%;
   background: linear-gradient(180deg, rgba(255,255,255,0.0) 0%, rgba(255,250,240,1) 12%, rgba(255,230,200,0.95) 35%, rgba(190,210,255,0.95) 70%, rgba(110,150,255,0.0) 100%);
@@ -305,11 +348,45 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   mix-blend-mode: normal; filter: none;
   animation: beamRise 0.9s ease-out forwards;
 }
-
 @keyframes beamRise {
   0%   { opacity: 0; transform: translateY(40px) scaleY(0.2); }
   60%  { opacity: 1; transform: translateY(-40vh) scaleY(1.4); }
   100% { opacity: 0.8; transform: translateY(-60vh) scaleY(1.8); }
+}
+
+/* --- ★神気開放：オーラ (.phase-aura) --- */
+/* ::beforeのボディをオーラで上書き */
+.awaken-gate.phase-aura::before {
+  content: ""; position: absolute; inset: -40%;
+  background: radial-gradient(circle, rgba(255,240,255,0.9), rgba(190,160,255,0.45), rgba(120,90,255,0));
+  filter: blur(18px); border-radius: 50%; opacity: 0;
+  clip-path: none; box-shadow: none;
+  animation: gateAura 0.9s ease-out forwards; z-index: -1;
+}
+@keyframes gateAura {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { opacity: 0.8; transform: scale(1.25); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+
+/* --- ★神気開放：紋章 (.phase-seal) --- */
+/* ::afterのビームを紋章で上書き */
+.awaken-gate.phase-seal::after {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  width: 160px; height: 160px;
+  /* 以前の設定をリセット */
+  inset: auto; border-radius: 0; background: none; box-shadow: none;
+  /* 紋章設定 */
+  transform: translate(-50%, -50%) scale(0.3);
+  background: url("assets/emblem.png") center/contain no-repeat;
+  opacity: 0; pointer-events: none;
+  filter: drop-shadow(0 0 12px rgba(230,210,255,.95));
+  animation: sealsummon 0.9s ease-out forwards;
+}
+@keyframes sealsummon {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+  70%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
 }
 
 /* キャプション */
@@ -319,61 +396,7 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 
 /* ===========================
-   7. フェーズ演出（オーラ・紋章・反転）
-=========================== */
-
-/* 神気オーラ */
-.crystal.phase-aura::before {
-  content: ""; position: absolute; inset: -40%;
-  background: radial-gradient(circle, rgba(255,240,255,0.9), rgba(190,160,255,0.45), rgba(120,90,255,0));
-  filter: blur(18px); border-radius: 50%; opacity: 0;
-  animation: gateAura 0.9s ease-out forwards; z-index: -1;
-}
-@keyframes gateAura {
-  0% { opacity: 0; transform: scale(0.7); }
-  60% { opacity: 0.8; transform: scale(1.25); }
-  100% { opacity: 0; transform: scale(1.8); }
-}
-
-/* セレフィアス紋章（PNG） */
-.serephias-seal {
-  position: absolute; width: min(220px, 60vw); aspect-ratio: 1 / 1;
-  background: url("assets/serephias-emblem.png") center/contain no-repeat;
-  opacity: 0; pointer-events: none; z-index: 1;
-  filter: drop-shadow(0 0 12px rgba(255,240,220,0.95)) drop-shadow(0 0 40px rgba(170,140,255,0.9));
-  transform: scale(0.86);
-}
-.serephias-seal.is-awakening {
-  animation: sealPulse 1.4s ease-out forwards, sealIdle 10s ease-in-out infinite 1.4s;
-}
-@keyframes sealPulse {
-  0% { transform: scale(0.7) rotate(0deg); opacity: 0; }
-  40% { transform: scale(1.1) rotate(4deg); opacity: 1; }
-  100% { transform: scale(1.5) rotate(8deg); opacity: 0; }
-}
-@keyframes sealIdle {
-  0%,100% { transform: scale(1.5) rotate(8deg); }
-  50% { transform: scale(1.45) rotate(6deg); }
-}
-
-/* 転送フェード（Void） */
-.overlay {
-  position: fixed; inset: 0; background: rgba(5, 5, 15, 0.75);
-  backdrop-filter: blur(6px); opacity: 0; pointer-events: none;
-  transition: opacity 1.2s ease; z-index: 100;
-}
-.overlay.active { opacity: 1; pointer-events: auto; }
-.overlay.to-void { animation: fadeToVoid 1.6s ease-in forwards; }
-
-@keyframes fadeToVoid {
-  0% { background: rgba(255,255,255,0.0); }
-  35% { background: rgba(255,255,255,1); }
-  100% { background: rgba(0,0,0,1); }
-}
-
-/* ===========================
-   8. 演出用バー非表示（核弾頭CSS・改良版）
-   ※最後に適用
+   8. 演出用バー非表示（改良版）
 =========================== */
 .bottom-bar,
 #action-buttons,
