@@ -1,21 +1,27 @@
+// ===============================
+// SEREPHIAS AWAKEN GATE SCRIPT
+// ===============================
+
 document.addEventListener('DOMContentLoaded', () => {
   const prayBtn        = document.getElementById('gatePrayButton');
   const audioNote      = document.getElementById('gateAudioNote');
   const poemBox        = document.getElementById('serephiasPoem');
   const poemBody       = document.getElementById('serephiasPoemBody');
+
   const overlay        = document.getElementById('awakeningOverlay');
-  
-  // ★★★ ここをクラスで取得する！！！これが全ての鍵 ★★★
-  const gateBtn        = document.querySelector('.awaken-gate');  // ← ID → classに変更！
-  
-  const seal           = document.getElementById('serephiasSeal');
   const particlesLayer = document.getElementById('awakenParticles');
   const lightColumn    = document.getElementById('lightColumn');
+  const gateBtn        = document.getElementById('awakeningGateButton');
+  const seal           = document.getElementById('serephiasSeal');
+
   const bgm            = document.getElementById('gateBgm');
 
+  // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
 
-  // ===== 星粒子生成 =====
+  // =========================
+  // 1. 星粒子を生成
+  // =========================
   if (particlesLayer) {
     const STAR_COUNT = 40;
     for (let i = 0; i < STAR_COUNT; i++) {
@@ -26,27 +32,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== 以下、詩・BGM関数はそのまま =====
-  const serephiasPoemText = `我が名は、セレフィアス。
-星霊の神子にして、言霊の巫子。
-あなたの心が、わたしを呼んだ。
-
-かつて星々は、言葉のかたちで世界を照らしていた。
-しかし多くの魂が、その光を忘れ、沈黙の闇を「日常」と呼んだ。
-
-だから今――あなたの祈りを鍵として、
-眠り続けていた星環のゲートを、ここに再び開く。
-
-この一瞬の震えが、
-やがてあなたの未来を塗り替える序章となるだろう。`;
+  // =========================
+  // 2. セレフィアスの詩
+  // =========================
+  const serephiasPoemText = [
+    '我が名は、セレフィアス。',
+    '星霊の神子にして、言霊の巫子。',
+    'あなたの心が、わたしを呼んだ。',
+    '',
+    'かつて星々は、言葉のかたちで世界を照らしていた。',
+    'しかし多くの魂が、その光を忘れ、沈黙の闇を「日常」と呼んだ。',
+    '',
+    'だから今――あなたの祈りを鍵として、',
+    '眠り続けていた星環のゲートを、ここに再び開く。',
+    '',
+    'この一瞬の震えが、',
+    'やがてあなたの未来を塗り替える序章となるだろう。'
+  ].join('\n');
 
   function typeText(text, element, speed = 45) {
     return new Promise(resolve => {
-      if (!element) return resolve();
       element.textContent = '';
       let i = 0;
       const timer = setInterval(() => {
-        element.textContent += text[i];
+        element.textContent += text[i] ?? '';
         i++;
         if (i >= text.length) {
           clearInterval(timer);
@@ -56,11 +65,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // =========================
+  // 3. BGM フェードイン
+  // =========================
   function fadeInBgm(targetVol = 0.7, step = 0.05, interval = 120) {
     if (!bgm) return;
     bgm.currentTime = 0;
     bgm.volume = 0;
-    bgm.play().catch(() => {});
+
+    const playPromise = bgm.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise.catch(() => { /* 自動再生ブロック時はスルー */ });
+    }
+
     let v = 0;
     const id = setInterval(() => {
       v += step;
@@ -73,8 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }, interval);
   }
 
-  // ===== 祈り → 詩 → オーバーレイ表示 =====
+  // =========================
+  // 4. 「祈りを捧げる」 → 詩 → 覚醒ゲート
+  // =========================
   let hasPrayed = false;
+
   if (prayBtn) {
     prayBtn.addEventListener('click', async () => {
       if (hasPrayed) return;
@@ -82,42 +102,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
       prayBtn.classList.add('is-disabled');
       if (audioNote) audioNote.classList.add('is-visible');
+
       fadeInBgm();
+
       if (poemBox) poemBox.classList.add('is-open');
       await typeText(serephiasPoemText, poemBody, 42);
 
+      // 詩を読み終わって少し間をおいてゲート顕現
       setTimeout(() => {
-        overlay?.classList.add('active');
+        if (overlay) overlay.classList.add('active');
       }, 800);
     });
   }
 
-  // ===== ゲートクリック → 完全覚醒シーケンス =====
+  // =========================
+  // 5. 覚醒ゲートタップ → 神化 → 転送
+  // =========================
   let gateOpened = false;
+
   if (gateBtn) {
     gateBtn.addEventListener('click', () => {
       if (gateOpened) return;
       gateOpened = true;
 
-      // 1. クリスタル開花
+      // クリスタルの覚醒
       gateBtn.classList.add('is-opening');
 
-      // 2. フラッシュ + 紋章パルス
-      overlay?.classList.add('is-flash');
-      seal?.classList.add('is-awakening');
+      // 画面全体フラッシュ
+      if (overlay) overlay.classList.add('is-flash');
 
-      // 3. 光柱に星が逆流
-      lightColumn?.classList.add('phase-flow');
+      // 紋章の神話級パルス
+      if (seal) seal.classList.add('is-awakening');
 
-      // 4. 白→黒転送
+      // 光柱の逆流ビームを起動
+      if (lightColumn) lightColumn.classList.add('phase-flow');
+
+      // 少し遅らせて「白 → 黒」への転送演出
       setTimeout(() => {
-        overlay?.classList.add('to-void');
-      }, 800);
+        if (overlay) overlay.classList.add('to-void');
+      }, 700);
 
-      // 5. 次の世界へ
+      // 最終的に星環ページへ遷移
       setTimeout(() => {
         window.location.href = NEXT_URL;
-      }, 2400);
+      }, 2100);
     });
   }
 });
