@@ -575,6 +575,71 @@
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
   }
 
+    /* クリスタルは完全に飾り（タップ不可） */
+.awaken-gate {
+  pointer-events: none;
+  /* それ以外のスタイルはそのまま */
+}
+
+/* 見た目用のボタン枠（大きく光らせる） */
+.resonate-btn-shell {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 30% 0%, #fff7dd 0%, #ffd77a 45%, #b88033 100%);
+  box-shadow:
+    0 0 18px rgba(255, 215, 140, 0.9),
+    0 0 38px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  pointer-events: none; /* ここもタップ不可 */
+}
+
+/* 実際に反応する小さな四角（安全サイズ） */
+.resonate-hotspot {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  color: #26130a;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  background: rgba(255,255,255,0.18);
+  box-shadow:
+    0 0 10px rgba(255, 230, 180, 0.8),
+    inset 0 0 4px rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+  pointer-events: auto; /* ここだけタップ有効 */
+}
+
+.resonate-hotspot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0 0, rgba(255,255,255,0.7), transparent 60%);
+  opacity: 0;
+  transition: opacity .18s ease-out;
+}
+.resonate-hotspot:active::after {
+  opacity: 1;
+}
+.resonate-label {
+  transform: translateY(1px);
+}
+
   /* ===========================
      8. 共鳴ボタン（安全仕様）
   ============================ */
@@ -701,17 +766,20 @@
       </p>
 
       <!-- クリスタル＋共鳴ボタン -->
-      <div id="gateVisual" class="gate-visual">
-        <div class="awaken-gate" id="awakeningGate">
-          <span class="awaken-gate-label">
-            SEREPHIAS<br>AWAKEN<br>GATE
-          </span>
-        </div>
+<div id="gateVisual" class="gate-visual">
+  <!-- これは完全に飾り（pointer-events: none にする） -->
+  <div class="awaken-gate" id="awakeningGate">
+    <span class="awaken-gate-label">
+      SEREPHIAS<br>AWAKEN<br>GATE
+    </span>
+  </div>
 
-        <button id="resonateButton" class="resonate-btn" aria-label="共鳴する">
-          <span class="resonate-label">共鳴</span>
-        </button>
-      </div>
+  <!-- 見た目の枠 + 中の小さな実ボタン -->
+  <div class="resonate-btn-shell">
+    <button id="resonateButton" class="resonate-hotspot" aria-label="共鳴する">
+      <span class="resonate-label">共鳴</span>
+    </button>
+  </div>
     </div>
   </div>
 
@@ -754,6 +822,43 @@
         particlesLayer.appendChild(s);
       }
     }
+
+    if (resonateBtn) {
+  resonateBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (gateOpened) return;
+    gateOpened = true;
+
+    // ここから先は今の覚醒演出と同じ
+    awakenGate.classList.add('is-opening');
+    awakenGate.classList.add('phase-aura');
+    setTimeout(() => {
+      awakenGate.classList.remove('phase-aura');
+    }, 900);
+
+    setTimeout(() => {
+      awakenGate.classList.add('phase-seal');
+      setTimeout(() => {
+        awakenGate.classList.remove('phase-seal');
+      }, 900);
+    }, 250);
+
+    if (lightColumn) {
+      lightColumn.classList.add('phase-flow');
+    }
+    overlay.classList.add('is-flash');
+
+    setTimeout(() => {
+      overlay.classList.add('to-void');
+    }, 700);
+
+    setTimeout(() => {
+      window.location.href = NEXT_URL;
+    }, 2100);
+  });
+}
 
     // =========================
     // 2. セレフィアスの詩（ページ内）
@@ -867,11 +972,7 @@
       });
     }
 
-    const crystal = document.querySelector('.crystal');
-crystal.style.transition = 'opacity 1s ease';
-crystal.style.opacity = '0';
-setTimeout(() => crystal.remove(), 1000);
-    // =========================
+        // =========================
     // 5. 共鳴ボタン → 覚醒 → 転送
     // =========================
     if (resonateBtn) {
