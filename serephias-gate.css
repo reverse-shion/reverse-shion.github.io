@@ -328,15 +328,16 @@ a {
   }
 }
 
-/* ===========================
-   覚醒オーバーレイ（星環レイヤー）
-=========================== */
+/* ============================================
+   セレフィアス覚醒ゲート — 完全調整版
+============================================ */
 
+/* ▼ 覚醒オーバーレイ */
 .awakening-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  display: flex;
+  display: flex; /* flexのまま維持して中央寄せ */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -349,15 +350,118 @@ a {
   backdrop-filter: blur(12px);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.55s ease;
+  transition: opacity .55s ease;
 }
 
 .awakening-overlay.active {
   opacity: 1;
   pointer-events: auto;
+  /* displayはflexのまま。ここでは触らない */
 }
 
-/* ベース：画面全体フラッシュ用フィルム */
+/* ▼ 星粒子（ゲートの「少し後ろ」に置く） */
+.awaken-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden; /* コンテナ外の粒子を隠すために推奨 */
+  pointer-events: none;
+  z-index: 2; /* シェル(5)より後ろ・背景より前くらいが無難 */
+}
+
+.awaken-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #ffffff, #d6b5ff, #9f80ff);
+  border-radius: 50%;
+  opacity: 0;
+  filter: blur(0.5px);
+  
+  /* keyframesアニメーションを設定 */
+  animation: riseParticles 5s linear infinite both; 
+  
+  /* JSで設定した --i をそのまま使う */
+  left: calc(var(--i) * 2.5%);
+  bottom: -40px; /* 画面下からスタート */
+  
+  /* ランダム感を出すための設定 (文法エラー修正済み) */
+  animation-duration: calc(3s + var(--i) * 0.1s); /* 括弧を修正 */
+  animation-delay: calc(var(--i) * -0.08s);
+  transform: translateX(calc(var(--i) * 1px - 20px)); /* 少し横ブレも */
+}
+
+/* keyframesはそのまま */
+@keyframes riseParticles {
+  0%   { transform: translateY(0) scale(0.4); opacity: 0; }
+  15%  { opacity: 0.9; }
+  100% { transform: translateY(-110vh) scale(1); opacity: 0; }
+}
+@keyframes starPulse {
+  0%, 100% { opacity: .15; transform: scale(.9); }
+  50% { opacity: .7; transform: scale(1.3); }
+}
+@keyframes drift {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(6px) translateY(-60vh); }
+  100% { transform: translateX(-3px) translateY(-120vh); }
+}
+
+/* ===========================
+   クリスタル覚醒アニメーション
+   （タップ時：光の柱 + 全画面フラッシュ）
+=========================== */
+
+/* クリスタル本体：タップ時に少し大きく＆光を強く */
+.awaken-gate {
+  transition: transform .5s ease, box-shadow .5s ease;
+  overflow: visible; /* 光の柱がはみ出せるように */
+}
+
+.awaken-gate.is-opening {
+  animation: none;                 /* 浮遊アニメを一旦止める */
+  transform: scale(1.05);          /* ほんの少し拡大 */
+  box-shadow:
+    0 0 36px rgba(255, 245, 220, 1),
+    0 0 120px rgba(190, 170, 255, 1);
+}
+
+/* タップ時：コアから光の柱が立ち昇る */
+.awaken-gate.is-opening::after {
+  inset: -60% 45%; /* 細長い光柱に変形 */
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.0) 0%,
+    rgba(255,250,240,1) 12%,
+    rgba(255,230,200,0.95) 35%,
+    rgba(190,210,255,0.95) 70%,
+    rgba(110,150,255,0.0) 100%
+  );
+  box-shadow:
+    0 0 50px rgba(255,245,230,1),
+    0 0 140px rgba(180,210,255,0.95);
+  animation: beamRise 0.9s ease-out forwards;
+}
+
+@keyframes beamRise {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scaleY(0.2);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-40vh) scaleY(1.4);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translateY(-60vh) scaleY(1.8);
+  }
+}
+
+/* ===========================
+   全画面フラッシュ（セレフィアスの星環へ）
+=========================== */
+
+/* ベース：何もしない時は透明 */
 .awakening-overlay::after {
   content: "";
   position: fixed;
@@ -370,95 +474,16 @@ a {
   pointer-events: none;
   mix-blend-mode: screen;
   transition: opacity 0.7s ease-out;
-  z-index: 20;
+  z-index: 20; /* ゲートより前面 */
 }
 
-/* フラッシュ発動 */
+/* 発動中：画面全体を光で覆う */
 .awakening-overlay.is-flash::after {
   opacity: 1;
 }
 
-/* 異界転送：白 → 黒へ溶ける */
-.awakening-overlay.to-void {
-  animation: fadeToVoid 1.6s ease-in forwards;
-}
 
-@keyframes fadeToVoid {
-  0%   { background: rgba(255,255,255,0.0); }
-  40%  { background: rgba(255,255,255,1); }
-  100% { background: rgba(0,0,0,1); }
-}
-
-/* 背景の柔らかいオーラ */
-.awaken-bg-glow {
-  position: absolute;
-  inset: -20%;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(255,255,255,0.18), transparent 70%),
-    radial-gradient(circle at 10% 80%, rgba(160,130,255,0.3), transparent 60%),
-    radial-gradient(circle at 80% 80%, rgba(255,220,210,0.2), transparent 60%);
-  opacity: 0.9;
-  filter: blur(4px);
-  pointer-events: none;
-}
-
-/* 星粒子コンテナ */
-.awaken-particles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 2;
-  background: rgba(255,255,255,0.02);
-  backdrop-filter: blur(1px);
-}
-
-/* 一つ一つの粒子 */
-.awaken-particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  opacity: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff, #dfc6ff, #9f80ff);
-  filter: blur(0.6px);
-  animation:
-    driftFloat calc(12s + var(--i) * .2s) linear infinite,
-    starPulse  calc(3.5s + var(--i) * .05s) ease-in-out infinite;
-  left: calc(var(--i) * 2.5%);
-  bottom: -40px;
-  transform: translateX(-20px) translateY(0);
-  animation-delay: calc(var(--i) * -0.15s);
-}
-
-/* 星が“呼吸する”ように淡く光る */
-@keyframes starPulse {
-  0%,100% {
-    opacity: 0.15;
-    transform: scale(.85);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.35);
-  }
-}
-
-/* 漂いながら上へ昇る */
-@keyframes driftFloat {
-  0% {
-    transform: translateX(0px) translateY(0px) scale(.9);
-  }
-  40% {
-    transform: translateX(12px) translateY(-40vh) scale(1.05);
-  }
-  100% {
-    transform: translateX(-6px) translateY(-120vh) scale(1);
-    opacity: 0;
-  }
-}
-
-/* ゲートシェル */
-
+/* ▼ ゲートシェル（中央揃え） */
 .awakening-gate-shell {
   position: relative;
   z-index: 5;
@@ -490,58 +515,7 @@ a {
   z-index: 0;
 }
 
-/* セレフィアス紋章（PNG透過画像） */
-
-.serephias-seal {
-  position: absolute;
-  width: min(220px, 60vw);
-  aspect-ratio: 1 / 1;
-  background:
-    url("assets/serephias-emblem.png") center/contain no-repeat;
-  opacity: 0;
-  filter:
-    drop-shadow(0 0 12px rgba(255,240,220,0.95))
-    drop-shadow(0 0 40px rgba(170,140,255,0.9));
-  transform: scale(0.86);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* オーバーレイが開いたら、ゆっくり呼吸しはじめる */
-.awakening-overlay.active .serephias-seal {
-  opacity: 0.8;
-  animation: sealIdle 10s ease-in-out infinite;
-}
-
-@keyframes sealIdle {
-  0%,100% { transform: scale(0.86) rotate(0deg); opacity: 0.7; }
-  40%     { transform: scale(0.95) rotate(2deg); opacity: 0.9; }
-}
-
-/* 神化トリガー時：一度だけ強くパルス */
-.serephias-seal.is-awakening {
-  animation:
-    sealPulse 1.4s ease-out forwards,
-    sealIdle 10s ease-in-out infinite 1.4s;
-}
-
-@keyframes sealPulse {
-  0% {
-    transform: scale(0.7) rotate(0deg);
-    opacity: 0;
-  }
-  40% {
-    transform: scale(1.1) rotate(4deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.5) rotate(8deg);
-    opacity: 0;
-  }
-}
-
-/* 浮遊クリスタルボタン */
-
+/* 浮遊クリスタルボタン（テキスト中央寄せ込み） */
 .awaken-gate {
   position: relative;
   border: none;
@@ -559,8 +533,6 @@ a {
   cursor: pointer;
 
   animation: awakenFloat 6s ease-in-out infinite;
-  transition: transform .5s ease, box-shadow .5s ease;
-  overflow: visible;
 }
 
 @keyframes awakenFloat {
@@ -616,7 +588,7 @@ a {
   50%     { opacity: 1; }
 }
 
-/* テキスト（3行を中央に） */
+/* テキスト（3行をくっきり中央に） */
 .awaken-gate-label {
   position: relative;
   display: block;
@@ -633,50 +605,15 @@ a {
   z-index: 10;
 }
 
-/* クリスタル覚醒アニメーション（タップ時） */
-
-.awaken-gate.is-opening {
-  animation: none;
-  transform: scale(1.05);
-  box-shadow:
-    0 0 36px rgba(255, 245, 220, 1),
-    0 0 120px rgba(190, 170, 255, 1);
+.awaken-gate-label-top,
+.awaken-gate-label-mid,
+.awaken-gate-label-bottom {
+  position: static;
+  transform: none;
 }
-
-/* 光の柱（縦方向ビーム） */
-.awaken-gate.is-opening::after {
-  inset: -60% 45%;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.0) 0%,
-    rgba(255,250,240,1) 12%,
-    rgba(255,230,200,0.95) 35%,
-    rgba(190,210,255,0.95) 70%,
-    rgba(110,150,255,0.0) 100%
-  );
-  box-shadow:
-    0 0 50px rgba(255,245,230,1),
-    0 0 140px rgba(180,210,255,0.95);
-  animation: beamRise 0.9s ease-out forwards;
-}
-
-@keyframes beamRise {
-  0% {
-    opacity: 0;
-    transform: translateY(40px) scaleY(0.2);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(-40vh) scaleY(1.4);
-  }
-  100% {
-    opacity: 0.8;
-    transform: translateY(-60vh) scaleY(1.8);
-  }
-}
-
-/* 覚醒キャプション */
-
+/* =============================================
+   キャプション（説明文）
+============================================= */
 .awaken-caption {
   margin-top: 16px;
   color: #e8e0d6;
@@ -686,155 +623,19 @@ a {
   max-width: 480px;
 }
 
-/* モバイル調整 */
-
+/* =============================================
+   モバイル調整
+============================================= */
 @media (max-width: 480px) {
-  .gate-main {
-    padding-inline: 12px;
-  }
   .awaken-gate {
     width: 75vw;
     height: 64vh;
   }
+  .awaken-gate-label-mid {
+    font-size: .88rem;
+  }
   .awaken-caption {
     padding-inline: 12px;
     font-size: .82rem;
-  }
-}
-
-/* ===========================================================
-   段階2：神気の発動（クリスタルのオーラ）
-=========================================================== */
-
-/* クリスタルに .phase-aura クラスが付いたとき発動 */
-.crystal.phase-aura::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(
-    circle,
-    rgba(255,240,255,0.9),
-    rgba(190,160,255,0.45),
-    rgba(120,90,255,0)
-  );
-  filter: blur(18px);
-  border-radius: 50%;
-  opacity: 0;
-  animation: gateAura 0.9s ease-out forwards;
-  z-index: -1;
-}
-
-@keyframes gateAura {
-  0%   { opacity: 0; transform: scale(0.7); }
-  60%  { opacity: 0.8; transform: scale(1.25); }
-  100% { opacity: 0; transform: scale(1.8); }
-}
-/* ===========================================================
-   段階2：セレフィアス紋章（ホログラム）
-=========================================================== */
-
-/* 中心に一瞬だけ浮かぶ紋章（透過PNG推奨） */
-.crystal.phase-seal::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 160px;
-  height: 160px;
-  transform: translate(-50%, -50%) scale(0.3);
-  background: url("assets/emblem.png") center/contain no-repeat;
-  opacity: 0;
-  pointer-events: none;
-  filter: drop-shadow(0 0 12px rgba(230,210,255,.95));
-  animation: sealsummon 0.9s ease-out forwards;
-}
-
-@keyframes sealsummon {
-  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
-  70%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
-}
-
-/* ===========================================================
-   段階3：光柱の中へ星粒が逆流する
-=========================================================== */
-
-/* 光柱の中心に細い逆流レーンを作る */
-.light-column .reverse-stars {
-  position: absolute;
-  left: 50%;
-  top: -20vh;
-  width: 4px;
-  height: 140vh;
-  transform: translateX(-50%);
-  overflow: hidden;
-  pointer-events: none;
-}
-
-/* 縦に走る光の筋 */
-.light-column .reverse-stars::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 100vh;
-  width: 100%;
-  height: 300vh;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.9),
-    rgba(255,255,255,0.0) 16px
-  );
-  filter: blur(1px);
-  opacity: 0;
-}
-
-/* .phase-flow が付いたら逆流開始 */
-.light-column.phase-flow .reverse-stars::before {
-  animation: reverseFlow 1.2s linear forwards;
-}
-
-@keyframes reverseFlow {
-  0%   { transform: translateY(0);      opacity: 0; }
-  30%  { transform: translateY(-60vh);  opacity: 1; }
-  100% { transform: translateY(-220vh); opacity: 0; }
-}
-
-/* ===========================================================
-   段階4：白から黒への世界反転（転送フェード）
-=========================================================== */
-
-/* 通常の overlay は少し暗転だけ */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(5, 5, 15, 0.75);
-  backdrop-filter: blur(6px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1.2s ease;
-  z-index: 100;
-}
-
-/* ここはそのまま維持 */
-.overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* ★ 転送開始時に .to-void を追加 */
-.overlay.to-void {
-  animation: fadeToVoid 1.6s ease-in forwards;
-}
-
-/* 背景を白→黒へ反転させる */
-@keyframes fadeToVoid {
-  0% {
-    background: rgba(255,255,255,0.0);
-  }
-  35% {
-    background: rgba(255,255,255,1);
-  }
-  100% {
-    background: rgba(0,0,0,1);
   }
 }
