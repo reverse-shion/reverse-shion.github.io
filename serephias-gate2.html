@@ -9,8 +9,11 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- CSS -->
+  <!-- 外部CSS -->
   <link rel="stylesheet" href="serephias-gate2.css">
+
+  <!-- 外部JS -->
+  <script src="serephias-gate2.js" defer></script>
 </head>
 
 <body>
@@ -72,30 +75,26 @@
 
     <!-- 中央コンテンツ -->
     <div class="awakening-gate-shell">
-      <!-- セレフィアスの詩（オーバーレイ用） -->
-      <p id="overlayPoem" class="overlay-poem"></p>
+      <!-- 詩＋メッセージ（先に表示 → 消えてからクリスタル） -->
+      <div class="overlay-text-wrap">
+        <p id="overlayPoem" class="overlay-poem"></p>
+        <p id="overlayMessage" class="overlay-message">
+          星環が、あなたの共鳴を待っている。
+        </p>
+      </div>
 
-      <!-- 星環メッセージ -->
-      <p id="overlayMessage" class="overlay-message">
-        星環が、あなたの共鳴を待っている。
-      </p>
+      <!-- クリスタル＋共鳴ボタン（最初は非表示） -->
+      <div id="crystalWrap" class="crystal-wrap">
+        <div class="awaken-gate" id="awakeningGate">
+          <span class="awaken-gate-label">
+            SEREPHIAS<br>AWAKEN<br>GATE
+          </span>
+        </div>
 
-      <!-- クリスタル＋共鳴ボタン（親コンテナで一括フェード） -->
-      <div id="gateVisual" class="gate-visual">
-        <div id="crystalWrap" class="crystal-wrap is-visible">
-          <!-- クリスタル本体（飾り） -->
-          <div class="awaken-gate" id="awakeningGate">
-            <span class="awaken-gate-label">
-              SEREPHIAS<br>AWAKEN<br>GATE
-            </span>
-          </div>
-
-          <!-- 見た目の枠 + 中の小さな実ボタン -->
-          <div class="resonate-btn-shell">
-            <button id="resonateButton" class="resonate-hotspot" aria-label="共鳴する">
-              <span class="resonate-label">共鳴</span>
-            </button>
-          </div>
+        <div class="resonate-btn-shell">
+          <button id="resonateButton" class="resonate-hotspot" aria-label="共鳴する">
+            <span class="resonate-label">共鳴</span>
+          </button>
         </div>
       </div>
     </div>
@@ -103,8 +102,5 @@
 
   <!-- BGM（パスは差し替え） -->
   <audio id="gateBgm" src="assets/gate-bgm.mp3" preload="auto"></audio>
-
-  <!-- JS -->
-  <script src="serephias-gate2.js"></script>
 </body>
 </html>
