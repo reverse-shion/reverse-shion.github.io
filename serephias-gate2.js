@@ -11,11 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay         = document.getElementById('awakeningOverlay');
   const particlesLayer  = document.getElementById('awakenParticles');
   const lightColumn     = document.getElementById('lightColumn');
-  const gateVisual      = document.getElementById('gateVisual');
-  const crystalWrap     = document.getElementById('crystalWrap');
-  const awakenGate      = document.getElementById('awakeningGate');
   const overlayPoem     = document.getElementById('overlayPoem');
   const overlayMessage  = document.getElementById('overlayMessage');
+
+  const crystalWrap     = document.getElementById('crystalWrap');
+  const awakenGate      = document.getElementById('awakeningGate');
   const resonateBtn     = document.getElementById('resonateButton');
 
   const bgm             = document.getElementById('gateBgm');
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================
-  // 2. 詩テキスト
+  // 2. テキスト
   // =========================
   const pagePoemText = [
     '我が名は、セレフィアス。',
@@ -120,43 +120,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
       fadeInBgm();
 
-      // ページ内の詩（タイプライター）
       if (poemBox) poemBox.classList.add('is-open');
       await typeText(pagePoemText, poemBody, 42);
 
       // ページ詩の後、オーバーレイ演出へ
-      setTimeout(() => {
-        if (!overlay) return;
-
+      setTimeout(async () => {
         overlay.classList.add('active');
         body.classList.add('gate-active');
 
-        // オーバーレイ詩を中央に表示
-        if (overlayPoem) {
-          overlayPoem.textContent = overlayPoemText;
-          overlayPoem.classList.add('is-visible');
-        }
+        // 詩を画面中央に表示
+        overlayPoem.classList.add('is-visible');
+        await typeText(overlayPoemText, overlayPoem, 46);
 
-        // しばらく表示 → フェードアウト
+        // 少し遅らせてメッセージ点灯
         setTimeout(() => {
-          if (overlayPoem) {
-            overlayPoem.classList.add('is-fadeout');
-          }
+          overlayMessage.classList.add('is-visible');
+        }, 400);
+
+        // さらに数秒後：テキストをフェードアウト → クリスタル出現
+        setTimeout(() => {
+          overlayPoem.classList.remove('is-visible');
+          overlayMessage.classList.remove('is-visible');
+
+          setTimeout(() => {
+            crystalWrap.classList.add('is-visible');
+          }, 700); // テキストが消えきったあと
         }, 2600);
-
-        // 詩が消えたあとにメッセージ
-        setTimeout(() => {
-          if (overlayMessage) {
-            overlayMessage.classList.add('is-visible');
-          }
-        }, 2800);
-
-        // 詩が消えてからクリスタル出現
-        setTimeout(() => {
-          if (gateVisual) {
-            gateVisual.classList.add('is-visible');
-          }
-        }, 3600);
       }, 800);
     });
   }
@@ -173,40 +162,28 @@ document.addEventListener('DOMContentLoaded', () => {
       gateOpened = true;
 
       // クリスタル覚醒演出
-      if (awakenGate) {
-        awakenGate.classList.add('is-opening');
-        awakenGate.classList.add('phase-aura');
-        setTimeout(() => {
-          awakenGate.classList.remove('phase-aura');
-        }, 900);
+      awakenGate.classList.add('is-opening');
+      awakenGate.classList.add('phase-aura');
+      setTimeout(() => {
+        awakenGate.classList.remove('phase-aura');
+      }, 900);
 
+      setTimeout(() => {
+        awakenGate.classList.add('phase-seal');
         setTimeout(() => {
-          awakenGate.classList.add('phase-seal');
-          setTimeout(() => {
-            awakenGate.classList.remove('phase-seal');
-          }, 900);
-        }, 250);
-      }
+          awakenGate.classList.remove('phase-seal');
+        }, 900);
+      }, 250);
 
       // 逆流星レーン & フラッシュ
       if (lightColumn) {
         lightColumn.classList.add('phase-flow');
       }
-      if (overlay) {
-        overlay.classList.add('is-flash');
-      }
-
-      // 中央クリスタル＋四角ボタンを親ごとフェードアウト
-      if (crystalWrap) {
-        crystalWrap.classList.remove('is-visible');
-        crystalWrap.classList.add('is-hidden');
-      }
+      overlay.classList.add('is-flash');
 
       // 少し遅らせて暗転
       setTimeout(() => {
-        if (overlay) {
-          overlay.classList.add('to-void');
-        }
+        overlay.classList.add('to-void');
       }, 700);
 
       // 最後に星環ページへ
