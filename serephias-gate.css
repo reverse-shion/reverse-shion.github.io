@@ -271,6 +271,31 @@ a {
   white-space: pre-wrap;
 }
 
+/* ===== セレフィアスの詩枠：高さ問題の修正 ===== */
+
+.serephias-poem {
+  /* 高さ系を全部リセットして「中身に合わせて伸びる」ようにする */
+  height: auto;
+  max-height: none;
+  overflow: visible;
+
+  box-sizing: border-box;
+  padding: 20px 18px 24px;
+}
+
+/* 改行をちゃんと反映＆読みやすく */
+.serephias-poem-body {
+  white-space: pre-line;
+  line-height: 1.9;
+}
+
+/* 画面が小さいスマホ用の微調整 */
+@media (max-width: 480px) {
+  .serephias-poem {
+    padding: 16px 14px 20px;
+  }
+}
+
 /* ===========================
    覚醒オーバーレイ（星環レイヤー）
 =========================== */
