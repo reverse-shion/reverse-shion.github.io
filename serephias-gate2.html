@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>Re:Verse Shion — SEREPHIAS AWAKEN GATE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="言葉と祈りがひとつの星環へと結晶する、セレフィアス覚醒ゲート。">
 
-  <!-- Google Fonts -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- 外部CSS -->
-  <link rel="stylesheet" href="gate-style.css">
+  <link rel="stylesheet" href="gate.css" />
 </head>
-<body>
 
+<body>
   <div class="page-wrap">
     <header class="site-header">
       <div class="site-title-block">
@@ -41,6 +41,7 @@
           </p>
         </div>
 
+        <!-- セレフィアスの詩（ページ内） -->
         <section id="serephiasPoem" class="serephias-poem">
           <div class="serephias-poem-label">SEREPHIAS LITANY</div>
           <div id="serephiasPoemBody" class="serephias-poem-body"></div>
@@ -57,23 +58,38 @@
     </footer>
   </div>
 
-  <!-- 覚醒オーバーレイ -->
+  <!-- ===========================
+       覚醒オーバーレイ
+  ============================ -->
   <div id="awakeningOverlay" class="awakening-overlay">
+    <!-- 星粒子 -->
     <div id="awakenParticles" class="awaken-particles"></div>
-    <div id="lightColumn" class="light-column"><div class="reverse-stars"></div></div>
 
+    <!-- 逆流星レーン -->
+    <div id="lightColumn" class="light-column">
+      <div class="reverse-stars"></div>
+    </div>
+
+    <!-- 中央コンテンツ -->
     <div class="awakening-gate-shell">
+      <!-- セレフィアスの詩（オーバーレイ用） -->
       <p id="overlayPoem" class="overlay-poem"></p>
-      <p id="overlayMessage" class="overlay-message">星環が、あなたの共鳴を待っている。</p>
 
-      <div id="gateVisual" class="gate-visual">
-        <!-- ここからが修正ポイント：親コンテナで包む -->
-        <div class="crystal-wrap is-visible">
-          <div class="awaken-gate" id="awakeningGate">
-            <span class="awaken-gate-label">SEREPHIAS<br>AWAKEN<br>GATE</span>
-          </div>
+      <!-- 星環メッセージ -->
+      <p id="overlayMessage" class="overlay-message">
+        星環が、あなたの共鳴を待っている。
+      </p>
+
+      <!-- クリスタル＋共鳴ボタン（親が crystal-wrap） -->
+      <div id="gateVisual" class="gate-visual crystal-wrap">
+        <!-- クリスタルは飾り（クリック不可） -->
+        <div class="awaken-gate" id="awakeningGate">
+          <span class="awaken-gate-label">
+            SEREPHIAS<br>AWAKEN<br>GATE
+          </span>
         </div>
 
+        <!-- 見た目の枠 + 中の小さな実ボタン -->
         <div class="resonate-btn-shell">
           <button id="resonateButton" class="resonate-hotspot" aria-label="共鳴する">
             <span class="resonate-label">共鳴</span>
@@ -83,9 +99,10 @@
     </div>
   </div>
 
+  <!-- BGM（パスは必要に応じて変更） -->
   <audio id="gateBgm" src="assets/gate-bgm.mp3" preload="auto"></audio>
 
   <!-- 外部JS -->
-  <script src="gate.js"></script>
+  <script src="gate.js" defer></script>
 </body>
 </html>
