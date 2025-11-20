@@ -611,6 +611,214 @@ a {
   position: static;
   transform: none;
 }
+
+
+/* クリスタル覚醒アニメーション（タップ時） */
+
+.awaken-gate.is-opening {
+  animation: none;
+  transform: scale(1.05);
+  box-shadow:
+    0 0 36px rgba(255, 245, 220, 1),
+    0 0 120px rgba(190, 170, 255, 1);
+}
+
+/* 光の柱（縦方向ビーム） */
+.awaken-gate.is-opening::after {
+  inset: -60% 45%;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.0) 0%,
+    rgba(255,250,240,1) 12%,
+    rgba(255,230,200,0.95) 35%,
+    rgba(190,210,255,0.95) 70%,
+    rgba(110,150,255,0.0) 100%
+  );
+  box-shadow:
+    0 0 50px rgba(255,245,230,1),
+    0 0 140px rgba(180,210,255,0.95);
+  animation: beamRise 0.9s ease-out forwards;
+}
+
+@keyframes beamRise {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scaleY(0.2);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-40vh) scaleY(1.4);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translateY(-60vh) scaleY(1.8);
+  }
+}
+
+/* 覚醒キャプション */
+
+.awaken-caption {
+  margin-top: 16px;
+  color: #e8e0d6;
+  text-shadow: 0 0 12px rgba(0,0,0,0.65);
+  font-size: .9rem;
+  line-height: 1.8;
+  max-width: 480px;
+}
+
+/* モバイル調整 */
+
+@media (max-width: 480px) {
+  .gate-main {
+    padding-inline: 12px;
+  }
+  .awaken-gate {
+    width: 75vw;
+    height: 64vh;
+  }
+  .awaken-caption {
+    padding-inline: 12px;
+    font-size: .82rem;
+  }
+}
+
+/* ===========================================================
+   段階2：神気の発動（クリスタルのオーラ）
+=========================================================== */
+
+/* クリスタルに .phase-aura クラスが付いたとき発動 */
+.crystal.phase-aura::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+    circle,
+    rgba(255,240,255,0.9),
+    rgba(190,160,255,0.45),
+    rgba(120,90,255,0)
+  );
+  filter: blur(18px);
+  border-radius: 50%;
+  opacity: 0;
+  animation: gateAura 0.9s ease-out forwards;
+  z-index: -1;
+}
+
+@keyframes gateAura {
+  0%   { opacity: 0; transform: scale(0.7); }
+  60%  { opacity: 0.8; transform: scale(1.25); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+/* ===========================================================
+   段階2：セレフィアス紋章（ホログラム）
+=========================================================== */
+
+/* 中心に一瞬だけ浮かぶ紋章（透過PNG推奨） */
+.crystal.phase-seal::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  transform: translate(-50%, -50%) scale(0.3);
+  background: url("assets/emblem.png") center/contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 12px rgba(230,210,255,.95));
+  animation: sealsummon 0.9s ease-out forwards;
+}
+
+@keyframes sealsummon {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+  70%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
+}
+
+/* ===========================================================
+   段階3：光柱の中へ星粒が逆流する
+=========================================================== */
+
+/* 光柱の中心に細い逆流レーンを作る */
+.light-column .reverse-stars {
+  position: absolute;
+  left: 50%;
+  top: -20vh;
+  width: 4px;
+  height: 140vh;
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 縦に走る光の筋 */
+.light-column .reverse-stars::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 100vh;
+  width: 100%;
+  height: 300vh;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.0) 16px
+  );
+  filter: blur(1px);
+  opacity: 0;
+}
+
+/* .phase-flow が付いたら逆流開始 */
+.light-column.phase-flow .reverse-stars::before {
+  animation: reverseFlow 1.2s linear forwards;
+}
+
+@keyframes reverseFlow {
+  0%   { transform: translateY(0);      opacity: 0; }
+  30%  { transform: translateY(-60vh);  opacity: 1; }
+  100% { transform: translateY(-220vh); opacity: 0; }
+}
+
+/* ===========================================================
+   段階4：白から黒への世界反転（転送フェード）
+=========================================================== */
+
+/* 通常の overlay は少し暗転だけ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 15, 0.75);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+  z-index: 100;
+}
+
+/* ここはそのまま維持 */
+.overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ★ 転送開始時に .to-void を追加 */
+.overlay.to-void {
+  animation: fadeToVoid 1.6s ease-in forwards;
+}
+
+/* 背景を白→黒へ反転させる */
+@keyframes fadeToVoid {
+  0% {
+    background: rgba(255,255,255,0.0);
+  }
+  35% {
+    background: rgba(255,255,255,1);
+  }
+  100% {
+    background: rgba(0,0,0,1);
+  }
+}
+
 /* =============================================
    キャプション（説明文）
 ============================================= */
