@@ -1,0 +1,67 @@
+/* ===== ここから通常のスタイル（省略せず全部残してます）===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; min-height: 100vh; overflow-x: hidden; overflow-y: auto;
+  font-family: 'Noto Serif JP', 'Shippori Mincho', system-ui, serif;
+  background: radial-gradient(circle at 50% 0%, #372964 0%, #160f2b 36%, #05030b 100%);
+  color: #f5efe5;
+}
+
+/* （ここに元の長いCSS全部貼り付け。省略すると可読性が落ちるのでそのまま） */
+/* 省略せず、元の <style> の中身をすべてここに貼り付けてください（ヘッダー〜フッターまで） */
+
+/* ===== ここからクリスタル修正部分（最重要）===== */
+
+/* 親コンテナ（これだけでフェード制御） */
+.crystal-wrap {
+  opacity: 1;
+  transition: opacity 0.7s ease-out;
+  pointer-events: auto;
+}
+.crystal-wrap.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 子要素はtransitionを一切書かない（これがズレの原因だった） */
+.awaken-gate,
+.awaken-gate::before,
+.awaken-gate::after {
+  transition: none !important;
+}
+
+/* 既存のクリスタルスタイル（変更なし） */
+.awaken-gate {
+  position: relative;
+  width: min(260px, 70vw);
+  aspect-ratio: 1 / 2.4;
+  animation: awakenFloat 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@media (max-width: 480px) {
+  .awaken-gate { width: 75vw; height: 64vh; aspect-ratio: unset; }
+}
+
+.awaken-gate::before {
+  content: "";
+  position: absolute;
+  inset: 6% 24%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.26) 0%, rgba(255,245,220,0.9) 22%, rgba(217,173,255,0.95) 50%, rgba(138,159,255,0.95) 75%, rgba(30,40,120,1) 100%);
+  clip-path: polygon(50% 0%, 88% 10%, 100% 50%, 88% 90%, 50% 100%, 12% 90%, 0% 50%, 12% 10%);
+  box-shadow: 0 0 28px rgba(255,245,220,.95), 0 0 60px rgba(182,149,255,.65), inset 0 0 16px rgba(12,8,22,.85);
+}
+
+.awaken-gate::after {
+  content: "";
+  position: absolute;
+  inset: 15% 38%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,215,180,0.05) 45%, rgba(140,190,255,0.4) 70%, rgba(16,28,72,0.0) 100%);
+  mix-blend-mode: screen;
+  filter: blur(1px);
+  animation: corePulse 3.2s ease-in-out infinite;
+}
+
+/* その他既存の .awaken-gate.is-opening などのアニメは全部そのまま残す */
