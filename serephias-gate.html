@@ -68,42 +68,43 @@
   </div>
 
   <!-- ★ 覚醒オーバーレイ（ゲート儀式レイヤー） -->
-  <div class="awakening-overlay" id="awakeningOverlay">
-    <!-- 星の薄い背景フィルム -->
-    <div class="awaken-bg-glow"></div>
+<div class="awakening-overlay" id="awakeningOverlay">
+  <!-- 星の薄い背景フィルム -->
+  <div class="awaken-bg-glow"></div>
 
-    <!-- 星粒子レイヤー -->
-    <div class="awaken-particles" id="awakenParticles"></div>
+  <!-- 星粒子レイヤー -->
+  <div class="awaken-particles" id="awakenParticles"></div>
 
-    <!-- ゲート本体 -->
-    <div class="awakening-gate-shell">
-
-      <div class="light-column" id="lightColumn">
-  <div class="reverse-stars"></div>
-</div>
-      <!-- セレフィアス紋章（PNG透過のせる場所） -->
-      <div class="serephias-seal" id="serephiasSeal"></div>
-      <div id="serephiasSeal" class="serephias-seal"></div>
-      <div class="reverse-stars"></div>
-
-      <!-- 覚醒クリスタル -->
-      <button class="awaken-gate" id="awakeningGateButton">
-        <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
-        <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
-        <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
-      </button>
-
-      <p class="awaken-caption">
-        このゲートに触れると、星環へと転送されます。
-      </p>
-    </div>
+  <!-- 光柱（逆流星用） -->
+  <div class="light-column" id="lightColumn">
+    <div class="reverse-stars"></div>
   </div>
 
-  <!-- BGM（好きな音源に差し替えてOK） -->
-  <audio id="gateBgm" preload="auto">
-    <source src="gate-bgm.mp3" type="audio/mpeg" />
-  </audio>
+  <!-- ゲート本体 -->
+  <div class="awakening-gate-shell">
 
-  <script src="serephias-gate.js"></script>
+    <!-- セレフィアス紋章（1つだけ！） -->
+    <div class="serephias-seal" id="serephiasSeal"></div>
+    <!-- ↑ 重複してたもう1つは削除 -->
+
+    <!-- 覚醒クリスタル（ここが超重要！クラスがあること） -->
+    <button class="awaken-gate" id="awakeningGateButton">
+      <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
+      <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
+      <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
+    </button>
+
+    <p class="awaken-caption">
+      このゲートに触れると、星環へと転送されます。
+    </p>
+  </div>
+</div>
+
+<!-- BGM -->
+<audio id="gateBgm" preload="auto" loop>
+  <source src="gate-bgm.mp3" type="audio/mpeg" />
+</audio>
+
+<script src="serephias-gate.js"></script>
 </body>
 </html>
