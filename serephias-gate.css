@@ -887,3 +887,43 @@ body:not(.gate-active) {
     font-size: .82rem;
   }
 }
+
+
+/* 神化トリガー時：一度だけ強くパルス */
+.serephias-seal.is-awakening {
+  animation:
+    sealPulse 1.4s ease-out forwards,
+    sealIdle 10s ease-in-out infinite 1.4s;
+}
+
+@keyframes sealPulse {
+  0% {
+    transform: scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.1) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+/* セレフィアス紋章（PNG透過画像） */
+
+.serephias-seal {
+  position: absolute;
+  width: min(220px, 60vw);
+  aspect-ratio: 1 / 1;
+  background:
+    url("assets/serephias-emblem.png") center/contain no-repeat;
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 12px rgba(255,240,220,0.95))
+    drop-shadow(0 0 40px rgba(170,140,255,0.9));
+  transform: scale(0.86);
+  pointer-events: none;
+  z-index: 1;
+}
