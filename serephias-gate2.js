@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'やがてあなたの未来を塗り替える序章となるだろう。'
   ].join('\n');
 
+  // オーバーレイ用は「確実に出す」ことを優先してタイプライター無しにする
   const overlayPoemText = [
     '星に触れし心よ――',
     'その痛みは、光の欠片。',
@@ -120,28 +121,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
       fadeInBgm();
 
+      // ページ内の詩はこれまで通りタイプライター
       if (poemBox) poemBox.classList.add('is-open');
       await typeText(pagePoemText, poemBody, 42);
 
       // ページ詩の後、オーバーレイ演出へ
-      setTimeout(async () => {
+      setTimeout(() => {
+        if (!overlay) return;
+
         overlay.classList.add('active');
         body.classList.add('gate-active');
 
-        // オーバーレイ詩
-        overlayPoem.classList.add('is-visible');
-        await typeText(overlayPoemText, overlayPoem, 46);
+        // ★ オーバーレイの詩は「一気に出す」
+        if (overlayPoem) {
+          overlayPoem.textContent = overlayPoemText;
+          overlayPoem.classList.add('is-visible');
+        }
 
         // 星環メッセージ
         setTimeout(() => {
-          overlayMessage.classList.add('is-visible');
-        }, 500);
+          if (overlayMessage) {
+            overlayMessage.classList.add('is-visible');
+          }
+        }, 400);
 
         // クリスタル＋共鳴ボタン表示
         setTimeout(() => {
-          gateVisual.classList.add('is-visible');
-        }, 1400);
-
+          if (gateVisual) {
+            gateVisual.classList.add('is-visible');
+          }
+        }, 1000);
       }, 800);
     });
   }
@@ -177,7 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (lightColumn) {
         lightColumn.classList.add('phase-flow');
       }
-      overlay.classList.add('is-flash');
+      if (overlay) {
+        overlay.classList.add('is-flash');
+      }
 
       // ★ 中央の光＋四角パネルを「親コンテナごと」フェードアウト
       if (crystalWrap) {
@@ -187,7 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 少し遅らせて暗転
       setTimeout(() => {
-        overlay.classList.add('to-void');
+        if (overlay) {
+          overlay.classList.add('to-void');
+        }
       }, 700);
 
       // 最後に星環ページへ
