@@ -1,4 +1,4 @@
-<script>
+
 document.addEventListener('DOMContentLoaded', () => {
   const body            = document.body;
   const prayBtn         = document.getElementById('gatePrayButton');
@@ -196,4 +196,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-</script>
