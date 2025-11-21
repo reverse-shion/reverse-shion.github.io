@@ -23,75 +23,61 @@ document.addEventListener('DOMContentLoaded', () => {
   // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
 
-  // ===============================
-  // 0. イントロ動画制御
-  // ===============================
-  function skipIntro() {
-    if (!introOverlay) return;
+// ===============================
+// 0. イントロ動画制御（自動再生時はテキスト非表示）
+// ===============================
+function skipIntro() {
+  if (!introOverlay) return;
+  introOverlay.classList.add('is-fadeout');
+  setTimeout(() => {
+    introOverlay?.remove();
+  }, 600);
+}
 
-    // 透明化＋クリック無効化
-    introOverlay.style.pointerEvents = 'none';
-    introOverlay.classList.add('is-fadeout');
+function tryAutoPlay() {
+  if (!introVideo || !introOverlay) return;
 
-    if (introVideo) {
-      introVideo.pause();
-    }
+  const p = introVideo.play();
 
-    // DOMから確実に削除
-    setTimeout(() => {
-      if (introOverlay && introOverlay.parentNode) {
-        introOverlay.parentNode.removeChild(introOverlay);
-      }
-    }, 700);
-  }
+  if (p && typeof p.then === 'function') {
+    p
+      .then(() => {
+        // ★ 自動再生に成功 → テキストは要らないので非表示モード
+        introOverlay.classList.add('auto-playing');
 
-  function tryAutoPlay() {
-    if (!introOverlay || !introVideo) return;
-
-    const p = introVideo.play();
-
-    if (p && typeof p.then === 'function') {
-      // 自動再生成功
-      p.then(() => {
+        // 動画が終わったらオーバーレイを閉じる
         introVideo.addEventListener('ended', skipIntro);
 
-        // 念のため最大15秒で強制終了
+        // 念のため 15 秒で強制終了
         setTimeout(() => {
           if (!introOverlay.classList.contains('is-fadeout')) {
             skipIntro();
           }
         }, 15000);
-      }).catch(() => {
-        // 自動再生ブロック → タップで開始
+      })
+      .catch(() => {
+        // ★ 自動再生ブロックされた場合 → テキスト表示したまま、タップで開始
         introOverlay.classList.add('needs-tap');
+
         introOverlay.addEventListener('click', () => {
           introOverlay.classList.remove('needs-tap');
 
-          const p2 = introVideo.play();
-          if (p2 && typeof p2.then === 'function') {
-            p2.then(() => {
-              introVideo.addEventListener('ended', skipIntro);
-            }).catch(() => {
-              skipIntro();
-            });
-          } else {
-            // 古い環境用
+          introVideo.play().then(() => {
             introVideo.addEventListener('ended', skipIntro);
-          }
+          });
 
-          // 最悪15秒で閉じる
+          // 最悪 15 秒で閉じる
           setTimeout(skipIntro, 15000);
-        }, { once: true });
+        });
       });
-    } else {
-      // Promise非対応ブラウザ
-      introVideo.addEventListener('ended', skipIntro);
-      setTimeout(skipIntro, 15000);
-    }
+  } else {
+    // 古いブラウザ用
+    introVideo.addEventListener('ended', skipIntro);
+    setTimeout(skipIntro, 15000);
   }
+}
 
-  // イントロ動画開始
-  tryAutoPlay();
+tryAutoPlay();
 
   // =========================
   // 1. 星粒子を生成（ココが消えてた!!）
