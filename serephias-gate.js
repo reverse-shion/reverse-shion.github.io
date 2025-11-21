@@ -258,3 +258,4 @@ if (gateBtn && overlay) {
     }, 550);
   });
 }
+});
