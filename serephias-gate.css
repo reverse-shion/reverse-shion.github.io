@@ -454,3 +454,113 @@ div.bg-black.bg-opacity-80 {
   border-radius: 8px;
   backdrop-filter: blur(4px);
 }
+
+
+/* ===========================
+   イントロ動画オーバーレイのテキスト
+=========================== */
+
+.gate-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.14), rgba(0,0,0,0.92));
+  overflow: hidden;
+}
+
+.gate-intro-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.72) contrast(1.1) saturate(1.05);
+}
+
+/* セリフ本体コンテナ */
+.gate-intro-message {
+  position: relative;
+  z-index: 2;
+  max-width: min(90%, 720px);
+  text-align: center;
+  padding: 24px 20px;
+}
+
+/* メインの神聖テキスト */
+.gate-intro-main {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(1.1rem, 1.6vw + 0.9rem, 1.6rem);
+  line-height: 1.9;
+  letter-spacing: 0.12em;
+  color: #fdf8f0;
+  text-shadow:
+    0 0 6px rgba(255, 248, 220, 0.8),
+    0 0 18px rgba(210, 180, 255, 0.9),
+    0 0 32px rgba(160, 140, 255, 0.75);
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.7));
+  animation: introTextPulse 6s ease-in-out infinite;
+}
+
+/* 補足：タップ誘導 */
+.gate-intro-sub {
+  margin-top: 1.8rem;
+  font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: none;
+  color: rgba(248, 242, 232, 0.9);
+  text-shadow:
+    0 0 5px rgba(255, 240, 210, 0.75),
+    0 0 12px rgba(190, 170, 255, 0.7);
+  position: relative;
+}
+
+/* サブテキストの下に細い光のライン */
+.gate-intro-sub::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.9rem;
+  transform: translateX(-50%);
+  width: 42%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 240, 210, 0.9),
+    transparent
+  );
+  box-shadow:
+    0 0 8px rgba(255, 240, 210, 0.8),
+    0 0 16px rgba(195, 170, 255, 0.9);
+}
+
+/* ゆるやかな鼓動のような発光アニメーション */
+@keyframes introTextPulse {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1.0);
+  }
+  60% {
+    opacity: 0.96;
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 0.85;
+    transform: translateY(0) scale(1.0);
+  }
+}
+
+/* フェードアウト用（JSで .is-fadeout が付与される想定） */
+.gate-intro.is-fadeout {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
