@@ -23,64 +23,45 @@ document.addEventListener('DOMContentLoaded', () => {
   // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
 
-// ===============================
-// 0. イントロ動画制御（自動再生時はテキスト非表示）
-// ===============================
-function skipIntro() {
-  if (!introOverlay) return;
-  introOverlay.classList.add('is-fadeout');
-  setTimeout(() => {
-    introOverlay?.remove();
-  }, 600);
-}
+  // ===============================
+  // 0. イントロ動画制御（超シンプル版）
+  // ===============================
+  if (introOverlay && introVideo) {
+    const skipIntro = () => {
+      // 連打防止
+      if (introOverlay.classList.contains('is-fadeout')) return;
 
-function tryAutoPlay() {
-  if (!introVideo || !introOverlay) return;
+      introOverlay.classList.add('is-fadeout');
+      setTimeout(() => {
+        try {
+          introVideo.pause();
+        } catch (e) {}
+        introOverlay.remove();
+      }, 500);
+    };
 
-  const p = introVideo.play();
+    // どこをタップしてもイントロをスキップできる
+    introOverlay.addEventListener('click', skipIntro);
 
-  if (p && typeof p.then === 'function') {
-    p
-      .then(() => {
-        // ★ 自動再生に成功 → テキストは要らないので非表示モード
-        introOverlay.classList.add('auto-playing');
-
-        // 動画が終わったらオーバーレイを閉じる
+    // 自動再生を試みる（失敗してもエラーで止まらないように）
+    const p = introVideo.play();
+    if (p && typeof p.then === 'function') {
+      p.then(() => {
+        // 再生できた → 再生終了か一定時間でスキップ
         introVideo.addEventListener('ended', skipIntro);
-
-        // 念のため 15 秒で強制終了
-        setTimeout(() => {
-          if (!introOverlay.classList.contains('is-fadeout')) {
-            skipIntro();
-          }
-        }, 15000);
-      })
-      .catch(() => {
-        // ★ 自動再生ブロックされた場合 → テキスト表示したまま、タップで開始
-        introOverlay.classList.add('needs-tap');
-
-        introOverlay.addEventListener('click', () => {
-          introOverlay.classList.remove('needs-tap');
-
-          introVideo.play().then(() => {
-            introVideo.addEventListener('ended', skipIntro);
-          });
-
-          // 最悪 15 秒で閉じる
-          setTimeout(skipIntro, 15000);
-        });
+        setTimeout(skipIntro, 15000); // 念のためタイムアウト
+      }).catch(() => {
+        // 自動再生ブロック → ユーザーがタップしたときに skipIntro が動く
       });
-  } else {
-    // 古いブラウザ用
-    introVideo.addEventListener('ended', skipIntro);
-    setTimeout(skipIntro, 15000);
+    } else {
+      // 古いブラウザなど
+      introVideo.addEventListener('ended', skipIntro);
+      setTimeout(skipIntro, 15000);
+    }
   }
-}
-
-tryAutoPlay();
 
   // =========================
-  // 1. 星粒子を生成（ココが消えてた!!）
+  // 1. 星粒子を生成
   // =========================
   if (particlesLayer) {
     const STAR_COUNT = 40;
