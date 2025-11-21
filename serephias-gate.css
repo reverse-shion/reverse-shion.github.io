@@ -797,3 +797,26 @@ div.bg-black.bg-opacity-80 {
       0 0 24px rgba(210,190,255,0.95);
   }
 }
+/* ===============================
+   イントロ動画フィルター完全オフ
+================================ */
+#gateIntro,
+#gateIntroVideo {
+  background: transparent !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+#gateIntro::before,
+#gateIntroVideo::before,
+#gateIntro::after {
+  content: none !important;
+  background: transparent !important;
+}
+
+/* Safariの色濃くなるバグ回避 */
+#gateIntroVideo {
+  opacity: 1 !important;
+  display: block;
+}
