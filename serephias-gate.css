@@ -791,3 +791,169 @@ div.bg-black.bg-opacity-80 {
   opacity: 1 !important;
   display: block;
 }
+
+/* =====================================
+   SEREPHIAS 前室（小神殿）レイアウト
+   タイトル〜祈りボタンのブロックに適用
+===================================== */
+.gate-hero {
+  position: relative;
+  z-index: 1;
+  padding: 96px 20px 80px;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  overflow: hidden;
+}
+
+/* 奥にぼんやり浮かぶ「聖堂の壁」 */
+.gate-hero::before {
+  content: "";
+  position: absolute;
+  inset: -10% 8%;
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(250, 245, 255, 0.22),
+      rgba(120, 90, 200, 0.15),
+      transparent 70%),
+    radial-gradient(circle at 50% 120%,
+      rgba(40, 20, 80, 0.9),
+      rgba(5, 3, 12, 1));
+  opacity: 0.9;
+  filter: blur(0.5px);
+  z-index: -3;
+}
+
+/* 足元の光輪＝祭壇／床 */
+.gate-hero::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(620px, 90vw);
+  height: 220px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 40%,
+      rgba(255, 240, 210, 0.75),
+      rgba(210, 180, 255, 0.35),
+      rgba(0, 0, 0, 0));
+  filter: blur(6px);
+  opacity: 0.9;
+  z-index: -2;
+}
+
+/* タイトル・本文を“前室中央”に集約 */
+.gate-hero h1,
+.gate-hero h2,
+.gate-hero p {
+  position: relative;
+  z-index: 1;
+}
+
+/* タイトルの後ろにうっすら円形の魔方陣 */
+.gate-hero h1 {
+  position: relative;
+}
+
+.gate-hero h1::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 260px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 240, 220, 0.18);
+  box-shadow:
+    0 0 18px rgba(210, 190, 255, 0.55),
+    inset 0 0 30px rgba(70, 40, 120, 0.7);
+  opacity: 0.55;
+  z-index: -1;
+}
+
+/* 魔方陣の内側に薄いリングを追加して情報量アップ */
+.gate-hero h1::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 180px;
+  height: 180px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 240, 220, 0.2);
+  box-shadow:
+    0 0 12px rgba(210, 190, 255, 0.5);
+  opacity: 0.6;
+  z-index: -1;
+}
+
+/* 祈りボタン＝“小さな祭壇” */
+.gate-hero #gatePrayButton {
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 0 18px rgba(255, 220, 160, 0.85),
+    0 0 42px rgba(210, 180, 255, 0.9);
+}
+
+/* ボタンの下に、専用の小さな光輪を追加 */
+.gate-hero #gatePrayButton::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 28px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 20%,
+    rgba(255, 245, 220, 0.9),
+    rgba(255, 225, 180, 0.2),
+    transparent 80%);
+  opacity: 0.9;
+  filter: blur(4px);
+  z-index: -1;
+}
+
+/* 上方に「上から差し込む光の柱」っぽい縦グラ */
+.gate-hero .gate-top-glow {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 55%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.32),
+    rgba(200, 180, 255, 0.16),
+    transparent
+  );
+  filter: blur(2px);
+  opacity: 0.8;
+  z-index: -4;
+}
+
+/* スマホで少しだけ圧縮して見やすく */
+@media (max-width: 600px) {
+  .gate-hero {
+    padding-top: 80px;
+    padding-bottom: 72px;
+  }
+  .gate-hero h1::before {
+    width: 220px;
+    height: 220px;
+  }
+  .gate-hero h1::after {
+    width: 150px;
+    height: 150px;
+  }
+}
