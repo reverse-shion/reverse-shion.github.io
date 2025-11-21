@@ -269,46 +269,55 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 
 /* ===========================
-   ★ 超高速プチュン暗転（即・闇）
+   覚醒オーバーレイ + 超高速プチュン
+   ※ クリスタル以外を全部隠す → 最後は完全ブラックアウト
 =========================== */
 .awakening-overlay {
   position: fixed;
   inset: 0;
+  z-index: 999;  /* ページの一番手前 */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  z-index: 40;
+
+  /* ★ ゲート出現時の背景（ページを完全に覆う） */
+  background:
+    radial-gradient(circle at 50% 10%, rgba(145,120,255,0.42), transparent 70%),
+    radial-gradient(circle at 30% 80%, rgba(255,200,255,0.25), transparent 65%),
+    linear-gradient(180deg, #2d2053 0%, #0e0a1c 100%);
+  backdrop-filter: blur(12px);
+
   pointer-events: none;
   opacity: 0;
-  background: transparent;
   transition: opacity 0.2s linear;
 }
 
-/* 表示可能状態（詩が終わった後など） */
+/* 表示可能状態（祈り→詩のあと） */
 .awakening-overlay.active {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* シャッター (白→線→黒) */
+/* ===== プチュン用シャッター ===== */
 .awakening-overlay::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: #ffffff;
+  background: #ffffff;       /* 最初は白で覆う */
   opacity: 0;
   transform-origin: center;
   transform: scaleY(1);
   pointer-events: none;
 }
 
-/* ★ 超高速プチュン */
+/* クリスタルタップ → プチュン開始 */
 .awakening-overlay.is-flash::before {
   opacity: 1;
-  animation: pluchunUltra 0.33s cubic-bezier(0.3, 0, 0.7, 1) forwards;
+  animation: pluchunUltra 0.32s cubic-bezier(0.3, 0, 0.7, 1) forwards;
 }
 
+/* ★ 超高速プチュン → 完全ブラックアウト */
 @keyframes pluchunUltra {
   0% {
     background: #ffffff;
@@ -316,37 +325,42 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   }
   25% {
     background: #ffffff;
-    transform: scaleY(0.12); /* 早期収束 */
+    transform: scaleY(0.12);
   }
   45% {
     background: #ffffff;
-    transform: scaleY(0.02); /* 一瞬のプチュン線 */
+    transform: scaleY(0.02);  /* 白い細線 */
   }
-  60% {
+  46% {
     background: #000000;
-    transform: scaleY(0.02);
+    transform: scaleY(0.02);  /* 黒い細線に反転 */
   }
   100% {
     background: #000000;
-    transform: scaleY(1); /* 闇 */
+    transform: scaleY(1);     /* 画面全体が真っ黒 */
   }
 }
 
-/* ★ 中身を即座に消す */
+/* ===== プチュン後：内部要素を消して完全な闇へ ===== */
+.awakening-overlay.to-void {
+  background: #000000 !important;  /* グラデを全消しして真っ黒に強制 */
+  opacity: 1 !important;
+  transition: background 0.01s linear, opacity 0.01s linear;
+}
+
+/* クリスタルや粒子など、中身を全て消す */
 .awakening-overlay.to-void .awakening-gate-shell,
 .awakening-overlay.to-void .light-column,
 .awakening-overlay.to-void .awaken-bg-glow,
 .awakening-overlay.to-void .awaken-particles {
-  opacity: 0;
-  transition: opacity 0.2s linear;
+  opacity: 0 !important;
 }
 
-/* ほんの僅かだけ拡大（世界がズレる感じ） */
+/* ほんの少しだけ拡大して“世界がズレた”感じ */
 .awakening-overlay.to-void .awakening-gate-shell {
   transform: scale(1.03);
   transition: transform 0.2s linear;
 }
-
 /* ===========================
    8. 演出用バー非表示（改良版）
 =========================== */
