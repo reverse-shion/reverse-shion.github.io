@@ -691,3 +691,109 @@ div.bg-black.bg-opacity-80 {
   pointer-events: none;
   transition: opacity 0.6s ease;
 }
+
+/* =========================================
+   浮遊クリスタル・背景レイヤー
+========================================= */
+.floating-crystal-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0; /* gate-inner より奥に */
+}
+
+/* クリスタル本体 */
+.tiny-crystal {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  width: var(--w, 16px);
+  height: var(--h, 40px);
+  transform-origin: center;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.98),
+      rgba(210,200,255,0.85),
+      rgba(120,140,255,0.85)
+    );
+  border-radius: 999px;
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.9),
+    0 0 18px rgba(186,167,255,0.9);
+  opacity: 0;
+  filter: blur(0.1px);
+  animation:
+    crystalFloat 18s linear infinite,
+    crystalGlow 6s ease-in-out infinite;
+}
+
+/* 大中小のサイズバリエーション */
+.tiny-crystal.sz-s {
+  --w: 10px;
+  --h: 24px;
+  opacity: 0.5;
+}
+
+.tiny-crystal.sz-m {
+  --w: 14px;
+  --h: 32px;
+  opacity: 0.75;
+}
+
+.tiny-crystal.sz-l {
+  --w: 18px;
+  --h: 44px;
+  opacity: 0.95;
+}
+
+/* 徐々に消えるとき */
+.tiny-crystal.is-fadeout {
+  transition: opacity 2.8s ease, transform 2.8s ease;
+  opacity: 0;
+  transform: translate3d(0, -10px, 0) scale(0.85) rotate3d(0,1,0,35deg);
+}
+
+/* 上下揺れ＋横スイング＋Y軸回転（「その場でゆっくり回る」イメージ） */
+@keyframes crystalFloat {
+  0% {
+    transform:
+      translate3d(0, 10px, 0)
+      rotate3d(0, 1, 0, 0deg);
+  }
+  25% {
+    transform:
+      translate3d(6px, 0, 0)
+      rotate3d(0, 1, 0, 40deg);
+  }
+  50% {
+    transform:
+      translate3d(0, -10px, 0)
+      rotate3d(0, 1, 0, 80deg);
+  }
+  75% {
+    transform:
+      translate3d(-6px, 0, 0)
+      rotate3d(0, 1, 0, 120deg);
+  }
+  100% {
+    transform:
+      translate3d(0, 10px, 0)
+      rotate3d(0, 1, 0, 160deg);
+  }
+}
+
+/* 明滅する輝き */
+@keyframes crystalGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 4px rgba(255,255,255,0.7),
+      0 0 12px rgba(186,167,255,0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 10px rgba(255,255,255,1),
+      0 0 24px rgba(210,190,255,0.95);
+  }
+}
