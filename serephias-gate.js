@@ -23,61 +23,56 @@ document.addEventListener('DOMContentLoaded', () => {
   // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
 
-  // =========================
-  // 0. イントロ動画制御
-  // =========================
-  function skipIntro() {
-    if (!introOverlay) return;
-    // フェードアウト演出
-    introOverlay.classList.add('is-fadeout');
-    setTimeout(() => {
-      if (introOverlay && introOverlay.parentNode) {
-        introOverlay.parentNode.removeChild(introOverlay);
-      }
-    }, 700);
-  }
+// ===============================
+// 0. イントロ動画制御（完全安定版）
+// ===============================
+function skipIntro() {
+  if (!introOverlay) return;
+  introOverlay.classList.add('is-fadeout');
+  setTimeout(() => {
+    introOverlay?.remove();
+  }, 600);
+}
 
-  if (introOverlay && introVideo) {
-    // クリックでスキップも可能
-    introOverlay.addEventListener('click', skipIntro);
+// ▼ 自動再生を試す（成功ならそのまま再生）
+function tryAutoPlay() {
+  const p = introVideo.play();
 
-    // 自動再生トライ
-    const p = introVideo.play();
-    if (p && typeof p.then === 'function') {
-      p.then(() => {
-        // 再生できた場合：終了でフェードアウト
+  if (p && typeof p.then === 'function') {
+    p
+      .then(() => {
+        // 再生成功 → 終わったら閉じる
         introVideo.addEventListener('ended', skipIntro);
 
-        // 念のため安全タイマー（動画が終わらなくても最大15秒で閉じる）
+        // 念のため最大15秒で強制終了
         setTimeout(() => {
-          if (introOverlay && !introOverlay.classList.contains('is-fadeout')) {
+          if (!introOverlay.classList.contains('is-fadeout')) {
             skipIntro();
           }
         }, 15000);
-      }).catch(() => {
-        // 自動再生ブロック時 → すぐ本編へ
-        skipIntro();
+      })
+      .catch(() => {
+        // 自動再生ブロック → タップで開始
+        introOverlay.classList.add('needs-tap');
+        introOverlay.addEventListener('click', () => {
+          introOverlay.classList.remove('needs-tap');
+
+          introVideo.play().then(() => {
+            introVideo.addEventListener('ended', skipIntro);
+          });
+
+          // 最悪15秒で閉じる
+          setTimeout(skipIntro, 15000);
+        });
       });
-    } else {
-      // 古いブラウザなど → 終了時だけ監視
-      introVideo.addEventListener('ended', skipIntro);
-      setTimeout(skipIntro, 15000);
-    }
+  } else {
+    // 古いブラウザ用
+    introVideo.addEventListener('ended', skipIntro);
+    setTimeout(skipIntro, 15000);
   }
+}
 
-  // =========================
-  // 1. 星粒子を生成
-  // =========================
-  if (particlesLayer) {
-    const STAR_COUNT = 40;
-    for (let i = 0; i < STAR_COUNT; i++) {
-      const s = document.createElement('span');
-      s.className = 'awaken-particle';
-      s.style.setProperty('--i', i);
-      particlesLayer.appendChild(s);
-    }
-  }
-
+tryAutoPlay();
   // =========================
   // 2. セレフィアスの詩
   // =========================
