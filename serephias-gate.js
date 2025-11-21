@@ -16,32 +16,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const bgm            = document.getElementById('gateBgm');
 
-  // ▼ 新しく追加：イントロ動画関連
+  // イントロ動画
   const introOverlay   = document.getElementById('gateIntro');
   const introVideo     = document.getElementById('gateIntroVideo');
 
   // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
 
-// ===============================
-// 0. イントロ動画制御（完全安定版）
-// ===============================
-function skipIntro() {
-  if (!introOverlay) return;
-  introOverlay.classList.add('is-fadeout');
-  setTimeout(() => {
-    introOverlay?.remove();
-  }, 600);
-}
+  // ===============================
+  // 0. イントロ動画制御
+  // ===============================
+  function skipIntro() {
+    if (!introOverlay) return;
 
-// ▼ 自動再生を試す（成功ならそのまま再生）
-function tryAutoPlay() {
-  const p = introVideo.play();
+    // 透明化＋クリック無効化
+    introOverlay.style.pointerEvents = 'none';
+    introOverlay.classList.add('is-fadeout');
 
-  if (p && typeof p.then === 'function') {
-    p
-      .then(() => {
-        // 再生成功 → 終わったら閉じる
+    if (introVideo) {
+      introVideo.pause();
+    }
+
+    // DOMから確実に削除
+    setTimeout(() => {
+      if (introOverlay && introOverlay.parentNode) {
+        introOverlay.parentNode.removeChild(introOverlay);
+      }
+    }, 700);
+  }
+
+  function tryAutoPlay() {
+    if (!introOverlay || !introVideo) return;
+
+    const p = introVideo.play();
+
+    if (p && typeof p.then === 'function') {
+      // 自動再生成功
+      p.then(() => {
         introVideo.addEventListener('ended', skipIntro);
 
         // 念のため最大15秒で強制終了
@@ -50,29 +61,51 @@ function tryAutoPlay() {
             skipIntro();
           }
         }, 15000);
-      })
-      .catch(() => {
+      }).catch(() => {
         // 自動再生ブロック → タップで開始
         introOverlay.classList.add('needs-tap');
         introOverlay.addEventListener('click', () => {
           introOverlay.classList.remove('needs-tap');
 
-          introVideo.play().then(() => {
+          const p2 = introVideo.play();
+          if (p2 && typeof p2.then === 'function') {
+            p2.then(() => {
+              introVideo.addEventListener('ended', skipIntro);
+            }).catch(() => {
+              skipIntro();
+            });
+          } else {
+            // 古い環境用
             introVideo.addEventListener('ended', skipIntro);
-          });
+          }
 
           // 最悪15秒で閉じる
           setTimeout(skipIntro, 15000);
-        });
+        }, { once: true });
       });
-  } else {
-    // 古いブラウザ用
-    introVideo.addEventListener('ended', skipIntro);
-    setTimeout(skipIntro, 15000);
+    } else {
+      // Promise非対応ブラウザ
+      introVideo.addEventListener('ended', skipIntro);
+      setTimeout(skipIntro, 15000);
+    }
   }
-}
 
-tryAutoPlay();
+  // イントロ動画開始
+  tryAutoPlay();
+
+  // =========================
+  // 1. 星粒子を生成（ココが消えてた!!）
+  // =========================
+  if (particlesLayer) {
+    const STAR_COUNT = 40;
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const s = document.createElement('span');
+      s.className = 'awaken-particle';
+      s.style.setProperty('--i', i);
+      particlesLayer.appendChild(s);
+    }
+  }
+
   // =========================
   // 2. セレフィアスの詩
   // =========================
@@ -120,7 +153,9 @@ tryAutoPlay();
 
     const playPromise = bgm.play();
     if (playPromise && typeof playPromise.then === 'function') {
-      playPromise.catch(() => { /* 自動再生ブロック時は無視（ユーザー操作なので基本OK） */ });
+      playPromise.catch(() => {
+        // 自動再生ブロック時は無視（ユーザー操作なので基本OK）
+      });
     }
 
     let v = 0;
@@ -174,16 +209,14 @@ tryAutoPlay();
       if (gateOpened) return;
       gateOpened = true;
 
-      // ★ ここで必ずBGMを停止（次のページへ行く前に強制ストップ）
+      // 次のページへ行く前に必ずBGM停止
       if (bgm) {
         bgm.pause();
         bgm.currentTime = 0;
       }
 
       // クリスタルの覚醒
-      gateBtn.classList.add('is-opening');
-      gateBtn.classList.add('phase-aura');
-      gateBtn.classList.add('phase-seal');
+      gateBtn.classList.add('is-opening', 'phase-aura', 'phase-seal');
 
       // 光柱の逆流ビーム
       if (lightColumn) {
