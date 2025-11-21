@@ -222,78 +222,10 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 
 /* ===========================
-   6. 光の柱と逆流星（Reverse Flow）
-=========================== */
-/* 光柱コンテナ */
-.light-column {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* 中央の細いレーン */
-.light-column .reverse-stars {
-  position: relative;
-  top: -20vh;
-  width: 4px;
-  height: 140vh;
-  overflow: hidden;
-}
-
-/* レーンの中を上に走る光 */
-.light-column .reverse-stars::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 100vh;
-  width: 100%;
-  height: 300vh;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.9),
-    rgba(255,255,255,0.0) 16px
-  );
-  filter: blur(1px);
-  opacity: 0;
-}
-
-/* JSで .phase-flow が付くと逆流アニメ起動 */
-.light-column.phase-flow .reverse-stars::before {
-  animation: reverseFlow 1.2s linear forwards;
-}
-
-@keyframes reverseFlow {
-  0%   { transform: translateY(0);      opacity: 0; }
-  30%  { transform: translateY(-60vh);  opacity: 1; }
-  100% { transform: translateY(-220vh); opacity: 0; }
-}
-
-/* ===========================
    7. クリスタルゲート & 神気演出
 =========================== */
-.awakening-gate-shell {
-  position: relative; z-index: 5;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 24px 20px; text-align: center; min-height: 80vh;
-}
 
-/* 【追加】暗転(.to-void)時に中身ごとフェードアウトさせる */
-.awakening-overlay.to-void .awakening-gate-shell {
-  opacity: 0;
-  transform: scale(1.05);
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
 
-/* ハロー */
-.awakening-gate-shell::before {
-  content: ""; position: absolute; bottom: -30px;
-  width: 320px; max-width: 70vw; height: 80px; border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, rgba(255, 245, 230, 0.85) 0%, rgba(255, 235, 200, 0.25) 40%, transparent 75%);
-  filter: blur(4px); opacity: 0.9; pointer-events: none; z-index: 0;
-}
 
 /* クリスタル本体 */
 .awaken-gate {
@@ -341,60 +273,90 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 14px rgba(0,0,0,0.8); z-index: 10;
 }
 
-/* --- タップ後：光の柱 (.is-opening) --- */
-.awaken-gate.is-opening {
-  animation: none; transform: scale(1.05);
-  box-shadow: 0 0 36px rgba(255, 245, 220, 1), 0 0 120px rgba(190, 170, 255, 1);
-}
-/* 光の柱 (::afterをコアからビームへ変化させる) */
-.awaken-gate.is-opening::after {
-  inset: -60% 45%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.0) 0%, rgba(255,250,240,1) 12%, rgba(255,230,200,0.95) 35%, rgba(190,210,255,0.95) 70%, rgba(110,150,255,0.0) 100%);
-  box-shadow: 0 0 50px rgba(255,245,230,1), 0 0 140px rgba(180,210,255,0.95);
-  mix-blend-mode: normal; filter: none;
-  animation: beamRise 0.9s ease-out forwards;
-}
-@keyframes beamRise {
-  0%   { opacity: 0; transform: translateY(40px) scaleY(0.2); }
-  60%  { opacity: 1; transform: translateY(-40vh) scaleY(1.4); }
-  100% { opacity: 0.8; transform: translateY(-60vh) scaleY(1.8); }
-}
-
-/* --- ★神気開放：オーラ (.phase-aura) --- */
-.awaken-gate.phase-aura::before {
-  content: ""; position: absolute; inset: -40%;
-  background: radial-gradient(circle, rgba(255,240,255,0.9), rgba(190,160,255,0.45), rgba(120,90,255,0));
-  filter: blur(18px); border-radius: 50%; opacity: 0;
-  clip-path: none; box-shadow: none;
-  animation: gateAura 0.9s ease-out forwards; z-index: -1;
-}
-@keyframes gateAura {
-  0% { opacity: 0; transform: scale(0.7); }
-  60% { opacity: 0.8; transform: scale(1.25); }
-  100% { opacity: 0; transform: scale(1.8); }
-}
-
-/* --- ★神気開放：紋章 (.phase-seal) --- */
-.awaken-gate.phase-seal::after {
-  content: ""; position: absolute; top: 50%; left: 50%;
-  width: 160px; height: 160px;
-  inset: auto; border-radius: 0; background: none; box-shadow: none;
-  transform: translate(-50%, -50%) scale(0.3);
-  background: url("assets/emblem.png") center/contain no-repeat;
-  opacity: 0; pointer-events: none;
-  filter: drop-shadow(0 0 12px rgba(230,210,255,.95));
-  animation: sealsummon 0.9s ease-out forwards;
-}
-@keyframes sealsummon {
-  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
-  70%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
-}
 
 /* キャプション */
 .awaken-caption {
   margin-top: 16px; color: #e8e0d6; text-shadow: 0 0 12px rgba(0,0,0,0.65);
   font-size: .9rem; line-height: 1.8; max-width: 480px;
+}
+
+/* ===========================
+   ★ 超高速プチュン暗転（即・闇）
+=========================== */
+.awakening-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  background: transparent;
+  transition: opacity 0.2s linear;
+}
+
+/* 表示可能状態（詩が終わった後など） */
+.awakening-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* シャッター (白→線→黒) */
+.awakening-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  transform-origin: center;
+  transform: scaleY(1);
+  pointer-events: none;
+}
+
+/* ★ 超高速プチュン */
+.awakening-overlay.is-flash::before {
+  opacity: 1;
+  animation: pluchunUltra 0.33s cubic-bezier(0.3, 0, 0.7, 1) forwards;
+}
+
+@keyframes pluchunUltra {
+  0% {
+    background: #ffffff;
+    transform: scaleY(1);
+  }
+  25% {
+    background: #ffffff;
+    transform: scaleY(0.12); /* 早期収束 */
+  }
+  45% {
+    background: #ffffff;
+    transform: scaleY(0.02); /* 一瞬のプチュン線 */
+  }
+  60% {
+    background: #000000;
+    transform: scaleY(0.02);
+  }
+  100% {
+    background: #000000;
+    transform: scaleY(1); /* 闇 */
+  }
+}
+
+/* ★ 中身を即座に消す */
+.awakening-overlay.to-void .awakening-gate-shell,
+.awakening-overlay.to-void .light-column,
+.awakening-overlay.to-void .awaken-bg-glow,
+.awakening-overlay.to-void .awaken-particles {
+  opacity: 0;
+  transition: opacity 0.2s linear;
+}
+
+/* ほんの僅かだけ拡大（世界がズレる感じ） */
+.awakening-overlay.to-void .awakening-gate-shell {
+  transform: scale(1.03);
+  transition: transform 0.2s linear;
 }
 
 /* ===========================
