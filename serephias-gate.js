@@ -23,43 +23,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
 
-  // ===============================
-  // 0. イントロ動画制御（超シンプル版）
+   // ===============================
+  // 0. イントロ動画制御（クロムは即スキップ）
   // ===============================
   if (introOverlay && introVideo) {
     const skipIntro = () => {
-      // 連打防止
       if (introOverlay.classList.contains('is-fadeout')) return;
 
       introOverlay.classList.add('is-fadeout');
       setTimeout(() => {
-        try {
-          introVideo.pause();
-        } catch (e) {}
+        try { introVideo.pause(); } catch (e) {}
         introOverlay.remove();
       }, 500);
     };
 
-    // どこをタップしてもイントロをスキップできる
+    // どこをタップしてもスキップ可能（保険）
     introOverlay.addEventListener('click', skipIntro);
 
-    // 自動再生を試みる（失敗してもエラーで止まらないように）
+    // 自動再生を試みる
     const p = introVideo.play();
+
     if (p && typeof p.then === 'function') {
-      p.then(() => {
-        // 再生できた → 再生終了か一定時間でスキップ
-        introVideo.addEventListener('ended', skipIntro);
-        setTimeout(skipIntro, 15000); // 念のためタイムアウト
-      }).catch(() => {
-        // 自動再生ブロック → ユーザーがタップしたときに skipIntro が動く
-      });
+      p
+        .then(() => {
+          // 自動再生に成功：再生終了か 15秒で閉じる
+          introVideo.addEventListener('ended', skipIntro);
+          setTimeout(skipIntro, 15000);
+        })
+        .catch(() => {
+          // ★ ここが重要：自動再生ブロックされたら即スキップ
+          skipIntro();
+        });
     } else {
-      // 古いブラウザなど
+      // play() が Promise 返さない古い挙動 → 念のためタイマーで閉じる
       introVideo.addEventListener('ended', skipIntro);
       setTimeout(skipIntro, 15000);
     }
   }
-
   // =========================
   // 1. 星粒子を生成
   // =========================
