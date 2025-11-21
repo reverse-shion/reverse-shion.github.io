@@ -226,41 +226,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // =========================
-  // 5. 覚醒ゲートタップ → 神化 → 転送
-  // =========================
-  if (gateBtn && overlay) {
-    gateBtn.addEventListener('click', () => {
-      if (gateOpened) return;
-      gateOpened = true;
+// =========================
+// 5. 覚醒ゲートタップ（即プチュン→暗闇）
+// =========================
+if (gateBtn && overlay) {
+  gateBtn.addEventListener('click', () => {
+    if (gateOpened) return;
+    gateOpened = true;
 
-      // 次のページへ行く前に必ずBGM停止
-      if (bgm) {
-        bgm.pause();
-        bgm.currentTime = 0;
-      }
+    // BGM停止
+    if (bgm) {
+      bgm.pause();
+      bgm.currentTime = 0;
+    }
 
-      // クリスタルの覚醒
-      gateBtn.classList.add('is-opening', 'phase-aura', 'phase-seal');
+    // 触れた瞬間の“反応”だけ（軽いタップ感）
+    gateBtn.classList.add('tapped');
 
-      // 光柱の逆流ビーム
-      if (lightColumn) {
-        lightColumn.classList.add('phase-flow');
-      }
+    // ★ 即プチュン開始
+    overlay.classList.add('is-flash');
 
-      // 画面全体フラッシュ
-      overlay.classList.add('is-flash');
+    // ★ プチュン途中で画面全要素を消す（0.15s）
+    setTimeout(() => {
+      overlay.classList.add('to-void');
+    }, 150);
 
-      // 白 → 黒の転送演出
-      setTimeout(() => {
-        overlay.classList.add('to-void');
-      }, 700);
-
-      // 星環ページへ転送
-      setTimeout(() => {
-        body.classList.remove('gate-active');
-        window.location.href = NEXT_URL;
-      }, 2100);
-    });
-  }
-});
+    // ★ 真っ黒のまま次ページへ（0.55s）
+    setTimeout(() => {
+      document.body.classList.remove('gate-active');
+      window.location.href = NEXT_URL;
+    }, 550);
+  });
+}
