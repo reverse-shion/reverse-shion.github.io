@@ -8,6 +8,20 @@
   <link rel="stylesheet" href="serephias-gate.css" />
 </head>
 <body>
+  <!-- ★ ページ読み込み時に再生されるゲート動画オーバーレイ -->
+  <!-- 動画が再生できない環境ではJS側で自動的にスキップされます -->
+  <div class="gate-intro" id="gateIntro">
+    <video
+      id="gateIntroVideo"
+      class="gate-intro-video"
+      src="serephias-gate-intro.MOV"  <!-- ←ここを実際の動画ファイル名に -->
+      playsinline
+      muted
+      autoplay
+      preload="auto"
+    ></video>
+  </div>
+
   <div class="page-wrap">
     <header class="site-header">
       <div class="site-title-block">
@@ -38,8 +52,9 @@
             </span>
           </button>
 
-          <p class="gate-audio-note" id="gateAudioNote">
-            ※ タップすると BGM が流れます
+          <!-- ★ BGM 注意書き：常にボタン直下に表示させる -->
+          <p class="gate-audio-note is-visible" id="gateAudioNote">
+            ※ このボタンをタップすると、儀式のBGMが流れます（音量にご注意ください）
           </p>
 
           <!-- STEP2：セレフィアスの詩（JSで中身を差し込み） -->
@@ -68,43 +83,42 @@
   </div>
 
   <!-- ★ 覚醒オーバーレイ（ゲート儀式レイヤー） -->
-<div class="awakening-overlay" id="awakeningOverlay">
-  <!-- 星の薄い背景フィルム -->
-  <div class="awaken-bg-glow"></div>
+  <div class="awakening-overlay" id="awakeningOverlay">
+    <!-- 星の薄い背景フィルム -->
+    <div class="awaken-bg-glow"></div>
 
-  <!-- 星粒子レイヤー -->
-  <div class="awaken-particles" id="awakenParticles"></div>
+    <!-- 星粒子レイヤー -->
+    <div class="awaken-particles" id="awakenParticles"></div>
 
-  <!-- 光柱（逆流星用） -->
-  <div class="light-column" id="lightColumn">
-    <div class="reverse-stars"></div>
+    <!-- 光柱（逆流星用） -->
+    <div class="light-column" id="lightColumn">
+      <div class="reverse-stars"></div>
+    </div>
+
+    <!-- ゲート本体 -->
+    <div class="awakening-gate-shell">
+
+      <!-- セレフィアス紋章（1つだけ） -->
+      <div class="serephias-seal" id="serephiasSeal"></div>
+
+      <!-- 覚醒クリスタル -->
+      <button class="awaken-gate" id="awakeningGateButton">
+        <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
+        <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
+        <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
+      </button>
+
+      <p class="awaken-caption">
+        このゲートに触れると、星環へと転送されます。
+      </p>
+    </div>
   </div>
 
-  <!-- ゲート本体 -->
-  <div class="awakening-gate-shell">
+  <!-- BGM -->
+  <audio id="gateBgm" preload="auto" loop>
+    <source src="gate-bgm.mp3" type="audio/mpeg" />
+  </audio>
 
-    <!-- セレフィアス紋章（1つだけ！） -->
-    <div class="serephias-seal" id="serephiasSeal"></div>
-    <!-- ↑ 重複してたもう1つは削除 -->
-
-    <!-- 覚醒クリスタル（ここが超重要！クラスがあること） -->
-    <button class="awaken-gate" id="awakeningGateButton">
-      <span class="awaken-gate-label awaken-gate-label-top">SEREPHIAS</span>
-      <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
-      <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
-    </button>
-
-    <p class="awaken-caption">
-      このゲートに触れると、星環へと転送されます。
-    </p>
-  </div>
-</div>
-
-<!-- BGM -->
-<audio id="gateBgm" preload="auto" loop>
-  <source src="gate-bgm.mp3" type="audio/mpeg" />
-</audio>
-
-<script src="serephias-gate.js"></script>
+  <script src="serephias-gate.js"></script>
 </body>
 </html>
