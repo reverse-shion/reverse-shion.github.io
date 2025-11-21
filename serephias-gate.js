@@ -73,6 +73,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+    // =========================
+  // X. 浮遊クリスタル：9個／ランダム生成
+  // =========================
+  const crystalLayer = document.querySelector('.floating-crystal-layer');
+
+  if (crystalLayer) {
+    const MAX_CRYSTALS   = 9;
+    const SPAWN_INTERVAL = 4500; // 4.5秒ごとに1つ湧く
+
+    const sizeClasses = ['sz-s', 'sz-m', 'sz-l'];
+
+    function spawnCrystal() {
+      if (!crystalLayer) return;
+
+      // 画面内のクリスタル数が多すぎたら一番古いものを削除
+      const current = crystalLayer.querySelectorAll('.tiny-crystal');
+      if (current.length >= MAX_CRYSTALS) {
+        current[0].classList.add('is-fadeout');
+        setTimeout(() => current[0].remove(), 3000);
+      }
+
+      const el = document.createElement('span');
+      el.classList.add('tiny-crystal');
+
+      // 大・中・小ランダム
+      const sizeClass = sizeClasses[Math.floor(Math.random() * sizeClasses.length)];
+      el.classList.add(sizeClass);
+
+      // 位置：縦はやや中央〜下、横は全域
+      const x = 5 + Math.random() * 90;   // 5〜95%
+      const y = 18 + Math.random() * 55;  // 18〜73%
+
+      el.style.setProperty('--x', x + '%');
+      el.style.setProperty('--y', y + '%');
+
+      // アニメーションの開始位置をずらして“永遠に湧いてる”感じに
+      const offset = Math.random() * 18; // 秒
+      el.style.animationDelay = `-${offset}s`;
+
+      crystalLayer.appendChild(el);
+
+      // 一定時間が過ぎたらフェードアウトして削除（ゴミ溜まり防止）
+      const life = 22000 + Math.random() * 8000; // 22〜30秒生存
+      setTimeout(() => {
+        el.classList.add('is-fadeout');
+        setTimeout(() => el.remove(), 3200);
+      }, life);
+    }
+
+    // 初期状態として数個まとめて生成
+    for (let i = 0; i < MAX_CRYSTALS; i++) {
+      setTimeout(spawnCrystal, i * 500);
+    }
+
+    // 以後、永続的に生成
+    setInterval(spawnCrystal, SPAWN_INTERVAL);
+  }
+
   // =========================
   // 2. セレフィアスの詩
   // =========================
