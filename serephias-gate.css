@@ -564,3 +564,124 @@ div.bg-black.bg-opacity-80 {
   pointer-events: none;
   transition: opacity 0.6s ease;
 }
+
+/* ===========================
+   イントロオーバーレイ用 上書き
+   （必ずファイルの一番下に入れてね）
+=========================== */
+
+.gate-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #04040a;
+  overflow: hidden;
+}
+
+/* Safari の黒い「タップして再生」オーバーレイを前面に出さないために
+   video は完全に背景扱いにしてクリックもさせない */
+.gate-intro-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.65) contrast(1.1) saturate(1.05);
+  pointer-events: none;
+}
+
+/* メッセージの共通コンテナ（中央に固定） */
+.gate-intro-message {
+  position: relative;
+  z-index: 2;
+  max-width: min(90%, 720px);
+  padding: 24px 20px;
+  text-align: center;
+}
+
+/* メインの神々しいテキスト */
+.gate-intro-main {
+  /* 他の縦書き指定を強制打ち消し */
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
+
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(1.05rem, 1.6vw + 0.9rem, 1.55rem);
+  line-height: 1.9;
+  letter-spacing: 0.15em;
+  color: #fdf8f0;
+  margin: 0;
+
+  text-shadow:
+    0 0 6px rgba(255, 248, 220, 0.8),
+    0 0 18px rgba(210, 180, 255, 0.9),
+    0 0 32px rgba(160, 140, 255, 0.75);
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.75));
+
+  animation: introTextPulse 6s ease-in-out infinite;
+}
+
+/* タップ誘導テキスト */
+.gate-intro-sub {
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
+
+  margin-top: 1.6rem;
+  font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  color: rgba(248, 242, 232, 0.92);
+  text-shadow:
+    0 0 5px rgba(255, 240, 210, 0.75),
+    0 0 12px rgba(190, 170, 255, 0.7);
+  position: relative;
+}
+
+.gate-intro-sub::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.9rem;
+  transform: translateX(-50%);
+  width: 42%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 240, 210, 0.95),
+    transparent
+  );
+  box-shadow:
+    0 0 8px rgba(255, 240, 210, 0.8),
+    0 0 16px rgba(195, 170, 255, 0.9);
+}
+
+/* ゆるやかな鼓動アニメーション */
+@keyframes introTextPulse {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1.0);
+  }
+  60% {
+    opacity: 0.96;
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 0.85;
+    transform: translateY(0) scale(1.0);
+  }
+}
+
+/* フェードアウト時（JSから .is-fadeout が付く前提） */
+.gate-intro.is-fadeout {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
