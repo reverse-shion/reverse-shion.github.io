@@ -1,6 +1,5 @@
 // ===============================
 // SEREPHIAS AWAKEN GATE SCRIPT
-// (Refined + gate-active 対応版)
 // ===============================
 document.addEventListener('DOMContentLoaded', () => {
   const body           = document.body;
@@ -17,8 +16,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const bgm            = document.getElementById('gateBgm');
 
+  // ▼ 新しく追加：イントロ動画関連
+  const introOverlay   = document.getElementById('gateIntro');
+  const introVideo     = document.getElementById('gateIntroVideo');
+
   // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
+
+  // =========================
+  // 0. イントロ動画制御
+  // =========================
+  function skipIntro() {
+    if (!introOverlay) return;
+    // フェードアウト演出
+    introOverlay.classList.add('is-fadeout');
+    setTimeout(() => {
+      if (introOverlay && introOverlay.parentNode) {
+        introOverlay.parentNode.removeChild(introOverlay);
+      }
+    }, 700);
+  }
+
+  if (introOverlay && introVideo) {
+    // クリックでスキップも可能
+    introOverlay.addEventListener('click', skipIntro);
+
+    // 自動再生トライ
+    const p = introVideo.play();
+    if (p && typeof p.then === 'function') {
+      p.then(() => {
+        // 再生できた場合：終了でフェードアウト
+        introVideo.addEventListener('ended', skipIntro);
+
+        // 念のため安全タイマー（動画が終わらなくても最大15秒で閉じる）
+        setTimeout(() => {
+          if (introOverlay && !introOverlay.classList.contains('is-fadeout')) {
+            skipIntro();
+          }
+        }, 15000);
+      }).catch(() => {
+        // 自動再生ブロック時 → すぐ本編へ
+        skipIntro();
+      });
+    } else {
+      // 古いブラウザなど → 終了時だけ監視
+      introVideo.addEventListener('ended', skipIntro);
+      setTimeout(skipIntro, 15000);
+    }
+  }
 
   // =========================
   // 1. 星粒子を生成
@@ -80,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const playPromise = bgm.play();
     if (playPromise && typeof playPromise.then === 'function') {
-      playPromise.catch(() => { /* 自動再生ブロック時は無視 */ });
+      playPromise.catch(() => { /* 自動再生ブロック時は無視（ユーザー操作なので基本OK） */ });
     }
 
     let v = 0;
@@ -108,9 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ボタン状態
       prayBtn.classList.add('is-disabled');
-      if (audioNote) audioNote.classList.add('is-visible');
 
-      // BGM
+      // BGM フェードイン開始
       fadeInBgm();
 
       // 詩のボックス開いてタイピング
@@ -135,7 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (gateOpened) return;
       gateOpened = true;
 
-      // クリスタルの覚醒（※overlay.active はいじらない）
+      // ★ ここで必ずBGMを停止（次のページへ行く前に強制ストップ）
+      if (bgm) {
+        bgm.pause();
+        bgm.currentTime = 0;
+      }
+
+      // クリスタルの覚醒
       gateBtn.classList.add('is-opening');
       gateBtn.classList.add('phase-aura');
       gateBtn.classList.add('phase-seal');
@@ -148,14 +198,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // 画面全体フラッシュ
       overlay.classList.add('is-flash');
 
-      // 白 → 黒の転送演出（CSS: .awakening-overlay.to-void）
+      // 白 → 黒の転送演出
       setTimeout(() => {
         overlay.classList.add('to-void');
       }, 700);
 
       // 星環ページへ転送
       setTimeout(() => {
-        // 念のためスクロールロック解除
         body.classList.remove('gate-active');
         window.location.href = NEXT_URL;
       }, 2100);
