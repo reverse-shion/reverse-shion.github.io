@@ -1268,3 +1268,100 @@ div.bg-black.bg-opacity-80 {
       0 0 30px rgba(215, 205, 255, 1);
   }
 }
+/* ===== 神殿感ちょい足し（上書き用） ===== */
+
+/* 壁のグラデを少し柔らかく＆縦柱っぽさ追加 */
+.gate-hero::before {
+  inset: -8% 12%;
+  background:
+    radial-gradient(circle at 50% -10%,
+      rgba(255, 252, 245, 0.38),
+      rgba(212, 190, 255, 0.42),
+      rgba(75, 55, 150, 0.2),
+      transparent 70%),
+    linear-gradient(90deg,
+      rgba(40, 20, 90, 0.95),
+      rgba(18, 8, 44, 1),
+      rgba(40, 20, 90, 0.95));
+}
+
+/* 左右にうっすら「柱」の影 */
+.gate-hero::after {
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(14%);
+  width: min(760px, 105vw);
+  height: 260px;
+}
+
+/* スマホで壁が広すぎるとき少しだけ内側に寄せる */
+@media (max-width: 600px) {
+  .gate-hero::before {
+    inset: -6% 16%;
+  }
+}
+
+/* =========================================================
+   ▼ 魔方陣リング（必ず表示されるバージョン）
+   （強制的に z-index を上げ、背景に沈まないようにする）
+========================================================= */
+
+.gate-heading {
+  position: relative;
+  z-index: 10; /* タイトル自身を前面へ */
+}
+
+/* 外側リング */
+.gate-heading::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 280px;
+  height: 280px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  border: 1px solid rgba(255, 240, 220, 0.22);
+  box-shadow:
+    0 0 28px rgba(224, 208, 255, 0.75),
+    inset 0 0 46px rgba(80, 55, 130, 0.9);
+
+  opacity: 0.42;
+  filter: blur(12px);
+  z-index: -1; /* タイトルの直下には置くが背景よりは前 */
+  pointer-events: none;
+}
+
+/* 内側リング */
+.gate-heading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 190px;
+  height: 190px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  border: 1px dashed rgba(255, 240, 220, 0.28);
+  box-shadow:
+    0 0 22px rgba(215, 200, 255, 0.9);
+  opacity: 0.35;
+  filter: blur(26px);
+
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* スマホ調整 */
+@media (max-width: 600px) {
+  .gate-heading::before {
+    width: 240px;
+    height: 240px;
+  }
+  .gate-heading::after {
+    width: 170px;
+    height: 170px;
+  }
+}
