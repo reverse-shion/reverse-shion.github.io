@@ -23,11 +23,12 @@
 
     body {
       font-family: 'Noto Serif JP', 'Shippori Mincho', system-ui, serif;
-      background:
-        radial-gradient(circle at 50% 0%, #1c1238 0%, #05030b 55%, #000000 100%);
+      /* ★ 初期状態は完全な黒背景 ＋ 縦スクロール許可 */
+      background: #000000;
       color: #f7f0e5;
       -webkit-font-smoothing: antialiased;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     a {
@@ -45,7 +46,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      /* ★ ここも黒でスタート。後で is-awakened で書き換え */
+      background: #000000;
+      transition: background 3s ease-out;
+      /* ★ スクロールさせるため overflow は消す/visible に */
+      overflow: visible;
     }
 
     /* 星砂ノイズ */
