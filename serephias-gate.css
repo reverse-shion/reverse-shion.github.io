@@ -1,6 +1,6 @@
 /* ===========================
    SENSHUAN AWAKEN GATE
-   Refined Final Version (Fixed Transition)
+   Refined Final Version
 =========================== */
 
 /* ===========================
@@ -44,28 +44,51 @@ body.gate-active {
    2. ヘッダー & フッター
 =========================== */
 .site-header {
-  padding: 14px 18px 4px; display: flex; justify-content: center;
+  padding: 14px 18px 4px;
+  display: flex;
+  justify-content: center;
 }
 .site-title-block { text-align: center; }
 .site-title-en {
-  display: block; letter-spacing: 0.18em; font-size: 0.78rem; color: rgba(230, 220, 255, 0.82);
+  display: block;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  color: rgba(230, 220, 255, 0.82);
 }
 .site-title-sub {
-  display: block; font-size: 0.76rem; letter-spacing: 0.22em; color: rgba(255, 236, 210, 0.88);
+  display: block;
+  font-size: 0.76rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 236, 210, 0.88);
 }
 
 .site-footer {
-  padding: 14px 14px 18px; text-align: center; font-size: 0.8rem;
-  color: rgba(240, 230, 220, 0.8); margin-top: auto;
+  padding: 14px 14px 18px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(240, 230, 220, 0.8);
+  margin-top: auto;
 }
 .footer-label {
-  display: block; letter-spacing: 0.22em; font-size: 0.7rem;
-  margin-bottom: 4px; color: rgba(190, 210, 255, 0.9);
+  display: block;
+  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  color: rgba(190, 210, 255, 0.9);
 }
-.footer-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.footer-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 .footer-link {
-  text-decoration: none; padding: 4px 10px; border-radius: 999px;
-  border: 1px solid rgba(210, 200, 255, 0.5); color: #f9f3ea; font-size: 0.78rem;
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(210, 200, 255, 0.5);
+  color: #f9f3ea;
+  font-size: 0.78rem;
   background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.12), transparent 60%);
   transition: background 0.2s ease-out, transform 0.2s ease-out;
 }
@@ -78,67 +101,145 @@ body.gate-active {
    3. メインゲート（祈り）エリア
 =========================== */
 .gate-main {
-  flex: 1; display: flex; align-items: center; justify-content: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 12px 16px 8px;
 }
-.gate-hero { width: 100%; max-width: 640px; }
-.gate-inner { text-align: center; }
-.gate-heading { font-size: 1.18rem; letter-spacing: 0.28em; margin-bottom: 6px; }
-.gate-lead {
-  font-size: 0.9rem; line-height: 1.9; color: rgba(245, 235, 225, 0.9); margin-bottom: 18px;
+
+.gate-hero {
+  position: relative;
+  z-index: 1;
+  padding: 96px 20px 80px;
+  min-height: 100vh;
+
+  width: 100%;
+  max-width: 640px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  overflow: hidden;
 }
 
-button, a { -webkit-tap-highlight-color: transparent; outline: none; }
+.gate-inner {
+  text-align: center;
+}
+
+.gate-heading {
+  font-size: 1.18rem;
+  letter-spacing: 0.28em;
+  margin-bottom: 6px;
+}
+.gate-lead {
+  font-size: 0.9rem;
+  line-height: 1.9;
+  color: rgba(245, 235, 225, 0.9);
+  margin-bottom: 18px;
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
 
 /* 《祈りを捧げる》ボタン */
 .gate-pray-btn {
-  border: none; border-radius: 999px; padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
   background: radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
-  color: #25130c; font-family: inherit; font-size: 0.9rem;
-  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  color: #25130c;
+  font-family: inherit;
+  font-size: 0.9rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(255, 215, 122, 0.9), 0 0 34px rgba(0, 0, 0, 0.95);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, filter 0.12s ease-out, opacity 0.2s ease-out;
-  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 20px rgba(255, 215, 122, 0.9),
+    0 0 34px rgba(0, 0, 0, 0.95);
+  transition:
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out,
+    filter 0.12s ease-out,
+    opacity 0.2s ease-out;
+  position: relative;
+  overflow: hidden;
 }
 .gate-pray-btn::after {
-  content: ""; position: absolute; inset: 0;
+  content: "";
+  position: absolute;
+  inset: 0;
   background: radial-gradient(circle at 0 50%, rgba(255, 255, 255, 0.5), transparent 60%);
-  mix-blend-mode: screen; opacity: 0;
+  mix-blend-mode: screen;
+  opacity: 0;
   transition: opacity 0.18s ease-out, transform 0.18s ease-out;
   transform: translateX(-30%);
 }
-.gate-pray-main { letter-spacing: 0.18em; }
-.gate-pray-sub { font-size: 0.76rem; color: rgba(60, 38, 22, 0.9); }
+.gate-pray-main {
+  letter-spacing: 0.18em;
+}
+.gate-pray-sub {
+  font-size: 0.76rem;
+  color: rgba(60, 38, 22, 0.9);
+}
 
 .gate-pray-btn:hover:not(.is-disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 0 26px rgba(255, 230, 180, 1), 0 0 36px rgba(0, 0, 0, 0.98);
+  box-shadow:
+    0 0 26px rgba(255, 230, 180, 1),
+    0 0 36px rgba(0, 0, 0, 0.98);
   filter: saturate(1.08);
 }
-.gate-pray-btn:hover:not(.is-disabled)::after { opacity: 1; transform: translateX(0); }
-.gate-pray-btn.is-disabled { opacity: 0.75; cursor: default; }
+.gate-pray-btn:hover:not(.is-disabled)::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+.gate-pray-btn.is-disabled {
+  opacity: 0.75;
+  cursor: default;
+}
 
 .gate-audio-note {
-  font-size: 0.75rem; margin-top: 8px; color: rgba(220, 220, 255, 0.8);
-  opacity: 0; transform: translateY(4px);
+  font-size: 0.75rem;
+  margin-top: 8px;
+  color: rgba(220, 220, 255, 0.8);
+  opacity: 0;
+  transform: translateY(4px);
   transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
-.gate-audio-note.is-visible { opacity: 1; transform: translateY(0); }
+.gate-audio-note.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 /* ===========================
    4. セレフィアスの詩（展開アニメーション）
 =========================== */
-:root { --gold-soft: #ffe0a8; --text-soft: #f4ece0; }
+:root {
+  --gold-soft: #ffe0a8;
+  --text-soft: #f4ece0;
+}
 
 .serephias-poem {
-  width: 100%; max-width: 540px; margin: 10px auto 0;
+  width: 100%;
+  max-width: 540px;
+  margin: 10px auto 0;
   padding: 0 14px; /* 初期：閉 */
   border: 1px solid rgba(170, 215, 255, 0);
-  background: radial-gradient(circle at 0 0, rgba(255,255,255,0.12), transparent 70%),
-              linear-gradient(135deg, rgba(8, 14, 40, 0.96), rgba(6, 20, 46, 0.98));
-  font-size: 0.9rem; color: var(--text-soft);
-  opacity: 0; max-height: 0; overflow: hidden;
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.12), transparent 70%),
+    linear-gradient(135deg, rgba(8, 14, 40, 0.96), rgba(6, 20, 46, 0.98));
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
   transform: translateY(10px);
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   box-sizing: border-box;
@@ -146,7 +247,8 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 
 /* 開いた状態 */
 .serephias-poem.is-open {
-  opacity: 1; max-height: 1000px;
+  opacity: 1;
+  max-height: 1000px;
   padding: 20px 22px 28px;
   border-color: rgba(170, 215, 255, 0.7);
   box-shadow: 0 0 22px rgba(80, 150, 255, 0.7);
@@ -155,133 +257,39 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 }
 
 .serephias-poem-label {
-  font-size: 0.76rem; letter-spacing: 0.18em; color: rgba(180, 215, 255, 0.95); margin-bottom: 4px;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  color: rgba(180, 215, 255, 0.95);
+  margin-bottom: 4px;
 }
 .serephias-poem-body {
-  font-size: 0.9rem; line-height: 1.9; color: var(--gold-soft);
+  font-size: 0.9rem;
+  line-height: 1.9;
+  color: var(--gold-soft);
   text-shadow: 0 0 14px rgba(255, 215, 122, 0.7);
-  white-space: pre-line; word-break: break-word;
+  white-space: pre-line;
+  word-break: break-word;
 }
 @media (max-width: 480px) {
-  .serephias-poem.is-open { padding: 16px 18px 26px; }
+  .serephias-poem.is-open {
+    padding: 16px 18px 26px;
+  }
 }
 
 /* ===========================
-   5. 覚醒オーバーレイ & 転送フェード
-   ※【重要】アニメーション廃止→Transitionへ変更
-=========================== */
-
-/* フラッシュ効果 */
-.awakening-overlay::after {
-  content: ""; position: fixed; inset: 0;
-  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,1), rgba(255,255,255,0.2));
-  opacity: 0; pointer-events: none; mix-blend-mode: screen;
-  transition: opacity 0.7s ease-out; z-index: 20;
-}
-.awakening-overlay.is-flash::after { opacity: 1; }
-
-/* ★【修正】白→黒の転送フェード（Safari対応シンプル版） */
-.awakening-overlay.to-void {
-  animation: none;
-  background: #000000; /* 強制的に黒へ */
-  transition: background 0.8s ease-in;
-}
-/* 以前の @keyframes fadeToVoid は削除済み */
-
-
-/* 星粒子 */
-.awaken-particles {
-  position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2;
-}
-.awaken-particle {
-  position: absolute; width: 4px; height: 4px;
-  background: radial-gradient(circle, #ffffff, #d6b5ff, #9f80ff);
-  border-radius: 50%; opacity: 0; filter: blur(0.5px);
-  animation: riseParticles 5s linear infinite both;
-  left: calc(var(--i) * 2.5%); bottom: -40px;
-  animation-duration: calc(3s + var(--i) * 0.1s);
-  animation-delay: calc(var(--i) * -0.08s);
-  transform: translateX(calc(var(--i) * 1px - 20px));
-}
-@keyframes riseParticles {
-  0%   { transform: translateY(0) scale(0.4); opacity: 0; }
-  15%  { opacity: 0.9; }
-  100% { transform: translateY(-110vh) scale(1); opacity: 0; }
-}
-
-/* ===========================
-   7. クリスタルゲート & 神気演出
-=========================== */
-
-
-
-/* クリスタル本体 */
-.awaken-gate {
-  position: relative; border: none; padding: 0; background: transparent;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 0.2em;
-  width: min(260px, 70vw); aspect-ratio: 1 / 2.4;
-  cursor: pointer;
-  animation: awakenFloat 6s ease-in-out infinite;
-  transition: transform .5s ease, box-shadow .5s ease;
-  overflow: visible;
-}
-@media (max-width: 480px) {
-  .awaken-gate { width: 75vw; height: 64vh; aspect-ratio: unset; }
-}
-@keyframes awakenFloat {
-  0%,100% { transform: translateY(0); }
-  50%     { transform: translateY(-8px); }
-}
-
-/* --- 通常時の見た目 --- */
-/* 外側ボディ (::before) */
-.awaken-gate::before {
-  content: ""; position: absolute; inset: 6% 24%; border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.26) 0%, rgba(255,245,220,0.9) 22%, rgba(217,173,255,0.95) 50%, rgba(138,159,255,0.95) 75%, rgba(30,40,120,1) 100%);
-  clip-path: polygon(50% 0%, 88% 10%, 100% 50%, 88% 90%, 50% 100%, 12% 90%, 0% 50%, 12% 10%);
-  box-shadow: 0 0 28px rgba(255, 245, 220, .95), 0 0 60px rgba(182, 149, 255, .65), inset 0 0 16px rgba(12, 8, 22, .85);
-}
-/* 内側コア (::after) */
-.awaken-gate::after {
-  content: ""; position: absolute; inset: 15% 38%; border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,215,180,0.05) 45%, rgba(140,190,255,0.4) 70%, rgba(16,28,72,0.0) 100%);
-  mix-blend-mode: screen; filter: blur(1px);
-  animation: corePulse 3.2s ease-in-out infinite;
-}
-@keyframes corePulse {
-  0%,100% { opacity: .85; }
-  50%     { opacity: 1; }
-}
-/* ラベル */
-.awaken-gate-label {
-  position: relative; display: block; text-align: center; letter-spacing: 0.28em;
-  text-transform: uppercase; font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  font-size: clamp(11px, 2.4vw, 15px); color: #ffffff;
-  text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 14px rgba(0,0,0,0.8); z-index: 10;
-}
-
-
-/* キャプション */
-.awaken-caption {
-  margin-top: 16px; color: #e8e0d6; text-shadow: 0 0 12px rgba(0,0,0,0.65);
-  font-size: .9rem; line-height: 1.8; max-width: 480px;
-}
-
-/* ===========================
-   覚醒オーバーレイ + 超高速プチュン
-   ※ クリスタル以外を全部隠す → 最後は完全ブラックアウト
+   5. 覚醒オーバーレイ + 超高速プチュン
+   ※ クリスタルの【手前】でブラックアウト
 =========================== */
 .awakening-overlay {
   position: fixed;
   inset: 0;
-  z-index: 999;  /* ページの一番手前 */
+  z-index: 999;  /* ページ最前面スタック */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 
-  /* ★ ゲート出現時の背景（ページを完全に覆う） */
+  /* ゲート表示中の背景（ページ全体を覆う） */
   background:
     radial-gradient(circle at 50% 10%, rgba(145,120,255,0.42), transparent 70%),
     radial-gradient(circle at 30% 80%, rgba(255,200,255,0.25), transparent 65%),
@@ -293,14 +301,26 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   transition: opacity 0.2s linear;
 }
 
-/* 表示可能状態（祈り→詩のあと） */
+/* 表示状態（祈り→詩のあと） */
 .awakening-overlay.active {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* ===== プチュン用シャッター ===== */
+/* ▼ 背景用：うっすらした光のレイヤー（クリスタルより奥） */
 .awakening-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.16), transparent 70%);
+  opacity: 1;
+  pointer-events: none;
+  z-index: 0; /* 中身（クリスタル）より奥側 */
+}
+
+/* ▼ プチュン用シャッター（クリスタルより手前のブラックアウト） */
+.awakening-overlay::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -309,15 +329,16 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   transform-origin: center;
   transform: scaleY(1);
   pointer-events: none;
+  z-index: 10;               /* ★ クリスタルより前にくるレイヤー */
 }
 
-/* クリスタルタップ → プチュン開始 */
-.awakening-overlay.is-flash::before {
+/* クリスタルタップ → プチュン開始（JSで .is-flash が付与される想定） */
+.awakening-overlay.is-flash::after {
   opacity: 1;
   animation: pluchunUltra 0.32s cubic-bezier(0.3, 0, 0.7, 1) forwards;
 }
 
-/* ★ 超高速プチュン → 完全ブラックアウト */
+/* 超高速プチュン → 完全ブラックアウト */
 @keyframes pluchunUltra {
   0% {
     background: #ffffff;
@@ -341,19 +362,21 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   }
 }
 
-/* ===== プチュン後：内部要素を消して完全な闇へ ===== */
+/* ▼ プチュン後：背景ごと完全な闇へ */
 .awakening-overlay.to-void {
-  background: #000000 !important;  /* グラデを全消しして真っ黒に強制 */
+  background: #000000 !important;  /* グラデを消して真っ黒に */
   opacity: 1 !important;
   transition: background 0.01s linear, opacity 0.01s linear;
 }
 
-/* クリスタルや粒子など、中身を全て消す */
+/* to-void中は中の演出レイヤーだけフェードアウト
+   （クリスタルごと闇に沈めたい場合） */
 .awakening-overlay.to-void .awakening-gate-shell,
 .awakening-overlay.to-void .light-column,
 .awakening-overlay.to-void .awaken-bg-glow,
 .awakening-overlay.to-void .awaken-particles {
   opacity: 0 !important;
+  transition: opacity 0.18s linear;
 }
 
 /* ほんの少しだけ拡大して“世界がズレた”感じ */
@@ -362,14 +385,170 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   transition: transform 0.2s linear;
 }
 
-/* 旧フラッシュ(::after)を完全無効化 */
-.awakening-overlay::after {
-  content: none !important;
-  background: transparent !important;
-  opacity: 0 !important;
-}
 /* ===========================
-   8. 演出用バー非表示（改良版）
+   6. 星粒子レイヤー
+=========================== */
+.awaken-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.awaken-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #ffffff, #d6b5ff, #9f80ff);
+  border-radius: 50%;
+  opacity: 0;
+  filter: blur(0.5px);
+  animation: riseParticles 5s linear infinite both;
+  left: calc(var(--i) * 2.5%);
+  bottom: -40px;
+  animation-duration: calc(3s + var(--i) * 0.1s);
+  animation-delay: calc(var(--i) * -0.08s);
+  transform: translateX(calc(var(--i) * 1px - 20px));
+}
+
+@keyframes riseParticles {
+  0% {
+    transform: translateY(0) scale(0.4);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-110vh) scale(1);
+    opacity: 0;
+  }
+}
+
+/* ===========================
+   7. クリスタルゲート & 神気演出
+=========================== */
+.awaken-gate {
+  position: relative;
+  border: none;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
+  width: min(260px, 70vw);
+  aspect-ratio: 1 / 2.4;
+  cursor: pointer;
+  animation: awakenFloat 6s ease-in-out infinite;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  overflow: visible;
+}
+
+@media (max-width: 480px) {
+  .awaken-gate {
+    width: 75vw;
+    height: 64vh;
+    aspect-ratio: unset;
+  }
+}
+
+@keyframes awakenFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* 外側ボディ (::before) */
+.awaken-gate::before {
+  content: "";
+  position: absolute;
+  inset: 6% 24%;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.26) 0%,
+    rgba(255, 245, 220, 0.9) 22%,
+    rgba(217, 173, 255, 0.95) 50%,
+    rgba(138, 159, 255, 0.95) 75%,
+    rgba(30, 40, 120, 1) 100%
+  );
+  clip-path: polygon(
+    50% 0%,
+    88% 10%,
+    100% 50%,
+    88% 90%,
+    50% 100%,
+    12% 90%,
+    0% 50%,
+    12% 10%
+  );
+  box-shadow:
+    0 0 28px rgba(255, 245, 220, 0.95),
+    0 0 60px rgba(182, 149, 255, 0.65),
+    inset 0 0 16px rgba(12, 8, 22, 0.85);
+}
+
+/* 内側コア (::after) */
+.awaken-gate::after {
+  content: "";
+  position: absolute;
+  inset: 15% 38%;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 215, 180, 0.05) 45%,
+    rgba(140, 190, 255, 0.4) 70%,
+    rgba(16, 28, 72, 0.0) 100%
+  );
+  mix-blend-mode: screen;
+  filter: blur(1px);
+  animation: corePulse 3.2s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* クリスタル名ラベル */
+.awaken-gate-label {
+  position: relative;
+  display: block;
+  text-align: center;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(11px, 2.4vw, 15px);
+  color: #ffffff;
+  text-shadow:
+    0 0 6px rgba(0, 0, 0, 0.9),
+    0 0 14px rgba(0, 0, 0, 0.8);
+  z-index: 10;
+}
+
+/* キャプション */
+.awaken-caption {
+  margin-top: 16px;
+  color: #e8e0d6;
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.65);
+  font-size: 0.9rem;
+  line-height: 1.8;
+  max-width: 480px;
+}
+
+/* ===========================
+   8. 演出用バー非表示（TikTok UIなど）
 =========================== */
 .bottom-bar,
 #action-buttons,
@@ -377,176 +556,14 @@ button, a { -webkit-tap-highlight-color: transparent; outline: none; }
 div.fixed.bottom-0.w-full,
 div.fixed.bottom-0.left-0,
 div.bg-black.bg-opacity-80 {
-    display: none !important;
-    pointer-events: none !important;
-}
-
-
-/* ===== イントロゲート動画 ===== */
-.gate-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: #02030a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  opacity: 1;
-  transition: opacity 0.6s ease;
-}
-
-.gate-intro-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* スキップ or 終了時に付与されるクラス */
-.gate-intro.is-fadeout {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* BGM注意書きの初期表示用（必要なら） */
-.gate-audio-note.is-visible {
-  opacity: 1;
-}
-.gate-intro.needs-tap::after {
-  content: "▶ 画面をタップしてゲートを開く";
-  position: absolute;
-  bottom: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.1rem;
-  color: #fff;
-  background: rgba(0,0,0,0.45);
-  padding: 10px 18px;
-  border-radius: 8px;
-  backdrop-filter: blur(4px);
-}
-
-
-/* ===========================
-   イントロ動画オーバーレイのテキスト
-=========================== */
-
-.gate-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.14), rgba(0,0,0,0.92));
-  overflow: hidden;
-}
-
-.gate-intro-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.72) contrast(1.1) saturate(1.05);
-}
-
-/* セリフ本体コンテナ */
-.gate-intro-message {
-  position: relative;
-  z-index: 2;
-  max-width: min(90%, 720px);
-  text-align: center;
-  padding: 24px 20px;
-}
-
-/* メインの神聖テキスト */
-.gate-intro-main {
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  font-size: clamp(1.1rem, 1.6vw + 0.9rem, 1.6rem);
-  line-height: 1.9;
-  letter-spacing: 0.12em;
-  color: #fdf8f0;
-  text-shadow:
-    0 0 6px rgba(255, 248, 220, 0.8),
-    0 0 18px rgba(210, 180, 255, 0.9),
-    0 0 32px rgba(160, 140, 255, 0.75);
-  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.7));
-  animation: introTextPulse 6s ease-in-out infinite;
-}
-
-/* 補足：タップ誘導 */
-.gate-intro-sub {
-  margin-top: 1.8rem;
-  font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.18em;
-  text-transform: none;
-  color: rgba(248, 242, 232, 0.9);
-  text-shadow:
-    0 0 5px rgba(255, 240, 210, 0.75),
-    0 0 12px rgba(190, 170, 255, 0.7);
-  position: relative;
-}
-
-/* サブテキストの下に細い光のライン */
-.gate-intro-sub::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -0.9rem;
-  transform: translateX(-50%);
-  width: 42%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 240, 210, 0.9),
-    transparent
-  );
-  box-shadow:
-    0 0 8px rgba(255, 240, 210, 0.8),
-    0 0 16px rgba(195, 170, 255, 0.9);
-}
-
-/* ゆるやかな鼓動のような発光アニメーション */
-@keyframes introTextPulse {
-  0% {
-    opacity: 0;
-    transform: translateY(6px) scale(0.97);
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(0) scale(1.0);
-  }
-  60% {
-    opacity: 0.96;
-    transform: translateY(-2px) scale(1.02);
-  }
-  100% {
-    opacity: 0.85;
-    transform: translateY(0) scale(1.0);
-  }
-}
-
-/* フェードアウト用（JSで .is-fadeout が付与される想定） */
-.gate-intro.is-fadeout {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.6s ease;
-}
-
-
-/* 自動再生成功時はテキストを消す */
-.gate-intro.auto-playing .gate-intro-message {
-  display: none;
+  display: none !important;
+  pointer-events: none !important;
 }
 
 /* ===========================
-   イントロオーバーレイ用 上書き
-   （必ずファイルの一番下に入れてね）
+   9. イントロゲート動画オーバーレイ
 =========================== */
-
+/* ベースオーバーレイ（class版） */
 .gate-intro {
   position: fixed;
   inset: 0;
@@ -556,10 +573,11 @@ div.bg-black.bg-opacity-80 {
   justify-content: center;
   background: #04040a;
   overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.6s ease;
 }
 
-/* Safari の黒い「タップして再生」オーバーレイを前面に出さないために
-   video は完全に背景扱いにしてクリックもさせない */
+/* 背景動画（class版） */
 .gate-intro-video {
   position: absolute;
   inset: 0;
@@ -570,7 +588,7 @@ div.bg-black.bg-opacity-80 {
   pointer-events: none;
 }
 
-/* メッセージの共通コンテナ（中央に固定） */
+/* メッセージコンテナ */
 .gate-intro-message {
   position: relative;
   z-index: 2;
@@ -581,23 +599,19 @@ div.bg-black.bg-opacity-80 {
 
 /* メインの神々しいテキスト */
 .gate-intro-main {
-  /* 他の縦書き指定を強制打ち消し */
   writing-mode: horizontal-tb;
   text-orientation: mixed;
-
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-size: clamp(1.05rem, 1.6vw + 0.9rem, 1.55rem);
   line-height: 1.9;
   letter-spacing: 0.15em;
   color: #fdf8f0;
   margin: 0;
-
   text-shadow:
     0 0 6px rgba(255, 248, 220, 0.8),
     0 0 18px rgba(210, 180, 255, 0.9),
     0 0 32px rgba(160, 140, 255, 0.75);
   filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.75));
-
   animation: introTextPulse 6s ease-in-out infinite;
 }
 
@@ -605,7 +619,6 @@ div.bg-black.bg-opacity-80 {
 .gate-intro-sub {
   writing-mode: horizontal-tb;
   text-orientation: mixed;
-
   margin-top: 1.6rem;
   font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, serif;
   font-size: 0.95rem;
@@ -656,16 +669,44 @@ div.bg-black.bg-opacity-80 {
   }
 }
 
-/* フェードアウト時（JSから .is-fadeout が付く前提） */
+/* フェードアウト（JSから .is-fadeout が付く前提） */
 .gate-intro.is-fadeout {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.6s ease;
 }
 
-/* =========================================
-   浮遊クリスタル・背景レイヤー
-========================================= */
+/* 自動再生成功時はテキストを消す */
+.gate-intro.auto-playing .gate-intro-message {
+  display: none;
+}
+
+/* ===============================
+   10. イントロ動画フィルター完全オフ（ID版）
+   ※ Safari の謎フィルター対策
+=============================== */
+#gateIntro,
+#gateIntroVideo {
+  background: transparent !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+#gateIntro::before,
+#gateIntroVideo::before,
+#gateIntro::after {
+  content: none !important;
+  background: transparent !important;
+}
+
+#gateIntroVideo {
+  opacity: 1 !important;
+  display: block;
+}
+
+/* ===============================
+   11. 浮遊クリスタル・背景レイヤー
+================================ */
 .floating-crystal-layer {
   position: absolute;
   inset: 0;
@@ -674,7 +715,7 @@ div.bg-black.bg-opacity-80 {
   z-index: 0; /* gate-inner より奥に */
 }
 
-/* クリスタル本体 */
+/* クリスタル本体（小さい装飾） */
 .tiny-crystal {
   position: absolute;
   left: var(--x, 50%);
@@ -682,17 +723,16 @@ div.bg-black.bg-opacity-80 {
   width: var(--w, 16px);
   height: var(--h, 40px);
   transform-origin: center;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.98),
-      rgba(210,200,255,0.85),
-      rgba(120,140,255,0.85)
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(210, 200, 255, 0.85),
+    rgba(120, 140, 255, 0.85)
+  );
   border-radius: 999px;
   box-shadow:
-    0 0 8px rgba(255,255,255,0.9),
-    0 0 18px rgba(186,167,255,0.9);
+    0 0 8px rgba(255, 255, 255, 0.9),
+    0 0 18px rgba(186, 167, 255, 0.9);
   opacity: 0;
   filter: blur(0.1px);
   animation:
@@ -706,27 +746,25 @@ div.bg-black.bg-opacity-80 {
   --h: 24px;
   opacity: 0.5;
 }
-
 .tiny-crystal.sz-m {
   --w: 14px;
   --h: 32px;
   opacity: 0.75;
 }
-
 .tiny-crystal.sz-l {
   --w: 18px;
   --h: 44px;
   opacity: 0.95;
 }
 
-/* 徐々に消えるとき */
+/* 徐々に消えるとき用 */
 .tiny-crystal.is-fadeout {
   transition: opacity 2.8s ease, transform 2.8s ease;
   opacity: 0;
-  transform: translate3d(0, -10px, 0) scale(0.85) rotate3d(0,1,0,35deg);
+  transform: translate3d(0, -10px, 0) scale(0.85) rotate3d(0, 1, 0, 35deg);
 }
 
-/* 上下揺れ＋横スイング＋Y軸回転（「その場でゆっくり回る」イメージ） */
+/* 上下揺れ＋横スイング＋Y軸回転 */
 @keyframes crystalFloat {
   0% {
     transform:
@@ -759,70 +797,35 @@ div.bg-black.bg-opacity-80 {
 @keyframes crystalGlow {
   0%, 100% {
     box-shadow:
-      0 0 4px rgba(255,255,255,0.7),
-      0 0 12px rgba(186,167,255,0.6);
+      0 0 4px rgba(255, 255, 255, 0.7),
+      0 0 12px rgba(186, 167, 255, 0.6);
   }
   50% {
     box-shadow:
-      0 0 10px rgba(255,255,255,1),
-      0 0 24px rgba(210,190,255,0.95);
+      0 0 10px rgba(255, 255, 255, 1),
+      0 0 24px rgba(210, 190, 255, 0.95);
   }
 }
+
 /* ===============================
-   イントロ動画フィルター完全オフ
+   12. SEREPHIAS 前室（小神殿）レイアウト
 ================================ */
-#gateIntro,
-#gateIntroVideo {
-  background: transparent !important;
-  filter: none !important;
-  -webkit-filter: none !important;
-  mix-blend-mode: normal !important;
-}
-
-#gateIntro::before,
-#gateIntroVideo::before,
-#gateIntro::after {
-  content: none !important;
-  background: transparent !important;
-}
-
-/* Safariの色濃くなるバグ回避 */
-#gateIntroVideo {
-  opacity: 1 !important;
-  display: block;
-}
-
-/* =====================================
-   SEREPHIAS 前室（小神殿）レイアウト
-   タイトル〜祈りボタンのブロックに適用
-===================================== */
-.gate-hero {
-  position: relative;
-  z-index: 1;
-  padding: 96px 20px 80px;
-  min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-
-  overflow: hidden;
-}
-
-/* 奥にぼんやり浮かぶ「聖堂の壁」 */
 .gate-hero::before {
   content: "";
   position: absolute;
   inset: -10% 8%;
   background:
-    radial-gradient(circle at 50% 0%,
+    radial-gradient(
+      circle at 50% 0%,
       rgba(250, 245, 255, 0.22),
       rgba(120, 90, 200, 0.15),
-      transparent 70%),
-    radial-gradient(circle at 50% 120%,
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at 50% 120%,
       rgba(40, 20, 80, 0.9),
-      rgba(5, 3, 12, 1));
+      rgba(5, 3, 12, 1)
+    );
   opacity: 0.9;
   filter: blur(0.5px);
   z-index: -3;
@@ -839,10 +842,12 @@ div.bg-black.bg-opacity-80 {
   height: 220px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 40%,
+    radial-gradient(
+      circle at 50% 40%,
       rgba(255, 240, 210, 0.75),
       rgba(210, 180, 255, 0.35),
-      rgba(0, 0, 0, 0));
+      rgba(0, 0, 0, 0)
+    );
   filter: blur(6px);
   opacity: 0.9;
   z-index: -2;
@@ -878,7 +883,7 @@ div.bg-black.bg-opacity-80 {
   z-index: -1;
 }
 
-/* 魔方陣の内側に薄いリングを追加して情報量アップ */
+/* 魔方陣の内側に薄いリング */
 .gate-hero h1::after {
   content: "";
   position: absolute;
@@ -889,8 +894,7 @@ div.bg-black.bg-opacity-80 {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   border: 1px dashed rgba(255, 240, 220, 0.2);
-  box-shadow:
-    0 0 12px rgba(210, 190, 255, 0.5);
+  box-shadow: 0 0 12px rgba(210, 190, 255, 0.5);
   opacity: 0.6;
   z-index: -1;
 }
@@ -904,7 +908,7 @@ div.bg-black.bg-opacity-80 {
     0 0 42px rgba(210, 180, 255, 0.9);
 }
 
-/* ボタンの下に、専用の小さな光輪を追加 */
+/* ボタンの下に専用の光輪 */
 .gate-hero #gatePrayButton::after {
   content: "";
   position: absolute;
@@ -914,16 +918,18 @@ div.bg-black.bg-opacity-80 {
   width: 120%;
   height: 28px;
   border-radius: 999px;
-  background: radial-gradient(circle at 50% 20%,
+  background: radial-gradient(
+    circle at 50% 20%,
     rgba(255, 245, 220, 0.9),
     rgba(255, 225, 180, 0.2),
-    transparent 80%);
+    transparent 80%
+  );
   opacity: 0.9;
   filter: blur(4px);
   z-index: -1;
 }
 
-/* 上方に「上から差し込む光の柱」っぽい縦グラ */
+/* 上から差し込む光の柱 */
 .gate-hero .gate-top-glow {
   position: absolute;
   top: -10%;
@@ -942,7 +948,7 @@ div.bg-black.bg-opacity-80 {
   z-index: -4;
 }
 
-/* スマホで少しだけ圧縮して見やすく */
+/* スマホ用微調整 */
 @media (max-width: 600px) {
   .gate-hero {
     padding-top: 80px;
