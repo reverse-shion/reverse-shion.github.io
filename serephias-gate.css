@@ -654,141 +654,12 @@ div.bg-black.bg-opacity-80 {
 }
 
 
-
-/* =====================================
-   SEREPHIAS 前室（小神殿）レイアウト
-   タイトル〜祈りボタンのブロックに適用
-===================================== */
-.gate-hero {
-  position: relative;
-  z-index: 1;
-  padding: 96px 20px 80px;
-  min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-
-  overflow: hidden;
-}
-
-/* 奥にぼんやり浮かぶ「聖堂の壁」 */
-.gate-hero::before {
-  content: "";
-  position: absolute;
-  inset: -10% 8%;
-  background:
-    radial-gradient(circle at 50% 0%,
-      rgba(250, 245, 255, 0.22),
-      rgba(120, 90, 200, 0.15),
-      transparent 70%),
-    radial-gradient(circle at 50% 120%,
-      rgba(40, 20, 80, 0.9),
-      rgba(5, 3, 12, 1));
-  opacity: 0.9;
-  filter: blur(0.5px);
-  z-index: -3;
-}
-
-/* 足元の光輪＝祭壇／床 */
-.gate-hero::after {
-  content: "";
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(620px, 90vw);
-  height: 220px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 40%,
-      rgba(255, 240, 210, 0.75),
-      rgba(210, 180, 255, 0.35),
-      rgba(0, 0, 0, 0));
-  filter: blur(6px);
-  opacity: 0.9;
-  z-index: -2;
-}
-
-/* タイトル・本文を“前室中央”に集約 */
-.gate-hero h2,
-.gate-hero p {
-  position: relative;
-  z-index: 1;
-}
-
-
-
-/* 祈りボタン＝“小さな祭壇” */
-.gate-hero #gatePrayButton {
-  position: relative;
-  z-index: 2;
-  box-shadow:
-    0 0 18px rgba(255, 220, 160, 0.85),
-    0 0 42px rgba(210, 180, 255, 0.9);
-}
-
-/* ボタンの下に、専用の小さな光輪を追加 */
-.gate-hero #gatePrayButton::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -18px;
-  transform: translateX(-50%);
-  width: 120%;
-  height: 28px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 50% 20%,
-    rgba(255, 245, 220, 0.9),
-    rgba(255, 225, 180, 0.2),
-    transparent 80%);
-  opacity: 0.9;
-  filter: blur(4px);
-  z-index: -1;
-}
-
-/* 上方に「上から差し込む光の柱」っぽい縦グラ */
-.gate-hero .gate-top-glow {
-  position: absolute;
-  top: -10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 55%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.32),
-    rgba(200, 180, 255, 0.16),
-    transparent
-  );
-  filter: blur(2px);
-  opacity: 0.8;
-  z-index: -4;
-}
-
-/* スマホで少しだけ圧縮して見やすく */
-@media (max-width: 600px) {
-  .gate-hero {
-    padding-top: 80px;
-    padding-bottom: 72px;
-  }
-  .gate-hero h1::before {
-    width: 220px;
-    height: 220px;
-  }
-  .gate-hero h1::after {
-    width: 150px;
-    height: 150px;
-  }
-}
-
 /* =========================================
-   SEREPHIAS 前室：聖なる小神殿レイアウト
-   （セレフィアス覚醒ゲートの部屋）
+   SEREPHIAS 前室：完全版スタイル
+   （重複削除・最終デザイン適用済み）
 ========================================= */
 
-/* ▼ ページ全体ベース */
+/* ▼ 1. ページ背景・ベース */
 .gate-main {
   position: relative;
   min-height: 100vh;
@@ -801,10 +672,11 @@ div.bg-black.bg-opacity-80 {
   overflow: hidden;
 }
 
-/* ▼ 前室本体（神殿のフロア） */
+/* ▼ 2. 神殿フロア（前室本体） */
 .gate-hero {
   position: relative;
   z-index: 1;
+  /* 最終調整されたパディングを採用 */
   padding: 96px 20px 88px;
   min-height: 100vh;
 
@@ -816,33 +688,35 @@ div.bg-black.bg-opacity-80 {
   overflow: hidden;
 }
 
-/* 聖堂の壁＋奥行き（明るめの神殿） */
+/* 奥の聖堂の壁＋柱の陰影（最終の上書き設定を採用） */
 .gate-hero::before {
   content: "";
   position: absolute;
-  inset: -8% 10%;
+  inset: -8% 12%; /* 一番バランスが良い値を採用 */
   background:
     radial-gradient(circle at 50% -10%,
-      rgba(255, 252, 245, 0.32),
-      rgba(212, 190, 255, 0.38),
+      rgba(255, 252, 245, 0.38),
+      rgba(212, 190, 255, 0.42),
       rgba(75, 55, 150, 0.2),
       transparent 70%),
-    radial-gradient(circle at 50% 115%,
-      rgba(40, 18, 80, 0.9),
-      rgba(10, 5, 24, 1));
+    linear-gradient(90deg,
+      rgba(40, 20, 90, 0.95),
+      rgba(18, 8, 44, 1),
+      rgba(40, 20, 90, 0.95));
   opacity: 0.95;
   filter: blur(1px);
   z-index: -3;
+  pointer-events: none;
 }
 
-/* 足元の光輪＝祭壇の床（少し明るめ） */
+/* 足元の光輪・床（最終の上書き設定を採用） */
 .gate-hero::after {
   content: "";
   position: absolute;
   bottom: -32px;
   left: 50%;
   transform: translateX(-50%) translateY(14%);
-  width: min(720px, 100vw);
+  width: min(760px, 105vw); /* 一番広くリッチな値を採用 */
   height: 260px;
   border-radius: 50%;
   background:
@@ -853,26 +727,36 @@ div.bg-black.bg-opacity-80 {
   filter: blur(40px);
   opacity: 0.55;
   z-index: -2;
+  pointer-events: none;
 }
 
-/* 内側コンテンツ */
+/* ▼ 3. コンテンツ配置エリア */
 .gate-inner {
   position: relative;
-  z-index: 3;            /* 神殿レイヤーより前、クリスタルより手前 */
+  z-index: 3;
   max-width: 760px;
   width: 100%;
   margin-inline: auto;
   text-align: center;
 }
 
-/* 天井から差し込む光の柱（柔らかいトップライト） */
+/* タイトル・本文の階層確保 */
+.gate-hero h2,
+.gate-hero p {
+  position: relative;
+  z-index: 1;
+}
+
+/* ▼ 4. 神殿の環境演出（光と影） */
+
+/* 天井からのトップライト */
 .gate-top-glow {
   position: absolute;
   top: -16%;
   left: 50%;
   transform: translateX(-50%);
   width: 140px;
-  height: 60%;
+  height: 60%; /* 長い方を採用 */
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.4),
@@ -882,13 +766,10 @@ div.bg-black.bg-opacity-80 {
   filter: blur(3px);
   opacity: 0.9;
   z-index: -4;
+  pointer-events: none;
 }
 
-/* =========================================
-   TEMPLE GLOW + WALLS：神殿の奥行き・雰囲気演出
-========================================= */
-
-/* 神殿全体を覆う柔らかい天井光 */
+/* 空間全体のグロー */
 .temple-glow-layer {
   position: absolute;
   inset: 0;
@@ -907,7 +788,7 @@ div.bg-black.bg-opacity-80 {
   pointer-events: none;
 }
 
-/* 左右の柱影：神殿の立体感を作る */
+/* 左右の柱影 */
 .temple-walls::before,
 .temple-walls::after {
   content: "";
@@ -926,12 +807,12 @@ div.bg-black.bg-opacity-80 {
   pointer-events: none;
   mix-blend-mode: screen;
 }
-
 .temple-walls::before { left: 0; }
 .temple-walls::after  { right: 0; }
 
 
-/* リード文 */
+/* ▼ 5. テキスト要素 */
+
 .gate-lead {
   margin: 0 0 2.6rem;
   font-size: 0.98rem;
@@ -941,94 +822,6 @@ div.bg-black.bg-opacity-80 {
   text-shadow: 0 0 10px rgba(10, 5, 20, 0.8);
 }
 
-/* =========================================
-   《祈りを捧げる》ボタン
-========================================= */
-
-.gate-pray-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 10px 20px;
-  background: radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
-  color: #25130c;
-  font-family: inherit;
-  font-size: 0.9rem;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  cursor: pointer;
-  box-shadow:
-    0 0 20px rgba(255, 215, 122, 0.9),
-    0 0 34px rgba(0, 0, 0, 0.95);
-  transition:
-    transform 0.12s ease-out,
-    box-shadow 0.12s ease-out,
-    filter 0.12s ease-out,
-    opacity 0.2s ease-out;
-  position: relative;
-  overflow: hidden;
-}
-
-/* ボタン上のハイライト走査（←元の ::after を ::before に移動） */
-.gate-pray-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 0 50%, rgba(255, 255, 255, 0.5), transparent 60%);
-  mix-blend-mode: screen;
-  opacity: 0;
-  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
-  transform: translateX(-30%);
-}
-
-/* ボタン下の専用光輪 */
-.gate-pray-btn::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -18px;
-  transform: translateX(-50%);
-  width: 130%;
-  height: 30px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 50% 20%,
-    rgba(255, 246, 220, 0.9),
-    rgba(255, 225, 180, 0.2),
-    transparent 80%);
-  opacity: 0.95;
-  filter: blur(5px);
-  z-index: -1;
-}
-
-.gate-pray-main {
-  letter-spacing: 0.18em;
-}
-
-.gate-pray-sub {
-  font-size: 0.76rem;
-  color: rgba(60, 38, 22, 0.9);
-}
-
-.gate-pray-btn:hover:not(.is-disabled) {
-  transform: translateY(-1px);
-  box-shadow:
-    0 0 26px rgba(255, 230, 180, 1),
-    0 0 36px rgba(0, 0, 0, 0.98);
-  filter: saturate(1.08);
-}
-
-.gate-pray-btn:hover:not(.is-disabled)::before {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.gate-pray-btn.is-disabled {
-  opacity: 0.75;
-  cursor: default;
-}
-
-/* 注意書き */
 .gate-audio-note {
   margin-top: 1.4rem;
   font-size: 0.72rem;
@@ -1038,7 +831,7 @@ div.bg-black.bg-opacity-80 {
   text-shadow: 0 0 8px rgba(5, 3, 12, 0.9);
 }
 
-/* 詩ブロック */
+/* 詩のブロック */
 .serephias-poem {
   margin-top: 2.6rem;
   padding: 18px 18px 20px;
@@ -1064,36 +857,118 @@ div.bg-black.bg-opacity-80 {
   line-height: 1.9;
 }
 
-/* スマホ調整 */
-@media (max-width: 600px) {
-  .gate-hero {
-    padding-top: 84px;
-    padding-bottom: 76px;
-  }
-  .gate-heading::before {
-    width: 240px;
-    height: 240px;
-  }
-  .gate-heading::after {
-    width: 170px;
-    height: 170px;
-  }
+
+/* ▼ 6. 祈りボタン（IDとClassを統合） */
+/* HTMLの id="gatePrayButton" でも class="gate-pray-btn" でも効くように両方指定 */
+#gatePrayButton,
+.gate-pray-btn {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  margin-top: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+
+  background: radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
+  color: #25130c;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  /* 後から追加されていたリッチな影設定を採用 */
+  box-shadow:
+    0 0 20px rgba(255, 215, 122, 0.9),
+    0 0 34px rgba(0, 0, 0, 0.95);
+
+  transition:
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out,
+    filter 0.12s ease-out,
+    opacity 0.2s ease-out;
+  overflow: hidden;
 }
 
-/* =========================================
-   浮遊クリスタル・背景レイヤー（神域版）
-   ※ 横回転なし／美しく軟らかい揺れだけ
-========================================= */
+/* ボタン上の光走査 */
+#gatePrayButton::before,
+.gate-pray-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0 50%, rgba(255, 255, 255, 0.5), transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translateX(-30%);
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+}
 
+/* ボタン下の専用光輪 */
+#gatePrayButton::after,
+.gate-pray-btn::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  width: 130%;
+  height: 30px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 20%,
+    rgba(255, 246, 220, 0.9),
+    rgba(255, 225, 180, 0.2),
+    transparent 80%);
+  opacity: 0.95;
+  filter: blur(5px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.gate-pray-main {
+  letter-spacing: 0.18em;
+}
+.gate-pray-sub {
+  font-size: 0.76rem;
+  color: rgba(60, 38, 22, 0.9);
+}
+
+/* ホバー時の挙動 */
+#gatePrayButton:hover:not(.is-disabled),
+.gate-pray-btn:hover:not(.is-disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 26px rgba(255, 230, 180, 1),
+    0 0 36px rgba(0, 0, 0, 0.98);
+  filter: saturate(1.08);
+}
+
+#gatePrayButton:hover:not(.is-disabled)::before,
+.gate-pray-btn:hover:not(.is-disabled)::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+#gatePrayButton.is-disabled,
+.gate-pray-btn.is-disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+
+
+/* ▼ 7. アニメーション（クリスタル・粒子） */
+
+/* 浮遊クリスタル（揺れのみ、回転なし） */
 .floating-crystal-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 2;  /* 柱より前、テキストより少し奥 */
+  z-index: 2;
 }
 
-/* クリスタル本体 */
 .tiny-crystal {
   position: absolute;
   left: var(--x, 50%);
@@ -1110,7 +985,6 @@ div.bg-black.bg-opacity-80 {
       rgba(158, 176, 255, 0.9)
     );
   border-radius: 999px;
-
   box-shadow:
     0 0 10px rgba(255, 255, 255, 0.95),
     0 0 22px rgba(195, 180, 255, 0.95);
@@ -1123,57 +997,25 @@ div.bg-black.bg-opacity-80 {
     crystalGlow 6s ease-in-out infinite;
 }
 
-/* 大中小のサイズバリエーション */
-.tiny-crystal.sz-s {
-  --w: 11px;
-  --h: 26px;
-  opacity: 0.55;
-}
+.tiny-crystal.sz-s { --w: 11px; --h: 26px; opacity: 0.55; }
+.tiny-crystal.sz-m { --w: 15px; --h: 34px; opacity: 0.78; }
+.tiny-crystal.sz-l { --w: 20px; --h: 48px; opacity: 0.98; }
 
-.tiny-crystal.sz-m {
-  --w: 15px;
-  --h: 34px;
-  opacity: 0.78;
-}
-
-.tiny-crystal.sz-l {
-  --w: 20px;
-  --h: 48px;
-  opacity: 0.98;
-}
-
-/* 徐々に消えるとき：ふわっと上へ */
 .tiny-crystal.is-fadeout {
   transition: opacity 2.8s ease, transform 2.8s ease;
   opacity: 0;
   transform: translate3d(0, -16px, 0) scale(0.9);
 }
 
-/* 上下揺れ＋緩い横スイングのみ（回転なし） */
 @keyframes crystalFloatSoft {
-  0% {
-    transform: translate3d(0, 10px, 0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  25% {
-    transform: translate3d(6px, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -12px, 0);
-  }
-  75% {
-    transform: translate3d(-6px, 0, 0);
-  }
-  100% {
-    transform: translate3d(0, 10px, 0);
-    opacity: 0;
-  }
+  0%   { transform: translate3d(0, 10px, 0); opacity: 0; }
+  10%  { opacity: 1; }
+  25%  { transform: translate3d(6px, 0, 0); }
+  50%  { transform: translate3d(0, -12px, 0); }
+  75%  { transform: translate3d(-6px, 0, 0); }
+  100% { transform: translate3d(0, 10px, 0); opacity: 0; }
 }
 
-/* 明滅する輝き（そのまま強めに） */
 @keyframes crystalGlow {
   0%, 100% {
     box-shadow:
@@ -1186,108 +1028,49 @@ div.bg-black.bg-opacity-80 {
       0 0 30px rgba(215, 205, 255, 1);
   }
 }
-/* ===== 神殿感ちょい足し（上書き用） ===== */
 
-/* 壁のグラデを少し柔らかく＆縦柱っぽさ追加 */
-.gate-hero::before {
-  inset: -8% 12%;
-  background:
-    radial-gradient(circle at 50% -10%,
-      rgba(255, 252, 245, 0.38),
-      rgba(212, 190, 255, 0.42),
-      rgba(75, 55, 150, 0.2),
-      transparent 70%),
-    linear-gradient(90deg,
-      rgba(40, 20, 90, 0.95),
-      rgba(18, 8, 44, 1),
-      rgba(40, 20, 90, 0.95));
-}
-
-/* 左右にうっすら「柱」の影 */
-.gate-hero::after {
-  bottom: -32px;
-  left: 50%;
-  transform: translateX(-50%) translateY(14%);
-  width: min(760px, 105vw);
-  height: 260px;
-}
-
-/* スマホで壁が広すぎるとき少しだけ内側に寄せる */
-@media (max-width: 600px) {
-  .gate-hero::before {
-    inset: -6% 16%;
-  }
-}
-
-/* 覚醒オーバーレイ全体は今のままでOK */
-
-/* 光粒子コンテナ */
+/* 覚醒粒子 */
 .awaken-particles {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-
-  /* ★ 背景グラデより前、大きいクリスタルより一段下 */
   z-index: 2;
 }
 
-/* 大きいクリスタル本体（クラス名は実際のものに合わせて） */
 .awakening-gate-shell {
   position: relative;
-  z-index: 3; /* 粒子より前に出す */
+  z-index: 3;
 }
 
-/* 光粒子 1 個ずつ */
 .awaken-particle {
   position: absolute;
   width: 8px;
   height: 24px;
   border-radius: 999px;
-
   background: radial-gradient(circle at 50% 0,
     rgba(255,255,255,0.95),
     rgba(190,200,255,0.8),
     rgba(120,140,255,0.0)
   );
-
   box-shadow:
     0 0 8px rgba(255,255,255,0.9),
     0 0 18px rgba(190,180,255,0.9);
-
   opacity: 0;
   animation:
     awakenFloat 10s ease-in-out infinite,
     awakenGlow 6s ease-in-out infinite;
-}
-
-/* JSが span に --i を入れてる前提 */
-.awaken-particle {
   animation-delay: calc(var(--i) * -0.6s);
 }
 
-/* ふわっと浮かぶ */
 @keyframes awakenFloat {
-  0% {
-    transform: translate3d(0, 20px, 0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    transform: translate3d(0, -18px, 0);
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(0, 24px, 0);
-    opacity: 0;
-  }
+  0%   { transform: translate3d(0, 20px, 0); opacity: 0; }
+  10%  { opacity: 1; }
+  50%  { transform: translate3d(0, -18px, 0); }
+  90%  { opacity: 1; }
+  100% { transform: translate3d(0, 24px, 0); opacity: 0; }
 }
 
-/* 明滅 */
 @keyframes awakenGlow {
   0%, 100% {
     box-shadow:
@@ -1300,4 +1083,32 @@ div.bg-black.bg-opacity-80 {
       0 0 26px rgba(215,205,255,1);
   }
 }
+
+
+/* ▼ 8. スマホ調整 */
+@media (max-width: 600px) {
+  .gate-hero {
+    padding-top: 84px; /* 最終的な微調整値を採用 */
+    padding-bottom: 76px;
+  }
+  .gate-hero::before {
+    inset: -6% 16%; /* スマホ用の壁寄せ設定を採用 */
+  }
+
+  /*
+    HTMLでタイトルのクラスが gate-heading なのか gate-hero内のh1 なのか
+    不明なため、両方に対応できるようにしています。
+  */
+  .gate-heading::before,
+  .gate-hero h1::before {
+    width: 220px;
+    height: 220px;
+  }
+  .gate-heading::after,
+  .gate-hero h1::after {
+    width: 150px;
+    height: 150px;
+  }
+}
+
 
