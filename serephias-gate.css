@@ -824,6 +824,7 @@ div.bg-black.bg-opacity-80 {
    （セレフィアス覚醒ゲートの部屋）
 ========================================= */
 
+/* ▼ ページ全体ベース */
 .gate-main {
   position: relative;
   min-height: 100vh;
@@ -836,7 +837,7 @@ div.bg-black.bg-opacity-80 {
   overflow: hidden;
 }
 
-/* 前室本体 */
+/* ▼ 前室本体（神殿のフロア） */
 .gate-hero {
   position: relative;
   z-index: 1;
@@ -893,14 +894,79 @@ div.bg-black.bg-opacity-80 {
 /* 内側コンテンツ */
 .gate-inner {
   position: relative;
-  z-index: 1;
+  z-index: 3;            /* 神殿レイヤーより前、クリスタルより手前 */
   max-width: 760px;
   width: 100%;
   margin-inline: auto;
   text-align: center;
 }
 
-/* タイトルまわり（魔方陣） */
+/* 天井から差し込む光の柱（柔らかいトップライト） */
+.gate-top-glow {
+  position: absolute;
+  top: -16%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 60%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(230, 215, 255, 0.16),
+    transparent
+  );
+  filter: blur(3px);
+  opacity: 0.9;
+  z-index: -4;
+}
+
+/* =========================================
+   Temple Glow Layer ＆ Temple Walls
+   （神殿の天井光と柱のシルエット）
+========================================= */
+
+.temple-glow-layer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(255,250,255,0.55),
+      rgba(255,255,255,0.03) 40%,
+      transparent 70%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.12),
+      transparent 70%);
+  filter: blur(18px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.temple-walls::before,
+.temple-walls::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 22%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(200,180,255,0.08),
+    rgba(80,60,140,0.15),
+    rgba(10,8,30,0.0)
+  );
+  filter: blur(6px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.temple-walls::before { left: 0; }
+.temple-walls::after  { right: 0; }
+
+/* =========================================
+   タイトルまわり（魔方陣）
+========================================= */
+
 .gate-heading {
   position: relative;
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
@@ -939,8 +1005,7 @@ div.bg-black.bg-opacity-80 {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   border: 1px dashed rgba(255, 240, 220, 0.26);
-  box-shadow:
-    0 0 18px rgba(218, 200, 255, 0.7);
+  box-shadow: 0 0 18px rgba(218, 200, 255, 0.7);
   opacity: 0.28;
   filter: blur(26px);
   z-index: -1;
@@ -956,60 +1021,46 @@ div.bg-black.bg-opacity-80 {
   text-shadow: 0 0 10px rgba(10, 5, 20, 0.8);
 }
 
-/* 天井から差し込む光の柱（前室） */
-.gate-top-glow {
-  position: absolute;
-  top: -16%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 140px;
-  height: 60%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.4),
-    rgba(230, 215, 255, 0.16),
-    transparent
-  );
-  filter: blur(3px);
-  opacity: 0.9;
-  z-index: -4;
-}
-/* 《祈りを捧げる》ボタン */
+/* =========================================
+   《祈りを捧げる》ボタン
+========================================= */
+
 .gate-pray-btn {
-  border: none; border-radius: 999px; padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
   background: radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
-  color: #25130c; font-family: inherit; font-size: 0.9rem;
-  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  color: #25130c;
+  font-family: inherit;
+  font-size: 0.9rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(255, 215, 122, 0.9), 0 0 34px rgba(0, 0, 0, 0.95);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, filter 0.12s ease-out, opacity 0.2s ease-out;
-  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 20px rgba(255, 215, 122, 0.9),
+    0 0 34px rgba(0, 0, 0, 0.95);
+  transition:
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out,
+    filter 0.12s ease-out,
+    opacity 0.2s ease-out;
+  position: relative;
+  overflow: hidden;
 }
-.gate-pray-btn::after {
-  content: ""; position: absolute; inset: 0;
+
+/* ボタン上のハイライト走査（←元の ::after を ::before に移動） */
+.gate-pray-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: radial-gradient(circle at 0 50%, rgba(255, 255, 255, 0.5), transparent 60%);
-  mix-blend-mode: screen; opacity: 0;
+  mix-blend-mode: screen;
+  opacity: 0;
   transition: opacity 0.18s ease-out, transform 0.18s ease-out;
   transform: translateX(-30%);
 }
-.gate-pray-main { letter-spacing: 0.18em; }
-.gate-pray-sub { font-size: 0.76rem; color: rgba(60, 38, 22, 0.9); }
-
-.gate-pray-btn:hover:not(.is-disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 0 26px rgba(255, 230, 180, 1), 0 0 36px rgba(0, 0, 0, 0.98);
-  filter: saturate(1.08);
-}
-.gate-pray-btn:hover:not(.is-disabled)::after { opacity: 1; transform: translateX(0); }
-.gate-pray-btn.is-disabled { opacity: 0.75; cursor: default; }
-
-.gate-audio-note {
-  font-size: 0.75rem; margin-top: 8px; color: rgba(220, 220, 255, 0.8);
-  opacity: 0; transform: translateY(4px);
-  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-.gate-audio-note.is-visible { opacity: 1; transform: translateY(0); }
-
 
 /* ボタン下の専用光輪 */
 .gate-pray-btn::after {
@@ -1030,7 +1081,32 @@ div.bg-black.bg-opacity-80 {
   z-index: -1;
 }
 
+.gate-pray-main {
+  letter-spacing: 0.18em;
+}
 
+.gate-pray-sub {
+  font-size: 0.76rem;
+  color: rgba(60, 38, 22, 0.9);
+}
+
+.gate-pray-btn:hover:not(.is-disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 26px rgba(255, 230, 180, 1),
+    0 0 36px rgba(0, 0, 0, 0.98);
+  filter: saturate(1.08);
+}
+
+.gate-pray-btn:hover:not(.is-disabled)::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.gate-pray-btn.is-disabled {
+  opacity: 0.75;
+  cursor: default;
+}
 
 /* 注意書き */
 .gate-audio-note {
@@ -1068,7 +1144,6 @@ div.bg-black.bg-opacity-80 {
   line-height: 1.9;
 }
 
-
 /* スマホ調整 */
 @media (max-width: 600px) {
   .gate-hero {
@@ -1085,7 +1160,6 @@ div.bg-black.bg-opacity-80 {
   }
 }
 
-
 /* =========================================
    浮遊クリスタル・背景レイヤー（神域版）
    ※ 横回転なし／美しく軟らかい揺れだけ
@@ -1096,7 +1170,7 @@ div.bg-black.bg-opacity-80 {
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 0;  /* gate-inner より奥に配置 */
+  z-index: 2;  /* 柱より前、テキストより少し奥 */
 }
 
 /* クリスタル本体 */
