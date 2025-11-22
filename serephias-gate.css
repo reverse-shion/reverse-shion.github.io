@@ -1385,33 +1385,3 @@ div.bg-black.bg-opacity-80 {
   }
 }
 
-/* ★ gate-inner より後ろ、神殿の中に浮かぶ魔法陣 */
-.temple-sigil {
-  position: absolute;
-  top: 112px;        /* タイトルの裏あたりに配置 */
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(320px, 80vw);
-  aspect-ratio: 1 / 1;
-
-  /* ▼ ここは実際のパスに合わせて書き換え */
-  background-image: url("serephias-magic-circle.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-
-  opacity: 0.55;                 /* 強すぎたら 0.4 くらいまで下げる */
-  mix-blend-mode: screen;        /* 黒背景を飛ばして光だけ残すイメージ */
-  filter:
-    drop-shadow(0 0 24px rgba(255,255,255,0.85))
-    blur(0.5px);
-
-  pointer-events: none;
-  z-index: 1;   /* temple-walls(たぶん -1) より前、gate-inner(z:2以上) より後ろ */
-}
-
-/* 念のため gate-inner の z-index をはっきり指定 */
-.gate-inner {
-  position: relative;
-  z-index: 2;
-}
