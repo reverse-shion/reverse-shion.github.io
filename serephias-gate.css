@@ -706,6 +706,7 @@ div.bg-black.bg-opacity-80 {
 
 /* ===============================
    11. 浮遊クリスタル・背景レイヤー
+   ※ 横回転なし・上品な揺れに変更
 ================================ */
 .floating-crystal-layer {
   position: absolute;
@@ -723,6 +724,7 @@ div.bg-black.bg-opacity-80 {
   width: var(--w, 16px);
   height: var(--h, 40px);
   transform-origin: center;
+
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.98),
@@ -733,10 +735,13 @@ div.bg-black.bg-opacity-80 {
   box-shadow:
     0 0 8px rgba(255, 255, 255, 0.9),
     0 0 18px rgba(186, 167, 255, 0.9);
+
   opacity: 0;
   filter: blur(0.1px);
+
+  /* ゆっくり上下＆左右に揺らめく、横回転なし */
   animation:
-    crystalFloat 18s linear infinite,
+    crystalFloat 18s ease-in-out infinite,
     crystalGlow 6s ease-in-out infinite;
 }
 
@@ -744,12 +749,12 @@ div.bg-black.bg-opacity-80 {
 .tiny-crystal.sz-s {
   --w: 10px;
   --h: 24px;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 .tiny-crystal.sz-m {
   --w: 14px;
   --h: 32px;
-  opacity: 0.75;
+  opacity: 0.7;
 }
 .tiny-crystal.sz-l {
   --w: 18px;
@@ -757,43 +762,35 @@ div.bg-black.bg-opacity-80 {
   opacity: 0.95;
 }
 
-/* 徐々に消えるとき用 */
+/* 徐々に消えるとき用（回転させず、そっと上に抜ける） */
 .tiny-crystal.is-fadeout {
   transition: opacity 2.8s ease, transform 2.8s ease;
   opacity: 0;
-  transform: translate3d(0, -10px, 0) scale(0.85) rotate3d(0, 1, 0, 35deg);
+  transform: translate3d(0, -10px, 0) scale(0.85);
 }
 
-/* 上下揺れ＋横スイング＋Y軸回転 */
+/* 上下揺れ＋わずかな左右スイング（横回転なし） */
 @keyframes crystalFloat {
   0% {
-    transform:
-      translate3d(0, 10px, 0)
-      rotate3d(0, 1, 0, 0deg);
+    transform: translate3d(-4px, 10px, 0);
+    opacity: 0;
   }
-  25% {
-    transform:
-      translate3d(6px, 0, 0)
-      rotate3d(0, 1, 0, 40deg);
+  15% {
+    opacity: 1;
   }
-  50% {
-    transform:
-      translate3d(0, -10px, 0)
-      rotate3d(0, 1, 0, 80deg);
+  35% {
+    transform: translate3d(2px, 0, 0);
   }
-  75% {
-    transform:
-      translate3d(-6px, 0, 0)
-      rotate3d(0, 1, 0, 120deg);
+  65% {
+    transform: translate3d(-2px, -10px, 0);
   }
   100% {
-    transform:
-      translate3d(0, 10px, 0)
-      rotate3d(0, 1, 0, 160deg);
+    transform: translate3d(4px, 10px, 0);
+    opacity: 0.95;
   }
 }
 
-/* 明滅する輝き */
+/* 明滅する輝き（そのまま活かす） */
 @keyframes crystalGlow {
   0%, 100% {
     box-shadow:
@@ -806,7 +803,6 @@ div.bg-black.bg-opacity-80 {
       0 0 24px rgba(210, 190, 255, 0.95);
   }
 }
-
 /* ===============================
    12. SEREPHIAS 前室（小神殿）レイアウト
 ================================ */
