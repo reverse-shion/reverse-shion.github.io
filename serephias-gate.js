@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const introVideo     = document.getElementById('gateIntroVideo');
 
   // 転送先URL
-  const NEXT_URL = 'https://reverse-shion.github.io/shion2.html';
+  const NEXT_URL = 'https://reverse-shion.github.io/serephias-chamber.html';
 
    // ===============================
   // 0. イントロ動画制御（クロムは即スキップ）
