@@ -2,161 +2,561 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<title>SEREPHIAS AWAKEN GATE — Full</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEREPHIAS STARSOUL CHAMBER</title>
 
 <style>
-/* ===========================
-   ベース
-=========================== */
+* { margin:0; padding:0; box-sizing:border-box; }
 html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: radial-gradient(circle at 50% 20%, #2e2150 0%, #120b25 70%, #090611 100%);
-  font-family: "Shippori Mincho", serif;
-  overflow-x: hidden;
-  color: #f7f4fb;
-}
-
-/* 中央揃えコンテナ */
-.center {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height:100%;
+  background:#000;
+  overflow:hidden;
+  font-family:'Noto Serif JP','Shippori Mincho',serif;
+  color:#f7f0e5;
 }
 
 /* ===========================
-   紋章
+   共通
 =========================== */
+body.awakened {
+  background: radial-gradient(circle at 50% -20%, #3b2c78 0%, #0a0620 55%, #000 100%);
+  transition: background 4s ease;
+}
+
+/* 星屑キャンバス */
+#particleCanvas {
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* 暗闇のカーテン */
+#voidCurtain {
+  position:fixed;
+  inset:0;
+  background:#000;
+  z-index:9999;
+  opacity:1;
+  transition:opacity 2s ease;
+}
+
+/* ===========================
+   紋章ステージ
+=========================== */
+#sigilStage {
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  z-index:10;
+  transition:opacity 1.8s ease;
+}
+
+.sigil-light {
+  position:absolute;
+  width:60vmax;
+  height:60vmax;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,215,120,0.8), transparent 60%);
+  opacity:0;
+  filter:blur(22px);
+  transition:opacity 2.2s ease;
+}
+
 #sigil {
-  width: 70%;
-  max-width: 420px;
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 2.5s ease, transform 2.5s ease;
-  margin-top: 70px;
+  width:40vmax;
+  max-width:420px;
+  filter:drop-shadow(0 0 40px #ffd077);
+  opacity:0;
+  transform:scale(0.3) rotate(-180deg);
+  transition:opacity 3s cubic-bezier(0.16,1,0.3,1), transform 3s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* 紋章放射パーティクル */
+#sigilBurst {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:15;
+  opacity:0;
+}
+
+.sigil-burst-particle {
+  position:absolute;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#ffd077;
+  box-shadow:0 0 16px #fff5d5;
+}
+
+@keyframes sigilBurst {
+  0% {
+    transform:translate(0,0);
+    opacity:1;
+  }
+  100% {
+    transform:translate(var(--dx), var(--dy));
+    opacity:0;
+  }
 }
 
 /* ===========================
-   セレフィアス立ち絵
+   セレフィアス登場ステージ
 =========================== */
-#serephias {
-  width: 80%;
-  max-width: 550px;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 2.8s ease, transform 2.8s ease;
-  margin: 40px auto 0 auto;
+#sereStage {
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  opacity:0;
+  z-index:20;
+  transition:opacity 2s ease;
+}
+
+/* 光の柱 */
+.light-beam {
+  position:absolute;
+  top:-100vh;
+  left:50%;
+  width:4px;
+  height:300vh;
+  transform:translate(-50%, -150vh);
+  background:linear-gradient(to bottom, rgba(255,250,235,0.9), transparent);
+  filter:blur(2px);
+  opacity:0;
+  transition:opacity 1.4s ease, transform 1.4s ease;
+}
+
+/* 足元の光輪 */
+.floor-circle {
+  position:absolute;
+  bottom:-100px;
+  left:50%;
+  transform:translateX(-50%);
+  width:500px;
+  height:200px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 20%, rgba(255,240,210,0.9), transparent 70%);
+  filter:blur(20px);
+  opacity:0;
+  transition:opacity 1.6s ease;
+}
+
+/* 立ち絵 */
+#sereFigure {
+  max-width:90vw;
+  max-height:90vh;
+  opacity:0;
+  transform:translateY(100px);
+  filter:blur(4px);
+  transition:opacity 2.4s cubic-bezier(0.2,0.9,0.3,1), transform 2.4s cubic-bezier(0.2,0.9,0.3,1), filter 2.4s cubic-bezier(0.2,0.9,0.3,1);
+  z-index:2;
+}
+
+/* 上昇オーラ粒子 */
+.sere-aura-particle {
+  position:fixed;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:radial-gradient(circle, #e0d8ff, #a8c0ff);
+  box-shadow:0 0 24px #c0c8ff;
+  opacity:0;
+  pointer-events:none;
 }
 
 /* ===========================
-   セリフボックス
+   メッセージ＆ボタン
 =========================== */
-#serif-box {
-  opacity: 0;
-  max-width: 780px;
-  margin: 40px auto;
-  padding: 25px 30px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.16);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  line-height: 1.9;
-  font-size: 1.15rem;
-  color: #efe9ff;
-  transition: opacity 2.5s ease;
+#messageBox {
+  position:fixed;
+  bottom:10vh;
+  left:50%;
+  transform:translateX(-50%);
+  text-align:center;
+  z-index:30;
+  opacity:0;
+  transition:opacity 1.5s ease;
+  max-width:90vw;
 }
 
-#serif-box span {
-  display: block;
-  margin-bottom: 10px;
+#messageText {
+  font-size:clamp(1.1rem,2.8vw,1.6rem);
+  line-height:2.3;
+  letter-spacing:0.22em;
+  text-shadow:0 0 20px #ffd077;
+  white-space:pre-line;
 }
 
-/* フェードイン済みクラス */
-.show {
-  opacity: 1 !important;
-  transform: translateY(0) scale(1) !important;
+/* 星命の間へボタン */
+#enterBtn {
+  margin-top:32px;
+  padding:14px 40px;
+  background:linear-gradient(135deg,#fff5d5,#ffd077);
+  color:#240b00;
+  border:none;
+  border-radius:999px;
+  font-size:1rem;
+  letter-spacing:0.2em;
+  cursor:pointer;
+  box-shadow:0 0 40px rgba(255,215,120,0.9);
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity 0.8s ease, transform 0.8s ease;
 }
 
-/* 星砂 */
-.stardust {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,.15) 0%, transparent 60%),
-    radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 70%);
-  background-size: 3px 3px, 5px 5px;
-  opacity: 0.3;
+/* スキップボタン */
+#skipBtn {
+  display:inline-block;
+  margin-top:16px;
+  padding:8px 20px;
+  background:rgba(0,0,0,0.45);
+  border:1px solid rgba(255,240,220,0.7);
+  border-radius:999px;
+  color:#f7f0e5;
+  font-size:0.8rem;
+  letter-spacing:0.18em;
+  cursor:pointer;
+  backdrop-filter:blur(6px);
+  opacity:0.85;
+  transition:background 0.2s ease, opacity 0.2s ease;
+}
+#skipBtn:hover {
+  background:rgba(255,255,255,0.06);
+}
+
+/* スマホ調整 */
+@media (max-width:600px) {
+  #messageText {
+    letter-spacing:0.16em;
+    line-height:2.15;
+  }
+  #enterBtn {
+    width:90%;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="stardust"></div>
+<canvas id="particleCanvas"></canvas>
+<div id="voidCurtain"></div>
 
-<!-- 紋章 -->
-<div class="center">
-  <img id="sigil" src="images/serephias-sigil.png" alt="">
-</div>
+<!-- 紋章ステージ -->
+<section id="sigilStage">
+  <div class="sigil-light"></div>
+  <img id="sigil" src="images/serephias-sigil.png" alt="SEREPHIAS SIGIL">
+</section>
 
-<!-- 立ち絵 -->
-<div class="center">
-  <img id="serephias" src="images/serephias-standing.png" alt="">
-</div>
+<!-- 紋章放射パーティクル -->
+<div id="sigilBurst"></div>
 
-<!-- セリフ -->
-<div id="serif-box">
-  <span>我が名は、セレフィアス。</span>
-  <span>星霊の神子にして、言霊の巫子。</span>
-  <span>あなたの心が、わたしを呼んだ。</span>
+<!-- セレフィアスステージ -->
+<section id="sereStage">
+  <div class="light-beam"></div>
+  <div class="floor-circle"></div>
+  <img id="sereFigure" src="images/serephias-standing.png" alt="SEREPHIAS">
+</section>
 
-  <span>あなたがこの門を越えたということは、</span>
-  <span>もう “星の記憶” から逃れられないということ。</span>
-
-  <span>光は失われてはいない。</span>
-  <span>ただ、思い出されるのを待っているだけ。</span>
-  <span>あなたの星は、まだ沈んでいない。</span>
-
-  <span>そして——</span>
-  <span>あなたの魂の奥底で眠る “始原の声” も、</span>
-  <span>いま静かに目を覚まそうとしている。</span>
-
-  <span>さあ——歩もう。</span>
-  <span>星の言霊（ことだま）が導く場所へ。</span>
-
-  <span>ここは、魂がひらかれる場所。</span>
-  <span>ようこそ──星霊の間へ。</span>
-</div>
+<!-- メッセージ＆ボタン -->
+<section id="messageBox">
+  <div id="messageText"></div>
+  <button id="enterBtn">星命の間へ</button><br>
+  <button id="skipBtn">スキップ / 全文表示</button>
+</section>
 
 <script>
-/* ===========================
-   演出シーケンス
-=========================== */
-window.onload = () => {
-  const sigil = document.getElementById("sigil");
-  const sere = document.getElementById("serephias");
-  const serif = document.getElementById("serif-box");
+document.addEventListener('DOMContentLoaded', () => {
+  const voidCurtain = document.getElementById('voidCurtain');
+  const canvas      = document.getElementById('particleCanvas');
+  const ctx         = canvas.getContext('2d');
 
-  // 紋章フェード
-  setTimeout(() => {
-    sigil.classList.add("show");
-  }, 300);
+  const sigilStage  = document.getElementById('sigilStage');
+  const sigil       = document.getElementById('sigil');
+  const sigilLight  = document.querySelector('.sigil-light');
+  const sigilBurst  = document.getElementById('sigilBurst');
 
-  // 立ち絵出現
-  setTimeout(() => {
-    sere.classList.add("show");
-  }, 2700);
+  const sereStage   = document.getElementById('sereStage');
+  const lightBeam   = document.querySelector('.light-beam');
+  const sereFigure  = document.getElementById('sereFigure');
+  const floorCircle = document.querySelector('.floor-circle');
 
-  // セリフ出現
-  setTimeout(() => {
-    serif.classList.add("show");
-  }, 4800);
-};
+  const messageBox  = document.getElementById('messageBox');
+  const messageText = document.getElementById('messageText');
+  const enterBtn    = document.getElementById('enterBtn');
+  const skipBtn     = document.getElementById('skipBtn');
+
+  let skipped = false;
+
+  // ==========================
+  //  星屑アニメ（Canvas）
+  // ==========================
+  function resizeCanvas() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  const stars = [];
+  for (let i = 0; i < 50; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 2 + 0.5,
+      speed: Math.random() * 1 + 0.5,
+      opacity: Math.random() * 0.6 + 0.4
+    });
+  }
+
+  function animateStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.y += s.speed;
+      if (s.y > canvas.height) s.y = -10;
+      ctx.fillStyle = `rgba(255,250,235,${s.opacity})`;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#fff5d5';
+      ctx.fillRect(s.x, s.y, s.size, s.size * 4);
+    });
+    requestAnimationFrame(animateStars);
+  }
+  animateStars();
+
+  // ==========================
+  //  紋章放射パーティクル
+  // ==========================
+  function sigilBurstEffect() {
+    sigilBurst.style.opacity = '1';
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    for (let i = 0; i < 70; i++) {
+      const angle = (i / 70) * Math.PI * 2;
+      const distance = 120 + Math.random() * 140;
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance;
+
+      const el = document.createElement('div');
+      el.className = 'sigil-burst-particle';
+      el.style.left = centerX + 'px';
+      el.style.top  = centerY + 'px';
+      el.style.setProperty('--dx', dx + 'px');
+      el.style.setProperty('--dy', dy + 'px');
+
+      sigilBurst.appendChild(el);
+      el.style.animation = 'sigilBurst 2.4s ease-out forwards';
+
+      setTimeout(() => el.remove(), 2600);
+    }
+  }
+
+  // ==========================
+  //  セレフィアス上昇オーラ
+  // ==========================
+  function serephiasAura() {
+    const count = 55;
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        if (skipped) return;
+        const el = document.createElement('div');
+        el.className = 'sere-aura-particle';
+
+        const baseX = window.innerWidth * 0.5;
+        const offsetX = (Math.random() - 0.5) * 320;
+        el.style.left = (baseX + offsetX) + 'px';
+        el.style.bottom = '-40px';
+
+        document.body.appendChild(el);
+
+        requestAnimationFrame(() => {
+          el.style.transition = 'all 4.2s cubic-bezier(0.16,1,0.3,1)';
+          el.style.transform  = 'translateY(-' + (window.innerHeight + 260) + 'px) scale(0.4)';
+          el.style.opacity    = '0.95';
+        });
+
+        setTimeout(() => el.remove(), 4500);
+      }, i * 70);
+    }
+  }
+
+  // ==========================
+  //  セリフ（タイピング風）
+  // ==========================
+  const lines = [
+    "我が名は、セレフィアス。",
+    "星霊の神子にして、言霊の巫子。",
+    "あなたの心が、わたしを呼んだ。",
+    "",
+    "あなたがこの門を越えたということは、",
+    "もう “星の記憶” から逃れられないということ。",
+    "",
+    "光は失われてはいない。",
+    "ただ、思い出されるのを待っているだけ。",
+    "あなたの星は、まだ沈んでいない。",
+    "",
+    "そして——",
+    "あなたの魂の奥底で眠る“始原の声”も、\nいま静かに目を覚まそうとしている。",
+    "",
+    "さあ——歩もう。",
+    "星の言霊（ことだま）が導く場所へ。",
+    "",
+    "ここは、魂がひらかれる場所。",
+    "ようこそ──星霊の間へ。"
+  ];
+
+  const fullText = lines.join("\n");
+  let lineIndex = 0;
+
+  function startDialogue() {
+    messageBox.style.opacity = '1';
+    messageText.textContent = "";
+    typeNextLine();
+  }
+
+  function typeNextLine() {
+    if (skipped) return;
+    if (lineIndex >= lines.length) {
+      // 全行表示後、ボタンを出す
+      enterBtn.style.opacity = '1';
+      enterBtn.style.transform = 'translateY(0)';
+      return;
+    }
+
+    const line = lines[lineIndex];
+
+    if (line === "") {
+      messageText.textContent += "\n";
+      lineIndex++;
+      setTimeout(typeNextLine, 600);
+      return;
+    }
+
+    let i = 0;
+    function typeChar() {
+      if (skipped) return;
+      messageText.textContent += line.charAt(i);
+      i++;
+      if (i < line.length) {
+        setTimeout(typeChar, 55);
+      } else {
+        messageText.textContent += "\n";
+        lineIndex++;
+        setTimeout(typeNextLine, 900);
+      }
+    }
+    typeChar();
+  }
+
+  // ==========================
+  //  スキップ処理
+  // ==========================
+  function skipAll() {
+    if (skipped) return;
+    skipped = true;
+
+    // カーテン解除
+    voidCurtain.style.opacity = '0';
+
+    // 紋章最終状態
+    sigilStage.style.opacity = '1';
+    sigil.style.opacity = '1';
+    sigil.style.transform = 'scale(1) rotate(0deg)';
+    sigilLight.style.opacity = '0.6';
+
+    // セレフィアス最終状態
+    sereStage.style.opacity = '1';
+    lightBeam.style.opacity = '0.9';
+    lightBeam.style.transform = 'translate(-50%, 0)';
+    floorCircle.style.opacity = '0.9';
+    sereFigure.style.opacity = '1';
+    sereFigure.style.transform = 'translateY(0)';
+    sereFigure.style.filter = 'blur(0)';
+
+    document.body.classList.add('awakened');
+
+    // セリフ全文表示＆ボタン
+    messageBox.style.opacity = '1';
+    messageText.textContent = fullText;
+    enterBtn.style.opacity = '1';
+    enterBtn.style.transform = 'translateY(0)';
+
+    skipBtn.style.opacity = '0.5';
+    skipBtn.disabled = true;
+  }
+
+  skipBtn.addEventListener('click', skipAll);
+
+  // ==========================
+  //  メインシーケンス
+  // ==========================
+  let t = 0;
+  function addStep(delay, fn) {
+    t += delay;
+    setTimeout(() => { if (!skipped) fn(); }, t);
+  }
+
+  // 1. 暗闇フェード
+  addStep(800, () => {
+    voidCurtain.style.opacity = '0';
+  });
+
+  // 2. 紋章ステージ表示
+  addStep(700, () => {
+    sigilStage.style.opacity = '1';
+    sigil.style.opacity = '1';
+    sigil.style.transform = 'scale(1) rotate(0deg)';
+    sigilLight.style.opacity = '0.6';
+  });
+
+  // 3. 紋章放射
+  addStep(300, () => {
+    sigilBurstEffect();
+  });
+
+  // 4. セレフィアスステージ表示
+  addStep(1800, () => {
+    sereStage.style.opacity = '1';
+  });
+
+  // 5. 光柱
+  addStep(400, () => {
+    lightBeam.style.opacity = '0.9';
+    lightBeam.style.transform = 'translate(-50%, 0)';
+  });
+
+  // 6. 立ち絵＋床光輪＋オーラ
+  addStep(600, () => {
+    sereFigure.style.opacity = '1';
+    sereFigure.style.transform = 'translateY(0)';
+    sereFigure.style.filter = 'blur(0)';
+    floorCircle.style.opacity = '0.9';
+    serephiasAura();
+  });
+
+  // 7. 背景覚醒
+  addStep(1400, () => {
+    document.body.classList.add('awakened');
+  });
+
+  // 8. セリフ開始
+  addStep(1200, () => {
+    startDialogue();
+  });
+
+  // ==========================
+  //  遷移
+  // ==========================
+  enterBtn.addEventListener('click', () => {
+    window.location.href = 'serephias-chamber.html'; // 遷移先は必要に応じて変更
+  });
+});
 </script>
 
 </body>
