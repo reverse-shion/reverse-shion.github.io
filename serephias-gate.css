@@ -959,37 +959,3 @@ div.bg-black.bg-opacity-80 {
     height: 150px;
   }
 }
-/* ===================================
-   セレフィアスの詩の表示位置・優先レイヤー
-   （祈りボタンの「上」に必ず出す）
-=================================== */
-
-/* gate-inner を縦並びに固定 */
-.gate-inner {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-}
-
-/* タイトル＆リード文は order:0 のまま（何もしなくてOK） */
-
-/* ★ セレフィアスの詩ボックス：祈りボタンより上 */
-.serephias-poem {
-  order: 10 !important;          /* タイトル群のすぐ下に来る */
-  width: 100%;
-  max-width: 540px;
-  align-self: center;
-  margin-top: 18px;
-  z-index: 2;                    /* ボタンより“前面”にもしておく */
-}
-
-/* ★ 祈りボタンはその下 */
-#gatePrayButton {
-  order: 20 !important;
-  z-index: 1;
-}
-
-/* ★ 注意書きは一番下 */
-.gate-audio-note {
-  order: 30 !important;
-}
