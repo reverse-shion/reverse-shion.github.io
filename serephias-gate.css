@@ -656,7 +656,7 @@ div.bg-black.bg-opacity-80 {
 
 /* =========================================
    SEREPHIAS 前室：完全版スタイル
-   （重複削除・最終デザイン適用済み）
+   （セレフィアス覚醒ゲートの部屋）
 ========================================= */
 
 /* ▼ 1. ページ背景・ベース */
@@ -676,7 +676,6 @@ div.bg-black.bg-opacity-80 {
 .gate-hero {
   position: relative;
   z-index: 1;
-  /* 最終調整されたパディングを採用 */
   padding: 96px 20px 88px;
   min-height: 100vh;
 
@@ -688,11 +687,11 @@ div.bg-black.bg-opacity-80 {
   overflow: hidden;
 }
 
-/* 奥の聖堂の壁＋柱の陰影（最終の上書き設定を採用） */
+/* 奥の聖堂の壁＋柱の陰影（最終版） */
 .gate-hero::before {
   content: "";
   position: absolute;
-  inset: -8% 12%; /* 一番バランスが良い値を採用 */
+  inset: -8% 12%;
   background:
     radial-gradient(circle at 50% -10%,
       rgba(255, 252, 245, 0.38),
@@ -709,14 +708,14 @@ div.bg-black.bg-opacity-80 {
   pointer-events: none;
 }
 
-/* 足元の光輪・床（最終の上書き設定を採用） */
+/* 足元の光輪・床（最終版） */
 .gate-hero::after {
   content: "";
   position: absolute;
   bottom: -32px;
   left: 50%;
   transform: translateX(-50%) translateY(14%);
-  width: min(760px, 105vw); /* 一番広くリッチな値を採用 */
+  width: min(760px, 105vw);
   height: 260px;
   border-radius: 50%;
   background:
@@ -741,7 +740,7 @@ div.bg-black.bg-opacity-80 {
 }
 
 /* タイトル・本文の階層確保 */
-.gate-hero h2,
+.gate-hero h1,
 .gate-hero p {
   position: relative;
   z-index: 1;
@@ -756,7 +755,7 @@ div.bg-black.bg-opacity-80 {
   left: 50%;
   transform: translateX(-50%);
   width: 140px;
-  height: 60%; /* 長い方を採用 */
+  height: 60%;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.4),
@@ -788,6 +787,14 @@ div.bg-black.bg-opacity-80 {
   pointer-events: none;
 }
 
+/* 左右の柱影コンテナ本体 */
+.temple-walls {
+  position: absolute;
+  inset: 0;
+  z-index: -4;
+  pointer-events: none;
+}
+
 /* 左右の柱影 */
 .temple-walls::before,
 .temple-walls::after {
@@ -803,15 +810,57 @@ div.bg-black.bg-opacity-80 {
     rgba(10, 8, 30, 0)
   );
   filter: blur(8px);
-  z-index: -4;
-  pointer-events: none;
   mix-blend-mode: screen;
 }
 .temple-walls::before { left: 0; }
 .temple-walls::after  { right: 0; }
 
+/* ▼ 5. タイトルまわり：魔法陣リング */
+.gate-heading {
+  position: relative;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.8rem);
+  letter-spacing: 0.18em;
+  margin-bottom: 1.8rem;
+}
 
-/* ▼ 5. テキスト要素 */
+/* 外側リング */
+.gate-heading::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 280px;
+  height: 280px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 240, 220, 0.2);
+  box-shadow:
+    0 0 24px rgba(222, 206, 255, 0.7),
+    inset 0 0 40px rgba(70, 45, 120, 0.85);
+  opacity: 0.35;
+  filter: blur(20px) brightness(1.1);
+  z-index: -1;
+}
+
+/* 内側リング */
+.gate-heading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 190px;
+  height: 190px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 240, 220, 0.26);
+  box-shadow: 0 0 18px rgba(218, 200, 255, 0.7);
+  opacity: 0.28;
+  filter: blur(26px);
+  z-index: -1;
+}
+
+/* ▼ 6. テキスト要素 */
 
 .gate-lead {
   margin: 0 0 2.6rem;
@@ -857,9 +906,8 @@ div.bg-black.bg-opacity-80 {
   line-height: 1.9;
 }
 
-
-/* ▼ 6. 祈りボタン（IDとClassを統合） */
-/* HTMLの id="gatePrayButton" でも class="gate-pray-btn" でも効くように両方指定 */
+/* ▼ 7. 祈りボタン */
+/* id="gatePrayButton" / class="gate-pray-btn" 両対応 */
 #gatePrayButton,
 .gate-pray-btn {
   position: relative;
@@ -880,7 +928,6 @@ div.bg-black.bg-opacity-80 {
   font-size: 0.9rem;
   cursor: pointer;
 
-  /* 後から追加されていたリッチな影設定を採用 */
   box-shadow:
     0 0 20px rgba(255, 215, 122, 0.9),
     0 0 34px rgba(0, 0, 0, 0.95);
@@ -930,6 +977,7 @@ div.bg-black.bg-opacity-80 {
 .gate-pray-main {
   letter-spacing: 0.18em;
 }
+
 .gate-pray-sub {
   font-size: 0.76rem;
   color: rgba(60, 38, 22, 0.9);
@@ -957,10 +1005,7 @@ div.bg-black.bg-opacity-80 {
   cursor: default;
 }
 
-
-/* ▼ 7. アニメーション（クリスタル・粒子） */
-
-/* 浮遊クリスタル（揺れのみ、回転なし） */
+/* ▼ 8. 浮遊クリスタル（回転なし・揺れのみ） */
 .floating-crystal-layer {
   position: absolute;
   inset: 0;
@@ -1029,7 +1074,7 @@ div.bg-black.bg-opacity-80 {
   }
 }
 
-/* 覚醒粒子 */
+/* ▼ 9. 覚醒用の光粒子（大クリスタルまわり） */
 .awaken-particles {
   position: absolute;
   inset: 0;
@@ -1084,31 +1129,23 @@ div.bg-black.bg-opacity-80 {
   }
 }
 
-
-/* ▼ 8. スマホ調整 */
+/* ▼ 10. スマホ調整 */
 @media (max-width: 600px) {
   .gate-hero {
-    padding-top: 84px; /* 最終的な微調整値を採用 */
+    padding-top: 84px;
     padding-bottom: 76px;
   }
+
   .gate-hero::before {
-    inset: -6% 16%; /* スマホ用の壁寄せ設定を採用 */
+    inset: -6% 16%;
   }
 
-  /*
-    HTMLでタイトルのクラスが gate-heading なのか gate-hero内のh1 なのか
-    不明なため、両方に対応できるようにしています。
-  */
-  .gate-heading::before,
-  .gate-hero h1::before {
+  .gate-heading::before {
     width: 220px;
     height: 220px;
   }
-  .gate-heading::after,
-  .gate-hero h1::after {
+  .gate-heading::after {
     width: 150px;
     height: 150px;
   }
 }
-
-
