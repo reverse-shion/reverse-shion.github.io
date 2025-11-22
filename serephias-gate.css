@@ -921,48 +921,50 @@ div.bg-black.bg-opacity-80 {
 }
 
 /* =========================================
-   Temple Glow Layer ＆ Temple Walls
-   （神殿の天井光と柱のシルエット）
+   TEMPLE GLOW + WALLS：神殿の奥行き・雰囲気演出
 ========================================= */
 
-.temple-glow-layer::before {
-  content: "";
+/* 神殿全体を覆う柔らかい天井光 */
+.temple-glow-layer {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 0%,
-      rgba(255,250,255,0.55),
-      rgba(255,255,255,0.03) 40%,
-      transparent 70%),
+    radial-gradient(circle at 50% -20%,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(210, 195, 255, 0.12) 40%,
+      rgba(90, 70, 160, 0.05) 65%,
+      transparent 80%),
     linear-gradient(180deg,
-      rgba(255,255,255,0.12),
-      transparent 70%);
-  filter: blur(18px);
-  z-index: 0;
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(0, 0, 0, 0.0) 100%);
+  filter: blur(24px);
+  opacity: 0.85;
+  z-index: -5;
   pointer-events: none;
 }
 
+/* 左右の柱影：神殿の立体感を作る */
 .temple-walls::before,
 .temple-walls::after {
   content: "";
   position: absolute;
   top: 0;
-  width: 22%;
+  width: 20%;
   height: 100%;
   background: linear-gradient(
     180deg,
-    rgba(200,180,255,0.08),
-    rgba(80,60,140,0.15),
-    rgba(10,8,30,0.0)
+    rgba(200, 180, 255, 0.18),
+    rgba(80, 60, 140, 0.12),
+    rgba(10, 8, 30, 0)
   );
-  filter: blur(6px);
+  filter: blur(8px);
+  z-index: -4;
   pointer-events: none;
-  z-index: 1;
+  mix-blend-mode: screen;
 }
 
 .temple-walls::before { left: 0; }
 .temple-walls::after  { right: 0; }
-
 /* =========================================
    タイトルまわり（魔方陣）
 ========================================= */
