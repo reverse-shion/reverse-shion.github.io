@@ -1394,3 +1394,23 @@ div.bg-black.bg-opacity-80 {
   z-index: 9000;  /* 999 → 9000 とかでOK */
   /* 以下はそのまま */
 }
+
+/* =========================================
+   魔法陣：黒背景を完全透明化（スクリーン合成）
+========================================= */
+
+.temple-sigil {
+  position: absolute;
+  inset: 0;
+  background: url('/mnt/data/6666A74F-B185-4093-AA67-C5BC83305CF4.jpeg') center/contain no-repeat;
+
+  /* ★黒背景を完全に透明化して光線だけ残す */
+  mix-blend-mode: screen;
+
+  /* 光を強める */
+  opacity: 0.78;
+  filter: brightness(1.8) contrast(1.25) blur(0.4px);
+
+  pointer-events: none;
+  z-index: 0; /* 神殿の壁より前、テキストより後ろ */
+}
