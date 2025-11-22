@@ -1303,3 +1303,84 @@ div.bg-black.bg-opacity-80 {
   }
 }
 
+/* 覚醒オーバーレイ全体は今のままでOK */
+
+/* 光粒子コンテナ */
+.awaken-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  /* ★ 背景グラデより前、大きいクリスタルより一段下 */
+  z-index: 2;
+}
+
+/* 大きいクリスタル本体（クラス名は実際のものに合わせて） */
+.awakening-gate-shell {
+  position: relative;
+  z-index: 3; /* 粒子より前に出す */
+}
+
+/* 光粒子 1 個ずつ */
+.awaken-particle {
+  position: absolute;
+  width: 8px;
+  height: 24px;
+  border-radius: 999px;
+
+  background: radial-gradient(circle at 50% 0,
+    rgba(255,255,255,0.95),
+    rgba(190,200,255,0.8),
+    rgba(120,140,255,0.0)
+  );
+
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.9),
+    0 0 18px rgba(190,180,255,0.9);
+
+  opacity: 0;
+  animation:
+    awakenFloat 10s ease-in-out infinite,
+    awakenGlow 6s ease-in-out infinite;
+}
+
+/* JSが span に --i を入れてる前提 */
+.awaken-particle {
+  animation-delay: calc(var(--i) * -0.6s);
+}
+
+/* ふわっと浮かぶ */
+@keyframes awakenFloat {
+  0% {
+    transform: translate3d(0, 20px, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(0, -18px, 0);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 24px, 0);
+    opacity: 0;
+  }
+}
+
+/* 明滅 */
+@keyframes awakenGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 5px rgba(255,255,255,0.8),
+      0 0 14px rgba(195,185,255,0.8);
+  }
+  50% {
+    box-shadow:
+      0 0 13px rgba(255,255,255,1),
+      0 0 26px rgba(215,205,255,1);
+  }
+}
