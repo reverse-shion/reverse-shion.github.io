@@ -1149,3 +1149,83 @@ div.bg-black.bg-opacity-80 {
     height: 150px;
   }
 }
+/* =========================================
+   SEREPHIAS GATE — クリスタル＆粒子 完全版
+   （レイヤー順・overflow 修正）
+========================================= */
+
+/* クリスタルと粒子をクリアに見せたいので
+   ページ側の overflow で切らない */
+.gate-main,
+.gate-hero {
+  overflow: visible;
+}
+
+/* 覚醒オーバーレイ側も同様に切り抜かない */
+.awakening-overlay {
+  overflow: visible;
+}
+
+/* クリスタル本体：常に表示されたまま */
+.awakening-gate-shell {
+  position: relative;
+  z-index: 3;          /* 粒子より前に固定 */
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+
+/* 光の粒子レイヤー：画面いっぱいに広げてクリスタルの一段下 */
+.awaken-particles {
+  position: absolute;
+  inset: -12% 0 -12% 0;   /* 上下に少しはみ出させる */
+  pointer-events: none;
+  overflow: visible;
+  z-index: 2;             /* 背景より前、クリスタルより後ろ */
+}
+
+/* 粒子1つ1つの設定（そのままでもOKだけど念のため再定義） */
+.awaken-particle {
+  position: absolute;
+  width: 8px;
+  height: 24px;
+  border-radius: 999px;
+
+  background: radial-gradient(circle at 50% 0,
+    rgba(255,255,255,0.95),
+    rgba(190,200,255,0.8),
+    rgba(120,140,255,0.0)
+  );
+
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.9),
+    0 0 18px rgba(190,180,255,0.9);
+
+  opacity: 0;
+  animation:
+    awakenFloat 10s ease-in-out infinite,
+    awakenGlow  6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.6s);
+}
+
+/* 浮遊アニメーション（上下のみ） */
+@keyframes awakenFloat {
+  0%   { transform: translate3d(0, 20px, 0); opacity: 0; }
+  10%  { opacity: 1; }
+  50%  { transform: translate3d(0, -18px, 0); }
+  90%  { opacity: 1; }
+  100% { transform: translate3d(0, 24px, 0); opacity: 0; }
+}
+
+/* 明滅アニメーション */
+@keyframes awakenGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 5px rgba(255,255,255,0.8),
+      0 0 14px rgba(195,185,255,0.8);
+  }
+  50% {
+    box-shadow:
+      0 0 13px rgba(255,255,255,1),
+      0 0 26px rgba(215,205,255,1);
+  }
+}
