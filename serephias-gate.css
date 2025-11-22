@@ -1365,3 +1365,32 @@ div.bg-black.bg-opacity-80 {
     height: 170px;
   }
 }
+
+/* クリスタル・光柱・粒子は「中身レイヤー」 */
+.awakening-gate-shell,
+.light-column,
+.awaken-bg-glow,
+.awaken-particles {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== プチュン用シャッター ===== */
+.awakening-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ffffff;       /* 最初は白で覆う */
+  opacity: 0;
+  transform-origin: center;
+  transform: scaleY(1);
+  pointer-events: none;
+  z-index: 2;                /* ★ ここを追加：中身より前 */
+}
+
+.awakening-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;  /* 999 → 9000 とかでOK */
+  /* 以下はそのまま */
+}
