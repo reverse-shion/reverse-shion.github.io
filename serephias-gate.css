@@ -974,37 +974,42 @@ div.bg-black.bg-opacity-80 {
   opacity: 0.9;
   z-index: -4;
 }
-
-/* 祈りボタン（小さな祭壇） */
+/* 《祈りを捧げる》ボタン */
 .gate-pray-btn {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  margin-top: 0.4rem;
-  padding: 12px 26px 14px;
-
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #f6d47a, #f9b968);
-  color: #3a220c;
-  font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, serif;
-
-  box-shadow:
-    0 0 18px rgba(255, 224, 160, 0.9),
-    0 0 40px rgba(210, 182, 255, 0.95);
+  border: none; border-radius: 999px; padding: 10px 20px;
+  background: radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
+  color: #25130c; font-family: inherit; font-size: 0.9rem;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  box-shadow: 0 0 20px rgba(255, 215, 122, 0.9), 0 0 34px rgba(0, 0, 0, 0.95);
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, filter 0.12s ease-out, opacity 0.2s ease-out;
+  position: relative; overflow: hidden;
 }
+.gate-pray-btn::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 0 50%, rgba(255, 255, 255, 0.5), transparent 60%);
+  mix-blend-mode: screen; opacity: 0;
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+  transform: translateX(-30%);
+}
+.gate-pray-main { letter-spacing: 0.18em; }
+.gate-pray-sub { font-size: 0.76rem; color: rgba(60, 38, 22, 0.9); }
 
-.gate-pray-btn:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow:
-    0 0 24px rgba(255, 230, 170, 1),
-    0 0 54px rgba(214, 190, 255, 1);
+.gate-pray-btn:hover:not(.is-disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 26px rgba(255, 230, 180, 1), 0 0 36px rgba(0, 0, 0, 0.98);
+  filter: saturate(1.08);
 }
+.gate-pray-btn:hover:not(.is-disabled)::after { opacity: 1; transform: translateX(0); }
+.gate-pray-btn.is-disabled { opacity: 0.75; cursor: default; }
+
+.gate-audio-note {
+  font-size: 0.75rem; margin-top: 8px; color: rgba(220, 220, 255, 0.8);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+.gate-audio-note.is-visible { opacity: 1; transform: translateY(0); }
+
 
 /* ボタン下の専用光輪 */
 .gate-pray-btn::after {
@@ -1025,16 +1030,7 @@ div.bg-black.bg-opacity-80 {
   z-index: -1;
 }
 
-/* ボタン内テキスト */
-.gate-pray-main {
-  font-size: 1.02rem;
-  letter-spacing: 0.24em;
-}
-.gate-pray-sub {
-  margin-top: 2px;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-}
+
 
 /* 注意書き */
 .gate-audio-note {
