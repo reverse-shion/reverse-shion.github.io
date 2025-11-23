@@ -122,7 +122,6 @@ body.sere-body.gate-active {
   opacity: 1;
 }
 
-/* ▼▼▼ 修正箇所 ▼▼▼ */
 /* テキスト時は画像を薄く（表示中の画像のみ対象） */
 body.opening-text-phase .opening-frame.visible {
   opacity: 0.3;
@@ -133,7 +132,6 @@ body.opening-text-phase .opening-frame.visible {
 body.opening-text-phase .opening-frame:not(.visible) {
   opacity: 0;
 }
-/* ▲▲▲ 修正箇所終わり ▲▲▲ */
 
 /* テキストメッセージ */
 .opening-text-wrap {
@@ -194,6 +192,7 @@ body.opening-text-phase .opening-frame:not(.visible) {
 
 /* ===============================
    2. セレフィアスの間 本殿（白）
+   修正: 背景画像の追加とレイヤー順序変更
 =============================== */
 .sere-main {
   position: relative;
@@ -205,20 +204,40 @@ body.opening-text-phase .opening-frame:not(.visible) {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  z-index: 0;
 }
 
-/* 白背景用パーティクル */
+/* ▼▼▼ 背景画像レイヤー（一番下） ▼▼▼ */
+.sere-main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* ★ここに新しい画像のURLを入れてください */
+  background-image: url('/img/sere-m.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  /* 画面いっぱいに広げるなら cover、中央にロゴのように置くなら contain */
+  background-size: cover; 
+  /* 薄く表示 (0.1〜0.3くらい推奨) */
+  opacity: 0.15;
+  z-index: 0; /* 最背面 */
+  pointer-events: none;
+}
+
+/* 白背景用パーティクル（真ん中のレイヤー） */
 .main-particles {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1; /* 背景より上 */
 }
 
-/* 本文コンテナ */
+/* 本文コンテナ（一番上のレイヤー） */
 .main-inner {
   position: relative;
-  z-index: 1;
+  z-index: 2; /* パーティクルより上 */
   width: min(960px, 92vw);
   padding: 6vh 0 8vh;
   display: flex;
@@ -235,25 +254,14 @@ body.opening-text-phase .opening-frame:not(.visible) {
   margin-bottom: 3vh;
 }
 
+/* ▼▼▼ 紋章・サークルを削除（非表示） ▼▼▼ */
 .crest-circle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 1px solid rgba(184, 164, 232, 0.7);
-  box-shadow:
-    0 0 0 1px rgba(155, 138, 232, 0.3),
-    0 0 40px rgba(212, 192, 255, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.95) 0, rgba(240, 234, 255, 0.9) 60%, rgba(225, 215, 255, 0.95) 100%);
+  display: none;
 }
 
+/* 中身の画像も念のため非表示 */
 .crest-image {
-  width: 86%;
-  height: 86%;
-  object-fit: contain;
+  display: none;
 }
 
 .main-title-block {
