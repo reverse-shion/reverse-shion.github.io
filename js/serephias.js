@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showWelcomeAndGates(name) {
     if (welcomeText) {
-      welcomeText.textContent = `${name}、今日もここに来てくれたのですね。`;
+      welcomeText.textContent = `${name}、<br>今日もここに<br>来てくれたのですね。`;
       welcomeText.classList.remove('hidden');
     }
 
