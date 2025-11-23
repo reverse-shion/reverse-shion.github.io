@@ -1,0 +1,368 @@
+/* ================================
+   セレフィアスのお告げページ CSS
+================================ */
+
+/* ベース */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-main: #fdfbff;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --ink-main: #2a2438;
+  --ink-soft: #6b6780;
+  --accent-lav: #c9b8ff;
+  --accent-deep: #7a68d8;
+  --border-soft: rgba(201, 184, 255, 0.6);
+  --shadow-soft: 0 20px 40px rgba(120, 96, 190, 0.16);
+  --radius-card: 20px;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, serif;
+  background:
+    radial-gradient(circle at 50% -10%, #ffffff 0, #f2ebff 40%, #efe9ff 70%, #fdfbff 100%);
+  color: var(--ink-main);
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* うっすらセレフィアス背景（差し替え推奨） */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.92)),
+    url("img/serephias-bg.jpg") center top / cover no-repeat;
+  opacity: 1;
+  z-index: -2;
+}
+
+/* 星粒レイヤー */
+.oracle-stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.oracle-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(180, 170, 255, 0.9);
+  animation: oracleStarFloat 5s linear infinite;
+  opacity: 0;
+}
+
+@keyframes oracleStarFloat {
+  0% {
+    transform: translateY(10vh);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-110vh);
+    opacity: 0;
+  }
+}
+
+/* 転送ホワイトアウト */
+.oracle-flash {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.9s ease;
+}
+
+/* ラッパー */
+.oracle-wrap {
+  min-height: 100vh;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 3rem 1.6rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ヘッダー */
+.oracle-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.oracle-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  margin-bottom: 0.6rem;
+}
+
+.oracle-title {
+  font-size: 1.9rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.9rem;
+}
+
+.oracle-tagline {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--ink-soft);
+}
+
+/* メイン */
+.oracle-main {
+  flex: 1;
+}
+
+/* 導入 */
+.oracle-intro {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.oracle-intro-line {
+  font-size: 0.98rem;
+  margin-bottom: 0.9rem;
+}
+.oracle-intro-line span {
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+
+.oracle-breath {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.oracle-breath-bar {
+  width: 26px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(143, 123, 255, 0.3);
+  overflow: hidden;
+  position: relative;
+}
+.oracle-breath-bar::after {
+  content: "";
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #b8a4ff, transparent);
+  animation: oracleBreath 4.5s ease-in-out infinite;
+}
+
+.oracle-breath-bar-2::after {
+  animation-delay: 0.8s;
+}
+.oracle-breath-bar-3::after {
+  animation-delay: 1.6s;
+}
+
+@keyframes oracleBreath {
+  0% { transform: translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translateX(200%); opacity: 1; }
+  100% { transform: translateX(200%); opacity: 0; }
+}
+
+.oracle-intro-sub {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* 入力フォーム */
+.oracle-form {
+  margin: 0 auto 2.3rem;
+  padding: 1.5rem 1.3rem 1.8rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(8px);
+}
+
+.oracle-label-text {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.7rem;
+  color: var(--ink-soft);
+}
+
+.oracle-textarea {
+  width: 100%;
+  min-height: 140px;
+  border-radius: 14px;
+  border: 1px solid rgba(180, 168, 240, 0.7);
+  padding: 0.9rem 1rem;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+  background: rgba(255,255,255,0.95);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.oracle-textarea:focus {
+  border-color: var(--accent-deep);
+  box-shadow: 0 0 0 2px rgba(125, 108, 223, 0.3);
+  background: #ffffff;
+}
+
+.oracle-meta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.oracle-count {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.oracle-btn-send {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #e6ddff, #ffffff, #f4ecff);
+  color: var(--ink-main);
+  cursor: pointer;
+  box-shadow: 0 16px 30px rgba(140, 120, 230, 0.27);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+}
+
+.oracle-btn-send:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 38px rgba(140, 120, 230, 0.32);
+}
+
+.oracle-btn-send:active {
+  transform: translateY(0);
+  box-shadow: 0 10px 18px rgba(140, 120, 230, 0.24);
+  opacity: 0.9;
+}
+
+.oracle-note {
+  margin-top: 0.7rem;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* シェアセクション */
+.oracle-share {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.oracle-share-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.oracle-share-text {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  margin-bottom: 1.1rem;
+}
+
+.oracle-share-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.oracle-share-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(140, 120, 230, 0.6);
+  padding: 0.6rem 1.8rem;
+  font-size: 0.9rem;
+  background: rgba(255,255,255,0.9);
+  color: var(--ink-main);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 10px 20px rgba(140, 120, 230, 0.18);
+}
+
+.oracle-share-btn:hover {
+  background: #f7f3ff;
+  transform: translateY(-1px);
+}
+
+.oracle-share-btn-x {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+  box-shadow: 0 12px 22px rgba(0,0,0,0.3);
+}
+
+.oracle-share-btn-x:hover {
+  background: #000000;
+}
+
+.oracle-copy-msg {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--accent-deep);
+}
+
+/* フッター */
+.oracle-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9088a8;
+  margin-top: 1rem;
+}
+
+/* レスポンシブ */
+@media (min-width: 768px) {
+  .oracle-wrap {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .oracle-title {
+    font-size: 2.1rem;
+  }
+
+  .oracle-form {
+    padding: 1.7rem 1.6rem 2.1rem;
+  }
+
+  .oracle-share-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
