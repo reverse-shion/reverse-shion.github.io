@@ -4,645 +4,95 @@
   <meta charset="utf-8" />
   <title>セレフィアスの間 — STARSOUL CHAMBER</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="セレフィアス覚醒ゲートをくぐった先に現れる、星霊の神子セレフィアスの聖域。星命と言霊の真実に触れるための“星命の間”。">
-
+  <meta name="description" content="星霊の神子セレフィアスが導く、星と言霊の神域。オープニング儀式の先に、セレフィアスのお告げと深層星界ゲートが開かれる。">
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
-
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-      width: 100%;
-    }
-
-    body {
-      font-family: 'Noto Serif JP', 'Shippori Mincho', system-ui, serif;
-      /* ★ 初期状態は完全な黒背景 ＋ 縦スクロール許可 */
-      background: #000000;
-      color: #f7f0e5;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-      overflow-y: auto;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* ===========================
-       星霊の間 ベースレイアウト
-    ============================ */
-    .chamber-root {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      /* ★ ここも黒でスタート。後で is-awakened で書き換え */
-      background: #000000;
-      transition: background 3s ease-out;
-      /* ★ スクロールさせるため overflow は消す/visible に */
-      overflow: visible;
-    }
-
-    /* 星砂ノイズ */
-    .chamber-root::before {
-      content: "";
-      position: absolute;
-      inset: -20%;
-      background:
-        radial-gradient(circle at 20% 10%, rgba(255, 240, 210, 0.25), transparent 55%),
-        radial-gradient(circle at 80% 90%, rgba(190, 170, 255, 0.22), transparent 60%),
-        radial-gradient(circle at 10% 90%, rgba(160, 200, 255, 0.16), transparent 55%);
-      opacity: 0;
-      transition: opacity 2s ease-out;
-      z-index: 0;
-    }
-
-    /* 細かい星粒子 */
-    .star-dust-layer {
-      pointer-events: none;
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    .star-dust {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      border-radius: 50%;
-      background: rgba(255, 250, 235, 0.9);
-      opacity: 0;
-      animation: dustDrift linear infinite;
-    }
-
-    @keyframes dustDrift {
-      0% {
-        transform: translate3d(0, 20px, 0);
-        opacity: 0;
-      }
-      20% {
-        opacity: 0.7;
-      }
-      100% {
-        transform: translate3d(0, -120vh, 0);
-        opacity: 0;
-      }
-    }
-
-    /* コンテンツコンテナ */
-    .chamber-inner {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 1080px;
-      padding: 20px 16px 32px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
-      gap: 24px;
-      align-items: center;
-    }
-
-    @media (max-width: 860px) {
-      .chamber-inner {
-        grid-template-columns: 1fr;
-        grid-auto-rows: auto;
-        padding: 20px 16px 40px;
-      }
-    }
-
-    /* ===========================
-       左：星命紋章ブロック
-    ============================ */
-    .sigil-wrap {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 260px;
-    }
-
-    .sigil-core {
-      position: relative;
-      width: min(320px, 70vw);
-      max-width: 360px;
-      opacity: 0;
-      transform: scale(1.06);
-      filter: blur(5px);
-      transition:
-        opacity 1.8s ease-out,
-        transform 2.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-        filter 2.3s ease-out;
-    }
-
-    .sigil-core img {
-      width: 100%;
-      display: block;
-    }
-
-    /* 起動後のゆらぎ光輪 */
-    .sigil-glow-ring {
-      position: absolute;
-      inset: -4%;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 240, 210, 0.5);
-      box-shadow:
-        0 0 24px rgba(255, 240, 210, 0.4),
-        0 0 60px rgba(185, 170, 255, 0.35);
-      opacity: 0;
-      transform: scale(0.94);
-      filter: blur(2px);
-      pointer-events: none;
-    }
-
-    .sigil-glow-ring.is-active {
-      animation: sigilPulse 6s ease-in-out infinite;
-    }
-
-    @keyframes sigilPulse {
-      0%, 100% {
-        opacity: 0.18;
-        transform: scale(0.92);
-      }
-      40% {
-        opacity: 0.55;
-        transform: scale(1.02);
-      }
-    }
-
-    /* 紋章・起動状態 */
-    .sigil-wrap.is-awaken .sigil-core {
-      opacity: 1;
-      transform: scale(1);
-      filter: blur(0px);
-    }
-
-    /* ===========================
-       右：セレフィアス立ち絵
-    ============================ */
-    .figure-wrap {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      min-height: min(540px, 90vh);
-    }
-
-    /* 縦の光柱 */
-    .light-column {
-      position: absolute;
-      top: -30vh;
-      bottom: 8%;
-      left: 50%;
-      width: 2px;
-      transform: translateX(-50%);
-      background: linear-gradient(
-        180deg,
-        rgba(255, 250, 230, 0.9),
-        rgba(255, 230, 180, 0.35),
-        rgba(120, 100, 255, 0.1),
-        transparent
-      );
-      filter: blur(1px);
-      opacity: 0;
-      transition: opacity 2s ease-out;
-    }
-
-    .light-column::before {
-      content: "";
-      position: absolute;
-      top: 14%;
-      left: 50%;
-      width: 220px;
-      height: 220px;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      background: radial-gradient(
-        circle,
-        rgba(255, 250, 235, 1),
-        rgba(255, 230, 190, 0.3),
-        transparent 70%
-      );
-      filter: blur(2px);
-      opacity: 0.0;
-      transition: opacity 2.4s ease-out;
-    }
-
-    .light-column.is-on {
-      opacity: 1;
-    }
-
-    .light-column.is-on::before {
-      opacity: 0.85;
-    }
-
-    /* 立ち絵本体 */
-    .sere-figure {
-      position: relative;
-      max-width: min(460px, 82vw);
-      opacity: 0;
-      transform: translateY(40px) scale(0.96);
-      filter: blur(3px);
-      transition:
-        opacity 1.8s ease-out,
-        transform 1.8s cubic-bezier(0.18, 0.85, 0.25, 1.05),
-        filter 1.8s ease-out;
-      z-index: 2;
-    }
-
-    .sere-figure img {
-      width: 100%;
-      display: block;
-    }
-
-    .sere-figure.is-visible {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
-    }
-
-    /* 立ち姿足元の光輪 */
-    .floor-halo {
-      position: absolute;
-      bottom: -24px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(420px, 75vw);
-      height: 140px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 40%,
-          rgba(255, 240, 210, 0.8),
-          rgba(200, 170, 255, 0.4),
-          rgba(0, 0, 0, 0.0));
-      filter: blur(6px);
-      opacity: 0;
-      transition: opacity 2.5s ease-out;
-      z-index: 1;
-    }
-
-    .floor-halo.is-on {
-      opacity: 0.95;
-    }
-
-    /* ===========================
-       テキスト & ボタン
-    ============================ */
-    .text-block {
-      position: relative;
-      z-index: 3;
-      max-width: 760px;
-      margin: 24px auto 0;
-      padding: 18px 18px 24px;
-      border-radius: 18px;
-      border: 1px solid rgba(210, 205, 255, 0.5);
-      background:
-        radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.14), transparent 55%),
-        linear-gradient(135deg, rgba(9, 10, 30, 0.94), rgba(7, 18, 45, 0.96));
-      box-shadow:
-        0 0 24px rgba(40, 40, 90, 0.85),
-        0 0 50px rgba(0, 0, 0, 0.9);
-      opacity: 0;
-      transform: translateY(16px);
-      transition:
-        opacity 1.2s ease-out 0.2s,
-        transform 1.2s ease-out 0.2s;
-    }
-
-    .text-block.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .text-label {
-      font-size: 0.78rem;
-      letter-spacing: 0.26em;
-      color: rgba(185, 210, 255, 0.96);
-      margin-bottom: 6px;
-      text-align: center;
-    }
-
-    .text-main {
-      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-      font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.05rem);
-      line-height: 1.9;
-      color: #f8eddc;
-      text-align: center;
-      white-space: pre-line;
-      min-height: 5.5em;
-    }
-
-    .text-line {
-      opacity: 0;
-    }
-
-    .text-line.is-shown {
-      opacity: 1;
-    }
-
-    .gate-buttons {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-      opacity: 0;
-      transform: translateY(10px);
-      pointer-events: none;
-      transition:
-        opacity 1s ease-out,
-        transform 1s ease-out;
-    }
-
-    .gate-buttons.is-ready {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .btn-main,
-    .btn-sub {
-      border-radius: 999px;
-      padding: 10px 26px;
-      font-size: 0.9rem;
-      letter-spacing: 0.16em;
-      text-align: center;
-      text-transform: none;
-      cursor: pointer;
-      border: 1px solid transparent;
-    }
-
-    .btn-main {
-      background:
-        radial-gradient(circle at 50% 0%, #fff5d5 0%, #ffd077 40%, #b8742b 100%);
-      color: #241107;
-      box-shadow:
-        0 0 18px rgba(255, 230, 180, 1),
-        0 0 32px rgba(0, 0, 0, 0.95);
-      transition:
-        transform 0.16s ease-out,
-        box-shadow 0.16s ease-out,
-        filter 0.16s ease-out;
-    }
-
-    .btn-main:hover {
-      transform: translateY(-1px);
-      filter: saturate(1.08);
-      box-shadow:
-        0 0 26px rgba(255, 236, 195, 1),
-        0 0 40px rgba(0, 0, 0, 0.98);
-    }
-
-    .btn-sub {
-      background: transparent;
-      color: rgba(230, 220, 255, 0.9);
-      border-color: rgba(210, 205, 255, 0.6);
-      backdrop-filter: blur(6px);
-      padding-inline: 20px;
-    }
-
-    .btn-sub:hover {
-      background: radial-gradient(circle at 50% 0%,
-        rgba(255, 255, 255, 0.14),
-        transparent 70%);
-    }
-
-    @media (max-width: 640px) {
-      .text-block {
-        margin-top: 16px;
-        padding-inline: 14px;
-      }
-      .btn-main, .btn-sub {
-        width: 100%;
-        max-width: 340px;
-      }
-    }
-
-    /* ===========================
-       背景グラデ変化（聖域開放）
-    ============================ */
-    .chamber-root.is-awakened {
-      background:
-        radial-gradient(circle at 50% -10%, #3b2c78 0%, #160f2c 40%, #020008 100%);
-    }
-
-    .chamber-root.is-awakened::before {
-      opacity: 1;
-    }
-
-    /* ヘッダー簡易表示（任意） */
-    .chamber-header {
-      position: absolute;
-      top: 12px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      z-index: 5;
-      font-size: 0.72rem;
-      letter-spacing: 0.28em;
-      color: rgba(230, 220, 255, 0.8);
-      pointer-events: none;
-    }
-
-    .chamber-header span {
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .chamber-footer {
-      position: absolute;
-      bottom: 10px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 0.7rem;
-      letter-spacing: 0.16em;
-      color: rgba(230, 220, 255, 0.55);
-      z-index: 4;
-      pointer-events: none;
-    }
-
-  </style>
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/serephias.css">
 </head>
-<body>
-  <div class="chamber-root" id="sereChamber">
-    <div class="chamber-header">
-      <span>Re:Verse Shion</span>
-      <span>SEREPHIAS STARSOUL CHAMBER</span>
+<body class="sere-body">
+
+  <!-- ===============================
+       1. オープニング儀式
+  ================================ -->
+  <div id="sereOpening" class="sere-opening">
+    <div class="opening-bg"></div>
+    <div id="openingParticles" class="opening-particles"></div>
+
+    <!-- 4カットのレイヤー -->
+    <div class="opening-image-layer">
+      <!-- ① 紋章 -->
+      <!-- ★ 画像パスを自分の環境に合わせて変更してください -->
+      <img src="img/sere-crest.jpg" alt="セレフィアス紋章" class="opening-frame" data-frame="0">
+      <!-- ② 瞳 -->
+      <img src="img/sere-eyes.jpg" alt="セレフィアスの星霊眼" class="opening-frame" data-frame="1">
+      <!-- ③ 胸の星核 -->
+      <img src="img/sere-core.jpg" alt="セレフィアスの星命核" class="opening-frame" data-frame="2">
+      <!-- ④ 全身覚醒 -->
+      <img src="img/sere-full.jpg" alt="セレフィアス全身" class="opening-frame" data-frame="3">
     </div>
 
-    <!-- 星砂レイヤー -->
-    <div class="star-dust-layer" id="starDustLayer"></div>
-
-    <!-- メインコンテンツ -->
-    <div class="chamber-inner">
-      <!-- 左：紋章 -->
-      <div class="sigil-wrap" id="sigilWrap">
-        <div class="sigil-core">
-          <!-- ★ ここをセレフィアス紋章画像に差し替え -->
-          <img src="images/serephias-sigil.png" alt="Serephias Sigil">
-        </div>
-        <div class="sigil-glow-ring" id="sigilGlow"></div>
-      </div>
-
-      <!-- 右：セレフィアス立ち絵 -->
-      <div class="figure-wrap">
-        <div class="light-column" id="lightColumn"></div>
-        <div class="sere-figure" id="sereFigure">
-          <!-- ★ ここをセレフィアス立ち絵画像に差し替え -->
-          <img src="images/serephias-standing.png" alt="Serephias">
-        </div>
-        <div class="floor-halo" id="floorHalo"></div>
-      </div>
+    <!-- メッセージエリア -->
+    <div class="opening-text-wrap">
+      <div id="shortMessage" class="opening-message-block"></div>
+      <div id="longMessage" class="opening-message-block opening-message-long"></div>
     </div>
 
-    <!-- 詩 & ボタン -->
-    <div class="text-block" id="textBlock">
-      <div class="text-label">SEREPHIAS MESSAGE — 星霊からの言葉</div>
-      <div class="text-main">
-        <span id="line1" class="text-line"></span>
-        <span id="line2" class="text-line"></span>
-        <span id="line3" class="text-line"></span>
-        <span id="line4" class="text-line"></span>
-      </div>
-
-      <div class="gate-buttons" id="gateButtons">
-        <!-- ★ href を実際のURLに差し替えてね -->
-        <a href="https://reverse-shion.github.io/shion2.html" class="btn-main">
-          星の言霊（詩韻思想）へ進む
-        </a>
-        <a href="https://reverse-shion.github.io/serephias-gate.html" class="btn-sub">
-          星界ゲートへ戻る
-        </a>
-      </div>
-    </div>
-
-    <div class="chamber-footer">
-      STARSOUL CHAMBER — Only those who cross the gate may enter.
-    </div>
+    <!-- スキップボタン -->
+    <button id="skipOpening" class="opening-skip-btn" type="button">
+      SKIP ▶
+    </button>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const chamber    = document.getElementById('sereChamber');
-      const sigilWrap  = document.getElementById('sigilWrap');
-      const sigilGlow  = document.getElementById('sigilGlow');
-      const lightCol   = document.getElementById('lightColumn');
-      const figure     = document.getElementById('sereFigure');
-      const floorHalo  = document.getElementById('floorHalo');
-      const textBlock  = document.getElementById('textBlock');
-      const gateBtns   = document.getElementById('gateButtons');
-      const starLayer  = document.getElementById('starDustLayer');
+  <!-- ===============================
+       2. 本編：セレフィアスの間 本殿
+  ================================ -->
+  <main id="sereMain" class="sere-main hidden">
+    <!-- 背景用：セレフィアスの残像 -->
+    <div class="main-bg">
+      <!-- 全身画像を薄く背景として利用 -->
+      <img src="img/sere-full.jpg" alt="セレフィアス" class="main-bg-sere">
+    </div>
 
-      // ===========================
-      // 星砂パーティクルを軽めに生成
-      // ===========================
-      const starCount = 40;
-      for (let i = 0; i < starCount; i++) {
-        const s = document.createElement('div');
-        s.className = 'star-dust';
-        const delay = Math.random() * -10;
-        const duration = 12 + Math.random() * 8;
-        const left = Math.random() * 100;
-        s.style.left = left + '%';
-        s.style.bottom = (-10 - Math.random() * 20) + 'px';
-        s.style.animationDuration = duration + 's';
-        s.style.animationDelay = delay + 's';
-        starLayer.appendChild(s);
-      }
+    <div class="main-overlay"></div>
 
-      // ===========================
-      // タイピング演出
-      // ===========================
-      const lines = [
-        {
-          id: 'line1',
-          text: '我が名は――セレフィアス。'
-        },
-        {
-          id: 'line2',
-          text: '星霊の神子にして、言霊の巫子。あなたの心が、わたしを呼んだ。'
-        },
-        {
-          id: 'line3',
-          text: 'ここは「星命の間」。すべての言葉は光となり、その光は世界を編む。'
-        },
-        {
-          id: 'line4',
-          text: 'さあ――あなたの中の星を、もう一度、思い出して。'
-        }
-      ];
+    <section class="main-inner">
+      <header class="main-header">
+        <div class="crest-circle">
+          <img src="img/sere-crest.jpg" alt="セレフィアス紋章" class="crest-image">
+        </div>
+        <div class="main-title-block">
+          <h1 class="main-title-en">SEREPHIAS CHAMBER</h1>
+          <p class="main-title-jp">星霊の間 ― 星と言霊の神域 ―</p>
+        </div>
+      </header>
 
-      function typeLine(el, text, speed, cb) {
-        el.classList.add('is-shown');
-        let i = 0;
-        function tick() {
-          if (i <= text.length) {
-            el.textContent = text.slice(0, i);
-            i++;
-            setTimeout(tick, speed);
-          } else {
-            setTimeout(cb, 500);
-          }
-        }
-        tick();
-      }
+      <!-- ボタン群 -->
+      <section class="main-gate-section">
+        <!-- ① セレフィアスのお告げ -->
+        <a href="oracle.html" class="sere-btn sere-btn-primary">
+          <span class="btn-title">セレフィアスのお告げを受ける</span>
+          <span class="btn-sub">今のあなたに必要な“ひと言”だけが降りてくる</span>
+        </a>
 
-      function typeAllLines(idx, cb) {
-        if (idx >= lines.length) {
-          cb && cb();
-          return;
-        }
-        const def = lines[idx];
-        const el = document.getElementById(def.id);
-        if (!el) {
-          typeAllLines(idx + 1, cb);
-          return;
-        }
-        typeLine(el, def.text, 70, () => typeAllLines(idx + 1, cb));
-      }
+        <div class="main-sub-buttons">
+          <!-- ② 深層星界ゲート（1日・15日のみ開門） -->
+          <button id="deepGateBtn" class="sere-btn sere-btn-secondary" type="button">
+            <span class="btn-title">深層星界ゲート</span>
+            <span id="deepGateSub" class="btn-sub"></span>
+          </button>
 
-      // ===========================
-      // シーケンス開始
-      // ===========================
-      // 1) 少し待ってから紋章起動
-      setTimeout(() => {
-        sigilWrap.classList.add('is-awaken');
-        sigilGlow.classList.add('is-active');
-      }, 1200);
+          <!-- ③ 星命アーカイヴ（ここ経由のみ） -->
+          <a href="archive.html" class="sere-btn sere-btn-secondary">
+            <span class="btn-title">星命アーカイヴへ</span>
+            <span class="btn-sub">ここでしか開かない、封印された記録</span>
+          </a>
+        </div>
+      </section>
+    </section>
+  </main>
 
-      // 2) セレフィアス降臨（光柱→立ち絵→足元光輪）
-      setTimeout(() => {
-        lightCol.classList.add('is-on');
-        figure.classList.add('is-visible');
-        floorHalo.classList.add('is-on');
-      }, 4800);
-
-      // 3) 背景を“聖域モード”へ
-      setTimeout(() => {
-        chamber.classList.add('is-awakened');
-      }, 7000);
-
-      // 4) 詩テキストボックス表示
-      setTimeout(() => {
-        textBlock.classList.add('is-visible');
-        // タイピング開始
-        typeAllLines(0, () => {
-          // 5) 全文表示後、ボタンを表示
-          gateBtns.classList.add('is-ready');
-        });
-      }, 8200);
-    });
-  </script>
+  <!-- Scripts -->
+  <script src="js/serephias.js"></script>
 </body>
 </html>
