@@ -4,36 +4,95 @@
   <meta charset="utf-8" />
   <title>セレフィアスの間 — STARSOUL CHAMBER</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <link rel="stylesheet" href="css/serephias.css" />
+  <meta name="description" content="星霊の神子セレフィアスが導く、星と言霊の神域。オープニング儀式の先に、セレフィアスのお告げと深層星界ゲートが開かれる。">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/serephias.css">
 </head>
+<body class="sere-body">
 
-<body>
+  <!-- ===============================
+       1. オープニング儀式
+  ================================ -->
+  <div id="sereOpening" class="sere-opening">
+    <div class="opening-bg"></div>
+    <div id="openingParticles" class="opening-particles"></div>
 
-  <!-- ▼ 星屑レイヤー -->
-  <canvas id="starfield"></canvas>
+    <!-- 4カットのレイヤー -->
+    <div class="opening-image-layer">
+      <!-- ① 紋章 -->
+      <!-- ★ 画像パスを自分の環境に合わせて変更してください -->
+      <img src="img/sere-crest.png" alt="セレフィアス紋章" class="opening-frame" data-frame="0">
+      <!-- ② 瞳 -->
+      <img src="img/sere-eyes.png" alt="セレフィアスの星霊眼" class="opening-frame" data-frame="1">
+      <!-- ③ 胸の星核 -->
+      <img src="img/sere-core.png" alt="セレフィアスの星命核" class="opening-frame" data-frame="2">
+      <!-- ④ 全身覚醒 -->
+      <img src="img/sere-full.png" alt="セレフィアス全身" class="opening-frame" data-frame="3">
+    </div>
 
-  <!-- ▼ オープニング4カット -->
-  <div id="op-sequence">
-    <img src="/img/sere-crest.png" class="op-cut" id="cut1">
-    <img src="/img/sere-eyes.png" class="op-cut" id="cut2">
-    <img src="/img/sere-core.png" class="op-cut" id="cut3">
-    <img src="/img/sere-full.png" class="op-cut" id="cut4">
+    <!-- メッセージエリア -->
+    <div class="opening-text-wrap">
+      <div id="shortMessage" class="opening-message-block"></div>
+      <div id="longMessage" class="opening-message-block opening-message-long"></div>
+    </div>
+
+    <!-- スキップボタン -->
+    <button id="skipOpening" class="opening-skip-btn" type="button">
+      SKIP ▶
+    </button>
   </div>
 
-  <!-- ▼ テキスト演出 -->
-  <div id="text-box">
-    <div id="typewriter"></div>
-    <button id="skip-btn">SKIP ▶</button>
-  </div>
+  <!-- ===============================
+       2. 本編：セレフィアスの間 本殿
+  ================================ -->
+  <main id="sereMain" class="sere-main hidden">
+    <!-- 背景用：セレフィアスの残像 -->
+    <div class="main-bg">
+      <!-- 全身画像を薄く背景として利用 -->
+      <img src="img/sere-full.jpg" alt="セレフィアス" class="main-bg-sere">
+    </div>
 
-  <!-- ▼ メインメニュー（OP終了後に出現） -->
-  <div id="main-menu">
-    <button class="menu-btn" id="oracle-btn">セレフィアスのお告げを受ける</button>
-    <button class="menu-btn" id="deepgate-btn">深層星界ゲート（1日・15日のみ）</button>
-    <button class="menu-btn" id="secret-btn">星命アーカイヴへ</button>
-  </div>
+    <div class="main-overlay"></div>
 
+    <section class="main-inner">
+      <header class="main-header">
+        <div class="crest-circle">
+          <img src="img/sere-crest.jpg" alt="セレフィアス紋章" class="crest-image">
+        </div>
+        <div class="main-title-block">
+          <h1 class="main-title-en">SEREPHIAS CHAMBER</h1>
+          <p class="main-title-jp">星霊の間 ― 星と言霊の神域 ―</p>
+        </div>
+      </header>
+
+      <!-- ボタン群 -->
+      <section class="main-gate-section">
+        <!-- ① セレフィアスのお告げ -->
+        <a href="oracle.html" class="sere-btn sere-btn-primary">
+          <span class="btn-title">セレフィアスのお告げを受ける</span>
+          <span class="btn-sub">今のあなたに必要な“ひと言”だけが降りてくる</span>
+        </a>
+
+        <div class="main-sub-buttons">
+          <!-- ② 深層星界ゲート（1日・15日のみ開門） -->
+          <button id="deepGateBtn" class="sere-btn sere-btn-secondary" type="button">
+            <span class="btn-title">深層星界ゲート</span>
+            <span id="deepGateSub" class="btn-sub"></span>
+          </button>
+
+          <!-- ③ 星命アーカイヴ（ここ経由のみ） -->
+          <a href="archive.html" class="sere-btn sere-btn-secondary">
+            <span class="btn-title">星命アーカイヴへ</span>
+            <span class="btn-sub">ここでしか開かない、封印された記録</span>
+          </a>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Scripts -->
   <script src="js/serephias.js"></script>
 </body>
 </html>
