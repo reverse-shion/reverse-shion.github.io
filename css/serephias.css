@@ -517,3 +517,15 @@ body.opening-text-phase .opening-frame {
     font-size: 0.76rem;
   }
 }
+/* テキストフェーズ用：最後の1枚だけ、白ベール越しに見える */
+.sere-opening.text-phase .opening-frame.visible {
+  opacity: 0.4;          /* ちょっと薄く */
+}
+
+.sere-opening.text-phase::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(255,255,255,0.68), rgba(255,255,255,0.25));
+  pointer-events: none;
+}
