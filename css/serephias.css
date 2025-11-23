@@ -18,12 +18,13 @@ body {
 body.sere-body {
   font-family: 'Noto Serif JP', 'Shippori Mincho', system-ui, -apple-system,
     BlinkMacSystemFont, 'Yu Mincho', '游明朝', serif;
-  background: #020008;
+  background: radial-gradient(circle at 50% 0%, #38255c 0%, #14081f 40%, #05020a 100%);
   color: #fdf7f0;
-  overflow: hidden; /* 1画面完結 */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-/* テキストフェーズ中：セレフィアスを薄く */
+/* テキストフェーズ中：セレフィアスをうっすらに */
 body.sere-body.opening-text-phase .opening-image-layer {
   opacity: 0.35;
   filter: blur(1px);
@@ -55,12 +56,14 @@ body.sere-body.opening-text-phase .opening-image-layer {
   pointer-events: none;
 }
 
-/* 背景：最初はほぼ黒 */
+/* 背景 */
 .opening-bg {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 0%, #090013 0, #020008 55%, #000000 100%);
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.15) 0, transparent 50%),
+    radial-gradient(circle at 80% 100%, rgba(148, 118, 255, 0.35) 0, transparent 55%),
+    radial-gradient(circle at 50% 50%, #12091f 0, #05020a 60%, #020107 100%);
   z-index: 0;
 }
 
@@ -74,7 +77,7 @@ body.sere-body.opening-text-phase .opening-image-layer {
     radial-gradient(1px 1px at 80% 30%, rgba(255, 255, 255, 0.3) 0, transparent 55%),
     radial-gradient(1px 1px at 30% 80%, rgba(255, 255, 255, 0.45) 0, transparent 55%),
     radial-gradient(1px 1px at 70% 65%, rgba(255, 255, 255, 0.35) 0, transparent 55%);
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 /* 光粒子（オープニング用） */
@@ -193,17 +196,10 @@ body.sere-body.opening-text-phase .opening-image-layer {
 .sere-main {
   position: relative;
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   color: #fdf7f0;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.9s ease;
-}
-
-.sere-main.visible {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 /* 背景（セレフィアス残像） */
@@ -248,12 +244,10 @@ body.sere-body.opening-text-phase .opening-image-layer {
   z-index: 3;
   width: min(960px, 92vw);
   margin: 0 auto;
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 縦中央 */
-  gap: 2.5rem;
-  padding: 2vh 0;
+  padding: 3vh 0 8vh;
 }
 
 /* ヘッダー */
@@ -262,6 +256,7 @@ body.sere-body.opening-text-phase .opening-image-layer {
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
+  margin-bottom: 3vh;
 }
 
 .crest-circle {
@@ -306,36 +301,11 @@ body.sere-body.opening-text-phase .opening-image-layer {
 
 /* ボタンセクション */
 .main-gate-section {
-  margin-top: 1vh;
+  margin-top: 3vh;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 2.2rem;
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-/* 本殿表示時にボタン群を光りながら出す */
-.sere-main.visible .main-gate-section {
-  animation: gateFadeIn 0.9s ease forwards 0.3s;
-}
-
-@keyframes gateFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(18px);
-    filter: brightness(0.7);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: brightness(1.25);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: brightness(1);
-  }
+  gap: 2.5rem;
 }
 
 /* 共通ボタン */
@@ -343,7 +313,7 @@ body.sere-body.opening-text-phase .opening-image-layer {
   position: relative;
   display: block;
   width: 100%;
-  padding: 1.05rem 1.3rem;
+  padding: 1.15rem 1.3rem;
   border-radius: 18px;
   border: 1px solid rgba(255, 233, 205, 0.6);
   background:
@@ -363,24 +333,6 @@ body.sere-body.opening-text-phase .opening-image-layer {
     box-shadow 0.18s ease,
     border-color 0.18s ease,
     background 0.18s ease;
-}
-
-/* ボタンの鼓動する光 */
-.sere-main.visible .sere-btn {
-  animation: btnPulse 3.2s ease-in-out infinite;
-}
-
-@keyframes btnPulse {
-  0%, 100% {
-    box-shadow:
-      0 0 0 1px rgba(121, 95, 255, 0.35),
-      0 0 26px rgba(255, 223, 168, 0.45);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(171, 145, 255, 0.7),
-      0 0 40px rgba(255, 238, 205, 0.9);
-  }
 }
 
 .sere-btn::before {
@@ -422,7 +374,7 @@ body.sere-body.opening-text-phase .opening-image-layer {
 
 /* プライマリボタン（お告げ） */
 .sere-btn-primary {
-  padding-block: 1.2rem;
+  padding-block: 1.3rem;
   background:
     radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.18) 0, rgba(21, 7, 35, 0.98) 55%),
     radial-gradient(circle at 100% 100%, rgba(255, 217, 170, 0.4) 0, rgba(15, 4, 26, 0.98) 65%);
@@ -485,8 +437,7 @@ body.sere-body.opening-text-phase .opening-image-layer {
   }
 
   .main-inner {
-    gap: 2.2rem;
-    padding: 2vh 0;
+    padding: 2.5vh 0 8vh;
   }
 
   .main-sub-buttons {
