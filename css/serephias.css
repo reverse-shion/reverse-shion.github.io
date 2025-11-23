@@ -1,0 +1,439 @@
+/* ===============================
+   セレフィアスの間 共通
+=============================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body.sere-body {
+  font-family: 'Noto Serif JP', 'Shippori Mincho', system-ui, -apple-system,
+    BlinkMacSystemFont, 'Yu Mincho', '游明朝', serif;
+  background: radial-gradient(circle at 50% 0%, #38255c 0%, #14081f 40%, #05020a 100%);
+  color: #fdf7f0;
+  overflow: hidden;
+}
+
+/* 汎用 */
+.hidden {
+  display: none;
+}
+
+/* ===============================
+   1. オープニング儀式
+=============================== */
+.sere-opening {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  color: #fdf7f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease;
+}
+
+.sere-opening.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 背景 */
+.opening-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.2) 0, transparent 50%),
+    radial-gradient(circle at 80% 100%, rgba(148, 118, 255, 0.35) 0, transparent 55%),
+    radial-gradient(circle at 50% 50%, #12091f 0, #05020a 60%, #020107 100%);
+  z-index: 0;
+}
+
+/* 星屑レイヤー（シンプル） */
+.opening-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.6) 0, transparent 55%),
+    radial-gradient(1px 1px at 80% 30%, rgba(255, 255, 255, 0.3) 0, transparent 55%),
+    radial-gradient(1px 1px at 30% 80%, rgba(255, 255, 255, 0.45) 0, transparent 55%),
+    radial-gradient(1px 1px at 70% 65%, rgba(255, 255, 255, 0.35) 0, transparent 55%);
+  opacity: 0.7;
+}
+
+/* 光粒子 */
+.opening-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffeab0 0, rgba(255, 234, 176, 0) 65%);
+  opacity: 0.9;
+  animation: particleFall linear infinite;
+}
+
+@keyframes particleFall {
+  0% {
+    transform: translate3d(0, -10vh, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 110vh, 0);
+    opacity: 0;
+  }
+}
+
+/* 4カットの画像レイヤー */
+.opening-image-layer {
+  position: relative;
+  width: min(420px, 80vw);
+  max-height: 80vh;
+  aspect-ratio: 3 / 4;
+  z-index: 2;
+}
+
+.opening-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.opening-frame.visible {
+  opacity: 1;
+}
+
+/* テキストメッセージ */
+.opening-text-wrap {
+  position: absolute;
+  bottom: 8vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, 90vw);
+  text-align: center;
+  z-index: 3;
+}
+
+.opening-message-block {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 16px rgba(0, 0, 0, 0.8);
+}
+
+.opening-message-long {
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+.opening-message-block p {
+  margin-bottom: 0.25rem;
+}
+
+/* スキップボタン */
+.opening-skip-btn {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 4;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(250, 230, 190, 0.7);
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.18) 0, rgba(16, 4, 24, 0.95) 65%);
+  color: #f8e9d5;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.opening-skip-btn:hover {
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.25) 0, rgba(16, 4, 24, 0.95) 65%);
+  box-shadow: 0 0 16px rgba(255, 235, 200, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ===============================
+   2. セレフィアスの間 本殿
+=============================== */
+.sere-main {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  color: #fdf7f0;
+}
+
+/* 背景（セレフィアス残像） */
+.main-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.32;
+  mix-blend-mode: screen;
+}
+
+.main-bg-sere {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 上にかけるグラデーション */
+.main-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(110, 92, 255, 0.45) 0, transparent 45%),
+    radial-gradient(circle at 90% 100%, rgba(255, 224, 173, 0.35) 0, transparent 55%),
+    linear-gradient(to bottom, rgba(4, 0, 16, 0.96), rgba(4, 0, 18, 0.96));
+  pointer-events: none;
+}
+
+/* 本文コンテナ */
+.main-inner {
+  position: relative;
+  z-index: 1;
+  width: min(960px, 92vw);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5vh 0 7vh;
+}
+
+/* ヘッダー */
+.main-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 3vh;
+}
+
+.crest-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 235, 210, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(126, 106, 255, 0.2),
+    0 0 30px rgba(255, 220, 170, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.16) 0, rgba(15, 5, 30, 0.95) 70%);
+}
+
+.crest-image {
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+}
+
+.main-title-block {
+  text-align: center;
+}
+
+.main-title-en {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #f7e3c9;
+  margin-bottom: 0.35rem;
+}
+
+.main-title-jp {
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  color: rgba(248, 235, 214, 0.9);
+}
+
+/* ボタンセクション */
+.main-gate-section {
+  margin-top: 3vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2.5rem;
+}
+
+/* 共通ボタン */
+.sere-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 1.15rem 1.3rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 233, 205, 0.6);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.12) 0, rgba(21, 7, 35, 0.98) 70%);
+  box-shadow:
+    0 0 0 1px rgba(121, 95, 255, 0.35),
+    0 0 32px rgba(255, 223, 168, 0.4);
+  text-decoration: none;
+  color: #fdf6ea;
+  text-align: left;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.sere-btn::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle at 0% 0%, rgba(255, 252, 240, 0.25) 0, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.sere-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgba(151, 122, 255, 0.6),
+    0 0 38px rgba(255, 231, 190, 0.7);
+  border-color: rgba(255, 238, 214, 0.9);
+}
+
+.sere-btn:hover::before {
+  opacity: 1;
+}
+
+.sere-btn .btn-title {
+  display: block;
+  font-size: 1.02rem;
+  letter-spacing: 0.18em;
+  text-transform: none;
+  margin-bottom: 0.25rem;
+}
+
+.sere-btn .btn-sub {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: rgba(249, 234, 215, 0.9);
+}
+
+/* プライマリボタン（お告げ） */
+.sere-btn-primary {
+  padding-block: 1.3rem;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.18) 0, rgba(21, 7, 35, 0.98) 55%),
+    radial-gradient(circle at 100% 100%, rgba(255, 217, 170, 0.4) 0, rgba(15, 4, 26, 0.98) 65%);
+}
+
+.sere-btn-primary .btn-title {
+  font-size: 1.08rem;
+}
+
+/* サブボタンの2列レイアウト */
+.main-sub-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+.sere-btn-secondary {
+  padding-block: 1rem;
+}
+
+/* 深層ゲートの状態 */
+#deepGateBtn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow:
+    0 0 0 1px rgba(115, 104, 155, 0.6),
+    0 0 16px rgba(40, 28, 70, 0.6);
+  border-color: rgba(190, 175, 230, 0.7);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.08) 0, rgba(10, 4, 24, 0.98) 70%);
+}
+
+#deepGateBtn.disabled:hover::before {
+  opacity: 0;
+}
+
+#deepGateBtn.active {
+  box-shadow:
+    0 0 0 1px rgba(191, 164, 255, 0.8),
+    0 0 40px rgba(255, 234, 190, 0.9);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.2) 0, rgba(22, 7, 40, 0.98) 55%),
+    radial-gradient(circle at 100% 100%, rgba(255, 238, 195, 0.68) 0, rgba(15, 4, 26, 0.98) 65%);
+}
+
+/* ===============================
+   レスポンシブ
+=============================== */
+@media (max-width: 768px) {
+  .opening-text-wrap {
+    bottom: 10vh;
+  }
+
+  .opening-message-block {
+    font-size: 0.95rem;
+  }
+
+  .opening-message-long {
+    font-size: 0.86rem;
+  }
+
+  .main-inner {
+    padding-inline: 1.2rem;
+  }
+
+  .main-sub-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .sere-btn .btn-title {
+    font-size: 0.98rem;
+  }
+
+  .sere-btn .btn-sub {
+    font-size: 0.76rem;
+  }
+
+  .opening-skip-btn {
+    right: 1rem;
+    bottom: 1rem;
+  }
+}
