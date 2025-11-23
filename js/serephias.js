@@ -1,259 +1,128 @@
-// ===============================
-// セレフィアスの間 スクリプト
-// ===============================
-document.addEventListener('DOMContentLoaded', () => {
-  const opening = document.getElementById('sereOpening');
-  const mainView = document.getElementById('sereMain');
-  const frames = Array.from(document.querySelectorAll('.opening-frame'));
-  const particlesLayer = document.getElementById('openingParticles');
-  const skipBtn = document.getElementById('skipOpening');
-  const shortBox = document.getElementById('shortMessage');
-  const longBox = document.getElementById('longMessage');
+/* ===========================
+   1. 星屑アニメーション
+=========================== */
+const canvas = document.getElementById("starfield");
+const ctx = canvas.getContext("2d");
 
-  let frameIndex = 0;
-  const frameDuration = 2000; // 2秒
-  let frameTimer = null;
-  let openingFinished = false;
-  let skipRequested = false;
+let w, h;
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
 
-  // ---- 1. 星屑パーティクル生成 ----
-  createParticles(particlesLayer, 40);
+let stars = Array.from({length:180}, () => ({
+  x: Math.random() * w,
+  y: Math.random() * h,
+  s: Math.random() * 2,
+  v: 0.2 + Math.random() * 0.3
+}));
 
-  // ---- 2. 4カットのオープニング開始 ----
-  startOpeningSequence();
-
-  // ---- 3. スキップボタン ----
-  skipBtn.addEventListener('click', () => {
-    skipRequested = true;
-    finishOpening(true);
+function animateStars() {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "white";
+  stars.forEach(star => {
+    ctx.fillRect(star.x, star.y, star.s, star.s);
+    star.y += star.v;
+    if (star.y > h) star.y = 0;
   });
+  requestAnimationFrame(animateStars);
+}
+animateStars();
 
-  // ---- 4. 深層ゲートの状態設定 ----
-  setupDeepGate();
+/* ===========================
+   2. オープニング4カット
+=========================== */
+const cuts = [
+  document.getElementById("cut1"),
+  document.getElementById("cut2"),
+  document.getElementById("cut3"),
+  document.getElementById("cut4")
+];
 
-  // ==========================
-  // オープニング関連関数
-  // ==========================
-  function startOpeningSequence() {
-    if (frames.length === 0) {
-      // 画像がない場合は即本編へ
-      finishOpening(false);
-      return;
-    }
-    showFrame(0);
-    frameTimer = setTimeout(nextFrame, frameDuration);
+let step = 0;
+
+function playOP() {
+  if (step < cuts.length) {
+    cuts[step].style.opacity = 1;
+    setTimeout(() => {
+      cuts[step].style.opacity = 0;
+      step++;
+      setTimeout(playOP, 400); 
+    }, 2000);
+  } else {
+    startText();
   }
+}
+playOP();
 
-  function showFrame(index) {
-    frames.forEach((img, i) => {
-      if (i === index) {
-        img.classList.add('visible');
-      } else {
-        img.classList.remove('visible');
-      }
-    });
-  }
+/* ===========================
+   3. テキスト・タイプライター
+=========================== */
 
-  function nextFrame() {
-    if (skipRequested || openingFinished) return;
+const textBox = document.getElementById("text-box");
+const tw = document.getElementById("typewriter");
+const skip = document.getElementById("skip-btn");
 
-    frameIndex++;
-    if (frameIndex < frames.length) {
-      showFrame(frameIndex);
-      frameTimer = setTimeout(nextFrame, frameDuration);
+const messages = [
+  "我が名は──セレフィアス。\n星霊の神子にして、言霊の巫子。",
+  "あなたがこの門を越えたということは、もう “星の記憶” から逃れられないということ。",
+  "光は失われてはいない。ただ、思い出されるのを待っているだけ。",
+  "あなたの星は、まだ沈んでいない。",
+  "そして──あなたの魂の奥底で眠る“始原の声”も、いま静かに目を覚まそうとしている。",
+  "さあ──歩もう。星の言霊が導く場所へ。",
+  "ここは、魂がひらかれる場所。ようこそ──星霊の間へ。"
+];
+
+let msgIndex = 0;
+let charIndex = 0;
+let typing = true;
+
+function typeMessage() {
+  if (charIndex < messages[msgIndex].length) {
+    tw.textContent += messages[msgIndex][charIndex];
+    charIndex++;
+    setTimeout(typeMessage, 55);
+  } else {
+    msgIndex++;
+    if (msgIndex < messages.length) {
+      charIndex = 0;
+      tw.innerHTML += "<br><br>";
+      setTimeout(typeMessage, 500);
     } else {
-      // 最後の全身カットが表示されたあと、テキストへ
-      setTimeout(() => {
-        startTextSequence();
-      }, 1000); // 静止1秒
+      finishOP();
     }
   }
+}
 
-  function startTextSequence() {
-    if (skipRequested || openingFinished) {
-      finishOpening(true);
-      return;
-    }
+function startText() {
+  textBox.style.opacity = 1;
+  setTimeout(typeMessage, 600);
+}
 
-    const shortLines = [
-      '我が名は──セレフィアス。',
-      '星霊の神子にして、',
-      '言霊の巫子。',
-      'あなたの心が、わたしを呼んだ。',
-      'この言葉が──運命を変える。'
-    ];
-
-    const longLines = [
-      'あなたがこの門を越えたということは、',
-      'もう “星の記憶” から逃れられないということ。',
-      '',
-      '光は失われてはいない。',
-      'ただ、思い出されるのを待っているだけ。',
-      'あなたの星は、まだ沈んでいない。',
-      '',
-      'そして——',
-      'あなたの魂の奥底で眠る“始原の声”も、',
-      'いま静かに目を覚まそうとしている。',
-      '',
-      'さあ——歩もう。',
-      '星の言霊（ことだま）が導く場所へ。',
-      '',
-      'ここは、魂がひらかれる場所。',
-      'ようこそ──星霊の間へ。'
-    ];
-
-    // ショートメッセージ → ロングメッセージ → 本殿へ
-    typeLines(shortLines, shortBox, () => {
-      if (skipRequested || openingFinished) {
-        finishOpening(true);
-        return;
-      }
-      typeLines(longLines, longBox, () => {
-        if (skipRequested || openingFinished) {
-          finishOpening(true);
-          return;
-        }
-        setTimeout(() => {
-          finishOpening(false);
-        }, 800);
-      });
-    });
-  }
-
-  /**
-   * 配列のテキストをタイプライタ表示
-   * @param {string[]} lines
-   * @param {HTMLElement} container
-   * @param {Function} onComplete
-   */
-  function typeLines(lines, container, onComplete) {
-    container.innerHTML = '';
-    let lineIndex = 0;
-
-    function typeNextLine() {
-      if (skipRequested) {
-        // スキップ時：残りの行を一気に表示
-        for (; lineIndex < lines.length; lineIndex++) {
-          const p = document.createElement('p');
-          p.textContent = lines[lineIndex];
-          container.appendChild(p);
-        }
-        onComplete && onComplete();
-        return;
-      }
-
-      if (lineIndex >= lines.length) {
-        onComplete && onComplete();
-        return;
-      }
-
-      const text = lines[lineIndex];
-      const p = document.createElement('p');
-      container.appendChild(p);
-      let charIndex = 0;
-      const charDelay = 60; // ms
-      const lineGap = 600; // 次の行までの間
-
-      function typeChar() {
-        if (skipRequested) {
-          p.textContent = text;
-          // 残りも全部出す
-          lineIndex++;
-          for (; lineIndex < lines.length; lineIndex++) {
-            const pRest = document.createElement('p');
-            pRest.textContent = lines[lineIndex];
-            container.appendChild(pRest);
-          }
-          onComplete && onComplete();
-          return;
-        }
-
-        if (charIndex <= text.length) {
-          p.textContent = text.slice(0, charIndex++);
-          setTimeout(typeChar, charDelay);
-        } else {
-          lineIndex++;
-          setTimeout(typeNextLine, lineGap);
-        }
-      }
-
-      typeChar();
-    }
-
-    typeNextLine();
-  }
-
-  /**
-   * オープニング終了 → 本殿へ遷移
-   * @param {boolean} immediate 即座に遷移するか（スキップ時 true）
-   */
-  function finishOpening(immediate) {
-    if (openingFinished) return;
-    openingFinished = true;
-    clearTimeout(frameTimer);
-
-    if (immediate) {
-      opening.classList.add('fade-out');
-      setTimeout(() => {
-        opening.classList.add('hidden');
-        mainView.classList.remove('hidden');
-      }, 300);
-    } else {
-      opening.classList.add('fade-out');
-      setTimeout(() => {
-        opening.classList.add('hidden');
-        mainView.classList.remove('hidden');
-      }, 800);
-    }
-  }
-
-  // ==========================
-  // 星屑パーティクル生成
-  // ==========================
-  function createParticles(container, count) {
-    if (!container) return;
-    const width = container.offsetWidth || window.innerWidth;
-    const height = container.offsetHeight || window.innerHeight;
-
-    for (let i = 0; i < count; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'particle';
-      const x = Math.random() * width;
-      const delay = Math.random() * 8;
-      const duration = 12 + Math.random() * 10;
-
-      dot.style.left = `${x}px`;
-      dot.style.animationDuration = `${duration}s`;
-      dot.style.animationDelay = `${delay}s`;
-      container.appendChild(dot);
-    }
-  }
-
-  // ==========================
-  // 深層星界ゲートの状態設定
-  // ==========================
-  function setupDeepGate() {
-    const gateBtn = document.getElementById('deepGateBtn');
-    const gateSub = document.getElementById('deepGateSub');
-    if (!gateBtn || !gateSub) return;
-
-    const today = new Date();
-    const day = today.getDate();
-    const isOpen = day === 1 || day === 15;
-
-    if (isOpen) {
-      gateBtn.classList.add('active');
-      gateBtn.disabled = false;
-      gateSub.textContent = '― 本日、星界への扉は開いています ―';
-
-      gateBtn.addEventListener('click', () => {
-        // ★ 深層部ページのURLを差し替えてください
-        window.location.href = 'deep-gate.html';
-      });
-    } else {
-      gateBtn.classList.add('disabled');
-      gateBtn.disabled = true;
-      gateSub.textContent = '本日は閉じています（毎月1日・15日に開門）';
-    }
-  }
+/* SKIPボタン */
+skip.addEventListener("click", () => {
+  tw.textContent = messages.join("\n\n");
+  finishOP();
 });
+
+/* ===========================
+   4. メニュー出現
+=========================== */
+const menu = document.getElementById("main-menu");
+const deepgate = document.getElementById("deepgate-btn");
+
+function finishOP() {
+  textBox.style.opacity = 0;
+  setTimeout(() => {
+    menu.style.opacity = 1;
+    menu.style.pointerEvents = "auto";
+  }, 1200);
+
+  /* 月2回の開門設定 */
+  const d = new Date().getDate();
+  if (d !== 1 && d !== 15) {
+    deepgate.classList.add("locked");
+  }
+}
