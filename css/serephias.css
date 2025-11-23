@@ -166,10 +166,11 @@ body.opening-text-phase .opening-frame:not(.visible) {
 
 /* スキップボタン */
 .opening-skip-btn {
-  position: absolute;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  z-index: 4;
+  position: fixed;
+  right: max(1.5rem, env(safe-area-inset-right, 1.5rem));
+  bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+  z-index: 9999;
+
   padding: 0.45rem 0.95rem;
   border-radius: 999px;
   border: 1px solid rgba(250, 230, 190, 0.7);
@@ -179,8 +180,10 @@ body.opening-text-phase .opening-frame:not(.visible) {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
+
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+
   transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
