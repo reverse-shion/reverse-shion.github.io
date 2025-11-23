@@ -64,7 +64,7 @@
     }
 
     // ★★ ここをシオンの「セレフィアスGPT」のURLに差し替える ★★
-    const gptURL = "https://chatgpt.com/g/g-p-6923276122d88191b02691a8fee2211c";
+    const gptURL = "";
 
     // GPT側で「悩み：〜」として扱いやすいように前置き
     const query = encodeURIComponent("悩み：" + text);
