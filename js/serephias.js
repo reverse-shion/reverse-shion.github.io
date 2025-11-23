@@ -115,6 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // 全フレームを一度リセットして、最後の1枚だけ visible
+frames.forEach((img, i) => {
+  img.classList.toggle('visible', i === frames.length - 1);
+});
+opening.classList.add('text-phase');
+
     // テキストフェーズ：画像を薄くする
     body.classList.add('opening-text-phase');
 
