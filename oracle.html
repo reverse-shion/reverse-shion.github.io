@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>セレフィアスのお告げ — 星霊の神域</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="セレフィアスのお告げ — 星霊の神子セレフィアスが、あなたの“いま”に必要なひと言と星の言霊を届ける神域。">
+  <link rel="stylesheet" href="oracle.css">
+</head>
+<body>
+
+  <!-- 転送ホワイトアウト -->
+  <div class="oracle-flash" id="oracleFlash"></div>
+
+  <!-- 星粒 -->
+  <div class="oracle-stars" id="oracleStars"></div>
+
+  <div class="oracle-wrap">
+    <header class="oracle-header">
+      <p class="oracle-label">SEREPHIAS ORACLE</p>
+      <h1 class="oracle-title">セレフィアスのお告げ</h1>
+      <p class="oracle-tagline">
+        今日も、ここまで辿り着いてくれてありがとう。<br>
+        もう少しだけ、あなたの心を軽くしよう。
+      </p>
+    </header>
+
+    <main class="oracle-main">
+      <section class="oracle-intro">
+        <p class="oracle-intro-line">
+          まずは、ゆっくり<span>3回</span>、息をしてから──。
+        </p>
+        <div class="oracle-breath">
+          <div class="oracle-breath-bar oracle-breath-bar-1"></div>
+          <div class="oracle-breath-bar oracle-breath-bar-2"></div>
+          <div class="oracle-breath-bar oracle-breath-bar-3"></div>
+        </div>
+        <p class="oracle-intro-sub">
+          一文でも、長く書いても、どちらでも大丈夫。<br>
+          セレフィアスと、しおぽんがちゃんと受け取ります。
+        </p>
+      </section>
+
+      <section class="oracle-form">
+        <label for="oracleWorry" class="oracle-label-text">
+          いま、セレフィアスにそっと聞いてほしいこと
+        </label>
+        <textarea id="oracleWorry"
+                  class="oracle-textarea"
+                  placeholder="例）恋愛で彼の気持ちが分からず、これからどうしていけばいいのか不安です…。"></textarea>
+        <div class="oracle-meta">
+          <span id="oracleCount" class="oracle-count">0 / 400 文字</span>
+        </div>
+
+        <button type="button"
+                class="oracle-btn-send"
+                id="oracleSendBtn">
+          星霊へ送る
+        </button>
+        <p class="oracle-note">
+          ※ ボタンを押すと、星霊の神子セレフィアスのもとへ<br>
+          あなたの想いが転送されます。
+        </p>
+      </section>
+
+      <section class="oracle-share">
+        <h2 class="oracle-share-title">この神域を、誰かのための灯りにする</h2>
+        <p class="oracle-share-text">
+          あなたが救われた場所は、きっと誰かの救いにもなります。<br>
+          このお告げの間の存在を、そっとシェアしてみませんか。
+        </p>
+        <div class="oracle-share-buttons">
+          <button type="button"
+                  class="oracle-share-btn oracle-share-btn-x"
+                  onclick="shareToX()">
+            X（旧Twitter）でシェア
+          </button>
+          <button type="button"
+                  class="oracle-share-btn"
+                  onclick="copyOracleLink()">
+            このページのURLをコピー
+          </button>
+        </div>
+        <p id="oracleCopyMsg" class="oracle-copy-msg" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <footer class="oracle-footer">
+      <p>© Seraphias Chamber — 詩韻 Shion</p>
+    </footer>
+  </div>
+
+  <script src="oracle.js"></script>
+</body>
+</html>
