@@ -13,13 +13,15 @@
 <body class="sere-body">
 
   <!-- ===============================
-       1. オープニング儀式
+       1. オープニング儀式（黒背景）
   ================================ -->
   <div id="sereOpening" class="sere-opening">
+    <!-- 黒背景 -->
     <div class="opening-bg"></div>
+    <!-- 星屑パーティクル -->
     <div id="openingParticles" class="opening-particles"></div>
 
-    <!-- 4カットのレイヤー -->
+    <!-- 4カット全画面レイヤー -->
     <div class="opening-image-layer">
       <!-- ① 紋章 -->
       <img src="img/sere-crest.png" alt="セレフィアス紋章" class="opening-frame" data-frame="0">
@@ -44,19 +46,14 @@
   </div>
 
   <!-- ===============================
-       2. 本編：セレフィアスの間 本殿
+       2. 本編：セレフィアスの間（白背景）
   ================================ -->
-  <main id="sereMain" class="sere-main">
-    <!-- 背景用：セレフィアスの残像 -->
-    <div class="main-bg">
-      <img src="img/sere-full.png" alt="セレフィアス" class="main-bg-sere">
-    </div>
-
-    <div class="main-overlay"></div>
-    <!-- ★ ボタン背景にも粒子を降らせるレイヤー -->
+  <main id="sereMain" class="sere-main hidden">
+    <!-- 白背景上の光粒子 -->
     <div id="mainParticles" class="main-particles"></div>
 
     <section class="main-inner">
+      <!-- 紋章＋タイトル -->
       <header class="main-header">
         <div class="crest-circle">
           <img src="img/sere-crest.png" alt="セレフィアス紋章" class="crest-image">
@@ -67,8 +64,36 @@
         </div>
       </header>
 
-      <!-- ボタン群 -->
-      <section class="main-gate-section">
+      <!-- 名前儀式ブロック -->
+      <section class="main-name-block">
+        <!-- 既に名前がある場合のウェルカムメッセージ -->
+        <p id="welcomeText" class="name-line hidden"></p>
+
+        <!-- 初回：名前入力儀式 -->
+        <div id="nameAskBlock" class="name-ask-block">
+          <p id="nameAskText" class="name-line">
+            ……あなたの名を教えてくれますか？
+          </p>
+          <div class="name-form">
+            <input
+              id="userNameInput"
+              type="text"
+              inputmode="text"
+              autocomplete="name"
+              maxlength="20"
+              placeholder="あなたの名をここに"
+              class="name-input"
+            />
+            <button id="nameSubmitBtn" type="button" class="name-submit-btn">
+              名を刻む
+            </button>
+          </div>
+          <p id="nameResult" class="name-line name-result"></p>
+        </div>
+      </section>
+
+      <!-- ボタン群（お告げ・ゲート・アーカイヴ） -->
+      <section id="gateSection" class="main-gate-section hidden">
         <!-- ① セレフィアスのお告げ -->
         <a href="oracle.html" class="sere-btn sere-btn-primary">
           <span class="btn-title">セレフィアスのお告げを受ける</span>
