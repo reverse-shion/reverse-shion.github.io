@@ -18,10 +18,16 @@ body {
 body.sere-body {
   font-family: 'Noto Serif JP', 'Shippori Mincho', system-ui, -apple-system,
     BlinkMacSystemFont, 'Yu Mincho', '游明朝', serif;
-  background: radial-gradient(circle at 50% 0%, #38255c 0%, #14081f 40%, #05020a 100%);
+  background: #020008;
   color: #fdf7f0;
-  overflow-x: hidden;  /* 横だけ隠す */
-  overflow-y: auto;    /* 縦スクロールOK（本殿用） */
+  overflow: hidden; /* 1画面完結 */
+}
+
+/* テキストフェーズ中：セレフィアスを薄く */
+body.sere-body.opening-text-phase .opening-image-layer {
+  opacity: 0.35;
+  filter: blur(1px);
+  transition: opacity 0.6s ease, filter 0.6s ease;
 }
 
 /* 汎用 */
@@ -49,14 +55,12 @@ body.sere-body {
   pointer-events: none;
 }
 
-/* 背景 */
+/* 背景：最初はほぼ黒 */
 .opening-bg {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.2) 0, transparent 50%),
-    radial-gradient(circle at 80% 100%, rgba(148, 118, 255, 0.35) 0, transparent 55%),
-    radial-gradient(circle at 50% 50%, #12091f 0, #05020a 60%, #020107 100%);
+    radial-gradient(circle at 50% 0%, #090013 0, #020008 55%, #000000 100%);
   z-index: 0;
 }
 
@@ -70,10 +74,10 @@ body.sere-body {
     radial-gradient(1px 1px at 80% 30%, rgba(255, 255, 255, 0.3) 0, transparent 55%),
     radial-gradient(1px 1px at 30% 80%, rgba(255, 255, 255, 0.45) 0, transparent 55%),
     radial-gradient(1px 1px at 70% 65%, rgba(255, 255, 255, 0.35) 0, transparent 55%);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-/* 光粒子 */
+/* 光粒子（オープニング用） */
 .opening-particles {
   position: absolute;
   inset: 0;
@@ -112,6 +116,7 @@ body.sere-body {
   max-height: 80vh;
   aspect-ratio: 3 / 4;
   z-index: 2;
+  transition: opacity 0.4s ease;
 }
 
 .opening-frame {
@@ -122,20 +127,10 @@ body.sere-body {
   object-fit: contain;
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 24px rgba(255, 224, 190, 0.7));
 }
 
 .opening-frame.visible {
   opacity: 1;
-}
-
-/* ★テキスト中にセレフィアスを薄くする */
-.opening-image-layer.dimmed .opening-frame.visible {
-  opacity: 0.25;
-  filter:
-    blur(0.3px)
-    drop-shadow(0 0 16px rgba(255, 230, 200, 0.6));
 }
 
 /* テキストメッセージ */
@@ -147,21 +142,13 @@ body.sere-body {
   width: min(640px, 90vw);
   text-align: center;
   z-index: 3;
-  opacity: 0;
-  transition: opacity 0.8s ease;
-}
-
-.opening-text-wrap.visible {
-  opacity: 1;
 }
 
 .opening-message-block {
   font-size: 1.05rem;
   line-height: 1.75;
   letter-spacing: 0.08em;
-  text-shadow:
-    0 0 12px rgba(0, 0, 0, 0.9),
-    0 0 22px rgba(10, 0, 35, 0.9);
+  text-shadow: 0 0 16px rgba(0, 0, 0, 0.8);
 }
 
 .opening-message-long {
@@ -206,9 +193,17 @@ body.sere-body {
 .sere-main {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  overflow: visible;
+  height: 100vh;
+  overflow: hidden;
   color: #fdf7f0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease;
+}
+
+.sere-main.visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* 背景（セレフィアス残像） */
@@ -218,6 +213,7 @@ body.sere-body {
   overflow: hidden;
   opacity: 0.32;
   mix-blend-mode: screen;
+  z-index: 0;
 }
 
 .main-bg-sere {
@@ -235,18 +231,29 @@ body.sere-body {
     radial-gradient(circle at 90% 100%, rgba(255, 224, 173, 0.35) 0, transparent 55%),
     linear-gradient(to bottom, rgba(4, 0, 16, 0.96), rgba(4, 0, 18, 0.96));
   pointer-events: none;
+  z-index: 1;
+}
+
+/* 本殿用の光粒子（ボタン背景にも降らせる） */
+.main-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* 本文コンテナ */
 .main-inner {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   width: min(960px, 92vw);
   margin: 0 auto;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 5vh 0 7vh;
+  justify-content: center; /* 縦中央 */
+  gap: 2.5rem;
+  padding: 2vh 0;
 }
 
 /* ヘッダー */
@@ -255,7 +262,6 @@ body.sere-body {
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
-  margin-bottom: 3vh;
 }
 
 .crest-circle {
@@ -300,11 +306,36 @@ body.sere-body {
 
 /* ボタンセクション */
 .main-gate-section {
-  margin-top: 3vh;
+  margin-top: 1vh;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 2.5rem;
+  gap: 2.2rem;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* 本殿表示時にボタン群を光りながら出す */
+.sere-main.visible .main-gate-section {
+  animation: gateFadeIn 0.9s ease forwards 0.3s;
+}
+
+@keyframes gateFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: brightness(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: brightness(1.25);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: brightness(1);
+  }
 }
 
 /* 共通ボタン */
@@ -312,7 +343,7 @@ body.sere-body {
   position: relative;
   display: block;
   width: 100%;
-  padding: 1.15rem 1.3rem;
+  padding: 1.05rem 1.3rem;
   border-radius: 18px;
   border: 1px solid rgba(255, 233, 205, 0.6);
   background:
@@ -332,6 +363,24 @@ body.sere-body {
     box-shadow 0.18s ease,
     border-color 0.18s ease,
     background 0.18s ease;
+}
+
+/* ボタンの鼓動する光 */
+.sere-main.visible .sere-btn {
+  animation: btnPulse 3.2s ease-in-out infinite;
+}
+
+@keyframes btnPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(121, 95, 255, 0.35),
+      0 0 26px rgba(255, 223, 168, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(171, 145, 255, 0.7),
+      0 0 40px rgba(255, 238, 205, 0.9);
+  }
 }
 
 .sere-btn::before {
@@ -360,6 +409,7 @@ body.sere-body {
   display: block;
   font-size: 1.02rem;
   letter-spacing: 0.18em;
+  text-transform: none;
   margin-bottom: 0.25rem;
 }
 
@@ -372,7 +422,7 @@ body.sere-body {
 
 /* プライマリボタン（お告げ） */
 .sere-btn-primary {
-  padding-block: 1.3rem;
+  padding-block: 1.2rem;
   background:
     radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.18) 0, rgba(21, 7, 35, 0.98) 55%),
     radial-gradient(circle at 100% 100%, rgba(255, 217, 170, 0.4) 0, rgba(15, 4, 26, 0.98) 65%);
@@ -422,16 +472,6 @@ body.sere-body {
    レスポンシブ
 =============================== */
 @media (max-width: 768px) {
-  .opening-image-layer {
-    width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-  }
-
-  .opening-frame {
-    object-fit: cover;
-  }
-
   .opening-text-wrap {
     bottom: 10vh;
   }
@@ -445,7 +485,8 @@ body.sere-body {
   }
 
   .main-inner {
-    padding-inline: 1.2rem;
+    gap: 2.2rem;
+    padding: 2vh 0;
   }
 
   .main-sub-buttons {
