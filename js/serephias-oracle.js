@@ -2,7 +2,13 @@
 
 (() => {
   const TEXT_LIMIT = 400;
-  const SEREPHIAS_GPT_URL = 'https://chatgpt.com/g/g-692352d953b8-xxxxxxxxxxxxxx';
+  const SEREPHIAS_GPT_URL =
+    'https://chatgpt.com/g/g-692352d953b08191b0b46a7358a37456-serehuiasu-serephias';
+  const SUCCESS_MESSAGE = `あなたの言葉を星霊に預けました。いまの言葉はクリップボードにコピーされています。
+これからセレフィアスのお告げの間を開きます。ページが開いたら、そのまま貼り付けてください。`;
+  const FALLBACK_FAIL_MESSAGE =
+    'クリップボードへの自動コピーに失敗しました。ページが開いたら、いま選択されている言葉を長押ししてコピーしてから貼り付けてください。';
+
   const modal = document.getElementById('oracleModal');
   const modalMessage = document.getElementById('oracleModalMessage');
   const textarea = document.getElementById('oracleWorry');
@@ -14,11 +20,12 @@
   const starsContainer = document.getElementById('oracleStars');
 
   // ------------------------------
-  // ユーティリティ
+  // モーダルの開閉
   // ------------------------------
   const showModal = (message) => {
     if (!modal || !modalMessage) return;
-    modalMessage.textContent = message;
+    // 改行を維持しつつメッセージを表示
+    modalMessage.innerHTML = message.replace(/\n/g, '<br>');
     modal.setAttribute('aria-hidden', 'false');
     modal.classList.add('is-active');
   };
@@ -29,9 +36,48 @@
     modal.setAttribute('aria-hidden', 'true');
   };
 
+  // ------------------------------
+  // クリップボードコピー処理
+  // ------------------------------
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const copyText = async (text) => {
+  // navigator.clipboard が使えないときのフォールバック（テキストエリアを選択してコピー）
+  const copyWithExecCommand = () => {
+    if (!textarea) return false;
+    textarea.focus();
+    textarea.select();
+
+    try {
+      const succeeded = document.execCommand('copy');
+      if (succeeded) {
+        // 成功時は選択を解除し、見た目を元に戻す
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        textarea.blur();
+      }
+      return succeeded;
+    } catch (error) {
+      console.warn('execCommand copy failed:', error);
+      // 失敗した場合は選択状態をそのままにしておく
+      return false;
+    }
+  };
+
+  // メインの悩みテキストをコピーする（フォールバック込み）
+  const copyWorryText = async (text) => {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (error) {
+        console.warn('navigator.clipboard copy failed:', error);
+      }
+    }
+
+    return copyWithExecCommand();
+  };
+
+  // シェア用の汎用コピー（既存挙動を崩さないために別途用意）
+  const copyGenericText = async (text) => {
     if (navigator.clipboard?.writeText) {
       try {
         await navigator.clipboard.writeText(text);
@@ -41,7 +87,6 @@
       }
     }
 
-    // graceful fallback
     const temp = document.createElement('textarea');
     temp.value = text;
     temp.setAttribute('readonly', '');
@@ -95,34 +140,47 @@
   };
 
   // ------------------------------
+  // GPTリンクを開く
+  const openSerephiasGPT = () => {
+    window.open(SEREPHIAS_GPT_URL, '_blank', 'noopener');
+  };
+
   // 送信ボタン
   // ------------------------------
+  const handleSend = async () => {
+    if (!textarea) return;
+
+    const text = textarea.value.trim();
+    if (!text) {
+      alert('悩みを入力してください。');
+      return;
+    }
+
+    if (text.length > TEXT_LIMIT) {
+      const ok = confirm('400文字を超えていますが、このまま星霊に預けますか？');
+      if (!ok) return;
+    }
+
+    // まずはクリップボードへ自動コピーを試す
+    const copied = await copyWorryText(text);
+    const modalMessageText = copied ? SUCCESS_MESSAGE : FALLBACK_FAIL_MESSAGE;
+
+    // 失敗時は選択状態を維持したまま案内する
+    if (!copied && textarea) {
+      textarea.focus();
+      textarea.select();
+    }
+
+    showModal(modalMessageText);
+    await delay(900);
+    openSerephiasGPT();
+    await delay(500);
+    hideModal();
+  };
+
   const setupSend = () => {
-    if (!sendBtn || !textarea) return;
-
-    sendBtn.addEventListener('click', async () => {
-      const text = textarea.value.trim();
-      if (!text) {
-        alert('悩みを入力してください。');
-        return;
-      }
-
-      if (text.length > TEXT_LIMIT) {
-        const ok = confirm('400文字を超えていますが、このまま星霊に預けますか？');
-        if (!ok) return;
-      }
-
-      const copied = await copyText(text);
-      const message = copied
-        ? 'あなたの言葉を星霊に預けました。\nこれからセレフィアスのお告げの間を開きます。\nページが開いたら、さきほどの言葉をそのまま貼り付けてください。'
-        : '自動コピーに失敗しました。\nメッセージを選択してコピーしてからお進みください。';
-
-      showModal(message);
-      await delay(1700);
-      window.open(SEREPHIAS_GPT_URL, '_blank', 'noopener');
-      await delay(400);
-      hideModal();
-    });
+    if (!sendBtn) return;
+    sendBtn.addEventListener('click', handleSend);
   };
 
   // ------------------------------
@@ -141,7 +199,7 @@
 
     if (shareCopyBtn && copyMsg) {
       shareCopyBtn.addEventListener('click', async () => {
-        const copied = await copyText(window.location.href);
+        const copied = await copyGenericText(window.location.href);
         copyMsg.textContent = copied
           ? 'URLをコピーしました。'
           : 'コピーに失敗しました。お手数ですが手動でお願いします。';
