@@ -4,7 +4,7 @@
   const TEXT_LIMIT = 400;
   const SEREPHIAS_GPT_URL =
     'https://chatgpt.com/g/g-692352d953b08191b0b46a7358a37456-serehuiasu-serephias';
-  const OVERLAY_DURATION = 2800;
+  const OVERLAY_DURATION = 4500;
 
   const textarea = document.getElementById('oracleWorry');
   const count = document.getElementById('oracleCount');
