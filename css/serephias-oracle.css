@@ -65,14 +65,123 @@ body::before {
   height: 2px;
   border-radius: 50%;
   background: rgba(180, 170, 255, 0.9);
-  animation: oracleStarFloat 5s linear infinite;
+  animation: oracleStarFall 8s ease-in infinite;
   opacity: 0;
 }
 
-@keyframes oracleStarFloat {
-  0% { transform: translateY(10vh); opacity: 0; }
-  20% { opacity: 1; }
-  100% { transform: translateY(-110vh); opacity: 0; }
+@keyframes oracleStarFall {
+  0% { transform: translateY(-20vh); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(120vh); opacity: 0; }
+}
+
+/* --------------------------------
+   セレフィアスの導きオーバーレイ
+-------------------------------- */
+.oracle-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.oracle-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.oracle-overlay-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(140deg, rgba(72, 52, 139, 0.3), rgba(255, 255, 255, 0.22)),
+    url('../img/sere-m.png') center top / cover no-repeat;
+  /* 必要に応じて上記の画像パスを差し替えてください */
+  filter: saturate(1.08);
+}
+
+.oracle-overlay-card {
+  position: relative;
+  max-width: 720px;
+  margin: 0 1.4rem;
+  padding: 1.8rem 1.6rem;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 22px;
+  box-shadow:
+    0 25px 50px rgba(78, 56, 138, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(201, 184, 255, 0.7);
+  overflow: hidden;
+  animation: oracleOverlayCardGlow 4s ease-in-out infinite;
+}
+
+.oracle-overlay-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 40px rgba(152, 134, 240, 0.35);
+  opacity: 0.75;
+  pointer-events: none;
+  animation: oracleOverlayPulse 5.2s ease-in-out infinite;
+}
+
+.oracle-overlay-text {
+  position: relative;
+  font-size: 1rem;
+  line-height: 1.9;
+  color: #2b223d;
+  text-align: center;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.7);
+  animation: oracleOverlayFade 0.9s ease forwards;
+}
+
+.oracle-overlay-sparkles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.oracle-overlay-sparkle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 12px rgba(207, 189, 255, 0.8);
+  animation: oracleOverlaySparkleFall 6s ease-in infinite;
+  opacity: 0;
+}
+
+@keyframes oracleOverlayFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes oracleOverlayCardGlow {
+  0% { box-shadow: 0 25px 50px rgba(78, 56, 138, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.3); }
+  50% { box-shadow: 0 25px 50px rgba(78, 56, 138, 0.32), 0 0 0 1px rgba(140, 120, 230, 0.6); }
+  100% { box-shadow: 0 25px 50px rgba(78, 56, 138, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.3); }
+}
+
+@keyframes oracleOverlayPulse {
+  0%, 100% { opacity: 0.65; box-shadow: 0 0 40px rgba(152, 134, 240, 0.35); }
+  50% { opacity: 1; box-shadow: 0 0 50px rgba(180, 164, 255, 0.5); }
+}
+
+@keyframes oracleOverlaySparkleFall {
+  0% { transform: translateY(-10vh) scale(0.7); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(120vh) scale(1); opacity: 0; }
 }
 
 /* --------------------------------
