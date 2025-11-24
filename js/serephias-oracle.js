@@ -4,13 +4,8 @@
   const TEXT_LIMIT = 400;
   const SEREPHIAS_GPT_URL =
     'https://chatgpt.com/g/g-692352d953b08191b0b46a7358a37456-serehuiasu-serephias';
-  const SUCCESS_MESSAGE = `あなたの言葉を星霊に預けました。いまの言葉はクリップボードにコピーされています。
-これからセレフィアスのお告げの間を開きます。ページが開いたら、そのまま貼り付けてください。`;
-  const FALLBACK_FAIL_MESSAGE =
-    'クリップボードへの自動コピーに失敗しました。ページが開いたら、いま選択されている言葉を長押ししてコピーしてから貼り付けてください。';
+  const OVERLAY_DURATION = 2800;
 
-  const modal = document.getElementById('oracleModal');
-  const modalMessage = document.getElementById('oracleModalMessage');
   const textarea = document.getElementById('oracleWorry');
   const count = document.getElementById('oracleCount');
   const sendBtn = document.getElementById('oracleSendBtn');
@@ -18,62 +13,26 @@
   const shareCopyBtn = document.getElementById('oracleShareCopy');
   const copyMsg = document.getElementById('oracleCopyMsg');
   const starsContainer = document.getElementById('oracleStars');
-
-  // ------------------------------
-  // モーダルの開閉
-  // ------------------------------
-  const showModal = (message) => {
-    if (!modal || !modalMessage) return;
-    // 改行を維持しつつメッセージを表示
-    modalMessage.innerHTML = message.replace(/\n/g, '<br>');
-    modal.setAttribute('aria-hidden', 'false');
-    modal.classList.add('is-active');
-  };
-
-  const hideModal = () => {
-    if (!modal) return;
-    modal.classList.remove('is-active');
-    modal.setAttribute('aria-hidden', 'true');
-  };
+  const overlay = document.getElementById('oracleOverlay');
+  const overlaySparkles = document.getElementById('oracleOverlaySparkles');
+  let isSending = false;
 
   // ------------------------------
   // クリップボードコピー処理
   // ------------------------------
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  // navigator.clipboard が使えないときのフォールバック（テキストエリアを選択してコピー）
-  const copyWithExecCommand = () => {
-    if (!textarea) return false;
-    textarea.focus();
-    textarea.select();
+  const copyWorryText = async (text) => {
+    if (!navigator.clipboard?.writeText) {
+      console.warn('Clipboard API is not available.');
+      return;
+    }
 
     try {
-      const succeeded = document.execCommand('copy');
-      if (succeeded) {
-        // 成功時は選択を解除し、見た目を元に戻す
-        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
-        textarea.blur();
-      }
-      return succeeded;
+      await navigator.clipboard.writeText(text);
     } catch (error) {
-      console.warn('execCommand copy failed:', error);
-      // 失敗した場合は選択状態をそのままにしておく
-      return false;
+      console.warn('navigator.clipboard copy failed:', error);
     }
-  };
-
-  // メインの悩みテキストをコピーする（フォールバック込み）
-  const copyWorryText = async (text) => {
-    if (navigator.clipboard?.writeText) {
-      try {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } catch (error) {
-        console.warn('navigator.clipboard copy failed:', error);
-      }
-    }
-
-    return copyWithExecCommand();
   };
 
   // シェア用の汎用コピー（既存挙動を崩さないために別途用意）
@@ -114,13 +73,33 @@
       star.style.width = `${size}px`;
       star.style.height = `${size}px`;
       star.style.left = `${Math.random() * 100}%`;
-      star.style.bottom = `${Math.random() * 100}%`;
-      star.style.animationDelay = `${(Math.random() * 4).toFixed(2)}s`;
+      star.style.top = `${Math.random() * 25}%`;
+      star.style.animationDelay = `${(Math.random() * 3).toFixed(2)}s`;
+      star.style.animationDuration = `${(6 + Math.random() * 5).toFixed(2)}s`;
       star.style.opacity = (0.3 + Math.random() * 0.7).toFixed(2);
       fragment.appendChild(star);
     }
 
     starsContainer.appendChild(fragment);
+  };
+
+  const createOverlaySparkles = () => {
+    if (!overlaySparkles) return;
+    const COUNT = 45;
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < COUNT; i++) {
+      const sparkle = document.createElement('span');
+      sparkle.className = 'oracle-overlay-sparkle';
+      sparkle.style.left = `${Math.random() * 100}%`;
+      sparkle.style.top = `${Math.random() * 30}%`;
+      sparkle.style.animationDelay = `${(Math.random() * 3).toFixed(2)}s`;
+      sparkle.style.animationDuration = `${(5 + Math.random() * 4).toFixed(2)}s`;
+      sparkle.style.opacity = (0.5 + Math.random() * 0.5).toFixed(2);
+      fragment.appendChild(sparkle);
+    }
+
+    overlaySparkles.appendChild(fragment);
   };
 
   // ------------------------------
@@ -148,7 +127,7 @@
   // 送信ボタン
   // ------------------------------
   const handleSend = async () => {
-    if (!textarea) return;
+    if (!textarea || isSending) return;
 
     const text = textarea.value.trim();
     if (!text) {
@@ -161,21 +140,25 @@
       if (!ok) return;
     }
 
-    // まずはクリップボードへ自動コピーを試す
-    const copied = await copyWorryText(text);
-    const modalMessageText = copied ? SUCCESS_MESSAGE : FALLBACK_FAIL_MESSAGE;
+    isSending = true;
+    sendBtn?.setAttribute('disabled', 'disabled');
 
-    // 失敗時は選択状態を維持したまま案内する
-    if (!copied && textarea) {
-      textarea.focus();
-      textarea.select();
+    await copyWorryText(text);
+    if (overlay) {
+      overlay.classList.add('is-active');
+      overlay.setAttribute('aria-hidden', 'false');
     }
 
-    showModal(modalMessageText);
-    await delay(900);
+    await delay(OVERLAY_DURATION);
     openSerephiasGPT();
-    await delay(500);
-    hideModal();
+    setTimeout(() => {
+      if (overlay) {
+        overlay.classList.remove('is-active');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      sendBtn?.removeAttribute('disabled');
+      isSending = false;
+    }, 800);
   };
 
   const setupSend = () => {
@@ -212,6 +195,7 @@
   // ------------------------------
   const init = () => {
     createStars();
+    createOverlaySparkles();
     setupCounter();
     setupSend();
     setupShare();
