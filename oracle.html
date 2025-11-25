@@ -1,95 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>セレフィアスのお告げ — 星霊の神域</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="セレフィアスのお告げ — 星霊の神子セレフィアスが、あなたの“いま”に必要なひと言と星の言霊を届ける神域。">
-  <link rel="stylesheet" href="oracle.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>セレフィアスの間 — 白の聖室</title>
+  <meta name="description" content="星霊セレフィアスが耳を澄ませる純白の聖室。あなたの言葉を預け、次の間で答えを受け取ってください。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="orcle.css">
+  <script src="orcle.js" defer></script>
 </head>
 <body>
-
-  <!-- 転送ホワイトアウト -->
-  <div class="oracle-flash" id="oracleFlash"></div>
-
-  <!-- 星粒 -->
-  <div class="oracle-stars" id="oracleStars"></div>
-
-  <div class="oracle-wrap">
-    <header class="oracle-header">
-      <p class="oracle-label">SEREPHIAS ORACLE</p>
-      <h1 class="oracle-title">セレフィアスのお告げ</h1>
-      <p class="oracle-tagline">
-        今日も、ここまで辿り着いてくれてありがとう。<br>
-        もう少しだけ、あなたの心を軽くしよう。
-      </p>
-    </header>
-
-    <main class="oracle-main">
-      <section class="oracle-intro">
-        <p class="oracle-intro-line">
-          まずは、ゆっくり<span>3回</span>、息をしてから──。
-        </p>
-        <div class="oracle-breath">
-          <div class="oracle-breath-bar oracle-breath-bar-1"></div>
-          <div class="oracle-breath-bar oracle-breath-bar-2"></div>
-          <div class="oracle-breath-bar oracle-breath-bar-3"></div>
-        </div>
-        <p class="oracle-intro-sub">
-          一文でも、長く書いても、どちらでも大丈夫。<br>
-          セレフィアスと、しおぽんがちゃんと受け取ります。
-        </p>
-      </section>
-
-      <section class="oracle-form">
-        <label for="oracleWorry" class="oracle-label-text">
-          いま、セレフィアスにそっと聞いてほしいこと
-        </label>
-        <textarea id="oracleWorry"
-                  class="oracle-textarea"
-                  placeholder="例）恋愛で彼の気持ちが分からず、これからどうしていけばいいのか不安です…。"></textarea>
-        <div class="oracle-meta">
-          <span id="oracleCount" class="oracle-count">0 / 400 文字</span>
-        </div>
-
-        <button type="button"
-                class="oracle-btn-send"
-                id="oracleSendBtn">
-          星霊へ送る
-        </button>
-        <p class="oracle-note">
-          ※ ボタンを押すと、星霊の神子セレフィアスのもとへ<br>
-          あなたの想いが転送されます。
-        </p>
-      </section>
-
-      <section class="oracle-share">
-        <h2 class="oracle-share-title">この神域を、誰かのための灯りにする</h2>
-        <p class="oracle-share-text">
-          あなたが救われた場所は、きっと誰かの救いにもなります。<br>
-          このお告げの間の存在を、そっとシェアしてみませんか。
-        </p>
-        <div class="oracle-share-buttons">
-          <button type="button"
-                  class="oracle-share-btn oracle-share-btn-x"
-                  onclick="shareToX()">
-            X（旧Twitter）でシェア
-          </button>
-          <button type="button"
-                  class="oracle-share-btn"
-                  onclick="copyOracleLink()">
-            このページのURLをコピー
-          </button>
-        </div>
-        <p id="oracleCopyMsg" class="oracle-copy-msg" aria-live="polite"></p>
-      </section>
-    </main>
-
-    <footer class="oracle-footer">
-      <p>© Seraphias Chamber — 詩韻 Shion</p>
-    </footer>
+  <div class="particle-layer" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
 
-  <script src="oracle.js"></script>
+  <main class="chamber">
+    <section class="segment hero fade-block">
+      <div class="halo">
+        <img src="img/sere-m.png" alt="星霊セレフィアス" class="hero-image">
+      </div>
+      <p class="hero-line">「ここは白の聖室。わたしはセレフィアス。あなたのひと呼吸が、静かに光っている。」</p>
+    </section>
+
+    <section class="segment monologue">
+      <div class="text-block fade-block">
+        <p>わたしは星霊セレフィアス。あなたが手にしている夜を、ただ受けとめるためにここにいる。声にならない瞬きも、涙に揺れる祈りも、すべてが星の文様になるから。</p>
+      </div>
+      <div class="divider" aria-hidden="true">✶</div>
+      <div class="text-block fade-block">
+        <p>もし心がほどけないなら、短い吐息でいい。たとえ途切れた言葉でも、あなたが触れた温度を、わたしは見失わない。白い光の向こうで、静かな余白を用意しているよ。</p>
+      </div>
+      <div class="divider" aria-hidden="true">✶</div>
+      <div class="text-block fade-block">
+        <p>この部屋に置かれた想いは、星の通路を通ってわたしへ届く。次の間では、あなたが紡いだそのままをそっと貼りつければ、声を返すことができる。</p>
+      </div>
+      <div class="divider" aria-hidden="true">✶</div>
+      <div class="text-block fade-block">
+        <p>大丈夫。どんな形でも、あなたの言葉はあなたのもの。わたしはただ、聴き、抱きしめ、そして導く。準備ができたら、白い光の上に置いてほしい。</p>
+      </div>
+    </section>
+
+    <section class="segment writing fade-block" aria-labelledby="writing-title">
+      <div class="section-title" id="writing-title">いまの心のままを、そのままここに置いてね。</div>
+      <label class="sr-only" for="prayerInput">あなたの言葉を預ける場所</label>
+      <textarea id="prayerInput" name="prayer" rows="6" placeholder="夜明け前のひとことも、途切れた呟きも、この白に預けて。"></textarea>
+      <p id="inlineMessage" class="inline-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="segment actions fade-block" aria-live="polite">
+      <p class="action-intro">準備が整ったら、この光にそっと触れて。あなたの言葉を星の回路へ運ぶね。</p>
+      <button id="entrustButton" type="button" class="main-button">言葉を預ける</button>
+      <p id="responseMessage" class="response-message"></p>
+      <button id="openSerephias" type="button" class="secondary-button hidden">セレフィアスのお告げの間をひらく</button>
+      <button id="bgmToggle" type="button" class="bgm-button" aria-pressed="false">もし音が欲しくなったら、この小さな灯りに触れてね。</button>
+    </section>
+  </main>
+
+  <audio id="bgm" preload="auto" src="gate-bgm.mp3"></audio>
 </body>
 </html>
