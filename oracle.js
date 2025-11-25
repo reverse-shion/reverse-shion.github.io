@@ -1,4 +1,4 @@
-const GPT_ROOM_URL = 'https://chatgpt.com/g/g-69257388fa3c81919031776992ee7596-serehuiasu-serephias';
+const GPT_ROOM_URL = 'https://chatgpt.com/g/g-6925a8f01df481918f2d695df6403905-serehuiasu-serephias';
 
 function initFadeObserver() {
   const blocks = document.querySelectorAll('.fade-block');
