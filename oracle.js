@@ -1,114 +1,87 @@
-// ===============================
-// セレフィアスのお告げページ JS
-// ===============================
+const GPT_ROOM_URL = 'https://chatgpt.com/g/g-69257388fa3c81919031776992ee7596-serehuiasu-serephias';
 
-// 星粒生成
-(function createStars() {
-  const container = document.getElementById("oracleStars");
-  if (!container) return;
+function initFadeObserver() {
+  const blocks = document.querySelectorAll('.fade-block');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
 
-  const STAR_COUNT = 70;
-  for (let i = 0; i < STAR_COUNT; i++) {
-    const star = document.createElement("div");
-    star.className = "oracle-star";
-    const size = 1 + Math.random() * 2;
-    star.style.width = size + "px";
-    star.style.height = size + "px";
-    star.style.left = Math.random() * 100 + "%";
-    star.style.bottom = Math.random() * 100 + "%";
-    star.style.animationDelay = (Math.random() * 4).toFixed(2) + "s";
-    star.style.opacity = (0.3 + Math.random() * 0.7).toFixed(2);
-    container.appendChild(star);
-  }
-})();
+  blocks.forEach((block) => observer.observe(block));
+}
 
-// 文字数カウンタ
-(function setupCounter() {
-  const textarea = document.getElementById("oracleWorry");
-  const counter = document.getElementById("oracleCount");
-  if (!textarea || !counter) return;
+function showMessage(target, message) {
+  target.textContent = message;
+}
 
-  const LIMIT = 400;
+function openSerephiasGPT() {
+  window.open(GPT_ROOM_URL, '_blank', 'noopener');
+}
 
-  const update = () => {
-    const len = textarea.value.length;
-    counter.textContent = `${len} / ${LIMIT} 文字`;
-    if (len > LIMIT) {
-      counter.style.color = "#c0392b";
+async function copyText(value) {
+  await navigator.clipboard.writeText(value);
+}
+
+function initBgmToggle() {
+  const bgm = document.getElementById('bgm');
+  const toggle = document.getElementById('bgmToggle');
+  if (!bgm || !toggle) return;
+
+  toggle.addEventListener('click', () => {
+    const isPlaying = toggle.getAttribute('aria-pressed') === 'true';
+    if (isPlaying) {
+      bgm.pause();
+      toggle.setAttribute('aria-pressed', 'false');
+      toggle.textContent = '音を静めたよ。また欲しくなったら、いつでも触れて。';
     } else {
-      counter.style.color = "var(--ink-soft)";
+      bgm.currentTime = 0;
+      bgm.play().catch(() => {});
+      toggle.setAttribute('aria-pressed', 'true');
+      toggle.textContent = 'いま小さな音をともしたよ。離したくなったら、またここに触れてね。';
     }
-  };
+  });
+}
 
-  textarea.addEventListener("input", update);
-  update();
-})();
+function initChamber() {
+  const textarea = document.getElementById('prayerInput');
+  const inlineMessage = document.getElementById('inlineMessage');
+  const responseMessage = document.getElementById('responseMessage');
+  const mainButton = document.getElementById('entrustButton');
+  const openButton = document.getElementById('openSerephias');
 
-// 「星霊へ送る」ボタン
-(function setupSend() {
-  const btn = document.getElementById("oracleSendBtn");
-  const textarea = document.getElementById("oracleWorry");
-  const flash = document.getElementById("oracleFlash");
-  if (!btn || !textarea || !flash) return;
+  if (!textarea || !inlineMessage || !responseMessage || !mainButton || !openButton) return;
 
-  btn.addEventListener("click", () => {
-    const text = textarea.value.trim();
+  mainButton.addEventListener('click', async () => {
+    const value = textarea.value.trim();
 
-    if (!text) {
-      alert("悩みを入力してください。");
+    if (!value) {
+      showMessage(inlineMessage, 'まだ言葉が見つからないときは、ひとことだけでも大丈夫だよ。');
+      responseMessage.textContent = '';
+      openButton.classList.add('hidden');
       return;
     }
-    if (text.length > 400) {
-      const ok = confirm("400文字を超えていますが、このまま星霊に預けますか？");
-      if (!ok) return;
+
+    try {
+      await copyText(value);
+      showMessage(responseMessage, 'あなたの言葉は、白の光が受けとったよ。このあと開く部屋でそのまま貼りつけてくれたら、わたしが応えるね。');
+      openButton.classList.remove('hidden');
+    } catch (err) {
+      showMessage(responseMessage, 'もしうまくいかなかったら、あなたの手でコピーしてくれても大丈夫。それでも、わたしはちゃんと受け取るからね。');
+      openButton.classList.remove('hidden');
     }
 
-    // ★★ ここをシオンの「セレフィアスGPT」のURLに差し替える ★★
-    const gptURL = "https://chatgpt.com/g/g-692352d953b08191b0b46a7358a37456-serehuiasu-serephias";
-
-    // GPT側で「悩み：〜」として扱いやすいように前置き
-    const query = encodeURIComponent("悩み：" + text);
-
-    // 転送演出
-    flash.style.opacity = "1";
-
-    setTimeout(() => {
-      window.location.href = `${gptURL}?q=${query}`;
-    }, 900);
+    showMessage(inlineMessage, '');
   });
-})();
 
-// X（Twitter）シェア
-function shareToX() {
-  const text = encodeURIComponent(
-    "星霊の神子セレフィアスに、今の悩みをそっと預ける場所。"
-  );
-  const url = encodeURIComponent(window.location.href);
-  const hashtags = encodeURIComponent("セレフィアスのお告げ,詩韻思想,タロット");
-  const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}&hashtags=${hashtags}`;
-  window.open(shareUrl, "_blank");
+  openButton.addEventListener('click', openSerephiasGPT);
 }
 
-// URLコピー
-function copyOracleLink() {
-  const msgEl = document.getElementById("oracleCopyMsg");
-  if (!navigator.clipboard) {
-    // 古いブラウザ用フォールバック
-    const dummy = document.createElement("input");
-    dummy.value = window.location.href;
-    document.body.appendChild(dummy);
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
-    if (msgEl) msgEl.textContent = "URLをコピーしました。";
-    return;
-  }
-
-  navigator.clipboard.writeText(window.location.href)
-    .then(() => {
-      if (msgEl) msgEl.textContent = "URLをコピーしました。";
-    })
-    .catch(() => {
-      if (msgEl) msgEl.textContent = "コピーに失敗しました。お手数ですが手動でお願いします。";
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+  initFadeObserver();
+  initChamber();
+  initBgmToggle();
+});
