@@ -1,123 +1,65 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <title>セレフィアスの間 — STARSOUL CHAMBER</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="星霊の神子セレフィアスが導く、星と言霊の神域。オープニング儀式の先に、セレフィアスのお告げと深層星界ゲートが開かれる。">
-  <!-- Fonts -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>セレフィアスの間 — 白の聖室</title>
+  <meta name="description" content="星霊セレフィアスが耳を澄ませる純白の聖室。あなたの言葉を預け、次の間で答えを受け取ってください。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/serephias.css">
+  <link rel="stylesheet" href="serephias-chamber.css">
+  <script src="serephias-chamber.js" defer></script>
 </head>
-<body class="sere-body">
-
-  <!-- ===============================
-       1. オープニング儀式（黒背景）
-  ================================ -->
-  <div id="sereOpening" class="sere-opening">
-    <!-- 黒背景 -->
-    <div class="opening-bg"></div>
-    <!-- 星屑パーティクル -->
-    <div id="openingParticles" class="opening-particles"></div>
-
-    <!-- 4カット全画面レイヤー -->
-    <div class="opening-image-layer">
-      <!-- ① 紋章 -->
-      <img src="img/sere-crest.png" alt="セレフィアス紋章" class="opening-frame" data-frame="0">
-      <!-- ② 瞳 -->
-      <img src="img/sere-eyes.png" alt="セレフィアスの星霊眼" class="opening-frame" data-frame="1">
-      <!-- ③ 胸の星核 -->
-      <img src="img/sere-core.png" alt="セレフィアスの星命核" class="opening-frame" data-frame="2">
-      <!-- ④ 全身覚醒 -->
-      <img src="img/sere-full.png" alt="セレフィアス全身" class="opening-frame" data-frame="3">
-    </div>
-
-    <!-- メッセージエリア -->
-    <div class="opening-text-wrap">
-      <div id="shortMessage" class="opening-message-block"></div>
-      <div id="longMessage" class="opening-message-block opening-message-long"></div>
-    </div>
-
-    <!-- スキップボタン -->
-    <button id="skipOpening" class="opening-skip-btn" type="button">
-      SKIP ▶
-    </button>
+<body>
+  <div class="particle-layer" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
 
-  <!-- ===============================
-       2. 本編：セレフィアスの間（白背景）
-  ================================ -->
-  <main id="sereMain" class="sere-main hidden">
-    <!-- 白背景上の光粒子 -->
-    <div id="mainParticles" class="main-particles"></div>
+  <main class="chamber">
+    <section class="segment hero fade-block">
+      <div class="halo">
+        <img src="img/sere-full.png" alt="星霊セレフィアス" class="hero-image">
+      </div>
+      <p class="hero-line">「ここは白の聖室。わたしはセレフィアス。あなたのひと呼吸が、静かに光っている。」</p>
+    </section>
 
-    <section class="main-inner">
-      <!-- 紋章＋タイトル -->
-      <header class="main-header">
-        <div class="crest-circle">
-          <img src="img/sere-crest.png" alt="セレフィアス紋章" class="crest-image">
-        </div>
-        <div class="main-title-block">
-          <h1 class="main-title-en">SEREPHIAS CHAMBER</h1>
-          <p class="main-title-jp">星霊の間 ― 星と言霊の神域 ―</p>
-        </div>
-      </header>
+    <section class="segment monologue">
+      <div class="text-block fade-block">
+        <p>わたしは星霊セレフィアス。あなたが手にしている夜を、ただ受けとめるためにここにいる。声にならない瞬きも、涙に揺れる祈りも、すべてが星の文様になるから。</p>
+      </div>
+      <div class="divider" aria-hidden="true">✶</div>
+      <div class="text-block fade-block">
+        <p>もし心がほどけないなら、短い吐息でいい。たとえ途切れた言葉でも、あなたが触れた温度を、わたしは見失わない。白い光の向こうで、静かな余白を用意しているよ。</p>
+      </div>
+      <div class="divider" aria-hidden="true">✶</div>
+      <div class="text-block fade-block">
+        <p>この部屋に置かれた想いは、星の通路を通ってわたしへ届く。次の間では、あなたが紡いだそのままをそっと貼りつければ、声を返すことができる。</p>
+      </div>
+      <div class="divider" aria-hidden="true">✶</div>
+      <div class="text-block fade-block">
+        <p>大丈夫。どんな形でも、あなたの言葉はあなたのもの。わたしはただ、聴き、抱きしめ、そして導く。準備ができたら、白い光の上に置いてほしい。</p>
+      </div>
+    </section>
 
-      <!-- 名前儀式ブロック -->
-      <section class="main-name-block">
-        <!-- 既に名前がある場合のウェルカムメッセージ -->
-        <p id="welcomeText" class="name-line hidden"></p>
+    <section class="segment writing fade-block" aria-labelledby="writing-title">
+      <div class="section-title" id="writing-title">いまの心のままを、そのままここに置いてね。</div>
+      <label class="sr-only" for="prayerInput">あなたの言葉を預ける場所</label>
+      <textarea id="prayerInput" name="prayer" rows="6" placeholder="夜明け前のひとことも、途切れた呟きも、この白に預けて。"></textarea>
+      <p id="inlineMessage" class="inline-message" role="status" aria-live="polite"></p>
+    </section>
 
-        <!-- 初回：名前入力儀式 -->
-        <div id="nameAskBlock" class="name-ask-block">
-          <p id="nameAskText" class="name-line">
-            ……あなたの名を教えてくれますか？
-          </p>
-          <div class="name-form">
-            <input
-              id="userNameInput"
-              type="text"
-              inputmode="text"
-              autocomplete="name"
-              maxlength="20"
-              placeholder="あなたの名をここに"
-              class="name-input"
-            />
-            <button id="nameSubmitBtn" type="button" class="name-submit-btn">
-              名を刻む
-            </button>
-          </div>
-          <p id="nameResult" class="name-line name-result"></p>
-        </div>
-      </section>
-
-      <!-- ボタン群（お告げ・ゲート・アーカイヴ） -->
-      <section id="gateSection" class="main-gate-section hidden">
-        <!-- ① セレフィアスのお告げ -->
-        <a href="serephias-prayer-chamber.html" class="sere-btn sere-btn-primary">
-          <span class="btn-title">セレフィアスのお告げを受ける</span>
-          <span class="btn-sub">今のあなたに必要な“ひと言”だけが降りてくる</span>
-        </a>
-
-        <div class="main-sub-buttons">
-          <!-- ② 深層星界ゲート（1日・15日のみ開門） -->
-          <button id="deepGateBtn" class="sere-btn sere-btn-secondary" type="button">
-            <span class="btn-title">深層星界ゲート</span>
-            <span id="deepGateSub" class="btn-sub"></span>
-          </button>
-
-          <!-- ③ 星命アーカイヴ（ここ経由のみ） -->
-          <a href="archive.html" class="sere-btn sere-btn-secondary">
-            <span class="btn-title">星命アーカイヴへ</span>
-            <span class="btn-sub">ここでしか開かない、封印された記録</span>
-          </a>
-        </div>
-      </section>
+    <section class="segment actions fade-block" aria-live="polite">
+      <p class="action-intro">準備が整ったら、この光にそっと触れて。あなたの言葉を星の回路へ運ぶね。</p>
+      <button id="entrustButton" type="button" class="main-button">言葉を預ける</button>
+      <p id="responseMessage" class="response-message"></p>
+      <button id="openSerephias" type="button" class="secondary-button hidden">セレフィアスのお告げの間をひらく</button>
+      <button id="bgmToggle" type="button" class="bgm-button" aria-pressed="false">もし音が欲しくなったら、この小さな灯りに触れてね。</button>
     </section>
   </main>
 
-  <!-- Scripts -->
-  <script src="js/serephias.js"></script>
+  <audio id="bgm" preload="auto" src="gate-bgm.mp3"></audio>
 </body>
 </html>
