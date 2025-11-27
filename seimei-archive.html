@@ -69,7 +69,7 @@
 
     @keyframes drift {
       from { transform: translateY(0); opacity: 0.9; }
-      to { transform: translateY(10px); opacity: 0.6; }
+      to   { transform: translateY(10px); opacity: 0.6; }
     }
 
     header {
@@ -263,7 +263,7 @@
 
     .btn:hover { transform: translateY(-1px); border-color: rgba(90,70,130,0.3); box-shadow: 0 16px 34px rgba(70,50,110,0.18); }
 
-    /* 共鳴の間：星の息吹・星の鼓動の演出 */
+    /* ===== 共鳴の間：星の息吹・灯火の鼓動 ===== */
     .resonance {
       position: relative;
       overflow: hidden;
@@ -275,16 +275,16 @@
       animation: resonanceGlow 9s ease-in-out infinite;
     }
 
-    /* テキストを守る内側プレート */
+    /* テキストを守るプレート */
     .resonance-content {
       position: relative;
       z-index: 1;
-      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.90), rgba(255,255,255,0.78));
+      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(255,255,255,0.90));
       border-radius: 20px;
-      padding: 16px 18px 14px;
+      padding: 16px 18px 18px;
     }
 
-    /* 部屋全体を包む柔らかな星霊の霞 */
+    /* 部屋全体を包む柔らかな霞 */
     .resonance::before {
       content: "";
       position: absolute;
@@ -327,52 +327,56 @@
       font-size: 15px;
     }
 
-    /* 星の息吹：内側プレートの下で鼓動する光 */
+    /* 星の息吹：カード下部で灯る鼓動 */
     .star-breath {
       position: absolute;
-      inset: 18px 34px 24px 34px;
+      left: 40px;
+      right: 40px;
+      bottom: 26px;
+      height: 110px;
       pointer-events: none;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
-      opacity: 0.55;
       mix-blend-mode: screen;
+      opacity: 0.8;
       z-index: 0;
     }
 
     .star-core {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: radial-gradient(circle, #fde9c6 0%, #f5d7a8 40%, rgba(248,213,160,0) 70%);
       box-shadow:
-        0 0 10px rgba(248,213,160,0.8),
-        0 0 26px rgba(246,219,179,0.6);
-      animation: starPulse 6.2s ease-in-out infinite;
+        0 0 12px rgba(248,213,160,0.9),
+        0 0 30px rgba(246,219,179,0.7);
+      animation: starPulse 5.4s ease-in-out infinite;
     }
 
     .star-ring {
       position: absolute;
+      bottom: 18px;
       border-radius: 50%;
-      border: 1px solid rgba(252,233,194,0.55);
-      box-shadow: 0 0 10px rgba(248,213,160,0.45);
+      border: 1px solid rgba(252,233,194,0.7);
+      box-shadow: 0 0 14px rgba(248,213,160,0.55);
       opacity: 0;
       transform: translateZ(0);
-      animation: ringWave 8s ease-out infinite;
+      animation: ringWave 7s ease-out infinite;
     }
 
-    .star-ring.ring-1 { width: 90px;  height: 90px;  animation-delay: 0s; }
-    .star-ring.ring-2 { width: 140px; height: 140px; animation-delay: 1.8s; }
-    .star-ring.ring-3 { width: 190px; height: 190px; animation-delay: 3.6s; }
+    .star-ring.ring-1 { width: 80px;  height: 80px;  animation-delay: 0s; }
+    .star-ring.ring-2 { width: 120px; height: 120px; animation-delay: 1.8s; }
+    .star-ring.ring-3 { width: 160px; height: 160px; animation-delay: 3.6s; }
 
     @keyframes starPulse {
       0%   { transform: scale(0.9);  opacity: 0.7; }
-      45%  { transform: scale(1.05); opacity: 1; }
+      45%  { transform: scale(1.1); opacity: 1; }
       100% { transform: scale(0.9);  opacity: 0.7; }
     }
 
     @keyframes ringWave {
-      0%   { transform: scale(0.7); opacity: 0.45; }
+      0%   { transform: scale(0.7); opacity: 0.55; }
       100% { transform: scale(1.5); opacity: 0; }
     }
 
@@ -475,7 +479,7 @@
     </section>
 
     <section class="resonance fade" aria-labelledby="resonance-title">
-      <!-- 星の息吹：内側プレートの下で鼓動する光 -->
+      <!-- 星の息吹：カード下部で鼓動する灯火 -->
       <div class="star-breath" aria-hidden="true">
         <span class="star-ring ring-1"></span>
         <span class="star-ring ring-2"></span>
