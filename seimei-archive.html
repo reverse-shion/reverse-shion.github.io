@@ -285,10 +285,42 @@
       opacity: 0.85;
     }
 
+    /* 光の輪がゆっくり外側へ広がる演出（ユーザーへ届く光の輪） */
+    .resonance::after {
+      content: "";
+      position: absolute;
+      inset: 14% 12%;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 213, 160, 0.55);
+      box-shadow:
+        0 0 18px rgba(248, 213, 160, 0.5),
+        0 0 32px rgba(248, 213, 160, 0.35);
+      opacity: 0;
+      transform: scale(0.9);
+      pointer-events: none;
+      animation: ringWave 6s ease-out infinite;
+    }
+
     @keyframes resonanceGlow {
-      0% { box-shadow: 0 22px 68px rgba(60, 40, 100, 0.18), inset 0 0 0 rgba(130,110,170,0.12); border-color: rgba(90,70,130,0.18); }
-      50% { box-shadow: 0 24px 80px rgba(60, 40, 100, 0.24), inset 0 0 18px rgba(130,110,170,0.16); border-color: rgba(90,70,130,0.28); }
+      0%   { box-shadow: 0 22px 68px rgba(60, 40, 100, 0.18), inset 0 0 0 rgba(130,110,170,0.12); border-color: rgba(90,70,130,0.18); }
+      50%  { box-shadow: 0 24px 80px rgba(60, 40, 100, 0.24), inset 0 0 18px rgba(130,110,170,0.16); border-color: rgba(90,70,130,0.28); }
       100% { box-shadow: 0 22px 68px rgba(60, 40, 100, 0.18), inset 0 0 0 rgba(130,110,170,0.12); border-color: rgba(90,70,130,0.18); }
+    }
+
+    /* 共鳴の光の輪が、ゆっくり鼓動しながら外側へ届くアニメーション */
+    @keyframes ringWave {
+      0% {
+        opacity: 0.55;
+        transform: scale(0.9);
+      }
+      60% {
+        opacity: 0.0;
+        transform: scale(1.18);
+      }
+      100% {
+        opacity: 0.0;
+        transform: scale(1.22);
+      }
     }
 
     .res-title {
@@ -338,7 +370,7 @@
     }
 
     @keyframes doorPulse {
-      0% { transform: scale(1); box-shadow: inset 0 0 12px rgba(110, 90, 140, 0.3), 0 12px 30px rgba(70,50,110,0.18); }
+      0% { transform: scale(1);   box-shadow: inset 0 0 12px rgba(110, 90, 140, 0.3), 0 12px 30px rgba(70,50,110,0.18); }
       50% { transform: scale(1.02); box-shadow: inset 0 0 16px rgba(110, 90, 140, 0.35), 0 16px 40px rgba(70,50,110,0.22); }
       100% { transform: scale(1); box-shadow: inset 0 0 12px rgba(110, 90, 140, 0.3), 0 12px 30px rgba(70,50,110,0.18); }
     }
@@ -450,8 +482,16 @@
       <div class="door" aria-hidden="true"></div>
       <h2 id="resonance-title" class="res-title">共鳴の間 — Resonance Chamber</h2>
       <div class="res-sub">QUIET PASSAGE TO COMMUNITY</div>
-      <p>星命アーカイヴのさらに奥には、同じ星の声に耳を澄ます者たちが静かに集う「共鳴の間」があります。ここでは、ジャッジされることなく、比べられることもなく、ただあなたの言葉がひとつの灯として迎えられます。</p>
-      <a class="btn" href="https://discord.gg/6MGCSeqJy" target="_blank" rel="noopener noreferrer">共鳴の間の扉をそっと開く</a>
+      <p>
+        星命アーカイヴのさらに奥に、ここがあります。<br>
+        ここは、あなたをそのまま受け入れるために灯された、静かなひとつの灯りです。<br>
+        部屋の中心でゆっくりと脈打つ光が、あなたの鼓動に合わせるようにひろがり、<br>
+        かすかな痛みも、願いも、そのまま抱きしめて心に共鳴していきます。<br>
+        ここに集うのは、同じ想いを抱えた小さな光たち。あなたの灯りも、その輪のひとつとして迎えられます。
+      </p>
+      <a class="btn" href="https://discord.gg/6MGCSeqJy" target="_blank" rel="noopener noreferrer">
+        共鳴の間の扉をそっと開く
+      </a>
     </section>
   </main>
 
