@@ -203,82 +203,85 @@
 
     /* === エンディング祝福オーバーレイ === */
 
-    .blessing-overlay {
+  /* ---- 最前面のイラスト＋祝福レイヤー ---- */
+
+.blessing-overlay {
   position: fixed;
   inset: 0;
-  background:
-    url("fin.png"),
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.35), transparent 60%),
-    radial-gradient(circle at 10% 80%, rgba(255, 231, 210, 0.25), transparent 55%),
-    radial-gradient(circle at 90% 40%, rgba(210, 190, 255, 0.25), transparent 55%),
-    linear-gradient(180deg, rgba(250, 235, 210, 0.25), rgba(150, 130, 220, 0.4));
-
-  background-size: cover;
-  background-position: center;
-  z-index: 50;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 2.2s ease-out;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: saturate(1.1);
-}
-    body.blessing-visible .blessing-overlay {
-      opacity: 1;
-      pointer-events: auto;
-      animation: overlayGlow 8s ease-in-out infinite alternate;
-    }
-
-    @keyframes overlayGlow {
-      0% { filter: saturate(1.05) brightness(1.02); }
-      100% { filter: saturate(1.2) brightness(1.12); }
-    }
-
- .blessing-inner {
-  text-align: center;
-  padding: 20px 24px;
-  border-radius: 18px;
-
-  /* ぼかしを軽く・暗さを控えめに */
-  background: radial-gradient(circle at 50% 40%, rgba(10, 12, 30, 0.35), rgba(10, 12, 30, 0.45));
-  box-shadow:
-    0 0 20px rgba(0, 0, 0, 0.35),
-    0 0 40px rgba(10, 12, 30, 0.45);
-  backdrop-filter: blur(4px);
-  display: inline-block;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.25)),
+    url("fin.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2s ease-in-out;
 }
 
-/* メインの「大丈夫だよ」 */
+body.blessing-visible .blessing-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---- ぼかしパネル（背景） ---- */
+.blessing-inner {
+  position: relative;     /* ← 必須 */
+  padding: 20px 26px;
+  border-radius: 22px;
+
+  background: rgba(10,12,30,0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  z-index: 10;            /* ← 背景パネルを前面 */
+}
+
+/* ---- メイン文字 ---- */
 .blessing-main {
+  position: relative;
+  z-index: 20;            /* ← テキストを最前面 */
   font-size: 2.2rem;
+  color: #fff;
   letter-spacing: 0.25em;
-  color: #ffffff;
-  text-shadow:
-    0 0 6px rgba(0, 0, 0, 0.9),
-    0 0 14px rgba(0, 0, 0, 0.8),
-    0 0 28px rgba(255, 255, 255, 0.85);
   opacity: 0;
-  transform: translateY(16px);
-  animation: blessingText 3.2s ease-out forwards 1.4s;
-  white-space: nowrap;
+
+  text-shadow:
+    0 0 8px rgba(0,0,0,0.8),
+    0 0 22px rgba(255,255,255,0.9);
+
+  animation: blessingText 2s ease-out forwards 0.6s;
 }
 
-/* サブメッセージ */
+/* ---- サブ文字 ---- */
 .blessing-sub {
-  margin-top: 14px;
-  font-size: 0.92rem;
-  letter-spacing: 0.18em;
-  color: rgba(250, 248, 240, 0.95);
-  text-shadow:
-    0 0 3px rgba(0, 0, 0, 0.8),
-    0 0 10px rgba(0, 0, 0, 0.8),
-    0 0 20px rgba(255, 255, 255, 0.7);
+  position: relative;
+  z-index: 20;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.92);
   opacity: 0;
-  transform: translateY(10px);
-  animation: blessingSub 2.4s ease-out forwards 2.4s;
+
+  text-shadow:
+    0 0 6px rgba(0,0,0,0.8),
+    0 0 12px rgba(255,255,255,0.85);
+
+  animation: blessingSub 2s ease-out forwards 1.2s;
 }
-@media (max-width: 600px) {
+
+@keyframes blessingText {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blessingSub {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+    @media (max-width: 600px) {
   .blessing-main {
     font-size: 1.7rem;
     letter-spacing: 0.18em;
