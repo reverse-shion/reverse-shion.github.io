@@ -203,25 +203,29 @@
 
     /* === エンディング祝福オーバーレイ === */
 
-  /* ---- 最前面のイラスト＋祝福レイヤー ---- */
-
+ /* ---- 最前面のイラスト＋祝福レイヤー ---- */
 .blessing-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
 
+  /* 眩しすぎない白＋パステルの光にする */
   background:
-    radial-gradient(circle at 50% 10%, rgba(255,255,255,0.95), rgba(255,255,255,0.10) 65%),
-    radial-gradient(circle at 80% 70%, rgba(210,180,255,0.45), transparent 70%),
-    radial-gradient(circle at 20% 80%, rgba(255,225,200,0.45), transparent 75%),
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.55), transparent 70%),
+    radial-gradient(circle at 15% 80%, rgba(255,220,210,0.35), transparent 75%),
+    radial-gradient(circle at 85% 30%, rgba(210,190,255,0.32), transparent 75%),
     url("fin.png");
 
   background-size: cover;
   background-position: center;
-  filter: saturate(1.18) brightness(1.18);
+  filter: saturate(1.05) brightness(1.03);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 2s ease-in-out;
+  transition: opacity 1.8s ease-in-out;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 body.blessing-visible .blessing-overlay {
@@ -229,68 +233,92 @@ body.blessing-visible .blessing-overlay {
   pointer-events: auto;
 }
 
-/* ---- ぼかしパネル（背景） ---- */
+/* ---- 中央の文字コンテナ（背景なし） ---- */
 .blessing-inner {
   position: relative;
   z-index: 10;
-  padding: 22px 26px;
-  border-radius: 24px;
-
-  background: rgba(255,255,255,0.20);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
-  border: 1px solid rgba(255,255,255,0.45);
-  box-shadow:
-    0 0 18px rgba(255,255,255,0.45),
-    0 0 32px rgba(200,170,255,0.35);
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  text-align: center;
 }
-/* ---- メイン文字 ---- */
+
+/* ---- メイン文字「大丈夫だよ」 ---- */
 .blessing-main {
   position: relative;
   z-index: 20;
-  font-size: 2.2rem;
-  letter-spacing: 0.2em;
-  color: #ffffff;
+  font-size: 2.4rem;
+  letter-spacing: 0.22em;
+  margin-bottom: 14px;
 
+  /* 虹色グラデーションテキスト */
+  background: linear-gradient(
+    120deg,
+    #fff7d1,
+    #ffe0f5,
+    #d4e5ff,
+    #e6fff5,
+    #fff7d1
+  );
+  background-size: 220% 220%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  /* 光のにじみ */
   text-shadow:
-    0 0 12px rgba(255,255,255,0.9),
-    0 0 24px rgba(180,160,255,0.9),
+    0 0 10px rgba(255,255,255,0.9),
+    0 0 26px rgba(220,200,255,0.95),
     0 0 40px rgba(255,255,255,1);
 
   opacity: 0;
-  animation: blessingText 1.8s ease-out forwards 0.5s;
+  transform: translateY(12px);
+  animation:
+    rainbowFlow 5s linear infinite,
+    blessingText 2.2s ease-out forwards 0.6s;
 }
-/* ---- サブ文字 ---- */
+
+/* ---- サブメッセージ ---- */
 .blessing-sub {
-  position: relative;
-  z-index: 20;
-  margin-top: 16px;
-  font-size: 0.9rem;
-  letter-spacing: 0.15em;
-  color: rgba(255,255,255,0.92);
-  opacity: 0;
-
+  margin-top: 6px;
+  font-size: 0.86rem;
+  letter-spacing: 0.18em;
+  color: #ffffff;
   text-shadow:
-    0 0 6px rgba(0,0,0,0.8),
-    0 0 12px rgba(255,255,255,0.85);
+    0 0 10px rgba(60,40,120,0.75),
+    0 0 18px rgba(255,255,255,0.9);
 
-  animation: blessingSub 2s ease-out forwards 1.2s;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: blessingSub 2s ease-out forwards 1.4s;
 }
 
+/* 虹色がゆっくり流れるアニメーション */
+@keyframes rainbowFlow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* フェードイン用キーフレーム（1回だけ定義） */
 @keyframes blessingText {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  0%   { opacity: 0; transform: translateY(12px); }
+  60%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
 }
+
 @keyframes blessingSub {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  0%   { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
-    @media (max-width: 600px) {
+
+/* ---- スマホ調整 ---- */
+@media (max-width: 600px) {
   .blessing-main {
     font-size: 1.7rem;
     letter-spacing: 0.18em;
   }
+}
   </style>
 </head>
 
