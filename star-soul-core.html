@@ -236,63 +236,57 @@
     }
 
     .blessing-inner {
-      text-align: center;
-      padding: 24px 18px;
-    }
+  text-align: center;
+  padding: 20px 26px;
+  border-radius: 18px;
+  /* 文字の背後だけを少し暗く＆ぼかす帯にする */
+  background: radial-gradient(circle at 50% 40%,
+              rgba(10, 12, 30, 0.55),
+              rgba(10, 12, 30, 0.78));
+  box-shadow:
+    0 0 30px rgba(0, 0, 0, 0.55),
+    0 0 80px rgba(10, 12, 30, 0.95);
+  backdrop-filter: blur(6px);
+}
 
-    .blessing-main {
-      font-size: 2.1rem;
-      letter-spacing: 0.25em;
-      color: #ffffff;
-      text-shadow:
-        0 0 18px rgba(255, 255, 255, 0.95),
-        0 0 32px rgba(255, 244, 215, 0.95),
-        0 0 70px rgba(180, 160, 255, 0.9);
-      opacity: 0;
-      transform: translateY(16px);
-      animation: blessingText 3.2s ease-out forwards 1.4s;
-      white-space: nowrap;
-    }
+/* 「大丈夫だよ」 */
+.blessing-main {
+  font-size: 2.1rem;
+  letter-spacing: 0.25em;
+  color: #fffdf7;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.9),
+    0 0 9px rgba(0, 0, 0, 0.75);
+  opacity: 0;
+  transform: translateY(16px);
+  animation: blessingText 3.2s ease-out forwards 1.4s;
+  white-space: nowrap;
+}
 
-    @keyframes blessingText {
-      0% { opacity: 0; transform: translateY(16px); }
-      60% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
+/* 下の一文 */
+.blessing-sub {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  color: rgba(245, 241, 232, 0.96);
+  text-shadow:
+    0 0 3px rgba(0, 0, 0, 0.9),
+    0 0 7px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: blessingSub 2.4s ease-out forwards 2.4s;
+}
 
-    .blessing-sub {
-      margin-top: 14px;
-      font-size: 0.9rem;
-      letter-spacing: 0.18em;
-      color: rgba(255, 252, 242, 0.9);
-      text-shadow: 0 0 14px rgba(60, 40, 100, 0.8);
-      opacity: 0;
-      transform: translateY(10px);
-      animation: blessingSub 2.4s ease-out forwards 2.4s;
-    }
-
-    @keyframes blessingSub {
-      0% { opacity: 0; transform: translateY(10px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 600px) {
-      .blessing-main {
-        font-size: 1.6rem;
-        letter-spacing: 0.18em;
-      }
-      .blessing-sub {
-        font-size: 0.8rem;
-        letter-spacing: 0.16em;
-      }
-    }
-
-    /* 動きを減らしたい人向け */
-    @media (prefers-reduced-motion: reduce) {
-      .trail { animation: none; opacity: 0.16; }
-      .core-plate::before,
-      body.blessing-visible .blessing-overlay { animation: none; }
-    }
+@media (max-width: 600px) {
+  .blessing-main {
+    font-size: 1.7rem;
+    letter-spacing: 0.18em;
+  }
+  .blessing-sub {
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+  }
+}
   </style>
 </head>
 
