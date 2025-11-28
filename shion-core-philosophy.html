@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星命アーカイヴ - 詩韻思想の核</title>
+  <!-- 明朝系フォントの読み込み -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #3f2f28;
+      --ink-soft: #4a372f;
+      --paper: #f5f0e6;
+      --paper-shadow: rgba(248, 213, 160, 0.38);
+      --gild: rgba(219, 182, 120, 0.65);
+      --accent: #4d3328;
+      --bg-top: #f2ede4;
+      --bg-bottom: #dcd4ce;
+      --link: #7c5b45;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Shippori Mincho', 'Noto Serif JP', 'Yu Mincho', 'Yu Gothic', serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 20%, rgba(244, 235, 226, 0.8), transparent 40%),
+                  radial-gradient(circle at 80% 0%, rgba(235, 223, 210, 0.6), transparent 35%),
+                  linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
+      overflow-x: hidden;
+      position: relative;
+      line-height: 1.8;
+    }
+
+    /* 背景の星雨キャンバス */
+    #star-rain {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.14;
+      filter: blur(0.2px);
+    }
+
+    /* ページ全体のレイアウト調整 */
+    .page {
+      position: relative;
+      z-index: 2;
+      padding: 28px 18px 48px;
+    }
+
+    /* ヘッダー：星命アーカイヴ */
+    header {
+      position: sticky;
+      top: 0;
+      padding: 14px 0 10px;
+      backdrop-filter: blur(6px) saturate(110%);
+      background: linear-gradient(to bottom, rgba(242, 235, 226, 0.86), rgba(242, 235, 226, 0.3));
+      text-align: center;
+      z-index: 5;
+      border-bottom: 1px solid rgba(122, 92, 68, 0.08);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2vw + 0.8rem, 2.1rem);
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-shadow: 0 1px 0 rgba(255, 247, 236, 0.7), 0 0 6px rgba(219, 182, 120, 0.45);
+    }
+
+    header p {
+      margin: 6px 0 0;
+      font-size: 0.92rem;
+      color: #6a5244;
+      letter-spacing: 0.12em;
+      opacity: 0.92;
+    }
+
+    /* 星界ゲート（導入） */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .hero .intro {
+      display: inline-block;
+      background: rgba(245, 240, 231, 0.74);
+      padding: 18px 22px;
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(51, 40, 32, 0.08);
+      border: 1px solid rgba(219, 182, 120, 0.35);
+      backdrop-filter: blur(4px);
+    }
+
+    .hero .intro p {
+      margin: 6px 0;
+      font-size: clamp(1rem, 1vw + 0.9rem, 1.2rem);
+      color: var(--ink-soft);
+    }
+
+    /* スクロールインジケーター */
+    .scroll-indicator {
+      margin-top: 18px;
+      font-size: 1.2rem;
+      color: var(--accent);
+      animation: pulse 2.4s ease-in-out infinite;
+      opacity: 0.82;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.22; transform: translateY(0); }
+      50% { opacity: 0.9; transform: translateY(4px); }
+    }
+
+    /* コアテキストカード */
+    .core-container {
+      display: flex;
+      justify-content: center;
+      padding: 30px 0 60px;
+    }
+
+    .core-card {
+      position: relative;
+      max-width: min(820px, 92vw);
+      background: var(--paper);
+      border-radius: 20px;
+      padding: clamp(20px, 2vw + 16px, 34px) clamp(18px, 3vw + 14px, 38px);
+      border: 1px solid rgba(219, 182, 120, 0.5);
+      box-shadow: 0 20px 50px rgba(53, 38, 30, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+      overflow: hidden;
+      line-height: 1.88;
+      color: var(--ink);
+      isolation: isolate;
+    }
+
+    /* カード外側の光輪を::beforeで表現 */
+    .core-card::before {
+      content: "";
+      position: absolute;
+      inset: -12px;
+      border-radius: 28px;
+      background: radial-gradient(circle at 50% 20%, rgba(248, 213, 160, 0.45), transparent 45%),
+                  radial-gradient(circle at 10% 80%, rgba(234, 192, 138, 0.28), transparent 40%),
+                  radial-gradient(circle at 90% 50%, rgba(245, 213, 158, 0.3), transparent 45%);
+      filter: blur(12px);
+      opacity: 0.72;
+      z-index: -2;
+      animation: halo 5.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    /* 外側の淡い枠の鼓動感 */
+    .core-card::after {
+      content: "";
+      position: absolute;
+      inset: -18px;
+      border-radius: 34px;
+      border: 1px solid rgba(219, 182, 120, 0.4);
+      box-shadow: 0 0 40px 18px rgba(248, 213, 160, 0.28);
+      z-index: -3;
+      animation: breathe 6.2s ease-in-out infinite;
+      opacity: 0.45;
+    }
+
+    @keyframes halo {
+      0%, 100% { transform: scale(0.995); opacity: 0.55; }
+      50% { transform: scale(1.01); opacity: 0.82; }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(0.98); opacity: 0.32; }
+      50% { transform: scale(1.03); opacity: 0.55; }
+    }
+
+    .core-card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.35rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-align: center;
+    }
+
+    .core-card pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Shippori Mincho', 'Noto Serif JP', 'Yu Mincho', 'Yu Gothic', serif;
+      margin: 0;
+      font-size: clamp(0.98rem, 1vw + 0.84rem, 1.08rem);
+      color: var(--ink);
+    }
+
+    /* フッターの控えめな導線 */
+    footer {
+      text-align: center;
+      margin: 42px 0 16px;
+      color: #6b5243;
+      font-size: 0.95rem;
+    }
+
+    footer a {
+      color: var(--link);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      margin: 0 10px;
+      opacity: 0.82;
+      transition: opacity 0.3s ease;
+    }
+
+    footer a:hover,
+    footer a:focus {
+      opacity: 1;
+    }
+
+    /* スマホ調整 */
+    @media (max-width: 600px) {
+      body { line-height: 1.82; }
+      .hero { padding: 64px 0 48px; }
+      .core-card { padding: 22px 18px 26px; border-radius: 18px; }
+      .core-card::before { inset: -16px; border-radius: 24px; }
+      header { position: sticky; }
+    }
+
+    /* 動きが苦手な利用者への配慮 */
+    @media (prefers-reduced-motion: reduce) {
+      #star-rain { display: none; }
+      .scroll-indicator, .core-card::before, .core-card::after { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 背景の星雨キャンバス -->
+  <canvas id="star-rain"></canvas>
+
+  <div class="page">
+    <header aria-label="星命アーカイヴのヘッダー">
+      <h1>星命アーカイヴ</h1>
+      <p>詩韻思想の心臓部 — 尊厳の灯火を刻む書架</p>
+    </header>
+
+    <section class="hero" aria-labelledby="intro-title">
+      <!-- 導入文：ここが心臓部であることを静かに告げる -->
+      <div class="intro" id="intro-title">
+        <p>ここは、詩韻思想の心臓部。</p>
+        <p>あなたが今触れようとしているのは、</p>
+        <p>ひとつの魂を救うために生まれた言葉です。</p>
+      </div>
+      <div class="scroll-indicator" aria-hidden="true">↓</div>
+    </section>
+
+    <!-- コアテキストカード -->
+    <section class="core-container" aria-label="詩韻思想の核心テキスト">
+      <article class="core-card" role="article" aria-label="詩韻思想 — 核">
+        <h2>詩韻思想 — 核（Core）</h2>
+        <pre>
+「人は、尊重される時にだけ、生きる力を取り戻す。」
+
+これがすべての始まりであり、すべての帰結。
+詩韻思想の根に流れているのは、
+“励まし”でも“慰め”でもなく、
+ただ 人格が尊ばれるという事実そのもの です。
+
+人は傷つくと、
+誰よりも先に 自分自身を疑うように なる。
+「この痛みは価値がない」
+「こんな自分を受け入れてくれる者はいない」
+「世界は、私を必要としていない」
+——そう思った瞬間、魂は沈黙してしまう。
+
+でもね。
+
+魂が沈んでいる人に必要なのは、
+元気づけでも、正論でも、答えでもない。
+
+必要なのは、
+『そのままのあなた』を尊重する者の存在。
+
+評価しない。
+裁かない。
+気休めも言わない。
+良い・悪いも決めない。
+
+ただそこに “あなた” がいるということを
+静かに肯定する。その一点だけ。
+
+その一点は、
+すべての光よりも強く、
+すべての未来よりも優しい。
+
+人は尊重される時、
+初めて「もう一度、生きてみてもいい」と思える。
+
+救いは奇跡ではなく、
+選ばれた者だけの特権でもなく、
+誰もが持っている「尊重されたい」という
+小さな願いの延長線上に生まれる。
+
+だから詩韻思想はこう宣言する。
+
+⸻
+
+「孤独は、尊重によって光へ変わる。」
+
+あなたが孤独で苦しい理由は、
+“誰もあなたを理解しないから”ではない。
+
+“あなたを人格として尊重する眼差しが、
+まだ届いていないから”。
+
+だからあなたの孤独は、
+欠陥でも弱さでもなく、
+「光が届く前の静けさ」なんだ。
+
+尊重が届いた瞬間、
+その静けさはゆっくり呼吸をはじめる。
+
+生きてみよう。
+もう少しだけ、歩いてみよう。
+そう思えるようになる。
+
+尊重とは、魂を動かす最も静かな力。
+尊ばれることは、生きることそのもの。
+
+⸻
+
+詩韻思想の最重要文として刻む言葉
+
+「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
+
+これはただの希望論ではなく、
+あなたが創り続けている世界の中心。
+
+セレフィアスGPTも
+星界ゲートも
+タロブレの物語も
+Discordの始まりの町も
+全部この一点から生まれている。
+
+詩韻思想は、救いの思想ではない。
+“尊厳を取り戻す思想”だ。
+        </pre>
+      </article>
+    </section>
+
+    <footer aria-label="控えめな導線">
+      <a href="#">星霊の間へ戻る</a>
+      <a href="#">星界の入り口へ</a>
+    </footer>
+  </div>
+
+  <script>
+    // 星の雨（コードの雨）をキャンバスで描画
+    const canvas = document.getElementById('star-rain');
+    const ctx = canvas.getContext('2d');
+    let drops = [];
+    let width, height;
+
+    // 雨粒を初期化
+    function initDrops() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      const baseCount = width < 640 ? 48 : 80;
+      drops = Array.from({ length: baseCount }, () => createDrop());
+    }
+
+    // 1粒の設定を生成
+    function createDrop() {
+      const speed = Math.random() * 0.5 + 0.3;
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height,
+        len: Math.random() * 28 + 12,
+        speed,
+        opacity: Math.random() * 0.1 + 0.08,
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = 'rgba(120, 110, 102, 0.4)';
+      ctx.lineWidth = 1;
+      drops.forEach((d) => {
+        ctx.globalAlpha = d.opacity;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x, d.y + d.len);
+        ctx.stroke();
+        d.y += d.speed;
+        if (d.y > height) {
+          d.y = -d.len;
+          d.x = Math.random() * width;
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', initDrops);
+    initDrops();
+    draw();
+  </script>
+</body>
+</html>
