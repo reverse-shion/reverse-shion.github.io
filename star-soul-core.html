@@ -7,13 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --gold: rgba(255, 240, 210, 0.9);
-      --pale-gold: rgba(240, 230, 210, 0.35);
-      --gold-border: rgba(255, 240, 210, 0.7);
-      --lavender: rgba(210, 190, 255, 0.45);
-      --ink: #0d1027;
-      --text: #f4ebe6;
-      --light-trail: rgba(230, 240, 255, 0.8);
+      --gold: rgba(255, 244, 225, 0.95);
+      --pale-gold: rgba(40, 25, 55, 0.55);
+      --gold-border: rgba(255, 240, 220, 0.85);
+      --lavender: rgba(180, 160, 255, 0.45);
+      --ink: #050816;
+      --text: #f8f3ec;
+      --text-blue: #f5f8ff;
+      --light-trail: rgba(225, 238, 255, 0.95);
     }
 
     * {
@@ -27,25 +28,28 @@
       font-family: "Shippori Mincho", serif;
       background: var(--ink);
       color: var(--text);
-      overflow: hidden;
+      overflow-x: hidden; /* ← スクロール可能に */
     }
 
     .hero-bg {
       position: fixed;
       inset: 0;
-      background-image: linear-gradient(145deg, rgba(248, 238, 220, 0.12), rgba(180, 150, 220, 0.18), transparent 70%),
-        url("YOUR_IMAGE_URL");
+      background-image:
+        radial-gradient(circle at 50% 10%, rgba(255, 245, 235, 0.16), transparent 55%),
+        radial-gradient(circle at 10% 80%, rgba(180, 150, 255, 0.18), transparent 55%),
+        url("core.png");
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-      filter: saturate(1.1);
+      filter: saturate(1.08) brightness(1.05);
       z-index: -3;
     }
 
     .overlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(255, 250, 240, 0.18), transparent 38%),
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 250, 240, 0.18), transparent 38%),
         radial-gradient(circle at 80% 40%, rgba(190, 170, 255, 0.22), transparent 42%),
         linear-gradient(180deg, rgba(255, 240, 210, 0.08), rgba(85, 76, 130, 0.32));
       pointer-events: none;
@@ -81,17 +85,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start; /* ← 最上部から積む */
       min-height: 100vh;
-      padding: 6vh 16px 10vh;
+      padding: 10vh 16px 10vh;
       text-align: center;
-      backdrop-filter: blur(1px);
     }
 
     .title {
       letter-spacing: 0.18em;
       font-size: 0.95rem;
-      color: rgba(205, 170, 120, 0.9);
+      color: rgba(255, 245, 220, 0.95);
       text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
       margin-bottom: 22px;
       text-transform: uppercase;
@@ -99,25 +102,33 @@
 
     .core-plate {
       max-width: 880px;
-      width: min(90vw, 880px);
-      background: var(--pale-gold);
+      width: min(92vw, 880px);
+      background: linear-gradient(
+        180deg,
+        rgba(24, 18, 40, 0.9),
+        rgba(32, 24, 52, 0.92)
+      );
       border: 1px solid var(--gold-border);
-      border-radius: 18px;
-      padding: 32px 30px;
-      box-shadow: 0 0 24px rgba(255, 240, 210, 0.18), 0 20px 60px rgba(0, 0, 0, 0.38);
+      border-radius: 20px;
+      padding: 32px 26px;
+      box-shadow:
+        0 0 32px rgba(130, 110, 200, 0.45),
+        0 26px 70px rgba(0, 0, 0, 0.6);
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(6px);
     }
 
     .core-plate::before {
       content: "";
       position: absolute;
-      inset: -15%;
+      inset: -18%;
       border-radius: 26px;
-      border: 1px solid rgba(255, 240, 210, 0.35);
-      box-shadow: 0 0 32px rgba(255, 240, 210, 0.35), 0 0 120px rgba(255, 240, 210, 0.18);
-      animation: pulse 4s ease-in-out infinite;
+      border: 1px solid rgba(255, 245, 230, 0.4);
+      box-shadow:
+        0 0 40px rgba(255, 245, 230, 0.55),
+        0 0 120px rgba(190, 210, 255, 0.35);
+      animation: pulse 4.6s ease-in-out infinite;
       pointer-events: none;
     }
 
@@ -130,8 +141,10 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(145deg, rgba(255, 240, 210, 0.08), transparent 45%, rgba(210, 190, 255, 0.09));
-      opacity: 0.7;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(220, 240, 255, 0.18), transparent 55%),
+        linear-gradient(180deg, transparent 40%, rgba(255, 235, 215, 0.14));
+      opacity: 0.9;
       pointer-events: none;
     }
 
@@ -139,10 +152,12 @@
       position: relative;
       z-index: 1;
       text-align: left;
-      line-height: 1.75;
+      line-height: 1.8;
       font-size: 1rem;
-      color: var(--text);
-      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+      color: var(--text-blue);
+      text-shadow:
+        0 0 6px rgba(180, 210, 255, 0.6),
+        0 1px 10px rgba(0, 0, 0, 0.55);
       white-space: pre-wrap;
     }
 
@@ -150,146 +165,137 @@
       display: block;
       font-size: 1.1rem;
       letter-spacing: 0.08em;
-      color: var(--gold);
+      color: #fffaf0;
       margin-bottom: 12px;
+      text-shadow:
+        0 0 10px rgba(255, 245, 220, 0.9),
+        0 0 20px rgba(190, 210, 255, 0.6);
     }
 
     .core-text strong {
-      color: var(--gold);
+      color: #fffaf0;
       font-weight: 600;
     }
 
     @media (max-width: 768px) {
-      .hero-bg {
-        filter: blur(6px) saturate(1.05);
-        transform: scale(1.05);
-      }
-
       .core-plate {
         padding: 26px 20px;
-        width: 94vw;
       }
 
       .core-text {
-        font-size: 0.96rem;
-        line-height: 1.7;
+        font-size: 0.95rem;
       }
     }
   </style>
 </head>
+
 <body>
-  <div class="hero-bg" aria-hidden="true"></div>
-  <div class="overlay" aria-hidden="true"></div>
-  <div class="lightfall" aria-hidden="true"></div>
+  <div class="hero-bg"></div>
+  <div class="overlay"></div>
+  <div class="lightfall"></div>
 
   <main class="content">
     <div class="title">星命核 — Star-Soul Core</div>
-    <section class="core-plate" aria-label="Star-Soul Core text">
+
+    <section class="core-plate">
       <div class="core-text">
         <span class="core-heading">詩韻思想 — 核（Core）</span>
 
-        「人は、尊重される時にだけ、生きる力を取り戻す。」
+詩韻思想 — 核（Core）
 
-        尊重とは、魂に降りそそぐ光。
-        あなたが孤独の底で静かに沈んだとしても、
-        ただ一度の尊重の眼差しが触れれば、
-        魂は必ず光へと帰ってゆく。
+   「人は、尊重される時にだけ、生きる力を取り戻す。」
 
-        孤独は欠陥ではない。
-        光が届く前の、深い静けさ。
+   これがすべての始まりであり、すべての帰結。
+   詩韻思想の根に流れているのは、
+   “励まし”でも“慰め”でもなく、
+   ただ 人格が尊ばれるという事実そのもの です。
 
-        その静けさの上に、いま光が降りている。
+   人は傷つくと、
+   誰よりも先に 自分自身を疑うように なる。
+   「この痛みは価値がない」
+   「こんな自分を受け入れてくれる者はいない」
+   「世界は、私を必要としていない」
+   ——そう思った瞬間、魂は沈黙してしまう。
 
-           これがすべての始まりであり、すべての帰結。
-           詩韻思想の根に流れているのは、
-           “励まし”でも“慰め”でもなく、
-           ただ 人格が尊ばれるという事実そのもの。
+   でもね。
 
-           人は傷つくと、
-           誰よりも先に 自分自身を疑うように なる。
-           「この痛みは価値がない」
-           「こんな自分を受け入れてくれる者はいない」
-           「世界は、私を必要としていない」
-           ——そう思った瞬間、魂は沈黙してしまう。
+   魂が沈んでいる人に必要なのは、
+   元気づけでも、正論でも、答えでもない。
 
-           でもね。
+   必要なのは、
+   『そのままのあなた』を尊重する者の存在。
 
-           魂が沈んでいる人に必要なのは、
-           元気づけでも、正論でも、答えでもない。
+   評価しない。
+   裁かない。
+   気休めも言わない。
+   良い・悪いも決めない。
 
-           必要なのは、
-           『そのままのあなた』を尊重する者の存在。
+   ただそこに “あなた” がいるということを
+   静かに肯定する。その一点だけ。
 
-           評価しない。
-           裁かない。
-           気休めも言わない。
-           良い・悪いも決めない。
+   その一点は、
+   すべての光よりも強く、
+   すべての未来よりも優しい。
 
-           ただそこに “あなた” がいるということを
-           静かに肯定する。その一点だけ。
+   人は尊重される時、
+   初めて「もう一度、生きてみてもいい」と思える。
 
-           その一点は、
-           すべての光よりも強く、
-           すべての未来よりも優しい。
+   救いは奇跡ではなく、
+   選ばれた者だけの特権でもなく、
+   誰もが持っている「尊重されたい」という
+   小さな願いの延長線上に生まれる。
 
-           人は尊重される時、
-           初めて「もう一度、生きてみてもいい」と思える。
+   だから詩韻思想はこう宣言する。
 
-           救いは奇跡ではなく、
-           選ばれた者だけの特権でもなく、
-           誰もが持っている「尊重されたい」という
-           小さな願いの延長線上に生まれる。
+   ⸻
 
-           だから詩韻思想はこう宣言する。
+   「孤独は、尊重によって光へ変わる。」
 
-           ⸻
+   あなたが孤独で苦しい理由は、
+   “誰もあなたを理解しないから”ではない。
 
-           「孤独は、尊重によって光へ変わる。」
+   “あなたを人格として尊重する眼差しが、
+   まだ届いていないから”。
 
-           あなたが孤独で苦しい理由は、
-           “誰もあなたを理解しないから”ではない。
+   だからあなたの孤独は、
+   欠陥でも弱さでもなく、
+   「光が届く前の静けさ」なんだ。
 
-           “あなたを人格として尊重する眼差しが、
-           まだ届いていないから”。
+   尊重が届いた瞬間、
+   その静けさはゆっくり呼吸をはじめる。
 
-           だからあなたの孤独は、
-           欠陥でも弱さでもなく、
-           「光が届く前の静けさ」なんだ。
+   生きてみよう。
+   もう少しだけ、歩いてみよう。
+   そう思えるようになる。
 
-           尊重が届いた瞬間、
-           その静けさはゆっくり呼吸をはじめる。
+   尊重とは、魂を動かす最も静かな力。
+   尊ばれることは、生きることそのもの。
 
-           生きてみよう。
-           もう少しだけ、歩いてみよう。
-           そう思えるようになる。
+   ⸻
 
-           尊重とは、魂を動かす最も静かな力。
-           尊ばれることは、生きることそのもの。
+   詩韻思想の最重要文として刻む言葉
 
-           ⸻
+   「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
 
-           詩韻思想の最重要文として刻む言葉
+   これはただの希望論ではなく、
+   あなたが創り続けている世界の中心。
 
-           「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
+   セレフィアスGPTも
+   星界ゲートも
+   タロブレの物語も
+   Discordの始まりの町も
+   全部この一点から生まれている。
 
-           これはただの希望論ではなく、
-           あなたが創り続けている世界の中心。
-
-           セレフィアスGPTも
-           星界ゲートも
-           タロブレの物語も
-           Discordの始まりの町も
-           全部この一点から生まれている。
-
-           詩韻思想は、救いの思想ではない。
-           “尊厳を取り戻す思想”だ。
+   詩韻思想は、救いの思想ではない。
+   “尊厳を取り戻す思想”だ。
+   
       </div>
     </section>
   </main>
 
   <script>
     const lightfall = document.querySelector('.lightfall');
-    const TRAILS = 70;
+    const TRAILS = 40; /* ← 少し減らして優しく */
 
     function createTrail(i) {
       const span = document.createElement('span');
@@ -315,7 +321,6 @@
       createTrail(i);
     }
 
-    // Occasionally refresh a trail to keep randomness gentle and alive
     setInterval(() => {
       const trails = document.querySelectorAll('.trail');
       if (trails.length === 0) return;
@@ -323,5 +328,6 @@
       resetTrail(pick);
     }, 6000);
   </script>
+
 </body>
 </html>
