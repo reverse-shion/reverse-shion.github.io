@@ -417,15 +417,18 @@
   <div class="transition-flash" aria-hidden="true"></div>
 
   <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const body = document.body;
     const gateButton = document.querySelector(".gate-button");
     const flash = document.querySelector(".transition-flash");
-    const body = document.body;
     const backLink = document.querySelector(".back-link");
     const starLayer = document.querySelector(".bg-stars");
 
     let isTransitioning = false;
 
     function createStars() {
+      if (!starLayer) return; // 念のためガード
+
       const total = Math.min(70, Math.floor(window.innerWidth / 8));
       for (let i = 0; i < total; i++) {
         const star = document.createElement("span");
@@ -436,7 +439,9 @@
         star.style.width = size + "px";
         star.style.height = size + "px";
         star.style.animationDelay = (Math.random() * 6).toFixed(2) + "s";
-        star.style.animationDuration = (6 + Math.random() * 6).toFixed(2) + "s, " + (14 + Math.random() * 10).toFixed(2) + "s";
+        star.style.animationDuration =
+          (6 + Math.random() * 6).toFixed(2) + "s, " +
+          (14 + Math.random() * 10).toFixed(2) + "s";
         star.style.opacity = (0.25 + Math.random() * 0.5).toFixed(2);
         starLayer.appendChild(star);
       }
@@ -445,10 +450,18 @@
     function enterGate() {
       if (isTransitioning) return;
       isTransitioning = true;
-      flash.classList.add("is-active");
+
+      if (flash) {
+        flash.classList.add("is-active");
+      }
       body.classList.add("tunnel-leaving");
-      gateButton.setAttribute("aria-busy", "true");
+
+      if (gateButton) {
+        gateButton.setAttribute("aria-busy", "true");
+      }
+
       setTimeout(() => {
+        // 必要ならパスを調整（例： "./star-soul-core.html" や "/shion/star-soul-core.html"）
         window.location.href = "star-soul-core.html";
       }, 900);
     }
@@ -458,12 +471,19 @@
       createStars();
     }
 
-    gateButton.addEventListener("click", enterGate);
-    backLink.addEventListener("click", () => {
-      window.location.href = "star-memory.html";
-    });
+    if (gateButton) {
+      gateButton.addEventListener("click", enterGate);
+    }
 
-    document.addEventListener("DOMContentLoaded", init);
-  </script>
+    if (backLink) {
+      backLink.addEventListener("click", () => {
+        // ここも必要に応じてパス調整
+        window.location.href = "star-memory.html";
+      });
+    }
+
+    init();
+  });
+</script>
 </body>
 </html>
