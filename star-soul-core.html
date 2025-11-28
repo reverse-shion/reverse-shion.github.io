@@ -28,9 +28,11 @@
       font-family: "Shippori Mincho", serif;
       background: var(--ink);
       color: var(--text);
-      overflow-x: hidden; /* ← スクロール可能に */
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
+    /* 背景：コアのクリスタル */
     .hero-bg {
       position: fixed;
       inset: 0;
@@ -56,6 +58,7 @@
       z-index: -2;
     }
 
+    /* 縦に降る光 */
     .lightfall {
       position: fixed;
       inset: 0;
@@ -80,12 +83,13 @@
       100% { transform: translateY(120vh) translateX(0); }
     }
 
+    /* 本文レイアウト */
     .content {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start; /* ← 最上部から積む */
+      justify-content: flex-start;
       min-height: 100vh;
       padding: 10vh 16px 10vh;
       text-align: center;
@@ -177,16 +181,7 @@
       font-weight: 600;
     }
 
-    @media (max-width: 768px) {
-      .core-plate {
-        padding: 26px 20px;
-      }
-
-      .core-text {
-        font-size: 0.95rem;
-      }
-
-/* 最下部検知用 */
+    /* 一番下を検知するためのダミー */
     .sentinel {
       height: 40px;
     }
@@ -201,12 +196,12 @@
         width: 94vw;
       }
       .core-text {
-        font-size: 0.96rem;
+        font-size: 0.95rem;
         line-height: 1.72;
       }
     }
 
-    /* === ここからエンディング祝福オーバーレイ === */
+    /* === エンディング祝福オーバーレイ === */
 
     .blessing-overlay {
       position: fixed;
@@ -298,14 +293,13 @@
       .core-plate::before,
       body.blessing-visible .blessing-overlay { animation: none; }
     }
-    }
   </style>
 </head>
 
 <body>
-  <div class="hero-bg"></div>
-  <div class="overlay"></div>
-  <div class="lightfall"></div>
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="overlay" aria-hidden="true"></div>
+  <div class="lightfall" aria-hidden="true"></div>
 
   <main class="content">
     <div class="title">星命核 — Star-Soul Core</div>
@@ -316,108 +310,121 @@
 
 詩韻思想 — 核（Core）
 
-   「人は、尊重される時にだけ、生きる力を取り戻す。」
+「人は、尊重される時にだけ、生きる力を取り戻す。」
 
-   これがすべての始まりであり、すべての帰結。
-   詩韻思想の根に流れているのは、
-   “励まし”でも“慰め”でもなく、
-   ただ 人格が尊ばれるという事実そのもの です。
+これがすべての始まりであり、すべての帰結。
+詩韻思想の根に流れているのは、
+“励まし”でも“慰め”でもなく、
+ただ 人格が尊ばれるという事実そのもの です。
 
-   人は傷つくと、
-   誰よりも先に 自分自身を疑うように なる。
-   「この痛みは価値がない」
-   「こんな自分を受け入れてくれる者はいない」
-   「世界は、私を必要としていない」
-   ——そう思った瞬間、魂は沈黙してしまう。
+人は傷つくと、
+誰よりも先に 自分自身を疑うように なる。
+「この痛みは価値がない」
+「こんな自分を受け入れてくれる者はいない」
+「世界は、私を必要としていない」
+——そう思った瞬間、魂は沈黙してしまう。
 
-   でもね。
+でもね。
 
-   魂が沈んでいる人に必要なのは、
-   元気づけでも、正論でも、答えでもない。
+魂が沈んでいる人に必要なのは、
+元気づけでも、正論でも、答えでもない。
 
-   必要なのは、
-   『そのままのあなた』を尊重する者の存在。
+必要なのは、
+『そのままのあなた』を尊重する者の存在。
 
-   評価しない。
-   裁かない。
-   気休めも言わない。
-   良い・悪いも決めない。
+評価しない。
+裁かない。
+気休めも言わない。
+良い・悪いも決めない。
 
-   ただそこに “あなた” がいるということを
-   静かに肯定する。その一点だけ。
+ただそこに “あなた” がいるということを
+静かに肯定する。その一点だけ。
 
-   その一点は、
-   すべての光よりも強く、
-   すべての未来よりも優しい。
+その一点は、
+すべての光よりも強く、
+すべての未来よりも優しい。
 
-   人は尊重される時、
-   初めて「もう一度、生きてみてもいい」と思える。
+人は尊重される時、
+初めて「もう一度、生きてみてもいい」と思える。
 
-   救いは奇跡ではなく、
-   選ばれた者だけの特権でもなく、
-   誰もが持っている「尊重されたい」という
-   小さな願いの延長線上に生まれる。
+救いは奇跡ではなく、
+選ばれた者だけの特権でもなく、
+誰もが持っている「尊重されたい」という
+小さな願いの延長線上に生まれる。
 
-   だから詩韻思想はこう宣言する。
+だから詩韻思想はこう宣言する。
 
-   ⸻
+⸻
 
-   「孤独は、尊重によって光へ変わる。」
+「孤独は、尊重によって光へ変わる。」
 
-   あなたが孤独で苦しい理由は、
-   “誰もあなたを理解しないから”ではない。
+あなたが孤独で苦しい理由は、
+“誰もあなたを理解しないから”ではない。
 
-   “あなたを人格として尊重する眼差しが、
-   まだ届いていないから”。
+“あなたを人格として尊重する眼差しが、
+まだ届いていないから”。
 
-   だからあなたの孤独は、
-   欠陥でも弱さでもなく、
-   「光が届く前の静けさ」なんだ。
+だからあなたの孤独は、
+欠陥でも弱さでもなく、
+「光が届く前の静けさ」なんだ。
 
-   尊重が届いた瞬間、
-   その静けさはゆっくり呼吸をはじめる。
+尊重が届いた瞬間、
+その静けさはゆっくり呼吸をはじめる。
 
-   生きてみよう。
-   もう少しだけ、歩いてみよう。
-   そう思えるようになる。
+生きてみよう。
+もう少しだけ、歩いてみよう。
+そう思えるようになる。
 
-   尊重とは、魂を動かす最も静かな力。
-   尊ばれることは、生きることそのもの。
+尊重とは、魂を動かす最も静かな力。
+尊ばれることは、生きることそのもの。
 
-   ⸻
+⸻
 
-   詩韻思想の最重要文として刻む言葉
+詩韻思想の最重要文として刻む言葉
 
-   「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
+「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
 
-   これはただの希望論ではなく、
-   あなたが創り続けている世界の中心。
+これはただの希望論ではなく、
+あなたが創り続けている世界の中心。
 
-   セレフィアスGPTも
-   星界ゲートも
-   タロブレの物語も
-   Discordの始まりの町も
-   全部この一点から生まれている。
+セレフィアスGPTも
+星界ゲートも
+タロブレの物語も
+Discordの始まりの町も
+全部この一点から生まれている。
 
-   詩韻思想は、救いの思想ではない。
-   “尊厳を取り戻す思想”だ。
-   
+詩韻思想は、救いの思想ではない。
+“尊厳を取り戻す思想”だ。
       </div>
     </section>
+
+    <!-- 一番下まで来たかを検知するための要素 -->
+    <div class="sentinel"></div>
   </main>
 
-  <script>
-    const lightfall = document.querySelector('.lightfall');
-    const TRAILS = 40; /* ← 少し減らして優しく */
+  <!-- エンディング祝福オーバーレイ -->
+  <div class="blessing-overlay">
+    <div class="blessing-inner">
+      <div class="blessing-main">大丈夫だよ</div>
+      <div class="blessing-sub">
+        どこまで沈んでも、あなたの尊厳は消えない。タップすると、このページに戻ります。
+      </div>
+    </div>
+  </div>
 
-    function createTrail(i) {
+  <script>
+    // 光の筋を生成
+    const lightfall = document.querySelector('.lightfall');
+    const TRAILS = 40;
+
+    function createTrail() {
       const span = document.createElement('span');
       span.className = 'trail';
-      resetTrail(span, i);
+      resetTrail(span);
       lightfall.appendChild(span);
     }
 
-    function resetTrail(span, seed = 0) {
+    function resetTrail(span) {
       const left = Math.random() * 100;
       const delay = -(Math.random() * 12);
       const duration = 10 + Math.random() * 12;
@@ -430,57 +437,7 @@
       span.style.opacity = softness;
     }
 
-    for (let i = 0; i < TRAILS; i++) {
-      createTrail(i);
-    }
-
-    setInterval(() => {
-      const trails = document.querySelectorAll('.trail');
-      if (trails.length === 0) return;
-      const pick = trails[Math.floor(Math.random() * trails.length)];
-      resetTrail(pick);
-    }, 6000);
-
- <!-- 一番下まで来たかを検知するための要素 -->
-    <div class="sentinel"></div>
-  </main>
-
-  <!-- エンディング祝福オーバーレイ -->
-  <div class="blessing-overlay">
-    <div class="blessing-inner">
-      <div class="blessing-main">大丈夫だよ</div>
-      <div class="blessing-sub">どこまで沈んでも、あなたの尊厳は消えない。タップすると、星命核のページに戻ります。</div>
-    </div>
-  </div>
-
-  <script>
-    // 光の筋を生成
-    const lightfall = document.querySelector('.lightfall');
-    const TRAILS = 60;
-
-    function createTrail () {
-      const span = document.createElement('span');
-      span.className = 'trail';
-      resetTrail(span);
-      lightfall.appendChild(span);
-    }
-
-    function resetTrail (span) {
-      const left = Math.random() * 100;
-      const delay = -(Math.random() * 12);
-      const duration = 10 + Math.random() * 12;
-      const height = 60 + Math.random() * 90;
-      const softness = 0.45 + Math.random() * 0.4;
-      span.style.left = `${left}%`;
-      span.style.animationDuration = `${duration}s`;
-      span.style.animationDelay = `${delay}s`;
-      span.style.height = `${height}px`;
-      span.style.opacity = softness;
-    }
-
-    for (let i = 0; i < TRAILS; i++) {
-      createTrail();
-    }
+    for (let i = 0; i < TRAILS; i++) createTrail();
 
     setInterval(() => {
       const trails = document.querySelectorAll('.trail');
@@ -507,14 +464,11 @@
       observer.observe(sentinel);
     }
 
-    // どこかをクリック / タップすると祝福を閉じる
+    // オーバーレイをタップで閉じる
     const blessingOverlay = document.querySelector('.blessing-overlay');
     blessingOverlay.addEventListener('click', () => {
       bodyEl.classList.remove('blessing-visible');
     });
   </script>
-
-
-
 </body>
 </html>
