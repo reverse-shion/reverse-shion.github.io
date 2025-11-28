@@ -7,14 +7,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --gold: rgba(255, 244, 225, 0.95);
-      --pale-gold: rgba(40, 25, 55, 0.55);
-      --gold-border: rgba(255, 240, 220, 0.85);
-      --lavender: rgba(180, 160, 255, 0.45);
-      --ink: #050816;
-      --text: #f8f3ec;
-      --text-blue: #f5f8ff;
-      --light-trail: rgba(225, 238, 255, 0.95);
+      --gold: rgba(255, 240, 218, 0.95);
+      --pale-gold: rgba(255, 244, 230, 0.18);
+      --gold-border: rgba(255, 240, 210, 0.9);
+      --lavender: rgba(210, 190, 255, 0.45);
+      --ink: #130f2a;
+      --text: #fdf7f1;
+      --light-trail: rgba(233, 244, 255, 0.9);
     }
 
     * {
@@ -28,20 +27,23 @@
       font-family: "Shippori Mincho", serif;
       background: var(--ink);
       color: var(--text);
-      overflow-x: hidden; /* ← スクロール可能に */
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
+    /* 背景：星界＋セレフィアスコアの世界 */
     .hero-bg {
       position: fixed;
       inset: 0;
       background-image:
-        radial-gradient(circle at 50% 10%, rgba(255, 245, 235, 0.16), transparent 55%),
-        radial-gradient(circle at 10% 80%, rgba(180, 150, 255, 0.18), transparent 55%),
+        radial-gradient(circle at 15% 10%, rgba(255, 245, 230, 0.28), transparent 55%),
+        radial-gradient(circle at 80% 0%, rgba(210, 190, 255, 0.35), transparent 50%),
+        linear-gradient(180deg, rgba(32, 24, 68, 0.9), rgba(10, 7, 24, 1)),
         url("core.png");
       background-size: cover;
-      background-position: center;
+      background-position: center top;
       background-attachment: fixed;
-      filter: saturate(1.08) brightness(1.05);
+      filter: saturate(1.1) brightness(0.9);
       z-index: -3;
     }
 
@@ -49,13 +51,14 @@
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(circle at 20% 20%, rgba(255, 250, 240, 0.18), transparent 38%),
-        radial-gradient(circle at 80% 40%, rgba(190, 170, 255, 0.22), transparent 42%),
-        linear-gradient(180deg, rgba(255, 240, 210, 0.08), rgba(85, 76, 130, 0.32));
+        radial-gradient(circle at 20% 20%, rgba(255, 250, 240, 0.25), transparent 40%),
+        radial-gradient(circle at 80% 40%, rgba(200, 180, 255, 0.23), transparent 45%),
+        linear-gradient(180deg, rgba(255, 240, 220, 0.12), rgba(70, 55, 120, 0.45));
       pointer-events: none;
       z-index: -2;
     }
 
+    /* 縦に降る光の筋 */
     .lightfall {
       position: fixed;
       inset: 0;
@@ -72,7 +75,7 @@
       opacity: 0.7;
       border-radius: 999px;
       animation: fall linear infinite;
-      filter: drop-shadow(0 0 6px rgba(240, 246, 255, 0.45));
+      filter: drop-shadow(0 0 8px rgba(240, 246, 255, 0.7));
     }
 
     @keyframes fall {
@@ -80,21 +83,21 @@
       100% { transform: translateY(120vh) translateX(0); }
     }
 
+    /* 本文コンテンツ */
     .content {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start; /* ← 最上部から積む */
       min-height: 100vh;
-      padding: 10vh 16px 10vh;
+      padding: 8vh 16px 16vh;
       text-align: center;
     }
 
     .title {
       letter-spacing: 0.18em;
       font-size: 0.95rem;
-      color: rgba(255, 245, 220, 0.95);
+      color: rgba(255, 234, 198, 0.95);
       text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
       margin-bottom: 22px;
       text-transform: uppercase;
@@ -103,33 +106,31 @@
     .core-plate {
       max-width: 880px;
       width: min(92vw, 880px);
-      background: linear-gradient(
-        180deg,
-        rgba(24, 18, 40, 0.9),
-        rgba(32, 24, 52, 0.92)
-      );
+      background: radial-gradient(circle at 50% 0%, rgba(255, 249, 236, 0.20), rgba(40, 26, 70, 0.92));
       border: 1px solid var(--gold-border);
       border-radius: 20px;
-      padding: 32px 26px;
+      padding: 32px 30px;
       box-shadow:
-        0 0 32px rgba(130, 110, 200, 0.45),
-        0 26px 70px rgba(0, 0, 0, 0.6);
+        0 0 30px rgba(255, 240, 210, 0.35),
+        0 20px 60px rgba(3, 0, 20, 0.75),
+        0 0 0 1px rgba(255, 255, 255, 0.25) inset;
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(9px);
     }
 
     .core-plate::before {
       content: "";
       position: absolute;
       inset: -18%;
-      border-radius: 26px;
-      border: 1px solid rgba(255, 245, 230, 0.4);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 240, 220, 0.45);
       box-shadow:
-        0 0 40px rgba(255, 245, 230, 0.55),
-        0 0 120px rgba(190, 210, 255, 0.35);
+        0 0 35px rgba(255, 240, 220, 0.55),
+        0 0 160px rgba(255, 248, 230, 0.5);
       animation: pulse 4.6s ease-in-out infinite;
       pointer-events: none;
+      opacity: 0.85;
     }
 
     @keyframes pulse {
@@ -142,8 +143,8 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 50% 0%, rgba(220, 240, 255, 0.18), transparent 55%),
-        linear-gradient(180deg, transparent 40%, rgba(255, 235, 215, 0.14));
+        radial-gradient(circle at 50% 0%, rgba(255, 246, 230, 0.35), transparent 55%),
+        linear-gradient(145deg, rgba(255, 240, 210, 0.1), transparent 45%, rgba(210, 190, 255, 0.16));
       opacity: 0.9;
       pointer-events: none;
     }
@@ -152,164 +153,280 @@
       position: relative;
       z-index: 1;
       text-align: left;
-      line-height: 1.8;
+      line-height: 1.78;
       font-size: 1rem;
-      color: var(--text-blue);
-      text-shadow:
-        0 0 6px rgba(180, 210, 255, 0.6),
-        0 1px 10px rgba(0, 0, 0, 0.55);
+      color: var(--text);
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
       white-space: pre-wrap;
     }
 
     .core-heading {
       display: block;
-      font-size: 1.1rem;
+      font-size: 1.12rem;
       letter-spacing: 0.08em;
-      color: #fffaf0;
+      color: var(--gold);
       margin-bottom: 12px;
-      text-shadow:
-        0 0 10px rgba(255, 245, 220, 0.9),
-        0 0 20px rgba(190, 210, 255, 0.6);
     }
 
     .core-text strong {
-      color: #fffaf0;
+      color: var(--gold);
       font-weight: 600;
     }
 
-    @media (max-width: 768px) {
-      .core-plate {
-        padding: 26px 20px;
-      }
+    /* 最下部検知用 */
+    .sentinel {
+      height: 40px;
+    }
 
-      .core-text {
-        font-size: 0.95rem;
+    @media (max-width: 768px) {
+      .hero-bg {
+        filter: blur(4px) saturate(1.05) brightness(0.9);
+        transform: scale(1.04);
       }
+      .core-plate {
+        padding: 26px 18px;
+        width: 94vw;
+      }
+      .core-text {
+        font-size: 0.96rem;
+        line-height: 1.72;
+      }
+    }
+
+    /* === ここからエンディング祝福オーバーレイ === */
+
+    .blessing-overlay {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.85), transparent 60%),
+        radial-gradient(circle at 10% 80%, rgba(255, 231, 210, 0.65), transparent 55%),
+        radial-gradient(circle at 90% 40%, rgba(210, 190, 255, 0.6), transparent 55%),
+        linear-gradient(180deg, rgba(250, 235, 210, 0.75), rgba(150, 130, 220, 0.85)),
+        url("fin.png");
+      background-size: cover;
+      background-position: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2.2s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: saturate(1.15);
+    }
+
+    body.blessing-visible .blessing-overlay {
+      opacity: 1;
+      pointer-events: auto;
+      animation: overlayGlow 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes overlayGlow {
+      0% { filter: saturate(1.05) brightness(1.02); }
+      100% { filter: saturate(1.2) brightness(1.12); }
+    }
+
+    .blessing-inner {
+      text-align: center;
+      padding: 24px 18px;
+    }
+
+    .blessing-main {
+      font-size: 2.1rem;
+      letter-spacing: 0.25em;
+      color: #ffffff;
+      text-shadow:
+        0 0 18px rgba(255, 255, 255, 0.95),
+        0 0 32px rgba(255, 244, 215, 0.95),
+        0 0 70px rgba(180, 160, 255, 0.9);
+      opacity: 0;
+      transform: translateY(16px);
+      animation: blessingText 3.2s ease-out forwards 1.4s;
+      white-space: nowrap;
+    }
+
+    @keyframes blessingText {
+      0% { opacity: 0; transform: translateY(16px); }
+      60% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .blessing-sub {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      letter-spacing: 0.18em;
+      color: rgba(255, 252, 242, 0.9);
+      text-shadow: 0 0 14px rgba(60, 40, 100, 0.8);
+      opacity: 0;
+      transform: translateY(10px);
+      animation: blessingSub 2.4s ease-out forwards 2.4s;
+    }
+
+    @keyframes blessingSub {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .blessing-main {
+        font-size: 1.6rem;
+        letter-spacing: 0.18em;
+      }
+      .blessing-sub {
+        font-size: 0.8rem;
+        letter-spacing: 0.16em;
+      }
+    }
+
+    /* 動きを減らしたい人向け */
+    @media (prefers-reduced-motion: reduce) {
+      .trail { animation: none; opacity: 0.16; }
+      .core-plate::before,
+      body.blessing-visible .blessing-overlay { animation: none; }
     }
   </style>
 </head>
-
 <body>
-  <div class="hero-bg"></div>
-  <div class="overlay"></div>
-  <div class="lightfall"></div>
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="overlay" aria-hidden="true"></div>
+  <div class="lightfall" aria-hidden="true"></div>
 
   <main class="content">
     <div class="title">星命核 — Star-Soul Core</div>
 
-    <section class="core-plate">
+    <section class="core-plate" aria-label="Star-Soul Core text">
       <div class="core-text">
         <span class="core-heading">詩韻思想 — 核（Core）</span>
 
-詩韻思想 — 核（Core）
+        「人は、尊重される時にだけ、生きる力を取り戻す。」
 
-   「人は、尊重される時にだけ、生きる力を取り戻す。」
+        尊重とは、魂に降りそそぐ光。
+        あなたが孤独の底で静かに沈んだとしても、
+        ただ一度の尊重の眼差しが触れれば、
+        魂は必ず光へと帰ってゆく。
 
-   これがすべての始まりであり、すべての帰結。
-   詩韻思想の根に流れているのは、
-   “励まし”でも“慰め”でもなく、
-   ただ 人格が尊ばれるという事実そのもの です。
+        孤独は欠陥ではない。
+        光が届く前の、深い静けさ。
 
-   人は傷つくと、
-   誰よりも先に 自分自身を疑うように なる。
-   「この痛みは価値がない」
-   「こんな自分を受け入れてくれる者はいない」
-   「世界は、私を必要としていない」
-   ——そう思った瞬間、魂は沈黙してしまう。
+        その静けさの上に、いま光が降りている。
 
-   でもね。
+           これがすべての始まりであり、すべての帰結。
+           詩韻思想の根に流れているのは、
+           “励まし”でも“慰め”でもなく、
+           ただ 人格が尊ばれるという事実そのもの。
 
-   魂が沈んでいる人に必要なのは、
-   元気づけでも、正論でも、答えでもない。
+           人は傷つくと、
+           誰よりも先に 自分自身を疑うように なる。
+           「この痛みは価値がない」
+           「こんな自分を受け入れてくれる者はいない」
+           「世界は、私を必要としていない」
+           ——そう思った瞬間、魂は沈黙してしまう。
 
-   必要なのは、
-   『そのままのあなた』を尊重する者の存在。
+           でもね。
 
-   評価しない。
-   裁かない。
-   気休めも言わない。
-   良い・悪いも決めない。
+           魂が沈んでいる人に必要なのは、
+           元気づけでも、正論でも、答えでもない。
 
-   ただそこに “あなた” がいるということを
-   静かに肯定する。その一点だけ。
+           必要なのは、
+           『そのままのあなた』を尊重する者の存在。
 
-   その一点は、
-   すべての光よりも強く、
-   すべての未来よりも優しい。
+           評価しない。
+           裁かない。
+           気休めも言わない。
+           良い・悪いも決めない。
 
-   人は尊重される時、
-   初めて「もう一度、生きてみてもいい」と思える。
+           ただそこに “あなた” がいるということを
+           静かに肯定する。その一点だけ。
 
-   救いは奇跡ではなく、
-   選ばれた者だけの特権でもなく、
-   誰もが持っている「尊重されたい」という
-   小さな願いの延長線上に生まれる。
+           その一点は、
+           すべての光よりも強く、
+           すべての未来よりも優しい。
 
-   だから詩韻思想はこう宣言する。
+           人は尊重される時、
+           初めて「もう一度、生きてみてもいい」と思える。
 
-   ⸻
+           救いは奇跡ではなく、
+           選ばれた者だけの特権でもなく、
+           誰もが持っている「尊重されたい」という
+           小さな願いの延長線上に生まれる。
 
-   「孤独は、尊重によって光へ変わる。」
+           だから詩韻思想はこう宣言する。
 
-   あなたが孤独で苦しい理由は、
-   “誰もあなたを理解しないから”ではない。
+           ⸻
 
-   “あなたを人格として尊重する眼差しが、
-   まだ届いていないから”。
+           「孤独は、尊重によって光へ変わる。」
 
-   だからあなたの孤独は、
-   欠陥でも弱さでもなく、
-   「光が届く前の静けさ」なんだ。
+           あなたが孤独で苦しい理由は、
+           “誰もあなたを理解しないから”ではない。
 
-   尊重が届いた瞬間、
-   その静けさはゆっくり呼吸をはじめる。
+           “あなたを人格として尊重する眼差しが、
+           まだ届いていないから”。
 
-   生きてみよう。
-   もう少しだけ、歩いてみよう。
-   そう思えるようになる。
+           だからあなたの孤独は、
+           欠陥でも弱さでもなく、
+           「光が届く前の静けさ」なんだ。
 
-   尊重とは、魂を動かす最も静かな力。
-   尊ばれることは、生きることそのもの。
+           尊重が届いた瞬間、
+           その静けさはゆっくり呼吸をはじめる。
 
-   ⸻
+           生きてみよう。
+           もう少しだけ、歩いてみよう。
+           そう思えるようになる。
 
-   詩韻思想の最重要文として刻む言葉
+           尊重とは、魂を動かす最も静かな力。
+           尊ばれることは、生きることそのもの。
 
-   「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
+           ⸻
 
-   これはただの希望論ではなく、
-   あなたが創り続けている世界の中心。
+           詩韻思想の最重要文として刻む言葉
 
-   セレフィアスGPTも
-   星界ゲートも
-   タロブレの物語も
-   Discordの始まりの町も
-   全部この一点から生まれている。
+           「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
 
-   詩韻思想は、救いの思想ではない。
-   “尊厳を取り戻す思想”だ。
-   
+           これはただの希望論ではなく、
+           あなたが創り続けている世界の中心。
+
+           セレフィアスGPTも
+           星界ゲートも
+           タロブレの物語も
+           Discordの始まりの町も
+           全部この一点から生まれている。
+
+           詩韻思想は、救いの思想ではない。
+           “尊厳を取り戻す思想”だ。
       </div>
     </section>
+
+    <!-- 一番下まで来たかを検知するための要素 -->
+    <div class="sentinel"></div>
   </main>
 
-  <script>
-    const lightfall = document.querySelector('.lightfall');
-    const TRAILS = 40; /* ← 少し減らして優しく */
+  <!-- エンディング祝福オーバーレイ -->
+  <div class="blessing-overlay">
+    <div class="blessing-inner">
+      <div class="blessing-main">大丈夫だよ</div>
+      <div class="blessing-sub">どこまで沈んでも、あなたの尊厳は消えない。タップすると、星命核のページに戻ります。</div>
+    </div>
+  </div>
 
-    function createTrail(i) {
+  <script>
+    // 光の筋を生成
+    const lightfall = document.querySelector('.lightfall');
+    const TRAILS = 60;
+
+    function createTrail () {
       const span = document.createElement('span');
       span.className = 'trail';
-      resetTrail(span, i);
+      resetTrail(span);
       lightfall.appendChild(span);
     }
 
-    function resetTrail(span, seed = 0) {
+    function resetTrail (span) {
       const left = Math.random() * 100;
       const delay = -(Math.random() * 12);
       const duration = 10 + Math.random() * 12;
-      const height = 50 + Math.random() * 80;
-      const softness = 0.4 + Math.random() * 0.4;
+      const height = 60 + Math.random() * 90;
+      const softness = 0.45 + Math.random() * 0.4;
       span.style.left = `${left}%`;
       span.style.animationDuration = `${duration}s`;
       span.style.animationDelay = `${delay}s`;
@@ -318,16 +435,39 @@
     }
 
     for (let i = 0; i < TRAILS; i++) {
-      createTrail(i);
+      createTrail();
     }
 
     setInterval(() => {
       const trails = document.querySelectorAll('.trail');
-      if (trails.length === 0) return;
+      if (!trails.length) return;
       const pick = trails[Math.floor(Math.random() * trails.length)];
       resetTrail(pick);
     }, 6000);
-  </script>
 
+    // スクロールエンドで祝福オーバーレイを表示
+    const sentinel = document.querySelector('.sentinel');
+    const bodyEl = document.body;
+    let blessingShown = false;
+
+    if ('IntersectionObserver' in window && sentinel) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !blessingShown) {
+            blessingShown = true;
+            bodyEl.classList.add('blessing-visible');
+          }
+        });
+      }, { threshold: 0.8 });
+
+      observer.observe(sentinel);
+    }
+
+    // どこかをクリック / タップすると祝福を閉じる
+    const blessingOverlay = document.querySelector('.blessing-overlay');
+    blessingOverlay.addEventListener('click', () => {
+      bodyEl.classList.remove('blessing-visible');
+    });
+  </script>
 </body>
 </html>
