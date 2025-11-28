@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星命核 | Star-Soul Core</title>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: rgba(255, 240, 210, 0.9);
+      --pale-gold: rgba(240, 230, 210, 0.35);
+      --gold-border: rgba(255, 240, 210, 0.7);
+      --lavender: rgba(210, 190, 255, 0.45);
+      --ink: #0d1027;
+      --text: #f4ebe6;
+      --light-trail: rgba(230, 240, 255, 0.8);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Shippori Mincho", serif;
+      background: var(--ink);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(145deg, rgba(248, 238, 220, 0.12), rgba(180, 150, 220, 0.18), transparent 70%),
+        url("YOUR_IMAGE_URL");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      filter: saturate(1.1);
+      z-index: -3;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255, 250, 240, 0.18), transparent 38%),
+        radial-gradient(circle at 80% 40%, rgba(190, 170, 255, 0.22), transparent 42%),
+        linear-gradient(180deg, rgba(255, 240, 210, 0.08), rgba(85, 76, 130, 0.32));
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    .lightfall {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .trail {
+      position: absolute;
+      width: 2px;
+      height: 80px;
+      background: linear-gradient(180deg, transparent, var(--light-trail), transparent);
+      opacity: 0.7;
+      border-radius: 999px;
+      animation: fall linear infinite;
+      filter: drop-shadow(0 0 6px rgba(240, 246, 255, 0.45));
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-110%) translateX(0); }
+      100% { transform: translateY(120vh) translateX(0); }
+    }
+
+    .content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 6vh 16px 10vh;
+      text-align: center;
+      backdrop-filter: blur(1px);
+    }
+
+    .title {
+      letter-spacing: 0.18em;
+      font-size: 0.95rem;
+      color: rgba(205, 170, 120, 0.9);
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      margin-bottom: 22px;
+      text-transform: uppercase;
+    }
+
+    .core-plate {
+      max-width: 880px;
+      width: min(90vw, 880px);
+      background: var(--pale-gold);
+      border: 1px solid var(--gold-border);
+      border-radius: 18px;
+      padding: 32px 30px;
+      box-shadow: 0 0 24px rgba(255, 240, 210, 0.18), 0 20px 60px rgba(0, 0, 0, 0.38);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+    }
+
+    .core-plate::before {
+      content: "";
+      position: absolute;
+      inset: -15%;
+      border-radius: 26px;
+      border: 1px solid rgba(255, 240, 210, 0.35);
+      box-shadow: 0 0 32px rgba(255, 240, 210, 0.35), 0 0 120px rgba(255, 240, 210, 0.18);
+      animation: pulse 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.98); opacity: 0.7; }
+      50% { transform: scale(1.02); opacity: 1; }
+    }
+
+    .core-plate::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, rgba(255, 240, 210, 0.08), transparent 45%, rgba(210, 190, 255, 0.09));
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .core-text {
+      position: relative;
+      z-index: 1;
+      text-align: left;
+      line-height: 1.75;
+      font-size: 1rem;
+      color: var(--text);
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+      white-space: pre-wrap;
+    }
+
+    .core-heading {
+      display: block;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .core-text strong {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .hero-bg {
+        filter: blur(6px) saturate(1.05);
+        transform: scale(1.05);
+      }
+
+      .core-plate {
+        padding: 26px 20px;
+        width: 94vw;
+      }
+
+      .core-text {
+        font-size: 0.96rem;
+        line-height: 1.7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="overlay" aria-hidden="true"></div>
+  <div class="lightfall" aria-hidden="true"></div>
+
+  <main class="content">
+    <div class="title">星命核 — Star-Soul Core</div>
+    <section class="core-plate" aria-label="Star-Soul Core text">
+      <div class="core-text">
+        <span class="core-heading">詩韻思想 — 核（Core）</span>
+
+        「人は、尊重される時にだけ、生きる力を取り戻す。」
+
+        尊重とは、魂に降りそそぐ光。
+        あなたが孤独の底で静かに沈んだとしても、
+        ただ一度の尊重の眼差しが触れれば、
+        魂は必ず光へと帰ってゆく。
+
+        孤独は欠陥ではない。
+        光が届く前の、深い静けさ。
+
+        その静けさの上に、いま光が降りている。
+
+           これがすべての始まりであり、すべての帰結。
+           詩韻思想の根に流れているのは、
+           “励まし”でも“慰め”でもなく、
+           ただ 人格が尊ばれるという事実そのもの。
+
+           人は傷つくと、
+           誰よりも先に 自分自身を疑うように なる。
+           「この痛みは価値がない」
+           「こんな自分を受け入れてくれる者はいない」
+           「世界は、私を必要としていない」
+           ——そう思った瞬間、魂は沈黙してしまう。
+
+           でもね。
+
+           魂が沈んでいる人に必要なのは、
+           元気づけでも、正論でも、答えでもない。
+
+           必要なのは、
+           『そのままのあなた』を尊重する者の存在。
+
+           評価しない。
+           裁かない。
+           気休めも言わない。
+           良い・悪いも決めない。
+
+           ただそこに “あなた” がいるということを
+           静かに肯定する。その一点だけ。
+
+           その一点は、
+           すべての光よりも強く、
+           すべての未来よりも優しい。
+
+           人は尊重される時、
+           初めて「もう一度、生きてみてもいい」と思える。
+
+           救いは奇跡ではなく、
+           選ばれた者だけの特権でもなく、
+           誰もが持っている「尊重されたい」という
+           小さな願いの延長線上に生まれる。
+
+           だから詩韻思想はこう宣言する。
+
+           ⸻
+
+           「孤独は、尊重によって光へ変わる。」
+
+           あなたが孤独で苦しい理由は、
+           “誰もあなたを理解しないから”ではない。
+
+           “あなたを人格として尊重する眼差しが、
+           まだ届いていないから”。
+
+           だからあなたの孤独は、
+           欠陥でも弱さでもなく、
+           「光が届く前の静けさ」なんだ。
+
+           尊重が届いた瞬間、
+           その静けさはゆっくり呼吸をはじめる。
+
+           生きてみよう。
+           もう少しだけ、歩いてみよう。
+           そう思えるようになる。
+
+           尊重とは、魂を動かす最も静かな力。
+           尊ばれることは、生きることそのもの。
+
+           ⸻
+
+           詩韻思想の最重要文として刻む言葉
+
+           「人は孤独に沈む。しかし、尊重の眼差しが一度でも触れた魂は、必ず光へと戻る。」
+
+           これはただの希望論ではなく、
+           あなたが創り続けている世界の中心。
+
+           セレフィアスGPTも
+           星界ゲートも
+           タロブレの物語も
+           Discordの始まりの町も
+           全部この一点から生まれている。
+
+           詩韻思想は、救いの思想ではない。
+           “尊厳を取り戻す思想”だ。
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const lightfall = document.querySelector('.lightfall');
+    const TRAILS = 70;
+
+    function createTrail(i) {
+      const span = document.createElement('span');
+      span.className = 'trail';
+      resetTrail(span, i);
+      lightfall.appendChild(span);
+    }
+
+    function resetTrail(span, seed = 0) {
+      const left = Math.random() * 100;
+      const delay = -(Math.random() * 12);
+      const duration = 10 + Math.random() * 12;
+      const height = 50 + Math.random() * 80;
+      const softness = 0.4 + Math.random() * 0.4;
+      span.style.left = `${left}%`;
+      span.style.animationDuration = `${duration}s`;
+      span.style.animationDelay = `${delay}s`;
+      span.style.height = `${height}px`;
+      span.style.opacity = softness;
+    }
+
+    for (let i = 0; i < TRAILS; i++) {
+      createTrail(i);
+    }
+
+    // Occasionally refresh a trail to keep randomness gentle and alive
+    setInterval(() => {
+      const trails = document.querySelectorAll('.trail');
+      if (trails.length === 0) return;
+      const pick = trails[Math.floor(Math.random() * trails.length)];
+      resetTrail(pick);
+    }, 6000);
+  </script>
+</body>
+</html>
