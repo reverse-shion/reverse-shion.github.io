@@ -119,21 +119,23 @@
       font-size: clamp(30px, 4vw, 48px);
       letter-spacing: 0.16em;
       font-family: "Shippori Mincho", "Noto Serif JP", serif;
-      color: #5c3c32; /* 少し赤みのあるブラウンインク */
+      color: #6c3e2e;
       position: relative;
       z-index: 3;
       text-shadow:
-        0 1px 0 rgba(255, 252, 245, 0.9),
-        0 3px 8px rgba(120, 80, 70, 0.45);
+        0 2px 4px rgba(255, 244, 229, 0.8),
+        0 4px 14px rgba(118, 72, 52, 0.45),
+        0 0 18px rgba(214, 160, 122, 0.35);
     }
 
     .subtitle {
       font-size: 12px;
       letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: #6f6587;
+      color: #6f5b78;
       font-family: "Times New Roman", "Georgia", serif;
       margin-bottom: 28px;
+      text-shadow: 0 1px 6px rgba(240, 220, 205, 0.35);
     }
 
     .intro {
@@ -148,6 +150,45 @@
       box-shadow: 0 16px 44px rgba(70, 50, 110, 0.1);
       backdrop-filter: blur(5px);
       position: relative;
+    }
+
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 18px auto 4px;
+      padding: 8px 14px;
+      color: #73584b;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      background: rgba(255, 247, 237, 0.6);
+      border: 1px solid rgba(150, 120, 100, 0.16);
+      border-radius: 999px;
+      box-shadow: 0 10px 26px rgba(120, 90, 70, 0.12);
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .scroll-hint::after {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-left: 2px solid rgba(115, 88, 75, 0.9);
+      border-bottom: 2px solid rgba(115, 88, 75, 0.9);
+      transform: rotate(-45deg);
+      display: inline-block;
+      animation: arrowFloat 2.6s ease-in-out infinite;
+    }
+
+    .scroll-hint.hidden {
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
     }
 
     .whisper {
@@ -275,77 +316,59 @@
       overflow: hidden;
       border-radius: 26px;
       padding: 26px 20px;
-      background: linear-gradient(145deg, #f8f2ff, #f2e7ff);
-      border: 1px solid rgba(140, 110, 170, 0.35);
-      box-shadow: 0 22px 70px rgba(60, 40, 100, 0.2);
+      background: linear-gradient(145deg, #f8f0e6, #f3e4d5);
+      border: 1px solid rgba(150, 118, 96, 0.25);
+      box-shadow: 0 22px 70px rgba(110, 82, 60, 0.18);
+      isolation: isolate;
     }
 
     /* カード本体：文字の読みやすさを守るプレート */
     .resonance-inner {
       position: relative;
       z-index: 1;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.94));
+      background: linear-gradient(180deg, rgba(255,255,252,0.98), rgba(255,255,255,0.95));
       border-radius: 22px;
       padding: 20px 20px 22px;
     }
 
-    /* 縁で鼓動する光（外周） */
-    .resonance::before {
-      content: "";
-      position: absolute;
-      inset: 4px;
-      border-radius: 24px;
-      border: 2px solid rgba(252, 233, 194, 0.98);
-      box-shadow:
-        0 0 20px rgba(252, 233, 194, 0.95),
-        0 0 45px rgba(246, 215, 176, 0.9);
-      opacity: 0.6;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      animation: borderPulse 4.6s ease-in-out infinite;
-    }
-
-    /* 内側からふわっと広がる灯火のハロー */
+    /* 灯火の呼吸（丸みのあるハローのみ） */
+    .resonance::before,
     .resonance::after {
       content: "";
       position: absolute;
-      inset: 18px;
-      border-radius: 22px;
-      background: radial-gradient(circle at 50% 50%, rgba(252,233,194,0.55), transparent 70%);
-      opacity: 0.0;
+      inset: 12px;
+      border-radius: 24px;
       pointer-events: none;
+      filter: blur(10px);
       mix-blend-mode: screen;
-      animation: haloBreath 6.2s ease-in-out infinite;
+      transform-origin: center;
+      z-index: 0;
     }
 
-    @keyframes borderPulse {
-      0% {
-        opacity: 0.35;
-        transform: scale(0.97);
-      }
-      50% {
-        opacity: 1;
-        transform: scale(1.03);
-      }
-      100% {
-        opacity: 0.35;
-        transform: scale(0.97);
-      }
+    .resonance::before {
+      background: radial-gradient(circle at 50% 45%, rgba(249, 226, 197, 0.82) 0%, rgba(245, 207, 163, 0.46) 34%, rgba(246, 212, 170, 0.22) 58%, rgba(246, 212, 170, 0) 88%);
+      opacity: 0.65;
+      animation: lanternPulse 5.2s ease-in-out infinite;
     }
 
-    @keyframes haloBreath {
-      0% {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      50% {
-        opacity: 0.65;
-        transform: scale(1.02);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(0.95);
-      }
+    .resonance::after {
+      background:
+        radial-gradient(120% 140% at 50% 58%, rgba(244, 196, 150, 0.38), rgba(244, 196, 150, 0.05) 60%, transparent 80%),
+        radial-gradient(80% 80% at 50% 42%, rgba(249, 226, 197, 0.45), rgba(249, 226, 197, 0) 70%);
+      opacity: 0.55;
+      animation: haloBloom 5.8s ease-in-out infinite;
+    }
+
+    @keyframes lanternPulse {
+      0% { opacity: 0.45; transform: scale(0.97); }
+      45% { opacity: 0.9; transform: scale(1.03); }
+      100% { opacity: 0.45; transform: scale(0.97); }
+    }
+
+    @keyframes haloBloom {
+      0% { opacity: 0.35; transform: scale(0.95); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+      100% { opacity: 0.35; transform: scale(0.95); }
     }
 
     /* タイトルと本文：少しあたたかい色味に（読みやすさ優先） */
@@ -354,22 +377,28 @@
       font-size: 22px;
       font-family: "Shippori Mincho", "Noto Serif JP", serif;
       letter-spacing: 0.08em;
-      color: #3b3041;
+      color: #3e2f2b;
     }
 
     .res-sub {
       font-size: 12px;
       letter-spacing: 0.26em;
       text-transform: uppercase;
-      color: #7a6a8a;
+      color: #7a675a;
       font-family: "Times New Roman", "Georgia", serif;
       margin-bottom: 18px;
     }
 
     .resonance p {
       margin: 0 0 18px;
-      color: #5d4c6a;
+      color: #59483f;
       font-size: 15px;
+    }
+
+    @keyframes arrowFloat {
+      0% { transform: translateY(0) rotate(-45deg); }
+      50% { transform: translateY(5px) rotate(-45deg); }
+      100% { transform: translateY(0) rotate(-45deg); }
     }
 
     .fade { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
@@ -415,6 +444,7 @@
       すべては、あなたの魂と共鳴するために封じられています。
       <div class="whisper">ページをめくるたびに、ひとつずつ灯がともっていきます。</div>
     </div>
+    <div class="scroll-hint">静かな回廊は、下へ続きます</div>
   </header>
 
   <main>
@@ -510,6 +540,30 @@
       } else {
         targets.forEach(el => el.classList.add('visible'));
       }
+    })();
+  </script>
+  <script>
+    (() => {
+      const hint = document.querySelector('.scroll-hint');
+      const archiveTitle = document.getElementById('archive-title');
+      if (!hint) return;
+
+      const toggleHint = () => {
+        if (window.scrollY > 150) {
+          hint.classList.add('hidden');
+        } else {
+          hint.classList.remove('hidden');
+        }
+      };
+
+      toggleHint();
+      window.addEventListener('scroll', toggleHint, { passive: true });
+
+      hint.addEventListener('click', () => {
+        if (archiveTitle) {
+          archiveTitle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
     })();
   </script>
 </body>
