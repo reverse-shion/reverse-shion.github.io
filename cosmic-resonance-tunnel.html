@@ -131,6 +131,8 @@
       justify-content: center;
       text-align: center;
       padding: 5vw;
+      /* 念のためクリックを絶対通す */
+      pointer-events: auto;
     }
 
     .gate-core {
@@ -147,6 +149,8 @@
       opacity: 0;
       transform: scale(0.97);
       transition: opacity 1.1s ease 0.5s, transform 1.1s ease 0.5s;
+      pointer-events: auto;
+      z-index: 50; /* 最前面に */
     }
 
     body.is-ready .bg-base,
@@ -166,6 +170,7 @@
       box-shadow: 0 0 25px rgba(136,245,255,0.35);
       filter: blur(0.5px);
       animation: gatePulse 10s ease-in-out infinite reverse;
+      pointer-events: none;
     }
 
     .gate-core::after {
@@ -178,6 +183,7 @@
       mix-blend-mode: screen;
       opacity: 0.45;
       animation: glyphRing 16s linear infinite;
+      pointer-events: none;
     }
 
     .gate-button {
@@ -199,28 +205,13 @@
       text-decoration: none;
       transition: transform 0.5s ease, box-shadow 0.5s ease, filter 0.5s ease;
       isolation: isolate;
+      pointer-events: auto !important;
+      z-index: 60;
     }
 
-    .gate-button::before {
-      content: "";
-      position: absolute;
-      inset: 8%;
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.35), rgba(136,245,255,0.15) 40%, rgba(2,8,20,0.0) 70%);
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      z-index: -1;
-    }
-
+    .gate-button::before,
     .gate-button::after {
-      content: "";
-      position: absolute;
-      inset: -2%;
-      border-radius: 50%;
-      border: 1px solid rgba(136,245,255,0.25);
-      opacity: 0;
-      transition: opacity 0.4s ease, transform 0.6s ease;
-      transform: scale(0.98);
+      pointer-events: none;
     }
 
     .gate-button:focus-visible {
@@ -234,17 +225,6 @@
       transform: scale(1.03);
       box-shadow: 0 0 24px rgba(136,245,255,0.45), 0 0 56px rgba(197,181,255,0.35);
       filter: drop-shadow(0 0 20px rgba(136,245,255,0.25));
-    }
-
-    .gate-button:hover::before,
-    .gate-button:active::before {
-      opacity: 0.8;
-    }
-
-    .gate-button:hover::after,
-    .gate-button:active::after {
-      opacity: 0.6;
-      transform: scale(1.05);
     }
 
     .gate-title-ja {
@@ -301,7 +281,8 @@
       text-decoration: none;
       backdrop-filter: blur(4px);
       transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-      z-index: 20;
+      z-index: 70;
+      pointer-events: auto !important;
     }
 
     .back-link:hover,
@@ -371,9 +352,10 @@
 
   <main class="gate-layer" aria-label="Cosmic Resonance Tunnel — 星命核への共鳴回廊">
     <div class="gate-core">
-      <!-- ここを a に変更 -->
+      <!-- a タグ ＋ pointer-events 強制ON -->
       <a href="star-soul-core.html"
          class="gate-button"
+         style="pointer-events:auto;"
          aria-label="星命核の心臓部へ進むゲート">
         <span class="gate-title-ja">星命核への共鳴回廊</span>
         <span class="gate-title-en">Cosmic Resonance Tunnel</span>
@@ -381,9 +363,9 @@
       </a>
     </div>
 
-    <!-- ここも a に変更 -->
     <a href="star-memory.html"
        class="back-link"
+       style="pointer-events:auto;"
        aria-label="星の記憶へ戻る">
       星の記憶へ戻る
     </a>
