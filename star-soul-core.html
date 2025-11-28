@@ -248,37 +248,62 @@ body.blessing-visible .blessing-overlay {
 .blessing-main {
   position: relative;
   z-index: 20;
-  font-size: 2.4rem;
-  letter-spacing: 0.22em;
+  font-size: 2.6rem;
+  letter-spacing: 0.24em;
   margin-bottom: 14px;
+  font-weight: 600;
 
-  /* 虹色グラデーションテキスト */
+  /* ──── ★ 文字の主発光（白金グラデ）──── */
   background: linear-gradient(
-    120deg,
-    #fff7d1,
-    #ffe0f5,
-    #d4e5ff,
-    #e6fff5,
-    #fff7d1
+    180deg,
+    #ffffff 0%,
+    #fff6e8 25%,
+    #ffe9ff 50%,
+    #d7eaff 75%,
+    #ffffff 100%
   );
-  background-size: 220% 220%;
+  background-size: 180% 180%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 
-  /* 光のにじみ */
+  /* ──── ★ 文字のオーラ（影ではなく光）──── */
   text-shadow:
-    0 0 10px rgba(255,255,255,0.9),
-    0 0 26px rgba(220,200,255,0.95),
-    0 0 40px rgba(255,255,255,1);
+    0 0 14px rgba(255,255,255,0.95),
+    0 0 28px rgba(255,245,230,0.95),
+    0 0 45px rgba(255,255,255,1),
+    0 0 70px rgba(255,220,255,0.9),
+    0 0 90px rgba(210,230,255,0.9);
 
+  /* 浮上アニメーション */
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(18px) scale(0.97);
   animation:
-    rainbowFlow 5s linear infinite,
-    blessingText 2.2s ease-out forwards 0.6s;
+    blessingFloat 2.2s ease-out forwards 0.4s,
+    rainbowPulse 6s ease-in-out infinite 1s;
 }
 
+/* ゆっくり発光の脈動 */
+@keyframes rainbowPulse {
+  0% { filter: brightness(1.0) saturate(1.0); }
+  50% { filter: brightness(1.25) saturate(1.15); }
+  100% { filter: brightness(1.0) saturate(1.0); }
+}
+
+/* フェード＋浮遊 */
+@keyframes blessingFloat {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.97); }
+  60%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* スマホ */
+@media (max-width: 600px) {
+  .blessing-main {
+    font-size: 1.8rem;
+    letter-spacing: 0.2em;
+  }
+}
 /* ---- サブメッセージ ---- */
 .blessing-sub {
   margin-top: 6px;
