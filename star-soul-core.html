@@ -235,58 +235,54 @@
       100% { filter: saturate(1.2) brightness(1.12); }
     }
 
-    .blessing-inner {
+ .blessing-inner {
   text-align: center;
-  padding: 20px 26px;
+  padding: 20px 24px;
   border-radius: 18px;
-  /* 文字の背後だけを少し暗く＆ぼかす帯にする */
-  background: radial-gradient(circle at 50% 40%,
-              rgba(10, 12, 30, 0.55),
-              rgba(10, 12, 30, 0.78));
+
+  /* ぼかしを軽く・暗さを控えめに */
+  background: radial-gradient(circle at 50% 40%, rgba(10, 12, 30, 0.35), rgba(10, 12, 30, 0.45));
   box-shadow:
-    0 0 30px rgba(0, 0, 0, 0.55),
-    0 0 80px rgba(10, 12, 30, 0.95);
-  backdrop-filter: blur(6px);
+    0 0 20px rgba(0, 0, 0, 0.35),
+    0 0 40px rgba(10, 12, 30, 0.45);
+  backdrop-filter: blur(4px);
+  display: inline-block;
 }
 
-/* 「大丈夫だよ」 */
+/* メインの「大丈夫だよ」 */
 .blessing-main {
-  font-size: 2.1rem;
+  font-size: 2.2rem;
   letter-spacing: 0.25em;
-  color: #fffdf7;
+  color: #ffffff;
   text-shadow:
-    0 0 4px rgba(0, 0, 0, 0.9),
-    0 0 9px rgba(0, 0, 0, 0.75);
+    0 0 6px rgba(0, 0, 0, 0.9),
+    0 0 14px rgba(0, 0, 0, 0.8),
+    0 0 28px rgba(255, 255, 255, 0.85);
   opacity: 0;
   transform: translateY(16px);
   animation: blessingText 3.2s ease-out forwards 1.4s;
   white-space: nowrap;
 }
 
-/* 下の一文 */
+/* サブメッセージ */
 .blessing-sub {
   margin-top: 14px;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   letter-spacing: 0.18em;
-  color: rgba(245, 241, 232, 0.96);
+  color: rgba(250, 248, 240, 0.95);
   text-shadow:
-    0 0 3px rgba(0, 0, 0, 0.9),
-    0 0 7px rgba(0, 0, 0, 0.7);
+    0 0 3px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.7);
   opacity: 0;
   transform: translateY(10px);
   animation: blessingSub 2.4s ease-out forwards 2.4s;
 }
-
 @media (max-width: 600px) {
   .blessing-main {
     font-size: 1.7rem;
     letter-spacing: 0.18em;
   }
-  .blessing-sub {
-    font-size: 0.8rem;
-    letter-spacing: 0.16em;
-  }
-
   </style>
 </head>
 
