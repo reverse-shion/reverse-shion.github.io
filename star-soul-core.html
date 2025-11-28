@@ -204,26 +204,26 @@
     /* === エンディング祝福オーバーレイ === */
 
     .blessing-overlay {
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.85), transparent 60%),
-        radial-gradient(circle at 10% 80%, rgba(255, 231, 210, 0.65), transparent 55%),
-        radial-gradient(circle at 90% 40%, rgba(210, 190, 255, 0.6), transparent 55%),
-        linear-gradient(180deg, rgba(250, 235, 210, 0.75), rgba(150, 130, 220, 0.85)),
-        url("fin.png");
-      background-size: cover;
-      background-position: center;
-      z-index: 50;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 2.2s ease-out;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      filter: saturate(1.15);
-    }
+  position: fixed;
+  inset: 0;
+  background:
+    url("fin.png"),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(circle at 10% 80%, rgba(255, 231, 210, 0.25), transparent 55%),
+    radial-gradient(circle at 90% 40%, rgba(210, 190, 255, 0.25), transparent 55%),
+    linear-gradient(180deg, rgba(250, 235, 210, 0.25), rgba(150, 130, 220, 0.4));
 
+  background-size: cover;
+  background-position: center;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2.2s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: saturate(1.1);
+}
     body.blessing-visible .blessing-overlay {
       opacity: 1;
       pointer-events: auto;
