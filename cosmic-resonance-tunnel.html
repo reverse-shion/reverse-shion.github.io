@@ -454,16 +454,24 @@
     }
 
     function init() {
-      body.classList.add("is-ready");
-      createStars();
-    }
+  body.classList.add("is-ready");
+  createStars();
+}
 
-    gateButton.addEventListener("click", enterGate);
-    backLink.addEventListener("click", () => {
-      window.location.href = "star-memory.html";
-    });
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 
-    document.addEventListener("DOMContentLoaded", init);
+if (gateButton) {
+  gateButton.addEventListener("click", enterGate);
+}
+if (backLink) {
+  backLink.addEventListener("click", () => {
+    window.location.href = "star-memory.html";
+  });
+}  
   </script>
 </body>
 </html>
