@@ -428,6 +428,7 @@
   <div class="transition-flash" aria-hidden="true"></div>
 
   <script>
+  document.addEventListener("DOMContentLoaded", () => {
     const gateButton = document.querySelector(".gate-button");
     const flash = document.querySelector(".transition-flash");
     const body = document.body;
@@ -437,6 +438,7 @@
     let isTransitioning = false;
 
     function createStars() {
+      if (!starLayer) return; // ★ 保険をかける
       const total = Math.min(70, Math.floor(window.innerWidth / 8));
       for (let i = 0; i < total; i++) {
         const star = document.createElement("span");
@@ -447,7 +449,11 @@
         star.style.width = size + "px";
         star.style.height = size + "px";
         star.style.animationDelay = (Math.random() * 6).toFixed(2) + "s";
-        star.style.animationDuration = (6 + Math.random() * 6).toFixed(2) + "s, " + (14 + Math.random() * 10).toFixed(2) + "s";
+        star.style.animationDuration =
+          (6 + Math.random() * 6).toFixed(2) +
+          "s, " +
+          (14 + Math.random() * 10).toFixed(2) +
+          "s";
         star.style.opacity = (0.25 + Math.random() * 0.5).toFixed(2);
         starLayer.appendChild(star);
       }
@@ -464,25 +470,19 @@
       }, 900);
     }
 
-    function init() {
-  body.classList.add("is-ready");
-  createStars();
-}
+    body.classList.add("is-ready");
+    createStars();
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
+    if (gateButton) {
+      gateButton.addEventListener("click", enterGate);
+    }
 
-if (gateButton) {
-  gateButton.addEventListener("click", enterGate);
-}
-if (backLink) {
-  backLink.addEventListener("click", () => {
-    window.location.href = "star-memory.html";
+    if (backLink) {
+      backLink.addEventListener("click", () => {
+        window.location.href = "star-memory.html";
+      });
+    }
   });
-}  
-  </script>
+</script>
 </body>
 </html>
