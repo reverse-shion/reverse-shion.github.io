@@ -429,60 +429,64 @@
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const gateButton = document.querySelector(".gate-button");
-    const flash = document.querySelector(".transition-flash");
-    const body = document.body;
-    const backLink = document.querySelector(".back-link");
-    const starLayer = document.querySelector(".bg-stars");
+  const gateButton = document.querySelector(".gate-button");
+  const gateCore   = document.querySelector(".gate-core");  // ★ 追加
+  const flash      = document.querySelector(".transition-flash");
+  const body       = document.body;
+  const backLink   = document.querySelector(".back-link");
+  const starLayer  = document.querySelector(".bg-stars");
 
-    let isTransitioning = false;
+  let isTransitioning = false;
 
-    function createStars() {
-      if (!starLayer) return; // ★ 保険をかける
-      const total = Math.min(70, Math.floor(window.innerWidth / 8));
-      for (let i = 0; i < total; i++) {
-        const star = document.createElement("span");
-        star.className = "star-particle";
-        star.style.left = Math.random() * 100 + "%";
-        star.style.top = Math.random() * 100 + "%";
-        const size = (Math.random() * 1.8 + 1).toFixed(2);
-        star.style.width = size + "px";
-        star.style.height = size + "px";
-        star.style.animationDelay = (Math.random() * 6).toFixed(2) + "s";
-        star.style.animationDuration =
-          (6 + Math.random() * 6).toFixed(2) +
-          "s, " +
-          (14 + Math.random() * 10).toFixed(2) +
-          "s";
-        star.style.opacity = (0.25 + Math.random() * 0.5).toFixed(2);
-        starLayer.appendChild(star);
-      }
+  function createStars() {
+    if (!starLayer) return;
+    const total = Math.min(70, Math.floor(window.innerWidth / 8));
+    for (let i = 0; i < total; i++) {
+      const star = document.createElement("span");
+      star.className = "star-particle";
+      star.style.left = Math.random() * 100 + "%";
+      star.style.top  = Math.random() * 100 + "%";
+      const size = (Math.random() * 1.8 + 1).toFixed(2);
+      star.style.width  = size + "px";
+      star.style.height = size + "px";
+      star.style.animationDelay =
+        (Math.random() * 6).toFixed(2) + "s";
+      star.style.animationDuration =
+        (6 + Math.random() * 6).toFixed(2) +
+        "s, " +
+        (14 + Math.random() * 10).toFixed(2) + "s";
+      star.style.opacity = (0.25 + Math.random() * 0.5).toFixed(2);
+      starLayer.appendChild(star);
     }
+  }
 
-    function enterGate() {
-      if (isTransitioning) return;
-      isTransitioning = true;
-      flash.classList.add("is-active");
-      body.classList.add("tunnel-leaving");
-      gateButton.setAttribute("aria-busy", "true");
-      setTimeout(() => {
-        window.location.href = "star-soul-core.html";
-      }, 900);
-    }
+  function enterGate() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    flash.classList.add("is-active");
+    body.classList.add("tunnel-leaving");
+    if (gateButton) gateButton.setAttribute("aria-busy", "true");
+    setTimeout(() => {
+      window.location.href = "star-soul-core.html";
+    }, 900);
+  }
 
-    body.classList.add("is-ready");
-    createStars();
+  body.classList.add("is-ready");
+  createStars();
 
-    if (gateButton) {
-      gateButton.addEventListener("click", enterGate);
-    }
+  if (gateButton) {
+    gateButton.addEventListener("click", enterGate);
+  }
+  if (gateCore) {                    // ★ 円全体も反応させる
+    gateCore.addEventListener("click", enterGate);
+  }
 
-    if (backLink) {
-      backLink.addEventListener("click", () => {
-        window.location.href = "star-memory.html";
-      });
-    }
-  });
+  if (backLink) {
+    backLink.addEventListener("click", () => {
+      window.location.href = "star-memory.html";
+    });
+  }
+});
 </script>
 </body>
 </html>
