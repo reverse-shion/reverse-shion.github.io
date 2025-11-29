@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shionverse | 始まりの町</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    /* Base layout */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Zen Kaku Gothic New', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 30% 20%, rgba(97, 133, 255, 0.12), transparent 35%),
+                  radial-gradient(circle at 70% 70%, rgba(184, 112, 255, 0.14), transparent 40%),
+                  #080b1c;
+      color: #ecf4ff;
+      overflow: hidden;
+    }
+
+    .town-shell {
+      position: relative;
+      min-height: 100vh;
+      isolation: isolate;
+      background: linear-gradient(180deg, rgba(6, 9, 20, 0.8) 0%, rgba(8, 12, 27, 0.7) 50%, rgba(5, 7, 16, 0.9) 100%);
+    }
+
+    /* Time-based backgrounds */
+    .bg-stage {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+    }
+
+    .bg-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.05) brightness(0.95);
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+
+    .bg-layer.is-active { opacity: 1; }
+
+    /* Replace the image paths below with actual town visuals */
+    .bg-layer--morning { background-image: url('images/morningTown.jpg'); }
+    .bg-layer--day { background-image: url('images/dayTown.jpg'); }
+    .bg-layer--evening { background-image: url('images/eveningTown.jpg'); }
+    .bg-layer--night { background-image: url('images/nightTown.jpg'); }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(8, 10, 24, 0.65) 0%, rgba(11, 13, 28, 0.55) 40%, rgba(8, 10, 24, 0.85) 100%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Starfield animation */
+    .starfield, .starfield::before, .starfield::after {
+      position: absolute;
+      inset: 0;
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      content: '';
+      pointer-events: none;
+    }
+
+    .starfield {
+      z-index: -1;
+      background-image: radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.55), transparent 50%),
+                        radial-gradient(1px 1px at 80% 60%, rgba(167, 207, 255, 0.65), transparent 55%),
+                        radial-gradient(1px 1px at 50% 80%, rgba(255, 255, 255, 0.5), transparent 55%);
+      animation: twinkle 9s linear infinite;
+    }
+
+    .starfield::before {
+      background-image: radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.4), transparent 60%),
+                        radial-gradient(1px 1px at 60% 50%, rgba(166, 196, 255, 0.45), transparent 60%),
+                        radial-gradient(1px 1px at 30% 90%, rgba(255, 255, 255, 0.35), transparent 60%);
+      animation: twinkle 12s linear infinite reverse;
+      opacity: 0.8;
+    }
+
+    .starfield::after {
+      background-image: radial-gradient(1px 1px at 90% 10%, rgba(255, 255, 255, 0.5), transparent 60%),
+                        radial-gradient(1px 1px at 40% 70%, rgba(205, 225, 255, 0.45), transparent 60%),
+                        radial-gradient(1px 1px at 70% 40%, rgba(255, 255, 255, 0.35), transparent 60%);
+      animation: twinkle 10s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.7; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-2px); }
+      100% { opacity: 0.7; transform: translateY(0); }
+    }
+
+    /* Content layout */
+    main {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem 3rem;
+    }
+
+    .hero {
+      max-width: 960px;
+      width: min(960px, 100%);
+      text-align: center;
+      display: grid;
+      gap: 1.75rem;
+      margin: 0 auto;
+      animation: fadeSlide 1.4s ease forwards;
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-family: 'Shippori Mincho', 'Zen Kaku Gothic New', serif;
+      font-size: clamp(1.8rem, 4vw + 0.6rem, 2.8rem);
+      letter-spacing: 0.06em;
+      text-shadow: 0 6px 20px rgba(30, 71, 153, 0.55), 0 0 12px rgba(184, 224, 255, 0.5);
+    }
+
+    header p {
+      margin: 0;
+      color: #dbe9ff;
+      font-size: clamp(1.05rem, 1vw + 0.85rem, 1.3rem);
+      line-height: 1.7;
+      text-shadow: 0 3px 12px rgba(16, 51, 125, 0.5);
+    }
+
+    .gate-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .gate-card {
+      background: linear-gradient(135deg, rgba(18, 24, 44, 0.65), rgba(15, 18, 33, 0.85));
+      border: 1px solid rgba(140, 178, 255, 0.35);
+      border-radius: 999px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 10px 35px rgba(5, 11, 27, 0.55), 0 0 18px rgba(116, 169, 255, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 180ms ease, box-shadow 220ms ease, border-color 200ms ease;
+    }
+
+    .gate-card:hover,
+    .gate-card:focus-visible {
+      transform: translateY(-2px) scale(1.015);
+      box-shadow: 0 12px 38px rgba(5, 11, 27, 0.65), 0 0 24px rgba(144, 210, 255, 0.45);
+      border-color: rgba(173, 214, 255, 0.65);
+      outline: none;
+    }
+
+    .gate-card:active { transform: translateY(0) scale(0.997); }
+
+    .gate-title {
+      display: block;
+      font-family: 'Shippori Mincho', 'Zen Kaku Gothic New', serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+    }
+
+    .gate-desc {
+      display: block;
+      font-size: 0.95rem;
+      color: #c9dcff;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      position: absolute;
+      left: 1.5rem;
+      bottom: 1.1rem;
+      font-size: 0.85rem;
+      color: #b5c8ff;
+      opacity: 0.88;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Motion adjustments */
+    @keyframes fadeSlide {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (min-width: 768px) {
+      main { padding: 3.5rem 2.5rem 4rem; }
+      .gate-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .gate-card { padding: 1.2rem 1.4rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      .gate-card:hover, .gate-card:focus-visible { transform: none; box-shadow: 0 10px 35px rgba(5, 11, 27, 0.55); }
+    }
+  </style>
+</head>
+<body>
+  <div class="town-shell">
+    <div class="bg-stage" aria-hidden="true">
+      <div class="bg-layer bg-layer--morning" data-slot="morning"></div>
+      <div class="bg-layer bg-layer--day" data-slot="day"></div>
+      <div class="bg-layer bg-layer--evening" data-slot="evening"></div>
+      <div class="bg-layer bg-layer--night" data-slot="night"></div>
+      <div class="overlay"></div>
+      <div class="starfield"></div>
+    </div>
+
+    <main>
+      <section class="hero" aria-label="Shionverse 始まりの町の案内">
+        <header>
+          <h1>星のはじまりの町へ、いつでもおかえり。</h1>
+          <p>ここから、Discordの広場と、記憶の図書館へと旅立てます。</p>
+        </header>
+
+        <nav class="gate-list" aria-label="Shionverseのゲート">
+          <!-- Swap the Discord URL with the live invite when available -->
+          <a class="gate-card" href="https://discord.example.com" aria-label="始まりの広場（Discord）へ移動">
+            <div>
+              <span class="gate-title">始まりの広場（Discord）へ</span>
+              <span class="gate-desc">みんなが集う、言葉と星が交差する広場。</span>
+            </div>
+          </a>
+          <a class="gate-card" href="library.html" aria-label="記憶の図書館へ移動">
+            <div>
+              <span class="gate-title">記憶の図書館へ</span>
+              <span class="gate-desc">Shionverseの歴史と、静かな星の記録が眠る場所。</span>
+            </div>
+          </a>
+        </nav>
+      </section>
+    </main>
+
+    <footer>
+      <small>© Shionverse – Home of Returning Stars</small>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const layers = document.querySelectorAll('.bg-layer');
+
+      function resolveTimeSlot(date) {
+        const hour = date.getHours();
+        if (hour >= 5 && hour < 10) return 'morning';
+        if (hour >= 10 && hour < 16) return 'day';
+        if (hour >= 16 && hour < 19) return 'evening';
+        return 'night';
+      }
+
+      function activateSlot(slot) {
+        layers.forEach((layer) => {
+          const isMatch = layer.dataset.slot === slot;
+          layer.classList.toggle('is-active', isMatch);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        activateSlot(resolveTimeSlot(new Date()));
+      });
+    })();
+  </script>
+</body>
+</html>
