@@ -252,10 +252,10 @@
       isolation: isolate;
       background:
         radial-gradient(circle at 50% 52%,
-          rgba(0,0,0,0.78) 0%,
-          rgba(0,0,0,0.68) 30%,
-          rgba(0,0,0,0.4) 52%,
-          transparent 70%),
+          rgba(0,0,0,0.55) 0%,
+          rgba(0,0,0,0.45) 28%,
+          rgba(0,0,0,0.22) 52%,
+          transparent 72%),
         radial-gradient(circle at 50% 20%,
           rgba(255,255,255,0.22),
           transparent 60%);
@@ -324,11 +324,6 @@
       transform: scale(1.06);
     }
 
-    /* 文字を少し“共鳴発光”させる */
-    .gate-button span {
-      animation: softGlow 6s ease-in-out infinite;
-    }
-
     .gate-title-ja {
       font-family: "Shippori Mincho", "Zen Kaku Gothic New", serif;
       font-weight: 600;
@@ -340,8 +335,9 @@
         0 0 18px rgba(136,245,255,0.8);
       opacity: 0;
       transform: translateY(8px);
-      animation: textRise 1s ease forwards;
-      animation-delay: 0.7s;
+      animation:
+        textRise 1s ease forwards 0.7s,
+        softGlow 6s ease-in-out infinite 1.6s;
     }
 
     .gate-title-en {
@@ -355,8 +351,9 @@
         0 0 16px rgba(136,245,255,0.7);
       opacity: 0;
       transform: translateY(10px);
-      animation: textRise 1s ease forwards;
-      animation-delay: 1s;
+      animation:
+        textRise 1s ease forwards 1s,
+        softGlow 6s ease-in-out infinite 1.9s;
     }
 
     .gate-sub {
@@ -368,8 +365,9 @@
         0 0 6px rgba(0,0,0,0.9);
       opacity: 0;
       transform: translateY(12px);
-      animation: textRise 1s ease forwards;
-      animation-delay: 1.25s;
+      animation:
+        textRise 1s ease forwards 1.25s,
+        softGlow 6s ease-in-out infinite 2.1s;
     }
 
     .gate-layer .back-link {
