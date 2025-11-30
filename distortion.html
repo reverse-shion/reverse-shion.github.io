@@ -20,23 +20,24 @@
       background: #020314;
       overflow: hidden;
       touch-action: pan-y;
+      font-family: "Shippori Mincho", serif;
     }
 
-    /* 画面いっぱいに画像を表示（ボケなし） */
+    /* --- 背景画像（ボケなし） --- */
     .distortion-bg {
       position: fixed;
       inset: 0;
-      background-image: url("img/distortion.png"); 
-      /* ↑ ここをシオンのひずみ画像のファイル名に差し替えてね */
+      background-image: url("img/distortion.png");
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
       transform: scale(1.02);
       transform-origin: center;
       animation: slowDrift 26s ease-in-out infinite alternate;
+      z-index: -2;
     }
 
-    /* ほんのりだけ星のかぶせ（画像を邪魔しない程度） */
+    /* --- 星のかすかなオーバーレイ --- */
     .distortion-overlay {
       position: fixed;
       inset: 0;
@@ -47,6 +48,7 @@
       mix-blend-mode: screen;
       opacity: 0.25;
       animation: overlayPulse 18s ease-in-out infinite;
+      z-index: -1;
     }
 
     @keyframes slowDrift {
@@ -65,10 +67,44 @@
       0%, 100% { opacity: 0.18; }
       50% { opacity: 0.32; }
     }
+
+    /* --- 中央の「No•code」 --- */
+    .nocode {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 248, 255, 0.95);
+      font-size: clamp(28px, 6vw, 48px);
+      letter-spacing: 0.14em;
+      text-shadow:
+        0 0 8px rgba(255, 230, 255, 0.85),
+        0 0 18px rgba(170, 120, 255, 0.55);
+
+      opacity: 0;
+      animation: fadeIn 2.6s ease forwards, floatSoft 10s ease-in-out infinite;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translate(-50%, -48%); }
+      100% { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    @keyframes floatSoft {
+      0%   { transform: translate(-50%, -50%) rotate(0deg); }
+      50%  { transform: translate(calc(-50% + 1px), calc(-50% - 2px)) rotate(0.4deg); }
+      100% { transform: translate(-50%, -50%) rotate(0deg); }
+    }
   </style>
 </head>
+
 <body>
   <div class="distortion-bg"></div>
   <div class="distortion-overlay"></div>
+
+  <!-- 中央の象徴 -->
+  <div class="nocode">No•code</div>
 </body>
 </html>
