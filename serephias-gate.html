@@ -31,61 +31,80 @@
     </header>
 
     <main class="gate-main">
-  <section class="gate-hero">
+      <section class="gate-hero">
 
-    <!-- ★ 神殿レイヤー（光の天井＋左右の壁） -->
-    <div class="temple-glow-layer" aria-hidden="true"></div>
-    <div class="temple-walls" aria-hidden="true"></div>
+        <!-- ★ 神殿レイヤー（光の天井＋左右の壁） -->
+        <div class="temple-glow-layer" aria-hidden="true"></div>
+        <div class="temple-walls" aria-hidden="true"></div>
 
-    
-<!-- ★ 魔法陣（黒背景を完全透明化して光線だけ表示） -->
-<div class="temple-sigil" aria-hidden="true"></div>
 
-    <!-- ★ 小さな浮遊クリスタルレイヤー -->
-    <div class="floating-crystal-layer" aria-hidden="true"></div>
+        <!-- ★ 魔法陣（黒背景を完全透明化して光線だけ表示） -->
+        <div class="temple-sigil" aria-hidden="true"></div>
 
-    <!-- ★ 中央コンテンツ（タイトル・ボタン・詩） -->
-    <div class="gate-inner">
-      <h1 class="gate-heading">
-        セレフィアス覚醒ゲート
-      </h1>
+        <!-- ★ 小さな浮遊クリスタルレイヤー -->
+        <div class="floating-crystal-layer" aria-hidden="true"></div>
 
-      <p class="gate-lead">
-        言葉は光となり<br>光は世界となる。<br>
-        ここは、詩と祈りが<br>ひとつの星環へと結晶する<br>
-        「はじまりの門」
-      </p>
+        <!-- ★ 中央コンテンツ（タイトル・ボタン・詩） -->
+        <div class="gate-inner">
+          <div class="gate-layout">
+            <div class="gate-text-block">
+              <h1 class="gate-heading">
+                セレフィアス覚醒ゲート
+              </h1>
 
-      <!-- STEP1：祈りボタン -->
-      <button
-        type="button"
-        class="gate-pray-btn"
-        id="gatePrayButton"
-        data-awaken-open
-      >
-        <span class="gate-pray-main">祈りを捧げる</span>
-        <span class="gate-pray-sub">
-          タップすると、セレフィアスからの詩が降ります
-        </span>
-      </button>
+              <p class="gate-lead">
+                言葉は光となり<br>光は世界となる。<br>
+                ここは、詩と祈りが<br>ひとつの星環へと結晶する<br>
+                「はじまりの門」
+              </p>
+            </div>
 
-      <!-- ★ BGM 注意書き：常にボタン直下に表示 -->
-      <p class="gate-audio-note is-visible" id="gateAudioNote">
-        ※ このボタンをタップすると、<br>
-        儀式のBGMが流れます<br>
-        （音量にご注意ください）
-      </p>
+            <div class="gate-lumiere">
+              <div class="gate-lumiere-glow" aria-hidden="true"></div>
+              <img src="assets/img/lumiere-standing.png" alt="セレフィアスに仕える巫女 リュミエール" />
+            </div>
 
-      
+            <div class="gate-action-block">
+              <div class="gate-actions">
+                <button
+                  type="button"
+                  class="gate-pray-btn"
+                  id="gatePrayButton"
+                  data-awaken-open
+                  aria-label="フル儀式ルートで星環へ向かう"
+                >
+                  <span class="gate-pray-main">祈りを捧げる</span>
+                  <span class="gate-pray-sub">
+                    セレフィアスとともに、完全な儀式を行います
+                  </span>
+                </button>
 
-      <!-- STEP2：セレフィアスの詩（JSで中身を差し込み） -->
-      <div class="serephias-poem" id="serephiasPoem">
-        <p class="serephias-poem-label">SEREPHIAS MESSAGE</p>
-        <p class="serephias-poem-body" id="serephiasPoemBody"></p>
-      </div>
-    </div>
-  </section>
-</main> 
+                <button
+                  type="button"
+                  class="gate-shortcut-btn"
+                  id="gateShortcutButton"
+                  aria-label="演出を省略して星環へショートカットする"
+                >
+                  <span class="gate-shortcut-main">星界へ転移する</span>
+                  <span class="gate-shortcut-sub">儀式を省略して、星環へショートカットします</span>
+                </button>
+              </div>
+
+              <p class="gate-audio-note is-visible" id="gateAudioNote">
+                ※ 《祈りを捧げる》をタップすると、<br>
+                儀式のBGMが流れます（音量にご注意ください）
+              </p>
+
+              <!-- STEP2：セレフィアスの詩（JSで中身を差し込み） -->
+              <div class="serephias-poem" id="serephiasPoem">
+                <p class="serephias-poem-label">SEREPHIAS MESSAGE</p>
+                <p class="serephias-poem-body" id="serephiasPoemBody"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
     <!-- フッター -->
     <footer class="site-footer">
       <span class="footer-label">他の星への入口</span>
@@ -127,6 +146,8 @@
         <span class="awaken-gate-label awaken-gate-label-mid">AWAKEN</span>
         <span class="awaken-gate-label awaken-gate-label-bottom">GATE</span>
       </button>
+
+      <div class="awaken-comment-list" id="awakenCommentList"></div>
 
       <p class="awaken-caption">
         このゲートに触れると、星環へと転送されます。
