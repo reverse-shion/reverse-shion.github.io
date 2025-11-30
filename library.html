@@ -28,7 +28,6 @@
       padding: 0;
       height: 100%;
       width: 100%;
-      overflow: hidden;
       background: var(--ink);
       color: var(--text-main);
       font-family: "Zen Kaku Gothic New", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -37,6 +36,9 @@
     body {
       position: relative;
       isolation: isolate;
+      min-height: 100vh;
+  overflow-x: hidden;   /* 横だけ隠す */
+  overflow-y: auto;     /* 縦スクロールOKにする */
     }
 
     /* ===== 背景レイヤー ===== */
@@ -132,6 +134,7 @@
       z-index: 1;
       height: 100vh;
       width: 100vw;
+      padding: clamp(80px, 12vh, 140px) clamp(16px, 5vw, 40px) 96px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
