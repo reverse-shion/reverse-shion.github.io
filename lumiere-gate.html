@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Re:Verse Shion | Lumiere Gate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Shippori+Mincho:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg-base: #ffffff;
+      --gold: #f7dca6;
+      --lavender: #d7e4ff;
+      --lavender-strong: #cfd8ff;
+      --text-main: #1b1f2a;
+      --glass: rgba(255, 255, 255, 0.7);
+      --glass-strong: rgba(255, 255, 255, 0.85);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+      --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.12);
+      --card-max: 520px;
+      --font-ja: "Shippori Mincho", "Zen Kaku Gothic New", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-en: "DM Sans", system-ui, sans-serif;
+      --transition-scene: 600ms ease;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-ja);
+      background: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      overflow: hidden;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+      font-family: var(--font-ja);
+    }
+    a { color: inherit; }
+    .scene {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      transition: opacity var(--transition-scene);
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .scene.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.05) 75%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .scene__content {
+      position: relative;
+      width: min(92vw, var(--card-max));
+      margin: 0 auto;
+      padding: 20px 16px 32px;
+      text-align: center;
+      color: #0f1220;
+    }
+    .glass-card {
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: 20px 18px;
+    }
+    .glass-card h2 {
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      font-family: var(--font-en);
+      color: #7d6a2d;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .glass-card h3 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .glass-card p {
+      margin: 6px 0;
+      white-space: pre-line;
+      font-size: 15px;
+    }
+    .subcopy {
+      font-size: 13px;
+      color: #4a5568;
+      margin-top: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font-ja);
+      cursor: pointer;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 200ms ease;
+    }
+    .btn:focus-visible {
+      outline: 2px solid #7f9cf5;
+      outline-offset: 3px;
+    }
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), #fff6d5);
+      color: #4b3310;
+      box-shadow: 0 10px 22px rgba(247, 220, 166, 0.45);
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost {
+      background: transparent;
+      color: #34445f;
+      border: 1px solid rgba(52, 68, 95, 0.35);
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    .small-link {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #2c4a7c;
+      text-decoration: none;
+    }
+    .small-link:focus-visible { outline: 2px solid #7f9cf5; outline-offset: 3px; }
+
+    /* Scene A - Foyer */
+    .scene--foyer { background-image: url("img/foyer-lumiere.jpg"); }
+    .foyer-card-wrapper {
+      position: absolute;
+      inset: auto 0 6vh 0;
+      display: flex;
+      justify-content: center;
+      padding: 0 18px 22px;
+    }
+    .foyer-card {
+      width: min(520px, 100%);
+    }
+    .foyer-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .foyer-particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.15));
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+      animation: floatUp linear infinite;
+      opacity: 0.75;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 0.8; }
+      100% { transform: translateY(-60vh) translateX(16px); opacity: 0; }
+    }
+
+    /* Scene B - Hall */
+    .scene--hall {
+      background-image: url("img/lumiere-hall.jpg");
+      overflow-y: auto;
+      align-items: flex-start;
+      padding-top: 24px;
+      padding-bottom: 32px;
+    }
+    .scene--hall .overlay { background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.05) 80%); }
+    .hall-inner {
+      position: relative;
+      width: min(92vw, 680px);
+      margin: 0 auto 48px;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(8px);
+      padding: 22px 18px 28px;
+    }
+    .section-card {
+      background: var(--glass-strong);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      padding: 16px 14px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 18px;
+    }
+    .section-card h4 { font-size: 16px; margin-bottom: 8px; color: #2f3e57; }
+    .name-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .name-input {
+      flex: 1 1 220px;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(52, 68, 95, 0.25);
+      font-size: 15px;
+      font-family: var(--font-ja);
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .name-input:focus-visible { outline: 2px solid #8ea8ff; outline-offset: 2px; }
+    .name-edit-link {
+      font-size: 13px;
+      color: #37508a;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .error-text {
+      color: #b84040;
+      font-size: 13px;
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+    .error-text.visible { opacity: 1; }
+    .main-hall-card {
+      text-align: left;
+      padding: 20px 18px 16px;
+    }
+    .main-hall-card h3 { font-size: 20px; margin-bottom: 8px; color: #2b3850; }
+    .main-hall-card p { font-size: 15px; margin-bottom: 16px; white-space: pre-line; }
+    .hall-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #e2e9ff, #d7e4ff);
+      color: #2c3a60;
+      box-shadow: 0 10px 20px rgba(207, 216, 255, 0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(52, 68, 95, 0.3);
+      color: #2c3a60;
+    }
+    #prayer-form-section textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(52, 68, 95, 0.25);
+      padding: 12px;
+      font-size: 15px;
+      font-family: var(--font-ja);
+      background: rgba(255, 255, 255, 0.9);
+      min-height: 160px;
+      resize: vertical;
+    }
+    #prayer-form-section textarea:focus-visible { outline: 2px solid #8ea8ff; outline-offset: 2px; }
+
+    /* Scene C - Character */
+    .scene--character {
+      background-image: url("img/lumiere-hall.jpg");
+    }
+    .scene--character .overlay { background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.2)); }
+    .character-inner {
+      position: relative;
+      width: min(92vw, 780px);
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 18px 16px 24px;
+    }
+    .lumiere-figure {
+      max-height: 64vh;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.22));
+      opacity: 0;
+      animation: fadeInUp 900ms ease forwards, gentleFloat 5s ease-in-out infinite;
+      animation-delay: 150ms;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .dialog-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 18px;
+      padding: 18px 16px 16px;
+      box-shadow: var(--shadow-soft);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      margin-top: 14px;
+    }
+    .dialog-card p { margin: 0 0 12px; white-space: pre-line; }
+
+    /* Utilities */
+    .pill-label {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(247, 220, 166, 0.24);
+      color: #5b4320;
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Responsive */
+    @media (min-width: 640px) {
+      .scene__content { padding: 32px 24px 48px; }
+      .glass-card { padding: 24px 22px; }
+      .hall-inner { padding: 28px 24px 32px; }
+      .hall-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dialog-card { width: min(640px, 100%); }
+    }
+    @media (min-width: 960px) {
+      .foyer-card-wrapper { inset: auto 0 8vh 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene scene--foyer is-visible" aria-label="Lumiere foyer scene">
+    <div class="overlay"></div>
+    <div class="foyer-particles" aria-hidden="true"></div>
+    <div class="scene__content foyer-card-wrapper">
+      <div class="glass-card foyer-card">
+        <h2>Re:Verse Shion — LUMIERE GATE</h2>
+        <h3>前室</h3>
+        <p data-with-name="true">ようこそ、{name}。<br>ここは、言葉が星に変わる前室。<br>リュミエールが、あなたの祈りを<br>セレフィアスさまのもとへお届けします。</p>
+        <p class="subcopy">深呼吸してから、扉にお進みください。</p>
+        <button class="btn btn-primary" id="enterHallBtn">扉へ進む</button>
+      </div>
+    </div>
+    <a class="small-link" href="index.html#start-town">はじまりの町にもどる</a>
+  </div>
+
+  <div class="scene scene--hall" aria-label="Lumiere hall scene">
+    <div class="overlay"></div>
+    <div class="scene__content">
+      <div class="hall-inner">
+        <div class="section-card" aria-labelledby="name-label">
+          <div class="pill-label" id="name-label">お名前を教えていただけますか？</div>
+          <div class="name-row" style="margin-top: 12px;">
+            <input class="name-input" id="nameInput" type="text" inputmode="text" autocomplete="name" placeholder="お名前（ニックネームでも大丈夫です）" aria-describedby="nameError" />
+            <button class="btn btn-secondary" id="nameSaveBtn">決定</button>
+            <span class="name-edit-link" id="editNameLink" tabindex="0" role="button">（別のお名前にする）</span>
+          </div>
+          <div class="error-text" id="nameError" aria-live="polite"></div>
+        </div>
+
+        <div class="section-card main-hall-card">
+          <h3>リュミエールの間</h3>
+          <p data-with-name="true">「ようこそお越しくださいました、{name}。<br>ここから先は、言葉がそのまま星の光になる場所なのです。<br>セレフィアスさまに届けたい想いや、胸の内を<br>すこしだけ、わたしに預けていただけますか？」</p>
+          <div class="hall-actions">
+            <button class="btn btn-secondary" id="talkToLumiereBtn">リュミエールと話す</button>
+            <button class="btn btn-outline" id="writePrayerBtn">そのまま祈りを書く</button>
+          </div>
+        </div>
+
+        <div class="section-card" id="prayer-form-section">
+          <h4>セレフィアスさまへの祈り</h4>
+          <textarea id="prayerInput" rows="7" placeholder="ここに、いま抱えている不安や、&#10;聞いてほしいことを書いてください…" aria-describedby="prayerError"></textarea>
+          <div class="error-text" id="prayerError" aria-live="polite"></div>
+          <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
+            <button class="btn btn-primary" id="submitPrayerBtn" style="width: 100%; max-width: 280px;">祈りの言葉を整える</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scene scene--character" aria-label="Lumiere character scene">
+    <div class="overlay"></div>
+    <div class="character-inner">
+      <img src="img/lumiere-full.png" alt="リュミエール" class="lumiere-figure" />
+      <div class="dialog-card">
+        <p data-with-name="true">「{name}の祈り、たしかにお預かりしましたなの。<br>この先で、セレフィアスさまがきっと受け止めてくださいます。<br>どうか、ご自分の心もいたわりながら進んでくださいね。」</p>
+        <button class="btn btn-primary" id="goToSerephiasBtn">セレフィアスさまの間へ進む</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgm" src="audio/lumiere-theme.mp3" preload="auto" loop></audio>
+
+  <script>
+    const scenes = Array.from(document.querySelectorAll('.scene'));
+    const enterHallBtn = document.getElementById('enterHallBtn');
+    const talkToLumiereBtn = document.getElementById('talkToLumiereBtn');
+    const writePrayerBtn = document.getElementById('writePrayerBtn');
+    const submitPrayerBtn = document.getElementById('submitPrayerBtn');
+    const goToSerephiasBtn = document.getElementById('goToSerephiasBtn');
+    const nameInput = document.getElementById('nameInput');
+    const nameSaveBtn = document.getElementById('nameSaveBtn');
+    const nameError = document.getElementById('nameError');
+    const editNameLink = document.getElementById('editNameLink');
+    const prayerInput = document.getElementById('prayerInput');
+    const prayerError = document.getElementById('prayerError');
+    const bgm = document.getElementById('bgm');
+    const particlesContainer = document.querySelector('.foyer-particles');
+
+    function getUserName() {
+      const n = localStorage.getItem('shionverseName') || '';
+      return n.trim() || 'あなた';
+    }
+    function getUserNameWithSama() {
+      return getUserName() + '様';
+    }
+    function getPrayer() {
+      return localStorage.getItem('serephiasPrayer') || '';
+    }
+
+    function updateNameBindings() {
+      const nameText = getUserNameWithSama();
+      document.querySelectorAll('[data-with-name="true"]').forEach((el) => {
+        const original = el.dataset.originalText || el.innerHTML;
+        if (!el.dataset.originalText) el.dataset.originalText = original;
+        el.innerHTML = original.replace(/\{name\}/g, nameText);
+      });
+    }
+
+    function switchScene(targetClass) {
+      scenes.forEach((scene) => {
+        scene.classList.toggle('is-visible', scene.classList.contains(targetClass));
+      });
+    }
+
+    function fadeInBgm() {
+      try {
+        bgm.currentTime = 0;
+        bgm.volume = 0;
+        const playPromise = bgm.play();
+        const fadeTarget = 0.72;
+        const step = 0.06;
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            const interval = setInterval(() => {
+              bgm.volume = Math.min(fadeTarget, bgm.volume + step);
+              if (bgm.volume >= fadeTarget) clearInterval(interval);
+            }, 160);
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('BGM could not start:', e);
+      }
+    }
+
+    function handleNameSave() {
+      const value = (nameInput.value || '').trim();
+      if (!value) {
+        nameError.textContent = '※ お名前が空のままになっています。よろしければ一文字だけでも教えてください。';
+        nameError.classList.add('visible');
+        return;
+      }
+      localStorage.setItem('shionverseName', value);
+      nameError.textContent = '';
+      nameError.classList.remove('visible');
+      updateNameBindings();
+    }
+
+    function handlePrayerSubmit() {
+      const value = (prayerInput.value || '').trim();
+      if (!value) {
+        prayerError.textContent = '※ 祈りの言葉がまだ書かれていません。書けるところだけでも大丈夫です。';
+        prayerError.classList.add('visible');
+        return;
+      }
+      prayerError.textContent = '';
+      prayerError.classList.remove('visible');
+      localStorage.setItem('serephiasPrayer', value);
+      const name = encodeURIComponent(getUserName());
+      const prayer = encodeURIComponent(value);
+      const target = `serephias-chamber.html?name=${name}&q=${prayer}`;
+      window.location.href = target;
+    }
+
+    function jumpToPrayerSection() {
+      document.getElementById('prayer-form-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function goToSerephias() {
+      const prayer = getPrayer();
+      if (prayer.trim()) {
+        const name = encodeURIComponent(getUserName());
+        const target = `serephias-chamber.html?name=${name}&q=${encodeURIComponent(prayer)}`;
+        window.location.href = target;
+      } else {
+        window.location.href = 'serephias-chamber.html';
+      }
+    }
+
+    function createParticles() {
+      const count = 22;
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'foyer-particle';
+        const size = 4 + Math.random() * 6;
+        span.style.width = `${size}px`;
+        span.style.height = `${size}px`;
+        span.style.left = `${Math.random() * 100}%`;
+        span.style.bottom = `${Math.random() * 40}%`;
+        span.style.animationDuration = `${12 + Math.random() * 8}s`;
+        span.style.animationDelay = `${Math.random() * 6}s`;
+        fragment.appendChild(span);
+      }
+      particlesContainer.appendChild(fragment);
+    }
+
+    function prefFillName() {
+      const stored = localStorage.getItem('shionverseName');
+      if (stored && stored.trim()) {
+        nameInput.value = stored;
+        editNameLink.style.display = 'inline';
+      } else {
+        editNameLink.style.display = 'none';
+      }
+    }
+
+    function init() {
+      createParticles();
+      updateNameBindings();
+      prefFillName();
+
+      enterHallBtn.addEventListener('click', () => {
+        switchScene('scene--hall');
+        fadeInBgm();
+      });
+      talkToLumiereBtn.addEventListener('click', () => switchScene('scene--character'));
+      writePrayerBtn.addEventListener('click', jumpToPrayerSection);
+      submitPrayerBtn.addEventListener('click', handlePrayerSubmit);
+      goToSerephiasBtn.addEventListener('click', goToSerephias);
+      nameSaveBtn.addEventListener('click', handleNameSave);
+      editNameLink.addEventListener('click', () => nameInput.focus());
+      editNameLink.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nameInput.focus(); } });
+      nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleNameSave(); } });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
