@@ -24,9 +24,7 @@
       --font-en: "DM Sans", system-ui, sans-serif;
       --transition-scene: 600ms ease;
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: var(--font-ja);
@@ -43,6 +41,7 @@
       font-family: var(--font-ja);
     }
     a { color: inherit; }
+
     .scene {
       position: fixed;
       inset: 0;
@@ -131,12 +130,15 @@
     }
     .btn-primary:hover { transform: translateY(-1px); }
     .btn-primary:active { transform: translateY(0); }
-    .btn-ghost {
+    .btn-secondary {
+      background: linear-gradient(135deg, #e2e9ff, #d7e4ff);
+      color: #2c3a60;
+      box-shadow: 0 10px 20px rgba(207, 216, 255, 0.5);
+    }
+    .btn-outline {
       background: transparent;
-      color: #34445f;
-      border: 1px solid rgba(52, 68, 95, 0.35);
-      padding: 10px 12px;
-      font-size: 14px;
+      border: 1px solid rgba(52, 68, 95, 0.3);
+      color: #2c3a60;
     }
     .small-link {
       display: inline-block;
@@ -181,7 +183,7 @@
       100% { transform: translateY(-60vh) translateX(16px); opacity: 0; }
     }
 
-    /* Scene B - Hall */
+    /* Scene B - Lumiere hall */
     .scene--hall {
       background-image: url("img/lumiere-hall.jpg");
       overflow-y: auto;
@@ -189,7 +191,54 @@
       padding-top: 24px;
       padding-bottom: 32px;
     }
-    .scene--hall .overlay { background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.05) 80%); }
+    .scene--hall .overlay {
+      background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.05) 80%);
+    }
+
+    .character-section {
+      position: relative;
+      width: min(92vw, 680px);
+      margin: 0 auto 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 18px 0;
+    }
+    .lumiere-figure {
+      max-height: 60vh;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.22));
+      opacity: 0;
+      animation: fadeInUp 900ms ease forwards, gentleFloat 5s ease-in-out infinite;
+      animation-delay: 150ms;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .dialog-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 18px;
+      padding: 18px 16px 16px;
+      box-shadow: var(--shadow-soft);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      margin-top: 14px;
+    }
+    .dialog-card p {
+      margin: 0 0 8px;
+      white-space: pre-line;
+      font-size: 15px;
+    }
+
     .hall-inner {
       position: relative;
       width: min(92vw, 680px);
@@ -207,13 +256,20 @@
       padding: 16px 14px;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
       margin-bottom: 18px;
+      text-align: left;
     }
-    .section-card h4 { font-size: 16px; margin-bottom: 8px; color: #2f3e57; }
+    .section-card h4 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #2f3e57;
+    }
+
     .name-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       align-items: center;
+      margin-top: 12px;
     }
     .name-input {
       flex: 1 1 220px;
@@ -239,27 +295,11 @@
       transition: opacity 200ms ease;
     }
     .error-text.visible { opacity: 1; }
-    .main-hall-card {
-      text-align: left;
-      padding: 20px 18px 16px;
+
+    #lumiereTalkCard p {
+      margin-bottom: 6px;
     }
-    .main-hall-card h3 { font-size: 20px; margin-bottom: 8px; color: #2b3850; }
-    .main-hall-card p { font-size: 15px; margin-bottom: 16px; white-space: pre-line; }
-    .hall-actions {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .btn-secondary {
-      background: linear-gradient(135deg, #e2e9ff, #d7e4ff);
-      color: #2c3a60;
-      box-shadow: 0 10px 20px rgba(207, 216, 255, 0.5);
-    }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid rgba(52, 68, 95, 0.3);
-      color: #2c3a60;
-    }
+
     #prayer-form-section textarea {
       width: 100%;
       border-radius: 14px;
@@ -271,55 +311,11 @@
       min-height: 160px;
       resize: vertical;
     }
-    #prayer-form-section textarea:focus-visible { outline: 2px solid #8ea8ff; outline-offset: 2px; }
+    #prayer-form-section textarea:focus-visible {
+      outline: 2px solid #8ea8ff;
+      outline-offset: 2px;
+    }
 
-    /* Scene C - Character */
-    .scene--character {
-      background-image: url("img/lumiere-hall.jpg");
-    }
-    .scene--character .overlay { background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.2)); }
-    .character-inner {
-      position: relative;
-      width: min(92vw, 780px);
-      margin: 0 auto;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 18px 16px 24px;
-    }
-    .lumiere-figure {
-      max-height: 64vh;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.22));
-      opacity: 0;
-      animation: fadeInUp 900ms ease forwards, gentleFloat 5s ease-in-out infinite;
-      animation-delay: 150ms;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes gentleFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    .dialog-card {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      border-radius: 18px;
-      padding: 18px 16px 16px;
-      box-shadow: var(--shadow-soft);
-      text-align: center;
-      backdrop-filter: blur(10px);
-      margin-top: 14px;
-    }
-    .dialog-card p { margin: 0 0 12px; white-space: pre-line; }
-
-    /* Utilities */
     .pill-label {
       display: inline-block;
       padding: 6px 12px;
@@ -330,12 +326,12 @@
       letter-spacing: 0.05em;
     }
 
-    /* Responsive */
+    .hidden { display: none; }
+
     @media (min-width: 640px) {
       .scene__content { padding: 32px 24px 48px; }
       .glass-card { padding: 24px 22px; }
       .hall-inner { padding: 28px 24px 32px; }
-      .hall-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .dialog-card { width: min(640px, 100%); }
     }
     @media (min-width: 960px) {
@@ -344,6 +340,7 @@
   </style>
 </head>
 <body>
+  <!-- Scene A: 前室 -->
   <div class="scene scene--foyer is-visible" aria-label="Lumiere foyer scene">
     <div class="overlay"></div>
     <div class="foyer-particles" aria-hidden="true"></div>
@@ -351,56 +348,90 @@
       <div class="glass-card foyer-card">
         <h2>Re:Verse Shion — LUMIERE GATE</h2>
         <h3>前室</h3>
-        <p data-with-name="true">ようこそ、{name}。<br>ここは、言葉が星に変わる前室。<br>リュミエールが、あなたの祈りを<br>セレフィアスさまのもとへお届けします。</p>
-        <p class="subcopy">深呼吸してから、扉にお進みください。</p>
-        <button class="btn btn-primary" id="enterHallBtn">扉へ進む</button>
+        <p data-with-name="true">
+          ようこそ、{name}。  
+          ここは、言葉が星に変わる前室。  
+          この先で、星の案内人リュミエールが  
+          あなたの祈りを迎えに来てくれます。
+        </p>
+        <p class="subcopy">静かに息を整えてから、扉をお開きください。</p>
+        <button class="btn btn-primary" id="enterHallBtn">扉を開く</button>
       </div>
     </div>
     <a class="small-link" href="index.html#start-town">はじまりの町にもどる</a>
   </div>
 
+  <!-- Scene B: リュミエール登場〜名前入力〜会話〜祈り -->
   <div class="scene scene--hall" aria-label="Lumiere hall scene">
     <div class="overlay"></div>
     <div class="scene__content">
+      <!-- リュミエール初登場（画像＋短い挨拶） -->
+      <section class="character-section">
+        <img src="img/lumiere-full.png" alt="リュミエール" class="lumiere-figure" />
+        <div class="dialog-card">
+          <p>「はじめまして。わたしはリュミエール。  
+          星の間とセレフィアスさまへ続く、この門の案内人です。」</p>
+          <p data-with-name="true">「{name}、ここまで来てくれてありがとう。  
+          まずは、あなたのお名前を教えてもらえますか？」</p>
+        </div>
+      </section>
+
       <div class="hall-inner">
+        <!-- 生の名前入力フォーム -->
         <div class="section-card" aria-labelledby="name-label">
           <div class="pill-label" id="name-label">お名前を教えていただけますか？</div>
-          <div class="name-row" style="margin-top: 12px;">
-            <input class="name-input" id="nameInput" type="text" inputmode="text" autocomplete="name" placeholder="お名前（ニックネームでも大丈夫です）" aria-describedby="nameError" />
-            <button class="btn btn-secondary" id="nameSaveBtn">決定</button>
-            <span class="name-edit-link" id="editNameLink" tabindex="0" role="button">（別のお名前にする）</span>
+          <p style="font-size:13px; margin-top:6px; color:#4a5568;">
+            ニックネームでも大丈夫です。  
+            リュミエールが、あなたをそう呼びかけます。
+          </p>
+          <div class="name-row">
+            <input class="name-input" id="nameInput" type="text" inputmode="text" autocomplete="name"
+                   placeholder="お名前（ニックネームでも大丈夫です）" aria-describedby="nameError" />
+            <button class="btn btn-secondary" id="nameSaveBtn">この名前にする</button>
+            <span class="name-edit-link" id="editNameLink" tabindex="0" role="button">
+              （別のお名前にする）
+            </span>
           </div>
           <div class="error-text" id="nameError" aria-live="polite"></div>
         </div>
 
-        <div class="section-card main-hall-card">
-          <h3>リュミエールの間</h3>
-          <p data-with-name="true">「ようこそお越しくださいました、{name}。<br>ここから先は、言葉がそのまま星の光になる場所なのです。<br>セレフィアスさまに届けたい想いや、胸の内を<br>すこしだけ、わたしに預けていただけますか？」</p>
-          <div class="hall-actions">
-            <button class="btn btn-secondary" id="talkToLumiereBtn">リュミエールと話す</button>
-            <button class="btn btn-outline" id="writePrayerBtn">そのまま祈りを書く</button>
-          </div>
+        <!-- リュミエールとの会話 -->
+        <div class="section-card hidden" id="lumiereTalkCard">
+          <h4>リュミエールとの小さな会話</h4>
+          <p data-with-name="true">
+            「{name}って、とても素敵な響きですね。  
+            その名前で、これから星の記録に残しておきます。」</p>
+          <p data-with-name="true">
+            「ここから先は、{name}の心の声が  
+            そのまま星の光になっていく場所です。」</p>
+          <p>
+            「この下の欄に、いま抱えていることや  
+            そっと聞いてほしいことを書いてみてください。  
+            上手く言葉にならなくても大丈夫。  
+            断片のままでも、星はちゃんと受け取ってくれます。」</p>
+          <button class="btn btn-outline" type="button"
+                  onclick="document.getElementById('prayer-form-section').scrollIntoView({behavior:'smooth'});">
+            祈りを書く場所へスクロールする
+          </button>
         </div>
 
+        <!-- 祈りのコメント入力 -->
         <div class="section-card" id="prayer-form-section">
           <h4>セレフィアスさまへの祈り</h4>
-          <textarea id="prayerInput" rows="7" placeholder="ここに、いま抱えている不安や、&#10;聞いてほしいことを書いてください…" aria-describedby="prayerError"></textarea>
+          <p style="font-size:13px; margin-top:0; color:#4a5568;">
+            消したくなったら、いつでも書き直してかまいません。  
+            いまのあなたの気持ちを、そのまま置いていくつもりで書いてみてください。
+          </p>
+          <textarea id="prayerInput" rows="7"
+            placeholder="ここに、いま抱えている不安や、&#10;聞いてほしいことを書いてください…"
+            aria-describedby="prayerError"></textarea>
           <div class="error-text" id="prayerError" aria-live="polite"></div>
           <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
-            <button class="btn btn-primary" id="submitPrayerBtn" style="width: 100%; max-width: 280px;">祈りの言葉を整える</button>
+            <button class="btn btn-primary" id="submitPrayerBtn" style="width: 100%; max-width: 280px;">
+              祈りの言葉をセレフィアスさまへ送る
+            </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="scene scene--character" aria-label="Lumiere character scene">
-    <div class="overlay"></div>
-    <div class="character-inner">
-      <img src="img/lumiere-full.png" alt="リュミエール" class="lumiere-figure" />
-      <div class="dialog-card">
-        <p data-with-name="true">「{name}の祈り、たしかにお預かりしましたなの。<br>この先で、セレフィアスさまがきっと受け止めてくださいます。<br>どうか、ご自分の心もいたわりながら進んでくださいね。」</p>
-        <button class="btn btn-primary" id="goToSerephiasBtn">セレフィアスさまの間へ進む</button>
       </div>
     </div>
   </div>
@@ -410,10 +441,7 @@
   <script>
     const scenes = Array.from(document.querySelectorAll('.scene'));
     const enterHallBtn = document.getElementById('enterHallBtn');
-    const talkToLumiereBtn = document.getElementById('talkToLumiereBtn');
-    const writePrayerBtn = document.getElementById('writePrayerBtn');
     const submitPrayerBtn = document.getElementById('submitPrayerBtn');
-    const goToSerephiasBtn = document.getElementById('goToSerephiasBtn');
     const nameInput = document.getElementById('nameInput');
     const nameSaveBtn = document.getElementById('nameSaveBtn');
     const nameError = document.getElementById('nameError');
@@ -422,6 +450,7 @@
     const prayerError = document.getElementById('prayerError');
     const bgm = document.getElementById('bgm');
     const particlesContainer = document.querySelector('.foyer-particles');
+    const lumiereTalkCard = document.getElementById('lumiereTalkCard');
 
     function getUserName() {
       const n = localStorage.getItem('shionverseName') || '';
@@ -480,6 +509,8 @@
       nameError.textContent = '';
       nameError.classList.remove('visible');
       updateNameBindings();
+      lumiereTalkCard.classList.remove('hidden');
+      document.getElementById('lumiereTalkCard').scrollIntoView({ behavior: 'smooth' });
     }
 
     function handlePrayerSubmit() {
@@ -496,21 +527,6 @@
       const prayer = encodeURIComponent(value);
       const target = `serephias-chamber.html?name=${name}&q=${prayer}`;
       window.location.href = target;
-    }
-
-    function jumpToPrayerSection() {
-      document.getElementById('prayer-form-section').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function goToSerephias() {
-      const prayer = getPrayer();
-      if (prayer.trim()) {
-        const name = encodeURIComponent(getUserName());
-        const target = `serephias-chamber.html?name=${name}&q=${encodeURIComponent(prayer)}`;
-        window.location.href = target;
-      } else {
-        window.location.href = 'serephias-chamber.html';
-      }
     }
 
     function createParticles() {
@@ -536,6 +552,7 @@
       if (stored && stored.trim()) {
         nameInput.value = stored;
         editNameLink.style.display = 'inline';
+        lumiereTalkCard.classList.remove('hidden');
       } else {
         editNameLink.style.display = 'none';
       }
@@ -550,14 +567,21 @@
         switchScene('scene--hall');
         fadeInBgm();
       });
-      talkToLumiereBtn.addEventListener('click', () => switchScene('scene--character'));
-      writePrayerBtn.addEventListener('click', jumpToPrayerSection);
       submitPrayerBtn.addEventListener('click', handlePrayerSubmit);
-      goToSerephiasBtn.addEventListener('click', goToSerephias);
       nameSaveBtn.addEventListener('click', handleNameSave);
       editNameLink.addEventListener('click', () => nameInput.focus());
-      editNameLink.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nameInput.focus(); } });
-      nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleNameSave(); } });
+      editNameLink.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          nameInput.focus();
+        }
+      });
+      nameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleNameSave();
+        }
+      });
     }
 
     document.addEventListener('DOMContentLoaded', init);
