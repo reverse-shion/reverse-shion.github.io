@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Shippori+Mincho:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+
   <style>
     :root {
       color-scheme: light;
@@ -24,11 +25,18 @@
       --font-en: "DM Sans", system-ui, sans-serif;
       --transition-scene: 600ms ease;
     }
+
     * {
       box-sizing: border-box;
     }
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    body {
       font-family: var(--font-ja);
       background: var(--bg-base);
       color: var(--text-main);
@@ -36,7 +44,6 @@
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-      overflow: hidden;
     }
     h1, h2, h3, h4, h5, h6 {
       margin: 0;
@@ -44,7 +51,7 @@
     }
     a { color: inherit; }
 
-    /* 共通シーン */
+    /* ===== 共通シーン ===== */
     .scene {
       position: fixed;
       inset: 0;
@@ -56,7 +63,8 @@
       transition: opacity var(--transition-scene);
       opacity: 0;
       pointer-events: none;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
     .scene.is-visible {
       opacity: 1;
@@ -143,6 +151,14 @@
       box-shadow: 0 10px 20px rgba(207, 216, 255, 0.5);
     }
 
+    .btn-ghost {
+      background: transparent;
+      color: #34445f;
+      border: 1px solid rgba(52, 68, 95, 0.35);
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
     .small-link {
       display: inline-block;
       margin-top: 10px;
@@ -152,7 +168,7 @@
     }
     .small-link:focus-visible { outline: 2px solid #7f9cf5; outline-offset: 3px; }
 
-    /* 前室 */
+    /* ===== 前室 ===== */
     .scene--foyer { background-image: url("img/foyer-lumiere.jpg"); }
     .foyer-card-wrapper {
       position: absolute;
@@ -186,7 +202,7 @@
       100% { transform: translateY(-60vh) translateX(16px); opacity: 0; }
     }
 
-    /* リュミエールシーン共通 */
+    /* ===== リュミエールシーン共通 ===== */
     .scene--lumiere-intro,
     .scene--lumiere-name,
     .scene--lumiere-talk {
@@ -203,7 +219,7 @@
       position: relative;
       width: min(92vw, 780px);
       margin: 0 auto;
-      height: 100%;
+      min-height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -305,6 +321,19 @@
       cursor: pointer;
     }
 
+    .shortcut-row {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #extraLine {
+      font-size: 14px;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+
     @media (min-width: 640px) {
       .scene__content { padding: 32px 24px 48px; }
       .glass-card { padding: 24px 22px; }
@@ -323,11 +352,11 @@
     <div class="scene__content foyer-card-wrapper">
       <div class="glass-card foyer-card">
         <h2>Re:Verse Shion — LUMIERE GATE</h2>
-        <h3>前室</h3>
+        <h3>星の門・前室</h3>
         <p>ようこそ、星の門の前室へ。<br>
           ここから先は、言葉が星の光へとかわる場所。<br>
           一歩進めば、リュミエールがあなたをお迎えします。</p>
-        <p class="subcopy">深呼吸をひとつしてから、「門をくぐる」を押してください。</p>
+        <p class="subcopy">深呼吸をひとつしてから、「光の門をくぐる」を押してください。</p>
         <button class="btn btn-primary" id="enterHallBtn">光の門をくぐる</button>
       </div>
     </div>
@@ -344,11 +373,12 @@
         <p>「はじめまして。わたしはリュミエール。<br>
         星の間とセレフィアスさまへ続く、この門の案内人です。」</p>
         <button class="btn btn-primary" id="toNameSceneBtn">リュミエールのそばへ進む</button>
+        <a class="small-link" href="index.html#start-town">はじまりの町へショートカット</a>
       </div>
     </div>
   </div>
 
-  <!-- Scene C: 名前入力（バストアップ） -->
+  <!-- Scene C: 名前入力（バストアップ） ※初回だけ -->
   <div class="scene scene--lumiere-name" aria-label="Lumiere name scene">
     <div class="overlay"></div>
     <div class="character-inner">
@@ -372,16 +402,41 @@
       <img src="img/lumiere-close.png" alt="リュミエール" class="lumiere-figure" />
       <div class="dialog-card">
         <span class="pill-label">LUMIERE</span>
-        <p data-with-name="true">
+
+        <!-- 初回用セリフ -->
+        <p id="talkLineFirst" data-with-name="true" style="display:none;">
           「{name}、お名前を教えてくれてありがとうございます。<br>
+          『{name}』って、とても素敵な響きですね。<br>
+          そのお名前で、これから星の記録にそっと刻んでおきます。<br><br>
           ここでは、あなたの“いま”の気持ちをそのまま書いて大丈夫です。<br>
           セレフィアスさまに届けたい祈りや不安を、わたしに預けてくれますか？」
         </p>
+
+        <!-- 2回目以降用セリフ -->
+        <p id="talkLineRepeat" data-with-name="true" style="display:none;">
+          「おかえりなさい、{name}。<br>
+          今日も星の門に来てくださって、わたしうれしいです。<br>
+          あなたのお名前は、もう星の記録にしっかり刻まれています。<br><br>
+          今日はどうしましょうか？<br>
+          はじまりの町でひと息つきますか？<br>
+          それとも、セレフィアスさまの間へ向かいますか？<br>
+          もし、新しい祈りがあるなら、ここに書いて残してもらえるとうれしいです。」
+        </p>
+
         <textarea id="prayerInput" rows="7"
           placeholder="ここに、いま抱えている不安や、&#10;聞いてほしいこと・叶えたい願いを書いてください…"
           aria-describedby="prayerError"></textarea>
         <div class="error-text" id="prayerError" aria-live="polite"></div>
         <button class="btn btn-primary" id="submitPrayerBtn">祈りをセレフィアスさまへ託す</button>
+
+        <p id="extraLine" style="display:none;"></p>
+
+        <div class="shortcut-row">
+          <button class="btn btn-secondary" id="goSerephiasDirectBtn">祈りを書かずにセレフィアスさまの間へ</button>
+          <button class="btn btn-secondary" id="goStartTownBtn">はじまりの町へ向かう</button>
+          <button class="btn btn-ghost" id="talkMoreBtn">もう少しリュミエールと話す</button>
+        </div>
+
         <div class="edit-name-link" id="editNameLink">（お名前をもう一度決めなおす）</div>
       </div>
     </div>
@@ -394,25 +449,48 @@
 
     const enterHallBtn = document.getElementById('enterHallBtn');
     const toNameSceneBtn = document.getElementById('toNameSceneBtn');
+
     const nameInput = document.getElementById('nameInput');
     const nameSaveBtn = document.getElementById('nameSaveBtn');
     const nameError = document.getElementById('nameError');
 
+    const talkLineFirst = document.getElementById('talkLineFirst');
+    const talkLineRepeat = document.getElementById('talkLineRepeat');
     const prayerInput = document.getElementById('prayerInput');
     const prayerError = document.getElementById('prayerError');
     const submitPrayerBtn = document.getElementById('submitPrayerBtn');
     const editNameLink = document.getElementById('editNameLink');
+    const extraLineEl = document.getElementById('extraLine');
+
+    const goSerephiasDirectBtn = document.getElementById('goSerephiasDirectBtn');
+    const goStartTownBtn = document.getElementById('goStartTownBtn');
+    const talkMoreBtn = document.getElementById('talkMoreBtn');
 
     const bgm = document.getElementById('bgm');
     const particlesContainer = document.querySelector('.foyer-particles');
 
+    let hasFixedName = false;
+    let extraIndex = 0;
+
+    const extraLines = [
+      '「……もし疲れていたら、ここでは何も書かずに、ただ深呼吸しているだけでもいいのですよ。」',
+      '「あなたがここに来てくれるだけで、星の記録にはひとつ光が増えるんです。だから、焦らなくて大丈夫です。」',
+      '「どんな気持ちも、ここでは“まちがい”ではありません。涙も沈黙も、そのまま星の言葉になります。」'
+    ];
+
+    function getStoredNameRaw() {
+      return localStorage.getItem('shionverseName') || '';
+    }
+
     function getUserName() {
-      const n = localStorage.getItem('shionverseName') || '';
+      const n = getStoredNameRaw();
       return n.trim() || 'あなた';
     }
+
     function getUserNameWithSama() {
       return getUserName() + '様';
     }
+
     function getPrayer() {
       return localStorage.getItem('serephiasPrayer') || '';
     }
@@ -452,6 +530,18 @@
       }
     }
 
+    function showTalkScene(firstTime) {
+      switchScene('scene--lumiere-talk');
+      if (firstTime) {
+        talkLineFirst.style.display = 'block';
+        talkLineRepeat.style.display = 'none';
+      } else {
+        talkLineFirst.style.display = 'none';
+        talkLineRepeat.style.display = 'block';
+      }
+      updateNameBindings();
+    }
+
     function handleNameSave() {
       const value = (nameInput.value || '').trim();
       if (!value) {
@@ -462,8 +552,8 @@
       localStorage.setItem('shionverseName', value);
       nameError.textContent = '';
       nameError.classList.remove('visible');
-      updateNameBindings();
-      switchScene('scene--lumiere-talk');
+      hasFixedName = true;
+      showTalkScene(true); // 初回セリフ
     }
 
     function handlePrayerSubmit() {
@@ -480,6 +570,16 @@
       const name = encodeURIComponent(getUserName());
       const prayer = encodeURIComponent(value);
       const target = `serephias-chamber.html?name=${name}&q=${prayer}`;
+      window.location.href = target;
+    }
+
+    function goToSerephiasDirect() {
+      const prayer = getPrayer();
+      const name = encodeURIComponent(getUserName());
+      const q = encodeURIComponent(prayer || '');
+      const target = prayer
+        ? `serephias-chamber.html?name=${name}&q=${q}`
+        : `serephias-chamber.html?name=${name}`;
       window.location.href = target;
     }
 
@@ -503,7 +603,7 @@
     }
 
     function prefFillName() {
-      const stored = localStorage.getItem('shionverseName');
+      const stored = getStoredNameRaw();
       if (stored && stored.trim()) {
         nameInput.value = stored;
       }
@@ -511,6 +611,8 @@
 
     function init() {
       createParticles();
+
+      hasFixedName = !!getStoredNameRaw().trim();
       updateNameBindings();
       prefFillName();
 
@@ -520,7 +622,12 @@
       });
 
       toNameSceneBtn.addEventListener('click', () => {
-        switchScene('scene--lumiere-name');
+        // すでに名前がある場合は名前入力をスキップして会話シーンへ
+        if (hasFixedName) {
+          showTalkScene(false); // 2回目以降セリフ
+        } else {
+          switchScene('scene--lumiere-name');
+        }
       });
 
       nameSaveBtn.addEventListener('click', handleNameSave);
@@ -535,7 +642,18 @@
 
       editNameLink.addEventListener('click', () => {
         switchScene('scene--lumiere-name');
-        setTimeout(() => nameInput.focus(), 300);
+        setTimeout(() => nameInput.focus(), 250);
+      });
+
+      goSerephiasDirectBtn.addEventListener('click', goToSerephiasDirect);
+      goStartTownBtn.addEventListener('click', () => {
+        window.location.href = 'index.html#start-town';
+      });
+
+      talkMoreBtn.addEventListener('click', () => {
+        extraLineEl.style.display = 'block';
+        extraLineEl.textContent = extraLines[extraIndex].replace(/\{name\}/g, getUserNameWithSama());
+        extraIndex = (extraIndex + 1) % extraLines.length;
       });
     }
 
