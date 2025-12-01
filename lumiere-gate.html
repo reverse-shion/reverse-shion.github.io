@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Re:Verse Shion | Lumiere Gate</title>
+  <title>Re:Verse Shion | Lumiere Gate 1.0</title>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Shippori+Mincho:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -11,15 +13,21 @@
   <style>
     :root {
       color-scheme: light;
-      --bg-base: #ffffff;
+
+      /* カラー：星の白銀×桃 */
+      --bg-silver: #f5f7ff;
+      --bg-pink: #fde7f4;
+      --bg-base: radial-gradient(circle at 20% 0%, var(--bg-pink) 0, #ffffff 40%, var(--bg-silver) 85%);
       --gold: #f7dca6;
       --lavender: #d7e4ff;
       --lavender-strong: #cfd8ff;
       --text-main: #1b1f2a;
-      --glass: rgba(255, 255, 255, 0.7);
-      --glass-strong: rgba(255, 255, 255, 0.85);
+
+      --glass: rgba(255, 255, 255, 0.78);
+      --glass-strong: rgba(255, 255, 255, 0.9);
       --shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
       --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.12);
+
       --card-max: 520px;
       --font-ja: "Shippori Mincho", "Zen Kaku Gothic New", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       --font-en: "DM Sans", system-ui, sans-serif;
@@ -29,6 +37,7 @@
     * {
       box-sizing: border-box;
     }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -36,6 +45,7 @@
       max-width: 100%;
       overflow-x: hidden;
     }
+
     body {
       font-family: var(--font-ja);
       background: var(--bg-base);
@@ -45,13 +55,16 @@
       -webkit-font-smoothing: antialiased;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
+
     h1, h2, h3, h4, h5, h6 {
       margin: 0;
       font-family: var(--font-ja);
     }
+
     a { color: inherit; }
 
-    /* ===== 共通シーン ===== */
+    /* ========= 共通シーン ========= */
+
     .scene {
       position: fixed;
       inset: 0;
@@ -60,23 +73,31 @@
       justify-content: center;
       background-size: cover;
       background-position: center;
+      background-repeat: no-repeat;
       transition: opacity var(--transition-scene);
       opacity: 0;
       pointer-events: none;
       overflow-y: auto;
       overflow-x: hidden;
     }
+
     .scene.is-visible {
       opacity: 1;
       pointer-events: auto;
     }
-    .overlay {
+
+    .scene::before {
+      /* どのシーンにも共通の星屑グラデ */
+      content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.05) 75%);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.9), transparent 60%),
+        radial-gradient(circle at 80% 0%, rgba(255,255,255,0.9), transparent 55%);
       mix-blend-mode: screen;
       pointer-events: none;
     }
+
     .scene__content {
       position: relative;
       width: min(92vw, var(--card-max));
@@ -84,16 +105,20 @@
       padding: 20px 16px 32px;
       text-align: center;
       color: #0f1220;
+      z-index: 1;
     }
+
+    /* ========= ガラスカード ========= */
 
     .glass-card {
       background: var(--glass);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.7);
       border-radius: 18px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       padding: 20px 18px;
     }
+
     .glass-card h2 {
       font-size: 14px;
       letter-spacing: 0.1em;
@@ -102,27 +127,33 @@
       text-transform: uppercase;
       margin-bottom: 8px;
     }
+
     .glass-card h3 {
       font-size: 22px;
       margin-bottom: 12px;
     }
+
     .glass-card p {
       margin: 6px 0;
       white-space: pre-line;
       font-size: 15px;
     }
+
     .subcopy {
       font-size: 13px;
       color: #4a5568;
       margin-top: 12px;
     }
 
+    /* ========= ボタン & リンク ========= */
+
     .btn {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 12px 14px;
+      padding: 12px 16px;
       border-radius: 12px;
       border: none;
       font-size: 16px;
@@ -130,19 +161,21 @@
       font-family: var(--font-ja);
       cursor: pointer;
       transition: transform 150ms ease, box-shadow 150ms ease, background 200ms ease;
+      overflow: hidden;
+      isolation: isolate;
     }
+
     .btn:focus-visible {
       outline: 2px solid #7f9cf5;
       outline-offset: 3px;
     }
+
     .btn-primary {
       width: 100%;
       background: linear-gradient(135deg, var(--gold), #fff6d5);
       color: #4b3310;
       box-shadow: 0 10px 22px rgba(247, 220, 166, 0.45);
     }
-    .btn-primary:hover { transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
 
     .btn-secondary {
       width: 100%;
@@ -152,11 +185,61 @@
     }
 
     .btn-ghost {
+      width: 100%;
       background: transparent;
       color: #34445f;
       border: 1px solid rgba(52, 68, 95, 0.35);
       padding: 10px 12px;
       font-size: 14px;
+    }
+
+    /* 足元から光が舞い上がる粒子エフェクト */
+    .btn-particles::before {
+      content: "";
+      position: absolute;
+      inset: 40% -20% -40%;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.9) 0, transparent 55%),
+        radial-gradient(circle, rgba(255,255,255,0.8) 0, transparent 55%),
+        radial-gradient(circle, rgba(255,255,255,0.8) 0, transparent 55%);
+      background-size: 10px 10px, 8px 8px, 6px 6px;
+      background-repeat: no-repeat;
+      background-position: 10% 100%, 50% 105%, 90% 110%;
+      opacity: 0;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      animation: riseParticles 4s linear infinite;
+      animation-play-state: paused;
+    }
+
+    .btn-particles:hover::before,
+    .btn-particles:focus-visible::before,
+    .btn-particles:active::before {
+      opacity: 1;
+      animation-play-state: running;
+    }
+
+    @keyframes riseParticles {
+      0% {
+        transform: translateY(18px);
+        background-position: 10% 100%, 50% 105%, 90% 110%;
+      }
+      100% {
+        transform: translateY(-16px);
+        background-position: 5% 20%, 55% 10%, 95% 0%;
+      }
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    .btn-ghost:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active,
+    .btn-secondary:active,
+    .btn-ghost:active {
+      transform: translateY(0);
     }
 
     .small-link {
@@ -166,10 +249,18 @@
       color: #2c4a7c;
       text-decoration: none;
     }
-    .small-link:focus-visible { outline: 2px solid #7f9cf5; outline-offset: 3px; }
 
-    /* ===== 前室 ===== */
-    .scene--foyer { background-image: url("img/foyer-lumiere.jpg"); }
+    .small-link:focus-visible {
+      outline: 2px solid #7f9cf5;
+      outline-offset: 3px;
+    }
+
+    /* ========= 前室 ========= */
+
+    .scene--foyer {
+      background-image: url("img/foyer-lumiere.jpg");
+    }
+
     .foyer-card-wrapper {
       position: absolute;
       inset: auto 0 6vh 0;
@@ -177,15 +268,18 @@
       justify-content: center;
       padding: 0 18px 22px;
     }
+
     .foyer-card {
       width: min(520px, 100%);
     }
+
     .foyer-particles {
       position: absolute;
       inset: 0;
       pointer-events: none;
       overflow: hidden;
     }
+
     .foyer-particle {
       position: absolute;
       width: 6px;
@@ -196,23 +290,28 @@
       animation: floatUp linear infinite;
       opacity: 0.75;
     }
+
     @keyframes floatUp {
       0% { transform: translateY(0) translateX(0); opacity: 0; }
-      10% { opacity: 0.8; }
-      100% { transform: translateY(-60vh) translateX(16px); opacity: 0; }
+      10% { opacity: 0.9; }
+      100% { transform: translateY(-60vh) translateX(18px); opacity: 0; }
     }
 
-    /* ===== リュミエールシーン共通 ===== */
+    /* ========= リュミエールシーン共通 ========= */
+
     .scene--lumiere-intro,
     .scene--lumiere-name,
     .scene--lumiere-talk {
       background-image: url("img/lumiere-hall.jpg");
       align-items: flex-end;
     }
-    .scene--lumiere-intro .overlay,
-    .scene--lumiere-name .overlay,
-    .scene--lumiere-talk .overlay {
-      background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.05) 80%);
+
+    .scene--lumiere-intro::before,
+    .scene--lumiere-name::before,
+    .scene--lumiere-talk::before {
+      background:
+        radial-gradient(circle at 50% 10%, rgba(255,255,255,0.9), transparent 60%),
+        radial-gradient(circle at 80% 0%, rgba(255,255,255,0.7), transparent 70%);
     }
 
     .character-inner {
@@ -224,39 +323,90 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      padding: 18px 16px 24px;
+      padding: 18px 16px 28px;
+      z-index: 1;
     }
-    .lumiere-figure {
+
+    /* ========= 生きているリュミエール（表情＋瞬き） ========= */
+
+    .lumiere-portrait {
+      position: relative;
+      width: min(420px, 86vw);
       max-height: 64vh;
-      width: auto;
+      margin: 0 auto;
+      pointer-events: none;
+      animation: bodyFloat 7s ease-in-out infinite;
+      transform-origin: 50% 100%;
+    }
+
+    .lumiere-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.22));
       opacity: 0;
-      animation: fadeInUp 900ms ease forwards, gentleFloat 5s ease-in-out infinite;
-      animation-delay: 150ms;
+      transition: opacity 220ms ease-out;
     }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    /* 表情別表示（open は通常表示、closed は瞬き中だけ） */
+    .lumiere-portrait[data-mood="neutral"] .frame-open-neutral,
+    .lumiere-portrait[data-mood="smile"]   .frame-open-smile,
+    .lumiere-portrait[data-mood="sad"]     .frame-open-sad {
+      opacity: 1;
     }
-    @keyframes gentleFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+
+    .lumiere-portrait.is-blinking .frame-open-neutral,
+    .lumiere-portrait.is-blinking .frame-open-smile,
+    .lumiere-portrait.is-blinking .frame-open-sad {
+      opacity: 0;
     }
+
+    .lumiere-portrait.is-blinking[data-mood="neutral"] .frame-closed-neutral,
+    .lumiere-portrait.is-blinking[data-mood="smile"]   .frame-closed-smile,
+    .lumiere-portrait.is-blinking[data-mood="sad"]     .frame-closed-sad {
+      opacity: 1;
+    }
+
+    /* 呼吸するようなゆらめき */
+    @keyframes bodyFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-6px) scale(1.01); }
+    }
+
+    /* 話しているときの淡いオーラ */
+    .lumiere-portrait.is-speaking::after {
+      content: "";
+      position: absolute;
+      inset: -6% -4% 0;
+      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.7), transparent 55%);
+      mix-blend-mode: screen;
+      opacity: 0.85;
+      animation: speakAura 1.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes speakAura {
+      0%, 100% { opacity: 0.4; transform: translateY(0); }
+      50%      { opacity: 0.9; transform: translateY(-4px); }
+    }
+
+    /* ========= セリフカード ========= */
 
     .dialog-card {
       width: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      background: var(--glass-strong);
+      border: 1px solid rgba(255, 255, 255, 0.9);
       border-radius: 18px;
-      padding: 18px 16px 16px;
+      padding: 16px 16px 14px;
       box-shadow: var(--shadow-soft);
       text-align: center;
-      backdrop-filter: blur(10px);
-      margin-top: 14px;
+      backdrop-filter: blur(12px);
+      margin-top: 16px;
     }
+
     .dialog-card p {
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       white-space: pre-line;
       font-size: 15px;
     }
@@ -264,13 +414,15 @@
     .pill-label {
       display: inline-block;
       padding: 6px 12px;
-      background: rgba(247, 220, 166, 0.24);
+      background: rgba(247, 220, 166, 0.3);
       color: #5b4320;
       border-radius: 999px;
       font-size: 13px;
       letter-spacing: 0.05em;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
+
+    /* 名前入力 */
 
     .name-input {
       width: 100%;
@@ -279,13 +431,15 @@
       border: 1px solid rgba(52, 68, 95, 0.25);
       font-size: 15px;
       font-family: var(--font-ja);
-      background: rgba(255, 255, 255, 0.95);
-      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.98);
+      margin: 10px 0 6px;
     }
+
     .name-input:focus-visible {
       outline: 2px solid #8ea8ff;
       outline-offset: 2px;
     }
+
     .error-text {
       color: #b84040;
       font-size: 13px;
@@ -293,20 +447,24 @@
       opacity: 0;
       transition: opacity 200ms ease;
     }
+
     .error-text.visible { opacity: 1; }
+
+    /* 祈り入力 */
 
     #prayerInput {
       width: 100%;
       border-radius: 14px;
       border: 1px solid rgba(52, 68, 95, 0.25);
-      padding: 12px;
+      padding: 10px 12px;
       font-size: 15px;
       font-family: var(--font-ja);
-      background: rgba(255, 255, 255, 0.95);
-      min-height: 160px;
+      background: rgba(255, 255, 255, 0.98);
+      min-height: 150px;
       resize: vertical;
       margin: 8px 0 4px;
     }
+
     #prayerInput:focus-visible {
       outline: 2px solid #8ea8ff;
       outline-offset: 2px;
@@ -332,6 +490,7 @@
       font-size: 14px;
       color: #4b5563;
       margin-top: 4px;
+      min-height: 1.4em;
     }
 
     @media (min-width: 640px) {
@@ -339,67 +498,88 @@
       .glass-card { padding: 24px 22px; }
       .dialog-card { width: min(640px, 100%); }
     }
+
     @media (min-width: 960px) {
       .foyer-card-wrapper { inset: auto 0 8vh 0; }
     }
   </style>
 </head>
+
 <body>
-  <!-- Scene A: 前室 -->
-  <div class="scene scene--foyer is-visible" aria-label="Lumiere foyer scene">
-    <div class="overlay"></div>
+  <!-- ===== Scene A: 前室 ===== -->
+  <div class="scene scene--foyer is-visible" aria-label="Lumiere foyer">
     <div class="foyer-particles" aria-hidden="true"></div>
     <div class="scene__content foyer-card-wrapper">
       <div class="glass-card foyer-card">
         <h2>Re:Verse Shion — LUMIERE GATE</h2>
         <h3>星の門・前室</h3>
         <p>ようこそ、星の門の前室へ。<br>
-          ここから先は、言葉が星の光へとかわる場所。<br>
-          一歩進めば、リュミエールがあなたをお迎えします。</p>
+        ここから先は、言葉が星の光へとかわる場所。<br>
+        一歩進めば、リュミエールがあなたをお迎えします。</p>
         <p class="subcopy">深呼吸をひとつしてから、「光の門をくぐる」を押してください。</p>
-        <button class="btn btn-primary" id="enterHallBtn">光の門をくぐる</button>
+        <button class="btn btn-primary btn-particles" id="enterHallBtn">光の門をくぐる</button>
       </div>
     </div>
     <a class="small-link" href="index.html#start-town">はじまりの町にもどる</a>
   </div>
 
-  <!-- Scene B: リュミエール初登場（全身） -->
+  <!-- ===== Scene B: リュミエール初登場（全身） ===== -->
   <div class="scene scene--lumiere-intro" aria-label="Lumiere first appearance">
-    <div class="overlay"></div>
     <div class="character-inner">
-      <img src="img/lumiere-full.png" alt="リュミエール" class="lumiere-figure" />
+      <div class="lumiere-portrait" data-mood="smile">
+        <img src="img/lumiere-full.png" alt="リュミエール" class="lumiere-frame frame-open-smile" />
+      </div>
       <div class="dialog-card">
         <span class="pill-label">LUMIERE</span>
         <p>「はじめまして。わたしはリュミエール。<br>
         星の間とセレフィアスさまへ続く、この門の案内人です。」</p>
-        <button class="btn btn-primary" id="toNameSceneBtn">リュミエールのそばへ進む</button>
+
+        <button class="btn btn-primary btn-particles" id="toNameSceneBtn">リュミエールのそばへ進む</button>
         <a class="small-link" href="index.html#start-town">はじまりの町へショートカット</a>
       </div>
     </div>
   </div>
 
-  <!-- Scene C: 名前入力（バストアップ） ※初回だけ -->
+  <!-- ===== Scene C: 名前入力（初回だけ） ===== -->
   <div class="scene scene--lumiere-name" aria-label="Lumiere name scene">
-    <div class="overlay"></div>
     <div class="character-inner">
-      <img src="img/lumiere-close.png" alt="リュミエール" class="lumiere-figure" />
+      <div class="lumiere-portrait" data-mood="neutral" id="portraitName">
+        <!-- 通常表情（開眼・閉眼） -->
+        <img src="img/lumiere-neutral-open.png"   alt="リュミエール" class="lumiere-frame frame-open-neutral" />
+        <img src="img/lumiere-neutral-closed.png" alt="" class="lumiere-frame frame-closed-neutral" />
+      </div>
       <div class="dialog-card">
         <span class="pill-label">LUMIERE</span>
         <p>「ここまで来てくれてありがとう。<br>
         まずは、あなたのお名前を教えてもらえますか？」</p>
+
         <input class="name-input" id="nameInput" type="text" inputmode="text" autocomplete="name"
                placeholder="お名前（ニックネームでも大丈夫です）" aria-describedby="nameError" />
         <div class="error-text" id="nameError" aria-live="polite"></div>
-        <button class="btn btn-secondary" id="nameSaveBtn">この名前で呼んでもらう</button>
+
+        <button class="btn btn-secondary btn-particles" id="nameSaveBtn">この名前で呼んでもらう</button>
       </div>
     </div>
   </div>
 
-  <!-- Scene D: 会話 ＋ 祈り入力 -->
-  <div class="scene scene--lumiere-talk" aria-label="Lumiere conversation and prayer">
-    <div class="overlay"></div>
+  <!-- ===== Scene D: 会話 ＋ 祈り ===== -->
+  <div class="scene scene--lumiere-talk" aria-label="Lumiere conversation & prayer">
     <div class="character-inner">
-      <img src="img/lumiere-close.png" alt="リュミエール" class="lumiere-figure" />
+      <!-- 表情切り替え用ポートレート -->
+      <div class="lumiere-portrait" data-mood="smile" id="portraitTalk">
+        <!-- neutral -->
+        <img src="img/lumiere-neutral-open.png"   alt="リュミエール" class="lumiere-frame frame-open-neutral" />
+        <img src="img/lumiere-neutral-closed.png" alt="" class="lumiere-frame frame-closed-neutral" />
+
+        <!-- gentle smile -->
+        <img src="img/lumiere-smile-open.png"   alt="" class="lumiere-frame frame-open-smile" />
+        <img src="img/lumiere-smile-closed.png" alt="" class="lumiere-frame frame-closed-smile" />
+
+        <!-- little sorrow -->
+        <img src="img/lumiere-sad-open.png"   alt="" class="lumiere-frame frame-open-sad" />
+        <img src="img/lumiere-sad-closed.png" alt="" class="lumiere-frame frame-closed-sad" />
+      </div>
+
       <div class="dialog-card">
         <span class="pill-label">LUMIERE</span>
 
@@ -423,51 +603,73 @@
           もし、新しい祈りがあるなら、ここに書いて残してもらえるとうれしいです。」
         </p>
 
-        <textarea id="prayerInput" rows="7"
+        <textarea id="prayerInput" rows="6"
           placeholder="ここに、いま抱えている不安や、&#10;聞いてほしいこと・叶えたい願いを書いてください…"
           aria-describedby="prayerError"></textarea>
         <div class="error-text" id="prayerError" aria-live="polite"></div>
-        <button class="btn btn-primary" id="submitPrayerBtn">祈りをセレフィアスさまへ託す</button>
 
-        <p id="extraLine" style="display:none;"></p>
+        <button class="btn btn-primary btn-particles" id="submitPrayerBtn">
+          祈りをセレフィアスさまへ託す
+        </button>
+
+        <p id="extraLine"></p>
 
         <div class="shortcut-row">
-          <button class="btn btn-secondary" id="goSerephiasDirectBtn">祈りを書かずにセレフィアスさまの間へ</button>
-          <button class="btn btn-secondary" id="goStartTownBtn">はじまりの町へ向かう</button>
-          <button class="btn btn-ghost" id="talkMoreBtn">もう少しリュミエールと話す</button>
+          <button class="btn btn-secondary btn-particles" id="goSerephiasDirectBtn">
+            祈りを書かずにセレフィアスさまの間へ
+          </button>
+          <button class="btn btn-secondary" id="goStartTownBtn">
+            はじまりの町へ向かう
+          </button>
+          <button class="btn btn-ghost" id="talkMoreBtn">
+            もう少しリュミエールと話す
+          </button>
         </div>
 
-        <div class="edit-name-link" id="editNameLink">（お名前をもう一度決めなおす）</div>
+        <div class="edit-name-link" id="editNameLink">
+          （お名前をもう一度決めなおす）
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- BGM（任意） -->
   <audio id="bgm" src="audio/lumiere-theme.mp3" preload="auto" loop></audio>
 
   <script>
+    // ===== 要素取得 =====
     const scenes = Array.from(document.querySelectorAll('.scene'));
 
     const enterHallBtn = document.getElementById('enterHallBtn');
     const toNameSceneBtn = document.getElementById('toNameSceneBtn');
 
-    const nameInput = document.getElementById('nameInput');
+    const nameInput  = document.getElementById('nameInput');
     const nameSaveBtn = document.getElementById('nameSaveBtn');
     const nameError = document.getElementById('nameError');
 
-    const talkLineFirst = document.getElementById('talkLineFirst');
+    const talkLineFirst  = document.getElementById('talkLineFirst');
     const talkLineRepeat = document.getElementById('talkLineRepeat');
-    const prayerInput = document.getElementById('prayerInput');
-    const prayerError = document.getElementById('prayerError');
+
+    const prayerInput  = document.getElementById('prayerInput');
+    const prayerError  = document.getElementById('prayerError');
     const submitPrayerBtn = document.getElementById('submitPrayerBtn');
-    const editNameLink = document.getElementById('editNameLink');
-    const extraLineEl = document.getElementById('extraLine');
 
     const goSerephiasDirectBtn = document.getElementById('goSerephiasDirectBtn');
-    const goStartTownBtn = document.getElementById('goStartTownBtn');
-    const talkMoreBtn = document.getElementById('talkMoreBtn');
+    const goStartTownBtn       = document.getElementById('goStartTownBtn');
+    const talkMoreBtn          = document.getElementById('talkMoreBtn');
+    const editNameLink         = document.getElementById('editNameLink');
+    const extraLineEl          = document.getElementById('extraLine');
+
+    const portraitTalk = document.getElementById('portraitTalk');
+    const portraitName = document.getElementById('portraitName');
 
     const bgm = document.getElementById('bgm');
     const particlesContainer = document.querySelector('.foyer-particles');
+
+    // ===== 状態管理 =====
+    const NAME_KEY   = 'shionverseName';
+    const PRAYER_KEY = 'serephiasPrayer';
+    const VISIT_KEY  = 'lumiereVisitCount';
 
     let hasFixedName = false;
     let extraIndex = 0;
@@ -478,8 +680,9 @@
       '「どんな気持ちも、ここでは“まちがい”ではありません。涙も沈黙も、そのまま星の言葉になります。」'
     ];
 
+    // ===== ユーティリティ =====
     function getStoredNameRaw() {
-      return localStorage.getItem('shionverseName') || '';
+      return localStorage.getItem(NAME_KEY) || '';
     }
 
     function getUserName() {
@@ -492,21 +695,21 @@
     }
 
     function getPrayer() {
-      return localStorage.getItem('serephiasPrayer') || '';
+      return localStorage.getItem(PRAYER_KEY) || '';
+    }
+
+    function switchScene(targetClass) {
+      scenes.forEach(scene => {
+        scene.classList.toggle('is-visible', scene.classList.contains(targetClass));
+      });
     }
 
     function updateNameBindings() {
       const nameText = getUserNameWithSama();
-      document.querySelectorAll('[data-with-name="true"]').forEach((el) => {
+      document.querySelectorAll('[data-with-name="true"]').forEach(el => {
         const original = el.dataset.originalText || el.innerHTML;
         if (!el.dataset.originalText) el.dataset.originalText = original;
         el.innerHTML = original.replace(/\{name\}/g, nameText);
-      });
-    }
-
-    function switchScene(targetClass) {
-      scenes.forEach((scene) => {
-        scene.classList.toggle('is-visible', scene.classList.contains(targetClass));
       });
     }
 
@@ -515,8 +718,9 @@
         bgm.currentTime = 0;
         bgm.volume = 0;
         const playPromise = bgm.play();
-        const fadeTarget = 0.72;
+        const fadeTarget = 0.7;
         const step = 0.06;
+
         if (playPromise !== undefined) {
           playPromise.then(() => {
             const interval = setInterval(() => {
@@ -530,30 +734,79 @@
       }
     }
 
-    function showTalkScene(firstTime) {
-      switchScene('scene--lumiere-talk');
-      if (firstTime) {
-        talkLineFirst.style.display = 'block';
-        talkLineRepeat.style.display = 'none';
-      } else {
-        talkLineFirst.style.display = 'none';
-        talkLineRepeat.style.display = 'block';
-      }
-      updateNameBindings();
+    // ===== リュミエール表情制御 =====
+    function setMood(mood) {
+      if (!portraitTalk) return;
+      portraitTalk.dataset.mood = mood;
     }
 
+    function startBlinkLoop(portrait) {
+      if (!portrait) return;
+      function blinkOnce() {
+        portrait.classList.add('is-blinking');
+        setTimeout(() => {
+          portrait.classList.remove('is-blinking');
+        }, 140); // まばたきの長さ
+      }
+
+      // ランダム間隔で瞬き
+      function loop() {
+        const delay = 2600 + Math.random() * 2800;
+        setTimeout(() => {
+          blinkOnce();
+          loop();
+        }, delay);
+      }
+      loop();
+    }
+
+    function setSpeaking(portrait, speaking) {
+      if (!portrait) return;
+      portrait.classList.toggle('is-speaking', speaking);
+    }
+
+    // ===== パーティクル生成（前室） =====
+    function createFoyerParticles() {
+      if (!particlesContainer) return;
+      const count = 22;
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'foyer-particle';
+        const size = 4 + Math.random() * 6;
+        span.style.width  = `${size}px`;
+        span.style.height = `${size}px`;
+        span.style.left   = `${Math.random() * 100}%`;
+        span.style.bottom = `${Math.random() * 40}%`;
+        span.style.animationDuration = `${12 + Math.random() * 8}s`;
+        span.style.animationDelay    = `${Math.random() * 6}s`;
+        fragment.appendChild(span);
+      }
+      particlesContainer.appendChild(fragment);
+    }
+
+    // ===== 名前・祈り処理 =====
     function handleNameSave() {
       const value = (nameInput.value || '').trim();
       if (!value) {
         nameError.textContent = '※ お名前が空のままになっています。よろしければ一文字だけでも教えてください。';
         nameError.classList.add('visible');
+        setMood('sad');
         return;
       }
-      localStorage.setItem('shionverseName', value);
       nameError.textContent = '';
       nameError.classList.remove('visible');
+
+      localStorage.setItem(NAME_KEY, value);
       hasFixedName = true;
-      showTalkScene(true); // 初回セリフ
+
+      // visit カウント
+      const count = Number(localStorage.getItem(VISIT_KEY) || '0');
+      localStorage.setItem(VISIT_KEY, String(count + 1));
+
+      updateNameBindings();
+      setMood('smile');
+      showTalkScene(true); // 初回セリフへ
     }
 
     function handlePrayerSubmit() {
@@ -561,11 +814,13 @@
       if (!value) {
         prayerError.textContent = '※ 祈りの言葉がまだ書かれていません。書けるところだけでも大丈夫です。';
         prayerError.classList.add('visible');
+        setMood('sad');
         return;
       }
       prayerError.textContent = '';
       prayerError.classList.remove('visible');
-      localStorage.setItem('serephiasPrayer', value);
+      localStorage.setItem(PRAYER_KEY, value);
+      setMood('neutral');
 
       const name = encodeURIComponent(getUserName());
       const prayer = encodeURIComponent(value);
@@ -583,23 +838,21 @@
       window.location.href = target;
     }
 
-    function createParticles() {
-      if (!particlesContainer) return;
-      const count = 22;
-      const fragment = document.createDocumentFragment();
-      for (let i = 0; i < count; i++) {
-        const span = document.createElement('span');
-        span.className = 'foyer-particle';
-        const size = 4 + Math.random() * 6;
-        span.style.width = `${size}px`;
-        span.style.height = `${size}px`;
-        span.style.left = `${Math.random() * 100}%`;
-        span.style.bottom = `${Math.random() * 40}%`;
-        span.style.animationDuration = `${12 + Math.random() * 8}s`;
-        span.style.animationDelay = `${Math.random() * 6}s`;
-        fragment.appendChild(span);
+    // ===== シーン切り替え =====
+    function showTalkScene(firstTime) {
+      switchScene('scene--lumiere-talk');
+      if (firstTime) {
+        talkLineFirst.style.display  = 'block';
+        talkLineRepeat.style.display = 'none';
+        setMood('smile');
+      } else {
+        talkLineFirst.style.display  = 'none';
+        talkLineRepeat.style.display = 'block';
+        setMood('neutral');
       }
-      particlesContainer.appendChild(fragment);
+      updateNameBindings();
+      setSpeaking(portraitTalk, true);
+      setTimeout(() => setSpeaking(portraitTalk, false), 4200);
     }
 
     function prefFillName() {
@@ -609,27 +862,37 @@
       }
     }
 
+    // ===== 初期化 =====
     function init() {
-      createParticles();
+      createFoyerParticles();
 
       hasFixedName = !!getStoredNameRaw().trim();
       updateNameBindings();
       prefFillName();
 
+      // 瞬きループ開始
+      startBlinkLoop(portraitName);
+      startBlinkLoop(portraitTalk);
+
+      // 前室 → リュミエールホール
       enterHallBtn.addEventListener('click', () => {
         switchScene('scene--lumiere-intro');
         fadeInBgm();
       });
 
+      // 全身 → 名前または会話へ
       toNameSceneBtn.addEventListener('click', () => {
-        // すでに名前がある場合は名前入力をスキップして会話シーンへ
         if (hasFixedName) {
-          showTalkScene(false); // 2回目以降セリフ
+          // 2回目以降：名前入力をスキップ
+          const count = Number(localStorage.getItem(VISIT_KEY) || '0');
+          localStorage.setItem(VISIT_KEY, String(count + 1));
+          showTalkScene(false);
         } else {
           switchScene('scene--lumiere-name');
         }
       });
 
+      // 名前決定
       nameSaveBtn.addEventListener('click', handleNameSave);
       nameInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -638,23 +901,52 @@
         }
       });
 
+      // 祈り送信
       submitPrayerBtn.addEventListener('click', handlePrayerSubmit);
 
-      editNameLink.addEventListener('click', () => {
-        switchScene('scene--lumiere-name');
-        setTimeout(() => nameInput.focus(), 250);
+      // 祈り入力時はやさしい表情に
+      prayerInput.addEventListener('input', () => {
+        if ((prayerInput.value || '').trim()) {
+          setMood('smile');
+        } else {
+          setMood('neutral');
+        }
       });
 
+      // 名前再設定
+      editNameLink.addEventListener('click', () => {
+        switchScene('scene--lumiere-name');
+        setTimeout(() => nameInput.focus(), 240);
+      });
+
+      // ショートカット
       goSerephiasDirectBtn.addEventListener('click', goToSerephiasDirect);
       goStartTownBtn.addEventListener('click', () => {
         window.location.href = 'index.html#start-town';
       });
 
+      // もう少し話す
       talkMoreBtn.addEventListener('click', () => {
-        extraLineEl.style.display = 'block';
-        extraLineEl.textContent = extraLines[extraIndex].replace(/\{name\}/g, getUserNameWithSama());
+        extraLineEl.textContent = extraLines[extraIndex];
+        // 2つ目は微笑、3つ目はすこし悲しみ
+        if (extraIndex === 0) setMood('neutral');
+        if (extraIndex === 1) setMood('smile');
+        if (extraIndex === 2) setMood('sad');
+        setSpeaking(portraitTalk, true);
+        setTimeout(() => setSpeaking(portraitTalk, false), 2600);
+
         extraIndex = (extraIndex + 1) % extraLines.length;
       });
+
+      // 最初の訪問で、すでに名前が保存されているケースにも対応
+      if (hasFixedName) {
+        // ユーザーが URL 直アクセスでこのページを開いた場合を想定
+        const visit = Number(localStorage.getItem(VISIT_KEY) || '0');
+        if (visit > 0) {
+          // すでに一度以上来ているなら、いきなり会話シーンを見せてもよいが、
+          // ここでは前室からの流れを優先するので何もしない。
+        }
+      }
     }
 
     document.addEventListener('DOMContentLoaded', init);
