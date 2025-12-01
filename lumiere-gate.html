@@ -17,7 +17,7 @@
       /* カラー：星の白銀×桃 */
       --bg-silver: #f5f7ff;
       --bg-pink: #fde7f4;
-      --bg-base: radial-gradient(circle at 20% 0%, var(--bg-pink) 0, #ffffff 40%, var(--bg-silver) 85%);
+      --bg-base: radial-gradient(circle at 20% 0%, var(--bg-pink) 0, #ffffff 42%, var(--bg-silver) 88%);
       --gold: #f7dca6;
       --lavender: #d7e4ff;
       --lavender-strong: #cfd8ff;
@@ -32,6 +32,7 @@
       --font-ja: "Shippori Mincho", "Zen Kaku Gothic New", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       --font-en: "DM Sans", system-ui, sans-serif;
       --transition-scene: 600ms ease;
+      --btn-sheen: linear-gradient(120deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0.85) 100%);
     }
 
     * {
@@ -96,6 +97,20 @@
         radial-gradient(circle at 80% 0%, rgba(255,255,255,0.9), transparent 55%);
       mix-blend-mode: screen;
       pointer-events: none;
+    }
+
+    .scene-fader {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 30;
+    }
+
+    .scene-fader.is-active {
+      opacity: 0.65;
     }
 
     .scene__content {
@@ -163,6 +178,9 @@
       transition: transform 150ms ease, box-shadow 150ms ease, background 200ms ease;
       overflow: hidden;
       isolation: isolate;
+      background-size: 220% 220%;
+      background-position: 0 50%;
+      animation: sheenMove 8s linear infinite;
     }
 
     .btn:focus-visible {
@@ -191,6 +209,20 @@
       border: 1px solid rgba(52, 68, 95, 0.35);
       padding: 10px 12px;
       font-size: 14px;
+    }
+
+    .btn-ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      transform: scale(0);
+      animation: ripple 650ms ease-out;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .btn.is-pulsing {
+      animation: sheenMove 8s linear infinite, pulse 2.4s ease-in-out infinite;
     }
 
     /* 足元から光が舞い上がる粒子エフェクト */
@@ -242,12 +274,27 @@
       transform: translateY(0);
     }
 
-    .small-link {
+    .small-link { 
       display: inline-block;
       margin-top: 10px;
       font-size: 13px;
       color: #2c4a7c;
       text-decoration: none;
+    }
+
+    @keyframes sheenMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    @keyframes ripple {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+      100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(207,216,255,0.35); }
+      50% { transform: scale(1.01); box-shadow: 0 12px 26px rgba(207,216,255,0.55); }
     }
 
     .small-link:focus-visible {
@@ -337,6 +384,7 @@
       pointer-events: none;
       animation: bodyFloat 7s ease-in-out infinite;
       transform-origin: 50% 100%;
+      filter: drop-shadow(0 0 12px rgba(255,255,255,0.7));
     }
 
     .lumiere-frame {
@@ -403,12 +451,32 @@
       text-align: center;
       backdrop-filter: blur(12px);
       margin-top: 16px;
+      position: relative;
+      overflow: hidden;
     }
 
     .dialog-card p {
       margin: 0 0 10px;
       white-space: pre-line;
       font-size: 15px;
+    }
+
+    .dialog-card.line-enter {
+      animation: lineIn 420ms ease forwards;
+    }
+
+    .dialog-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.65), transparent 55%);
+      transform: scale(0);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .dialog-card.ripple-light::after {
+      animation: rippleLight 800ms ease-out;
     }
 
     .pill-label {
@@ -493,6 +561,16 @@
       min-height: 1.4em;
     }
 
+    @keyframes lineIn {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rippleLight {
+      0% { transform: scale(0); opacity: 0.45; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
     @media (min-width: 640px) {
       .scene__content { padding: 32px 24px 48px; }
       .glass-card { padding: 24px 22px; }
@@ -502,11 +580,18 @@
     @media (min-width: 960px) {
       .foyer-card-wrapper { inset: auto 0 8vh 0; }
     }
+
+    @media (max-width: 599px) {
+      .lumiere-portrait { max-height: 68vh; width: min(86vw, 360px); }
+      .dialog-card { margin-top: 14px; }
+    }
   </style>
 </head>
 
 <body>
   <!-- ===== Scene A: 前室 ===== -->
+  <div class="scene-fader" id="sceneFader" aria-hidden="true"></div>
+
   <div class="scene scene--foyer is-visible" aria-label="Lumiere foyer">
     <div class="foyer-particles" aria-hidden="true"></div>
     <div class="scene__content foyer-card-wrapper">
@@ -639,6 +724,7 @@
   <script>
     // ===== 要素取得 =====
     const scenes = Array.from(document.querySelectorAll('.scene'));
+    const sceneFader = document.getElementById('sceneFader');
 
     const enterHallBtn = document.getElementById('enterHallBtn');
     const toNameSceneBtn = document.getElementById('toNameSceneBtn');
@@ -662,9 +748,13 @@
 
     const portraitTalk = document.getElementById('portraitTalk');
     const portraitName = document.getElementById('portraitName');
+    const talkCard = document.querySelector('.scene--lumiere-talk .dialog-card');
+    const foyerCard = document.querySelector('.foyer-card');
 
     const bgm = document.getElementById('bgm');
     const particlesContainer = document.querySelector('.foyer-particles');
+    const allButtons = Array.from(document.querySelectorAll('.btn'));
+    const pulseTargets = [];
 
     // ===== 状態管理 =====
     const NAME_KEY   = 'shionverseName';
@@ -681,8 +771,25 @@
     ];
 
     // ===== ユーティリティ =====
+    function safeGet(key) {
+      try {
+        return localStorage.getItem(key) || '';
+      } catch (e) {
+        console.warn('Storage read blocked', e);
+        return '';
+      }
+    }
+
+    function safeSet(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (e) {
+        console.warn('Storage write blocked', e);
+      }
+    }
+
     function getStoredNameRaw() {
-      return localStorage.getItem(NAME_KEY) || '';
+      return safeGet(NAME_KEY);
     }
 
     function getUserName() {
@@ -695,13 +802,50 @@
     }
 
     function getPrayer() {
-      return localStorage.getItem(PRAYER_KEY) || '';
+      return safeGet(PRAYER_KEY);
+    }
+
+    function triggerCardEffect(card) {
+      if (!card) return;
+      card.classList.remove('line-enter', 'ripple-light');
+      void card.offsetWidth;
+      card.classList.add('ripple-light', 'line-enter');
+    }
+
+    function togglePulse(active) {
+      pulseTargets.forEach(btn => btn && btn.classList.toggle('is-pulsing', active));
+    }
+
+    function attachButtonRipples() {
+      allButtons.forEach(btn => {
+        btn.addEventListener('pointerdown', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const ripple = document.createElement('span');
+          ripple.className = 'btn-ripple';
+          ripple.style.width = ripple.style.height = `${size}px`;
+          ripple.style.left = `${e.clientX - rect.left}px`;
+          ripple.style.top  = `${e.clientY - rect.top}px`;
+          btn.appendChild(ripple);
+          setTimeout(() => ripple.remove(), 700);
+        });
+      });
     }
 
     function switchScene(targetClass) {
-      scenes.forEach(scene => {
-        scene.classList.toggle('is-visible', scene.classList.contains(targetClass));
-      });
+      if (sceneFader) {
+        sceneFader.classList.add('is-active');
+        setTimeout(() => {
+          scenes.forEach(scene => {
+            scene.classList.toggle('is-visible', scene.classList.contains(targetClass));
+          });
+          setTimeout(() => sceneFader.classList.remove('is-active'), 140);
+        }, 120);
+      } else {
+        scenes.forEach(scene => {
+          scene.classList.toggle('is-visible', scene.classList.contains(targetClass));
+        });
+      }
     }
 
     function updateNameBindings() {
@@ -723,6 +867,8 @@
 
         if (playPromise !== undefined) {
           playPromise.then(() => {
+            document.body.classList.add('is-bgm-on');
+            togglePulse(true);
             const interval = setInterval(() => {
               bgm.volume = Math.min(fadeTarget, bgm.volume + step);
               if (bgm.volume >= fadeTarget) clearInterval(interval);
@@ -797,15 +943,16 @@
       nameError.textContent = '';
       nameError.classList.remove('visible');
 
-      localStorage.setItem(NAME_KEY, value);
+      safeSet(NAME_KEY, value);
       hasFixedName = true;
 
       // visit カウント
-      const count = Number(localStorage.getItem(VISIT_KEY) || '0');
-      localStorage.setItem(VISIT_KEY, String(count + 1));
+      const count = Number(safeGet(VISIT_KEY) || '0');
+      safeSet(VISIT_KEY, String(count + 1));
 
       updateNameBindings();
       setMood('smile');
+      triggerCardEffect(talkCard);
       showTalkScene(true); // 初回セリフへ
     }
 
@@ -819,7 +966,7 @@
       }
       prayerError.textContent = '';
       prayerError.classList.remove('visible');
-      localStorage.setItem(PRAYER_KEY, value);
+      safeSet(PRAYER_KEY, value);
       setMood('neutral');
 
       const name = encodeURIComponent(getUserName());
@@ -829,7 +976,9 @@
     }
 
     function goToSerephiasDirect() {
-      const prayer = getPrayer();
+      const current = (prayerInput.value || '').trim();
+      const prayer = current || getPrayer();
+      if (current) safeSet(PRAYER_KEY, current);
       const name = encodeURIComponent(getUserName());
       const q = encodeURIComponent(prayer || '');
       const target = prayer
@@ -845,12 +994,19 @@
         talkLineFirst.style.display  = 'block';
         talkLineRepeat.style.display = 'none';
         setMood('smile');
+        talkLineFirst.classList.remove('line-enter');
+        void talkLineFirst.offsetWidth;
+        talkLineFirst.classList.add('line-enter');
       } else {
         talkLineFirst.style.display  = 'none';
         talkLineRepeat.style.display = 'block';
         setMood('neutral');
+        talkLineRepeat.classList.remove('line-enter');
+        void talkLineRepeat.offsetWidth;
+        talkLineRepeat.classList.add('line-enter');
       }
       updateNameBindings();
+      triggerCardEffect(talkCard);
       setSpeaking(portraitTalk, true);
       setTimeout(() => setSpeaking(portraitTalk, false), 4200);
     }
@@ -865,10 +1021,14 @@
     // ===== 初期化 =====
     function init() {
       createFoyerParticles();
+      attachButtonRipples();
+      triggerCardEffect(foyerCard);
 
       hasFixedName = !!getStoredNameRaw().trim();
       updateNameBindings();
       prefFillName();
+
+      pulseTargets.push(enterHallBtn, toNameSceneBtn, nameSaveBtn, submitPrayerBtn, goSerephiasDirectBtn);
 
       // 瞬きループ開始
       startBlinkLoop(portraitName);
@@ -884,8 +1044,8 @@
       toNameSceneBtn.addEventListener('click', () => {
         if (hasFixedName) {
           // 2回目以降：名前入力をスキップ
-          const count = Number(localStorage.getItem(VISIT_KEY) || '0');
-          localStorage.setItem(VISIT_KEY, String(count + 1));
+          const count = Number(safeGet(VISIT_KEY) || '0');
+          safeSet(VISIT_KEY, String(count + 1));
           showTalkScene(false);
         } else {
           switchScene('scene--lumiere-name');
@@ -934,14 +1094,17 @@
         if (extraIndex === 2) setMood('sad');
         setSpeaking(portraitTalk, true);
         setTimeout(() => setSpeaking(portraitTalk, false), 2600);
-
+        extraLineEl.classList.remove('line-enter');
+        void extraLineEl.offsetWidth;
+        extraLineEl.classList.add('line-enter');
+        triggerCardEffect(talkCard);
         extraIndex = (extraIndex + 1) % extraLines.length;
       });
 
       // 最初の訪問で、すでに名前が保存されているケースにも対応
       if (hasFixedName) {
         // ユーザーが URL 直アクセスでこのページを開いた場合を想定
-        const visit = Number(localStorage.getItem(VISIT_KEY) || '0');
+        const visit = Number(safeGet(VISIT_KEY) || '0');
         if (visit > 0) {
           // すでに一度以上来ているなら、いきなり会話シーンを見せてもよいが、
           // ここでは前室からの流れを優先するので何もしない。
