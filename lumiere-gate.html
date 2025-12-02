@@ -200,27 +200,28 @@
 
     /* セリフウィンドウ */
     .dialogue-window {
-      position: absolute;
-      left: 50%;
-      bottom: 5vh;
-      transform: translateX(-50%);
-      width: min(var(--dialog-max), 92vw);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
-      border: 1px solid rgba(243, 217, 163, 0.6);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-      padding: clamp(14px, 3vw, 18px);
-      color: #1b1e2a;
-      z-index: 6;
-      opacity: 0;
-      transition: opacity 600ms ease;
-    }
+  position: absolute;
+  left: 50%;
+  bottom: 14vh;           /* 少し上に移動（後述のレイアウト調整込み） */
+  transform: translateX(-50%);
+  width: min(var(--dialog-max), 92vw);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
+  border: 1px solid rgba(243, 217, 163, 0.6);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  padding: clamp(14px, 3vw, 18px);
+  color: #1b1e2a;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 600ms ease;
+  pointer-events: none;   /* ★追加：通常はクリックさせない */
+}
 
-    .dialogue-window.is-visible {
-      opacity: 1;
-    }
-
+.dialogue-window.is-visible {
+  opacity: 1;
+  pointer-events: auto;   /* ★見えるときだけクリック可 */
+}
     .dialogue-name {
       font-size: 14px;
       letter-spacing: 0.08em;
@@ -361,7 +362,7 @@
     .menu {
       position: absolute;
       left: 50%;
-      bottom: 6vh;
+      bottom: 4vh;
       transform: translateX(-50%);
       display: flex;
       gap: 12px;
