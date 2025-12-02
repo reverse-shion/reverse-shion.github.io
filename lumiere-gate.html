@@ -456,9 +456,17 @@
       transition: opacity 600ms ease;
     }
 
+    /* ★ここを追加：見えてないときはクリック不可 */
+  pointer-events: none;
+}
+
+
     .menu.is-visible {
       opacity: 1;
-    }
+    
+      /* ★ここを追加：表示するときだけクリック可能 */
+  pointer-events: auto;
+}
 
     /* サウンドボタン */
     .sound-toggle {
