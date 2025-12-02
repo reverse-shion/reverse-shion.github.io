@@ -169,18 +169,25 @@
     }
 
     /* バストアップ */
-    .lumiere-bust {
-      position: absolute;
-      bottom: 12vh;
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: min(58vh, 78vw);
-      opacity: 0;
-      transition: opacity 800ms ease;
-      z-index: 5;
-    }
-    .lumiere-bust.is-visible { opacity: 1; }
+    /* ここを置き換え or 追記してOK */
 
+/* バストアップ */
+.lumiere-bust {
+  position: absolute;
+  bottom: 16vh;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(420px, 82vw);  /* かなり大きめにして“アップ感”を出す */
+  opacity: 0;
+  display: none;                /* ★最初は非表示 */
+  transition: opacity 800ms ease;
+  z-index: 5;
+}
+
+.lumiere-bust.is-visible {
+  opacity: 1;
+  display: block;               /* ★見せるときだけブロック表示 */
+}
     .lumiere-bust .frame {
       position: relative;
       width: 100%;
@@ -730,25 +737,28 @@
       };
 
       const runInitialDialogue = () => {
-        // 2回目以降
-        if (cachedName) {
-          fullFigure.classList.remove('show');
-          bustContainer.classList.add('is-visible');
-          scheduleBlink();
+  if (cachedName) {
+    // 全身OFF
+    fullFigure.classList.remove('show');
+    fullFigure.style.display = 'none';
 
-          playLines(
-            injectName(lines.menu_return || fallbackLines.menu_return),
-            () => {
-              // セリフ窓を閉じてからメニュー表示
-              dialogueWindow.classList.remove('is-visible');
-              setTimeout(() => {
-                menu.classList.add('is-visible');
-                updateMenuForReturn();
-              }, 350);
-            }
-          );
-          return;
-        }
+    // バストアップON
+    bustContainer.style.display = 'block';
+    bustContainer.classList.add('is-visible');
+    scheduleBlink();
+
+    playLines(
+      injectName(lines.menu_return || fallbackLines.menu_return),
+      () => {
+        dialogueWindow.classList.remove('is-visible');
+        setTimeout(() => {
+          menu.classList.add('is-visible');
+          updateMenuForReturn();
+        }, 350);
+      }
+    );
+    return;
+  }
 
         // 初回
         const firstLines = lines.sceneB_first   || fallbackLines.sceneB_first;
@@ -764,34 +774,40 @@
         });
       };
 
-      const showNameFixed = () => {
-        const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
-        playLines(linesToShow, () => {
-          dialogueWindow.classList.remove('is-visible');
-          fullFigure.classList.remove('show');
-          setTimeout(() => {
-            bustContainer.classList.add('is-visible');
-            scheduleBlink();
-            menu.classList.add('is-visible');
-            updateMenuForReturn();
-          }, 700);
-        });
-      };
+     const showNameFixed = () => {
+  const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
+  playLines(linesToShow, () => {
+    dialogueWindow.classList.remove('is-visible');
+    fullFigure.classList.remove('show');
+    fullFigure.style.display = 'none';        // ★ 全身OFF
+
+    setTimeout(() => {
+      bustContainer.style.display = 'block';  // ★ バストON
+      bustContainer.classList.add('is-visible');
+      scheduleBlink();
+      menu.classList.add('is-visible');
+      updateMenuForReturn();
+    }, 700);
+  });
+};
 
       /* 会話モード */
-      const startConversation = () => {
-        menu.classList.remove('is-visible');
+const startConversation = () => {
+  menu.classList.remove('is-visible');
 
-        // 全身→バストアップへ
-        fullFigure.classList.remove('show');
-        bustContainer.classList.add('is-visible');
+  // ★ 全身を完全に隠す
+  fullFigure.classList.remove('show');
+  fullFigure.style.display = 'none';
 
-        dialogueWindow.classList.add('is-visible');
-        setExpression('smile');
+  // ★ バストアップを確実に表示
+  bustContainer.style.display = 'block';
+  bustContainer.classList.add('is-visible');
 
-        playLines(lines.conversation || fallbackLines.conversation, endConversation);
-      };
+  dialogueWindow.classList.add('is-visible');
+  setExpression('smile');
 
+  playLines(lines.conversation || fallbackLines.conversation, endConversation);
+};
       const endConversation = () => {
         setExpression('neutral');
         dialogueWindow.classList.remove('is-visible');
