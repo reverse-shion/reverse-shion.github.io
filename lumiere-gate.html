@@ -183,6 +183,8 @@
       z-index: 4; /* セリフより奥 */
       animation: gentleFloat 6s ease-in-out infinite;
       filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
+      /* ★必須！口パクの基準点になる */
+  position: relative;
     }
 
     .lumiere-bust.is-visible {
@@ -412,7 +414,7 @@
 .lumiere-mouth-glow {
   position: absolute;
   left: 50%;
-  bottom: 42%;  /* リュミエールの口の高さに合わせて微調整してね */
+  bottom: 26%;  /* リュミエールの口の高さに合わせて微調整してね */
   transform: translateX(-50%);
   width: 22%;
   height: 24px;
@@ -554,13 +556,18 @@
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
       <!-- バストアップ（会話用） -->
-      <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
+      <div class="lumiere-bust is-visible" id="bustContainer">
+
   <div class="frame">
-    <img src="img/open1.png" alt="リュミエール" id="bustOpen">
-    <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
+
+    <img src="img/open1.png" id="bustOpen">
+    <img src="img/open2.png" id="bustClosed" style="opacity:0;">
+
+    <!-- ★口の光は frame の中に移動する -->
+    <div class="lumiere-mouth-glow"></div>
+
   </div>
-  <!-- ★ここを追加：口元の光 -->
-  <div class="lumiere-mouth-glow"></div>
+
 </div>
 
       <!-- セリフ -->
