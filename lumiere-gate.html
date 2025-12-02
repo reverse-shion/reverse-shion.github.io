@@ -535,14 +535,6 @@
       .lumiere-bust { bottom: 24vh; }
       .menu { bottom: 2.4vh; }
     }
-    .lumiere-bust.speaking {
-  outline: 3px solid red;          /* 喋ってる時だけ赤枠が出るはず */
-}
-
-.lumiere-mouth-glow {
-  background: red !important;      /* まずは赤ベタで確認 */
-  opacity: 0.8 !important;
-}
   </style>
 </head>
 <body>
@@ -769,24 +761,33 @@
       };
 
       const showLine = (line, onComplete) => {
-        clearInterval(typingTimer);
-        dialogueNext.style.opacity = 0;
-        const chars = line.split('');
-        let idx = 0;
-        dialogueText.textContent = '';
-        isTyping = true;
-        typingTimer = setInterval(() => {
-          dialogueText.textContent += chars[idx];
-          idx++;
-          if (idx >= chars.length) {
-            clearInterval(typingTimer);
-            isTyping = false;
-            dialogueNext.style.opacity = 1;
-            if (onComplete) onComplete();
-          }
-        }, 35);
-      };
+  clearInterval(typingTimer);
+  dialogueNext.style.opacity = 0;
 
+  const chars = line.split('');
+  let idx = 0;
+  dialogueText.textContent = '';
+  isTyping = true;
+
+  // ★ 喋り始めた瞬間に speaking = true
+  setSpeaking(true);
+
+  typingTimer = setInterval(() => {
+    dialogueText.textContent += chars[idx];
+    idx++;
+
+    if (idx >= chars.length) {
+      clearInterval(typingTimer);
+      isTyping = false;
+      dialogueNext.style.opacity = 1;
+
+      // ★ 喋り終わった瞬間に speaking = false
+      setSpeaking(false);
+
+      if (onComplete) onComplete();
+    }
+  }, 35);
+};
       const showAll = (line) => {
         clearInterval(typingTimer);
         isTyping = false;
@@ -1064,13 +1065,7 @@
 
       document.body.addEventListener('click', ensureBgm, { once: true });
 
-function startSpeaking() {
-  document.getElementById('bustContainer').classList.add('speaking');
-}
 
-function stopSpeaking() {
-  document.getElementById('bustContainer').classList.remove('speaking');
-}
       
       /* --------------- 初期化 --------------- */
       const startLumiereGate = () => {
