@@ -174,7 +174,7 @@
     /* バストアップ（会話用） */
     .lumiere-bust {
       position: absolute;
-      bottom: 24vh;
+      bottom: 30vh;
       left: 50%;
       transform: translateX(-50%);
       max-width: min(58vh, 78vw);
@@ -218,7 +218,7 @@
     .dialogue-window {
       position: absolute;
       left: 50%;
-      bottom: 7vh;
+      bottom: 6vh;
       transform: translateX(-50%);
       width: min(var(--dialog-max), 92vw);
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
@@ -408,6 +408,43 @@
       30% { opacity: 1; }
       100% { transform: translateY(-16px) scale(1); opacity: 0; }
     }
+    /* ===== リュミエール：光の口パク ===== */
+.lumiere-mouth-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;  /* リュミエールの口の高さに合わせて微調整してね */
+  transform: translateX(-50%);
+  width: 22%;
+  height: 24px;
+
+  pointer-events: none;
+  opacity: 0;
+  filter: blur(6px);
+  mix-blend-mode: screen;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 255, 0.95),
+    rgba(255, 150, 220, 0.4),
+    rgba(255, 150, 220, 0.0)
+  );
+
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+
+/* 会話中だけ光が脈動して「喋ってる」感じに */
+.lumiere-bust.speaking .lumiere-mouth-glow {
+  opacity: 1;
+  animation: mouthPulse 0.45s ease-in-out infinite;
+}
+
+@keyframes mouthPulse {
+  0%   { transform: translateX(-50%) scaleY(0.55) scaleX(0.85); opacity: 0.35; }
+  40%  { transform: translateX(-50%) scaleY(1.15) scaleX(1.10); opacity: 0.95; }
+  70%  { transform: translateX(-50%) scaleY(0.85) scaleX(1.00); opacity: 0.65; }
+  100% { transform: translateX(-50%) scaleY(0.60) scaleX(0.90); opacity: 0.40; }
+}
 
     /* メニュー */
     .menu {
@@ -480,7 +517,7 @@
 
     /* スマホ調整 */
     @media (max-width: 720px) {
-      .dialogue-window { bottom: 16vh; border-radius: 14px; }
+      .dialogue-window { bottom: 8vh; border-radius: 14px; }
       .menu { bottom: 3vh; gap: 10px; }
       .gold-button { width: calc(50% - 8px); justify-content: center; text-align: center; }
       .name-input { flex-direction: column; align-items: stretch; }
@@ -489,13 +526,13 @@
 
     @media (max-width: 480px) {
       .lumiere-full { bottom: 4vh; }
-      .lumiere-bust { bottom: 15vh; }
+      .lumiere-bust { bottom: 28vh; }
       .dialogue-window { padding: 12px 14px 18px; }
     }
 
     @media (max-height: 700px) {
-      .dialogue-window { bottom: 18vh; }
-      .lumiere-bust { bottom: 14vh; }
+      .dialogue-window { bottom: 10vh; }
+      .lumiere-bust { bottom: 24vh; }
       .menu { bottom: 2.4vh; }
     }
   </style>
@@ -518,11 +555,13 @@
 
       <!-- バストアップ（会話用） -->
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
-        <div class="frame">
-          <img src="img/open1.png" alt="リュミエール" id="bustOpen">
-          <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
-        </div>
-      </div>
+  <div class="frame">
+    <img src="img/open1.png" alt="リュミエール" id="bustOpen">
+    <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
+  </div>
+  <!-- ★ここを追加：口元の光 -->
+  <div class="lumiere-mouth-glow"></div>
+</div>
 
       <!-- セリフ -->
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
