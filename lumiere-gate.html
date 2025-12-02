@@ -437,6 +437,21 @@
       .lumiere-bust { bottom: 8vh; }
       .dialogue-window { padding: 12px 14px 18px; }
     }
+
+    /* 全体共通の位置を少し上げる／下げる */
+.dialogue-window {
+  bottom: 14vh;  /* 5vh → 14vh くらいに */
+}
+
+.menu {
+  bottom: 4vh;   /* 6vh → 4vh にして画面の一番下寄りへ */
+}
+
+/* 画面の縦が短いスマホ向けに、さらに調整してもOK */
+@media (max-height: 700px) {
+  .dialogue-window { bottom: 18vh; }
+  .menu { bottom: 3vh; }
+}
   </style>
 </head>
 <body>
@@ -725,16 +740,20 @@
       };
 
       const runInitialDialogue = () => {
-        if (cachedName) {
-          fullFigure.classList.remove('show');
-          bustContainer.classList.add('is-visible');
-          scheduleBlink();
-          playLines(injectName(lines.menu_return || fallbackLines.menu_return), () => {
-            menu.classList.add('is-visible');
-            updateMenuForReturn();
-          });
-          return;
-        }
+  if (cachedName) {
+    fullFigure.classList.remove('show');
+    bustContainer.classList.add('is-visible');
+    scheduleBlink();
+    playLines(injectName(lines.menu_return || fallbackLines.menu_return), () => {
+      // ★ここで一度セリフ窓を閉じる
+      dialogueWindow.classList.remove('is-visible');
+      setTimeout(() => {
+        menu.classList.add('is-visible');
+        updateMenuForReturn();
+      }, 350); // フェードアウトに合わせて少し待つ
+    });
+    return;
+  }
 
         const firstLines = lines.sceneB_first || fallbackLines.sceneB_first;
         const askLines = lines.sceneB_askName || fallbackLines.sceneB_askName;
@@ -750,18 +769,19 @@
       };
 
       const showNameFixed = () => {
-        const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
-        playLines(linesToShow, () => {
-          fullFigure.classList.remove('show');
-          setTimeout(() => {
-            bustContainer.classList.add('is-visible');
-            scheduleBlink();
-            menu.classList.add('is-visible');
-            updateMenuForReturn();
-          }, 700);
-        });
-      };
-
+  const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
+  playLines(linesToShow, () => {
+    // ★セリフ窓を先に閉じる
+    dialogueWindow.classList.remove('is-visible');
+    fullFigure.classList.remove('show');
+    setTimeout(() => {
+      bustContainer.classList.add('is-visible');
+      scheduleBlink();
+      menu.classList.add('is-visible');
+      updateMenuForReturn();
+    }, 700);
+  });
+};
       const updateMenuForReturn = () => {
         const villageBtn = menu.querySelector('[data-action="village"]');
         villageBtn.style.display = cachedName ? 'inline-flex' : 'none';
@@ -776,10 +796,14 @@
       };
 
       const endConversation = () => {
-        isConversation = false;
-        setExpression('neutral');
-        menu.classList.add('is-visible');
-      };
+  isConversation = false;
+  setExpression('neutral');
+  // ★会話が終わったらウィンドウを閉じてからメニュー復帰
+  dialogueWindow.classList.remove('is-visible');
+  setTimeout(() => {
+    menu.classList.add('is-visible');
+  }, 350);
+};
 
       // イベント
       nameSubmit.addEventListener('click', () => {
