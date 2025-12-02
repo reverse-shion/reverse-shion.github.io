@@ -172,41 +172,49 @@
     }
 
     /* バストアップ */
-    .lumiere-bust {
-      position: absolute;
-      bottom: 10vh;
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: min(58vh, 78vw);
-      opacity: 0;
-      transition: opacity 800ms ease;
-      z-index: 5;
-      animation: gentleFloat 6s ease-in-out infinite;
-      filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
-    }
+  /* ===== Lumiere バストアップ位置＆ふわ揺れ ===== */
+.lumiere-bust {
+  position: fixed;
+  left: 50%;
+  bottom: 30vh; /* 顔が画面のやや上 1/3 くらいに来る位置 */
+  transform: translateX(-50%);
+  max-width: min(78vw, 420px);
 
-    .lumiere-bust.is-visible {
-      opacity: 1;
-    }
+  opacity: 0;
+  transition: opacity 700ms ease;
 
-    .lumiere-bust.speaking {
-      filter: drop-shadow(0 0 16px rgba(255,255,255,0.8));
-    }
-
-    .lumiere-bust .frame img {
-  position: absolute !important;
-  left: 50% !important;
-  top: 0 !important;
-  transform: translateX(-50%) !important; /* translateYなし */
-  width: 320px !important;
-  height: auto !important;
+  z-index: 5;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.65));
+  animation: bustFloat 9s ease-in-out infinite;
 }
 
- .lumiere-bust .frame {
-  position: relative !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 320px !important; /* ここが命 */
+.lumiere-bust.is-visible {
+  opacity: 1;
+}
+
+.lumiere-bust.speaking {
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
+}
+
+.lumiere-bust .frame {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.lumiere-bust .frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ふわっとした縦揺れ（控えめ） */
+@keyframes bustFloat {
+  0%   { transform: translateX(-50%) translateY(0); }
+  50%  { transform: translateX(-50%) translateY(-8px); }
+  100% { transform: translateX(-50%) translateY(0); }
 }
 
     #bustContainer {
@@ -226,55 +234,77 @@
   height: auto !important;
 }
     /* セリフウィンドウ */
-    .dialogue-window {
-      position: absolute;
-      left: 50%;
-      bottom: 14vh;   /* ボタンとかぶらないよう上寄せ */
-      transform: translateX(-50%);
-      width: min(var(--dialog-max), 92vw);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
-      border: 1px solid rgba(243, 217, 163, 0.6);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-      padding: clamp(14px, 3vw, 18px);
-      color: #1b1e2a;
-      z-index: 6;
-      opacity: 0;
-      transition: opacity 600ms ease;
-      pointer-events: none;   /* 非表示時はクリック無効 */
-    }
+/* ===== Lumiere セリフ枠：星銀 × 桃 ===== */
+.dialogue-window {
+  position: absolute;
+  left: 50%;
+  bottom: 11vh; /* 少し下げてアゴ〜首元あたりに被る位置 */
+  transform: translateX(-50%);
+  width: min(var(--dialog-max), 92vw);
 
-    .dialogue-window.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
+  padding: 14px 18px 20px;
+  border-radius: 18px;
 
-    .dialogue-name {
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      color: #6c5c2c;
-      margin-bottom: 6px;
-    }
+  background:
+    radial-gradient(circle at 0% 0%,
+      rgba(255, 255, 255, 0.95),
+      transparent 60%
+    ),
+    linear-gradient(180deg,
+      rgba(255, 239, 246, 0.94),   /* 桃 */
+      rgba(245, 246, 255, 0.86)    /* 星銀 */
+    );
 
-    .dialogue-text {
-      white-space: pre-line;
-      font-size: clamp(15px, 2.5vw, 17px);
-      line-height: 1.7;
-      min-height: 3.4em;
-    }
+  border: 1px solid rgba(243, 217, 163, 0.80); /* 柔らかい金 */
 
-    .dialogue-next {
-      position: absolute;
-      right: 14px;
-      bottom: 10px;
-      font-size: 13px;
-      color: #876c2b;
-      text-shadow: 0 0 8px rgba(243, 217, 163, 0.7);
-      opacity: 0;
-      animation: blink 1.4s ease-in-out infinite;
-      user-select: none;
-    }
+  box-shadow:
+    0 12px 28px rgba(12, 10, 30, 0.38),        /* 下方向の影 */
+    0 0 18px rgba(255, 210, 240, 0.45),        /* 桃の光 */
+    0 0 26px rgba(230, 236, 255, 0.40);        /* 星銀の光 */
+
+  backdrop-filter: blur(14px);
+
+  color: #2a2238;
+  opacity: 0;
+  transition: opacity 600ms ease;
+  pointer-events: none;
+}
+
+.dialogue-window::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.dialogue-window.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dialogue-name {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9c8450;             /* 落ち着いた金 */
+  margin-bottom: 4px;
+}
+
+.dialogue-name::before {
+  content: "✶";
+  margin-right: 6px;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.dialogue-text {
+  font-size: clamp(15px, 2.5vw, 17px);
+  line-height: 1.8;
+  color: #3a324c;
+}
 
     @keyframes blink {
       0%, 60% { opacity: 0; }
@@ -540,6 +570,28 @@
 .sound-toggle {
   z-index: 40 !important;
 }
+
+    /* ===== 星粒：控えめバージョン ===== */
+.star-field span {
+  position: absolute;
+  display: block;
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, 0.75) 0,
+    rgba(255, 255, 255, 0.10) 40%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  opacity: 0.35;
+  filter: blur(1px);
+  animation: drift 24s linear infinite;
+}
+
+@keyframes drift {
+  0%   { transform: translate3d(0, 8px, 0) scale(0.9); opacity: 0; }
+  20%  { opacity: 0.45; }
+  80%  { opacity: 0.35; }
+  100% { transform: translate3d(0, -36px, 0) scale(1.1); opacity: 0; }
+}
   </style>
 </head>
 <body>
@@ -700,6 +752,21 @@
           starField.appendChild(s);
         }
       };
+      // 星粒生成
+const createStars = () => {
+  const total = 24; // ★ 40 → 24 にして控えめに
+  for (let i = 0; i < total; i++) {
+    const s = document.createElement('span');
+    const size = Math.random() * 2.2 + 1; // 少し小さめ
+    s.style.width = `${size}px`;
+    s.style.height = `${size}px`;
+    s.style.left = `${Math.random() * 100}%`;
+    s.style.top = `${Math.random() * 100}%`;
+    s.style.animationDuration = `${20 + Math.random() * 10}s`;
+    s.style.animationDelay = `${Math.random() * 16}s`;
+    starField.appendChild(s);
+  }
+};
 
       // 粒子演出
       const spawnParticles = (btn) => {
@@ -1052,6 +1119,8 @@
         startLumiereGate();
       });
     })();
+
+    
   </script>
 </body>
 </html>
