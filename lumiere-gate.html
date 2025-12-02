@@ -9,7 +9,7 @@
       --silver: #f3f5ff;
       --lavender: #d9d7ff;
       --lavender-veil: rgba(217, 215, 255, 0.35);
-      --pearl: rgba(255, 255, 255, 0.inline82);
+      --pearl: rgba(255, 255, 255, 0.82);
       --gold: #f3d9a3;
       --gold-soft: rgba(243, 217, 163, 0.6);
       --text: #1b1e2a;
@@ -21,35 +21,49 @@
       --font-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
 
     html, body {
-      margin: 0; padding: 0;
-      width: 100%; height: 100%;
+      margin: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       background: #000;
       color: var(--text);
       font-family: var(--font-ja);
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     body {
       position: relative;
       background:
-        radial-gradient(circle at 30% 15%, rgba(255,255,255,0.3), transparent 35%),
-        radial-gradient(circle at 80% 0%, rgba(255,255,255,0.25), transparent 45%),
+        radial-gradient(circle at 30% 15%, rgba(255, 255, 255, 0.3), transparent 35%),
+        radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.25), transparent 45%),
         linear-gradient(180deg, #0e0f1a 0%, #0a0b14 40%, #0b0c16 100%);
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
-    main { width: 100%; height: 100%; position: relative; overflow: hidden; }
+    main {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
 
-    /* 星粒 */
+    /* 星粒レイヤー */
     .star-field {
-      position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1;
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
     }
     .star-field span {
       position: absolute;
+      display: block;
       background: radial-gradient(circle, rgba(255,255,255,0.9) 0, rgba(255,255,255,0.2) 45%, transparent 70%);
       border-radius: 50%;
       animation: drift 18s linear infinite;
@@ -57,260 +71,494 @@
       filter: blur(0.2px);
     }
     @keyframes drift {
-      0%   { transform: translate3d(0,0,0) scale(1); opacity: 0.2; }
-      50%  { opacity: 0.8; }
-      100% { transform: translate3d(0,-40px,0) scale(1.15); opacity: 0.15; }
+      0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.2; }
+      50% { opacity: 0.8; }
+      100% { transform: translate3d(0, -40px, 0) scale(1.15); opacity: 0.15; }
     }
 
     /* シーン共通 */
     .scene {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background-size: cover; background-position: center;
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       transition: opacity var(--transition);
-      opacity: 0; pointer-events: none; z-index: 2;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
     }
+
     .scene::after {
-      content: ""; position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(5,7,16,0.55) 0%, rgba(17,18,35,0.35) 45%, rgba(38,35,58,0.35) 100%);
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(5, 7, 16, 0.55) 0%, rgba(17, 18, 35, 0.35) 45%, rgba(38, 35, 58, 0.35) 100%);
       pointer-events: none;
     }
-    .scene.is-active { opacity: 1; pointer-events: auto; }
 
-    .scene-foyer  { background-image: url('img/foyer-lumiere.jpg'); }
-    .scene-hall   { background-image: url('img/lumiere-hall.jpg'); }
+    .scene.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* フォイヤー */
+    .scene-foyer {
+      background-image: url('img/foyer-lumiere.jpg');
+    }
 
     .welcome-text {
-      text-align: center; color: #fdfbff;
-      text-shadow: 0 0 12px rgba(255,255,255,0.65), 0 0 24px rgba(243,217,163,0.45);
-      font-size: clamp(18px, 3vw, 26px); line-height: 1.8; letter-spacing: 0.08em;
-      opacity: 0; transform: translateY(10px);
+      position: relative;
+      text-align: center;
+      color: #fdfbff;
+      text-shadow:
+        0 0 12px rgba(255, 255, 255, 0.65),
+        0 0 24px rgba(243, 217, 163, 0.45);
+      font-size: clamp(18px, 3vw, 26px);
+      line-height: 1.8;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      transform: translateY(10px);
       transition: opacity 900ms ease, transform 900ms ease;
-      z-index: 3; padding: 16px 22px;
+      z-index: 3;
+      padding: 16px 22px;
     }
-    .welcome-text.show { opacity: 1; transform: translateY(0); }
 
-    /* ホール演出 */
+    .welcome-text.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ホール */
+    .scene-hall {
+      background-image: url('img/lumiere-hall.jpg');
+    }
+
     .hall-overlay {
-      position: absolute; inset: 0; pointer-events: none; z-index: 2;
+      position: absolute;
+      inset: 0;
       background:
-        radial-gradient(circle at 50% 30%, rgba(255,255,255,0.15), transparent 45%),
-        radial-gradient(circle at 20% 70%, rgba(255,229,210,0.16), transparent 45%),
-        linear-gradient(180deg, rgba(10,9,25,0.35), rgba(10,9,25,0.48));
+        radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.15), transparent 45%),
+        radial-gradient(circle at 20% 70%, rgba(255, 229, 210, 0.16), transparent 45%),
+        linear-gradient(180deg, rgba(10, 9, 25, 0.35), rgba(10, 9, 25, 0.48));
+      pointer-events: none;
+      z-index: 2;
     }
 
     .lumiere-full {
-      position: absolute; bottom: 8vh; left: left 50%;
+      position: absolute;
+      bottom: 8vh;
+      left: 50%;
       transform: translateX(-50%) translateY(10px);
-      opacity: 0; max-width: min(60vh, 70vw);
+      opacity: 0;
+      max-width: min(60vh, 70vw);
       transition: opacity 800ms ease, transform 1600ms ease;
       z-index: 4;
       animation: float 9s ease-in-out infinite;
     }
-    .lumiere-full.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    @keyframes float {
-      0%,100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-8px); }
+
+    .lumiere-full.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
-    /* バストアップ（常に表示させる） */
+    @keyframes float {
+      0% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+      100% { transform: translateX(-50%) translateY(0); }
+    }
+
+    /* バストアップ */
     .lumiere-bust {
-      position: absolute; bottom: 10vh; left: 50%;
+      position: absolute;
+      bottom: 10vh;
+      left: 50%;
       transform: translateX(-50%);
       max-width: min(58vh, 78vw);
       opacity: 0;
       transition: opacity 800ms ease;
       z-index: 5;
       animation: gentleFloat 6s ease-in-out infinite;
-      filter: drop-shadow(0 0 10px rgba(255,255,255,255,0.55));
-      pointer-events: none;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
     }
-    .lumiere-bust.is-visible { opacity: 1; }
-    .lumiere-bust.speaking { filter: drop-shadow(0 0 18px rgba(255,255,255,0.9); }
-    .lumiere-bust img { display: block; width: 100%; height: auto; position: absolute; inset: 0; object-fit: contain; }
-    .lumiere-bust .frame { position: relative; width: 100%; padding-bottom: 140%; }
-    @keyframes gentleFloat {
-      0%   { transform: translateX(-50%) translateY(2px); }
-      50%  { transform: translateX(-50%) translateY(-6px); }
-      100% { transform: translateX(-50%) translateY(2px); }
+
+    .lumiere-bust.is-visible {
+      opacity: 1;
+    }
+
+    .lumiere-bust.speaking {
+      filter: drop-shadow(0 0 16px rgba(255,255,255,0.8));
+    }
+
+    .lumiere-bust img {
+      display: block;
+      width: 100%;
+      height: auto;
+      position: absolute;
+      inset: 0;
+      object-fit: contain;
+    }
+
+    .lumiere-bust .frame {
+      position: relative;
+      width: 100%;
+      padding-bottom: 140%;
     }
 
     /* セリフウィンドウ */
     .dialogue-window {
-      position: absolute; left: 50%; bottom: 14vh;
+      position: absolute;
+      left: 50%;
+      bottom: 14vh;   /* ボタンとかぶらないよう上寄せ */
       transform: translateX(-50%);
       width: min(var(--dialog-max), 92vw);
-      background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.58));
-      border: 1px solid rgba(243,217,163,0.6);
-      border-radius: 16px; box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
+      border: 1px solid rgba(243, 217, 163, 0.6);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
       padding: clamp(14px, 3vw, 18px);
-      color: #1b1e2a; z-index: 6;
-      opacity: 0; transition: opacity 600ms ease;
-      pointer-events: none;
+      color: #1b1e2a;
+      z-index: 6;
+      opacity: 0;
+      transition: opacity 600ms ease;
+      pointer-events: none;   /* 非表示時はクリック無効 */
     }
-    .dialogue-window.is-visible { opacity: 1; pointer-events: auto; }
 
-    .dialogue-name { font-size: 14px; color: #6c5c2c; margin-bottom: 6px; letter-spacing: 0.08em; }
-    .dialogue-text { white-space: pre-line; font-size: clamp(15px, 2.5vw, 17px); line-height: 1.7; min-height: 3.4em; }
+    .dialogue-window.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .dialogue-name {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      color: #6c5c2c;
+      margin-bottom: 6px;
+    }
+
+    .dialogue-text {
+      white-space: pre-line;
+      font-size: clamp(15px, 2.5vw, 17px);
+      line-height: 1.7;
+      min-height: 3.4em;
+    }
+
     .dialogue-next {
-      position: absolute; right: 14px; bottom: 10px;
-      font-size: 13px; color: #876c2b;
-      text-shadow: 0 0 8px rgba(243,217,163,0.7);
-      opacity: 0; animation: blink 1.4s ease-in-out infinite;
+      position: absolute;
+      right: 14px;
+      bottom: 10px;
+      font-size: 13px;
+      color: #876c2b;
+      text-shadow: 0 0 8px rgba(243, 217, 163, 0.7);
+      opacity: 0;
+      animation: blink 1.4s ease-in-out infinite;
       user-select: none;
     }
-    @keyframes blink { 0%,60% { opacity: 0; } 100% { opacity: 1; } }
+
+    @keyframes blink {
+      0%, 60% { opacity: 0; }
+      100% { opacity: 1; }
+    }
 
     /* 名前入力 */
     .name-input {
-      margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-    }
-    .name-input input {
-      flex: 1 1 180px; padding: 10px 12px; border-radius: 10px;
-      border: 1px solid rgba(27,30,42,0.2); background: rgba(255,255,255,0.8);
-      font-size: 15px; font-family: var(--font-ja);
-    }
-    .name-input input:focus {
-      border-color: rgba(243,217,163,0.8);
-      box-shadow: 0 0 0 3px rgba(243,217,163,0.25);
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
     }
 
-    /* ボタン（演出強化版） */
+    .name-input label {
+      font-size: 14px;
+      color: #3b3b52;
+    }
+
+    .name-input input {
+      flex: 1 1 180px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(27, 30, 42, 0.2);
+      font-size: 15px;
+      font-family: var(--font-ja);
+      background: rgba(255, 255, 255, 0.8);
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .name-input input:focus {
+      border-color: rgba(243, 217, 163, 0.8);
+      box-shadow: 0 0 0 3px rgba(243, 217, 163, 0.25);
+    }
+
+    .name-input .error {
+      width: 100%;
+      color: #8a1f2d;
+      font-size: 13px;
+      margin-top: -4px;
+    }
+
     .gold-button {
       position: relative;
-      border: 1px solid rgba(243,217,163,0.8);
-      background: linear-gradient(135deg, rgba(255,255,255,0.86), rgba(232,225,255,0.8));
+      border: 1px solid rgba(243, 217, 163, 0.8);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(232, 225, 255, 0.8));
       color: #725c1b;
-      border-radius: 14px; padding: 12px 20px;
-      font-size: 15px; letter-spacing: 0.06em;
-      cursor: pointer; box-shadow: var(--shadow-soft);
+      border-radius: 14px;
+      padding: 11px 18px;
+      font-size: 15px;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
       overflow: hidden;
-      transition: transform 180ms ease, box-shadow 180ms ease;
+      transition: transform 160ms ease, box-shadow 160ms ease;
       font-family: var(--font-ja);
+    }
+
+    .gold-button:focus-visible {
+      outline: 2px solid rgba(243, 217, 163, 0.8);
+      outline-offset: 2px;
+    }
+
+    .gold-button:hover, .gold-button:active {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(111, 92, 24, 0.25);
+    }
+
+    .gold-button::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.45), transparent 50%);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 220ms ease, transform 220ms ease;
+      pointer-events: none;
       z-index: 1;
     }
-    .gold-button:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(111,92,24,0.3); }
 
-    /* 光柱演出（超派手） */
+    .gold-button:hover::after, .gold-button:active::after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .button-column-glow {
-      position: absolute; left: 50%; bottom: -50%;
-      transform: translateX(-50%);
-      width: 180%; height: 260%;
-      background:
-        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.98) 0%, rgba(243,217,163,0.75) 25%, transparent 65%),
-        linear-gradient(180deg, transparent 30%, rgba(255,255,255,0.7) 60%, transparent);
-      opacity: 0; pointer-events: none;
-      mix-blend-mode: screen; filter: blur(3px);
-      z-index: 3;
-      animation: riseColumn 1000ms ease-out forwards;
-    }
-    @keyframes riseColumn {
-      0%   { opacity: 0; transform: translateX(-50%) translateY(40px); }
-      30%  { opacity: 1; }
-      100% { opacity: 0; transform: translateX(-50%) translateY(-70px); }
+  position: absolute;
+  left: 50%;
+  bottom: -30%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 180%;
+  background:
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.95), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.9), rgba(255,255,255,0));
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(1.5px);
+  z-index: 2; /* ★ボタンのテキストより上に */
+  animation: riseColumn 700ms ease-out forwards;
+}
+
+@keyframes riseColumn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-36px);
+  }
+}
+    .gold-button {
+  position: relative;
+  border: 1px solid rgba(243, 217, 163, 0.8);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(232, 225, 255, 0.8));
+  color: #725c1b;
+  border-radius: 14px;
+  padding: 11px 18px;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  overflow: visible; /* ★ここを hidden → visible に */
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  font-family: var(--font-ja);
+}
+    .particle-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    /* パーティクル演出 */
-    .particle-layer {
-      position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2;
-    }
     .particle-layer span {
-      position: absolute; width: 8px; height: 8px;
-      background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(243,217,163,0.8) 50%, transparent 80%);
-      border-radius: 50%; opacity: 0;
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, rgba(255,255,255,0.9) 0, rgba(243, 217, 163, 0.7) 40%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0;
       animation: sparkle 1200ms ease-out forwards;
     }
+
     @keyframes sparkle {
-      0%   { transform: translateY(20px) scale(0.3); opacity: 0; }
-      40%  { opacity: 1; }
-      100% { transform: translateY(-40px) scale(1.3); opacity: 0; }
+      0% { transform: translateY(12px) scale(0.6); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(-16px) scale(1); opacity: 0; }
     }
 
+    /* メニュー */
     .menu {
-      position: absolute; left: 50%; bottom: 3vh;
+      position: absolute;
+      left: 50%;
+      bottom: 3vh;  /* 画面の一番下寄り */
       transform: translateX(-50%);
-      display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-      width: min(960px, 94vw); z-index: 5;
-      opacity: 0; transition: opacity 600ms ease;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: min(960px, 94vw);
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 600ms ease;
     }
-    .menu.is-visible { opacity: 1; }
 
+    .menu.is-visible {
+      opacity: 1;
+    }
+
+    /* サウンドボタン */
     .sound-toggle {
-      position: fixed; top: 14px; right: 14px;
-      width: 46px; height: 46px; border-radius: 50%;
-      background: rgba(255,255,255,0.6); border: 1px solid rgba(243,217,163,0.7);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-      display: grid; place-items: center; cursor: pointer; z-index: 20;
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(243, 217, 163, 0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      z-index: 20;
+      transition: transform 140ms ease, box-shadow 140ms ease;
     }
-    .sound-toggle span { font-size: 19px; color: #5b4a1c; }
 
-    .overlay-dim {
-      position: fixed; inset: 0; background: rgba(6,7,16,0.75);
-      z-index: 18; opacity: 0; pointer-events: none;
-      transition: opacity 300ms ease;
-      display: grid; place-items: center; color: #fdfbff;
-      font-size: 17px; text-align: center; padding: 20px;
+    .sound-toggle:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+    .sound-toggle:active { transform: translateY(0); }
+
+    .sound-toggle span {
+      font-size: 18px;
+      color: #5b4a1c;
+      text-shadow: 0 0 6px rgba(243, 217, 163, 0.7);
+      user-select: none;
     }
+
+    /* 画面暗転用 */
+    .overlay-dim {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 7, 16, 0.65);
+      z-index: 18;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms ease;
+      display: grid;
+      place-items: center;
+      color: #fdfbff;
+      text-align: center;
+      padding: 20px;
+      font-size: 16px;
+    }
+
     .overlay-dim.show { opacity: 1; pointer-events: auto; }
 
+    /* スマホ調整 */
     @media (max-width: 720px) {
-      .dialogue-window { bottom: 16vh; }
-      .gold-button { width: calc(50% - 10px); }
+      .dialogue-window { bottom: 16vh; border-radius: 14px; }
+      .menu { bottom: 3vh; gap: 10px; }
+      .gold-button { width: calc(50% - 8px); justify-content: center; text-align: center; }
+      .name-input { flex-direction: column; align-items: stretch; }
+      .name-input input { width: 100%; }
     }
+
+    @media (max-width: 480px) {
+      .lumiere-full { bottom: 4vh; }
+      .lumiere-bust { bottom: 9vh; }
+      .dialogue-window { padding: 12px 14px 18px; }
+    }
+
     @media (max-height: 700px) {
-      .lumiere-bust { bottom: 11vh; }
       .dialogue-window { bottom: 18vh; }
+      .lumiere-bust { bottom: 11vh; }
+      .menu { bottom: 2.4vh; }
+    }
+
+    @keyframes gentleFloat {
+      0% { transform: translateX(-50%) translateY(2px); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+      100% { transform: translateX(-50%) translateY(2px); }
+    }
+
+    @keyframes riseColumn {
+      0% { opacity: 0; transform: translateX(-50%) translateY(16px); }
+      30% { opacity: 0.9; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
     }
   </style>
 </head>
 <body>
   <div class="star-field" aria-hidden="true"></div>
-
   <main>
-    <section class="scene scene-foyer is-active">
+    <section class="scene scene-foyer is-active" aria-label="静かな前室">
       <div class="welcome-text" id="welcomeText">
         <div>……ようこそ。</div>
         <div>ここは、リュミエールの間——星の記憶が静かに灯る場所。</div>
       </div>
     </section>
 
-    <section class="scene scene-hall">
+    <section class="scene scene-hall" aria-label="リュミエールの間">
       <div class="hall-overlay"></div>
-
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
-      <!-- バストアップ（常に表示させる） -->
-      <div class="lumiere-bust is-visible" id="bustContainer">
+      <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
         <div class="frame">
           <img src="img/open1.png" alt="リュミエール" id="bustOpen">
-          <img src="img/open2.png" alt="閉眼" id="bustClosed" style="opacity:0;">
+          <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
         </div>
       </div>
 
-      <div class="dialogue-window" id="dialogueWindow">
+      <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
         <div class="dialogue-name">Lumiere</div>
         <div class="dialogue-text" id="dialogueText"></div>
-        <div class="dialogue-next" id="dialogueNext">Next</div>
-
+        <div class="dialogue-next" id="dialogueNext">▶</div>
         <div class="name-input" id="nameInput" style="display:none;">
           <label for="visitorName">あなたの名前</label>
-          <input id="visitorName" type="text" maxlength="20">
-          <button class="gold-button" id="nameSubmit">この名前で呼んで</button>
-          <div class="error" id="nameError"></div>
+          <input id="visitorName" name="visitorName" type="text" maxlength="20" aria-label="お名前入力欄">
+          <button class="gold-button" id="nameSubmit" aria-label="この名前で呼んで">この名前で呼んで</button>
+          <div class="error" id="nameError" aria-live="assertive"></div>
         </div>
       </div>
 
       <div class="menu" id="menu">
-        <button class="gold-button" data-action="pray">
+        <button class="gold-button" data-action="pray" aria-label="セレフィアスに祈りを捧げる">
           セレフィアスに祈りを捧げる
           <div class="particle-layer"></div>
         </button>
-        <button class="gold-button" data-action="village" style="display:none;">
+        <button class="gold-button" data-action="village" aria-label="始まりの町に行く" style="display:none;">
           始まりの町に行く
           <div class="particle-layer"></div>
         </button>
-        <button class="gold-button" data-action="talk">
+        <button class="gold-button" data-action="talk" aria-label="リュミエールと話す">
           リュミエールと話す
           <div class="particle-layer"></div>
         </button>
@@ -318,239 +566,464 @@
     </section>
   </main>
 
-  <button class="sound-toggle" id="soundToggle" aria-label="BGM切替"><span>♪</span></button>
+  <button class="sound-toggle" id="soundToggle" aria-label="BGM 切り替え"><span>♪</span></button>
   <div class="overlay-dim" id="dimOverlay"></div>
   <audio id="bgm" src="audio/lumiere-theme.mp3" loop preload="auto"></audio>
 
   <script>
     (() => {
-      // DOM
-      const starField      = document.querySelector('.star-field');
-      const sceneFoyer     = document.querySelector('.scene-foyer');
-      const sceneHall      = document.querySelector('.scene-hall');
-      const welcomeText    = document.getElementById('welcomeText');
-      const fullFigure     = document.getElementById('fullFigure');
-      const bustContainer  = document.getElementById('bustContainer');
-      const bustOpen       = document.getElementById('bustOpen');
-      const bustClosed     = document.getElementById('bustClosed');
+      const starField = document.querySelector('.star-field');
+      const sceneFoyer = document.querySelector('.scene-foyer');
+      const sceneHall = document.querySelector('.scene-hall');
+      const welcomeText = document.getElementById('welcomeText');
+      const fullFigure = document.getElementById('fullFigure');
+      const bustContainer = document.getElementById('bustContainer');
+      const bustOpen = document.getElementById('bustOpen');
+      const bustClosed = document.getElementById('bustClosed');
       const dialogueWindow = document.getElementById('dialogueWindow');
-      const dialogueText   = document.getElementById('dialogueText');
-      const dialogueNext   = document.getElementById('dialogueNext');
-      const nameInput      = document.getElementById('nameInput');
-      const nameField      = document.getElementById('visitorName');
-      const nameSubmit     = document.getElementById('nameSubmit');
-      const nameError      = document.getElementById('nameError');
-      const menu           = document.getElementById('menu');
-      const soundToggle    = document.getElementById('soundToggle');
-      const bgm            = document.getElementById('bgm');
-      const dimOverlay     = document.getElementById('dimOverlay');
+      const dialogueText = document.getElementById('dialogueText');
+      const dialogueNext = document.getElementById('dialogueNext');
+      const nameInput = document.getElementById('nameInput');
+      const nameError = document.getElementById('nameError');
+      const nameField = document.getElementById('visitorName');
+      const nameSubmit = document.getElementById('nameSubmit');
+      const menu = document.getElementById('menu');
+      const menuButtons = menu.querySelectorAll('button');
+      const soundToggle = document.getElementById('soundToggle');
+      const bgm = document.getElementById('bgm');
+      const dimOverlay = document.getElementById('dimOverlay');
 
       const STORAGE_NAME = 'lumiereVisitorName';
       const STORAGE_MUTE = 'lumiereBgmMuted';
+      const blinkMin = 3000;
+      const blinkMax = 7000;
+
+      const fallbackLines = {
+        'first-visit': ['……聞こえていますか？', 'あなたの足音が、この星の間まで届いたの。', '静かな光が揺れて……あなたを迎えているみたい。'],
+        'ask-name': ['ねぇ……あなたのお名前を、わたしに教えてくれる？', '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'],
+        'after-name': ['……{name}様。', 'うん……とても、きれいな音。', 'これからは、その名前で呼ばせてくださいね。'],
+        revisit: ['おかえりなさい、{name}様。', 'またひとつ、静かな光が灯りました。'],
+        conversation: ['最近ね……星たちが少しざわめいているの。', 'でも、大丈夫。あなたが来てくれると、', 'この間は……なんだか落ち着くの。', '疲れたら、いつでもここで休んでくださいね。']
+      };
+
+      let currentLines = [];
+      let lineIndex = 0;
+      let typingTimer = null;
+      let isTyping = false;
       let cachedName = localStorage.getItem(STORAGE_NAME) || '';
+      let isConversation = false;
       let blinkTimer = null;
+      let currentExpression = 'neutral';
+
+      const getDisplayName = () => {
+        if (!cachedName) return '';
+        return /様$/.test(cachedName) ? cachedName : `${cachedName}様`;
+      };
+
+      // TXT パース
+      const parseLumiereTxt = (txt) => {
+        const lines = {};
+        let current = null;
+
+        txt.split('\n').forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return;
+
+          if (trimmed.startsWith('# ')) {
+            current = trimmed.replace('# ', '').trim();
+            lines[current] = [];
+          } else if (current) {
+            lines[current].push(trimmed);
+          }
+        });
+
+        return lines;
+      };
+
+      let externalLines = {};
+
+      const loadExternalLines = async () => {
+        try {
+          const res = await fetch('data/lumiere-lines.txt');
+          const txt = await res.text();
+          externalLines = parseLumiereTxt(txt);
+        } catch (e) {
+          console.warn('TXT 読み込み失敗。内部デフォルトを使用します。', e);
+        }
+      };
+
+      const getLines = (category) => {
+        if (externalLines[category] && externalLines[category].length > 0) {
+          return externalLines[category];
+        }
+        return fallbackLines[category] || [];
+      };
+
+      // 星粒生成
+      const createStars = () => {
+        const total = 40;
+        for (let i = 0; i < total; i++) {
+          const s = document.createElement('span');
+          const size = Math.random() * 3 + 1;
+          s.style.width = `${size}px`;
+          s.style.height = `${size}px`;
+          s.style.left = `${Math.random() * 100}%`;
+          s.style.top = `${Math.random() * 100}%`;
+          s.style.animationDuration = `${14 + Math.random() * 10}s`;
+          s.style.animationDelay = `${Math.random() * 12}s`;
+          starField.appendChild(s);
+        }
+      };
+
+      // 粒子演出
+      const spawnParticles = (btn) => {
+        const layer = btn.querySelector('.particle-layer');
+        if (!layer) return;
+        layer.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+          const p = document.createElement('span');
+          p.style.left = `${20 + Math.random() * 60}%`;
+          p.style.top = `${60 + Math.random() * 30}%`;
+          p.style.animationDelay = `${i * 60}ms`;
+          layer.appendChild(p);
+        }
+      };
+
+      const spawnColumnLight = (btn) => {
+        const glow = document.createElement('div');
+        glow.className = 'button-column-glow';
+        btn.appendChild(glow);
+        glow.addEventListener('animationend', () => glow.remove());
+      };
+
+      const resetDialogueHandlers = () => {
+        dialogueWindow.onclick = null;
+        dialogueNext.onclick = null;
+      };
+
+      const setSpeaking = (state) => {
+        bustContainer.classList.toggle('speaking', !!state);
+      };
+
+      const hideDialogueWindow = () => {
+        dialogueWindow.classList.remove('is-visible');
+        resetDialogueHandlers();
+        clearInterval(typingTimer);
+        isTyping = false;
+        dialogueNext.style.opacity = 0;
+        setSpeaking(false);
+      };
+
+      // タイプライター
+      const showLine = (line, onComplete) => {
+        clearInterval(typingTimer);
+        dialogueNext.style.opacity = 0;
+        const chars = line.split('');
+        let idx = 0;
+        dialogueText.textContent = '';
+        isTyping = true;
+        typingTimer = setInterval(() => {
+          dialogueText.textContent += chars[idx];
+          idx++;
+          if (idx >= chars.length) {
+            clearInterval(typingTimer);
+            isTyping = false;
+            dialogueNext.style.opacity = 1;
+            if (onComplete) onComplete();
+          }
+        }, 35);
+      };
+
+      const showAll = (line) => {
+        clearInterval(typingTimer);
+        isTyping = false;
+        dialogueText.textContent = line;
+        dialogueNext.style.opacity = 1;
+      };
+
+      const playLines = (list, callback, { keepVisible = false } = {}) => {
+        currentLines = Array.isArray(list) ? list.slice() : [];
+        lineIndex = 0;
+
+        if (!currentLines.length) {
+          if (!keepVisible) hideDialogueWindow();
+          if (callback) callback();
+          return;
+        }
+
+        dialogueWindow.classList.add('is-visible');
+        setSpeaking(true);
+
+        const next = () => {
+          if (lineIndex >= currentLines.length) {
+            resetDialogueHandlers();
+            setSpeaking(false);
+            if (!keepVisible) hideDialogueWindow();
+            if (callback) callback();
+            return;
+          }
+          const line = currentLines[lineIndex];
+          showLine(line, () => {});
+        };
+
+        const advance = () => {
+          if (isTyping) {
+            showAll(currentLines[lineIndex]);
+            return;
+          }
+          lineIndex++;
+          next();
+        };
+
+        resetDialogueHandlers();
+        dialogueWindow.onclick = advance;
+        dialogueNext.onclick = advance;
+        next();
+      };
+
+      // 名前差し込み
+      const injectName = (arr) => {
+  const name = cachedName || '';
+  return arr.map(l => l.replace('{name}', name));
+};
+
+      // BGM
+      const setMute = (muted) => {
+        bgm.muted = muted;
+        soundToggle.querySelector('span').textContent = muted ? '♪×' : '♪';
+        localStorage.setItem(STORAGE_MUTE, muted ? '1' : '0');
+      };
+
+      const ensureBgm = () => {
+        if (bgm.dataset.started) return;
+        bgm.dataset.started = '1';
+        bgm.volume = 0.6;
+        if (!bgm.muted) {
+          bgm.play().catch(() => {});
+        }
+      };
 
       // 瞬き
-      const startBlink = () => {
+      const scheduleBlink = () => {
         clearTimeout(blinkTimer);
-        const delay = 3000 + Math.random() * 4000;
+        const delay = blinkMin + Math.random() * (blinkMax - blinkMin);
         blinkTimer = setTimeout(() => {
           bustClosed.style.opacity = 1;
           setTimeout(() => {
             bustClosed.style.opacity = 0;
-            startBlink();
-          }, 150);
+            scheduleBlink();
+          }, 140);
         }, delay);
       };
 
       const showBust = () => {
         bustContainer.classList.add('is-visible');
-        startBlink();
+        scheduleBlink();
       };
 
-      // 星生成
-      const createStars = () => {
-        for (let i = 0; i < 45; i++) {
-          const s = document.createElement('span');
-          const size = Math.random() * 3 + 1;
-          s.style.width = s.style.height = `${size}px`;
-          s.style.left = `${Math.random()*100}%`;
-          s.style.top  = `${Math.random()*100}%`;
-          s.style.animationDelay = `${Math.random()*15}s`;
-          s.style.animationDuration = `${15 + Math.random()*10}s`;
-          starField.appendChild(s);
-        }
+      const hideBust = () => {
+        bustContainer.classList.remove('is-visible');
+        clearTimeout(blinkTimer);
+        bustClosed.style.opacity = 0;
       };
 
-      // 派手なボタン演出
-      const playButtonEffect = (btn) => {
-        // 光柱
-        const glow = document.createElement('div');
-        glow.className = 'button-column-glow';
-        btn.appendChild(glow);
-        glow.addEventListener('animationend', () => glow.remove());
-
-        // パーティクル
-        const layer = btn.querySelector('.particle-layer');
-        layer.innerHTML = '';
-        for (let i = 0; i < 12; i++) {
-          const p = document.createElement('span');
-          p.style.left = `${15 + Math.random()*70}%`;
-          p.style.animationDelay = `${i*50}ms`;
-          layer.appendChild(p);
-        }
-      };
-
-      // タイプライター
-      let typingTimer, isTyping = false;
-      const typeLine = (text, callback) => {
-        dialogueText.textContent = '';
-        dialogueNext.style.opacity = 0;
-        let i = 0;
-        clearInterval(typingTimer);
-        isTyping = true;
-        typingTimer = setInterval(() => {
-          dialogueText.textContent += text[i];
-          i++;
-          if (i >= text.length) {
-            clearInterval(typingTimer);
-            isTyping = false;
-            dialogueNext.style.opacity = 1;
-            callback?.();
-          }
-        }, 35);
-      };
-
-      const playLines = (lines, onEnd, opts = {}) => {
-        let idx = 0;
-        dialogueWindow.classList.add('is-visible');
-
-        const next = () => {
-          if (idx >= lines.length) {
-            if (!opts.keepVisible) dialogueWindow.classList.remove('is-visible');
-            onEnd?.();
-            return;
-          }
-          typeLine(lines[idx], () => {});
-          idx++;
+      const setExpression = (type) => {
+        currentExpression = type;
+        const openMap = {
+          neutral: 'img/open1.png',
+          smile: 'img/smile1.png',
+          sad: 'img/sad1.png'
         };
-
-        dialogueWindow.onclick = dialogueNext.onclick = () => {
-          if (isTyping) {
-            dialogueText.textContent = lines[idx-1];
-            clearInterval(typingTimer);
-            isTyping = false;
-            dialogueNext.style.opacity = 1;
-          } else next();
+        const closedMap = {
+          neutral: 'img/open2.png',
+          smile: 'img/smile2.png',
+          sad: 'img/sad2.png'
         };
-        next();
+        bustOpen.src = openMap[type] || openMap.neutral;
+        bustClosed.src = closedMap[type] || closedMap.neutral;
       };
 
-      // 名前差し込み
-      const injectName = arr => arr.map(l => l.replace('{name}', cachedName || ''));
-
-      // BGM
-      const toggleMute = () => {
-        const muted = bgm.muted = !bgm.muted;
-        soundToggle.querySelector('span').textContent = muted ? 'Muted' : 'Music';
-        localStorage.setItem(STORAGE_MUTE, muted ? '1' : '0');
-        if (!muted) bgm.play().catch(() => {});
+      // 画像プリロード
+      const preloadImages = () => {
+        const files = [
+          'img/open1.png',
+          'img/open2.png',
+          'img/smile1.png',
+          'img/smile2.png',
+          'img/sad1.png',
+          'img/sad2.png'
+        ];
+        files.forEach(src => { const img = new Image(); img.src = src; });
       };
 
-      // 初回・再訪共通：ホールに入ったら必ずバストアップ表示
+      // フォイヤー → ホール
+      const startFoyer = () => {
+        dialogueWindow.classList.remove('is-visible');
+        menu.classList.remove('is-visible');
+        hideBust();
+        setTimeout(() => welcomeText.classList.add('show'), 3000);
+        setTimeout(() => {
+          welcomeText.classList.remove('show');
+          sceneFoyer.classList.remove('is-active');
+          sceneHall.classList.add('is-active');
+          enterHall();
+        }, 6200);
+      };
+
       const enterHall = () => {
         fullFigure.classList.add('show');
-        showBust(); // 必ずバストアップ表示＋瞬き開始
-
         setTimeout(() => {
-          if (cachedName) {
-            fullFigure.classList.remove('show');
-            playLines(injectName(['おかえりなさい、{name}様。','また来てくれて……嬉しいです。']), () => {
-              menu.classList.add('is-visible');
-            });
-          } else {
-            playLines([
-              '……聞こえていますか？',
-              'あなたの足音が、この星の間まで届いたの。',
-              '静かな光が揺れて……あなたを迎えているみたい。',
-            ], () => {
-              playLines([
-                'ねぇ……あなたのお名前を、わたしに教えてくれる？',
-                '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'
-              ], () => {
-                nameInput.style.display = 'flex';
-                nameField.focus();
-              }, {keepVisible: true});
-            });
-          }
-        }, 800);
+          runInitialDialogue();
+        }, 1000);
       };
 
-      nameSubmit.onclick = () => {
-        const name = nameField.value.trim();
-        if (!name) {
-          nameError.textContent = '……お名前を教えてくれる？';
+      // 最初のセリフ
+      const runInitialDialogue = () => {
+       // ★ここを追加：ホールに入ったら必ずバストアップ ON
+  showBust();
+  if (cachedName) {
+          // 再訪問
+          fullFigure.classList.remove('show');
+          showBust();
+
+          playLines(
+            injectName(getLines('revisit')),
+            () => {
+              hideDialogueWindow();
+              isConversation = false;
+              setTimeout(() => {
+                menu.classList.add('is-visible');
+                updateMenuForReturn();
+              }, 350);
+            }
+          );
           return;
         }
-        cachedName = name;
-        localStorage.setItem(STORAGE_NAME, name);
-        nameInput.style.display = 'none';
+
+        // 初回
+        const firstLines = getLines('first-visit');
+        const askLines = getLines('ask-name');
+
+        playLines(firstLines, () => {
+          playLines(askLines, () => {
+            nameInput.style.display = 'flex';
+            nameField.focus();
+            resetDialogueHandlers();
+          }, { keepVisible: true });
+        }, { keepVisible: true });
+      };
+
+      const showNameFixed = () => {
+        const linesToShow = injectName(getLines('after-name'));
         fullFigure.classList.remove('show');
-        playLines(injectName(['……{name}様。','うん……とても、きれいな音。','これからは、その名前で呼ばせてくださいね。']), () => {
-          menu.classList.add('is-visible');
+
+        playLines(linesToShow, () => {
+          hideDialogueWindow();
+
+          setTimeout(() => {
+            showBust();
+            menu.classList.add('is-visible');
+            updateMenuForReturn();
+          }, 700);
         });
       };
 
-      // ボタンクリック
-      menu.querySelectorAll('.gold-button').forEach(btn => {
-        btn.onclick = () => {
-          playButtonEffect(btn);
+      const updateMenuForReturn = () => {
+        const villageBtn = menu.querySelector('[data-action="village"]');
+        villageBtn.style.display = cachedName ? 'inline-flex' : 'none';
+      };
+
+      // 会話モード
+      const startConversation = () => {
+        isConversation = true;
+        menu.classList.remove('is-visible');
+
+        fullFigure.classList.remove('show');       // 全身は隠す
+        showBust(); // アップ強制表示
+        setExpression('smile');
+
+        playLines(injectName(getLines('conversation')), endConversation);
+      };
+
+      const endConversation = () => {
+        isConversation = false;
+        setExpression('neutral');
+        hideDialogueWindow();
+        setTimeout(() => {
+          menu.classList.add('is-visible');
+        }, 350);
+      };
+
+      // イベント
+      nameSubmit.addEventListener('click', () => {
+        const value = nameField.value.trim();
+        if (!value) {
+          nameError.textContent = '……お名前を教えてくれる？';
+          return;
+        }
+        nameError.textContent = '';
+        cachedName = value;
+        localStorage.setItem(STORAGE_NAME, cachedName);
+        nameInput.style.display = 'none';
+        showNameFixed();
+      });
+
+      menuButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          spawnParticles(btn);
+          spawnColumnLight(btn);
+          ensureBgm();
           const action = btn.dataset.action;
           if (action === 'pray') {
             dimOverlay.textContent = '静かに祈りを届けています……';
             dimOverlay.classList.add('show');
-            setTimeout(() => location.href = 'serephias-gate.html', 1200);
+            setTimeout(() => {
+              window.location.href = 'serephias-gate.html'; // TODO: 実際の遷移先に書き換えてください
+            }, 900);
           }
           if (action === 'village') {
             dimOverlay.textContent = '風の音が、始まりの町へと導きます。';
             dimOverlay.classList.add('show');
-            setTimeout(() => location.href = 'village.html', 1200);
+            setTimeout(() => {
+              window.location.href = 'village.html'; // TODO: 実際の遷移先に書き換えてください
+            }, 900);
           }
           if (action === 'talk') {
-            playLines(injectName([
-              '最近ね……星たちが少しざわめいているの。',
-              'でも、あなたが来てくれると……なんだか落ち着くの。',
-              '疲れたら、いつでもここで休んでくださいね。'
-            ]), () => menu.classList.add('is-visible'));
+            dimOverlay.classList.remove('show');
+            if (isConversation) return;
+            startConversation();
           }
-        };
+        });
       });
 
-      soundToggle.onclick = toggleMute;
+      soundToggle.addEventListener('click', () => {
+        const muted = !(localStorage.getItem(STORAGE_MUTE) === '1');
+        setMute(muted);
+        ensureBgm();
+      });
 
-      // 初回はフォイヤー → ホールへ
-      const start = () => {
+      document.body.addEventListener('click', ensureBgm, { once: true });
+
+      // 初期化
+      const startLumiereGate = () => {
         createStars();
+        preloadImages();
+        setMute(localStorage.getItem(STORAGE_MUTE) === '1');
+
         if (cachedName) {
+          // 再訪問はフォイヤーをスキップしてすぐホールへ
           sceneFoyer.classList.remove('is-active');
           sceneHall.classList.add('is-active');
-          enterHall();
+          hideDialogueWindow();
+          runInitialDialogue();
         } else {
-          setTimeout(() => welcomeText.classList.add('show'), 2000);
-          setTimeout(() => {
-            welcomeText.classList.remove('show');
-            sceneFoyer.classList.remove('is-active');
-            sceneHall.classList.add('is-active');
-            enterHall();
-          }, 7000);
+          startFoyer();
         }
       };
 
-      document.addEventListener('DOMContentLoaded', () => {
-        bgm.muted = localStorage.getItem(STORAGE_MUTE) === '1';
-        soundToggle.querySelector('span').textContent = bgm.muted ? 'Muted' : 'Music';
-        start();
-        document.body.onclick = () => bgm.play().catch(() => {}), {once: true};
+      window.addEventListener('DOMContentLoaded', async () => {
+        await loadExternalLines();
+        startLumiereGate();
       });
     })();
   </script>
