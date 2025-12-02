@@ -740,41 +740,51 @@
         }, 1000);
       };
 
-      const runInitialDialogue = () => {
+    const runInitialDialogue = () => {
   if (cachedName) {
     fullFigure.classList.remove('show');
     bustContainer.classList.add('is-visible');
     scheduleBlink();
-    playLines(injectName(lines.menu_return || fallbackLines.menu_return), () => {
-      // ★ここで一度セリフ窓を閉じる
-      dialogueWindow.classList.remove('is-visible');
-      setTimeout(() => {
-        menu.classList.add('is-visible');
-        updateMenuForReturn();
-      }, 350); // フェードアウトに合わせて少し待つ
-    });
+
+    playLines(
+      injectName(lines.menu_return || fallbackLines.menu_return),
+      () => {
+        // ★セリフを読み終えたらいったん窓を閉じる
+        dialogueWindow.classList.remove('is-visible');
+
+        setTimeout(() => {
+          menu.classList.add('is-visible');
+          updateMenuForReturn();
+        }, 350); // フェードに合わせて少し待つ
+      }
+    );
     return;
   }
 
-        const firstLines = lines.sceneB_first || fallbackLines.sceneB_first;
-        const askLines = lines.sceneB_askName || fallbackLines.sceneB_askName;
+  // ↓ここから下は「初回」の流れ（そのままでOK）
+  const firstLines = lines.sceneB_first || fallbackLines.sceneB_first;
+  const askLines = lines.sceneB_askName || fallbackLines.sceneB_askName;
 
-        playLines(firstLines, () => {
-          playLines(askLines, () => {
-            nameInput.style.display = 'flex';
-            nameField.focus();
-            dialogueWindow.onclick = null;
-            dialogueNext.onclick = null;
-          });
-        });
-      };
+  playLines(firstLines, () => {
+    playLines(askLines, () => {
+      nameInput.style.display = 'flex';
+      nameField.focus();
+      dialogueWindow.onclick = null;
+      dialogueNext.onclick = null;
+    });
+  });
+};
 
-      const showNameFixed = () => {
-  const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
+  const showNameFixed = () => {
+  const linesToShow = injectName(
+    lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed
+  );
+
   playLines(linesToShow, () => {
-    // ★セリフ窓を先に閉じる
+    // ★ここでセリフ窓を閉じる
     dialogueWindow.classList.remove('is-visible');
     fullFigure.classList.remove('show');
+
     setTimeout(() => {
       bustContainer.classList.add('is-visible');
       scheduleBlink();
@@ -793,34 +803,36 @@
 const startConversation = () => {
   isConversation = true;
 
-  // メニューは一度消す
+  // メニューは消す
   menu.classList.remove('is-visible');
 
-  // ★ここを追加：会話用の状態に切り替え
-  // 全身は消して、バストアップを必ず表示
-  fullFigure.classList.remove('show');
-  bustContainer.classList.add('is-visible');
+  // 会話は必ずバストアップで行う
+  fullFigure.classList.remove('show');       // 全身は隠す
+  bustContainer.classList.add('is-visible'); // アップを表示
 
-  // セリフウィンドウも再表示（再訪問時や前回会話後など）
+  // セリフ窓を再表示
   dialogueWindow.classList.add('is-visible');
 
-  // 表情は会話用にスマイルへ
+  // 表情を会話用に
   setExpression('smile');
 
-  // 会話用セリフを再生
-  playLines(lines.conversation || fallbackLines.conversation, endConversation);
+  // 会話用のセリフを流す
+  playLines(
+    lines.conversation || fallbackLines.conversation,
+    endConversation
+  );
 };
-
-      const endConversation = () => {
+    const endConversation = () => {
   isConversation = false;
   setExpression('neutral');
-  // ★会話が終わったらウィンドウを閉じてからメニュー復帰
+
+  // 会話が終わったらセリフ窓を閉じる
   dialogueWindow.classList.remove('is-visible');
+
   setTimeout(() => {
     menu.classList.add('is-visible');
   }, 350);
 };
-
       // イベント
       nameSubmit.addEventListener('click', () => {
         const value = nameField.value.trim();
