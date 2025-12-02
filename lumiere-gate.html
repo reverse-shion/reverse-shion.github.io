@@ -346,22 +346,40 @@
     }
 
     .button-column-glow {
-      position: absolute;
-      left: 50%;
-      bottom: -20%;
-      transform: translateX(-50%);
-      width: 120%;
-      height: 140%;
-      background:
-        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.7), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.85), rgba(255,255,255,0.0));
-      opacity: 0;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      filter: blur(2px);
-      animation: riseColumn 700ms ease-out forwards;
-    }
+  position: absolute;
+  left: 50%;
+  bottom: -30%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 180%;
+  background:
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.95), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.9), rgba(255,255,255,0));
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(1.5px);
+  z-index: 2; /* ★ボタンのテキストより上に */
+  animation: riseColumn 700ms ease-out forwards;
+}
 
+@keyframes riseColumn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-36px);
+  }
+}
+    .gold-button {
+  position: relative;
+  z-index: 1;
+}
     .particle-layer {
       position: absolute;
       inset: 0;
@@ -754,9 +772,9 @@
 
       // 名前差し込み
       const injectName = (arr) => {
-        const display = getDisplayName();
-        return arr.map(l => l.replace('{name}', display));
-      };
+  const name = cachedName || '';
+  return arr.map(l => l.replace('{name}', name));
+};
 
       // BGM
       const setMute = (muted) => {
@@ -850,7 +868,9 @@
 
       // 最初のセリフ
       const runInitialDialogue = () => {
-        if (cachedName) {
+       // ★ここを追加：ホールに入ったら必ずバストアップ ON
+  showBust();
+  if (cachedName) {
           // 再訪問
           fullFigure.classList.remove('show');
           showBust();
