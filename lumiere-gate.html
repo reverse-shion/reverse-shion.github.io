@@ -183,8 +183,6 @@
       z-index: 4; /* セリフより奥 */
       animation: gentleFloat 6s ease-in-out infinite;
       filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
-      /* ★必須！口パクの基準点になる */
-  position: relative;
     }
 
     .lumiere-bust.is-visible {
@@ -414,7 +412,7 @@
 .lumiere-mouth-glow {
   position: absolute;
   left: 50%;
-  bottom: 26%;  /* リュミエールの口の高さに合わせて微調整してね */
+  bottom: 18%;  /* リュミエールの口の高さに合わせて微調整してね */
   transform: translateX(-50%);
   width: 22%;
   height: 24px;
@@ -556,18 +554,13 @@
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
       <!-- バストアップ（会話用） -->
-      <div class="lumiere-bust is-visible" id="bustContainer">
-
+      <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
   <div class="frame">
-
-    <img src="img/open1.png" id="bustOpen">
-    <img src="img/open2.png" id="bustClosed" style="opacity:0;">
-
-    <!-- ★口の光は frame の中に移動する -->
-    <div class="lumiere-mouth-glow"></div>
-
+    <img src="img/open1.png" alt="リュミエール" id="bustOpen">
+    <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
   </div>
-
+  <!-- ★ここを追加：口元の光 -->
+  <div class="lumiere-mouth-glow"></div>
 </div>
 
       <!-- セリフ -->
@@ -768,33 +761,24 @@
       };
 
       const showLine = (line, onComplete) => {
-  clearInterval(typingTimer);
-  dialogueNext.style.opacity = 0;
+        clearInterval(typingTimer);
+        dialogueNext.style.opacity = 0;
+        const chars = line.split('');
+        let idx = 0;
+        dialogueText.textContent = '';
+        isTyping = true;
+        typingTimer = setInterval(() => {
+          dialogueText.textContent += chars[idx];
+          idx++;
+          if (idx >= chars.length) {
+            clearInterval(typingTimer);
+            isTyping = false;
+            dialogueNext.style.opacity = 1;
+            if (onComplete) onComplete();
+          }
+        }, 35);
+      };
 
-  const chars = line.split('');
-  let idx = 0;
-  dialogueText.textContent = '';
-  isTyping = true;
-
-  // ★ 喋り始めた瞬間に speaking = true
-  setSpeaking(true);
-
-  typingTimer = setInterval(() => {
-    dialogueText.textContent += chars[idx];
-    idx++;
-
-    if (idx >= chars.length) {
-      clearInterval(typingTimer);
-      isTyping = false;
-      dialogueNext.style.opacity = 1;
-
-      // ★ 喋り終わった瞬間に speaking = false
-      setSpeaking(false);
-
-      if (onComplete) onComplete();
-    }
-  }, 35);
-};
       const showAll = (line) => {
         clearInterval(typingTimer);
         isTyping = false;
@@ -1072,7 +1056,13 @@
 
       document.body.addEventListener('click', ensureBgm, { once: true });
 
+function startSpeaking() {
+  document.getElementById('bustContainer').classList.add('speaking');
+}
 
+function stopSpeaking() {
+  document.getElementById('bustContainer').classList.remove('speaking');
+}
       
       /* --------------- 初期化 --------------- */
       const startLumiereGate = () => {
