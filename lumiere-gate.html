@@ -1022,10 +1022,18 @@
       };
 
       window.addEventListener('DOMContentLoaded', async () => {
-        await loadExternalLines();
-        startLumiereGate();
-      });
-    })();
+  await loadExternalLines();
+  startLumiereGate();
+
+  // ★デバッグ用：2秒後にバストアップ強制表示
+  setTimeout(() => {
+    const bust = document.getElementById('bustContainer');
+    const openImg = document.getElementById('bustOpen');
+    console.log('DEBUG bustContainer:', bust);
+    console.log('DEBUG bustOpen src:', openImg.src, 'size=', openImg.naturalWidth, openImg.naturalHeight);
+    bust.classList.add('is-visible');
+  }, 2000);
+});
   </script>
 </body>
 </html>
