@@ -193,7 +193,7 @@
     /* バストアップ */
     .lumiere-bust {
       position: absolute;
-      bottom: 10vh;
+      bottom: 25%;
       left: 50%;
       transform: translateX(-50%);
       max-width: min(58vh, 78vw);
@@ -233,7 +233,7 @@
   left: 50% !important;
   bottom: 25% !important; /* ← 顔の黄金位置 */
   transform: translateX(-50%) !important;
-  z-index: 8 !important;
+  
   opacity: 1 !important;
   display: block !important;
   width: auto !important;
@@ -904,27 +904,40 @@
 
       // 最初のセリフ
       const runInitialDialogue = () => {
-       // ★ここを追加：ホールに入ったら必ずバストアップ ON
-  showBust();
   if (cachedName) {
-          // 再訪問
-          fullFigure.classList.remove('show');
-          showBust();
+    // ★再訪問：最初からバストアップ＆再会メッセージ
+    fullFigure.classList.remove('show');
+    showBust();
 
-          playLines(
-            injectName(getLines('revisit')),
-            () => {
-              hideDialogueWindow();
-              isConversation = false;
-              setTimeout(() => {
-                menu.classList.add('is-visible');
-                updateMenuForReturn();
-              }, 350);
-            }
-          );
-          return;
-        }
+    playLines(
+      injectName(getLines('revisit')),
+      () => {
+        hideDialogueWindow();
+        isConversation = false;
+        setTimeout(() => {
+          menu.classList.add('is-visible');
+          updateMenuForReturn();
+        }, 350);
+      }
+    );
+    return;
+  }
 
+  // ★初回：全身だけ表示。バストアップは隠しておく
+  hideBust();
+
+  const firstLines = getLines('first-visit');
+  const askLines = getLines('ask-name');
+
+  playLines(firstLines, () => {
+    playLines(askLines, () => {
+      nameInput.style.display = 'flex';
+      nameField.focus();
+      resetDialogueHandlers();
+    }, { keepVisible: true });
+  }, { keepVisible: true });
+};
+      
         // 初回
         const firstLines = getLines('first-visit');
         const askLines = getLines('ask-name');
