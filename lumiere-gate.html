@@ -174,17 +174,23 @@
     /* バストアップ */
     .lumiere-bust {
       position: absolute;
-      bottom: 12vh;
+      bottom: 10vh;
       left: 50%;
       transform: translateX(-50%);
       max-width: min(58vh, 78vw);
       opacity: 0;
       transition: opacity 800ms ease;
       z-index: 5;
+      animation: gentleFloat 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
     }
 
     .lumiere-bust.is-visible {
       opacity: 1;
+    }
+
+    .lumiere-bust.speaking {
+      filter: drop-shadow(0 0 16px rgba(255,255,255,0.8));
     }
 
     .lumiere-bust img {
@@ -339,6 +345,23 @@
       transform: translateY(0);
     }
 
+    .button-column-glow {
+      position: absolute;
+      left: 50%;
+      bottom: -20%;
+      transform: translateX(-50%);
+      width: 120%;
+      height: 140%;
+      background:
+        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.7), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.85), rgba(255,255,255,0.0));
+      opacity: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      filter: blur(2px);
+      animation: riseColumn 700ms ease-out forwards;
+    }
+
     .particle-layer {
       position: absolute;
       inset: 0;
@@ -367,7 +390,7 @@
     .menu {
       position: absolute;
       left: 50%;
-      bottom: 4vh;  /* 画面の一番下寄り */
+      bottom: 3vh;  /* 画面の一番下寄り */
       transform: translateX(-50%);
       display: flex;
       gap: 12px;
@@ -448,6 +471,19 @@
     @media (max-height: 700px) {
       .dialogue-window { bottom: 18vh; }
       .lumiere-bust { bottom: 11vh; }
+      .menu { bottom: 2.4vh; }
+    }
+
+    @keyframes gentleFloat {
+      0% { transform: translateX(-50%) translateY(2px); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+      100% { transform: translateX(-50%) translateY(2px); }
+    }
+
+    @keyframes riseColumn {
+      0% { opacity: 0; transform: translateX(-50%) translateY(16px); }
+      30% { opacity: 0.9; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
     }
   </style>
 </head>
@@ -467,8 +503,8 @@
 
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
         <div class="frame">
-          <img src="img/lumiere-neutral-open.png" alt="リュミエール" id="bustOpen">
-          <img src="img/lumiere-neutral-closed.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
+          <img src="img/open1.png" alt="リュミエール" id="bustOpen">
+          <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
         </div>
       </div>
 
@@ -534,15 +570,13 @@
       const blinkMax = 7000;
 
       const fallbackLines = {
-        sceneA_welcome: ['……ようこそ。', 'ここは、リュミエールの間——', '星の記憶が静かに灯る場所。'],
-        sceneB_first: ['……聞こえる？', '星のささやきが、あなたをここまで連れてきたみたい。'],
-        sceneB_askName: ['ねえ、あなたのお名前を、教えてくれる？'],
-        sceneB_nameFixed: ['……{name}。', 'うん、とてもやさしい響き。', 'これからは、その名前で呼ぶね。'],
-        menu_return: ['おかえりなさい、{name}。', '静かな光がまた一つ灯りました。'],
-        conversation: ['最近、星たちが少しざわめいているの。', 'でも、大丈夫。あなたがそばにいてくれるから。', '疲れたら、いつでもここで休んでね。']
+        'first-visit': ['……聞こえていますか？', 'あなたの足音が、この星の間まで届いたの。', '静かな光が揺れて……あなたを迎えているみたい。'],
+        'ask-name': ['ねぇ……あなたのお名前を、わたしに教えてくれる？', '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'],
+        'after-name': ['……{name}様。', 'うん……とても、きれいな音。', 'これからは、その名前で呼ばせてくださいね。'],
+        revisit: ['おかえりなさい、{name}様。', 'またひとつ、静かな光が灯りました。'],
+        conversation: ['最近ね……星たちが少しざわめいているの。', 'でも、大丈夫。あなたが来てくれると、', 'この間は……なんだか落ち着くの。', '疲れたら、いつでもここで休んでくださいね。']
       };
 
-      let lines = { ...fallbackLines };
       let currentLines = [];
       let lineIndex = 0;
       let typingTimer = null;
@@ -555,6 +589,45 @@
       const getDisplayName = () => {
         if (!cachedName) return '';
         return /様$/.test(cachedName) ? cachedName : `${cachedName}様`;
+      };
+
+      // TXT パース
+      const parseLumiereTxt = (txt) => {
+        const lines = {};
+        let current = null;
+
+        txt.split('\n').forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return;
+
+          if (trimmed.startsWith('# ')) {
+            current = trimmed.replace('# ', '').trim();
+            lines[current] = [];
+          } else if (current) {
+            lines[current].push(trimmed);
+          }
+        });
+
+        return lines;
+      };
+
+      let externalLines = {};
+
+      const loadExternalLines = async () => {
+        try {
+          const res = await fetch('data/lumiere-lines.txt');
+          const txt = await res.text();
+          externalLines = parseLumiereTxt(txt);
+        } catch (e) {
+          console.warn('TXT 読み込み失敗。内部デフォルトを使用します。', e);
+        }
+      };
+
+      const getLines = (category) => {
+        if (externalLines[category] && externalLines[category].length > 0) {
+          return externalLines[category];
+        }
+        return fallbackLines[category] || [];
       };
 
       // 星粒生成
@@ -587,34 +660,29 @@
         }
       };
 
-      // セリフパース
-      const parseLines = (text) => {
-        const blocks = text.split(/\n\s*---\s*\n/);
-        const result = {};
-        blocks.forEach(block => {
-          const rows = block.trim().split(/\n/).filter(l => l.length > 0 || /^\s*$/.test(l));
-          if (!rows.length) return;
-          const idMatch = rows[0].match(/^\[(.+)\]$/);
-          if (!idMatch) return;
-          const id = idMatch[1].trim();
-          const content = rows.slice(1).map(r => r.replace(/^\s+/, ''));
-          if (content.length) {
-            result[id] = content;
-          }
-        });
-        return result;
+      const spawnColumnLight = (btn) => {
+        const glow = document.createElement('div');
+        glow.className = 'button-column-glow';
+        btn.appendChild(glow);
+        glow.addEventListener('animationend', () => glow.remove());
       };
 
-      const loadLines = async () => {
-        try {
-          const res = await fetch('data/lumiere-lines.txt');
-          if (!res.ok) throw new Error('failed');
-          const text = await res.text();
-          const parsed = parseLines(text);
-          lines = { ...fallbackLines, ...parsed };
-        } catch (e) {
-          lines = { ...fallbackLines };
-        }
+      const resetDialogueHandlers = () => {
+        dialogueWindow.onclick = null;
+        dialogueNext.onclick = null;
+      };
+
+      const setSpeaking = (state) => {
+        bustContainer.classList.toggle('speaking', !!state);
+      };
+
+      const hideDialogueWindow = () => {
+        dialogueWindow.classList.remove('is-visible');
+        resetDialogueHandlers();
+        clearInterval(typingTimer);
+        isTyping = false;
+        dialogueNext.style.opacity = 0;
+        setSpeaking(false);
       };
 
       // タイプライター
@@ -644,12 +712,24 @@
         dialogueNext.style.opacity = 1;
       };
 
-      const playLines = (list, callback) => {
-        currentLines = list.slice();
+      const playLines = (list, callback, { keepVisible = false } = {}) => {
+        currentLines = Array.isArray(list) ? list.slice() : [];
         lineIndex = 0;
+
+        if (!currentLines.length) {
+          if (!keepVisible) hideDialogueWindow();
+          if (callback) callback();
+          return;
+        }
+
+        dialogueWindow.classList.add('is-visible');
+        setSpeaking(true);
 
         const next = () => {
           if (lineIndex >= currentLines.length) {
+            resetDialogueHandlers();
+            setSpeaking(false);
+            if (!keepVisible) hideDialogueWindow();
             if (callback) callback();
             return;
           }
@@ -666,6 +746,7 @@
           next();
         };
 
+        resetDialogueHandlers();
         dialogueWindow.onclick = advance;
         dialogueNext.onclick = advance;
         next();
@@ -706,17 +787,28 @@
         }, delay);
       };
 
+      const showBust = () => {
+        bustContainer.classList.add('is-visible');
+        scheduleBlink();
+      };
+
+      const hideBust = () => {
+        bustContainer.classList.remove('is-visible');
+        clearTimeout(blinkTimer);
+        bustClosed.style.opacity = 0;
+      };
+
       const setExpression = (type) => {
         currentExpression = type;
         const openMap = {
-          neutral: 'img/lumiere-neutral-open.png',
-          smile: 'img/lumiere-smile-open.png',
-          sad: 'img/lumiere-sad-open.png'
+          neutral: 'img/open1.png',
+          smile: 'img/smile1.png',
+          sad: 'img/sad1.png'
         };
         const closedMap = {
-          neutral: 'img/lumiere-neutral-closed.png',
-          smile: 'img/lumiere-smile-closed.png',
-          sad: 'img/lumiere-sad-closed.png'
+          neutral: 'img/open2.png',
+          smile: 'img/smile2.png',
+          sad: 'img/sad2.png'
         };
         bustOpen.src = openMap[type] || openMap.neutral;
         bustClosed.src = closedMap[type] || closedMap.neutral;
@@ -725,12 +817,12 @@
       // 画像プリロード
       const preloadImages = () => {
         const files = [
-          'img/lumiere-neutral-open.png',
-          'img/lumiere-neutral-closed.png',
-          'img/lumiere-smile-open.png',
-          'img/lumiere-smile-closed.png',
-          'img/lumiere-sad-open.png',
-          'img/ lumiere-sad-closed.png'
+          'img/open1.png',
+          'img/open2.png',
+          'img/smile1.png',
+          'img/smile2.png',
+          'img/sad1.png',
+          'img/sad2.png'
         ];
         files.forEach(src => { const img = new Image(); img.src = src; });
       };
@@ -739,6 +831,7 @@
       const startFoyer = () => {
         dialogueWindow.classList.remove('is-visible');
         menu.classList.remove('is-visible');
+        hideBust();
         setTimeout(() => welcomeText.classList.add('show'), 3000);
         setTimeout(() => {
           welcomeText.classList.remove('show');
@@ -751,7 +844,6 @@
       const enterHall = () => {
         fullFigure.classList.add('show');
         setTimeout(() => {
-          dialogueWindow.classList.add('is-visible');
           runInitialDialogue();
         }, 1000);
       };
@@ -761,13 +853,13 @@
         if (cachedName) {
           // 再訪問
           fullFigure.classList.remove('show');
-          bustContainer.classList.add('is-visible');
-          scheduleBlink();
+          showBust();
 
           playLines(
-            injectName(lines.menu_return || fallbackLines.menu_return),
+            injectName(getLines('revisit')),
             () => {
-              dialogueWindow.classList.remove('is-visible');
+              hideDialogueWindow();
+              isConversation = false;
               setTimeout(() => {
                 menu.classList.add('is-visible');
                 updateMenuForReturn();
@@ -778,29 +870,27 @@
         }
 
         // 初回
-        const firstLines = lines.sceneB_first || fallbackLines.sceneB_first;
-        const askLines = lines.sceneB_askName || fallbackLines.sceneB_askName;
+        const firstLines = getLines('first-visit');
+        const askLines = getLines('ask-name');
 
         playLines(firstLines, () => {
           playLines(askLines, () => {
             nameInput.style.display = 'flex';
             nameField.focus();
-            dialogueWindow.onclick = null;
-            dialogueNext.onclick = null;
-          });
-        });
+            resetDialogueHandlers();
+          }, { keepVisible: true });
+        }, { keepVisible: true });
       };
 
       const showNameFixed = () => {
-        const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
+        const linesToShow = injectName(getLines('after-name'));
+        fullFigure.classList.remove('show');
 
         playLines(linesToShow, () => {
-          dialogueWindow.classList.remove('is-visible');
-          fullFigure.classList.remove('show');
+          hideDialogueWindow();
 
           setTimeout(() => {
-            bustContainer.classList.add('is-visible');
-            scheduleBlink();
+            showBust();
             menu.classList.add('is-visible');
             updateMenuForReturn();
           }, 700);
@@ -818,18 +908,16 @@
         menu.classList.remove('is-visible');
 
         fullFigure.classList.remove('show');       // 全身は隠す
-        bustContainer.classList.add('is-visible'); // アップ強制表示
+        showBust(); // アップ強制表示
         setExpression('smile');
 
-        dialogueWindow.classList.add('is-visible');
-
-        playLines(lines.conversation || fallbackLines.conversation, endConversation);
+        playLines(injectName(getLines('conversation')), endConversation);
       };
 
       const endConversation = () => {
         isConversation = false;
         setExpression('neutral');
-        dialogueWindow.classList.remove('is-visible');
+        hideDialogueWindow();
         setTimeout(() => {
           menu.classList.add('is-visible');
         }, 350);
@@ -852,6 +940,7 @@
       menuButtons.forEach(btn => {
         btn.addEventListener('click', () => {
           spawnParticles(btn);
+          spawnColumnLight(btn);
           ensureBgm();
           const action = btn.dataset.action;
           if (action === 'pray') {
@@ -870,6 +959,7 @@
           }
           if (action === 'talk') {
             dimOverlay.classList.remove('show');
+            if (isConversation) return;
             startConversation();
           }
         });
@@ -884,24 +974,26 @@
       document.body.addEventListener('click', ensureBgm, { once: true });
 
       // 初期化
-      const init = async () => {
+      const startLumiereGate = () => {
         createStars();
         preloadImages();
-        await loadLines();
         setMute(localStorage.getItem(STORAGE_MUTE) === '1');
 
         if (cachedName) {
           // 再訪問はフォイヤーをスキップしてすぐホールへ
           sceneFoyer.classList.remove('is-active');
           sceneHall.classList.add('is-active');
-          dialogueWindow.classList.add('is-visible');
+          hideDialogueWindow();
           runInitialDialogue();
         } else {
           startFoyer();
         }
       };
 
-      init();
+      window.addEventListener('DOMContentLoaded', async () => {
+        await loadExternalLines();
+        startLumiereGate();
+      });
     })();
   </script>
 </body>
