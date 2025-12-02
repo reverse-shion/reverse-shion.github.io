@@ -592,6 +592,47 @@
   80%  { opacity: 0.35; }
   100% { transform: translate3d(0, -36px, 0) scale(1.1); opacity: 0; }
 }
+
+    /* ===== リュミエール：光の口パク ===== */
+.lumiere-mouth-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 18%; /* ←リュミエールの口元に合わせて調整 */
+  transform: translateX(-50%);
+
+  width: 22%;  /* 光の幅。キャラの口元に合わせて調整 */
+  height: 24px;
+
+  pointer-events: none;
+
+  opacity: 0;
+  filter: blur(6px);
+  mix-blend-mode: screen;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 255, 0.95),
+    rgba(255, 150, 220, 0.4),
+    rgba(255, 150, 220, 0.0)
+  );
+
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+
+/* 会話中にONになる */
+.lumiere-bust.speaking .lumiere-mouth-glow {
+  opacity: 1;
+  animation: mouthPulse 0.45s ease-in-out infinite;
+}
+
+/* 光が脈動しながら喋ってるように見える */
+@keyframes mouthPulse {
+  0%   { transform: translateX(-50%) scaleY(0.55) scaleX(0.85); opacity: 0.35; }
+  40%  { transform: translateX(-50%) scaleY(1.15) scaleX(1.10); opacity: 0.95; }
+  70%  { transform: translateX(-50%) scaleY(0.85) scaleX(1.00); opacity: 0.65; }
+  100% { transform: translateX(-50%) scaleY(0.60) scaleX(0.90); opacity: 0.40; }
+}
   </style>
 </head>
 <body>
@@ -608,12 +649,13 @@
       <div class="hall-overlay"></div>
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
-      <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
-        <div class="frame">
-          <img src="img/open1.png" alt="リュミエール" id="bustOpen">
-          <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
-        </div>
-      </div>
+      <div class="lumiere-bust">
+  <div class="frame">
+    <img id="bustOpen" src="img/open1.png">
+    <img id="bustClosed" src="img/open2.png" style="opacity:0;">
+  </div>
+  <div class="lumiere-mouth-glow"></div> <!-- 光の口パク -->
+</div>
 
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
         <div class="dialogue-name">Lumiere</div>
@@ -1119,7 +1161,13 @@ const createStars = () => {
         startLumiereGate();
       });
     })();
+function startSpeaking() {
+  document.getElementById('bustContainer').classList.add('speaking');
+}
 
+function stopSpeaking() {
+  document.getElementById('bustContainer').classList.remove('speaking');
+}
     
   </script>
 </body>
