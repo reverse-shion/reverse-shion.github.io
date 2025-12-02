@@ -217,22 +217,7 @@
   100% { transform: translateX(-50%) translateY(0); }
 }
 
-    #bustContainer {
-  position: fixed !important;
-  left: 50% !important;
-  bottom: 25% !important; /* ← 顔の黄金位置 */
-  transform: translateX(-50%) !important;
-  z-index: 9999 !important;
-  opacity: 1 !important;
-  display: block !important;
-  width: auto !important;
-  height: auto !important;
-}
-
-#bustContainer img {
-  width: min(80vw, 420px) !important;
-  height: auto !important;
-}
+ 
     /* セリフウィンドウ */
 /* ===== Lumiere セリフ枠：星銀 × 桃 ===== */
 .dialogue-window {
@@ -649,12 +634,12 @@
       <div class="hall-overlay"></div>
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
-      <div class="lumiere-bust">
+      <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
   <div class="frame">
     <img id="bustOpen" src="img/open1.png">
     <img id="bustClosed" src="img/open2.png" style="opacity:0;">
   </div>
-  <div class="lumiere-mouth-glow"></div> <!-- 光の口パク -->
+  <div class="lumiere-mouth-glow"></div>
 </div>
 
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
@@ -779,21 +764,7 @@
         return fallbackLines[category] || [];
       };
 
-      // 星粒生成
-      const createStars = () => {
-        const total = 40;
-        for (let i = 0; i < total; i++) {
-          const s = document.createElement('span');
-          const size = Math.random() * 3 + 1;
-          s.style.width = `${size}px`;
-          s.style.height = `${size}px`;
-          s.style.left = `${Math.random() * 100}%`;
-          s.style.top = `${Math.random() * 100}%`;
-          s.style.animationDuration = `${14 + Math.random() * 10}s`;
-          s.style.animationDelay = `${Math.random() * 12}s`;
-          starField.appendChild(s);
-        }
-      };
+     
       // 星粒生成
 const createStars = () => {
   const total = 24; // ★ 40 → 24 にして控えめに
