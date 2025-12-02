@@ -440,31 +440,29 @@
       100% { transform: translateY(-16px) scale(1); opacity: 0; }
     }
 
-    /* メニュー */
-    .menu {
-      position: absolute;
-      left: 50%;
-      bottom: 3vh;  /* 画面の一番下寄り */
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: min(960px, 94vw);
-      z-index: 5;
-      opacity: 0;
-      transition: opacity 600ms ease;
-    }
+   /* メニュー */
+.menu {
+  position: absolute;
+  left: 50%;
+  bottom: 3vh;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: min(960px, 94vw);
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 600ms ease;
 
-    /* ★ここを追加：見えてないときはクリック不可 */
+  /* ★ここを追加：見えてないときはクリック不可 */
   pointer-events: none;
 }
 
+.menu.is-visible {
+  opacity: 1;
 
-    .menu.is-visible {
-      opacity: 1;
-    
-      /* ★ここを追加：表示するときだけクリック可能 */
+  /* ★ここを追加：表示するときだけクリック可能 */
   pointer-events: auto;
 }
 
