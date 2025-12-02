@@ -14,6 +14,7 @@
       --gold-soft: rgba(243, 217, 163, 0.6);
       --text: #1b1e2a;
       --dialog-max: 900px;
+      --glow: 0 0 16px rgba(255, 255, 255, 0.65);
       --shadow: 0 12px 32px rgba(12, 12, 20, 0.25);
       --shadow-soft: 0 8px 20px rgba(12, 12, 20, 0.12);
       --transition: 900ms ease;
@@ -147,7 +148,6 @@
       z-index: 2;
     }
 
-    /* 全身リュミエール（初回の導入用） */
     .lumiere-full {
       position: absolute;
       bottom: 8vh;
@@ -156,7 +156,7 @@
       opacity: 0;
       max-width: min(60vh, 70vw);
       transition: opacity 800ms ease, transform 1600ms ease;
-      z-index: 3;
+      z-index: 4;
       animation: float 9s ease-in-out infinite;
     }
 
@@ -170,17 +170,36 @@
       50% { transform: translateX(-50%) translateY(-8px); }
       100% { transform: translateX(-50%) translateY(0); }
     }
+    /* バストアップはセリフより奥（＝下）になる */
+#bustContainer {
+  z-index: 10 !important;
+}
 
-    /* バストアップ（会話用） */
+/* セリフウィンドウはバストアップより手前へ */
+.dialogue-window {
+  z-index: 20 !important;
+}
+
+/* メニューボタンはさらに手前へ */
+.menu {
+  z-index: 30 !important;
+}
+
+/* サウンドアイコン（右上） */
+.sound-toggle {
+  z-index: 40 !important;
+}
+
+    /* バストアップ */
     .lumiere-bust {
       position: absolute;
-      bottom: 18vh;
+      bottom: 25%;
       left: 50%;
       transform: translateX(-50%);
       max-width: min(58vh, 78vw);
       opacity: 0;
       transition: opacity 800ms ease;
-      z-index: 4; /* セリフより奥 */
+      z-index: 5;
       animation: gentleFloat 6s ease-in-out infinite;
       filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
     }
@@ -193,32 +212,43 @@
       filter: drop-shadow(0 0 16px rgba(255,255,255,0.8));
     }
 
-    .lumiere-bust .frame {
-      position: relative;
-      width: 100%;
-      min-height: 320px;
-    }
-
     .lumiere-bust .frame img {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-      width: min(80vw, 420px);
-      height: auto;
-    }
+  position: absolute !important;
+  left: 50% !important;
+  top: 0 !important;
+  transform: translateX(-50%) !important; /* translateYなし */
+  width: 320px !important;
+  height: auto !important;
+}
 
-    @keyframes gentleFloat {
-      0% { transform: translateX(-50%) translateY(2px); }
-      50% { transform: translateX(-50%) translateY(-6px); }
-      100% { transform: translateX(-50%) translateY(2px); }
-    }
+ .lumiere-bust .frame {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 320px !important; /* ここが命 */
+}
 
-    /* セリフウィンドウ（バストアップの手前） */
+    #bustContainer {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 25% !important; /* ← 顔の黄金位置 */
+  transform: translateX(-50%) !important;
+  
+  opacity: 1 !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+#bustContainer img {
+  width: min(80vw, 420px) !important;
+  height: auto !important;
+}
+    /* セリフウィンドウ */
     .dialogue-window {
       position: absolute;
       left: 50%;
-      bottom: 7vh;
+      bottom: 7vh;   /* ボタンとかぶらないよう上寄せ */
       transform: translateX(-50%);
       width: min(var(--dialog-max), 92vw);
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
@@ -228,10 +258,10 @@
       backdrop-filter: blur(12px);
       padding: clamp(14px, 3vw, 18px);
       color: #1b1e2a;
-      z-index: 5;
+      z-index: 6;
       opacity: 0;
       transition: opacity 600ms ease;
-      pointer-events: none;
+      pointer-events: none;   /* 非表示時はクリック無効 */
     }
 
     .dialogue-window.is-visible {
@@ -322,7 +352,6 @@
       overflow: hidden;
       transition: transform 160ms ease, box-shadow 160ms ease;
       font-family: var(--font-ja);
-      z-index: 1;
     }
 
     .gold-button:focus-visible {
@@ -352,39 +381,41 @@
       transform: translateY(0);
     }
 
-    /* 足元から光の柱エフェクト */
     .button-column-glow {
-      position: absolute;
-      left: 50%;
-      bottom: -30%;
-      transform: translateX(-50%);
-      width: 140%;
-      height: 180%;
-      background:
-        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.95), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.9), rgba(255,255,255,0));
-      opacity: 0;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      filter: blur(1.5px);
-      z-index: 2;
-      animation: riseColumn 700ms ease-out forwards;
-    }
+  position: absolute;
+  left: 50%;
+  bottom: -30%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 180%;
+  background:
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.95), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.9), rgba(255,255,255,0));
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(1.5px);
+  z-index: 2; /* ★ボタンのテキストより上に */
+  animation: riseColumn 700ms ease-out forwards;
+}
 
-    @keyframes riseColumn {
-      0% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(24px);
-      }
-      30% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-36px);
-      }
-    }
-
+@keyframes riseColumn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-36px);
+  }
+}
+    .gold-button {
+  position: relative;
+  z-index: 1;
+}
     .particle-layer {
       position: absolute;
       inset: 0;
@@ -409,26 +440,24 @@
       100% { transform: translateY(-16px) scale(1); opacity: 0; }
     }
 
-    /* メニュー */
-    .menu {
-      position: absolute;
-      left: 50%;
-      bottom: 3vh;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: min(960px, 94vw);
-      z-index: 6;
-      opacity: 0;
-      transition: opacity 600ms ease;
-      pointer-events: none;        /* 非表示時はクリック無効 */
-    }
+   /* メニュー */
+.menu {
+  position: absolute;
+  left: 50%;
+  bottom: 3vh;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: min(960px, 94vw);
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 600ms ease;
 
-    .menu.is-visible {
-      opacity: 1;
-      pointer-events: auto;        /* 表示時だけクリック可能 */
+.menu.is-visible {
+  opacity: 1;
+ }
     }
 
     /* サウンドボタン */
@@ -489,14 +518,26 @@
 
     @media (max-width: 480px) {
       .lumiere-full { bottom: 4vh; }
-      .lumiere-bust { bottom: 15vh; }
+      .lumiere-bust { bottom: 9vh; }
       .dialogue-window { padding: 12px 14px 18px; }
     }
 
     @media (max-height: 700px) {
       .dialogue-window { bottom: 18vh; }
-      .lumiere-bust { bottom: 14vh; }
+      .lumiere-bust { bottom: 11vh; }
       .menu { bottom: 2.4vh; }
+    }
+
+    @keyframes gentleFloat {
+      0% { transform: translateX(-50%) translateY(2px); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+      100% { transform: translateX(-50%) translateY(2px); }
+    }
+
+    @keyframes riseColumn {
+      0% { opacity: 0; transform: translateX(-50%) translateY(16px); }
+      30% { opacity: 0.9; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
     }
   </style>
 </head>
@@ -512,11 +553,8 @@
 
     <section class="scene scene-hall" aria-label="リュミエールの間">
       <div class="hall-overlay"></div>
-
-      <!-- 全身 → 初回のみ使用 -->
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
-      <!-- バストアップ（会話用） -->
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
         <div class="frame">
           <img src="img/open1.png" alt="リュミエール" id="bustOpen">
@@ -524,7 +562,6 @@
         </div>
       </div>
 
-      <!-- セリフ -->
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
         <div class="dialogue-name">Lumiere</div>
         <div class="dialogue-text" id="dialogueText"></div>
@@ -537,7 +574,6 @@
         </div>
       </div>
 
-      <!-- メニュー -->
       <div class="menu" id="menu">
         <button class="gold-button" data-action="pray" aria-label="セレフィアスに祈りを捧げる">
           セレフィアスに祈りを捧げる
@@ -561,26 +597,26 @@
 
   <script>
     (() => {
-      const starField     = document.querySelector('.star-field');
-      const sceneFoyer    = document.querySelector('.scene-foyer');
-      const sceneHall     = document.querySelector('.scene-hall');
-      const welcomeText   = document.getElementById('welcomeText');
-      const fullFigure    = document.getElementById('fullFigure');
+      const starField = document.querySelector('.star-field');
+      const sceneFoyer = document.querySelector('.scene-foyer');
+      const sceneHall = document.querySelector('.scene-hall');
+      const welcomeText = document.getElementById('welcomeText');
+      const fullFigure = document.getElementById('fullFigure');
       const bustContainer = document.getElementById('bustContainer');
-      const bustOpen      = document.getElementById('bustOpen');
-      const bustClosed    = document.getElementById('bustClosed');
-      const dialogueWindow= document.getElementById('dialogueWindow');
-      const dialogueText  = document.getElementById('dialogueText');
-      const dialogueNext  = document.getElementById('dialogueNext');
-      const nameInput     = document.getElementById('nameInput');
-      const nameError     = document.getElementById('nameError');
-      const nameField     = document.getElementById('visitorName');
-      const nameSubmit    = document.getElementById('nameSubmit');
-      const menu          = document.getElementById('menu');
-      const menuButtons   = menu.querySelectorAll('button');
-      const soundToggle   = document.getElementById('soundToggle');
-      const bgm           = document.getElementById('bgm');
-      const dimOverlay    = document.getElementById('dimOverlay');
+      const bustOpen = document.getElementById('bustOpen');
+      const bustClosed = document.getElementById('bustClosed');
+      const dialogueWindow = document.getElementById('dialogueWindow');
+      const dialogueText = document.getElementById('dialogueText');
+      const dialogueNext = document.getElementById('dialogueNext');
+      const nameInput = document.getElementById('nameInput');
+      const nameError = document.getElementById('nameError');
+      const nameField = document.getElementById('visitorName');
+      const nameSubmit = document.getElementById('nameSubmit');
+      const menu = document.getElementById('menu');
+      const menuButtons = menu.querySelectorAll('button');
+      const soundToggle = document.getElementById('soundToggle');
+      const bgm = document.getElementById('bgm');
+      const dimOverlay = document.getElementById('dimOverlay');
 
       const STORAGE_NAME = 'lumiereVisitorName';
       const STORAGE_MUTE = 'lumiereBgmMuted';
@@ -588,34 +624,13 @@
       const blinkMax = 7000;
 
       const fallbackLines = {
-        'first-visit': [
-          '……聞こえていますか？',
-          'あなたの足音が、この星の間まで届いたの。',
-          '静かな光が揺れて……あなたを迎えているみたい。'
-        ],
-        'ask-name': [
-          'ねぇ……あなたのお名前を、わたしに教えてくれる？',
-          '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'
-        ],
-        'after-name': [
-          '……{name}様。',
-          'うん……とても、きれいな音。',
-          'これからは、その名前で呼ばせてくださいね。'
-        ],
-        'revisit': [
-          'おかえりなさい、{name}様。',
-          'またひとつ、静かな光が灯りました。'
-        ],
-        'conversation': [
-          '今日は……少し話してもいい？',
-          '最近ね……星たちが、少しだけざわめいているの。',
-          'でも、大丈夫。あなたが来てくれると、',
-          'この間は……なんだか落ち着くの。',
-          '疲れたら、いつでもここで休んでくださいね。'
-        ]
+        'first-visit': ['……聞こえていますか？', 'あなたの足音が、この星の間まで届いたの。', '静かな光が揺れて……あなたを迎えているみたい。'],
+        'ask-name': ['ねぇ……あなたのお名前を、わたしに教えてくれる？', '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'],
+        'after-name': ['……{name}様。', 'うん……とても、きれいな音。', 'これからは、その名前で呼ばせてくださいね。'],
+        revisit: ['おかえりなさい、{name}様。', 'またひとつ、静かな光が灯りました。'],
+        conversation: ['最近ね……星たちが少しざわめいているの。', 'でも、大丈夫。あなたが来てくれると、', 'この間は……なんだか落ち着くの。', '疲れたら、いつでもここで休んでくださいね。']
       };
 
-      let externalLines = {};
       let currentLines = [];
       let lineIndex = 0;
       let typingTimer = null;
@@ -625,13 +640,20 @@
       let blinkTimer = null;
       let currentExpression = 'neutral';
 
-      /* --------------- テキストファイル読み込み（あれば上書き） --------------- */
+      const getDisplayName = () => {
+        if (!cachedName) return '';
+        return /様$/.test(cachedName) ? cachedName : `${cachedName}様`;
+      };
+
+      // TXT パース
       const parseLumiereTxt = (txt) => {
         const lines = {};
         let current = null;
+
         txt.split('\n').forEach(line => {
           const trimmed = line.trim();
           if (!trimmed) return;
+
           if (trimmed.startsWith('# ')) {
             current = trimmed.replace('# ', '').trim();
             lines[current] = [];
@@ -639,13 +661,15 @@
             lines[current].push(trimmed);
           }
         });
+
         return lines;
       };
+
+      let externalLines = {};
 
       const loadExternalLines = async () => {
         try {
           const res = await fetch('data/lumiere-lines.txt');
-          if (!res.ok) return;
           const txt = await res.text();
           externalLines = parseLumiereTxt(txt);
         } catch (e) {
@@ -660,12 +684,7 @@
         return fallbackLines[category] || [];
       };
 
-      const injectName = (arr) => {
-        const name = cachedName || '';
-        return arr.map(l => l.replace('{name}', name));
-      };
-
-      /* --------------- 星粒 --------------- */
+      // 星粒生成
       const createStars = () => {
         const total = 40;
         for (let i = 0; i < total; i++) {
@@ -681,7 +700,7 @@
         }
       };
 
-      /* --------------- 粒子＆光柱 --------------- */
+      // 粒子演出
       const spawnParticles = (btn) => {
         const layer = btn.querySelector('.particle-layer');
         if (!layer) return;
@@ -702,7 +721,6 @@
         glow.addEventListener('animationend', () => glow.remove());
       };
 
-      /* --------------- セリフ周り --------------- */
       const resetDialogueHandlers = () => {
         dialogueWindow.onclick = null;
         dialogueNext.onclick = null;
@@ -721,6 +739,7 @@
         setSpeaking(false);
       };
 
+      // タイプライター
       const showLine = (line, onComplete) => {
         clearInterval(typingTimer);
         dialogueNext.style.opacity = 0;
@@ -787,7 +806,13 @@
         next();
       };
 
-      /* --------------- BGM --------------- */
+      // 名前差し込み
+      const injectName = (arr) => {
+  const name = cachedName || '';
+  return arr.map(l => l.replace('{name}', name));
+};
+
+      // BGM
       const setMute = (muted) => {
         bgm.muted = muted;
         soundToggle.querySelector('span').textContent = muted ? '♪×' : '♪';
@@ -803,7 +828,7 @@
         }
       };
 
-      /* --------------- 瞬き・表情 --------------- */
+      // 瞬き
       const scheduleBlink = () => {
         clearTimeout(blinkTimer);
         const delay = blinkMin + Math.random() * (blinkMax - blinkMin);
@@ -831,35 +856,37 @@
         currentExpression = type;
         const openMap = {
           neutral: 'img/open1.png',
-          smile:  'img/smile1.png',
-          sad:    'img/sad1.png'
+          smile: 'img/smile1.png',
+          sad: 'img/sad1.png'
         };
         const closedMap = {
           neutral: 'img/open2.png',
-          smile:  'img/smile2.png',
-          sad:    'img/sad2.png'
+          smile: 'img/smile2.png',
+          sad: 'img/sad2.png'
         };
-        bustOpen.src   = openMap[type]   || openMap.neutral;
+        bustOpen.src = openMap[type] || openMap.neutral;
         bustClosed.src = closedMap[type] || closedMap.neutral;
       };
 
+      // 画像プリロード
       const preloadImages = () => {
         const files = [
-          'img/open1.png','img/open2.png',
-          'img/smile1.png','img/smile2.png',
-          'img/sad1.png','img/sad2.png'
+          'img/open1.png',
+          'img/open2.png',
+          'img/smile1.png',
+          'img/smile2.png',
+          'img/sad1.png',
+          'img/sad2.png'
         ];
         files.forEach(src => { const img = new Image(); img.src = src; });
       };
 
-      /* --------------- フォイヤー → ホール --------------- */
+      // フォイヤー → ホール
       const startFoyer = () => {
         dialogueWindow.classList.remove('is-visible');
         menu.classList.remove('is-visible');
         hideBust();
-
         setTimeout(() => welcomeText.classList.add('show'), 3000);
-
         setTimeout(() => {
           welcomeText.classList.remove('show');
           sceneFoyer.classList.remove('is-active');
@@ -869,68 +896,67 @@
       };
 
       const enterHall = () => {
-        // ホールに切り替わったら導入開始
         fullFigure.classList.add('show');
         setTimeout(() => {
           runInitialDialogue();
         }, 1000);
       };
 
-      /* --------------- 初期セリフ（初回／再訪） --------------- */
+      // 最初のセリフ
       const runInitialDialogue = () => {
-        if (cachedName && cachedName.trim() !== '') {
-          // 再訪問：全身は出さず、バストアップで「おかえり」
-          fullFigure.classList.remove('show');
-          showBust();
-          setExpression('smile');
+  if (cachedName) {
+    // ★再訪問：最初からバストアップ＆再会メッセージ
+    fullFigure.classList.remove('show');
+    showBust();
 
-          playLines(
-            injectName(getLines('revisit')),
-            () => {
-              setExpression('neutral');
-              hideDialogueWindow();
-              isConversation = false;
-              setTimeout(() => {
-                menu.classList.add('is-visible');
-                updateMenuForReturn();
-              }, 350);
-            }
-          );
+    playLines(
+      injectName(getLines('revisit')),
+      () => {
+        hideDialogueWindow();
+        isConversation = false;
+        setTimeout(() => {
+          menu.classList.add('is-visible');
+          updateMenuForReturn();
+        }, 350);
+      }
+    );
+    return;
+  }
 
-          return;
-        }
+  // ★初回：全身だけ表示。バストアップは隠しておく
+  hideBust();
 
-        // 初回：全身だけ表示。バストアップはまだ出さない
-        hideBust();
-        fullFigure.classList.add('show');
+  const firstLines = getLines('first-visit');
+  const askLines = getLines('ask-name');
 
+  playLines(firstLines, () => {
+    playLines(askLines, () => {
+      nameInput.style.display = 'flex';
+      nameField.focus();
+      resetDialogueHandlers();
+    }, { keepVisible: true });
+  }, { keepVisible: true });
+};
+      
+        // 初回
         const firstLines = getLines('first-visit');
-        const askLines   = getLines('ask-name');
+        const askLines = getLines('ask-name');
 
-        playLines(
-          firstLines,
-          () => {
-            playLines(
-              askLines,
-              () => {
-                nameInput.style.display = 'flex';
-                nameField.focus();
-                resetDialogueHandlers();
-              },
-              { keepVisible: true }
-            );
-          },
-          { keepVisible: true }
-        );
+        playLines(firstLines, () => {
+          playLines(askLines, () => {
+            nameInput.style.display = 'flex';
+            nameField.focus();
+            resetDialogueHandlers();
+          }, { keepVisible: true });
+        }, { keepVisible: true });
       };
 
       const showNameFixed = () => {
         const linesToShow = injectName(getLines('after-name'));
+        fullFigure.classList.remove('show');
 
         playLines(linesToShow, () => {
           hideDialogueWindow();
-          // 全身 → バストアップへ
-          fullFigure.classList.remove('show');
 
           setTimeout(() => {
             showBust();
@@ -945,17 +971,16 @@
         villageBtn.style.display = cachedName ? 'inline-flex' : 'none';
       };
 
-      /* --------------- 会話モード --------------- */
+      // 会話モード
       const startConversation = () => {
         isConversation = true;
         menu.classList.remove('is-visible');
 
-        showBust();
+        fullFigure.classList.remove('show');       // 全身は隠す
+        showBust(); // アップ強制表示
         setExpression('smile');
 
-        playLines(injectName(getLines('conversation')), () => {
-          endConversation();
-        });
+        playLines(injectName(getLines('conversation')), endConversation);
       };
 
       const endConversation = () => {
@@ -967,7 +992,7 @@
         }, 350);
       };
 
-      /* --------------- イベント --------------- */
+      // イベント
       nameSubmit.addEventListener('click', () => {
         const value = nameField.value.trim();
         if (!value) {
@@ -991,14 +1016,14 @@
             dimOverlay.textContent = '静かに祈りを届けています……';
             dimOverlay.classList.add('show');
             setTimeout(() => {
-              window.location.href = 'serephias-gate.html';
+              window.location.href = 'serephias-gate.html'; // TODO: 実際の遷移先に書き換えてください
             }, 900);
           }
           if (action === 'village') {
             dimOverlay.textContent = '風の音が、始まりの町へと導きます。';
             dimOverlay.classList.add('show');
             setTimeout(() => {
-              window.location.href = 'village.html';
+              window.location.href = 'village.html'; // TODO: 実際の遷移先に書き換えてください
             }, 900);
           }
           if (action === 'talk') {
@@ -1017,18 +1042,18 @@
 
       document.body.addEventListener('click', ensureBgm, { once: true });
 
-      /* --------------- 初期化 --------------- */
+      // 初期化
       const startLumiereGate = () => {
         createStars();
         preloadImages();
         setMute(localStorage.getItem(STORAGE_MUTE) === '1');
 
-        if (cachedName && cachedName.trim() !== '') {
-          // 再訪問：前室をスキップ
+        if (cachedName) {
+          // 再訪問はフォイヤーをスキップしてすぐホールへ
           sceneFoyer.classList.remove('is-active');
           sceneHall.classList.add('is-active');
           hideDialogueWindow();
-          enterHall();  // enterHall 内で runInitialDialogue が呼ばれる
+          runInitialDialogue();
         } else {
           startFoyer();
         }
