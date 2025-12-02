@@ -21,7 +21,9 @@
       --font-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
 
     html, body {
       margin: 0;
@@ -41,10 +43,7 @@
         radial-gradient(circle at 30% 15%, rgba(255, 255, 255, 0.3), transparent 35%),
         radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.25), transparent 45%),
         linear-gradient(180deg, #0e0f1a 0%, #0a0b14 40%, #0b0c16 100%);
-      padding: env(safe-area-inset-top)
-               env(safe-area-inset-right)
-               env(safe-area-inset-bottom)
-               env(safe-area-inset-left);
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
     main {
@@ -72,8 +71,8 @@
       filter: blur(0.2px);
     }
     @keyframes drift {
-      0%   { transform: translate3d(0, 0, 0) scale(1);   opacity: 0.2; }
-      50%  { opacity: 0.8; }
+      0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.2; }
+      50% { opacity: 0.8; }
       100% { transform: translate3d(0, -40px, 0) scale(1.15); opacity: 0.15; }
     }
 
@@ -92,25 +91,24 @@
       pointer-events: none;
       z-index: 2;
     }
+
     .scene::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(5, 7, 16, 0.55) 0%,
-        rgba(17, 18, 35, 0.35) 45%,
-        rgba(38, 35, 58, 0.35) 100%
-      );
+      background: linear-gradient(180deg, rgba(5, 7, 16, 0.55) 0%, rgba(17, 18, 35, 0.35) 45%, rgba(38, 35, 58, 0.35) 100%);
       pointer-events: none;
     }
+
     .scene.is-active {
       opacity: 1;
       pointer-events: auto;
     }
 
     /* フォイヤー */
-    .scene-foyer { background-image: url('img/foyer-lumiere.jpg'); }
+    .scene-foyer {
+      background-image: url('img/foyer-lumiere.jpg');
+    }
 
     .welcome-text {
       position: relative;
@@ -128,13 +126,16 @@
       z-index: 3;
       padding: 16px 22px;
     }
+
     .welcome-text.show {
       opacity: 1;
       transform: translateY(0);
     }
 
     /* ホール */
-    .scene-hall { background-image: url('img/lumiere-hall.jpg'); }
+    .scene-hall {
+      background-image: url('img/lumiere-hall.jpg');
+    }
 
     .hall-overlay {
       position: absolute;
@@ -158,41 +159,34 @@
       z-index: 4;
       animation: float 9s ease-in-out infinite;
     }
+
     .lumiere-full.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
     @keyframes float {
-      0%   { transform: translateX(-50%) translateY(0); }
-      50%  { transform: translateX(-50%) translateY(-8px); }
+      0% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
       100% { transform: translateX(-50%) translateY(0); }
     }
 
     /* バストアップ */
-    /* ここを置き換え or 追記してOK */
-
-/* バストアップ */
-.lumiere-bust {
-  position: absolute;
-  bottom: 16vh;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: min(420px, 82vw);  /* かなり大きめにして“アップ感”を出す */
-  opacity: 0;
-  display: none;                /* ★最初は非表示 */
-  transition: opacity 800ms ease;
-  z-index: 5;
-}
-
-.lumiere-bust.is-visible {
-  opacity: 1;
-  display: block;               /* ★見せるときだけブロック表示 */
-}
-    .lumiere-bust .frame {
-      position: relative;
-      width: 100%;
-      padding-bottom: 140%;
+    .lumiere-bust {
+      position: absolute;
+      bottom: 12vh;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: min(58vh, 78vw);
+      opacity: 0;
+      transition: opacity 800ms ease;
+      z-index: 5;
     }
+
+    .lumiere-bust.is-visible {
+      opacity: 1;
+    }
+
     .lumiere-bust img {
       display: block;
       width: 100%;
@@ -202,11 +196,17 @@
       object-fit: contain;
     }
 
-    /* セリフウィンドウ（被り対策済み） */
+    .lumiere-bust .frame {
+      position: relative;
+      width: 100%;
+      padding-bottom: 140%;
+    }
+
+    /* セリフウィンドウ */
     .dialogue-window {
       position: absolute;
       left: 50%;
-      bottom: 16vh; /* ←メニューと被らない高さ */
+      bottom: 14vh;   /* ボタンとかぶらないよう上寄せ */
       transform: translateX(-50%);
       width: min(var(--dialog-max), 92vw);
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
@@ -219,8 +219,9 @@
       z-index: 6;
       opacity: 0;
       transition: opacity 600ms ease;
-      pointer-events: none; /* 見えてない時はクリック無効 */
+      pointer-events: none;   /* 非表示時はクリック無効 */
     }
+
     .dialogue-window.is-visible {
       opacity: 1;
       pointer-events: auto;
@@ -232,12 +233,14 @@
       color: #6c5c2c;
       margin-bottom: 6px;
     }
+
     .dialogue-text {
       white-space: pre-line;
       font-size: clamp(15px, 2.5vw, 17px);
       line-height: 1.7;
       min-height: 3.4em;
     }
+
     .dialogue-next {
       position: absolute;
       right: 14px;
@@ -249,9 +252,10 @@
       animation: blink 1.4s ease-in-out infinite;
       user-select: none;
     }
+
     @keyframes blink {
       0%, 60% { opacity: 0; }
-      100%    { opacity: 1; }
+      100% { opacity: 1; }
     }
 
     /* 名前入力 */
@@ -262,10 +266,12 @@
       gap: 10px;
       align-items: center;
     }
+
     .name-input label {
       font-size: 14px;
       color: #3b3b52;
     }
+
     .name-input input {
       flex: 1 1 180px;
       padding: 10px 12px;
@@ -277,10 +283,12 @@
       outline: none;
       transition: border-color 160ms ease, box-shadow 160ms ease;
     }
+
     .name-input input:focus {
       border-color: rgba(243, 217, 163, 0.8);
       box-shadow: 0 0 0 3px rgba(243, 217, 163, 0.25);
     }
+
     .name-input .error {
       width: 100%;
       color: #8a1f2d;
@@ -288,7 +296,6 @@
       margin-top: -4px;
     }
 
-    /* ボタン */
     .gold-button {
       position: relative;
       border: 1px solid rgba(243, 217, 163, 0.8);
@@ -304,15 +311,17 @@
       transition: transform 160ms ease, box-shadow 160ms ease;
       font-family: var(--font-ja);
     }
+
     .gold-button:focus-visible {
       outline: 2px solid rgba(243, 217, 163, 0.8);
       outline-offset: 2px;
     }
-    .gold-button:hover,
-    .gold-button:active {
+
+    .gold-button:hover, .gold-button:active {
       transform: translateY(-1px);
       box-shadow: 0 12px 30px rgba(111, 92, 24, 0.25);
     }
+
     .gold-button::after {
       content: "";
       position: absolute;
@@ -324,8 +333,8 @@
       pointer-events: none;
       z-index: 1;
     }
-    .gold-button:hover::after,
-    .gold-button:active::after {
+
+    .gold-button:hover::after, .gold-button:active::after {
       opacity: 1;
       transform: translateY(0);
     }
@@ -337,6 +346,7 @@
       pointer-events: none;
       z-index: 0;
     }
+
     .particle-layer span {
       position: absolute;
       width: 6px;
@@ -346,17 +356,18 @@
       opacity: 0;
       animation: sparkle 1200ms ease-out forwards;
     }
+
     @keyframes sparkle {
-      0%   { transform: translateY(12px) scale(0.6); opacity: 0; }
-      30%  { opacity: 1; }
+      0% { transform: translateY(12px) scale(0.6); opacity: 0; }
+      30% { opacity: 1; }
       100% { transform: translateY(-16px) scale(1); opacity: 0; }
     }
 
-    /* メニュー（画面下寄せ） */
+    /* メニュー */
     .menu {
       position: absolute;
       left: 50%;
-      bottom: 4vh;
+      bottom: 4vh;  /* 画面の一番下寄り */
       transform: translateX(-50%);
       display: flex;
       gap: 12px;
@@ -367,7 +378,10 @@
       opacity: 0;
       transition: opacity 600ms ease;
     }
-    .menu.is-visible { opacity: 1; }
+
+    .menu.is-visible {
+      opacity: 1;
+    }
 
     /* サウンドボタン */
     .sound-toggle {
@@ -386,11 +400,10 @@
       z-index: 20;
       transition: transform 140ms ease, box-shadow 140ms ease;
     }
-    .sound-toggle:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
+
+    .sound-toggle:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
     .sound-toggle:active { transform: translateY(0); }
+
     .sound-toggle span {
       font-size: 18px;
       color: #5b4a1c;
@@ -398,7 +411,7 @@
       user-select: none;
     }
 
-    /* 画面暗転オーバーレイ */
+    /* 画面暗転用 */
     .overlay-dim {
       position: fixed;
       inset: 0;
@@ -414,29 +427,27 @@
       padding: 20px;
       font-size: 16px;
     }
-    .overlay-dim.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
 
-    /* スマホ向け微調整 */
+    .overlay-dim.show { opacity: 1; pointer-events: auto; }
+
+    /* スマホ調整 */
     @media (max-width: 720px) {
-      .dialogue-window { bottom: 18vh; border-radius: 14px; }
-      .menu          { bottom: 3vh;  gap: 10px; }
-      .gold-button   { width: calc(50% - 8px); text-align: center; justify-content: center; }
-      .name-input    { flex-direction: column; align-items: stretch; }
+      .dialogue-window { bottom: 16vh; border-radius: 14px; }
+      .menu { bottom: 3vh; gap: 10px; }
+      .gold-button { width: calc(50% - 8px); justify-content: center; text-align: center; }
+      .name-input { flex-direction: column; align-items: stretch; }
       .name-input input { width: 100%; }
     }
 
-    @media (max-height: 640px) {
-      .dialogue-window { bottom: 20vh; }
-      .menu            { bottom: 2vh; }
+    @media (max-width: 480px) {
+      .lumiere-full { bottom: 4vh; }
+      .lumiere-bust { bottom: 9vh; }
+      .dialogue-window { padding: 12px 14px 18px; }
     }
 
-    @media (max-width: 480px) {
-      .lumiere-full  { bottom: 4vh; }
-      .lumiere-bust  { bottom: 10vh; }
-      .dialogue-window { padding: 12px 14px 18px; }
+    @media (max-height: 700px) {
+      .dialogue-window { bottom: 18vh; }
+      .lumiere-bust { bottom: 11vh; }
     }
   </style>
 </head>
@@ -456,7 +467,7 @@
 
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
         <div class="frame">
-          <img src="img/lumiere-neutral-open.png"   alt="リュミエール" id="bustOpen">
+          <img src="img/lumiere-neutral-open.png" alt="リュミエール" id="bustOpen">
           <img src="img/lumiere-neutral-closed.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
         </div>
       </div>
@@ -496,68 +507,73 @@
 
   <script>
     (() => {
-      const starField     = document.querySelector('.star-field');
-      const sceneFoyer    = document.querySelector('.scene-foyer');
-      const sceneHall     = document.querySelector('.scene-hall');
-      const welcomeText   = document.getElementById('welcomeText');
-      const fullFigure    = document.getElementById('fullFigure');
+      const starField = document.querySelector('.star-field');
+      const sceneFoyer = document.querySelector('.scene-foyer');
+      const sceneHall = document.querySelector('.scene-hall');
+      const welcomeText = document.getElementById('welcomeText');
+      const fullFigure = document.getElementById('fullFigure');
       const bustContainer = document.getElementById('bustContainer');
-      const bustOpen      = document.getElementById('bustOpen');
-      const bustClosed    = document.getElementById('bustClosed');
-      const dialogueWindow= document.getElementById('dialogueWindow');
-      const dialogueText  = document.getElementById('dialogueText');
-      const dialogueNext  = document.getElementById('dialogueNext');
-      const nameInput     = document.getElementById('nameInput');
-      const nameError     = document.getElementById('nameError');
-      const nameField     = document.getElementById('visitorName');
-      const nameSubmit    = document.getElementById('nameSubmit');
-      const menu          = document.getElementById('menu');
-      const menuButtons   = menu.querySelectorAll('button');
-      const soundToggle   = document.getElementById('soundToggle');
-      const bgm           = document.getElementById('bgm');
-      const dimOverlay    = document.getElementById('dimOverlay');
+      const bustOpen = document.getElementById('bustOpen');
+      const bustClosed = document.getElementById('bustClosed');
+      const dialogueWindow = document.getElementById('dialogueWindow');
+      const dialogueText = document.getElementById('dialogueText');
+      const dialogueNext = document.getElementById('dialogueNext');
+      const nameInput = document.getElementById('nameInput');
+      const nameError = document.getElementById('nameError');
+      const nameField = document.getElementById('visitorName');
+      const nameSubmit = document.getElementById('nameSubmit');
+      const menu = document.getElementById('menu');
+      const menuButtons = menu.querySelectorAll('button');
+      const soundToggle = document.getElementById('soundToggle');
+      const bgm = document.getElementById('bgm');
+      const dimOverlay = document.getElementById('dimOverlay');
 
-      const STORAGE_NAME  = 'lumiereVisitorName';
-      const STORAGE_MUTE  = 'lumiereBgmMuted';
-      const blinkMin      = 3000;
-      const blinkMax      = 7000;
+      const STORAGE_NAME = 'lumiereVisitorName';
+      const STORAGE_MUTE = 'lumiereBgmMuted';
+      const blinkMin = 3000;
+      const blinkMax = 7000;
 
       const fallbackLines = {
-        sceneA_welcome : ['……ようこそ。', 'ここは、リュミエールの間——', '星の記憶が静かに灯る場所。'],
-        sceneB_first   : ['……聞こえる？', '星のささやきが、あなたをここまで連れてきたみたい。'],
-        sceneB_askName : ['ねえ、あなたのお名前を、教えてくれる？'],
+        sceneA_welcome: ['……ようこそ。', 'ここは、リュミエールの間——', '星の記憶が静かに灯る場所。'],
+        sceneB_first: ['……聞こえる？', '星のささやきが、あなたをここまで連れてきたみたい。'],
+        sceneB_askName: ['ねえ、あなたのお名前を、教えてくれる？'],
         sceneB_nameFixed: ['……{name}。', 'うん、とてもやさしい響き。', 'これからは、その名前で呼ぶね。'],
-        /* ★ここだけ「様」付き */
-        menu_return    : ['おかえりなさい、{name}様。', '静かな光がまた一つ灯りました。'],
-        conversation   : ['最近、星たちが少しざわめいているの。', 'でも、大丈夫。シオン様がそばにいてくれるから。', '疲れたら、いつでもここで休んでね。']
+        menu_return: ['おかえりなさい、{name}。', '静かな光がまた一つ灯りました。'],
+        conversation: ['最近、星たちが少しざわめいているの。', 'でも、大丈夫。あなたがそばにいてくれるから。', '疲れたら、いつでもここで休んでね。']
       };
 
-      let lines          = { ...fallbackLines };
-      let currentLines   = [];
-      let lineIndex      = 0;
-      let typingTimer    = null;
-      let isTyping       = false;
-      let cachedName     = localStorage.getItem(STORAGE_NAME) || '';
-      let blinkTimer     = null;
+      let lines = { ...fallbackLines };
+      let currentLines = [];
+      let lineIndex = 0;
+      let typingTimer = null;
+      let isTyping = false;
+      let cachedName = localStorage.getItem(STORAGE_NAME) || '';
+      let isConversation = false;
+      let blinkTimer = null;
       let currentExpression = 'neutral';
 
-      /* 星粒生成 */
+      const getDisplayName = () => {
+        if (!cachedName) return '';
+        return /様$/.test(cachedName) ? cachedName : `${cachedName}様`;
+      };
+
+      // 星粒生成
       const createStars = () => {
         const total = 40;
         for (let i = 0; i < total; i++) {
           const s = document.createElement('span');
           const size = Math.random() * 3 + 1;
-          s.style.width  = `${size}px`;
+          s.style.width = `${size}px`;
           s.style.height = `${size}px`;
-          s.style.left   = `${Math.random() * 100}%`;
-          s.style.top    = `${Math.random() * 100}%`;
+          s.style.left = `${Math.random() * 100}%`;
+          s.style.top = `${Math.random() * 100}%`;
           s.style.animationDuration = `${14 + Math.random() * 10}s`;
-          s.style.animationDelay    = `${Math.random() * 12}s`;
+          s.style.animationDelay = `${Math.random() * 12}s`;
           starField.appendChild(s);
         }
       };
 
-      /* ボタン粒子 */
+      // 粒子演出
       const spawnParticles = (btn) => {
         const layer = btn.querySelector('.particle-layer');
         if (!layer) return;
@@ -565,24 +581,26 @@
         for (let i = 0; i < 6; i++) {
           const p = document.createElement('span');
           p.style.left = `${20 + Math.random() * 60}%`;
-          p.style.top  = `${60 + Math.random() * 30}%`;
+          p.style.top = `${60 + Math.random() * 30}%`;
           p.style.animationDelay = `${i * 60}ms`;
           layer.appendChild(p);
         }
       };
 
-      /* txt読み込み */
+      // セリフパース
       const parseLines = (text) => {
         const blocks = text.split(/\n\s*---\s*\n/);
         const result = {};
         blocks.forEach(block => {
-          const rows = block.trim().split(/\n/).filter(l => l.length > 0);
+          const rows = block.trim().split(/\n/).filter(l => l.length > 0 || /^\s*$/.test(l));
           if (!rows.length) return;
           const idMatch = rows[0].match(/^\[(.+)\]$/);
           if (!idMatch) return;
           const id = idMatch[1].trim();
           const content = rows.slice(1).map(r => r.replace(/^\s+/, ''));
-          if (content.length) result[id] = content;
+          if (content.length) {
+            result[id] = content;
+          }
         });
         return result;
       };
@@ -599,7 +617,7 @@
         }
       };
 
-      /* タイプライター */
+      // タイプライター
       const showLine = (line, onComplete) => {
         clearInterval(typingTimer);
         dialogueNext.style.opacity = 0;
@@ -629,6 +647,7 @@
       const playLines = (list, callback) => {
         currentLines = list.slice();
         lineIndex = 0;
+
         const next = () => {
           if (lineIndex >= currentLines.length) {
             if (callback) callback();
@@ -637,6 +656,7 @@
           const line = currentLines[lineIndex];
           showLine(line, () => {});
         };
+
         const advance = () => {
           if (isTyping) {
             showAll(currentLines[lineIndex]);
@@ -645,16 +665,19 @@
           lineIndex++;
           next();
         };
+
         dialogueWindow.onclick = advance;
-        dialogueNext.onclick   = advance;
+        dialogueNext.onclick = advance;
         next();
       };
 
-      /* {name} 置換 */
-      const injectName = (arr) =>
-        arr.map(l => l.replace('{name}', cachedName));
+      // 名前差し込み
+      const injectName = (arr) => {
+        const display = getDisplayName();
+        return arr.map(l => l.replace('{name}', display));
+      };
 
-      /* BGM */
+      // BGM
       const setMute = (muted) => {
         bgm.muted = muted;
         soundToggle.querySelector('span').textContent = muted ? '♪×' : '♪';
@@ -665,10 +688,12 @@
         if (bgm.dataset.started) return;
         bgm.dataset.started = '1';
         bgm.volume = 0.6;
-        if (!bgm.muted) bgm.play().catch(() => {});
+        if (!bgm.muted) {
+          bgm.play().catch(() => {});
+        }
       };
 
-      /* 瞬き */
+      // 瞬き
       const scheduleBlink = () => {
         clearTimeout(blinkTimer);
         const delay = blinkMin + Math.random() * (blinkMax - blinkMin);
@@ -685,19 +710,19 @@
         currentExpression = type;
         const openMap = {
           neutral: 'img/lumiere-neutral-open.png',
-          smile  : 'img/lumiere-smile-open.png',
-          sad    : 'img/lumiere-sad-open.png'
+          smile: 'img/lumiere-smile-open.png',
+          sad: 'img/lumiere-sad-open.png'
         };
         const closedMap = {
           neutral: 'img/lumiere-neutral-closed.png',
-          smile  : 'img/lumiere-smile-closed.png',
-          sad    : 'img/lumiere-sad-closed.png'
+          smile: 'img/lumiere-smile-closed.png',
+          sad: 'img/lumiere-sad-closed.png'
         };
-        bustOpen.src   = openMap[type]   || openMap.neutral;
+        bustOpen.src = openMap[type] || openMap.neutral;
         bustClosed.src = closedMap[type] || closedMap.neutral;
       };
 
-      /* 画像プリロード */
+      // 画像プリロード
       const preloadImages = () => {
         const files = [
           'img/lumiere-neutral-open.png',
@@ -705,12 +730,12 @@
           'img/lumiere-smile-open.png',
           'img/lumiere-smile-closed.png',
           'img/lumiere-sad-open.png',
-          'img/lumiere-sad-closed.png'
+          'img/ lumiere-sad-closed.png'
         ];
         files.forEach(src => { const img = new Image(); img.src = src; });
       };
 
-      /* フロー */
+      // フォイヤー → ホール
       const startFoyer = () => {
         dialogueWindow.classList.remove('is-visible');
         menu.classList.remove('is-visible');
@@ -731,84 +756,78 @@
         }, 1000);
       };
 
-      const updateMenuForReturn = () => {
-        const villageBtn = menu.querySelector('[data-action="village"]');
-        villageBtn.style.display = cachedName ? 'inline-flex' : 'none';
-      };
-
+      // 最初のセリフ
       const runInitialDialogue = () => {
-  if (cachedName) {
-    // 全身OFF
-    fullFigure.classList.remove('show');
-    fullFigure.style.display = 'none';
+        if (cachedName) {
+          // 再訪問
+          fullFigure.classList.remove('show');
+          bustContainer.classList.add('is-visible');
+          scheduleBlink();
 
-    // バストアップON
-    bustContainer.style.display = 'block';
-    bustContainer.classList.add('is-visible');
-    scheduleBlink();
-
-    playLines(
-      injectName(lines.menu_return || fallbackLines.menu_return),
-      () => {
-        dialogueWindow.classList.remove('is-visible');
-        setTimeout(() => {
-          menu.classList.add('is-visible');
-          updateMenuForReturn();
-        }, 350);
-      }
-    );
-    return;
-  }
+          playLines(
+            injectName(lines.menu_return || fallbackLines.menu_return),
+            () => {
+              dialogueWindow.classList.remove('is-visible');
+              setTimeout(() => {
+                menu.classList.add('is-visible');
+                updateMenuForReturn();
+              }, 350);
+            }
+          );
+          return;
+        }
 
         // 初回
-        const firstLines = lines.sceneB_first   || fallbackLines.sceneB_first;
-        const askLines   = lines.sceneB_askName || fallbackLines.sceneB_askName;
+        const firstLines = lines.sceneB_first || fallbackLines.sceneB_first;
+        const askLines = lines.sceneB_askName || fallbackLines.sceneB_askName;
 
         playLines(firstLines, () => {
           playLines(askLines, () => {
             nameInput.style.display = 'flex';
             nameField.focus();
             dialogueWindow.onclick = null;
-            dialogueNext.onclick   = null;
+            dialogueNext.onclick = null;
           });
         });
       };
 
-     const showNameFixed = () => {
-  const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
-  playLines(linesToShow, () => {
-    dialogueWindow.classList.remove('is-visible');
-    fullFigure.classList.remove('show');
-    fullFigure.style.display = 'none';        // ★ 全身OFF
+      const showNameFixed = () => {
+        const linesToShow = injectName(lines.sceneB_nameFixed || fallbackLines.sceneB_nameFixed);
 
-    setTimeout(() => {
-      bustContainer.style.display = 'block';  // ★ バストON
-      bustContainer.classList.add('is-visible');
-      scheduleBlink();
-      menu.classList.add('is-visible');
-      updateMenuForReturn();
-    }, 700);
-  });
-};
+        playLines(linesToShow, () => {
+          dialogueWindow.classList.remove('is-visible');
+          fullFigure.classList.remove('show');
 
-      /* 会話モード */
-const startConversation = () => {
-  menu.classList.remove('is-visible');
+          setTimeout(() => {
+            bustContainer.classList.add('is-visible');
+            scheduleBlink();
+            menu.classList.add('is-visible');
+            updateMenuForReturn();
+          }, 700);
+        });
+      };
 
-  // ★ 全身を完全に隠す
-  fullFigure.classList.remove('show');
-  fullFigure.style.display = 'none';
+      const updateMenuForReturn = () => {
+        const villageBtn = menu.querySelector('[data-action="village"]');
+        villageBtn.style.display = cachedName ? 'inline-flex' : 'none';
+      };
 
-  // ★ バストアップを確実に表示
-  bustContainer.style.display = 'block';
-  bustContainer.classList.add('is-visible');
+      // 会話モード
+      const startConversation = () => {
+        isConversation = true;
+        menu.classList.remove('is-visible');
 
-  dialogueWindow.classList.add('is-visible');
-  setExpression('smile');
+        fullFigure.classList.remove('show');       // 全身は隠す
+        bustContainer.classList.add('is-visible'); // アップ強制表示
+        setExpression('smile');
 
-  playLines(lines.conversation || fallbackLines.conversation, endConversation);
-};
+        dialogueWindow.classList.add('is-visible');
+
+        playLines(lines.conversation || fallbackLines.conversation, endConversation);
+      };
+
       const endConversation = () => {
+        isConversation = false;
         setExpression('neutral');
         dialogueWindow.classList.remove('is-visible');
         setTimeout(() => {
@@ -816,7 +835,7 @@ const startConversation = () => {
         }, 350);
       };
 
-      /* イベント */
+      // イベント
       nameSubmit.addEventListener('click', () => {
         const value = nameField.value.trim();
         if (!value) {
@@ -839,14 +858,14 @@ const startConversation = () => {
             dimOverlay.textContent = '静かに祈りを届けています……';
             dimOverlay.classList.add('show');
             setTimeout(() => {
-              window.location.href = 'serephias-gate.html'; /* TODO: 実際の遷移先に書き換えてください */
+              window.location.href = 'serephias-gate.html'; // TODO: 実際の遷移先に書き換えてください
             }, 900);
           }
           if (action === 'village') {
             dimOverlay.textContent = '風の音が、始まりの町へと導きます。';
             dimOverlay.classList.add('show');
             setTimeout(() => {
-              window.location.href = 'village.html'; /* TODO: 実際の遷移先に書き換えてください */
+              window.location.href = 'village.html'; // TODO: 実際の遷移先に書き換えてください
             }, 900);
           }
           if (action === 'talk') {
@@ -864,7 +883,7 @@ const startConversation = () => {
 
       document.body.addEventListener('click', ensureBgm, { once: true });
 
-      /* 初期化 */
+      // 初期化
       const init = async () => {
         createStars();
         preloadImages();
@@ -872,7 +891,7 @@ const startConversation = () => {
         setMute(localStorage.getItem(STORAGE_MUTE) === '1');
 
         if (cachedName) {
-          // 2回目以降はフォイヤーを飛ばしてすぐホールへ
+          // 再訪問はフォイヤーをスキップしてすぐホールへ
           sceneFoyer.classList.remove('is-active');
           sceneHall.classList.add('is-active');
           dialogueWindow.classList.add('is-visible');
