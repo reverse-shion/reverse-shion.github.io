@@ -788,12 +788,27 @@
       };
 
       // 会話モード
-      const startConversation = () => {
-        isConversation = true;
-        menu.classList.remove('is-visible');
-        setExpression('smile');
-        playLines(lines.conversation || fallbackLines.conversation, endConversation);
-      };
+      // 会話モード
+const startConversation = () => {
+  isConversation = true;
+
+  // メニューは一度消す
+  menu.classList.remove('is-visible');
+
+  // ★ここを追加：会話用の状態に切り替え
+  // 全身は消して、バストアップを必ず表示
+  fullFigure.classList.remove('show');
+  bustContainer.classList.add('is-visible');
+
+  // セリフウィンドウも再表示（再訪問時や前回会話後など）
+  dialogueWindow.classList.add('is-visible');
+
+  // 表情は会話用にスマイルへ
+  setExpression('smile');
+
+  // 会話用セリフを再生
+  playLines(lines.conversation || fallbackLines.conversation, endConversation);
+};
 
       const endConversation = () => {
   isConversation = false;
