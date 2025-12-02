@@ -193,21 +193,21 @@
       filter: drop-shadow(0 0 16px rgba(255,255,255,0.8));
     }
 
-    .lumiere-bust img {
-      display: block;
-      width: 100%;
-      height: auto;
-      position: absolute;
-      inset: 0;
-      object-fit: contain;
-    }
+    .lumiere-bust .frame img {
+  position: absolute !important;
+  left: 50% !important;
+  top: 0 !important;
+  transform: translateX(-50%) !important; /* translateYなし */
+  width: 320px !important;
+  height: auto !important;
+}
 
-    .lumiere-bust .frame {
-      position: relative;
-      width: 100%;
-      padding-bottom: 140%;
-    }
-
+ .lumiere-bust .frame {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 320px !important; /* ここが命 */
+}
     /* セリフウィンドウ */
     .dialogue-window {
       position: absolute;
@@ -503,25 +503,6 @@
       30% { opacity: 0.9; }
       100% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
     }
-  
-#bustContainer {
-  position: fixed !important;
-  bottom: 5% !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: auto !important;
-  height: auto !important;
-  opacity: 1 !important;
-  z-index: 9999 !important;
-  background: rgba(255, 0, 0, 0.2) !important;
-  outline: 2px solid red !important;
-  display: block !important;
-}
-#bustContainer img {
-  width: 400px !important;
-  height: auto !important;
-  display: block !important;
-}
   </style>
 </head>
 <body>
@@ -538,7 +519,7 @@
       <div class="hall-overlay"></div>
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
-      <div class="lumiere-bust is-visible" id="bustContainer" aria-hidden="true">
+      <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
         <div class="frame">
           <img src="img/open1.png" alt="リュミエール" id="bustOpen">
           <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
