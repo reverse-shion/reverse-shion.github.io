@@ -999,18 +999,29 @@
     }, randomRange(6500, 12000));
   }
 
-  function blinkBust() {
+    function blinkBust() {
     const panel = document.getElementById("shiopon-panel");
     if (!panel) return;
     const eyes = panel.querySelector(".sp-layer.sp-eyes");
     if (!eyes) return;
 
+    // 今の気分を参照（smile のときはまた笑顔の目に戻す）
+    const mood = state.lastMood || "neutral";
+
+    // まばたき閉じる
     eyes.style.backgroundImage = `url(${BUST}eyes_closed.png)`;
+
     setTimeout(() => {
-      eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+      // mood に応じて「開いたあと」の状態を変える
+      if (mood === "smile" || mood === "excited") {
+        eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
+      } else if (mood === "worry") {
+        eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
+      } else {
+        eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+      }
     }, 120);
   }
-
   function blinkToggle(toggleLayers) {
     const eyes = toggleLayers.eyes;
     if (!eyes) return;
@@ -1032,18 +1043,28 @@
     }, 260);
   }
 
-  function earPyonToggle(toggleLayers) {
-    const ear = toggleLayers.ear;
-    const shadow = toggleLayers.shadow;
+    function earPyonBust(bustLayers) {
+    const ear = bustLayers.ear;
+    const shadow = bustLayers.shadow;
     if (!ear || !shadow) return;
-    ear.style.backgroundImage = `url(${TOGGLE}toggle_ear_up.png)`;
-    shadow.style.backgroundImage = `url(${TOGGLE}toggle_shadow2.png)`;
+
+    const mood = state.lastMood || "neutral";
+
+    // ぴょこ時は必ずアップ
+    ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
+    shadow.style.backgroundImage = `url(${BUST}shadow_up.png)`;
+
     setTimeout(() => {
-      ear.style.backgroundImage = `url(${TOGGLE}toggle_ear_neutral.png)`;
-      shadow.style.backgroundImage = `url(${TOGGLE}toggle_shadow1.png)`;
+      // 戻すときも mood に応じて戻す
+      if (mood === "smile" || mood === "excited") {
+        ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
+        shadow.style.backgroundImage = `url(${BUST}shadow_up.png)`;
+      } else {
+        ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
+        shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
+      }
     }, 260);
   }
-
   // ------------------------------
   // しおぽんと一緒にゲートジャンプ
   // ------------------------------
