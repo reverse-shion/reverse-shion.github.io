@@ -998,6 +998,24 @@
       earPyonToggle(toggleLayers);
     }, randomRange(6500, 12000));
   }
+  function earPyonToggle() {
+  const toggle = document.getElementById("shiopon-toggle");
+  if (!toggle) return;
+
+  const ear = toggle.querySelector(".sp-layer-toggle.sp-ear");
+  const shadow = toggle.querySelector(".sp-layer-toggle.sp-shadow");
+  if (!ear || !shadow) return;
+
+  // ぴょこ
+  ear.style.backgroundImage = `url(${TOGGLE}toggle_ear_up.png)`;
+  shadow.style.backgroundImage = `url(${TOGGLE}toggle_shadow2.png)`;
+
+  setTimeout(() => {
+    // 元に戻す
+    ear.style.backgroundImage = `url(${TOGGLE}toggle_ear_neutral.png)`;
+    shadow.style.backgroundImage = `url(${TOGGLE}toggle_shadow1.png)`;
+  }, 260);
+}
 
     function blinkBust() {
     const panel = document.getElementById("shiopon-panel");
