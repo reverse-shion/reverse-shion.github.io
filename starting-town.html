@@ -216,6 +216,240 @@
       * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
       .gate-card:hover, .gate-card:focus-visible { transform: none; box-shadow: 0 10px 35px rgba(5, 11, 27, 0.55); }
     }
+
+
+    /* ベース */
+#shiopon-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none; /* デフォルトはクリック通す */
+  z-index: 9999;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", sans-serif;
+}
+
+/* 右下トグルボタン */
+#shiopon-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  overflow: visible;
+}
+
+#shiopon-toggle .sp-toggle-layer {
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* トグル用ちょいフロートアニメ */
+#shiopon-toggle {
+  animation: sp-float 4s ease-in-out infinite;
+}
+
+@keyframes sp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* バストアップ＋ダイアログ */
+#shiopon-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 110px;
+  max-width: 420px;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(16px) scale(0.95);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+}
+
+#shiopon-panel.sp-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+#shiopon-panel.sp-hidden {
+  pointer-events: none;
+}
+
+.sp-panel-inner {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding: 10px 10px 10px 6px;
+  border-radius: 16px;
+  background: rgba(12, 10, 22, 0.85);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  color: #fdfbff;
+}
+
+/* アバターエリア */
+.sp-avatar-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.sp-avatar {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  overflow: visible;
+  animation: sp-float-soft 5s ease-in-out infinite;
+}
+
+@keyframes sp-float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.sp-layer {
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* 顔のオーバーレイ（ほっぺ・汗） */
+.sp-layer.sp-face-extra {
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+}
+
+/* ミニしおぽん（ロゴ的） */
+.sp-mini {
+  position: relative;
+  width: 56px;
+  height: 32px;
+}
+
+.sp-mini-shadow,
+.sp-mini-body {
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ダイアログ */
+.sp-dialog-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-dialog-bubble {
+  position: relative;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(237, 229, 255, 0.4);
+}
+
+.sp-dialog-bubble::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  bottom: 16px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent rgba(255, 255, 255, 0.16) transparent transparent;
+}
+
+.sp-dialog-text {
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 2.5em;
+  white-space: pre-wrap;
+}
+
+/* ボタン */
+.sp-dialog-actions {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sp-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 5px 8px;
+  font-size: 11px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f3d9ff, #ffe3b8);
+  color: #35204b;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sp-btn.ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f7f1ff;
+  border: 1px solid rgba(247, 241, 255, 0.3);
+}
+
+/* 閉じるボタン */
+.sp-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fdfbff;
+}
+
+/* 小さめモード */
+#shiopon-root.sp-small #shiopon-panel {
+  transform: translateY(8px) scale(0.88);
+  transform-origin: bottom right;
+}
+
+#shiopon-root.sp-mini-only #shiopon-panel {
+  display: none;
+}
+
+/* サイレントモードは見た目で分かるようにトグルを少し暗く */
+#shiopon-root.sp-silent #shiopon-toggle {
+  opacity: 0.65;
+}
+
+/* レスポンシブ（超狭い画面では少し縮小） */
+@media (max-width: 480px) {
+  #shiopon-panel {
+    right: 8px;
+    bottom: 96px;
+    max-width: 360px;
+  }
+  #shiopon-toggle {
+    right: 8px;
+    bottom: 8px;
+    width: 70px;
+    height: 70px;
+  }
+}
   </style>
 </head>
 <body>
@@ -282,6 +516,614 @@
         activateSlot(resolveTimeSlot(new Date()));
       });
     })();
+
+    // ==============================
+//  Shiopon Companion v1.0
+//  Shionverse 全域常駐 相棒システム
+// ==============================
+(function () {
+  const ASSET_BASE = "/assets/shiopon/";
+  const BUST = ASSET_BASE + "bust/";
+  const TOGGLE = ASSET_BASE + "toggle/";
+  const MINI = ASSET_BASE + "mini/";
+  const TXT_PATH = ASSET_BASE + "shiopon_lines.txt";
+
+  // ------------------------------
+  // 状態管理（タブ間もなんとなく共有）
+  // ------------------------------
+  const STORAGE_KEY = "shiopon_state_v1";
+
+  const defaultState = {
+    visits: 0,
+    lastMood: "neutral",
+    silent: false
+  };
+
+  let state = loadState();
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { ...defaultState };
+      return { ...defaultState, ...JSON.parse(raw) };
+    } catch (e) {
+      return { ...defaultState };
+    }
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // ------------------------------
+  // セリフ定義（のちに txt から拡張）
+  // mood: "neutral" | "smile" | "worry" | "excited" | "guide"
+  // ------------------------------
+  let lineSets = {
+    greetingFirst: [
+      { mood: "smile", text: "はじめましてなの！\nしおぽん、シオンさんの相棒だよ〜" },
+      { mood: "smile", text: "わぁ…ここまで来てくれてありがとなの！\nいっしょに星を見に行こ？" }
+    ],
+    greetingAgain: [
+      { mood: "smile", text: "おかえりなの〜！\n今日もいっしょに旅、続けよ？" },
+      { mood: "neutral", text: "シオンさん、また来てくれたの？\nふふ、星たちが喜んでるよ〜" }
+    ],
+    idle: [
+      { mood: "neutral", text: "星の声、ちょっとだけざわざわしてるの。\n…あとで、いっしょに聞いてみる？" },
+      { mood: "neutral", text: "ここ、落ち着く場所だね〜。\nしおぽん、ちょっとだけここに住みたいかも…" },
+      { mood: "smile", text: "シオンさんと一緒なら、\nどのゲートもこわくないの〜！" },
+      { mood: "neutral", text: "今日のシオンさんの心、\nどんな星座の形してるかなぁ…" }
+    ],
+    excited: [
+      { mood: "smile", text: "キラキラ〜☆\n新しいゲート、開けちゃう？" },
+      { mood: "smile", text: "うらなっちゃうの〜って言ったら、\n星たち本気だすかも…ぴょん！" }
+    ],
+    guideIntro: [
+      { mood: "smile", text: "どこ行きたい？\nしおぽん、道しるべになるの〜" },
+      { mood: "neutral", text: "ゲート、いろいろあるからね。\n迷ったら、しおぽんに任せてなの。" }
+    ],
+    silentOn: [
+      { mood: "neutral", text: "うん…今日は静かに寄りそってるね。\nなにかあったら、そっとトグル押してなの。" }
+    ],
+    silentOff: [
+      { mood: "smile", text: "ふふっ、声出してもいい？\nまた一緒におしゃべりするの〜" }
+    ]
+  };
+
+  // txt ファイルからセリフを追加する（形式: mood|text）
+  function loadLinesFromTxt() {
+    fetch(TXT_PATH)
+      .then(res => {
+        if (!res.ok) throw new Error("no txt");
+        return res.text();
+      })
+      .then(text => {
+        const lines = text.split(/\r?\n/);
+        lines.forEach(line => {
+          line = line.trim();
+          if (!line || line.startsWith("#")) return;
+          const [moodKey, textBody] = line.split("|");
+          if (!moodKey || !textBody) return;
+          const mood = moodKey.trim();
+          const entry = { mood, text: textBody.trim() };
+          // 追加先を mood 名と同じキーに突っ込む（なければ idle に）
+          if (!lineSets[mood]) lineSets[mood] = [];
+          lineSets[mood].push(entry);
+        });
+      })
+      .catch(() => {
+        // txt 無くても問題なし
+      });
+  }
+
+  // ------------------------------
+  // DOM 初期化
+  // ------------------------------
+  document.addEventListener("DOMContentLoaded", init);
+
+  function init() {
+    const root = document.getElementById("shiopon-root");
+    const panel = document.getElementById("shiopon-panel");
+    const toggleBtn = document.getElementById("shiopon-toggle");
+    const textEl = document.getElementById("shiopon-text");
+    if (!root || !panel || !toggleBtn || !textEl) return;
+
+    // ページ設定反映
+    const cfg = (window.ShioponConfig || {});
+    const mode = cfg.mode || "normal";
+    const size = cfg.size || "normal";
+
+    if (mode === "silent") {
+      root.classList.add("sp-silent");
+      state.silent = true;
+    }
+    if (size === "small") {
+      root.classList.add("sp-small");
+    }
+    if (mode === "mini-only") {
+      root.classList.add("sp-mini-only");
+    }
+
+    // レイヤー要素取得
+    const bustLayers = {
+      shadow: panel.querySelector(".sp-layer.sp-shadow"),
+      ear: panel.querySelector(".sp-layer.sp-ear"),
+      body: panel.querySelector(".sp-layer.sp-body"),
+      faceExtra: panel.querySelector(".sp-layer.sp-face-extra"),
+      eyes: panel.querySelector(".sp-layer.sp-eyes"),
+      mouth: panel.querySelector(".sp-layer.sp-mouth")
+    };
+
+    const miniShadow = panel.querySelector(".sp-mini-shadow");
+    const miniBody = panel.querySelector(".sp-mini-body");
+
+    const toggleLayers = {
+      shadow: toggleBtn.querySelector(".sp-toggle-shadow"),
+      ear: toggleBtn.querySelector(".sp-toggle-ear"),
+      base: toggleBtn.querySelector(".sp-toggle-base"),
+      eyes: toggleBtn.querySelector(".sp-toggle-eyes"),
+      mouth: toggleBtn.querySelector(".sp-toggle-mouth")
+    };
+
+    // 画像セット
+    setupImages(bustLayers, miniShadow, miniBody, toggleLayers);
+
+    // アニメーションループ
+    setupIdleAnimations(bustLayers, toggleLayers);
+
+    // イベント
+    const closeBtn = panel.querySelector(".sp-close");
+    const actionButtons = panel.querySelectorAll(".sp-btn");
+
+    toggleBtn.addEventListener("click", () => {
+      if (root.classList.contains("sp-mini-only")) {
+        // mini-only の場合も、トグル押したら一時的にしゃべらせる
+        root.classList.remove("sp-mini-only");
+        root.classList.add("sp-small");
+      }
+      if (panel.classList.contains("sp-visible")) {
+        hidePanel(panel);
+      } else {
+        showPanel(panel, textEl, "greeting");
+      }
+    });
+
+    closeBtn.addEventListener("click", () => {
+      hidePanel(panel);
+    });
+
+    actionButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const action = btn.getAttribute("data-sp-action");
+        handleAction(action, panel, textEl);
+      });
+    });
+
+    // 初回だけ自動で軽く挨拶（ただしサイレントでなければ）
+    if (!state.silent && mode === "normal") {
+      setTimeout(() => {
+        // 画面開いてすぐにドカンと出さないよう少し待つ
+        if (!panel.classList.contains("sp-visible")) {
+          // 軽く揺らすくらいでもいいけど、ここではトグルだけ光らせたいなら
+          // とりあえず何もしない。必要ならクラス付与で演出追加。
+        }
+      }, 2500);
+    }
+
+    saveState();
+    loadLinesFromTxt();
+  }
+
+  // ------------------------------
+  // 画像セット & プリロード
+  // ------------------------------
+  function setupImages(bustLayers, miniShadow, miniBody, toggleLayers) {
+    // バストアップ
+    if (bustLayers.shadow) bustLayers.shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
+    if (bustLayers.body) bustLayers.body.style.backgroundImage = `url(${BUST}body_base.png)`;
+    if (bustLayers.ear) bustLayers.ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
+    if (bustLayers.eyes) bustLayers.eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+    if (bustLayers.mouth) bustLayers.mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
+    if (bustLayers.faceExtra) bustLayers.faceExtra.style.backgroundImage = "none";
+
+    if (miniShadow) miniShadow.style.backgroundImage = `url(${MINI}mini_shadow.png)`;
+    if (miniBody) miniBody.style.backgroundImage = `url(${TOGGLE}toggle_base.png)`; // 共通画像を使う
+
+    // トグル
+    if (toggleLayers.shadow) toggleLayers.shadow.style.backgroundImage = `url(${TOGGLE}toggle_shadow1.png)`;
+    if (toggleLayers.base) toggleLayers.base.style.backgroundImage = `url(${TOGGLE}toggle_base.png)`;
+    if (toggleLayers.ear) toggleLayers.ear.style.backgroundImage = `url(${TOGGLE}toggle_ear_neutral.png)`;
+    if (toggleLayers.eyes) toggleLayers.eyes.style.backgroundImage = `url(${TOGGLE}toggle_eyes_open.png)`;
+    if (toggleLayers.mouth) toggleLayers.mouth.style.backgroundImage = `url(${TOGGLE}toggle_mouth_close.png)`;
+
+    // 軽いプリロード（よく使う素材だけ）
+    const preloadList = [
+      `${BUST}ear_up.png`,
+      `${BUST}eyes_half.png`,
+      `${BUST}eyes_closed.png`,
+      `${BUST}mouth_open1.png`,
+      `${BUST}mouth_open2.png`,
+      `${BUST}mouth_smile.png`,
+      `${BUST}face_blush.png`,
+      `${BUST}face_sweat.png`,
+      `${BUST}shadow_up.png`,
+      `${TOGGLE}toggle_ear_up.png`,
+      `${TOGGLE}toggle_eyes_half.png`,
+      `${TOGGLE}toggle_eyes_closed.png`,
+      `${TOGGLE}toggle_mouth_open.png`,
+      `${TOGGLE}toggle_shadow2.png`
+    ];
+
+    preloadList.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }
+
+  // ------------------------------
+  // パネルの表示 / 非表示
+  // ------------------------------
+  function showPanel(panel, textEl, type) {
+    panel.classList.remove("sp-hidden");
+    panel.classList.add("sp-visible");
+
+    state.visits += 1;
+    saveState();
+
+    if (type === "greeting") {
+      const isFirst = state.visits <= 1;
+      const pool = isFirst ? lineSets.greetingFirst : lineSets.greetingAgain;
+      const line = pickRandom(pool);
+      speak(line, textEl);
+    }
+  }
+
+  function hidePanel(panel) {
+    panel.classList.remove("sp-visible");
+    panel.classList.add("sp-hidden");
+  }
+
+  // ------------------------------
+  // ボタンアクション
+  // ------------------------------
+  function handleAction(action, panel, textEl) {
+    if (action === "more") {
+      const pool = lineSets.idle.concat(lineSets.excited);
+      const line = pickRandom(pool);
+      speak(line, textEl);
+      return;
+    }
+
+    if (action === "guide") {
+      // ページごとのゲート定義
+      const gates = (window.ShioponGates || []);
+      if (!gates.length) {
+        const fallback = {
+          mood: "worry",
+          text: "あれれ…このページには\n案内できるゲートが見当たらないの…。"
+        };
+        speak(fallback, textEl);
+        return;
+      }
+
+      // 案内用前口上
+      const intro = pickRandom(lineSets.guideIntro);
+      speak(intro, textEl, () => {
+        // 少し待ってからゲート選択（今は単純にランダム遷移）
+        const target = pickRandom(gates);
+        if (!target || !target.url) return;
+
+        // 遷移演出：軽いフェードアウト → ページ遷移
+        starJumpTo(target.url);
+      });
+      return;
+    }
+
+    if (action === "silent") {
+      state.silent = !state.silent;
+      saveState();
+
+      const line = pickRandom(state.silent ? lineSets.silentOn : lineSets.silentOff);
+      speak(line, textEl);
+      const root = document.getElementById("shiopon-root");
+      if (root) {
+        if (state.silent) root.classList.add("sp-silent");
+        else root.classList.remove("sp-silent");
+      }
+      return;
+    }
+  }
+
+  // ------------------------------
+  // セリフを話す（口パク＋表情連動）
+  // ------------------------------
+  let speakingTimer = null;
+
+  function speak(line, textEl, onDone) {
+    if (!line || !textEl) return;
+
+    state.lastMood = line.mood || "neutral";
+    saveState();
+
+    // 表情セット
+    setExpression(line.mood || "neutral");
+
+    // テキストを一気に表示（必要ならタイピング風にもできる）
+    textEl.textContent = line.text;
+
+    // 口パク
+    if (speakingTimer) {
+      clearInterval(speakingTimer);
+      speakingTimer = null;
+    }
+
+    const duration = Math.max(1500, line.text.length * 60);
+    const start = performance.now();
+
+    const panel = document.getElementById("shiopon-panel");
+    const mouthLayer = panel && panel.querySelector(".sp-layer.sp-mouth");
+
+    let phase = 0;
+    speakingTimer = setInterval(() => {
+      const now = performance.now();
+      const t = now - start;
+      if (!mouthLayer) return;
+
+      // 3段階口パク
+      if (phase === 0) {
+        mouthLayer.style.backgroundImage = `url(${BUST}mouth_open1.png)`;
+      } else if (phase === 1) {
+        mouthLayer.style.backgroundImage = `url(${BUST}mouth_open2.png)`;
+      } else {
+        // 閉じる or にっこり
+        if (line.mood === "smile" || line.mood === "excited") {
+          mouthLayer.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
+        } else {
+          mouthLayer.style.backgroundImage = `url(${BUST}mouth_close.png)`;
+        }
+      }
+      phase = (phase + 1) % 3;
+
+      if (t >= duration) {
+        clearInterval(speakingTimer);
+        speakingTimer = null;
+        // 終了顔
+        if (line.mood === "smile" || line.mood === "excited") {
+          mouthLayer.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
+        } else {
+          mouthLayer.style.backgroundImage = `url(${BUST}mouth_close.png)`;
+        }
+        if (typeof onDone === "function") {
+          onDone();
+        }
+      }
+    }, 120);
+  }
+
+  // ------------------------------
+  // 表情セット（レイヤー切り替え）
+  // ------------------------------
+  function setExpression(mood) {
+    const panel = document.getElementById("shiopon-panel");
+    if (!panel) return;
+
+    const shadow = panel.querySelector(".sp-layer.sp-shadow");
+    const ear = panel.querySelector(".sp-layer.sp-ear");
+    const eyes = panel.querySelector(".sp-layer.sp-eyes");
+    const mouth = panel.querySelector(".sp-layer.sp-mouth");
+    const extra = panel.querySelector(".sp-layer.sp-face-extra");
+
+    // デフォルト
+    if (shadow) shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
+    if (ear) ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
+    if (eyes) eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+    if (mouth) mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
+    if (extra) {
+      extra.style.backgroundImage = "none";
+      extra.style.opacity = "0";
+    }
+
+    // mood 別調整
+    switch (mood) {
+      case "smile":
+      case "excited":
+        if (ear) ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
+        if (shadow) shadow.style.backgroundImage = `url(${BUST}shadow_up.png)`;
+        if (mouth) mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
+        if (extra) {
+          extra.style.backgroundImage = `url(${BUST}face_blush.png)`;
+          extra.style.opacity = "1";
+        }
+        break;
+      case "worry":
+        if (eyes) eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
+        if (extra) {
+          extra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
+          extra.style.opacity = "1";
+        }
+        break;
+      // 今後：sad / tear など追加予定
+      default:
+        break;
+    }
+  }
+
+  // ------------------------------
+  // まばたき・耳ぴょこ アイドルアニメ
+  // ------------------------------
+  function setupIdleAnimations(bustLayers, toggleLayers) {
+    // バストアップのまばたき
+    setInterval(() => {
+      blinkBust();
+    }, randomRange(4000, 7000));
+
+    // トグルのまばたき
+    setInterval(() => {
+      blinkToggle(toggleLayers);
+    }, randomRange(4500, 8000));
+
+    // 耳ぴょこ（バストアップ）
+    setInterval(() => {
+      earPyonBust(bustLayers);
+    }, randomRange(6000, 11000));
+
+    // 耳ぴょこ（トグル）
+    setInterval(() => {
+      earPyonToggle(toggleLayers);
+    }, randomRange(6500, 12000));
+  }
+
+  function blinkBust() {
+    const panel = document.getElementById("shiopon-panel");
+    if (!panel) return;
+    const eyes = panel.querySelector(".sp-layer.sp-eyes");
+    if (!eyes) return;
+
+    eyes.style.backgroundImage = `url(${BUST}eyes_closed.png)`;
+    setTimeout(() => {
+      eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+    }, 120);
+  }
+
+  function blinkToggle(toggleLayers) {
+    const eyes = toggleLayers.eyes;
+    if (!eyes) return;
+    eyes.style.backgroundImage = `url(${TOGGLE}toggle_eyes_closed.png)`;
+    setTimeout(() => {
+      eyes.style.backgroundImage = `url(${TOGGLE}toggle_eyes_open.png)`;
+    }, 120);
+  }
+
+  function earPyonBust(bustLayers) {
+    const ear = bustLayers.ear;
+    const shadow = bustLayers.shadow;
+    if (!ear || !shadow) return;
+    ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
+    shadow.style.backgroundImage = `url(${BUST}shadow_up.png)`;
+    setTimeout(() => {
+      ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
+      shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
+    }, 260);
+  }
+
+  function earPyonToggle(toggleLayers) {
+    const ear = toggleLayers.ear;
+    const shadow = toggleLayers.shadow;
+    if (!ear || !shadow) return;
+    ear.style.backgroundImage = `url(${TOGGLE}toggle_ear_up.png)`;
+    shadow.style.backgroundImage = `url(${TOGGLE}toggle_shadow2.png)`;
+    setTimeout(() => {
+      ear.style.backgroundImage = `url(${TOGGLE}toggle_ear_neutral.png)`;
+      shadow.style.backgroundImage = `url(${TOGGLE}toggle_shadow1.png)`;
+    }, 260);
+  }
+
+  // ------------------------------
+  // しおぽんと一緒にゲートジャンプ
+  // ------------------------------
+  function starJumpTo(url) {
+    // 軽いフラッシュ / フェード演出
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.background = "radial-gradient(circle at 50% 70%, rgba(255,255,255,0.9), rgba(12,10,22,1))";
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 0.35s ease-out";
+    overlay.style.pointerEvents = "none";
+    overlay.style.zIndex = "99999";
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+      overlay.style.opacity = "1";
+    });
+
+    setTimeout(() => {
+      window.location.href = url;
+    }, 350);
+  }
+
+  // ------------------------------
+  // ユーティリティ
+  // ------------------------------
+  function pickRandom(arr) {
+    if (!arr || !arr.length) return null;
+    const idx = Math.floor(Math.random() * arr.length);
+    return arr[idx];
+  }
+
+  function randomRange(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+})();
   </script>
+
+  <!-- しおぽん常駐コンポーネント -->
+<div id="shiopon-root">
+  <!-- 右下トグル（常に表示） -->
+  <button id="shiopon-toggle" aria-label="しおぽんを呼ぶ">
+    <div class="sp-toggle-layer sp-toggle-shadow"></div>
+    <div class="sp-toggle-layer sp-toggle-ear"></div>
+    <div class="sp-toggle-layer sp-toggle-base"></div>
+    <div class="sp-toggle-layer sp-toggle-eyes"></div>
+    <div class="sp-toggle-layer sp-toggle-mouth"></div>
+  </button>
+
+  <!-- バストアップ＋セリフウィンドウ -->
+  <div id="shiopon-panel" class="sp-hidden">
+    <div class="sp-panel-inner">
+      <div class="sp-avatar-area">
+        <div class="sp-avatar">
+          <div class="sp-layer sp-shadow"></div>
+          <div class="sp-layer sp-ear"></div>
+          <div class="sp-layer sp-body"></div>
+          <div class="sp-layer sp-face-extra"></div>
+          <div class="sp-layer sp-eyes"></div>
+          <div class="sp-layer sp-mouth"></div>
+        </div>
+        <!-- ミニしおぽん（ロゴ的なちびアイコン）-->
+        <div class="sp-mini">
+          <div class="sp-mini-shadow"></div>
+          <div class="sp-mini-body"></div>
+        </div>
+      </div>
+
+      <div class="sp-dialog-area">
+        <div class="sp-dialog-bubble">
+          <div class="sp-dialog-text" id="shiopon-text"></div>
+        </div>
+        <div class="sp-dialog-actions">
+          <button class="sp-btn" data-sp-action="more">もっと話す</button>
+          <button class="sp-btn" data-sp-action="guide">案内して</button>
+          <button class="sp-btn ghost" data-sp-action="silent">今日は静かに</button>
+        </div>
+      </div>
+
+      <button class="sp-close" aria-label="しおぽんをしまう">×</button>
+    </div>
+  </div>
+</div>
+
+<!-- ページごとのオプション（任意） -->
+<script>
+  // ページごとのゲート（案内ボタン用リンク）
+  window.ShioponGates = [
+    // { label: "始まりの町へ", url: "/start-town.html" },
+    // { label: "星の言霊図書館へ", url: "/library.html" },
+  ];
+
+  // ページごとの動作モード
+  // mode: "normal" | "silent" | "mini-only"
+  window.ShioponConfig = {
+    mode: "normal",
+    size: "normal"  // "normal" | "small" （重要ページを小さめにしたいとき）
+  };
+</script>
+
+<link rel="stylesheet" href="/css/shiopon-companion.css">
+<script src="/js/shiopon-companion.js" defer></script>
 </body>
 </html>
