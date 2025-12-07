@@ -420,52 +420,61 @@
     }, 120);
   }
 
-  // ------------------------------
-  // 表情セット
-  // ------------------------------
-  function setExpression(mood) {
-    const panel = document.getElementById("shiopon-panel");
-    if (!panel) return;
+// ------------------------------
+// 表情セット（レイヤー切り替え）
+// ------------------------------
+function setExpression(mood) {
+  const panel = document.getElementById("shiopon-panel");
+  if (!panel) return;
 
-    const shadow = bustLayers.shadow;
-    const ear    = bustLayers.ear;
-    const eyes   = bustLayers.eyes;
-    const mouth  = bustLayers.mouth;
-    const extra  = bustLayers.faceExtra;
+  const shadow = panel.querySelector(".sp-layer.sp-shadow");
+  const ear    = panel.querySelector(".sp-layer.sp-ear");
+  const eyes   = panel.querySelector(".sp-layer.sp-eyes");
+  const mouth  = panel.querySelector(".sp-layer.sp-mouth");
+  const extra  = panel.querySelector(".sp-layer.sp-face-extra");
+  const avatar = panel.querySelector(".sp-avatar");
 
-    if (shadow) shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
-    if (ear)    ear.style.backgroundImage    = `url(${BUST}ear_neutral.png)`;
-    if (eyes)   eyes.style.backgroundImage   = `url(${BUST}eyes_open.png)`;
-    if (mouth)  mouth.style.backgroundImage  = `url(${BUST}mouth_close.png)`;
-    if (extra) {
-      extra.style.backgroundImage = "none";
-      extra.style.opacity = "0";
-    }
-
-    switch (mood) {
-      case "smile":
-      case "excited":
-        if (ear)    ear.style.backgroundImage    = `url(${BUST}ear_up.png)`;
-        if (shadow) shadow.style.backgroundImage = `url(${BUST}shadow_up.png)`;
-        if (eyes)   eyes.style.backgroundImage   = `url(${BUST}eyes_smile.png)`;
-        if (mouth)  mouth.style.backgroundImage  = `url(${BUST}mouth_smile.png)`;
-        if (extra) {
-          extra.style.backgroundImage = `url(${BUST}face_blush.png)`;
-          extra.style.opacity = "1";
-        }
-        break;
-      case "worry":
-        if (eyes)  eyes.style.backgroundImage  = `url(${BUST}eyes_half.png)`;
-        if (extra) {
-          extra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
-          extra.style.opacity = "1";
-        }
-        break;
-      default:
-        break;
-    }
+  // いったん全部デフォルトに戻す
+  if (shadow) shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
+  if (ear)    ear.style.backgroundImage    = `url(${BUST}ear_neutral.png)`;
+  if (eyes)   eyes.style.backgroundImage   = `url(${BUST}eyes_open.png)`;
+  if (mouth)  mouth.style.backgroundImage  = `url(${BUST}mouth_close.png)`;
+  if (extra) {
+    extra.style.backgroundImage = "none";
+    extra.style.opacity = "0";
+  }
+  if (avatar) {
+    avatar.classList.remove("sp-mood-smile", "sp-mood-worry");
   }
 
+  switch (mood) {
+    case "smile":
+    case "excited":
+      // 耳と影はそのまま（耳アップ無し）
+      if (eyes)  eyes.style.backgroundImage  = `url(${BUST}eyes_smile.png)`;
+      if (mouth) mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
+      if (extra) {
+        extra.style.backgroundImage = `url(${BUST}face_blush.png)`;
+        extra.style.opacity = "1";
+      }
+      if (avatar) avatar.classList.add("sp-mood-smile");
+      break;
+
+    case "worry":
+      if (eyes)  eyes.style.backgroundImage  = `url(${BUST}eyes_half.png)`;
+      if (mouth) mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
+      if (extra) {
+        extra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
+        extra.style.opacity = "1";
+      }
+      if (avatar) avatar.classList.add("sp-mood-worry");
+      break;
+
+    default:
+      // neutral はデフォルトのまま
+      break;
+  }
+}
   // ------------------------------
   // アイドルアニメ（まばたき・耳ぴょこ）
   // ------------------------------
