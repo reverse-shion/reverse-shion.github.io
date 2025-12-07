@@ -46,14 +46,14 @@
       { mood: "smile", text: "わぁ…ここまで来てくれてありがとなの！\nいっしょに星を見に行こ？" }
     ],
     greetingAgain: [
-      { mood: "smile", text: "おかえりなの〜！\n今日もいっしょに旅、続けよ？" },
-      { mood: "neutral", text: "シオンさん、また来てくれたの？\nふふ、星たちが喜んでるよ〜" }
+      { mood: "smile", text: "{name}さんおかえりなの〜！\n今日もいっしょに旅、続けよ？" },
+      { mood: "neutral", text: "{name}さん、また来てくれたの？\nふふ、星たちが喜んでるよ〜" }
     ],
     idle: [
       { mood: "neutral", text: "星の声、ちょっとだけざわざわしてるの。\n…あとで、いっしょに聞いてみる？" },
       { mood: "neutral", text: "ここ、落ち着く場所だね〜。\nしおぽん、ちょっとだけここに住みたいかも…" },
-      { mood: "smile", text: "シオンさんと一緒なら、\nどのゲートもこわくないの〜！" },
-      { mood: "neutral", text: "今日のシオンさんの心、\nどんな星座の形してるかなぁ…" }
+      { mood: "smile", text: "{name}さんと一緒なら、\nどのゲートもこわくないの〜！" },
+      { mood: "neutral", text: "今日の{name}さんの心、\nどんな星座の形してるかなぁ…" }
     ],
     excited: [
       { mood: "smile", text: "キラキラ〜☆\n新しいゲート、開けちゃう？" },
@@ -589,8 +589,8 @@ function blinkBust() {
   }
 
   function getUserName() {
-  const name = localStorage.getItem("shion_user_name");
-  return name && name.trim() ? name : "おともだち";
+  const name = localStorage.getItem("lumiereVisitorName");
+  return name && name.trim() ? name : "きみ";
 }
 
  function applyUserName(text) {
