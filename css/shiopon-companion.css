@@ -317,94 +317,67 @@
 .sp-bust-particles::before {
   content: "";
   position: absolute;
-  top: -25%;
+  top: 0;        /* ここからスタート（上端） */
   left: 0;
-  width: 4px;     /* ちょっと大きめにして見やすく */
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 999px;
 }
 
-/* ---- レイヤー別設定 ---- */
-
-/* 一番奥：白っぽい粒子、ゆっくり＆少なめ */
+/* 一番奥：白〜淡ラベンダー */
 .particles-back::before {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 1);
   box-shadow:
-    20px  10px  4px 0 rgba(255,255,255,0.7),
-    80px  60px  6px 0 rgba(235,225,255,0.7),
-    150px 20px  4px 0 rgba(240,230,255,0.75),
-    220px 90px  5px 0 rgba(255,255,255,0.7),
-    60px  140px 5px 0 rgba(235,230,255,0.7),
-    200px 170px 6px 0 rgba(250,245,255,0.7);
-  animation: spParticlesFloatBack 24s ease-in-out infinite;
+    20px  10px  0 0 rgba(255,255,255,0.9),
+    80px  60px  0 0 rgba(235,225,255,0.9),
+    150px 20px  0 0 rgba(240,230,255,0.9),
+    220px 90px  0 0 rgba(255,255,255,0.9),
+    60px  140px 0 0 rgba(235,230,255,0.9),
+    200px 170px 0 0 rgba(250,245,255,0.9);
+  animation: spParticlesFloatBack 22s linear infinite;
 }
 
-/* 中間：ラベンダー系、少しだけ速く */
+/* 中間：ラベンダー濃いめ */
 .particles-mid::before {
   background: rgba(210, 190, 255, 1);
   box-shadow:
-    40px  0px   6px 0 rgba(210,190,255,0.95),
-    120px 40px  8px 0 rgba(195,175,255,0.95),
-    200px 80px  6px 0 rgba(215,190,255,0.95),
-    30px  120px 7px 0 rgba(205,185,255,0.95),
-    160px 150px 8px 0 rgba(200,180,255,0.95),
-    260px 110px 7px 0 rgba(220,200,255,0.9);
-  animation: spParticlesFloatMid 20s ease-in-out infinite;
+    40px  20px  0 0 rgba(210,190,255,1),
+    120px 60px  0 0 rgba(195,175,255,1),
+    200px 40px  0 0 rgba(215,190,255,1),
+    30px  120px 0 0 rgba(205,185,255,1),
+    160px 150px 0 0 rgba(200,180,255,1),
+    260px 100px 0 0 rgba(220,200,255,1);
+  animation: spParticlesFloatMid 18s linear infinite;
 }
 
-/* 手前：ピンク〜ゴールド系、少し大きめ＆ちょい速い */
+/* 手前：ピンク〜ゴールド、一番目立たせる */
 .particles-front::before {
-  width: 5px;
-  height: 5px;
   background: rgba(255, 160, 220, 1);
   box-shadow:
-    30px  10px  8px 0 rgba(255,160,220,1),
-    90px  50px  9px 0 rgba(255,145,210,0.98),
-    140px 30px  8px 0 rgba(255,180,210,0.98),
-    210px 80px  9px 0 rgba(255,190,200,1),
-    70px  130px 8px 0 rgba(255,150,220,1),
-    190px 170px 9px 0 rgba(255,185,215,0.98);
-  animation: spParticlesFloatFront 16s ease-in-out infinite;
+    30px  30px  0 0 rgba(255,160,220,1),
+    90px  70px  0 0 rgba(255,145,210,1),
+    140px 50px  0 0 rgba(255,180,210,1),
+    210px 90px  0 0 rgba(255,190,200,1),
+    70px  140px 0 0 rgba(255,150,220,1),
+    190px 180px 0 0 rgba(255,185,215,1);
+  animation: spParticlesFloatFront 14s linear infinite;
 }
-/* ---- アニメーション定義 ---- */
 
-/* 奥ほどゆっくり動く（パララックスっぽく） */
+/* 上から下へ、必ず枠内を通るように「px」で制御 */
 @keyframes spParticlesFloatBack {
-  0% {
-    transform: translate3d(-6px, -20%, 0);
-  }
-  50% {
-    transform: translate3d( 6px,  10%, 0);
-  }
-  100% {
-    transform: translate3d(-6px,  40%, 0);
-  }
+  0%   { transform: translateY(-40px); }
+  100% { transform: translateY(80px); }
 }
 
 @keyframes spParticlesFloatMid {
-  0% {
-    transform: translate3d(-8px, -25%, 0);
-  }
-  50% {
-    transform: translate3d( 8px,  15%, 0);
-  }
-  100% {
-    transform: translate3d(-8px,  55%, 0);
-  }
+  0%   { transform: translateY(-60px); }
+  100% { transform: translateY(100px); }
 }
 
 @keyframes spParticlesFloatFront {
-  0% {
-    transform: translate3d(-10px, -30%, 0);
-  }
-  50% {
-    transform: translate3d( 10px,  20%, 0);
-  }
-  100% {
-    transform: translate3d(-10px,  70%, 0);
-  }
+  0%   { transform: translateY(-80px); }
+  100% { transform: translateY(120px); }
 }
-
 /* 端末が「簡易アニメーション」を指定している場合は停止 */
 @media (prefers-reduced-motion: reduce) {
   .sp-bust-particles {
@@ -413,7 +386,3 @@
 }
 
 
-/* 一時デバッグ用：粒子レイヤーの位置確認 */
-.sp-bust-particles {
-  background: rgba(0, 255, 0, 0.15);  /* 薄い緑の板にしてみる */
-}
