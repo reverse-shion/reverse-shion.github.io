@@ -4,58 +4,81 @@
 // ============================================================
 
 (() => {
+  "use strict";
+
   const STORAGE_KEY = "shiopon_state_v2";
   const LINES_TXT = "/assets/shiopon/shiopon_lines.txt";
 
   // ------------------------------------------------------------
-  // プロフィール（ユーザーのクセ）初期値
+  // プロフィール / 状態のファクトリ
+  //   ※ 参照共有バグを防ぐため、毎回新しいオブジェクトを生成
   // ------------------------------------------------------------
-  const defaultProfile = {
-    visitsByHour: Array(24).fill(0), // 各時間帯の訪問回数
-    totalVisits: 0,
-    totalTalkClicks: 0,     // 「もっと話す」
-    totalGuideClicks: 0,    // 「案内して」
-    totalSilentOn: 0,       // サイレントON
-    totalSilentOff: 0,      // サイレントOFF
-    lastVisitTs: 0,
-    lastCategory: null,     // 直近に喋ったカテゴリ
-    lastSilentChangeTs: 0
-  };
+  function createDefaultProfile() {
+    return {
+      visitsByHour: Array(24).fill(0), // 各時間帯の訪問回数
+      totalVisits: 0,
+      totalTalkClicks: 0,     // 「もっと話す」
+      totalGuideClicks: 0,    // 「案内して」
+      totalSilentOn: 0,       // サイレントON
+      totalSilentOff: 0,      // サイレントOFF
+      lastVisitTs: 0,
+      lastCategory: null,     // 直近に喋ったカテゴリ
+      lastSilentChangeTs: 0
+    };
+  }
+
+  function createDefaultState() {
+    return {
+      visits: 0,
+      silent: false,
+      lastMood: "neutral",
+      lastActionTime: 0,
+      profile: createDefaultProfile()
+    };
+  }
 
   // ------------------------------------------------------------
   // 状態管理
   // ------------------------------------------------------------
-  const defaultState = {
-    visits: 0,
-    silent: false,
-    lastMood: "neutral",
-    lastActionTime: 0,
-    profile: { ...defaultProfile }
-  };
-
   let state = loadState();
   let lineDict = {};        // { category: [ { mood, expression, text } ] }
   let speakingTimer = null;
   let linesLoaded = false;
 
   function loadState() {
+    const base = createDefaultState();
+
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return { ...defaultState };
+      if (!raw) return base;
 
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(raw) || {};
+      const loadedProfile = parsed.profile || {};
+
+      // visitsByHour を含めてマージしつつ、必ず length 24 に揃える
+      let visitsByHour = Array.isArray(loadedProfile.visitsByHour)
+        ? loadedProfile.visitsByHour.slice(0, 24)
+        : [];
+
+      if (visitsByHour.length < 24) {
+        visitsByHour = visitsByHour.concat(
+          Array(24 - visitsByHour.length).fill(0)
+        );
+      }
+
       const profile = {
-        ...defaultProfile,
-        ...(parsed.profile || {})
+        ...createDefaultProfile(),
+        ...loadedProfile,
+        visitsByHour
       };
 
       return {
-        ...defaultState,
+        ...base,
         ...parsed,
         profile
       };
     } catch {
-      return { ...defaultState };
+      return base;
     }
   }
 
@@ -73,8 +96,12 @@
   //    ここでは「さん」を付け足さない。
   // ------------------------------------------------------------
   function getUserName() {
-    const n = localStorage.getItem("lumiereVisitorName");
-    return n && n.trim() ? n.trim() : "きみ";
+    try {
+      const n = localStorage.getItem("lumiereVisitorName");
+      return n && n.trim() ? n.trim() : "きみ";
+    } catch {
+      return "きみ";
+    }
   }
 
   function applyUserName(text) {
@@ -91,15 +118,18 @@
       if (!res.ok) throw new Error("response not ok");
       const txt = await res.text();
       lineDict = parseLines(txt);
-      linesLoaded = true;
+      linesLoaded = Object.keys(lineDict).length > 0;
     } catch (e) {
       console.warn("shiopon_lines.txt が読めませんでした:", e);
+      lineDict = {};
       linesLoaded = false;
     }
   }
 
   function parseLines(raw) {
     const dict = {};
+    if (!raw) return dict;
+
     const rows = raw.split(/\r?\n/);
 
     rows.forEach((row) => {
@@ -157,9 +187,26 @@
   // ------------------------------------------------------------
   // プロフィール更新ヘルパー
   // ------------------------------------------------------------
+  function ensureVisitsByHour(profile) {
+    if (!profile) return;
+    if (!Array.isArray(profile.visitsByHour)) {
+      profile.visitsByHour = Array(24).fill(0);
+      return;
+    }
+    if (profile.visitsByHour.length < 24) {
+      profile.visitsByHour = profile.visitsByHour.concat(
+        Array(24 - profile.visitsByHour.length).fill(0)
+      );
+    } else if (profile.visitsByHour.length > 24) {
+      profile.visitsByHour = profile.visitsByHour.slice(0, 24);
+    }
+  }
+
   function updateProfileOnVisit() {
     const hour = new Date().getHours();
-    const p = state.profile;
+    const p = state.profile || (state.profile = createDefaultProfile());
+
+    ensureVisitsByHour(p);
 
     p.visitsByHour[hour] = (p.visitsByHour[hour] || 0) + 1;
     p.totalVisits += 1;
@@ -170,7 +217,7 @@
   }
 
   function updateProfileOnAction(action) {
-    const p = state.profile;
+    const p = state.profile || (state.profile = createDefaultProfile());
 
     if (action === "more") {
       p.totalTalkClicks += 1;
@@ -190,7 +237,7 @@
   }
 
   function updateProfileOnCategory(category) {
-    const p = state.profile;
+    const p = state.profile || (state.profile = createDefaultProfile());
     p.lastCategory = category;
     state.profile = p;
     state.lastActionTime = Date.now();
@@ -201,7 +248,9 @@
   // ユーザーの「クセ」推定
   // ------------------------------------------------------------
   function getUserTraits() {
-    const p = state.profile;
+    const p = state.profile || createDefaultProfile();
+    ensureVisitsByHour(p);
+
     const traits = {
       isNightOwl: false,
       isTalkative: false,
@@ -279,7 +328,7 @@
 
     // 6️⃣ おしゃべりさん
     if (traits.isTalkative) {
-      const lastCat = state.profile.lastCategory;
+      const lastCat = state.profile?.lastCategory;
       if (lastCat === "excited") return "idle";
       return "excited";
     }
@@ -408,6 +457,8 @@
   // ゲートジャンプ演出（必要なら使用）
   // ------------------------------------------------------------
   function starJumpTo(url) {
+    if (!url) return;
+
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
     overlay.style.inset = "0";
@@ -415,7 +466,7 @@
       "radial-gradient(circle at 50% 70%, rgba(255,255,255,0.9), rgba(12,10,22,1))";
     overlay.style.opacity = "0";
     overlay.style.transition = "opacity 0.35s ease-out";
-    overlay.style.pointerEvents = "none";
+    overlay.style.pointerEvents = "auto"; // ★ 二重クリック防止のためブロック
     overlay.style.zIndex = "99999";
     document.body.appendChild(overlay);
 
@@ -532,3 +583,5 @@
     getUserTraits
   };
 })();
+
+
