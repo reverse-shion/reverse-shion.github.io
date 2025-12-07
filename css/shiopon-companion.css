@@ -47,10 +47,18 @@
 
   z-index: var(--sp-z-base);
   transition: transform 0.25s ease;
+   
 }
 
 #shiopon-toggle:hover {
-  transform: scale(1.05);
+  animation: none;                /* ゆらゆら停止 */
+  transform: scale(1.05) !important;
+   animation: sp-toggle-float 6s ease-in-out infinite;
+}
+@keyframes sp-toggle-float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
 }
 
 /* トグル用レイヤー（影・耳・本体・目・口）
