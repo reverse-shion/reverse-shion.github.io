@@ -1,9 +1,6 @@
 // ============================================================
-//  Shiopon Companion System v2.1
+//  Shiopon Companion System v2.2
 //  --- VISUAL MODULE（見た目・アニメーション制御）---
-//  ・DOM未準備でも安全に動作
-//  ・まばたき / 耳ぴょこは setTimeout でランダム間隔
-//  ・しおぽんの「表情」と Core の lastMood を連動
 // ============================================================
 
 (() => {
@@ -20,7 +17,7 @@
   let miniShadow   = null;
   let miniBody     = null;
 
-  // アイドル用タイマー（setTimeout）
+  // アイドル用タイマー
   let blinkBustTimer   = null;
   let blinkToggleTimer = null;
   let earBustTimer     = null;
@@ -33,7 +30,7 @@
     const panel  = document.getElementById("shiopon-panel");
     const toggle = document.getElementById("shiopon-toggle");
 
-    // どちらもなければ何もしない
+    // どちらも無ければ何もしない
     if (!panel && !toggle) return;
 
     if (panel) {
@@ -80,8 +77,10 @@
         body.style.backgroundImage   = `url(${BUST}body_base.png)`;
       if (ear)
         ear.style.backgroundImage    = `url(${BUST}ear_neutral.png)`;
-      if (eyes)
+      if (eyes) {
         eyes.style.backgroundImage   = `url(${BUST}eyes_open.png)`;
+        eyes.style.opacity = "1";
+      }
       if (mouth)
         mouth.style.backgroundImage  = `url(${BUST}mouth_close.png)`;
       if (faceExtra) {
@@ -90,13 +89,13 @@
       }
     }
 
-    // ミニしおぽん（今は影＋本体のみ）
+    // ミニしおぽん
     if (miniShadow)
       miniShadow.style.backgroundImage = `url(${MINI}mini_shadow.png)`;
     if (miniBody)
-      miniBody.style.backgroundImage   = `url(${TOGGLE}toggle_base.png)`; // ミニ本体はトグルと共通
+      miniBody.style.backgroundImage   = `url(${TOGGLE}toggle_base.png)`; // 共通
 
-    // トグル（右下ボタン）
+    // トグル（ボタン）
     if (toggleLayers) {
       const { shadow, base, ear, eyes, mouth } = toggleLayers;
 
@@ -114,7 +113,7 @@
   }
 
   // ------------------------------------------------------------
-  // プリロード（描画カクつき防止）
+  // プリロード
   // ------------------------------------------------------------
   function preloadImages() {
     const list = [
@@ -138,7 +137,6 @@
       `${TOGGLE}toggle_ear_neutral.png`,
       `${TOGGLE}toggle_ear_up.png`,
       `${TOGGLE}toggle_eyes_open.png`,
-      `${TOGGLE}toggle_eyes_half.png`,
       `${TOGGLE}toggle_eyes_closed.png`,
       `${TOGGLE}toggle_mouth_close.png`,
       `${TOGGLE}toggle_mouth_open.png`,
@@ -162,42 +160,35 @@
 
     const { shadow, ear, eyes, mouth, faceExtra, avatar } = bustLayers;
 
-    // 全体リセット
-    if (avatar) {
+    // リセット
+    if (avatar)
       avatar.classList.remove("sp-mood-happy", "sp-mood-worry");
-    }
 
-    if (shadow) {
+    if (shadow)
       shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
-    }
-    if (ear) {
-      ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
-    }
+    if (ear)
+      ear.style.backgroundImage    = `url(${BUST}ear_neutral.png)`;
     if (eyes) {
       eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
       eyes.style.opacity = "1";
     }
-    if (mouth) {
-      mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
-    }
+    if (mouth)
+      mouth.style.backgroundImage  = `url(${BUST}mouth_close.png)`;
     if (faceExtra) {
       faceExtra.style.backgroundImage = "none";
       faceExtra.style.opacity = "0";
     }
 
-    // mood ごとの上書き
+    // mood 毎の上書き
     switch (mood) {
       case "smile":
       case "excited":
-        if (ear) {
+        if (ear)
           ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
-        }
-        if (eyes) {
+        if (eyes)
           eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
-        }
-        if (mouth) {
+        if (mouth)
           mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
-        }
         if (faceExtra) {
           faceExtra.style.backgroundImage = `url(${BUST}face_blush.png)`;
           faceExtra.style.opacity = "1";
@@ -206,9 +197,8 @@
         break;
 
       case "worry":
-        if (eyes) {
+        if (eyes)
           eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
-        }
         if (faceExtra) {
           faceExtra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
           faceExtra.style.opacity = "1";
@@ -217,19 +207,17 @@
         break;
 
       default:
-        // neutral のまま
+        // neutral
         break;
     }
   }
 
   // ------------------------------------------------------------
-  // 口パク制御（Core から呼ばれる）
-  //  animateMouth(mouthLayer, mood, phase)
+  // 口パク制御
   // ------------------------------------------------------------
   function animateMouth(mouthLayer, mood, phase) {
     if (!mouthLayer) return;
 
-    // ニコニコ声・うきうき声
     if (mood === "smile" || mood === "excited") {
       if (phase === 0) {
         mouthLayer.style.backgroundImage = `url(${BUST}mouth_close.png)`;
@@ -239,7 +227,6 @@
         mouthLayer.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
       }
     } else {
-      // 通常ボイス
       if (phase === 0) {
         mouthLayer.style.backgroundImage = `url(${BUST}mouth_open1.png)`;
       } else if (phase === 1) {
@@ -251,17 +238,15 @@
   }
 
   function resetMouth(mood) {
-    if (!bustLayers || !bustLayers.mouth) return;
-    if (mood === "smile" || mood === "excited") {
-      bustLayers.mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
-    } else {
-      bustLayers.mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
-    }
+    if (!bustLayers?.mouth) return;
+    bustLayers.mouth.style.backgroundImage =
+      (mood === "smile" || mood === "excited")
+        ? `url(${BUST}mouth_smile.png)`
+        : `url(${BUST}mouth_close.png)`;
   }
 
   // ------------------------------------------------------------
   // アイドルアニメ（まばたき & 耳ぴょこ）
-  //  ※ setTimeout で毎回ランダム間隔にする
   // ------------------------------------------------------------
   function setupIdleAnimations() {
     clearTimeout(blinkBustTimer);
@@ -269,13 +254,13 @@
     clearTimeout(earBustTimer);
     clearTimeout(earToggleTimer);
 
-    scheduleBlinkBust();
-    scheduleBlinkToggle();
-    scheduleEarBust();
-    scheduleEarToggle();
+    if (bustLayers?.eyes)  scheduleBlinkBust();
+    if (toggleLayers?.eyes) scheduleBlinkToggle();
+    if (bustLayers?.ear && bustLayers?.shadow) scheduleEarBust();
+    if (toggleLayers?.ear && toggleLayers?.shadow) scheduleEarToggle();
   }
 
-  // ★ バストアップのまばたき
+  // バストまばたき
   function scheduleBlinkBust() {
     blinkBustTimer = setTimeout(() => {
       blinkBust();
@@ -284,7 +269,7 @@
   }
 
   function blinkBust() {
-    if (!bustLayers || !bustLayers.eyes) return;
+    if (!bustLayers?.eyes) return;
     const eyes = bustLayers.eyes;
 
     let mood = "neutral";
@@ -296,12 +281,10 @@
     let texOpen, texHalf, texClosed;
 
     if (mood === "smile" || mood === "excited") {
-      // ★ smile のとき： eyes_smile → eyes_closed → eyes_smile
       texOpen   = `${BUST}eyes_smile.png`;
-      texHalf   = `${BUST}eyes_smile.png`;
+      texHalf   = `${BUST}eyes_half.png`;
       texClosed = `${BUST}eyes_closed.png`;
     } else if (mood === "worry") {
-      // ★ worry のとき： eyes_half → eyes_closed → eyes_half
       texOpen   = `${BUST}eyes_half.png`;
       texHalf   = `${BUST}eyes_half.png`;
       texClosed = `${BUST}eyes_closed.png`;
@@ -323,7 +306,7 @@
     }, 40);
   }
 
-  // ★ トグル（ボタン）のまばたき
+  // トグルまばたき
   function scheduleBlinkToggle() {
     blinkToggleTimer = setTimeout(() => {
       blinkToggle();
@@ -332,7 +315,7 @@
   }
 
   function blinkToggle() {
-    if (!toggleLayers || !toggleLayers.eyes) return;
+    if (!toggleLayers?.eyes) return;
     const eyes = toggleLayers.eyes;
 
     eyes.style.backgroundImage = `url(${TOGGLE}toggle_eyes_closed.png)`;
@@ -341,7 +324,7 @@
     }, 110);
   }
 
-  // ★ バストアップの耳ぴょこ
+  // バスト耳ぴょこ
   function scheduleEarBust() {
     earBustTimer = setTimeout(() => {
       earPyonBust();
@@ -350,17 +333,9 @@
   }
 
   function earPyonBust() {
-    if (!bustLayers || !bustLayers.ear || !bustLayers.shadow) return;
+    if (!bustLayers?.ear || !bustLayers?.shadow) return;
     const ear    = bustLayers.ear;
     const shadow = bustLayers.shadow;
-
-    let mood = "neutral";
-    if (window.ShioponCore && typeof window.ShioponCore.getState === "function") {
-      const st = window.ShioponCore.getState();
-      mood = (st && st.lastMood) || "neutral";
-    }
-
-    const isHappy = mood === "smile" || mood === "excited";
 
     const baseEar    = `${BUST}ear_neutral.png`;
     const baseShadow = `${BUST}shadow_base.png`;
@@ -370,14 +345,13 @@
     ear.style.backgroundImage    = `url(${pyonEar})`;
     shadow.style.backgroundImage = `url(${pyonShadow})`;
 
-    const backDelay = isHappy ? 120 : 150;
     setTimeout(() => {
       ear.style.backgroundImage    = `url(${baseEar})`;
       shadow.style.backgroundImage = `url(${baseShadow})`;
-    }, backDelay);
+    }, 140);
   }
 
-  // ★ トグル側の耳ぴょこ
+  // トグル耳ぴょこ
   function scheduleEarToggle() {
     earToggleTimer = setTimeout(() => {
       earPyonToggle();
@@ -386,7 +360,7 @@
   }
 
   function earPyonToggle() {
-    if (!toggleLayers || !toggleLayers.ear || !toggleLayers.shadow) return;
+    if (!toggleLayers?.ear || !toggleLayers?.shadow) return;
     const ear    = toggleLayers.ear;
     const shadow = toggleLayers.shadow;
 
@@ -415,4 +389,11 @@
     animateMouth,
     resetMouth
   };
+
+  // 念のため：Bootstrap から呼ばれなくても自分で初期化を試みる
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(init, 0);
+  } else {
+    document.addEventListener("DOMContentLoaded", init);
+  }
 })();
