@@ -485,24 +485,31 @@
     }, randomRange(5200, 9500));
   }
 
-  function blinkBust() {
+ // まばたき（バストアップ）
+function blinkBust() {
   const panel = document.getElementById("shiopon-panel");
   if (!panel) return;
   const eyes = panel.querySelector(".sp-layer.sp-eyes");
   if (!eyes) return;
 
-  // ★ 今の気分で「開いてるときの目」を決める
-  const isSmile = state.lastMood === "smile" || state.lastMood === "excited";
-  const openFrame = isSmile
-    ? `${BUST}eyes_smile.png`   // 笑顔時はにこ目
-    : `${BUST}eyes_open.png`;  // それ以外は通常の目
+  // 今の気分を参照（speak() で更新されてる）
+  const mood = state.lastMood || "neutral";
 
-  // 一瞬ぎゅっと閉じる
+  // いったん閉じる
   eyes.style.backgroundImage = `url(${BUST}eyes_closed.png)`;
 
   setTimeout(() => {
-    // もとの“開き目”に戻す
-    eyes.style.backgroundImage = `url(${openFrame})`;
+    // 表情に応じて「戻す先」を変える
+    if (mood === "smile" || mood === "excited") {
+      // 😊 笑顔のときは smile の目に戻す
+      eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
+    } else if (mood === "worry") {
+      // 😟 心配顔は half に戻す
+      eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
+    } else {
+      // それ以外は通常の目
+      eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+    }
   }, 120);
 }
   
