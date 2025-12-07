@@ -1,26 +1,18 @@
-:root {
-  --sp-panel-bg: rgba(12, 10, 22, 0.85);
-  --sp-panel-border: rgba(237, 229, 255, 0.4);
-  --sp-panel-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-  --sp-dialog-bg: rgba(255, 255, 255, 0.08);
-  --sp-dialog-border: rgba(237, 229, 255, 0.4);
-  --sp-accent-grad: linear-gradient(135deg, #f3d9ff, #ffe3b8);
-  --sp-accent-text: #35204b;
-  --sp-ghost-bg: rgba(255, 255, 255, 0.05);
-  --sp-ghost-border: rgba(247, 241, 255, 0.3);
-  --sp-ghost-text: #f7f1ff;
-}
+/* ================================
+   Shiopon Companion v1.0
+   Shionverse 全域常駐 相棒システム
+   ================================ */
 
-/* しおぽん全体コンテナ */
 #shiopon-root {
   position: fixed;
   inset: 0;
-  pointer-events: none;
+  pointer-events: none; /* デフォルトはページ操作優先 */
   z-index: 9999;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    "Yu Gothic", sans-serif;
 }
 
-/* 右下トグル */
+/* 右下トグルボタン */
 #shiopon-toggle {
   position: fixed;
   right: 16px;
@@ -34,7 +26,7 @@
   cursor: pointer;
   pointer-events: auto;
   overflow: visible;
-  animation: sp-float 4s ease-in-out infinite;
+  animation: sp-toggle-float 4s ease-in-out infinite;
 }
 
 #shiopon-toggle .sp-toggle-layer {
@@ -45,12 +37,18 @@
   background-position: center;
 }
 
-@keyframes sp-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+/* トグルのふわふわ */
+@keyframes sp-toggle-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
-/* パネル本体 */
+/* バストアップ＋ダイアログ */
 #shiopon-panel {
   position: fixed;
   right: 16px;
@@ -59,7 +57,9 @@
   pointer-events: auto;
   opacity: 0;
   transform: translateY(16px) scale(0.95);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
 }
 
 #shiopon-panel.sp-visible {
@@ -77,9 +77,9 @@
   gap: 8px;
   padding: 10px 10px 10px 6px;
   border-radius: 16px;
-  background: var(--sp-panel-bg);
+  background: rgba(12, 10, 22, 0.85);
   backdrop-filter: blur(18px);
-  box-shadow: var(--sp-panel-shadow);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
   color: #fdfbff;
 }
 
@@ -96,14 +96,20 @@
   width: 140px;
   height: 140px;
   overflow: visible;
-  animation: sp-float-soft 5s ease-in-out infinite;
+  animation: sp-avatar-float 5s ease-in-out infinite;
 }
 
-@keyframes sp-float-soft {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+@keyframes sp-avatar-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
+/* しおぽんレイヤー */
 .sp-layer {
   position: absolute;
   inset: 0;
@@ -112,13 +118,13 @@
   background-position: center;
 }
 
-/* 頬染め・汗など */
+/* ほっぺ／汗などのオーバーレイ */
 .sp-layer.sp-face-extra {
   opacity: 0;
   transition: opacity 0.15s ease-out;
 }
 
-/* ミニしおぽん */
+/* ミニしおぽん（ロゴ） */
 .sp-mini {
   position: relative;
   width: 56px;
@@ -134,7 +140,7 @@
   background-position: center;
 }
 
-/* ダイアログ */
+/* ダイアログエリア */
 .sp-dialog-area {
   flex: 1;
   min-width: 0;
@@ -144,8 +150,8 @@
   position: relative;
   padding: 8px 10px;
   border-radius: 12px;
-  background: var(--sp-dialog-bg);
-  border: 1px solid var(--sp-dialog-border);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(237, 229, 255, 0.4);
 }
 
 .sp-dialog-bubble::before {
@@ -181,19 +187,19 @@
   border-radius: 999px;
   border: none;
   cursor: pointer;
-  background: var(--sp-accent-grad);
-  color: var(--sp-accent-text);
+  background: linear-gradient(135deg, #f3d9ff, #ffe3b8);
+  color: #35204b;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .sp-btn.ghost {
-  background: var(--sp-ghost-bg);
-  color: var(--sp-ghost-text);
-  border: 1px solid var(--sp-ghost-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f7f1ff;
+  border: 1px solid rgba(247, 241, 255, 0.3);
 }
 
-/* 閉じる */
+/* 閉じるボタン */
 .sp-close {
   position: absolute;
   top: 4px;
@@ -214,45 +220,19 @@
   transform-origin: bottom right;
 }
 
-/* ミニのみモード */
+/* ミニのみモード（重要ページ用） */
 #shiopon-root.sp-mini-only #shiopon-panel {
   display: none;
 }
 
-/* サイレントモード見た目 */
+/* サイレントモードはトグルを少し暗く */
 #shiopon-root.sp-silent #shiopon-toggle {
   opacity: 0.65;
 }
 
-/* スマホ調整 */
-@media (max-width: 480px) {
-  #shiopon-panel {
-    right: 8px;
-    bottom: 96px;
-    max-width: 360px;
-  }
-  #shiopon-toggle {
-    right: 8px;
-    bottom: 8px;
-    width: 70px;
-    height: 70px;
-  }
-  .sp-mini {
-    display: none;
-  }
-}
-
-/* 動き軽減 */
-@media (prefers-reduced-motion: reduce) {
-  #shiopon-toggle,
-  .sp-avatar {
-    animation: none !important;
-  }
-}
-
-/* アバター全体のゆらぎ */
-.sp-avatar.sp-mood-smile {
-  animation: sp-happy-bounce 0.5s ease-out;
+/* ハッピー／心配時のちょこっとモーション */
+.sp-avatar.sp-mood-happy {
+  animation: sp-happy-bounce 0.45s ease-out;
 }
 
 .sp-avatar.sp-mood-worry {
@@ -260,16 +240,87 @@
 }
 
 @keyframes sp-happy-bounce {
-  0%   { transform: translateY(0) scale(1); }
-  30%  { transform: translateY(-4px) scale(1.03); }
-  60%  { transform: translateY(1px) scale(0.99); }
-  100% { transform: translateY(0) scale(1); }
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-4px) scale(1.03);
+  }
+  60% {
+    transform: translateY(1px) scale(0.99);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes sp-worry-shake {
-  0%   { transform: translateX(0); }
-  25%  { transform: translateX(-2px); }
-  50%  { transform: translateX(2px); }
-  75%  { transform: translateX(-1px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+  75% {
+    transform: translateX(-1px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* バストアップ用 耳ぴょこ（transform で一瞬だけ） */
+.sp-layer.sp-ear.sp-ear-pyon {
+  animation: sp-ear-pyon 0.14s ease-out;
+}
+
+.sp-layer.sp-shadow.sp-shadow-pyon {
+  animation: sp-shadow-pyon 0.14s ease-out;
+}
+
+@keyframes sp-ear-pyon {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes sp-shadow-pyon {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* レスポンシブ（超狭い画面では少し縮小） */
+@media (max-width: 480px) {
+  #shiopon-panel {
+    right: 8px;
+    bottom: 96px;
+    max-width: 360px;
+  }
+
+  #shiopon-toggle {
+    right: 8px;
+    bottom: 8px;
+    width: 70px;
+    height: 70px;
+  }
+
+  .sp-mini {
+    display: none;
+  }
 }
