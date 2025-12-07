@@ -10,18 +10,27 @@
   // 1. しおぽん用マークアップ（CSS構造と連動）
   // ------------------------------------------------------------
   function buildMarkup() {
-    return `
-      <button id="shiopon-toggle" aria-label="しおぽんを呼ぶ">
-        <div class="sp-toggle-layer sp-toggle-shadow"></div>
-        <div class="sp-toggle-layer sp-toggle-ear"></div>
-        <div class="sp-toggle-layer sp-toggle-base"></div>
-        <div class="sp-toggle-layer sp-toggle-eyes"></div>
-        <div class="sp-toggle-layer sp-toggle-mouth"></div>
-      </button>
+  return `
+    <button id="shiopon-toggle" aria-label="しおぽんを呼ぶ">
+      <div class="sp-toggle-layer sp-toggle-shadow"></div>
+      <div class="sp-toggle-layer sp-toggle-ear"></div>
+      <div class="sp-toggle-layer sp-toggle-base"></div>
+      <div class="sp-toggle-layer sp-toggle-eyes"></div>
+      <div class="sp-toggle-layer sp-toggle-mouth"></div>
+    </button>
 
-      <div id="shiopon-panel" class="sp-hidden" aria-label="しおぽんパネル">
-        <div class="sp-panel-inner">
-          <div class="sp-avatar-area">
+    <div id="shiopon-panel" class="sp-hidden" aria-label="しおぽんパネル">
+      <div class="sp-panel-inner">
+        <div class="sp-avatar-area">
+          
+          <!-- ★ バストアップ＋粒子エリア全体 -->
+          <div class="sp-bust-wrapper">
+            <!-- 粒子レイヤー（後ろ側から順に） -->
+            <div class="sp-bust-particles particles-back"></div>
+            <div class="sp-bust-particles particles-mid"></div>
+            <div class="sp-bust-particles particles-front"></div>
+
+            <!-- しおぽん本体（今のバストアップ） -->
             <div class="sp-avatar">
               <div class="sp-layer sp-shadow"></div>
               <div class="sp-layer sp-ear"></div>
@@ -30,29 +39,32 @@
               <div class="sp-layer sp-eyes"></div>
               <div class="sp-layer sp-mouth"></div>
             </div>
-            <div class="sp-mini">
-              <div class="sp-mini-shadow"></div>
-              <div class="sp-mini-body"></div>
-            </div>
           </div>
 
-          <div class="sp-dialog-area">
-  <div class="sp-dialog-bubble">
-    <div class="sp-dialog-name">Shiopon</div>
-    <div class="sp-dialog-text" id="shiopon-text"></div>
-  </div>
-  <div class="sp-dialog-actions">
-    <button class="sp-btn" data-sp-action="more">もっと話す</button>
-    <button class="sp-btn" data-sp-action="guide">案内して</button>
-    <button class="sp-btn ghost" data-sp-action="silent">今日は静かに</button>
-  </div>
-</div>
-          <button class="sp-close" aria-label="しおぽんをしまう">×</button>
+          <!-- ミニしおぽん（そのまま） -->
+          <div class="sp-mini">
+            <div class="sp-mini-shadow"></div>
+            <div class="sp-mini-body"></div>
+          </div>
         </div>
-      </div>
-    `;
-  }
 
+        <div class="sp-dialog-area">
+          <div class="sp-dialog-bubble">
+            <div class="sp-dialog-name">Shiopon</div>
+            <div class="sp-dialog-text" id="shiopon-text"></div>
+          </div>
+          <div class="sp-dialog-actions">
+            <button class="sp-btn" data-sp-action="more">もっと話す</button>
+            <button class="sp-btn" data-sp-action="guide">案内して</button>
+            <button class="sp-btn ghost" data-sp-action="silent">今日は静かに</button>
+          </div>
+        </div>
+
+        <button class="sp-close" aria-label="しおぽんをしまう">×</button>
+      </div>
+    </div>
+  `;
+}
   // ------------------------------------------------------------
   // 2. メイン処理
   // ------------------------------------------------------------
