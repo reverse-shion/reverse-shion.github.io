@@ -37,16 +37,16 @@
           </div>
 
           <div class="sp-dialog-area">
-            <div class="sp-dialog-bubble">
-              <div class="sp-dialog-text" id="shiopon-text"></div>
-            </div>
-            <div class="sp-dialog-actions">
-              <button class="sp-btn" data-sp-action="more">もっと話す</button>
-              <button class="sp-btn" data-sp-action="guide">案内して</button>
-              <button class="sp-btn ghost" data-sp-action="silent">今日は静かに</button>
-            </div>
-          </div>
-
+  <div class="sp-dialog-bubble">
+    <div class="sp-dialog-name">Shiopon</div>
+    <div class="sp-dialog-text" id="shiopon-text"></div>
+  </div>
+  <div class="sp-dialog-actions">
+    <button class="sp-btn" data-sp-action="more">もっと話す</button>
+    <button class="sp-btn" data-sp-action="guide">案内して</button>
+    <button class="sp-btn ghost" data-sp-action="silent">今日は静かに</button>
+  </div>
+</div>
           <button class="sp-close" aria-label="しおぽんをしまう">×</button>
         </div>
       </div>
