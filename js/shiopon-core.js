@@ -127,32 +127,39 @@
   }
 
   function parseLines(raw) {
-    const dict = {};
-    if (!raw) return dict;
+  const dict = {};
+  const rows = raw.split(/\r?\n/);
 
-    const rows = raw.split(/\r?\n/);
+  rows.forEach((row) => {
+    const line = row.trim();
+    if (!line || line.startsWith("#")) return;
 
-    rows.forEach((row) => {
-      const line = row.trim();
-      if (!line || line.startsWith("#")) return;
+    const parts = line.split("|").map((v) => v.trim());
+    if (parts.length < 3) return;
 
-      const parts = line.split("|");
-      if (parts.length < 4) return;
+    let category, mood, expression, text;
 
-      const [category, mood, expression, text] = parts.map((v) => v.trim());
-      if (!category || !text) return;
+    if (parts.length === 3) {
+      // v1 互換: category|expression|text
+      [category, expression, text] = parts;
+      mood = expression || "neutral";
+    } else {
+      // v2 仕様: category|mood|expression|text
+      [category, mood, expression, text] = parts;
+    }
 
-      if (!dict[category]) dict[category] = [];
-      dict[category].push({
-        mood: mood || "neutral",
-        expression: expression || "neutral",
-        text
-      });
+    if (!category || !text) return;
+
+    if (!dict[category]) dict[category] = [];
+    dict[category].push({
+      mood: mood || "neutral",
+      expression: expression || mood || "neutral",
+      text
     });
+  });
 
-    return dict;
-  }
-
+  return dict;
+}
   // ------------------------------------------------------------
   // ユーティリティ
   // ------------------------------------------------------------
