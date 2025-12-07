@@ -11,12 +11,15 @@
   --sp-z-panel: 2050;
   --sp-z-overlay: 2100;
 
-  --sp-dialog-bg: rgba(255, 255, 255, 0.78);
+  /* フキダシ背景を少しだけ濃く＆白寄りに */
+  --sp-dialog-bg: rgba(255, 255, 255, 0.92);
   --sp-dialog-shadow: 0 12px 32px rgba(0,0,0,0.15);
 
+  /* しおぽん専用の文字色 */
   --sp-font: "Noto Sans JP", sans-serif;
+  --sp-text-color: #24324a;        /* 読みやすい濃いめの青グレー */
+  --sp-name-color: #f070c8;        /* しおぽんらしいピンク寄りアクセント */
 }
-
 /* ============================================================
    0. TOGGLE BUTTON（右下の呼び出し）
    ============================================================ */
@@ -134,21 +137,38 @@
   margin-top: 8px;
 }
 
+/* しおぽん専用セリフエリア */
 .sp-dialog-bubble {
-  background: white;
-  border-radius: 12px;
-  padding: 12px 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(245, 240, 255, 0.96)
+  );
+  border-radius: 14px;
+  padding: 10px 14px 12px;
   font-family: var(--sp-font);
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.6;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+/* 名前ラベル（Lumiere と同じポジションイメージ） */
+.sp-dialog-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--sp-name-color);
+  margin-bottom: 4px;
+}
+
+/* セリフ本体 */
 #shiopon-text {
   min-height: 42px;
   white-space: pre-line;
+  color: var(--sp-text-color);
+  /* 少しだけ読みやすくするためのごく弱いシャドウ */
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
 }
-
 .sp-dialog-actions {
   display: flex;
   justify-content: space-between;
