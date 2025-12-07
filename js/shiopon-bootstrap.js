@@ -79,7 +79,7 @@
     const close   = panel ? panel.querySelector(".sp-close") : null;
     const buttons = panel ? panel.querySelectorAll(".sp-btn") : null;
 
-    if (!panel || !toggle || !textEl || !close || !buttons) {
+    if (!panel || !toggle || !textEl || !close || !buttons || !buttons.length) {
       console.warn("[Shiopon] 初期化に必要な DOM 要素が足りません。");
       return;
     }
@@ -99,9 +99,13 @@
     if (window.ShioponCore && typeof window.ShioponCore.init === "function") {
       try {
         // v2 Core は引数不要：内部で TXT 読み込みのみ行う
-        window.ShioponCore.init().catch?.((e) => {
-          console.error("[Shiopon] ShioponCore.init() 非同期処理でエラー:", e);
-        });
+        const result = window.ShioponCore.init();
+        // init が Promise の場合のみ catch
+        if (result && typeof result.then === "function") {
+          result.catch((e) => {
+            console.error("[Shiopon] ShioponCore.init() 非同期処理でエラー:", e);
+          });
+        }
       } catch (e) {
         console.error("[Shiopon] ShioponCore.init() 実行時にエラー:", e);
       }
@@ -124,14 +128,19 @@
     // ⑦ イベント結線
     // トグル：開閉
     toggle.addEventListener("click", () => {
-      if (!window.ShioponCore) return;
-
       const isVisible = panel.classList.contains("sp-visible");
+
+      if (!window.ShioponCore) {
+        // Core が無くても最低限の開閉だけは動かす
+        panel.classList.toggle("sp-visible", !isVisible);
+        panel.classList.toggle("sp-hidden", isVisible);
+        return;
+      }
+
       if (isVisible) {
         if (typeof window.ShioponCore.hidePanel === "function") {
           window.ShioponCore.hidePanel();
         } else {
-          // フォールバック：CSSクラスだけで閉じる
           panel.classList.remove("sp-visible");
           panel.classList.add("sp-hidden");
         }
@@ -169,11 +178,14 @@
 
   // ------------------------------------------------------------
   // 3. DOM 準備完了で起動
+  //    ※ Core / Visual 定義より後に必ず実行されるように調整
   // ------------------------------------------------------------
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", bootstrapShiopon);
+    document.addEventListener("DOMContentLoaded", bootstrapShiopon, { once: true });
   } else {
-    // すでに読み込み済みの場合
-    bootstrapShiopon();
+    // すでに読み込み済みの場合でも、window.onload まで待ってから起動
+    window.addEventListener("load", bootstrapShiopon, { once: true });
   }
 })();
+
+
