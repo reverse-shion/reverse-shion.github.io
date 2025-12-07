@@ -1,10 +1,14 @@
 // ============================================================
-//  Shiopon Companion v2.1
-//  --- BOOTSTRAP MODULE（DOM注入 & 起動）---
+//  Shiopon Companion v2.0
+//  --- BOOTSTRAP MODULE（DOM注入 & 起動 & イベント結線）---
 // ============================================================
 
 (() => {
-  // しおぽんマークアップ（CSSと連動する構造）
+  "use strict";
+
+  // ------------------------------------------------------------
+  // 1. しおぽん用マークアップ（CSS構造と連動）
+  // ------------------------------------------------------------
   function buildMarkup() {
     return `
       <button id="shiopon-toggle" aria-label="しおぽんを呼ぶ">
@@ -50,9 +54,13 @@
   }
 
   // ------------------------------------------------------------
-  // 初期化
+  // 2. メイン処理
   // ------------------------------------------------------------
   function bootstrapShiopon() {
+    // すでに初期化済みならスキップ（二重起動防止）
+    if (document.body.dataset.shioponBootstrapped === "1") return;
+    document.body.dataset.shioponBootstrapped = "1";
+
     // ① ルート要素の取得 or 作成
     let root = document.getElementById("shiopon-root");
     if (!root) {
@@ -61,76 +69,93 @@
       document.body.appendChild(root);
     }
 
-    // ② マークアップ注入
+    // ② マークアップ注入（既存内容は v2 用に差し替え）
     root.innerHTML = buildMarkup();
 
-    // ③ 必要なDOM参照
-    const panel  = document.getElementById("shiopon-panel");
-    const toggle = document.getElementById("shiopon-toggle");
-    const textEl = document.getElementById("shiopon-text");
+    // ③ 必要な DOM 参照
+    const panel   = document.getElementById("shiopon-panel");
+    const toggle  = document.getElementById("shiopon-toggle");
+    const textEl  = document.getElementById("shiopon-text");
+    const close   = panel ? panel.querySelector(".sp-close") : null;
+    const buttons = panel ? panel.querySelectorAll(".sp-btn") : null;
 
-    if (!panel || !toggle || !textEl) {
-      console.warn("[Shiopon] 必要なDOM要素が足りません");
+    if (!panel || !toggle || !textEl || !close || !buttons) {
+      console.warn("[Shiopon] 初期化に必要な DOM 要素が足りません。");
       return;
     }
-
-    const close   = panel.querySelector(".sp-close");
-    const buttons = panel.querySelectorAll(".sp-btn");
 
     // ④ Visual（見た目・アニメーション）の初期化
     if (window.ShioponVisual && typeof window.ShioponVisual.init === "function") {
       try {
         window.ShioponVisual.init();
       } catch (e) {
-        console.warn("[Shiopon] ShioponVisual.init() でエラー:", e);
+        console.error("[Shiopon] ShioponVisual.init() 実行時にエラー:", e);
       }
     } else {
-      console.warn("[Shiopon] ShioponVisual が見つかりません（/js/shiopon-visual.js を読み込んでください）");
+      console.warn("[Shiopon] ShioponVisual が見つかりません。（/js/shiopon-visual.js を確認）");
     }
 
-    // ⑤ Core（セリフ・状態管理）の初期化
+    // ⑤ Core（状態管理・セリフ）の初期化
     if (window.ShioponCore && typeof window.ShioponCore.init === "function") {
       try {
-        // Core v2.0 は引数なし想定なので何も渡さない
-        const r = window.ShioponCore.init();
-        // async 対応（エラー握りつぶし防止）
-        if (r && typeof r.then === "function") {
-          r.catch((e) => console.warn("[Shiopon] ShioponCore.init() でエラー:", e));
-        }
+        // v2 Core は引数不要：内部で TXT 読み込みのみ行う
+        window.ShioponCore.init().catch?.((e) => {
+          console.error("[Shiopon] ShioponCore.init() 非同期処理でエラー:", e);
+        });
       } catch (e) {
-        console.warn("[Shiopon] ShioponCore.init() でエラー:", e);
+        console.error("[Shiopon] ShioponCore.init() 実行時にエラー:", e);
       }
     } else {
-      console.warn("[Shiopon] ShioponCore が見つかりません（/js/shiopon-core.js を読み込んでください）");
+      console.warn("[Shiopon] ShioponCore が見つかりません。（/js/shiopon-core.js を確認）");
     }
 
-    // ⑥ イベントリスナー接続
+    // ⑥ サイレント状態の復元（あれば）
+    try {
+      if (window.ShioponCore && typeof window.ShioponCore.getState === "function") {
+        const st = window.ShioponCore.getState();
+        if (st && st.silent) {
+          root.classList.add("sp-silent");
+        }
+      }
+    } catch (e) {
+      console.warn("[Shiopon] サイレント状態の復元に失敗しました:", e);
+    }
+
+    // ⑦ イベント結線
     // トグル：開閉
     toggle.addEventListener("click", () => {
       if (!window.ShioponCore) return;
 
-      const isOpen = panel.classList.contains("sp-visible");
-      if (isOpen && typeof window.ShioponCore.hidePanel === "function") {
-        window.ShioponCore.hidePanel();
-      } else if (!isOpen && typeof window.ShioponCore.showPanel === "function") {
-        window.ShioponCore.showPanel();
+      const isVisible = panel.classList.contains("sp-visible");
+      if (isVisible) {
+        if (typeof window.ShioponCore.hidePanel === "function") {
+          window.ShioponCore.hidePanel();
+        } else {
+          // フォールバック：CSSクラスだけで閉じる
+          panel.classList.remove("sp-visible");
+          panel.classList.add("sp-hidden");
+        }
+      } else {
+        if (typeof window.ShioponCore.showPanel === "function") {
+          window.ShioponCore.showPanel();
+        } else {
+          panel.classList.remove("sp-hidden");
+          panel.classList.add("sp-visible");
+        }
       }
     });
 
     // 閉じるボタン
-    if (close) {
-      close.addEventListener("click", () => {
-        if (window.ShioponCore && typeof window.ShioponCore.hidePanel === "function") {
-          window.ShioponCore.hidePanel();
-        } else {
-          // 万が一 Core がなくても見た目だけは閉じる
-          panel.classList.remove("sp-visible");
-          panel.classList.add("sp-hidden");
-        }
-      });
-    }
+    close.addEventListener("click", () => {
+      if (window.ShioponCore && typeof window.ShioponCore.hidePanel === "function") {
+        window.ShioponCore.hidePanel();
+      } else {
+        panel.classList.remove("sp-visible");
+        panel.classList.add("sp-hidden");
+      }
+    });
 
-    // アクションボタン（もっと話す / 案内して / 今日は静かに）
+    // 「もっと話す」「案内して」「今日は静かに」
     buttons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const action = btn.dataset.spAction;
@@ -143,11 +168,12 @@
   }
 
   // ------------------------------------------------------------
-  // DOM準備完了で起動
+  // 3. DOM 準備完了で起動
   // ------------------------------------------------------------
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrapShiopon);
   } else {
+    // すでに読み込み済みの場合
     bootstrapShiopon();
   }
 })();
