@@ -155,62 +155,76 @@
   }
 
   // ------------------------------------------------------------
-  // 表情制御（Core から mood を受け取る）
-  // ------------------------------------------------------------
-  function setExpression(mood) {
-    if (!bustLayers) return;
+// 表情制御（Core から mood を受け取る）
+// ------------------------------------------------------------
+function setExpression(mood) {
+  if (!bustLayers) return;
 
-    const { shadow, ear, eyes, mouth, faceExtra, avatar } = bustLayers;
+  const { shadow, ear, eyes, mouth, faceExtra, avatar } = bustLayers;
 
-    // 全体リセット
-    if (avatar)
-      avatar.classList.remove("sp-mood-happy", "sp-mood-worry");
-
-    if (shadow)
-      shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
-    if (ear)
-      ear.style.backgroundImage    = `url(${BUST}ear_neutral.png)`;
-    if (eyes) {
-      eyes.style.backgroundImage   = `url(${BUST}eyes_open.png)`;
-      eyes.style.opacity = "1";
-    }
-    if (mouth)
-      mouth.style.backgroundImage  = `url(${BUST}mouth_close.png)`;
-    if (faceExtra) {
-      faceExtra.style.backgroundImage = "none";
-      faceExtra.style.opacity = "0";
-    }
-
-    // mood ごとの上書き
-    switch (mood) {
-      case "smile":
-      case "excited":
-        if (eyes)
-          eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
-        if (mouth)
-          mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
-        if (faceExtra) {
-          faceExtra.style.backgroundImage = `url(${BUST}face_blush.png)`;
-          faceExtra.style.opacity = "1";
-        }
-        if (avatar) avatar.classList.add("sp-mood-happy");
-        break;
-
-      case "worry":
-        if (eyes)
-          eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
-        if (faceExtra) {
-          faceExtra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
-          faceExtra.style.opacity = "1";
-        }
-        if (avatar) avatar.classList.add("sp-mood-worry");
-        break;
-
-      default:
-        // neutral のまま
-        break;
-    }
+  // 全体リセット
+  if (avatar) {
+    avatar.classList.remove("sp-mood-happy", "sp-mood-worry");
   }
+
+  if (shadow) {
+    shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
+  }
+  if (ear) {
+    ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
+  }
+  if (eyes) {
+    eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+    eyes.style.opacity = "1";
+    // ★ ここで必ず一旦 neutral にしておく
+    eyes.dataset.mode = "neutral";
+  }
+  if (mouth) {
+    mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
+  }
+  if (faceExtra) {
+    faceExtra.style.backgroundImage = "none";
+    faceExtra.style.opacity = "0";
+  }
+
+  // mood ごとの上書き（ここでだけ表情を決める）
+  switch (mood) {
+    case "smile":
+    case "excited":
+      if (ear) {
+        ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
+      }
+      if (eyes) {
+        eyes.dataset.mode = "smile";                    // ← まばたき用
+        eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
+      }
+      if (mouth) {
+        mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
+      }
+      if (faceExtra) {
+        faceExtra.style.backgroundImage = `url(${BUST}face_blush.png)`;
+        faceExtra.style.opacity = "1";
+      }
+      if (avatar) avatar.classList.add("sp-mood-happy");
+      break;
+
+    case "worry":
+      if (eyes) {
+        eyes.dataset.mode = "worry";                   // ← まばたき用
+        eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
+      }
+      if (faceExtra) {
+        faceExtra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
+        faceExtra.style.opacity = "1";
+      }
+      if (avatar) avatar.classList.add("sp-mood-worry");
+      break;
+
+    default:
+      // neutral のまま（eyes.dataset.mode = "neutral" が効いてる）
+      break;
+  }
+}
 
   // ------------------------------------------------------------
   // 口パク制御（Core から呼ばれる）
