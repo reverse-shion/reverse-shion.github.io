@@ -588,6 +588,17 @@ function blinkBust() {
     }, 120);
   }
 
+  function getUserName() {
+  const name = localStorage.getItem("shion_user_name");
+  return name && name.trim() ? name : "おともだち";
+}
+
+ function applyUserName(text) {
+  const userName = getUserName();
+  return text.replace(/\{name\}/g, userName);
+} 
+  textEl.textContent = applyUserName(line.text);
+
   // ゲートジャンプ演出
   function starJumpTo(url) {
     const overlay = document.createElement("div");
