@@ -1,326 +1,247 @@
-/* ================================
-   Shiopon Companion v1.0
-   Shionverse 全域常駐 相棒システム
-   ================================ */
+/* ============================================================
+   Shiopon Companion v2.0
+   CSS — Live Layers / Panel UI / Animations
+   ============================================================ */
 
-#shiopon-root {
-  position: fixed;
-  inset: 0;
-  pointer-events: none; /* デフォルトはページ操作優先 */
-  z-index: 9999;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
-    "Yu Gothic", sans-serif;
+:root {
+  --sp-size: 180px;
+  --sp-mini-size: 120px;
+
+  --sp-z-base: 2000;
+  --sp-z-panel: 2050;
+  --sp-z-overlay: 2100;
+
+  --sp-dialog-bg: rgba(255, 255, 255, 0.78);
+  --sp-dialog-shadow: 0 12px 32px rgba(0,0,0,0.15);
+
+  --sp-font: "Noto Sans JP", sans-serif;
 }
 
-/* 右下トグルボタン */
+/* ============================================================
+   0. TOGGLE BUTTON（右下の呼び出し）
+   ============================================================ */
+
 #shiopon-toggle {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
-  width: 80px;
-  height: 80px;
-  padding: 0;
-  border-radius: 999px;
+  bottom: 22px;
+  right: 22px;
+  width: 100px;
+  height: 100px;
+
   border: none;
-  background: transparent;
+  padding: 0;
+  background: none;
   cursor: pointer;
-  pointer-events: auto;
-  overflow: visible;
-  animation: sp-toggle-float 4s ease-in-out infinite;
+
+  z-index: var(--sp-z-base);
+  transition: transform 0.25s ease;
 }
 
-#shiopon-toggle .sp-toggle-layer {
+#shiopon-toggle:hover {
+  transform: scale(1.05);
+}
+
+/* トグル用レイヤー（影・耳・本体・目・口） */
+.sp-toggle-layer {
   position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-/* トグルのふわふわ */
-@keyframes sp-toggle-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
+/* ============================================================
+   1. PANEL（開いた時のしおぽん）
+   ============================================================ */
 
-/* バストアップ＋ダイアログ */
 #shiopon-panel {
   position: fixed;
-  right: 16px;
-  bottom: 110px;
-  max-width: 420px;
-  pointer-events: auto;
-  opacity: 0;
-  transform: translateY(16px) scale(0.95);
-  transition:
-    opacity 0.2s ease-out,
-    transform 0.2s ease-out;
-}
+  bottom: 130px;
+  right: 22px;
+  width: 340px;
 
-#shiopon-panel.sp-visible {
+  background: var(--sp-dialog-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  box-shadow: var(--sp-dialog-shadow);
+
+  padding: 16px;
+  z-index: var(--sp-z-panel);
+
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 #shiopon-panel.sp-hidden {
+  opacity: 0;
+  transform: translateY(15px);
   pointer-events: none;
 }
 
-.sp-panel-inner {
-  position: relative;
-  display: flex;
-  gap: 8px;
-  padding: 10px 10px 10px 6px;
-  border-radius: 16px;
-  background: rgba(12, 10, 22, 0.85);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-  color: #fdfbff;
-}
+/* ============================================================
+   2. AVATAR AREA
+   ============================================================ */
 
-/* アバターエリア */
 .sp-avatar-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
 }
 
+/* メインアバター */
 .sp-avatar {
+  width: var(--sp-size);
+  height: var(--sp-size);
   position: relative;
-  width: 140px;
-  height: 140px;
-  overflow: visible;
-  animation: sp-avatar-float 5s ease-in-out infinite;
+  margin-bottom: 8px;
 }
 
-@keyframes sp-avatar-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-/* しおぽんレイヤー */
 .sp-layer {
   position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  pointer-events: none;
 }
 
-/* ほっぺ／汗などのオーバーレイ */
-.sp-layer.sp-face-extra {
-  opacity: 0;
-  transition: opacity 0.15s ease-out;
-}
-
-/* ミニしおぽん（ロゴ） */
+/* ミニしおぽん（転送演出） */
 .sp-mini {
+  width: var(--sp-mini-size);
+  height: var(--sp-mini-size);
   position: relative;
-  width: 56px;
-  height: 32px;
+  margin: 8px auto 0;
 }
 
-.sp-mini-shadow,
-.sp-mini-body {
+.sp-mini img,
+.sp-mini div {
   position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
 }
 
-/* ダイアログエリア */
+/* ============================================================
+   3. DIALOG AREA
+   ============================================================ */
+
 .sp-dialog-area {
-  flex: 1;
-  min-width: 0;
+  margin-top: 8px;
 }
 
 .sp-dialog-bubble {
-  position: relative;
-  padding: 8px 10px;
+  background: white;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(237, 229, 255, 0.4);
+  padding: 12px 14px;
+  font-family: var(--sp-font);
+  font-size: 15px;
+  line-height: 1.55;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.sp-dialog-bubble::before {
-  content: "";
-  position: absolute;
-  left: -6px;
-  bottom: 16px;
-  border-width: 7px;
-  border-style: solid;
-  border-color: transparent rgba(255, 255, 255, 0.16) transparent transparent;
+#shiopon-text {
+  min-height: 42px;
+  white-space: pre-line;
 }
 
-.sp-dialog-text {
-  font-size: 13px;
-  line-height: 1.6;
-  min-height: 2.5em;
-  white-space: pre-wrap;
-}
-
-/* ボタン */
 .sp-dialog-actions {
-  margin-top: 6px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  justify-content: space-between;
+  margin-top: 12px;
 }
 
 .sp-btn {
-  flex: 1 1 auto;
-  min-width: 0;
-  padding: 5px 8px;
-  font-size: 11px;
-  border-radius: 999px;
-  border: none;
+  flex: 1;
+  margin: 0 4px;
+  padding: 8px 0;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
-  background: linear-gradient(135deg, #f3d9ff, #ffe3b8);
-  color: #35204b;
-  font-weight: 600;
-  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.sp-btn:hover {
+  background: #f7f7f7;
 }
 
 .sp-btn.ghost {
-  background: rgba(255, 255, 255, 0.05);
-  color: #f7f1ff;
-  border: 1px solid rgba(247, 241, 255, 0.3);
+  opacity: 0.7;
 }
 
 /* 閉じるボタン */
 .sp-close {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px;
-  height: 20px;
-  border-radius: 999px;
+  margin: 12px auto 0;
+  display: block;
+
+  width: 28px;
+  height: 28px;
+
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+
   border: none;
-  font-size: 12px;
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.45);
-  color: #fdfbff;
 }
 
-/* 小さめモード */
-#shiopon-root.sp-small #shiopon-panel {
-  transform: translateY(8px) scale(0.88);
-  transform-origin: bottom right;
+/* ============================================================
+   4. ANIMATIONS — BLINK / EARS / FLOAT
+   ============================================================ */
+
+/* まばたき（目レイヤーそのもののフェード制御） */
+@keyframes sp-blink {
+  0% { opacity: 1; }
+  45% { opacity: 1; }
+  48% { opacity: 0; }
+  51% { opacity: 0; }
+  54% { opacity: 1; }
+  100% { opacity: 1; }
 }
 
-/* ミニのみモード（重要ページ用） */
-#shiopon-root.sp-mini-only #shiopon-panel {
-  display: none;
+/* Visual側が .blink を付けると発動 */
+.sp-eyes.blink {
+  animation: sp-blink 0.22s ease;
 }
 
-/* サイレントモードはトグルを少し暗く */
-#shiopon-root.sp-silent #shiopon-toggle {
-  opacity: 0.65;
+/* 耳ぴょこ（回転） */
+@keyframes sp-ear-wiggle {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(-8deg); }
+  50%  { transform: rotate(4deg); }
+  75%  { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
 }
 
-/* ハッピー／心配時のちょこっとモーション */
-.sp-avatar.sp-mood-happy {
-  animation: sp-happy-bounce 0.45s ease-out;
+.sp-ear.wiggle {
+  animation: sp-ear-wiggle 0.5s ease;
 }
 
-.sp-avatar.sp-mood-worry {
-  animation: sp-worry-shake 0.4s ease-out;
+/* ふわっと浮く（体全体） */
+@keyframes sp-float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
 }
 
-@keyframes sp-happy-bounce {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-  30% {
-    transform: translateY(-4px) scale(1.03);
-  }
-  60% {
-    transform: translateY(1px) scale(0.99);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-  }
+.sp-avatar.float {
+  animation: sp-float 3s ease-in-out infinite;
 }
 
-@keyframes sp-worry-shake {
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-2px);
-  }
-  50% {
-    transform: translateX(2px);
-  }
-  75% {
-    transform: translateX(-1px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
+/* ============================================================
+   5. RESPONSIVE
+   ============================================================ */
 
-/* バストアップ用 耳ぴょこ（transform で一瞬だけ） */
-.sp-layer.sp-ear.sp-ear-pyon {
-  animation: sp-ear-pyon 0.14s ease-out;
-}
-
-.sp-layer.sp-shadow.sp-shadow-pyon {
-  animation: sp-shadow-pyon 0.14s ease-out;
-}
-
-@keyframes sp-ear-pyon {
-  0% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-4px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-@keyframes sp-shadow-pyon {
-  0% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(2px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-/* レスポンシブ（超狭い画面では少し縮小） */
 @media (max-width: 480px) {
   #shiopon-panel {
-    right: 8px;
-    bottom: 96px;
-    max-width: 360px;
-  }
-
-  #shiopon-toggle {
-    right: 8px;
-    bottom: 8px;
-    width: 70px;
-    height: 70px;
-  }
-
-  .sp-mini {
-    display: none;
+    width: calc(100% - 32px);
+    right: 16px;
+    bottom: 110px;
   }
 }
