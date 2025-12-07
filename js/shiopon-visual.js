@@ -373,6 +373,35 @@
     }, 120);
   }
 
+  // ==============================
+//  Shooting Star — 流星エフェクト
+// ==============================
+function spawnShootingStar() {
+  const avatar = document.querySelector(".sp-avatar");
+  if (!avatar) return;
+
+  const star = document.createElement("div");
+  star.className = "sp-shooting-star";
+
+  // ランダム位置に飛ばす
+  star.style.left = Math.random() * 80 + "%";
+  star.style.top = Math.random() * 40 + "%";
+
+  avatar.appendChild(star);
+
+  // 消去
+  setTimeout(() => star.remove(), 1000);
+}
+
+// mood更新時に呼ぶ
+export function moodChanged(mood) {
+  applyMoodColor(mood);
+  
+  if (Math.random() < 0.4) {     // 流星は40%の確率でスーッ☆
+    spawnShootingStar();
+  }
+}
+
   // ------------------------------------------------------------
   // ユーティリティ
   // ------------------------------------------------------------
