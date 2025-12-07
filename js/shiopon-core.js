@@ -126,7 +126,14 @@
     }
   }
 
-  function parseLines(raw) {
+  // ------------------------------------------------------------
+// TXT 読み込み & パース
+// 形式：category|expression|text  （v1互換）
+//   category … greetingFirst / idle / night など
+//   expression … smile / worry / neutral など（= mood）
+//   text … セリフ本文
+// ------------------------------------------------------------
+function parseLines(raw) {
   const dict = {};
   const rows = raw.split(/\r?\n/);
 
@@ -137,29 +144,20 @@
     const parts = line.split("|").map((v) => v.trim());
     if (parts.length < 3) return;
 
-    let category, mood, expression, text;
-
-    if (parts.length === 3) {
-      // v1 互換: category|expression|text
-      [category, expression, text] = parts;
-      mood = expression || "neutral";
-    } else {
-      // v2 仕様: category|mood|expression|text
-      [category, mood, expression, text] = parts;
-    }
-
+    const [category, expression, text] = parts;
     if (!category || !text) return;
 
     if (!dict[category]) dict[category] = [];
     dict[category].push({
-      mood: mood || "neutral",
-      expression: expression || mood || "neutral",
+      mood: expression || "neutral",
+      expression: expression || "neutral",
       text
     });
   });
 
   return dict;
 }
+  
   // ------------------------------------------------------------
   // ユーティリティ
   // ------------------------------------------------------------
