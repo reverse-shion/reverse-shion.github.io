@@ -7,6 +7,8 @@
 // ============================================================
 
 (() => {
+  "use strict";
+
   const ASSET_BASE = "/assets/shiopon/";
   const BUST   = ASSET_BASE + "bust/";
   const TOGGLE = ASSET_BASE + "toggle/";
@@ -213,7 +215,7 @@
   // ------------------------------------------------------------
   // 口パク制御（Core から呼ばれる）
   //  animateMouth(mouthLayer, mood, phase)
-// ------------------------------------------------------------
+  // ------------------------------------------------------------
   function animateMouth(mouthLayer, mood, phase) {
     if (!mouthLayer) return;
 
@@ -353,8 +355,8 @@
     const baseEar    = `${BUST}ear_neutral.png`;
     const baseShadow = `${BUST}shadow_base.png`;
 
-    const pyonEar    = isHappy ? `${BUST}ear_up.png`    : `${BUST}ear_up.png`;
-    const pyonShadow = isHappy ? `${BUST}shadow_up.png` : `${BUST}shadow_up.png`;
+    const pyonEar    = `${BUST}ear_up.png`;
+    const pyonShadow = `${BUST}shadow_up.png`;
 
     ear.style.backgroundImage    = `url(${pyonEar})`;
     shadow.style.backgroundImage = `url(${pyonShadow})`;
