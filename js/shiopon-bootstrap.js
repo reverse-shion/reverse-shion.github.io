@@ -22,15 +22,15 @@
     <div id="shiopon-panel" class="sp-hidden" aria-label="しおぽんパネル">
       <div class="sp-panel-inner">
         <div class="sp-avatar-area">
-          
-          <!-- ★ バストアップ＋粒子エリア全体 -->
+
+          <!-- ★ここから新しく追加したブロック★ -->
           <div class="sp-bust-wrapper">
-            <!-- 粒子レイヤー（後ろ側から順に） -->
+            <!-- 粒子レイヤー（後ろから順に） -->
             <div class="sp-bust-particles particles-back"></div>
             <div class="sp-bust-particles particles-mid"></div>
             <div class="sp-bust-particles particles-front"></div>
 
-            <!-- しおぽん本体（今のバストアップ） -->
+            <!-- しおぽん本体 -->
             <div class="sp-avatar">
               <div class="sp-layer sp-shadow"></div>
               <div class="sp-layer sp-ear"></div>
@@ -40,8 +40,9 @@
               <div class="sp-layer sp-mouth"></div>
             </div>
           </div>
+          <!-- ★ここまで★ -->
 
-          <!-- ミニしおぽん（そのまま） -->
+          <!-- ミニしおぽん（今は display:none でもOK） -->
           <div class="sp-mini">
             <div class="sp-mini-shadow"></div>
             <div class="sp-mini-body"></div>
@@ -64,7 +65,9 @@
       </div>
     </div>
   `;
-}
+}  
+  
+  
   // ------------------------------------------------------------
   // 2. メイン処理
   // ------------------------------------------------------------
