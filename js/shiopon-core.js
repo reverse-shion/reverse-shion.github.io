@@ -347,7 +347,7 @@ function parseLines(raw) {
     return "idle";
   }
 
-  // ------------------------------------------------------------
+    // ------------------------------------------------------------
   // セリフ発話（しおぽんの声）
   // window.ShioponVisual と連携
   // ------------------------------------------------------------
@@ -364,6 +364,20 @@ function parseLines(raw) {
     state.lastMood = mood;
     state.lastActionTime = Date.now();
     saveState();
+
+    // 🟣 ここでパネルの mood クラスを更新
+    const panel = document.getElementById("shiopon-panel");
+    if (panel) {
+      panel.classList.remove(
+        "mood-neutral",
+        "mood-smile",
+        "mood-excited",
+        "mood-worry"
+      );
+
+      const mode = expression || mood || "neutral";
+      panel.classList.add(`mood-${mode}`);
+    }
 
     // 表情セット（外部モジュールに委譲）
     if (window.ShioponVisual && typeof window.ShioponVisual.setExpression === "function") {
