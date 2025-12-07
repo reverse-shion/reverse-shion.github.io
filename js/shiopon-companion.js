@@ -486,31 +486,47 @@
   }
 
  // まばたき（バストアップ）
+// まばたき（バストアップ）全部3段階版
 function blinkBust() {
   const panel = document.getElementById("shiopon-panel");
   if (!panel) return;
   const eyes = panel.querySelector(".sp-layer.sp-eyes");
   if (!eyes) return;
 
-  // 今の気分を参照（speak() で更新されてる）
   const mood = state.lastMood || "neutral";
 
-  // いったん閉じる
-  eyes.style.backgroundImage = `url(${BUST}eyes_closed.png)`;
+  // 気分ごとに「open / half / closed」を決める
+  let texOpen, texHalf, texClosed;
 
+  if (mood === "smile" || mood === "excited") {
+    // 😊 ニコニコ中：open=笑顔、half/closed=ぎゅっと目つぶり
+    texOpen   = `${BUST}eyes_smile.png`;
+    texHalf   = `${BUST}eyes_closed.png`; // ちょっと細めに見えるイメージ
+    texClosed = `${BUST}eyes_closed.png`;
+  } else if (mood === "worry") {
+    // 😟 心配顔：open=half、half=closed、closed=closed
+    texOpen   = `${BUST}eyes_half.png`;
+    texHalf   = `${BUST}eyes_closed.png`;
+    texClosed = `${BUST}eyes_closed.png`;
+  } else {
+    // 😐 通常：open→half→closed→half→open のフル3段階
+    texOpen   = `${BUST}eyes_open.png`;
+    texHalf   = `${BUST}eyes_half.png`;
+    texClosed = `${BUST}eyes_closed.png`;
+  }
+
+  // open → half → closed → half → open
+  // ※時間は一瞬なので全部 40ms ずつくらい
+  eyes.style.backgroundImage = `url(${texHalf})`;
   setTimeout(() => {
-    // 表情に応じて「戻す先」を変える
-    if (mood === "smile" || mood === "excited") {
-      // 😊 笑顔のときは smile の目に戻す
-      eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
-    } else if (mood === "worry") {
-      // 😟 心配顔は half に戻す
-      eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
-    } else {
-      // それ以外は通常の目
-      eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
-    }
-  }, 120);
+    eyes.style.backgroundImage = `url(${texClosed})`;
+    setTimeout(() => {
+      eyes.style.backgroundImage = `url(${texHalf})`;
+      setTimeout(() => {
+        eyes.style.backgroundImage = `url(${texOpen})`;
+      }, 40);
+    }, 40);
+  }, 40);
 }
   
   function blinkToggle(toggleLayers) {
