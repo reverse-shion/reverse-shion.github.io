@@ -7,7 +7,7 @@
   "use strict";
 
   const STORAGE_KEY = "shiopon_state_v2";
-  const LINES_TXT = "/assets/shiopon/shiopon_lines.txt";
+  const LINES_TXT = "assets/shiopon/shiopon_lines.txt";
 
   // ------------------------------------------------------------
   // プロフィール / 状態のファクトリ
