@@ -15,10 +15,10 @@
   const MINI   = ASSET_BASE + "mini/";
 
   // DOMキャッシュ
-  let bustLayers = null;
+  let bustLayers   = null;
   let toggleLayers = null;
-  let miniShadow = null;
-  let miniBody = null;
+  let miniShadow   = null;
+  let miniBody     = null;
 
   // アイドル用タイマー（setTimeout）
   let blinkBustTimer   = null;
@@ -33,7 +33,7 @@
     const panel  = document.getElementById("shiopon-panel");
     const toggle = document.getElementById("shiopon-toggle");
 
-    // どちらもなければ何もしない（エラー防止）
+    // どちらもなければ何もしない
     if (!panel && !toggle) return;
 
     if (panel) {
@@ -90,13 +90,13 @@
       }
     }
 
-    // ミニしおぽん
+    // ミニしおぽん（今は影＋本体のみ）
     if (miniShadow)
       miniShadow.style.backgroundImage = `url(${MINI}mini_shadow.png)`;
     if (miniBody)
       miniBody.style.backgroundImage   = `url(${TOGGLE}toggle_base.png)`; // ミニ本体はトグルと共通
 
-    // トグル（フローティングボタン）
+    // トグル（右下ボタン）
     if (toggleLayers) {
       const { shadow, base, ear, eyes, mouth } = toggleLayers;
 
@@ -155,76 +155,72 @@
   }
 
   // ------------------------------------------------------------
-// 表情制御（Core から mood を受け取る）
-// ------------------------------------------------------------
-function setExpression(mood) {
-  if (!bustLayers) return;
+  // 表情制御（Core から mood を受け取る）
+  // ------------------------------------------------------------
+  function setExpression(mood) {
+    if (!bustLayers) return;
 
-  const { shadow, ear, eyes, mouth, faceExtra, avatar } = bustLayers;
+    const { shadow, ear, eyes, mouth, faceExtra, avatar } = bustLayers;
 
-  // 全体リセット
-  if (avatar) {
-    avatar.classList.remove("sp-mood-happy", "sp-mood-worry");
-  }
+    // 全体リセット
+    if (avatar) {
+      avatar.classList.remove("sp-mood-happy", "sp-mood-worry");
+    }
 
-  if (shadow) {
-    shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
-  }
-  if (ear) {
-    ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
-  }
-  if (eyes) {
-    eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
-    eyes.style.opacity = "1";
-    // ★ ここで必ず一旦 neutral にしておく
-    eyes.dataset.mode = "neutral";
-  }
-  if (mouth) {
-    mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
-  }
-  if (faceExtra) {
-    faceExtra.style.backgroundImage = "none";
-    faceExtra.style.opacity = "0";
-  }
+    if (shadow) {
+      shadow.style.backgroundImage = `url(${BUST}shadow_base.png)`;
+    }
+    if (ear) {
+      ear.style.backgroundImage = `url(${BUST}ear_neutral.png)`;
+    }
+    if (eyes) {
+      eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
+      eyes.style.opacity = "1";
+    }
+    if (mouth) {
+      mouth.style.backgroundImage = `url(${BUST}mouth_close.png)`;
+    }
+    if (faceExtra) {
+      faceExtra.style.backgroundImage = "none";
+      faceExtra.style.opacity = "0";
+    }
 
-  // mood ごとの上書き（ここでだけ表情を決める）
-  switch (mood) {
-    case "smile":
-    case "excited":
-      if (ear) {
-        ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
-      }
-      if (eyes) {
-        eyes.dataset.mode = "smile";                    // ← まばたき用
-        eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
-      }
-      if (mouth) {
-        mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
-      }
-      if (faceExtra) {
-        faceExtra.style.backgroundImage = `url(${BUST}face_blush.png)`;
-        faceExtra.style.opacity = "1";
-      }
-      if (avatar) avatar.classList.add("sp-mood-happy");
-      break;
+    // mood ごとの上書き
+    switch (mood) {
+      case "smile":
+      case "excited":
+        if (ear) {
+          ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
+        }
+        if (eyes) {
+          eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
+        }
+        if (mouth) {
+          mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
+        }
+        if (faceExtra) {
+          faceExtra.style.backgroundImage = `url(${BUST}face_blush.png)`;
+          faceExtra.style.opacity = "1";
+        }
+        if (avatar) avatar.classList.add("sp-mood-happy");
+        break;
 
-    case "worry":
-      if (eyes) {
-        eyes.dataset.mode = "worry";                   // ← まばたき用
-        eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
-      }
-      if (faceExtra) {
-        faceExtra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
-        faceExtra.style.opacity = "1";
-      }
-      if (avatar) avatar.classList.add("sp-mood-worry");
-      break;
+      case "worry":
+        if (eyes) {
+          eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
+        }
+        if (faceExtra) {
+          faceExtra.style.backgroundImage = `url(${BUST}face_sweat.png)`;
+          faceExtra.style.opacity = "1";
+        }
+        if (avatar) avatar.classList.add("sp-mood-worry");
+        break;
 
-    default:
-      // neutral のまま（eyes.dataset.mode = "neutral" が効いてる）
-      break;
+      default:
+        // neutral のまま
+        break;
+    }
   }
-}
 
   // ------------------------------------------------------------
   // 口パク制御（Core から呼ばれる）
@@ -255,7 +251,7 @@ function setExpression(mood) {
   }
 
   function resetMouth(mood) {
-    if (!bustLayers?.mouth) return;
+    if (!bustLayers || !bustLayers.mouth) return;
     if (mood === "smile" || mood === "excited") {
       bustLayers.mouth.style.backgroundImage = `url(${BUST}mouth_smile.png)`;
     } else {
@@ -268,7 +264,6 @@ function setExpression(mood) {
   //  ※ setTimeout で毎回ランダム間隔にする
   // ------------------------------------------------------------
   function setupIdleAnimations() {
-    // 既存タイマー停止
     clearTimeout(blinkBustTimer);
     clearTimeout(blinkToggleTimer);
     clearTimeout(earBustTimer);
@@ -289,7 +284,7 @@ function setExpression(mood) {
   }
 
   function blinkBust() {
-    if (!bustLayers?.eyes) return;
+    if (!bustLayers || !bustLayers.eyes) return;
     const eyes = bustLayers.eyes;
 
     let mood = "neutral";
@@ -301,10 +296,12 @@ function setExpression(mood) {
     let texOpen, texHalf, texClosed;
 
     if (mood === "smile" || mood === "excited") {
+      // ★ smile のとき： eyes_smile → eyes_closed → eyes_smile
       texOpen   = `${BUST}eyes_smile.png`;
-      texHalf   = `${BUST}eyes_half.png`;
+      texHalf   = `${BUST}eyes_smile.png`;
       texClosed = `${BUST}eyes_closed.png`;
     } else if (mood === "worry") {
+      // ★ worry のとき： eyes_half → eyes_closed → eyes_half
       texOpen   = `${BUST}eyes_half.png`;
       texHalf   = `${BUST}eyes_half.png`;
       texClosed = `${BUST}eyes_closed.png`;
@@ -335,7 +332,7 @@ function setExpression(mood) {
   }
 
   function blinkToggle() {
-    if (!toggleLayers?.eyes) return;
+    if (!toggleLayers || !toggleLayers.eyes) return;
     const eyes = toggleLayers.eyes;
 
     eyes.style.backgroundImage = `url(${TOGGLE}toggle_eyes_closed.png)`;
@@ -353,7 +350,7 @@ function setExpression(mood) {
   }
 
   function earPyonBust() {
-    if (!bustLayers?.ear || !bustLayers?.shadow) return;
+    if (!bustLayers || !bustLayers.ear || !bustLayers.shadow) return;
     const ear    = bustLayers.ear;
     const shadow = bustLayers.shadow;
 
@@ -365,10 +362,8 @@ function setExpression(mood) {
 
     const isHappy = mood === "smile" || mood === "excited";
 
-    // 基本はニュートラル、ぴょこ時に耳が上がる
     const baseEar    = `${BUST}ear_neutral.png`;
     const baseShadow = `${BUST}shadow_base.png`;
-
     const pyonEar    = `${BUST}ear_up.png`;
     const pyonShadow = `${BUST}shadow_up.png`;
 
@@ -391,7 +386,7 @@ function setExpression(mood) {
   }
 
   function earPyonToggle() {
-    if (!toggleLayers?.ear || !toggleLayers?.shadow) return;
+    if (!toggleLayers || !toggleLayers.ear || !toggleLayers.shadow) return;
     const ear    = toggleLayers.ear;
     const shadow = toggleLayers.shadow;
 
