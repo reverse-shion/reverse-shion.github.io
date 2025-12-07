@@ -23,6 +23,9 @@
   let earBustTimer     = null;
   let earToggleTimer   = null;
 
+  // パネル監視用（トグル表示/非表示の自動切り替え）
+  let panelObserver = null;
+
   // ------------------------------------------------------------
   // 初期化：DOM & 画像セット & アイドル開始
   // ------------------------------------------------------------
@@ -61,6 +64,46 @@
     setupImages();
     preloadImages();
     setupIdleAnimations();
+
+    // ★ 追加：パネルの状態に合わせてトグル表示を自動制御
+    setupPanelToggleSync(panel, toggle);
+  }
+
+  // ------------------------------------------------------------
+  // パネル表示状態とトグル表示の同期
+  // ------------------------------------------------------------
+  function setupPanelToggleSync(panel, toggle) {
+    if (!panel || !toggle) return;
+
+    // いったん現在の状態で同期
+    syncToggleVisibility(panel, toggle);
+
+    // すでにオブザーバーがあれば解除
+    if (panelObserver) {
+      panelObserver.disconnect();
+      panelObserver = null;
+    }
+
+    // class属性の変化を監視して、sp-hidden の有無で切り替え
+    panelObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === "class") {
+          syncToggleVisibility(panel, toggle);
+          break;
+        }
+      }
+    });
+
+    panelObserver.observe(panel, { attributes: true });
+  }
+
+  function syncToggleVisibility(panel, toggle) {
+    if (!panel || !toggle) return;
+    const isHidden = panel.classList.contains("sp-hidden");
+
+    // バストアップ表示中（sp-hidden が付いていない）→ トグル非表示
+    // バストアップ非表示中（sp-hidden あり）→ トグル表示
+    toggle.style.display = isHidden ? "block" : "none";
   }
 
   // ------------------------------------------------------------
@@ -373,7 +416,6 @@
     }, 120);
   }
 
-  
   // ------------------------------------------------------------
   // ユーティリティ
   // ------------------------------------------------------------
