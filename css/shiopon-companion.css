@@ -1,6 +1,6 @@
 /* ============================================================
    Shiopon Companion v2.0
-   CSS — Live Layers / Panel UI / Animations
+   CSS — Toggle / Panel / Mood Aura / Shooting Star
    ============================================================ */
 
 :root {
@@ -17,9 +17,14 @@
 
   /* しおぽん専用の文字色 */
   --sp-font: "Noto Sans JP", sans-serif;
-  --sp-text-color: #24324a;        /* 読みやすい濃いめの青グレー */
-  --sp-name-color: #f070c8;        /* しおぽんらしいピンク寄りアクセント */
+  --sp-text-color: #24324a;        /* 読みやすい濃いめ青グレー */
+  --sp-name-color: #f070c8;        /* しおぽんらしいピンクアクセント */
+
+  /* mood共通デフォルト（neutralのときなど） */
+  --sp-mood-color: rgba(255, 255, 255, 0.9);
+  --sp-mood-color-soft: rgba(255, 255, 255, 0.45);
 }
+
 /* ============================================================
    0. TOGGLE BUTTON（右下の呼び出し）
    ============================================================ */
@@ -28,31 +33,51 @@
   position: fixed;
   bottom: 90px;
   right: 22px;
-  width: 100px;
-  height: 100px;
+  width: 76px;
+  height: 76px;
 
-  border: none;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
   padding: 0;
-  background: none;
   cursor: pointer;
 
+  /* しおぽんらしいやわらかい光の丸 */
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.95), rgba(255,255,255,0.75)),
+    radial-gradient(circle at 70% 80%, rgba(240,210,255,0.9), rgba(210,220,255,0.3));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 10px 24px rgba(18, 10, 40, 0.35);
+
   z-index: var(--sp-z-base);
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+
+  /* ほのかな上下ゆらゆら */
+  animation: sp-toggle-float 4.5s ease-in-out infinite;
 }
 
 #shiopon-toggle:hover {
-  transform: scale(1.05);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 14px 32px rgba(18, 10, 40, 0.45);
 }
 
 /* トグル用レイヤー（影・耳・本体・目・口） */
 .sp-toggle-layer {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 10%; /* ほんの少し中に寄せる */
   pointer-events: none;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+/* トグル上下ふわふわアニメ */
+@keyframes sp-toggle-float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
 }
 
 /* ============================================================
@@ -85,6 +110,30 @@
 }
 
 /* ============================================================
+   1-1. moodごとの色（オーラ＆流星に反映）
+   ============================================================ */
+
+#shiopon-panel.mood-neutral {
+  --sp-mood-color: rgba(255, 255, 255, 0.9);
+  --sp-mood-color-soft: rgba(230, 235, 255, 0.55);
+}
+
+#shiopon-panel.mood-smile {
+  --sp-mood-color: rgba(255, 150, 210, 0.95);   /* ピンク */
+  --sp-mood-color-soft: rgba(255, 210, 240, 0.7);
+}
+
+#shiopon-panel.mood-excited {
+  --sp-mood-color: rgba(255, 210, 80, 0.98);    /* ゴールド */
+  --sp-mood-color-soft: rgba(255, 235, 180, 0.75);
+}
+
+#shiopon-panel.mood-worry {
+  --sp-mood-color: rgba(140, 190, 255, 0.95);   /* 青白 */
+  --sp-mood-color-soft: rgba(200, 225, 255, 0.7);
+}
+
+/* ============================================================
    2. AVATAR AREA
    ============================================================ */
 
@@ -100,6 +149,9 @@
   height: var(--sp-size);
   position: relative;
   margin-bottom: 8px;
+
+  /* しおぽん自体もふわっとゆれる */
+  animation: sp-avatar-float 3.4s ease-in-out infinite;
 }
 
 .sp-layer {
@@ -112,12 +164,45 @@
   pointer-events: none;
 }
 
-/* ミニしおぽん（転送演出） */
+/* バストアップ背景：moodごとの光のオーラ＋粒子 */
+.sp-avatar::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 40% 20%, var(--sp-mood-color) 0%, transparent 58%),
+    radial-gradient(circle at 70% 80%, var(--sp-mood-color-soft) 0%, transparent 70%);
+  opacity: 0.8;
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 星粒レイヤー（ゆっくり流れる粒子） */
+.sp-avatar::after {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border-radius: 24px;
+  pointer-events: none;
+  opacity: 0.9;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.85) 0, transparent 55%),
+    radial-gradient(circle at 80% 30%, rgba(255,255,255,0.7) 0, transparent 55%),
+    radial-gradient(circle at 30% 80%, rgba(255,255,255,0.6) 0, transparent 55%),
+    radial-gradient(circle at 60% 60%, rgba(255,255,255,0.75) 0, transparent 50%);
+  mix-blend-mode: screen;
+  animation: sp-particles-flow 14s linear infinite;
+}
+
+/* ミニしおぽん（今は非表示） */
 .sp-mini {
   width: var(--sp-mini-size);
   height: var(--sp-mini-size);
   position: relative;
   margin: 8px auto 0;
+  display: none;
 }
 
 .sp-mini img,
@@ -127,6 +212,80 @@
   height: 100%;
   background-size: contain;
   background-repeat: no-repeat;
+}
+
+/* アバターのゆらゆらアニメ */
+@keyframes sp-avatar-float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* 星粒がゆっくり流れるアニメ */
+@keyframes sp-particles-flow {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0.8; }
+  50%  { transform: translate3d(-6px, -8px, 0); opacity: 1; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0.8; }
+}
+
+/* ============================================================
+   2-1. 流星（shooting star）用レイヤー
+   ※ JSで .sp-avatar 内に <div class="sp-shooting-star"></div> を入れる前提
+   ============================================================ */
+
+.sp-avatar .sp-shooting-star {
+  --star-color: var(--sp-mood-color);
+
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--star-color);
+  box-shadow:
+    0 0 10px var(--star-color),
+    0 0 18px var(--star-color);
+
+  opacity: 0;
+  pointer-events: none;
+  filter: blur(0.5px);
+  transform-origin: center;
+
+  animation: sp-shooting-star 0.9s ease-out forwards;
+}
+
+/* 流星の軌跡を擬似要素で */
+.sp-avatar .sp-shooting-star::before {
+  content: "";
+  position: absolute;
+  right: 50%;
+  top: 50%;
+  width: 120px;
+  height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.75),
+    var(--star-color)
+  );
+  opacity: 0.9;
+}
+
+/* 流星アニメーション（右下へスーッと落ちる） */
+@keyframes sp-shooting-star {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6) rotate(18deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(90px, 110px, 0) scale(1.05) rotate(18deg);
+  }
 }
 
 /* ============================================================
@@ -152,13 +311,14 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* 名前ラベル（Lumiere と同じポジションイメージ） */
+/* 名前ラベル（"Shiopon"） */
 .sp-dialog-name {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   color: var(--sp-name-color);
   margin-bottom: 4px;
+  text-transform: uppercase;
 }
 
 /* セリフ本体 */
@@ -169,6 +329,7 @@
   /* 少しだけ読みやすくするためのごく弱いシャドウ */
   text-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
 }
+
 .sp-dialog-actions {
   display: flex;
   justify-content: space-between;
@@ -184,15 +345,16 @@
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .sp-btn:hover {
   background: #f7f7f7;
+  transform: translateY(-1px);
 }
 
 .sp-btn.ghost {
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 /* 閉じるボタン */
@@ -210,9 +372,48 @@
   border: none;
   cursor: pointer;
 }
+/* トグル用レイヤー（影・耳・本体・目・口）は一番手前に */
+.sp-toggle-layer {
+  position: absolute;
+  inset: 10%;
+  pointer-events: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 1;          /* ← これを追加 */
+}
 
+/* アバター本体の各レイヤーも一番手前に */
+.sp-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 1;          /* ← これを追加 */
+}
+
+/* 星粒レイヤーも本体の“後ろ側”に下げる */
+.sp-avatar::after {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border-radius: 24px;
+  pointer-events: none;
+  opacity: 0.9;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.85) 0, transparent 55%),
+    radial-gradient(circle at 80% 30%, rgba(255,255,255,0.7) 0, transparent 55%),
+    radial-gradient(circle at 30% 80%, rgba(255,255,255,0.6) 0, transparent 55%),
+    radial-gradient(circle at 60% 60%, rgba(255,255,255,0.75) 0, transparent 50%);
+  mix-blend-mode: screen;
+  animation: sp-particles-flow 14s linear infinite;
+  z-index: -1;         /* ← これを追加 */
+}
 /* ============================================================
-   4. ANIMATIONS — BLINK / EARS / FLOAT
+   4. ANIMATIONS — BLINK / EARS
    ============================================================ */
 
 /* まばたき（目レイヤーそのもののフェード制御） */
@@ -243,20 +444,6 @@
   animation: sp-ear-wiggle 0.5s ease;
 }
 
-/* ふわっと浮く（体全体） */
-@keyframes sp-float {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(-6px); }
-  100% { transform: translateY(0); }
-}
-
-.sp-avatar.float {
-  animation: sp-float 3s ease-in-out infinite;
-}
-.sp-mini {
-  display: none;
-}
-
 /* ============================================================
    5. RESPONSIVE
    ============================================================ */
@@ -267,4 +454,50 @@
     right: 16px;
     bottom: 110px;
   }
+
+  #shiopon-toggle {
+    bottom: 70px;
+    right: 18px;
+    width: 68px;
+    height: 68px;
+  }
+}
+
+/* ============================================================
+   ★ Shiopon レイヤー順 強制リセット
+   ============================================================ */
+
+/* アバター自体はスタッキングコンテキストの土台 */
+.sp-avatar {
+  position: relative;
+  z-index: 0;
+}
+
+/* オーラ＆粒子は「背景」側 */
+.sp-avatar::before,
+.sp-avatar::after {
+  z-index: 0;
+}
+
+/* しおぽん本体の各パーツは必ずその上に出す */
+.sp-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* トグル用のパーツも前面に */
+.sp-toggle-layer {
+  position: absolute;
+  inset: 10%;
+  pointer-events: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 1;
 }
