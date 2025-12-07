@@ -285,3 +285,121 @@
     bottom: 110px;
   }
 }
+
+/* バストアップ全体の箱 */
+/* バストアップ全体の箱（トグル内のしおぽん） */
+.sp-bust-wrapper {
+  position: relative;
+  width: 320px;      /* ここは実際のしおぽんサイズに合わせて */
+  height: 320px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* しおぽん本体を枠いっぱいに */
+.sp-bust-wrapper .sp-avatar {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 粒子レイヤー共通 */
+.sp-bust-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;          /* しおぽん本体より後ろにしたいなら 0 に、前に出したいなら 5 とかに調整 */
+  opacity: 0.9;
+  will-change: transform;
+}
+
+.sp-bust-particles::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+
+/* ---- レイヤー別設定 ---- */
+
+/* 一番奥：白っぽい粒子、ゆっくり＆少なめ */
+.particles-back::before {
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    20px  10px  0 0 rgba(255,255,255,0.35),
+    80px  60px  0 0 rgba(255,255,255,0.4),
+    150px 20px  0 0 rgba(255,255,255,0.3),
+    220px 90px  0 0 rgba(255,255,255,0.35),
+    60px  140px 0 0 rgba(255,255,255,0.3),
+    200px 160px 0 0 rgba(255,255,255,0.35);
+  animation: spParticlesFallBack 18s linear infinite;
+}
+
+/* 中間：ラベンダー系、少しだけ速く */
+.particles-mid::before {
+  background: rgba(210, 190, 255, 0.7);
+  box-shadow:
+    40px  0px   0 0 rgba(210,190,255,0.5),
+    120px 40px  0 0 rgba(210,190,255,0.6),
+    200px 80px  0 0 rgba(210,190,255,0.5),
+    30px  120px 0 0 rgba(210,190,255,0.6),
+    160px 150px 0 0 rgba(210,190,255,0.55),
+    260px 110px 0 0 rgba(210,190,255,0.5);
+  animation: spParticlesFallMid 14s linear infinite;
+}
+
+/* 手前：ピンク〜ゴールド系、少し大きめ＆ちょい速い */
+.particles-front::before {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 210, 235, 0.9);
+  box-shadow:
+    30px  10px  0 0 rgba(255,210,235,0.9),
+    90px  50px  0 0 rgba(255,195,230,0.85),
+    140px 30px  0 0 rgba(255,220,210,0.8),
+    210px 80px  0 0 rgba(255,215,200,0.85),
+    70px  130px 0 0 rgba(255,205,230,0.9),
+    190px 170px 0 0 rgba(255,220,220,0.85);
+  animation: spParticlesFallFront 11s linear infinite;
+}
+
+/* ---- アニメーション定義 ---- */
+
+/* 奥ほどゆっくり動く（パララックスっぽく） */
+@keyframes spParticlesFallBack {
+  0% {
+    transform: translateY(-10%);
+  }
+  100% {
+    transform: translateY(40%);
+  }
+}
+
+@keyframes spParticlesFallMid {
+  0% {
+    transform: translateY(-15%);
+  }
+  100% {
+    transform: translateY(55%);
+  }
+}
+
+@keyframes spParticlesFallFront {
+  0% {
+    transform: translateY(-20%);
+  }
+  100% {
+    transform: translateY(70%);
+  }
+}
+
+/* 動きを抑えたい人向け（端末設定） */
+@media (prefers-reduced-motion: reduce) {
+  .sp-bust-particles {
+    animation: none !important;
+  }
+}
