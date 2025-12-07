@@ -486,25 +486,26 @@
   }
 
   function blinkBust() {
-    const panel = document.getElementById("shiopon-panel");
-    if (!panel) return;
-    const eyes = panel.querySelector(".sp-layer.sp-eyes");
-    if (!eyes) return;
+  const panel = document.getElementById("shiopon-panel");
+  if (!panel) return;
+  const eyes = panel.querySelector(".sp-layer.sp-eyes");
+  if (!eyes) return;
 
-    const mood = (state && state.lastMood) || "neutral";
+  // ★ 今の気分で「開いてるときの目」を決める
+  const isSmile = state.lastMood === "smile" || state.lastMood === "excited";
+  const openFrame = isSmile
+    ? `${BUST}eyes_smile.png`   // 笑顔時はにこ目
+    : `${BUST}eyes_open.png`;  // それ以外は通常の目
 
-    eyes.style.backgroundImage = `url(${BUST}eyes_closed.png)`;
-    setTimeout(() => {
-      if (mood === "smile" || mood === "excited") {
-        eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
-      } else if (mood === "worry") {
-        eyes.style.backgroundImage = `url(${BUST}eyes_half.png)`;
-      } else {
-        eyes.style.backgroundImage = `url(${BUST}eyes_open.png)`;
-      }
-    }, 120);
-  }
+  // 一瞬ぎゅっと閉じる
+  eyes.style.backgroundImage = `url(${BUST}eyes_closed.png)`;
 
+  setTimeout(() => {
+    // もとの“開き目”に戻す
+    eyes.style.backgroundImage = `url(${openFrame})`;
+  }, 120);
+}
+  
   function blinkToggle(toggleLayers) {
     const eyes = toggleLayers.eyes;
     if (!eyes) return;
@@ -516,20 +517,39 @@
 
   // 耳ぴょこ（バストアップ）
   function earPyonBust(bustLayers) {
-    const ear = bustLayers.ear;
-    const shadow = bustLayers.shadow;
-    if (!ear) return;
-    if (ear.classList.contains("sp-ear-pyon")) return;
+  const ear = bustLayers.ear;
+  const shadow = bustLayers.shadow;
+  if (!ear || !shadow) return;
 
-    ear.classList.add("sp-ear-pyon");
-    if (shadow) shadow.classList.add("sp-shadow-pyon");
+  // 今の気分に応じた“基準の耳/影”
+  const isSmile = state.lastMood === "smile" || state.lastMood === "excited";
+  const baseEar = isSmile
+    ? `${BUST}ear_up.png`
+    : `${BUST}ear_neutral.png`;
+  const baseShadow = isSmile
+    ? `${BUST}shadow_up.png`
+    : `${BUST}shadow_base.png`;
 
-    setTimeout(() => {
-      ear.classList.remove("sp-ear-pyon");
-      if (shadow) shadow.classList.remove("sp-shadow-pyon");
-    }, 140);
-  }
+  // ぴょこっと「反転」させる：
+  //  笑顔中 → (一瞬だけ neutral) → もとに戻る(up)
+  //  通常   → (一瞬だけ up)       → もとに戻る(neutral)
+  const pyonEar = isSmile
+    ? `${BUST}ear_neutral.png`
+    : `${BUST}ear_up.png`;
+  const pyonShadow = isSmile
+    ? `${BUST}shadow_base.png`
+    : `${BUST}shadow_up.png`;
 
+  // 一瞬だけ“ぴょこ”
+  ear.style.backgroundImage = `url(${pyonEar})`;
+  shadow.style.backgroundImage = `url(${pyonShadow})`;
+
+  setTimeout(() => {
+    // 基準状態に戻す
+    ear.style.backgroundImage = `url(${baseEar})`;
+    shadow.style.backgroundImage = `url(${baseShadow})`;
+  }, 120); // ← 耳ぴょこは一瞬で
+}
   // 耳ぴょこ（トグル）
   function earPyonToggle(toggleLayers) {
     const ear = toggleLayers.ear;
