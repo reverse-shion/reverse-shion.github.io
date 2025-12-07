@@ -1,5 +1,5 @@
 // ============================================================
-//  Shiopon Companion v2.0
+//  Shiopon Companion v2.1
 //  --- BOOTSTRAP MODULE（DOM注入 & 起動）---
 // ============================================================
 
@@ -65,38 +65,81 @@
     root.innerHTML = buildMarkup();
 
     // ③ 必要なDOM参照
-    const panel   = document.getElementById("shiopon-panel");
-    const toggle  = document.getElementById("shiopon-toggle");
-    const textEl  = document.getElementById("shiopon-text");
-    const close   = panel.querySelector(".sp-close");
-    const buttons = panel.querySelectorAll(".sp-btn");
+    const panel  = document.getElementById("shiopon-panel");
+    const toggle = document.getElementById("shiopon-toggle");
+    const textEl = document.getElementById("shiopon-text");
 
     if (!panel || !toggle || !textEl) {
       console.warn("[Shiopon] 必要なDOM要素が足りません");
       return;
     }
 
+    const close   = panel.querySelector(".sp-close");
+    const buttons = panel.querySelectorAll(".sp-btn");
+
     // ④ Visual（見た目・アニメーション）の初期化
     if (window.ShioponVisual && typeof window.ShioponVisual.init === "function") {
-      window.ShioponVisual.init();
+      try {
+        window.ShioponVisual.init();
+      } catch (e) {
+        console.warn("[Shiopon] ShioponVisual.init() でエラー:", e);
+      }
     } else {
       console.warn("[Shiopon] ShioponVisual が見つかりません（/js/shiopon-visual.js を読み込んでください）");
     }
 
     // ⑤ Core（セリフ・状態管理）の初期化
     if (window.ShioponCore && typeof window.ShioponCore.init === "function") {
-      // Core側に「DOMハンドル一式」を渡す
-      window.ShioponCore.init({
-        rootEl: root,
-        panelEl: panel,
-        toggleEl: toggle,
-        textEl,
-        closeEl: close,
-        actionButtons: buttons
-      });
+      try {
+        // Core v2.0 は引数なし想定なので何も渡さない
+        const r = window.ShioponCore.init();
+        // async 対応（エラー握りつぶし防止）
+        if (r && typeof r.then === "function") {
+          r.catch((e) => console.warn("[Shiopon] ShioponCore.init() でエラー:", e));
+        }
+      } catch (e) {
+        console.warn("[Shiopon] ShioponCore.init() でエラー:", e);
+      }
     } else {
       console.warn("[Shiopon] ShioponCore が見つかりません（/js/shiopon-core.js を読み込んでください）");
     }
+
+    // ⑥ イベントリスナー接続
+    // トグル：開閉
+    toggle.addEventListener("click", () => {
+      if (!window.ShioponCore) return;
+
+      const isOpen = panel.classList.contains("sp-visible");
+      if (isOpen && typeof window.ShioponCore.hidePanel === "function") {
+        window.ShioponCore.hidePanel();
+      } else if (!isOpen && typeof window.ShioponCore.showPanel === "function") {
+        window.ShioponCore.showPanel();
+      }
+    });
+
+    // 閉じるボタン
+    if (close) {
+      close.addEventListener("click", () => {
+        if (window.ShioponCore && typeof window.ShioponCore.hidePanel === "function") {
+          window.ShioponCore.hidePanel();
+        } else {
+          // 万が一 Core がなくても見た目だけは閉じる
+          panel.classList.remove("sp-visible");
+          panel.classList.add("sp-hidden");
+        }
+      });
+    }
+
+    // アクションボタン（もっと話す / 案内して / 今日は静かに）
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const action = btn.dataset.spAction;
+        if (!action) return;
+        if (window.ShioponCore && typeof window.ShioponCore.handleAction === "function") {
+          window.ShioponCore.handleAction(action);
+        }
+      });
+    });
   }
 
   // ------------------------------------------------------------
