@@ -1,5 +1,5 @@
 // ============================================================
-//  Shiopon Companion System v2.2
+//  Shiopon Companion System v2.3
 //  --- VISUAL MODULE（見た目・アニメーション制御）---
 // ============================================================
 
@@ -16,6 +16,9 @@
   let toggleLayers = null;
   let miniShadow   = null;
   let miniBody     = null;
+
+  // いま画面に出ている表情を保持（neutral / smile / excited / worry）
+  let currentMood = "neutral";
 
   // アイドル用タイマー
   let blinkBustTimer   = null;
@@ -65,7 +68,7 @@
     preloadImages();
     setupIdleAnimations();
 
-    // ★ 追加：パネルの状態に合わせてトグル表示を自動制御
+    // パネルの状態に合わせてトグル表示を自動制御
     setupPanelToggleSync(panel, toggle);
   }
 
@@ -75,10 +78,10 @@
   function setupPanelToggleSync(panel, toggle) {
     if (!panel || !toggle) return;
 
-    // いったん現在の状態で同期
+    // 現在の状態で同期
     syncToggleVisibility(panel, toggle);
 
-    // すでにオブザーバーがあれば解除
+    // 既存オブザーバーがあれば解除
     if (panelObserver) {
       panelObserver.disconnect();
       panelObserver = null;
@@ -201,6 +204,9 @@
   function setExpression(mood) {
     if (!bustLayers) return;
 
+    // 現在のビジュアル状態として保持
+    currentMood = mood || "neutral";
+
     const { shadow, ear, eyes, mouth, faceExtra, avatar } = bustLayers;
 
     // リセット
@@ -223,11 +229,13 @@
     }
 
     // mood 毎の上書き
-    switch (mood) {
+    switch (currentMood) {
       case "smile":
       case "excited":
         if (ear)
           ear.style.backgroundImage = `url(${BUST}ear_up.png)`;
+        if (shadow)
+          shadow.style.backgroundImage = `url(${BUST}shadow_up.png)`;
         if (eyes)
           eyes.style.backgroundImage = `url(${BUST}eyes_smile.png)`;
         if (mouth)
@@ -250,7 +258,7 @@
         break;
 
       default:
-        // neutral
+        // neutral：初期状態のまま
         break;
     }
   }
@@ -297,9 +305,9 @@
     clearTimeout(earBustTimer);
     clearTimeout(earToggleTimer);
 
-    if (bustLayers?.eyes)  scheduleBlinkBust();
+    if (bustLayers?.eyes)   scheduleBlinkBust();
     if (toggleLayers?.eyes) scheduleBlinkToggle();
-    if (bustLayers?.ear && bustLayers?.shadow) scheduleEarBust();
+    if (bustLayers?.ear && bustLayers?.shadow)   scheduleEarBust();
     if (toggleLayers?.ear && toggleLayers?.shadow) scheduleEarToggle();
   }
 
@@ -315,11 +323,8 @@
     if (!bustLayers?.eyes) return;
     const eyes = bustLayers.eyes;
 
-    let mood = "neutral";
-    if (window.ShioponCore && typeof window.ShioponCore.getState === "function") {
-      const st = window.ShioponCore.getState();
-      mood = (st && st.lastMood) || "neutral";
-    }
+    // Core ではなく「画面上の表情」に合わせる
+    const mood = currentMood;
 
     let texOpen, texHalf, texClosed;
 
@@ -433,7 +438,7 @@
     resetMouth
   };
 
-  // 念のため：Bootstrap から呼ばれなくても自分で初期化を試みる
+  // Bootstrap から呼ばれなくても自分で初期化を試みる
   if (document.readyState === "complete" || document.readyState === "interactive") {
     setTimeout(init, 0);
   } else {
