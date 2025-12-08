@@ -31,7 +31,6 @@
   bottom: 45px;
   right: 22px;
 
-  /* 円コンテナ：ここで正方形＋円マスクを作る */
   width: var(--sp-toggle-size);
   height: var(--sp-toggle-size);
   border-radius: 50%;
@@ -39,7 +38,7 @@
 
   border: none;
   padding: 0;
-   background: rgba(255,255,255,0.05); /* 透明に近い */
+  background: rgba(255,255,255,0.05);
   backdrop-filter: blur(2px);
   border: 2px solid rgba(255,255,255,0.35);
   box-shadow: 0 0 12px rgba(255,255,255,0.28);
@@ -47,14 +46,17 @@
 
   z-index: var(--sp-z-base);
   transition: transform 0.25s ease;
-   
+
+  /* ★ ここで常時ふわふわさせる */
+  animation: sp-toggle-float 6s ease-in-out infinite;
 }
 
+
 #shiopon-toggle:hover {
-  animation: none;                /* ゆらゆら停止 */
-  transform: scale(1.05) !important;
-   animation: sp-toggle-float 6s ease-in-out infinite;
+  animation-play-state: paused;   /* ★ アニメーション一時停止 */
+  transform: scale(1.05);
 }
+
 @keyframes sp-toggle-float {
   0%   { transform: translateY(0); }
   50%  { transform: translateY(-4px); }
