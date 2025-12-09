@@ -319,24 +319,29 @@
     }, randomRange(4000, 7000));
   }
 
-  function blinkBust() {
+    function blinkBust() {
     if (!bustLayers?.eyes) return;
-    const eyes = bustLayers.eyes;
+    const eyes   = bustLayers.eyes;
+    const avatar = bustLayers.avatar;
 
-    // Core ではなく「画面上の表情」に合わせる
-    const mood = currentMood;
+    // DOMクラスで現在の表情を判定
+    const isHappy = avatar?.classList.contains("sp-mood-happy");
+    const isWorry = avatar?.classList.contains("sp-mood-worry");
 
     let texOpen, texHalf, texClosed;
 
-    if (mood === "smile" || mood === "excited") {
+    if (isHappy) {
+      // smile / excited のとき
       texOpen   = `${BUST}eyes_smile.png`;
       texHalf   = `${BUST}eyes_half.png`;
       texClosed = `${BUST}eyes_closed.png`;
-    } else if (mood === "worry") {
+    } else if (isWorry) {
+      // worry のとき
       texOpen   = `${BUST}eyes_half.png`;
       texHalf   = `${BUST}eyes_half.png`;
       texClosed = `${BUST}eyes_closed.png`;
     } else {
+      // neutral
       texOpen   = `${BUST}eyes_open.png`;
       texHalf   = `${BUST}eyes_half.png`;
       texClosed = `${BUST}eyes_closed.png`;
