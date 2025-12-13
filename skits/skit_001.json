@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "title": "Shionverse Skit 001",
+    "description": "Shion, Lumiere, and Shiopon catch up inside the corridor.",
+    "version": "1.2"
+  },
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "静かな回廊で、みんなの足音だけが響いている。",
+      "next": "spark",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm smile", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "listening" },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful" }
+      ]
+    },
+    "spark": {
+      "id": "spark",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "ねぇねぇ！今日の星の光、いつもより柔らかくない？",
+      "next": "tease",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle" },
+        { "slot": "center", "character": "lumiere", "expression": "soft grin", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "sparkling eyes", "speaking": true, "motion": { "type": "shake", "durationMs": 550, "intensity": "mild" } }
+      ]
+    },
+    "tease": {
+      "id": "tease",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "気のせいじゃないよ、シオポン。きっとシオンが優しくなったせいだね。",
+      "next": "focus",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "surprised" },
+        { "slot": "center", "character": "lumiere", "expression": "teasing", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "pouting", "speaking": false }
+      ]
+    },
+    "focus": {
+      "id": "focus",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "優しく…ふふ、そうかもしれないね。二人とも、ここに来た理由を覚えてる？",
+      "next": "choice",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "thoughtful", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "wondering", "speaking": false, "visible": false },
+        { "slot": "right", "character": "shiopon", "expression": "thinking", "speaking": false }
+      ]
+    },
+    "choice": {
+      "id": "choice",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "えっとね、えっとね…！",
+      "choices": [
+        { "text": "静かな時間を一緒に過ごすため", "next": "quiet" },
+        { "text": "新しい冒険の相談をするため", "next": "adventure" }
+      ],
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "curious", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "excited", "speaking": true, "motion": { "type": "shake" } }
+      ]
+    },
+    "quiet": {
+      "id": "quiet",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "うん、静けさの中で話すと、心が柔らかくなるよね。",
+      "next": "wrap",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "relief" },
+        { "slot": "center", "character": "lumiere", "expression": "soft smile", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "warm" }
+      ]
+    },
+    "adventure": {
+      "id": "adventure",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "そうだ、星の図書室からの地図があったね。君たちとなら、どこへでも行けそうだ。",
+      "next": "wrap",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "ready", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "inspired", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "bouncy" }
+      ]
+    },
+    "wrap": {
+      "id": "wrap",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "どっちでもいいよ！だって、ここにいるだけで楽しいもん！",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "smiling" },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "radiant", "speaking": true, "motion": { "type": "shake" } }
+      ]
+    }
+  }
+}
