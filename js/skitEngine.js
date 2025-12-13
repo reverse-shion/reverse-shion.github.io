@@ -180,37 +180,65 @@
     },
 
     renderCast(castFrames, node) {
-      const slots = ['left', 'center', 'right'];
-      const slotMap = Object.fromEntries(slots.map((s) => [s, null]));
+  const slots = ['left', 'center', 'right'];
+  const slotMap = Object.fromEntries(slots.map((s) => [s, null]));
 
-      castFrames.forEach((frame) => {
-        if (!frame?.slot) return;
-        slotMap[frame.slot] = frame;
-      });
+  castFrames.forEach((frame) => {
+    if (!frame?.slot) return;
+    slotMap[frame.slot] = frame;
+  });
 
-      slots.forEach((slotName) => {
-        const slotEl = this.rootEl.querySelector(`.sv-slot[data-slot="${slotName}"]`);
-        if (!slotEl) return;
+  slots.forEach((slotName) => {
+    const slotEl = this.rootEl.querySelector(`.sv-slot[data-slot="${slotName}"]`);
+    if (!slotEl) return;
 
-        const portrait = slotEl.querySelector('.sv-portrait');
-        const faceEl = slotEl.querySelector('.sv-face');
-        const frame = slotMap[slotName];
+    const portrait = slotEl.querySelector('.sv-portrait');
+    const faceEl = slotEl.querySelector('.sv-face');
+    const frame = slotMap[slotName];
 
-        if (!frame || frame.visible === false) {
-          slotEl.classList.add('sv-hidden');
-          slotEl.classList.remove('sv-speaking', 'sv-dimmed');
+    // 非表示
+    if (!frame || frame.visible === false) {
+      slotEl.classList.add('sv-hidden');
+      slotEl.classList.remove('sv-speaking', 'sv-dimmed');
 
-          if (portrait) {
-            portrait.dataset.character = '';
-            portrait.dataset.motion = 'none';
-          }
-          if (faceEl) {
-            faceEl.style.backgroundImage = '';
-            faceEl.setAttribute('aria-label', '');
-          }
-          return;
-        }
+      if (portrait) {
+        portrait.dataset.character = '';
+        portrait.dataset.motion = 'none';
+      }
+      if (faceEl) {
+        faceEl.style.backgroundImage = '';
+        faceEl.setAttribute('aria-label', '');
+      }
+      return;
+    }
 
+    // 表示
+    slotEl.classList.remove('sv-hidden');
+
+    const character = (frame.character || '').trim();
+    const expression = (frame.expression || '').trim();
+
+    // 見た目ラベル（任意）
+    if (portrait) portrait.dataset.character = character;
+
+    // 512x512画像をセット（ここが今回の本丸）
+    if (faceEl) {
+      const imgUrl = this.resolvePortraitUrl(character, expression);
+      faceEl.style.backgroundImage = `url("${imgUrl}")`;
+      faceEl.setAttribute('aria-label', `${character} ${expression}`.trim());
+    }
+
+    // 話者強調
+    const speaking = !!(frame.speaking || (character && character === node.speaker));
+    slotEl.classList.toggle('sv-speaking', speaking);
+    slotEl.classList.toggle('sv-dimmed', !speaking);
+
+    // モーション
+    if (portrait) this.applyMotion(portrait, frame.motion);
+  });
+}
+
+    
         slotEl.classList.remove('sv-hidden');
 
         const character = frame.character || '';
