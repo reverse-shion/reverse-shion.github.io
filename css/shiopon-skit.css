@@ -458,3 +458,121 @@ body.sv-skit-lock {
     min-height: 200px;
   }
 }
+
+
+/* ============================================================
+   Shionverse Immersion Patch (Bright Skit / Page Presence)
+   追記で上書きするだけでOK
+============================================================ */
+
+/* 1) 背景(暗幕)を薄くして“ページに居る感”を残す */
+#sv-skit .sv-overlay-backdrop {
+  background: rgba(5, 7, 12, 0.28);      /* 0.55 → 0.28 */
+  backdrop-filter: blur(1px) saturate(1.05);
+}
+
+/* 2) パネルを“完全な箱”にしない：少し透過＋星霧＋明るさ */
+#sv-skit .sv-overlay-panel {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(170, 210, 255, 0.22), transparent 45%),
+    radial-gradient(circle at 78% 38%, rgba(210, 170, 255, 0.18), transparent 42%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.10), transparent 55%),
+    linear-gradient(160deg, rgba(20, 24, 36, 0.72) 0%, rgba(10, 12, 18, 0.66) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 64px rgba(0, 0, 0, 0.38);
+}
+
+/* ヘッダーも少し明るくして、ページとの分離感を弱める */
+#sv-skit .sv-overlay-header {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* 3) スキット(STAGE)を明るく：Shionverse象徴の“星霧回廊” */
+#sv-skit .sv-stage {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(160, 210, 255, 0.26), transparent 48%),
+    radial-gradient(circle at 80% 40%, rgba(220, 170, 255, 0.22), transparent 44%),
+    radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.10), transparent 60%),
+    linear-gradient(180deg, rgba(28, 34, 52, 0.70) 0%, rgba(12, 12, 18, 0.62) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* ページの存在感を出す：STAGE外は“ちょい沈める” */
+#sv-skit .sv-topbar,
+#sv-skit .sv-log-panel {
+  opacity: 0.92;
+}
+
+/* キャラ枠はほんのり明るく、でもページが勝つように透明度を上げる */
+#sv-skit .sv-portrait {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.40);
+}
+
+/* 画像表示レイヤー：下寄せ＆しっかり見せる */
+#sv-skit .sv-face {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+/* speakingは“光が当たる”感じ、dimmedは抑えめ */
+#sv-skit .sv-slot.sv-speaking .sv-portrait {
+  transform: scale(1.05);
+  filter: brightness(1.08) saturate(1.05);
+  border-color: rgba(200, 230, 255, 0.30);
+}
+#sv-skit .sv-slot.sv-dimmed .sv-portrait {
+  filter: brightness(0.78) saturate(0.85);
+  opacity: 0.92;
+}
+
+/* 4) セリフエリアを白〜明るい霧ガラスにして没入感を最大化 */
+#sv-skit .sv-dialogue {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(245, 248, 255, 0.84) 100%);
+  border: 1px solid rgba(160, 200, 255, 0.40);
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.20),
+    0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+  color: rgba(10, 12, 18, 0.92);
+}
+
+/* 名前タグも“光るラベル”に（暗いままだと浮く） */
+#sv-skit .sv-name {
+  background: rgba(120, 165, 255, 0.22);
+  border: 1px solid rgba(120, 165, 255, 0.45);
+  color: rgba(10, 12, 18, 0.92);
+}
+
+/* 本文は濃いめで読みやすく（白背景に最適化） */
+#sv-skit .sv-text {
+  color: rgba(10, 12, 18, 0.92);
+}
+
+/* ヒントは薄いグレー */
+#sv-skit .sv-hint {
+  color: rgba(10, 12, 18, 0.42);
+}
+
+/* 選択肢も“白系”で統一してページ滞在感を守る */
+#sv-skit .sv-choice-btn {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(160, 200, 255, 0.35);
+  color: rgba(10, 12, 18, 0.88);
+}
+#sv-skit .sv-choice-btn:hover,
+#sv-skit .sv-choice-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(120, 165, 255, 0.55);
+}
+
+/* 5) 旧 .sv-expression は今後使わないので完全に無効化 */
+#sv-skit .sv-expression {
+  display: none !important;
+}
