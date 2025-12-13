@@ -1,0 +1,460 @@
+/* Namespaced styles for Shionverse Skit System */
+#sv-skit {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  font-family: 'Noto Sans JP', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+#sv-skit * {
+  box-sizing: border-box;
+}
+
+#sv-skit .sv-launch-btn {
+  pointer-events: auto;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: rgba(20, 24, 39, 0.85);
+  color: #f4f5ff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+#sv-skit .sv-launch-btn:hover,
+#sv-skit .sv-launch-btn:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(39, 50, 78, 0.95);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  outline: none;
+}
+
+#sv-skit .sv-launch-btn:active {
+  transform: translateY(0);
+}
+
+#sv-skit .sv-launch-btn.sv-pulse {
+  animation: sv-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes sv-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(112, 170, 255, 0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(112, 170, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(112, 170, 255, 0); }
+}
+
+#sv-skit .sv-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+#sv-skit .sv-overlay.sv-hidden {
+  display: none;
+}
+
+#sv-skit .sv-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 7, 12, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+#sv-skit .sv-overlay-panel {
+  position: relative;
+  width: min(960px, 94vw);
+  height: min(620px, 92vh);
+  background: linear-gradient(160deg, rgba(15, 19, 30, 0.95) 0%, rgba(13, 12, 20, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #e8ecff;
+  pointer-events: auto;
+}
+
+#sv-skit .sv-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+#sv-skit .sv-overlay-title {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #c6d4ff;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+#sv-skit .sv-overlay-actions button {
+  background: transparent;
+  color: #e8ecff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+#sv-skit .sv-overlay-actions button:hover,
+#sv-skit .sv-overlay-actions button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+#sv-skit .sv-overlay-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px 16px;
+  gap: 12px;
+  overflow: hidden;
+}
+
+#sv-skit .sv-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 10px;
+}
+
+#sv-skit .sv-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+#sv-skit .sv-title {
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: #bcd0ff;
+}
+
+#sv-skit .sv-controls {
+  display: flex;
+  gap: 8px;
+}
+
+#sv-skit .sv-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8ecff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+#sv-skit .sv-btn:hover,
+#sv-skit .sv-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  outline: none;
+}
+
+#sv-skit .sv-btn[aria-pressed='true'] {
+  background: rgba(120, 165, 255, 0.18);
+  border-color: rgba(120, 165, 255, 0.5);
+  color: #dcebff;
+}
+
+#sv-skit .sv-stage {
+  flex: 1;
+  background: radial-gradient(circle at 20% 20%, rgba(78, 98, 146, 0.12), transparent 45%),
+    radial-gradient(circle at 80% 40%, rgba(185, 120, 255, 0.08), transparent 40%),
+    linear-gradient(180deg, rgba(20, 24, 36, 0.9) 0%, rgba(12, 12, 18, 0.96) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: flex-end;
+  padding: 12px 14px 10px;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+#sv-skit .sv-slot {
+  position: relative;
+  height: 100%;
+  min-height: 240px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition: transform 0.35s ease, filter 0.35s ease, opacity 0.35s ease;
+}
+
+#sv-skit .sv-slot.sv-hidden {
+  opacity: 0;
+  transform: translateY(14px) scale(0.98);
+  pointer-events: none;
+}
+
+#sv-skit .sv-portrait {
+  width: 90%;
+  max-width: 220px;
+  aspect-ratio: 3 / 5;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(1px);
+  transform-origin: center bottom;
+}
+
+#sv-skit .sv-portrait::before {
+  content: attr(data-character);
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+#sv-skit .sv-expression {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #dfe7ff;
+  text-align: center;
+}
+
+#sv-skit .sv-slot.sv-speaking .sv-portrait {
+  transform: scale(1.04);
+  filter: brightness(1.05);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+#sv-skit .sv-slot.sv-dimmed .sv-portrait {
+  filter: brightness(0.65) saturate(0.8);
+}
+
+#sv-skit .sv-dialogue {
+  background: rgba(15, 17, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px 14px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  cursor: pointer;
+}
+
+#sv-skit .sv-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(120, 165, 255, 0.14);
+  color: #e5edff;
+  border: 1px solid rgba(120, 165, 255, 0.32);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  width: fit-content;
+}
+
+#sv-skit .sv-text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: #eef2ff;
+  white-space: pre-line;
+}
+
+#sv-skit .sv-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.05em;
+}
+
+#sv-skit .sv-choices {
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+#sv-skit .sv-choice-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: #eaf0ff;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+#sv-skit .sv-choice-btn:hover,
+#sv-skit .sv-choice-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  outline: none;
+}
+
+#sv-skit .sv-log-panel {
+  position: absolute;
+  inset: 14px;
+  background: rgba(5, 7, 12, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#sv-skit .sv-log-panel.sv-open {
+  display: flex;
+}
+
+#sv-skit .sv-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+#sv-skit .sv-log-title {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #dbe7ff;
+}
+
+#sv-skit .sv-log-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  color: #e8ecff;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#sv-skit .sv-log-body {
+  padding: 12px;
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+}
+
+#sv-skit .sv-log-row {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+#sv-skit .sv-log-speaker {
+  font-weight: 700;
+  color: #c1d4ff;
+  margin-bottom: 6px;
+}
+
+#sv-skit .sv-log-text {
+  color: #eaf0ff;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+#sv-skit .sv-auto-indicator {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+#sv-skit .sv-motion-shake {
+  animation: sv-shake 0.5s ease;
+}
+
+@keyframes sv-shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+#sv-skit .sv-motion-zoomIn {
+  animation: sv-zoomIn 0.6s ease;
+}
+
+#sv-skit .sv-motion-zoomOut {
+  animation: sv-zoomOut 0.6s ease;
+}
+
+@keyframes sv-zoomIn {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes sv-zoomOut {
+  0% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+
+#sv-skit .sv-portrait[data-motion='dim'] {
+  filter: brightness(0.5) saturate(0.7);
+}
+
+#sv-skit .sv-overlay, #sv-skit .sv-overlay * {
+  pointer-events: auto;
+}
+
+body.sv-skit-lock {
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  #sv-skit .sv-overlay-panel {
+    width: 94vw;
+    height: 88vh;
+  }
+
+  #sv-skit .sv-stage {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 10px;
+  }
+
+  #sv-skit .sv-slot {
+    min-height: 200px;
+  }
+}
