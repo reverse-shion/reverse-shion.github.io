@@ -16,6 +16,9 @@
       this.rootEl = rootEl;
       this.log = [];
       this.autoMode = false;
+      this.waitingChoice = false;
+      this.currentNode = null;
+
       this.rootEl.innerHTML = this.renderShell();
       this.bindStaticElements();
 
@@ -24,28 +27,34 @@
         this.validate(data);
         this.skit = data;
         this.nodes = data.nodes || {};
-        this.rootEl.querySelector('.sv-title').textContent = data.meta?.title || 'Skit Window';
+
+        const titleEl = this.rootEl.querySelector('.sv-title');
+        if (titleEl) titleEl.textContent = data.meta?.title || 'Skit Window';
+
         this.autoBtn.setAttribute('aria-pressed', 'false');
         this.gotoNode(data.start);
       } catch (err) {
-        this.showError(err.message || 'スキットの読み込みに失敗しました。');
+        this.showError(err?.message || 'スキットの読み込みに失敗しました。');
       }
     },
 
     stop() {
       clearTimeout(this.autoTimer);
+      this.autoTimer = null;
       this.autoMode = false;
       this.waitingChoice = false;
+
       if (this.logPanel) {
         this.logPanel.classList.remove('sv-open');
         this.logPanel.setAttribute('aria-hidden', 'true');
       }
+
+      // key handler cleanup
       if (this.keyHandler && this.rootEl) {
         const panel = this.rootEl.closest('.sv-overlay-panel');
-        if (panel) {
-          panel.removeEventListener('keydown', this.keyHandler, true);
-        }
+        if (panel) panel.removeEventListener('keydown', this.keyHandler, true);
       }
+      this.keyHandler = null;
     },
 
     renderShell() {
@@ -58,17 +67,34 @@
               <button type="button" class="sv-btn sv-auto-btn" aria-pressed="false">Auto</button>
             </div>
           </div>
+
           <div class="sv-stage" aria-live="polite">
-            <div class="sv-slot" data-slot="left"><div class="sv-portrait" data-character="" data-motion="none"><div class="sv-expression"></div></div></div>
-            <div class="sv-slot" data-slot="center"><div class="sv-portrait" data-character="" data-motion="none"><div class="sv-expression"></div></div></div>
-            <div class="sv-slot" data-slot="right"><div class="sv-portrait" data-character="" data-motion="none"><div class="sv-expression"></div></div></div>
+            <div class="sv-slot" data-slot="left">
+              <div class="sv-portrait" data-character="" data-motion="none">
+                <div class="sv-face" role="img" aria-label=""></div>
+              </div>
+            </div>
+
+            <div class="sv-slot" data-slot="center">
+              <div class="sv-portrait" data-character="" data-motion="none">
+                <div class="sv-face" role="img" aria-label=""></div>
+              </div>
+            </div>
+
+            <div class="sv-slot" data-slot="right">
+              <div class="sv-portrait" data-character="" data-motion="none">
+                <div class="sv-face" role="img" aria-label=""></div>
+              </div>
+            </div>
           </div>
+
           <div class="sv-dialogue" tabindex="0">
             <div class="sv-name">...</div>
             <div class="sv-text">読み込み中...</div>
             <div class="sv-choices" hidden></div>
             <div class="sv-hint">タップ / クリック / Spaceで進む</div>
           </div>
+
           <div class="sv-log-panel" aria-hidden="true">
             <div class="sv-log-header">
               <div class="sv-log-title">ログ</div>
@@ -96,15 +122,14 @@
 
       const panel = this.rootEl.closest('.sv-overlay-panel');
       this.keyHandler = (e) => {
-        if (!this.rootEl.isConnected) return;
+        if (!this.rootEl || !this.rootEl.isConnected) return;
+        if (this.waitingChoice) return;
         if (e.key === ' ' || e.code === 'Space') {
           e.preventDefault();
           this.handleAdvance();
         }
       };
-      if (panel) {
-        panel.addEventListener('keydown', this.keyHandler, true);
-      }
+      if (panel) panel.addEventListener('keydown', this.keyHandler, true);
     },
 
     async fetchSkit(url) {
@@ -120,6 +145,20 @@
       if (!data.nodes[data.start]) {
         throw new Error('開始ノードが見つかりません。');
       }
+    },
+
+    // "calm smile" -> "calm-smile"
+    normalizeExpression(expression) {
+      return (expression || 'normal')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+    },
+
+    resolvePortraitUrl(character, expression) {
+      const c = (character || 'unknown').trim().toLowerCase();
+      const e = this.normalizeExpression(expression);
+      return `/assets/skit/${c}/${e}.png`;
     },
 
     gotoNode(id) {
@@ -143,31 +182,50 @@
     renderCast(castFrames, node) {
       const slots = ['left', 'center', 'right'];
       const slotMap = Object.fromEntries(slots.map((s) => [s, null]));
+
       castFrames.forEach((frame) => {
-        if (!frame.slot) return;
+        if (!frame?.slot) return;
         slotMap[frame.slot] = frame;
       });
 
       slots.forEach((slotName) => {
         const slotEl = this.rootEl.querySelector(`.sv-slot[data-slot="${slotName}"]`);
+        if (!slotEl) return;
+
         const portrait = slotEl.querySelector('.sv-portrait');
-        const expressionEl = slotEl.querySelector('.sv-expression');
+        const faceEl = slotEl.querySelector('.sv-face');
         const frame = slotMap[slotName];
+
         if (!frame || frame.visible === false) {
           slotEl.classList.add('sv-hidden');
           slotEl.classList.remove('sv-speaking', 'sv-dimmed');
-          portrait.dataset.character = '';
-          expressionEl.textContent = '';
-          portrait.dataset.motion = 'none';
+
+          if (portrait) {
+            portrait.dataset.character = '';
+            portrait.dataset.motion = 'none';
+          }
+          if (faceEl) {
+            faceEl.style.backgroundImage = '';
+            faceEl.setAttribute('aria-label', '');
+          }
           return;
         }
 
         slotEl.classList.remove('sv-hidden');
-        portrait.dataset.character = frame.character || '';
-        expressionEl.textContent = frame.expression || '';
 
-        const speaking = frame.speaking || frame.character === node.speaker;
-        slotEl.classList.toggle('sv-speaking', !!speaking);
+        const character = frame.character || '';
+        const expression = frame.expression || 'normal';
+        const url = this.resolvePortraitUrl(character, expression);
+
+        if (portrait) portrait.dataset.character = character;
+
+        if (faceEl) {
+          faceEl.style.backgroundImage = `url("${url}")`;
+          faceEl.setAttribute('aria-label', `${character}:${expression}`);
+        }
+
+        const speaking = !!(frame.speaking || (frame.character && frame.character === node.speaker));
+        slotEl.classList.toggle('sv-speaking', speaking);
         slotEl.classList.toggle('sv-dimmed', !speaking);
 
         this.applyMotion(portrait, frame.motion);
@@ -175,29 +233,30 @@
     },
 
     applyMotion(portrait, motion) {
+      if (!portrait) return;
+
       portrait.classList.remove('sv-motion-shake', 'sv-motion-zoomIn', 'sv-motion-zoomOut');
       portrait.dataset.motion = 'none';
+
       if (!motion || motion.type === 'none') return;
+
       const duration = motion.durationMs || 600;
       portrait.dataset.motion = motion.type;
-      if (motion.type === 'shake') {
-        portrait.classList.add('sv-motion-shake');
-      }
-      if (motion.type === 'zoomIn') {
-        portrait.classList.add('sv-motion-zoomIn');
-      }
-      if (motion.type === 'zoomOut') {
-        portrait.classList.add('sv-motion-zoomOut');
-      }
-      setTimeout(() => {
+
+      if (motion.type === 'shake') portrait.classList.add('sv-motion-shake');
+      if (motion.type === 'zoomIn') portrait.classList.add('sv-motion-zoomIn');
+      if (motion.type === 'zoomOut') portrait.classList.add('sv-motion-zoomOut');
+
+      clearTimeout(portrait.__svMotionTimer);
+      portrait.__svMotionTimer = setTimeout(() => {
         portrait.classList.remove('sv-motion-shake', 'sv-motion-zoomIn', 'sv-motion-zoomOut');
-        portrait.dataset.motion = motion.type;
       }, duration);
     },
 
     renderDialogue(node) {
       this.nameEl.textContent = node.speaker || 'Narration';
       this.textEl.textContent = node.text || '';
+
       if (!this.waitingChoice) {
         this.choicesEl.hidden = true;
         this.choicesEl.innerHTML = '';
@@ -211,15 +270,18 @@
     renderChoices(choices) {
       this.choicesEl.innerHTML = '';
       this.choicesEl.hidden = false;
+
       choices.forEach((choice) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'sv-choice-btn';
-        btn.textContent = choice.text;
+        // accept both schema styles: label / text
+        btn.textContent = choice.label ?? choice.text ?? '';
         btn.addEventListener('click', () => {
           this.waitingChoice = false;
           this.choicesEl.hidden = true;
-          this.gotoNode(choice.next);
+          const next = choice.next;
+          if (next) this.gotoNode(next);
         });
         this.choicesEl.appendChild(btn);
       });
@@ -227,6 +289,7 @@
 
     scheduleAuto() {
       clearTimeout(this.autoTimer);
+      this.autoTimer = null;
       if (!this.autoMode || this.waitingChoice || !this.currentNode?.next) return;
       this.autoTimer = setTimeout(() => this.handleAdvance(), this.autoDelay);
     },
@@ -235,9 +298,7 @@
       if (this.waitingChoice) return;
       if (!this.currentNode) return;
       const nextId = this.currentNode.next;
-      if (nextId) {
-        this.gotoNode(nextId);
-      }
+      if (nextId) this.gotoNode(nextId);
     },
 
     toggleAuto() {
@@ -251,9 +312,9 @@
       this.logPanel.classList.toggle('sv-open', willOpen);
       this.logPanel.setAttribute('aria-hidden', String(!willOpen));
       if (willOpen) {
-        this.logPanel.querySelector('.sv-log-close').focus({ preventScroll: true });
+        this.logPanel.querySelector('.sv-log-close')?.focus({ preventScroll: true });
       } else {
-        this.dialogueEl.focus({ preventScroll: true });
+        this.dialogueEl?.focus({ preventScroll: true });
       }
     },
 
@@ -263,16 +324,27 @@
         const row = document.createElement('div');
         row.className = 'sv-log-row';
         row.innerHTML = `
-          <div class="sv-log-speaker">${entry.speaker}</div>
-          <div class="sv-log-text">${entry.text}</div>
+          <div class="sv-log-speaker"></div>
+          <div class="sv-log-text"></div>
         `;
+        row.querySelector('.sv-log-speaker').textContent = entry.speaker;
+        row.querySelector('.sv-log-text').textContent = entry.text;
         this.logBody.appendChild(row);
       });
     },
 
     showError(msg) {
       if (!this.rootEl) return;
-      this.rootEl.innerHTML = `<div class="sv-shell"><div class="sv-dialogue"><div class="sv-name">Error</div><div class="sv-text">${msg}</div></div></div>`;
+      this.rootEl.innerHTML = `
+        <div class="sv-shell">
+          <div class="sv-dialogue">
+            <div class="sv-name">Error</div>
+            <div class="sv-text"></div>
+          </div>
+        </div>
+      `;
+      const el = this.rootEl.querySelector('.sv-text');
+      if (el) el.textContent = msg;
     },
   };
 
