@@ -22,46 +22,54 @@
     exiting: false,
     userName: null,
 
+    __endByeTimer: null,
+    __byeT1: null,
+    __byeT2: null,
+
     // =========================
-    // Config (adjustable)
+    // Config
     // =========================
     config: {
-      hostId: "sv-skit",                 // ここが存在すると最強スコープになる
-      returnMode: "history",             // "history" | "href" | "callback"
-      returnHref: "/",                   // returnMode="href" の場合
-      onReturn: null,                    // returnMode="callback" の場合
-      byeDelayMs: 950,                   // 0.8〜1.2秒の中心値
-      byeFadeMs: 420,                    // フェードアウト長
-      randomByeSpeaker: true,            // 話者が取れない場合にランダム
+      hostId: "sv-skit",
+      returnMode: "history",   // "history" | "href" | "callback"
+      returnHref: "/",
+      onReturn: null,
+
+      byeDelayMs: 950,
+      byeFadeMs: 420,
+      randomByeSpeaker: true,
+
+      // ★重要：LOADER と Esc が競合するなら true（推奨）
+      // true なら Engine 側は Esc を「またね」に使わない（×で閉じる/LOADER Escに任せる）
+      // falseなら Engine Esc = またね演出（没入優先）
+      disableEngineEsc: true,
     },
 
     // キャラ別「またね」台詞
     byeLines: {
       shiopon: [
         "${userName}、またねっ！ぴょん！",
-        "${userName}、また来てね〜☆"
+        "${userName}、また来てね〜☆",
       ],
       shioriel: [
         "${userName}、また星の窓で会おう。",
-        "別れは終わりじゃない。${userName}、またね。"
+        "別れは終わりじゃない。${userName}、またね。",
       ],
       lumiere: [
         "${userName}様、今日もありがとう。またね。",
-        "${userName}様、道はいつでもここにあるよ。"
+        "${userName}様、道はいつでもここにあるよ。",
       ],
       shion: [
         "${userName}、いつでも来てね。また今度。",
-        "またね、${userName}。寂しい時は一緒にいよう。"
+        "またね、${userName}。寂しい時は一緒にいよう。",
       ],
-      narration: [
-        "${userName}、またね。",
-      ],
+      narration: ["${userName}、またね。"],
     },
 
     // =========================
     // Public API
     // =========================
-    async start({ rootEl, skitUrl, userName, returnMode, returnHref, onReturn }) {
+    async start({ rootEl, skitUrl, userName, returnMode, returnHref, onReturn, disableEngineEsc } = {}) {
       this.stop();
 
       this.rootEl = rootEl;
@@ -73,7 +81,7 @@
       this.waitingChoice = false;
       this.exiting = false;
 
-      // userName（未指定ならlocalStorageから拾う）
+      // userName（未指定ならlocalStorage）
       this.userName =
         (userName && String(userName).trim()) ||
         (localStorage.getItem("sv_user_name") || "").trim() ||
@@ -82,8 +90,10 @@
       // return設定（必要なら上書き）
       if (returnMode) this.config.returnMode = returnMode;
       if (returnHref) this.config.returnHref = returnHref;
-      if (onReturn) this.config.onReturn = onReturn;
+      if (typeof onReturn === "function") this.config.onReturn = onReturn;
+      if (typeof disableEngineEsc === "boolean") this.config.disableEngineEsc = disableEngineEsc;
 
+      // UI mount
       this.rootEl.innerHTML = this.renderShell();
       this.bindStaticElements();
 
@@ -97,7 +107,7 @@
         const titleEl = this.rootEl.querySelector(".sv-title");
         if (titleEl) titleEl.textContent = data.meta?.title || "Skit Window";
 
-        if (this.autoBtn) this.autoBtn.setAttribute("aria-pressed", "false");
+        this.autoBtn?.setAttribute("aria-pressed", "false");
 
         // 先読み（初回表示の安定）
         this.primePreloadCache(data);
@@ -109,16 +119,31 @@
     },
 
     stop() {
+      // timers
       clearTimeout(this.autoTimer);
+      clearTimeout(this.__endByeTimer);
+      clearTimeout(this.__byeT1);
+      clearTimeout(this.__byeT2);
+
       this.autoTimer = null;
+      this.__endByeTimer = null;
+      this.__byeT1 = null;
+      this.__byeT2 = null;
+
+      // flags
       this.autoMode = false;
       this.waitingChoice = false;
       this.exiting = false;
 
+      // panels
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
         this.logPanel.setAttribute("aria-hidden", "true");
       }
+
+      // remove exit classes
+      this.rootEl?.classList.remove("sv-fadeout");
+      this.dialogueEl?.classList.remove("sv-exit");
 
       // key handler cleanup
       if (this.keyHandler && this.rootEl) {
@@ -146,7 +171,6 @@
             ${["left", "center", "right"].map((slot) => `
               <div class="sv-slot" data-slot="${slot}">
                 <div class="sv-portrait" data-character="" data-motion="none">
-                  <!-- ★2レイヤー：base=固定 / top=新規（ロード完了後にフェード） -->
                   <div class="sv-face-base" role="img" aria-label=""></div>
                   <div class="sv-face-top" aria-hidden="true"></div>
                 </div>
@@ -198,7 +222,7 @@
       this.rootEl.querySelector(".sv-log-close")?.addEventListener("click", () => this.toggleLog(false));
 
       // Bye (always available)
-      this.byeBtn?.addEventListener("click", () => this.runByeSequence());
+      this.byeBtn?.addEventListener("click", () => this.runByeSequence({ preferSpeakerFromCurrent: true }));
 
       // Keyboard
       const panel = this.rootEl.closest(".sv-overlay-panel");
@@ -210,14 +234,17 @@
         if (!this.waitingChoice && (e.key === " " || e.code === "Space")) {
           e.preventDefault();
           this.handleAdvance();
+          return;
         }
 
-        // Esc: bye (world-friendly exit)
+        // Esc: 競合回避（推奨は LOADER側の Esc close）
         if (e.key === "Escape") {
+          if (this.config.disableEngineEsc) return; // LOADERに任せる
           e.preventDefault();
-          this.runByeSequence();
+          this.runByeSequence({ preferSpeakerFromCurrent: true });
         }
       };
+
       if (panel) panel.addEventListener("keydown", this.keyHandler, true);
     },
 
@@ -250,7 +277,7 @@
       this.currentNode = node;
       this.waitingChoice = Array.isArray(node.choices) && node.choices.length > 0;
 
-      // 画像先読み（連続切替の体感UP）
+      // 画像先読み
       this.preloadForNode(node);
 
       this.renderNode(node);
@@ -258,8 +285,6 @@
       // 終端検出：end:true or nextなし（choiceもない）
       const isEnd = !!node.end || (!node.next && !this.waitingChoice);
       if (isEnd) {
-        // スキットが終わったら「またね」で優しく帰す（自動）
-        // ただし強制しない：1回だけ案内
         this.scheduleEndAutoBye();
         return;
       }
@@ -275,28 +300,26 @@
     scheduleEndAutoBye() {
       clearTimeout(this.__endByeTimer);
       this.__endByeTimer = setTimeout(() => {
-        // ユーザーがまだ画面にいるなら実行
         if (!this.exiting && this.rootEl && this.rootEl.isConnected) {
-          this.runByeSequence({ preferSpeakerFromCurrent: true });
+          this.runByeSequence({ preferSpeakerFromCurrent: true, fromEnd: true });
         }
       }, 900);
     },
 
     // ============================================================
-    //  Smooth Swap Core
+    // Smooth Swap Core
     // ============================================================
     swapPortraitImage(portrait, baseEl, topEl, url, ariaLabel) {
       if (!portrait || !baseEl || !topEl || !url) return;
 
       const token = (portrait.__svSwapToken = (portrait.__svSwapToken || 0) + 1);
-
       const currentUrl = baseEl.__svUrl || "";
+
       if (currentUrl === url) {
         if (ariaLabel) baseEl.setAttribute("aria-label", ariaLabel);
         return;
       }
 
-      // topにセット（ロード完了まで見せない）
       topEl.style.backgroundImage = `url("${url}")`;
       topEl.style.backgroundRepeat = "no-repeat";
       topEl.style.backgroundPosition = "center bottom";
@@ -348,7 +371,6 @@
           if (token !== portrait.__svSwapToken) return;
           portrait.classList.remove("sv-swapping");
           topEl.style.backgroundImage = "";
-          // エラー時はbase保持で“消えない”
         };
       }
     },
@@ -413,10 +435,8 @@
         const url = this.resolvePortraitUrl(character, expression);
         const label = `${character} ${expression}`.trim();
 
-        // 消さずにクロスフェード
         this.swapPortraitImage(portrait, baseEl, topEl, url, label);
 
-        // モーション
         this.applyMotion(portrait, frame.motion);
       }
     },
@@ -464,10 +484,7 @@
       const speaker = node.speaker || "Narration";
       const text = node.text || "";
 
-      // speakerId判定（表記ゆれ吸収を強化）
       const speakerId = this.getSpeakerIdFromSpeakerText(speaker);
-
-      // data-speaker-id を刻印（CSSが必ず拾えるよう3点）
       this.applySpeakerId(speakerId);
 
       if (this.nameEl) this.nameEl.textContent = speaker;
@@ -525,7 +542,6 @@
     getSpeakerIdFromSpeakerText(speaker) {
       const raw = this.normSpeaker(speaker);
 
-      // 日本語・英語・揺れ全部吸う
       if (raw.includes("shiopon") || raw.includes("しおぽん")) return "shiopon";
       if (raw.includes("shioriel") || raw.includes("しおりえる") || raw.includes("シオリエル")) return "shioriel";
       if (raw.includes("lumiere") || raw.includes("りゅみえーる") || raw.includes("リュミエール")) return "lumiere";
@@ -574,7 +590,7 @@
     },
 
     // =========================
-    // Bye Sequence (world-friendly return)
+    // Bye Sequence
     // =========================
     runByeSequence(opts = {}) {
       if (this.exiting) return;
@@ -582,12 +598,25 @@
 
       // lock
       clearTimeout(this.autoTimer);
+      clearTimeout(this.__endByeTimer);
       this.autoTimer = null;
+      this.__endByeTimer = null;
+
       this.autoMode = false;
       this.autoBtn?.setAttribute("aria-pressed", "false");
-      this.waitingChoice = false;
 
-      // close log if open
+      // choices lock & hide
+      this.waitingChoice = false;
+      if (this.choicesEl) {
+        this.choicesEl.hidden = true;
+        this.choicesEl.innerHTML = "";
+      }
+
+      // disable buttons to prevent double-tap race
+      this.autoBtn?.setAttribute("disabled", "disabled");
+      this.byeBtn?.setAttribute("disabled", "disabled");
+
+      // close log
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
         this.logPanel.setAttribute("aria-hidden", "true");
@@ -597,13 +626,13 @@
       this.dialogueEl?.classList.add("sv-exit");
 
       // choose speaker
-      const chosen = this.pickByeSpeaker(opts.preferSpeakerFromCurrent);
+      const chosen = this.pickByeSpeaker(!!opts.preferSpeakerFromCurrent);
       const line = this.pickByeLine(chosen);
 
       // apply speaker color
       this.applySpeakerId(chosen);
 
-      // stage focus: one character forward (speaking)
+      // stage focus: one character forward
       this.focusSpeakerSlot(chosen);
 
       // set name + text (do NOT log)
@@ -615,17 +644,19 @@
       const t1 = this.jitter(this.config.byeDelayMs, 180); // 0.8〜1.2秒帯
       const t2 = this.config.byeFadeMs;
 
-      setTimeout(() => {
+      clearTimeout(this.__byeT1);
+      clearTimeout(this.__byeT2);
+
+      this.__byeT1 = setTimeout(() => {
         this.rootEl?.classList.add("sv-fadeout");
       }, t1);
 
-      setTimeout(() => {
+      this.__byeT2 = setTimeout(() => {
         this.returnToPage();
       }, t1 + t2);
     },
 
     jitter(base, range) {
-      // base ± range/2
       const half = Math.floor(range / 2);
       return base + (Math.random() * range - half);
     },
@@ -651,7 +682,7 @@
         if (s && s !== "narration") return s;
       }
 
-      // 2) 表示中のキャラからランダム（visibleなslot）
+      // 2) 表示中のキャラからランダム
       const visible = [];
       for (const slotName of ["left", "center", "right"]) {
         const slotEl = this.rootEl?.querySelector(`.sv-slot[data-slot="${slotName}"]`);
@@ -659,21 +690,17 @@
         const portrait = slotEl.querySelector(".sv-portrait");
         const c = (portrait?.dataset?.character || "").trim().toLowerCase();
         if (!c) continue;
-        // dataset.character は "shiopon" 等が入る想定
         visible.push(c);
       }
       if (visible.length) {
-        // しおぽん/シオリエル/リュミエール/シオン以外が入っても安全に
         const pick = visible[Math.floor(Math.random() * visible.length)];
         if (this.byeLines[pick]) return pick;
       }
 
-      // 3) fallback
       return "shiopon";
     },
 
     focusSpeakerSlot(speakerId) {
-      // speaking強調を作る（該当がいなければ全員dim解除で自然に）
       let found = false;
 
       for (const slotName of ["left", "center", "right"]) {
@@ -691,7 +718,6 @@
       }
 
       if (!found) {
-        // 該当がいないなら全部普通に（消えない世界観）
         for (const slotName of ["left", "center", "right"]) {
           const slotEl = this.rootEl?.querySelector(`.sv-slot[data-slot="${slotName}"]`);
           if (!slotEl) continue;
@@ -700,19 +726,29 @@
       }
     },
 
+    // ★ここが「完全接続」の核：callback優先
     returnToPage() {
-      // stopしてから戻る
+      // エンジン内部を止める（タイマー/キー解除）
       this.stop();
 
+      // 1) callback（LOADER close）を最優先
       if (this.config.returnMode === "callback" && typeof this.config.onReturn === "function") {
-        this.config.onReturn();
+        try {
+          this.config.onReturn();
+        } catch (_) {
+          // fallback
+          window.dispatchEvent(new CustomEvent("sv:skit:close"));
+        }
         return;
       }
+
+      // 2) href
       if (this.config.returnMode === "href") {
         location.href = this.config.returnHref || "/";
         return;
       }
-      // default: history
+
+      // 3) history
       if (history.length > 1) history.back();
       else location.href = this.config.returnHref || "/";
     },
@@ -755,7 +791,7 @@
     },
 
     // =========================
-    // Preload Helpers
+    // Preload
     // =========================
     _preloadCache: new Map(),
 
@@ -781,7 +817,6 @@
         this.preloadImage(url);
       }
 
-      // nextを軽く先読み
       const nextId = node?.next;
       if (nextId && this.nodes[nextId]) {
         const nextNode = this.nodes[nextId];
