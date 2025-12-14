@@ -714,7 +714,7 @@ body.sv-skit-lock{ overflow: hidden; }
 
 
 /* =========================
-   Shionverse Talk Button
+   Shionverse Talk Button (Clean v1)
    ========================= */
 :root{
   --sv-talk-left: 16px;
@@ -722,57 +722,122 @@ body.sv-skit-lock{ overflow: hidden; }
 
   --sv-btn-h: clamp(46px, 6.2vh, 56px);
   --sv-btn-pad-x: clamp(16px, 4.2vw, 22px);
+  --sv-btn-minw: 156px;
 
   --sv-text: #F6F3FF;
   --sv-border: rgba(246, 243, 255, 0.42);
 
-  --sv-bg-1: #0a0b18;   /* deep night */
-  --sv-bg-2: #1b1440;   /* violet */
-  --sv-bg-3: #3a2b73;   /* soft purple */
+  --sv-bg-1: #0a0b18;
+  --sv-bg-2: #1b1440;
+  --sv-bg-3: #3a2b73;
 
   --sv-glow: rgba(196, 170, 255, 0.35);
   --sv-glow-2: rgba(255, 236, 190, 0.20);
 
-  --sv-lumiere-opacity: 0.18; /* 0.15〜0.25の間で調整 */
+  --sv-lumiere-opacity: 0.18; /* 0.15〜0.25 */
 }
 
-/* Wrapper: fixed bottom-left */
-.sv-talk{
+/* =========================
+   Mount（fixedはここだけ）
+   ========================= */
+.sv-talk-mount{
   position: fixed;
   left: var(--sv-talk-left);
   bottom: var(--sv-talk-bottom);
   z-index: 9999;
-  pointer-events: none; /* 中のボタンだけ押せるようにする */
+
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  pointer-events: none; /* readyになったら有効化 */
 }
 
-/* Lumiere: behind button, faint, slightly up/left */
+.sv-talk-mount--ready{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.sv-talk-mount--loading{
+  opacity: 0;
+}
+
+/* iOS safe area */
+@supports (padding: max(0px)){
+  .sv-talk-mount{
+    bottom: calc(var(--sv-talk-bottom) + env(safe-area-inset-bottom));
+    left: calc(var(--sv-talk-left) + env(safe-area-inset-left));
+  }
+}
+
+/* =========================
+   Wrapper（中身はrelative）
+   ========================= */
+.sv-talk{
+  position: relative;
+  display: inline-block;
+  pointer-events: none; /* ボタンだけ押せる */
+}
+
+/* =========================
+   Lumiere bubble（丸抜き）
+   ========================= */
 .sv-talk__lumiere{
   position: absolute;
-  left: clamp(-18px, -2.6vw, -8px);
-  bottom: calc(var(--sv-btn-h) - 8px);
-  width: clamp(120px, 26vw, 180px);
-  height: auto;
+  left: -10px;
+  bottom: calc(var(--sv-btn-h) - 12px);
+
+  width: clamp(108px, 26vw, 160px);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+
   opacity: var(--sv-lumiere-opacity);
-  filter: blur(0.2px) saturate(1.05);
+  border-radius: 999px;
+  overflow: hidden;
+
+  /* “光の向こう” */
+  filter: saturate(1.06) blur(0.15px);
   transform: translateZ(0);
   user-select: none;
   pointer-events: none;
+
+  /* 円形らしさ（縁＋内側のふわ） */
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.06),
+    0 0 0 1px rgba(255,255,255,0.10) inset,
+    0 0 28px rgba(255, 236, 190, 0.12);
 }
 
-/* Button */
+/* 画像が四角に見えるのを完全に潰す保険（Safari対策） */
+.sv-talk__lumiere{
+  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%);
+}
+
+/* =========================
+   Button（文字が絶対はみ出ない）
+   ========================= */
 .sv-talk__btn{
   pointer-events: auto;
   position: relative;
+
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
 
   height: var(--sv-btn-h);
+  min-width: var(--sv-btn-minw);
   padding: 0 var(--sv-btn-pad-x);
-  border-radius: 999px;
 
-  color: var(--sv-text);
+  border-radius: 999px;
   border: 1px solid var(--sv-border);
+  color: var(--sv-text);
+
+  /* はみ出し封印 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
 
   background:
     radial-gradient(120% 140% at 20% 20%, rgba(255,255,255,0.08), transparent 55%),
@@ -786,27 +851,28 @@ body.sv-skit-lock{ overflow: hidden; }
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 
-  /* “待っている”呼吸 */
   transform-origin: 20% 80%;
   animation: svBreath 3.8s ease-in-out infinite;
 }
 
 /* Icon */
 .sv-talk__icon{
+  flex: 0 0 auto;
   font-size: 14px;
   line-height: 1;
   opacity: 0.95;
   text-shadow: 0 0 10px rgba(255,255,255,0.18);
 }
 
-/* Label */
+/* Label（縮みすぎ防止） */
 .sv-talk__label{
+  flex: 0 1 auto;
   font-size: clamp(14px, 3.6vw, 16px);
   letter-spacing: 0.02em;
   text-shadow: 0 0 14px rgba(255,255,255,0.14);
 }
 
-/* Hover (desktop): slightly brighter */
+/* Hover */
 @media (hover:hover){
   .sv-talk__btn:hover{
     box-shadow:
@@ -818,16 +884,12 @@ body.sv-skit-lock{ overflow: hidden; }
   }
 }
 
-/* Tap / Active: “静かな反応演出” */
+/* Tap / Active: 静かな反応 */
 .sv-talk__btn:active{
   transform: translateY(1px) scale(0.985);
-  box-shadow:
-    0 8px 18px rgba(0,0,0,0.24),
-    0 0 0 1px rgba(255,255,255,0.08) inset,
-    0 0 16px var(--sv-glow);
 }
 
-/* Gentle ripple-like shimmer (no JS) */
+/* gentle shimmer */
 .sv-talk__btn::after{
   content:"";
   position:absolute;
@@ -844,23 +906,10 @@ body.sv-skit-lock{ overflow: hidden; }
   transform: translateX(18px);
 }
 
-/* Breath animation */
+/* Breath */
 @keyframes svBreath{
-  0%, 100%{
-    transform: scale(1);
-    box-shadow:
-      0 10px 24px rgba(0,0,0,0.22),
-      0 0 0 1px rgba(255,255,255,0.06) inset,
-      0 0 16px var(--sv-glow);
-  }
-  50%{
-    transform: scale(1.02);
-    box-shadow:
-      0 12px 28px rgba(0,0,0,0.24),
-      0 0 0 1px rgba(255,255,255,0.07) inset,
-      0 0 22px var(--sv-glow),
-      0 0 14px var(--sv-glow-2);
-  }
+  0%, 100%{ transform: scale(1); }
+  50%{ transform: scale(1.02); }
 }
 
 /* =========================
@@ -870,66 +919,19 @@ body.sv-skit-lock{ overflow: hidden; }
   :root{
     --sv-talk-left: 14px;
     --sv-talk-bottom: 18px;
-    --sv-lumiere-opacity: 0.17; /* 少し控えめ */
+    --sv-lumiere-opacity: 0.17;
+    --sv-btn-minw: 148px;
   }
 
   .sv-talk__lumiere{
-    width: clamp(110px, 30vw, 160px);
-    bottom: calc(var(--sv-btn-h) - 10px);
-  }
-
-  .sv-talk__btn{
-    border-width: 1px;
-  }
-}
-
-/* iOS safe-area */
-@supports (padding: max(0px)){
-  .sv-talk{
-    bottom: calc(var(--sv-talk-bottom) + env(safe-area-inset-bottom));
-    left: calc(var(--sv-talk-left) + env(safe-area-inset-left));
-  }
-}
-
-/* Reduce motion accessibility */
-@media (prefers-reduced-motion: reduce){
-  .sv-talk__btn{ animation: none; }
-  .sv-talk__btn::after{ transition: none; }
-}
-
-/* mount: 初期は透明（チラつき防止） */
-.sv-talk-mount{
-  position: fixed;
-  left: 16px;
-  bottom: 20px;
-  z-index: 9999;
-  opacity: 0;
-  transform: translateY(6px);
-  pointer-events: none;
-  transition: opacity 260ms ease, transform 260ms ease;
-}
-
-/* 読み込み完了で表示 */
-.sv-talk-mount--ready{
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* ローディング中（必要なら微調整） */
-.sv-talk-mount--loading{
-  opacity: 0;
-}
-
-/* iOS safe area */
-@supports (padding: max(0px)){
-  .sv-talk-mount{
-    bottom: calc(20px + env(safe-area-inset-bottom));
-    left: calc(16px + env(safe-area-inset-left));
+    width: clamp(104px, 30vw, 150px);
+    bottom: calc(var(--sv-btn-h) - 12px);
   }
 }
 
 /* Reduce motion */
 @media (prefers-reduced-motion: reduce){
+  .sv-talk__btn{ animation: none; }
+  .sv-talk__btn::after{ transition: none; }
   .sv-talk-mount{ transition: none; }
 }
