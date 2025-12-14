@@ -278,25 +278,32 @@
   const speaker = node.speaker || "Narration";
   const text = node.text || "";
 
-  // ===== 追加：speakerId を作る（色切替用）=====
-  const raw = String(node.speaker || "").trim().toLowerCase();
-  // 表記ゆれ対応（必要なら増やしてOK）
+  // 文字の正規化：記号/括弧/アクセント差を吸収
+  const norm = (s) => String(s || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFKD")                 // é 等を分解
+    .replace(/[\u0300-\u036f]/g, "")   // 分解した濁点/アクセント除去
+    .replace(/[（）()【】\[\]「」『』]/g, " ")
+    .replace(/\s+/g, " ");
+
+  const raw = norm(node.speaker);
+
   const speakerId =
     raw.includes("shiopon") || raw.includes("しおぽん") ? "shiopon" :
-    raw.includes("shioriel") || raw.includes("シオリエル") ? "shioriel" :
-    raw.includes("lumiere") || raw.includes("リュミエール") ? "lumiere" :
+    raw.includes("shioriel") || raw.includes("しおりえる") || raw.includes("シオリエル") ? "shioriel" :
+    raw.includes("lumiere") || raw.includes("りゅみえーる") || raw.includes("リュミエール") ? "lumiere" :
     "narration";
 
-  // ===== 追加：DOMに「今の話者」を刻印 =====
-  // #sv-skit に付与（推奨）
+  // #sv-skit（最強スコープ）へ付与
   const host = document.getElementById("sv-skit");
   if (host) host.setAttribute("data-speaker-id", speakerId);
 
-  // dialogue/nameにも付与（CSSの拾い漏れ防止）
-  if (this.dialogueEl) this.dialogueEl.setAttribute("data-speaker-id", speakerId);
-  if (this.nameEl) this.nameEl.setAttribute("data-speaker-id", speakerId);
+  // 念のため dialogue / name にも付与
+  this.dialogueEl?.setAttribute("data-speaker-id", speakerId);
+  this.nameEl?.setAttribute("data-speaker-id", speakerId);
 
-  // 既存の表示
+  // 表示
   if (this.nameEl) this.nameEl.textContent = speaker;
   if (this.textEl) this.textEl.textContent = text;
 
