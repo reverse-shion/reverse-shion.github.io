@@ -573,7 +573,7 @@
         <div class="dialogue-next" id="dialogueNext">▶</div>
 
         <div class="name-input" id="nameInput" style="display:none;">
-          <label for="visitorName">あなたの名前</label>
+          <label for="visitorName">あなた様のお名前</label>
           <input id="visitorName" name="visitorName" type="text" maxlength="20" aria-label="お名前入力欄">
           <button class="gold-button" id="nameSubmit" aria-label="この名前で呼んで">この名前で呼んで</button>
           <div class="error" id="nameError" aria-live="assertive"></div>
@@ -633,20 +633,48 @@
       const blinkMin = 3000;
       const blinkMax = 7000;
 
+      // =========================================================
+      // ✅ 「様様」完全防止：入力・保存は"素の名前"だけ
+      //    表示の時だけ "様" を付与（Lumiere専用）
+      // =========================================================
+      const stripHonorific = (s) => {
+        return String(s || '')
+          .trim()
+          // 末尾の敬称を全除去（複数連続もまとめて消す）
+          .replace(/(様|さま|さん|ちゃん|くん)+$/u, '')
+          .trim();
+      };
+
+      const getRawUserName = () => {
+        if (typeof window.getUserName === 'function') return stripHonorific(window.getUserName());
+        return stripHonorific(localStorage.getItem('sv_user_name') || '');
+      };
+
+      const displayName = () => {
+        const base = getRawUserName();
+        return base ? `${base}様` : '';
+      };
+
+      // 現在の名前状態（空なら未登録扱い）
+      let cachedName = displayName(); // "〇〇様" or ""
+
+      // =========================================================
+      // ✅ セリフ：あなた→あなた様 に統一
+      // =========================================================
       const fallbackLines = {
         'first-visit': [
           '……聞こえていますか？',
-          'あなたの足音が、この星の間まで届いたの。',
-          '静かな光が揺れて……あなたを迎えているみたい。'
+          'あなた様の足音が、この星の間まで届いたの。',
+          '静かな光が揺れて……あなた様を迎えているみたい。'
         ],
         'ask-name': [
-          'ねぇ……あなたのお名前を、わたしに教えてくれる？',
+          'ねぇ……あなた様のお名前を、わたしに教えてくれる？',
           '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'
         ],
         'after-name': [
           '……{name}。',
           'うん……とても、きれいな音。',
-          'これからは、その名前で呼ばせてくださいね。'
+          'これからは、そのお名前で呼ばせてくださいね。'
         ],
         'revisit': [
           'おかえりなさい、{name}。',
@@ -655,7 +683,7 @@
         'conversation': [
           '今日は……少し話してもいい？',
           '最近ね……星たちが、少しだけざわめいているの。',
-          'でも、大丈夫。あなたが来てくれると、',
+          'でも、大丈夫。あなた様が来てくれると、',
           'この間は……なんだか落ち着くの。',
           '疲れたら、いつでもここで休んでくださいね。'
         ]
@@ -666,28 +694,6 @@
       let lineIndex = 0;
       let typingTimer = null;
       let isTyping = false;
-
-      // =========================================================
-      // ✅ common.js 統一：ユーザー名の中枢
-      // =========================================================
-      const rawGetUserName = () => {
-        // common.js があればそれを使う
-        if (typeof window.getUserName === 'function') return window.getUserName();
-        // フォールバック（万一commonが読み込めてない時）
-        return localStorage.getItem('sv_user_name') || 'ゲスト';
-      };
-
-      // Lumiere 表示用（敬称を付ける）
-      const displayName = () => {
-        const n = String(rawGetUserName() || '').trim();
-        if (!n || n === 'ゲスト') return '';
-        return `${n}様`;
-      };
-
-      // 現在の名前状態（空なら未登録扱い）
-      let cachedName = displayName(); // 例: "シオン様" or ""
-
-      // =========================================================
 
       let isConversation = false;
       let blinkTimer = null;
@@ -729,7 +735,6 @@
       };
 
       const injectName = (arr) => {
-        // {name} が空の場合は自然な文にしたいので置換だけ行う
         const name = cachedName || '';
         return arr.map(l => l.replace('{name}', name));
       };
@@ -967,7 +972,6 @@
               }, 350);
             }
           );
-
           return;
         }
 
@@ -996,7 +1000,7 @@
       };
 
       const showNameFixed = () => {
-        // ✅ 登録後、common.js と同じ中枢から再生成
+        // ✅ 登録後、common.js と同じ中枢から再生成（様様防止のまま）
         cachedName = displayName();
 
         const linesToShow = injectName(getLines('after-name'));
@@ -1015,7 +1019,6 @@
 
       const updateMenuForReturn = () => {
         const villageBtn = menu.querySelector('[data-action="village"]');
-        // ✅ 名前がある人だけ出す
         villageBtn.style.display = (displayName() ? 'inline-flex' : 'none');
       };
 
@@ -1050,19 +1053,18 @@
         }
         nameError.textContent = '';
 
+        // ✅ 入力値に敬称が付いてても保存は"素"にする（様様防止の核）
+        const clean = stripHonorific(value);
+
         // ✅ common.js 中枢へ保存（全ページ共通）
         if (typeof window.setUserName === 'function') {
-          window.setUserName(value);
+          window.setUserName(clean);
         } else {
-          // フォールバック
-          localStorage.setItem('sv_user_name', value);
-          window.ShioponUserName = value;
+          localStorage.setItem('sv_user_name', clean);
+          window.ShioponUserName = clean;
         }
 
-        // 入力UIを閉じる
         nameInput.style.display = 'none';
-
-        // 反映して会話へ
         showNameFixed();
       });
 
@@ -1111,11 +1113,10 @@
         preloadImages();
         setMute(localStorage.getItem(STORAGE_MUTE) === '1');
 
-        // ✅ common.js から再訪判定
+        // ✅ common.js から再訪判定（表示用は常に displayName()）
         cachedName = displayName();
 
         if (cachedName && cachedName.trim() !== '') {
-          // 再訪：前室スキップ
           sceneFoyer.classList.remove('is-active');
           sceneHall.classList.add('is-active');
           hideDialogueWindow();
