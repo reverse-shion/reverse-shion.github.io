@@ -896,3 +896,40 @@ body.sv-skit-lock{ overflow: hidden; }
   .sv-talk__btn{ animation: none; }
   .sv-talk__btn::after{ transition: none; }
 }
+
+/* mount: 初期は透明（チラつき防止） */
+.sv-talk-mount{
+  position: fixed;
+  left: 16px;
+  bottom: 20px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+/* 読み込み完了で表示 */
+.sv-talk-mount--ready{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ローディング中（必要なら微調整） */
+.sv-talk-mount--loading{
+  opacity: 0;
+}
+
+/* iOS safe area */
+@supports (padding: max(0px)){
+  .sv-talk-mount{
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: calc(16px + env(safe-area-inset-left));
+  }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .sv-talk-mount{ transition: none; }
+}
