@@ -418,3 +418,48 @@ body.sv-skit-lock{ overflow: hidden; }
     line-height: 1.7 !important;
   }
 }
+/* ============================================================
+   SV SKIT — PATCH: remove tall frame + no transparency dim
+   - 位置は変えない（stage/shell/dialogueの配置は触らない）
+   - 縦長カード（sv-portrait）の“見た目”を完全消去
+   - dimmedは opacity禁止、filterで暗くする
+============================================================ */
+
+/* 1) 縦長の透明エリア（カード枠/背景/影/ボーダー）を完全に消す */
+#sv-skit .sv-portrait{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+#sv-skit .sv-portrait::before,
+#sv-skit .sv-portrait::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* 画像側も“透け/合成”を無効化（ページが見えないように） */
+#sv-skit .sv-face{
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+}
+
+/* 2) sv-dimmedで透明度を下げない（透け禁止） */
+#sv-skit .sv-slot.sv-dimmed{
+  opacity: 1 !important;              /* ←これが最重要 */
+  filter: none !important;            /* slot全体でのfilterも一旦殺す */
+}
+
+/* 3) 話してないキャラは “暗くする” だけ（opacityは変えない） */
+#sv-skit .sv-slot.sv-dimmed .sv-face{
+  opacity: 1 !important;              /* 二重で固定 */
+  filter: saturate(.95) brightness(.78) contrast(1.02) !important;
+}
+
+/* 話者は明るく（既存演出は残してOK、ただし透けはさせない） */
+#sv-skit .sv-slot.sv-speaking .sv-face{
+  opacity: 1 !important;
+  filter: saturate(1.06) brightness(1.00) contrast(1.03) !important;
+}
