@@ -1063,6 +1063,14 @@ function startSpeaking() {
 function stopSpeaking() {
   document.getElementById('bustContainer').classList.remove('speaking');
 }
+
+      document.querySelector("#name-ok").addEventListener("click", () => {
+  const name = document.querySelector("#name-input").value;
+  setUserName(name);
+
+  // 次へ
+  location.href = "/skit.html";
+});
       
       /* --------------- 初期化 --------------- */
       const startLumiereGate = () => {
