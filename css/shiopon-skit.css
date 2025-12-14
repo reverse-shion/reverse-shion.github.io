@@ -1107,3 +1107,101 @@ body.sv-skit-lock {
   bottom: auto !important;
   width: min(92%, 720px) !important;
 }
+
+/* ============================================================
+   Fix: 画像をセリフの上に配置し、全体を上へ寄せる（3人同席）
+   ※必ずCSSの一番最後に追記
+============================================================ */
+
+/* overlay-body を“配置の基準”にする */
+#sv-skit .sv-overlay-body{
+  position: relative !important;
+  padding: 0 !important;
+}
+
+/* shell を高さ100%で使う（中でabsolute配置するため） */
+#sv-skit .sv-shell{
+  position: relative !important;
+  height: 100% !important;
+}
+
+/* --- 画像エリア（3人同席）を上に固定配置 --- */
+#sv-skit .sv-stage{
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  /* ここが“上げる量” */
+  top: 16vh !important;
+
+  width: min(92vw, 900px) !important;
+  height: min(42vh, 360px) !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+
+  padding: 0 !important;
+  gap: 10px !important;
+
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* 3人の枠を下寄せ */
+#sv-skit .sv-slot{
+  height: 100% !important;
+  min-height: 0 !important;
+  align-items: flex-end !important;
+}
+
+/* 画像を“見えるように”最大化（背景なし） */
+#sv-skit .sv-portrait{
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  aspect-ratio: auto !important;
+
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+/* 画像の実体（background-image）を確実に出す */
+#sv-skit .sv-face{
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center bottom !important;
+}
+
+/* --- セリフエリアを画像の“下”に固定配置 --- */
+#sv-skit .sv-dialogue{
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  /* 画像の下に置く：stageの top + height + 余白 */
+  top: calc(16vh + min(42vh, 360px) + 14px) !important;
+
+  width: min(92vw, 720px) !important;
+  margin: 0 !important;
+
+  border-radius: 16px !important;
+}
+
+/* スマホ：もう少し上に寄せる（好みで調整） */
+@media (max-width: 720px){
+  #sv-skit .sv-stage{
+    top: 12vh !important;
+    height: 38vh !important;
+  }
+  #sv-skit .sv-dialogue{
+    top: calc(12vh + 38vh + 12px) !important;
+    width: 94vw !important;
+  }
+}
