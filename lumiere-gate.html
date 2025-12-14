@@ -538,6 +538,9 @@
   </style>
 </head>
 <body>
+  <!-- ✅ common.js を先に読み込む（前室は必須） -->
+  <script src="/js/common.js"></script>
+
   <div class="star-field" aria-hidden="true"></div>
   <main>
     <section class="scene scene-foyer is-active" aria-label="静かな前室">
@@ -555,19 +558,20 @@
 
       <!-- バストアップ（会話用） -->
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
-  <div class="frame">
-    <img src="img/open1.png" alt="リュミエール" id="bustOpen">
-    <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
-  </div>
-  <!-- ★ここを追加：口元の光 -->
-  <div class="lumiere-mouth-glow"></div>
-</div>
+        <div class="frame">
+          <img src="img/open1.png" alt="リュミエール" id="bustOpen">
+          <img src="img/open2.png" alt="リュミエール" id="bustClosed" style="opacity:0;">
+        </div>
+        <!-- ★口元の光 -->
+        <div class="lumiere-mouth-glow"></div>
+      </div>
 
       <!-- セリフ -->
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
         <div class="dialogue-name">Lumiere</div>
         <div class="dialogue-text" id="dialogueText"></div>
         <div class="dialogue-next" id="dialogueNext">▶</div>
+
         <div class="name-input" id="nameInput" style="display:none;">
           <label for="visitorName">あなたの名前</label>
           <input id="visitorName" name="visitorName" type="text" maxlength="20" aria-label="お名前入力欄">
@@ -582,10 +586,12 @@
           セレフィアスに祈りを捧げる
           <div class="particle-layer"></div>
         </button>
+
         <button class="gold-button" data-action="village" aria-label="始まりの町に行く" style="display:none;">
           始まりの町に行く
           <div class="particle-layer"></div>
         </button>
+
         <button class="gold-button" data-action="talk" aria-label="リュミエールと話す">
           リュミエールと話す
           <div class="particle-layer"></div>
@@ -600,29 +606,30 @@
 
   <script>
     (() => {
-      const starField     = document.querySelector('.star-field');
-      const sceneFoyer    = document.querySelector('.scene-foyer');
-      const sceneHall     = document.querySelector('.scene-hall');
-      const welcomeText   = document.getElementById('welcomeText');
-      const fullFigure    = document.getElementById('fullFigure');
-      const bustContainer = document.getElementById('bustContainer');
-      const bustOpen      = document.getElementById('bustOpen');
-      const bustClosed    = document.getElementById('bustClosed');
-      const dialogueWindow= document.getElementById('dialogueWindow');
-      const dialogueText  = document.getElementById('dialogueText');
-      const dialogueNext  = document.getElementById('dialogueNext');
-      const nameInput     = document.getElementById('nameInput');
-      const nameError     = document.getElementById('nameError');
-      const nameField     = document.getElementById('visitorName');
-      const nameSubmit    = document.getElementById('nameSubmit');
-      const menu          = document.getElementById('menu');
-      const menuButtons   = menu.querySelectorAll('button');
-      const soundToggle   = document.getElementById('soundToggle');
-      const bgm           = document.getElementById('bgm');
-      const dimOverlay    = document.getElementById('dimOverlay');
+      const starField      = document.querySelector('.star-field');
+      const sceneFoyer     = document.querySelector('.scene-foyer');
+      const sceneHall      = document.querySelector('.scene-hall');
+      const welcomeText    = document.getElementById('welcomeText');
+      const fullFigure     = document.getElementById('fullFigure');
+      const bustContainer  = document.getElementById('bustContainer');
+      const bustOpen       = document.getElementById('bustOpen');
+      const bustClosed     = document.getElementById('bustClosed');
+      const dialogueWindow = document.getElementById('dialogueWindow');
+      const dialogueText   = document.getElementById('dialogueText');
+      const dialogueNext   = document.getElementById('dialogueNext');
+      const nameInput      = document.getElementById('nameInput');
+      const nameError      = document.getElementById('nameError');
+      const nameField      = document.getElementById('visitorName');
+      const nameSubmit     = document.getElementById('nameSubmit');
+      const menu           = document.getElementById('menu');
+      const menuButtons    = menu.querySelectorAll('button');
+      const soundToggle    = document.getElementById('soundToggle');
+      const bgm            = document.getElementById('bgm');
+      const dimOverlay     = document.getElementById('dimOverlay');
 
-      const STORAGE_NAME = 'lumiereVisitorName';
+      // ✅ BGMは前室固有でOK（名前はcommonへ統一）
       const STORAGE_MUTE = 'lumiereBgmMuted';
+
       const blinkMin = 3000;
       const blinkMax = 7000;
 
@@ -637,12 +644,12 @@
           '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'
         ],
         'after-name': [
-          '……{name}様。',
+          '……{name}。',
           'うん……とても、きれいな音。',
           'これからは、その名前で呼ばせてくださいね。'
         ],
         'revisit': [
-          'おかえりなさい、{name}様。',
+          'おかえりなさい、{name}。',
           'またひとつ、静かな光が灯りました。'
         ],
         'conversation': [
@@ -659,7 +666,29 @@
       let lineIndex = 0;
       let typingTimer = null;
       let isTyping = false;
-      let cachedName = localStorage.getItem(STORAGE_NAME) || '';
+
+      // =========================================================
+      // ✅ common.js 統一：ユーザー名の中枢
+      // =========================================================
+      const rawGetUserName = () => {
+        // common.js があればそれを使う
+        if (typeof window.getUserName === 'function') return window.getUserName();
+        // フォールバック（万一commonが読み込めてない時）
+        return localStorage.getItem('sv_user_name') || 'ゲスト';
+      };
+
+      // Lumiere 表示用（敬称を付ける）
+      const displayName = () => {
+        const n = String(rawGetUserName() || '').trim();
+        if (!n || n === 'ゲスト') return '';
+        return `${n}様`;
+      };
+
+      // 現在の名前状態（空なら未登録扱い）
+      let cachedName = displayName(); // 例: "シオン様" or ""
+
+      // =========================================================
+
       let isConversation = false;
       let blinkTimer = null;
       let currentExpression = 'neutral';
@@ -700,6 +729,7 @@
       };
 
       const injectName = (arr) => {
+        // {name} が空の場合は自然な文にしたいので置換だけ行う
         const name = cachedName || '';
         return arr.map(l => l.replace('{name}', name));
       };
@@ -908,7 +938,6 @@
       };
 
       const enterHall = () => {
-        // ホールに切り替わったら導入開始
         fullFigure.classList.add('show');
         setTimeout(() => {
           runInitialDialogue();
@@ -917,8 +946,11 @@
 
       /* --------------- 初期セリフ（初回／再訪） --------------- */
       const runInitialDialogue = () => {
+        // ✅ common.js から毎回再取得（別ページで更新される可能性がある）
+        cachedName = displayName(); // "〇〇様" or ""
+
         if (cachedName && cachedName.trim() !== '') {
-          // 再訪問：全身は出さず、バストアップで「おかえり」
+          // 再訪問
           fullFigure.classList.remove('show');
           showBust();
           setExpression('smile');
@@ -939,7 +971,7 @@
           return;
         }
 
-        // 初回：全身だけ表示。バストアップはまだ出さない
+        // 初回
         hideBust();
         fullFigure.classList.add('show');
 
@@ -964,11 +996,13 @@
       };
 
       const showNameFixed = () => {
+        // ✅ 登録後、common.js と同じ中枢から再生成
+        cachedName = displayName();
+
         const linesToShow = injectName(getLines('after-name'));
 
         playLines(linesToShow, () => {
           hideDialogueWindow();
-          // 全身 → バストアップへ
           fullFigure.classList.remove('show');
 
           setTimeout(() => {
@@ -981,7 +1015,8 @@
 
       const updateMenuForReturn = () => {
         const villageBtn = menu.querySelector('[data-action="village"]');
-        villageBtn.style.display = cachedName ? 'inline-flex' : 'none';
+        // ✅ 名前がある人だけ出す
+        villageBtn.style.display = (displayName() ? 'inline-flex' : 'none');
       };
 
       /* --------------- 会話モード --------------- */
@@ -1014,9 +1049,20 @@
           return;
         }
         nameError.textContent = '';
-        cachedName = value;
-        localStorage.setItem(STORAGE_NAME, cachedName);
+
+        // ✅ common.js 中枢へ保存（全ページ共通）
+        if (typeof window.setUserName === 'function') {
+          window.setUserName(value);
+        } else {
+          // フォールバック
+          localStorage.setItem('sv_user_name', value);
+          window.ShioponUserName = value;
+        }
+
+        // 入力UIを閉じる
         nameInput.style.display = 'none';
+
+        // 反映して会話へ
         showNameFixed();
       });
 
@@ -1026,6 +1072,7 @@
           spawnColumnLight(btn);
           ensureBgm();
           const action = btn.dataset.action;
+
           if (action === 'pray') {
             dimOverlay.textContent = '静かに祈りを届けています……';
             dimOverlay.classList.add('show');
@@ -1033,6 +1080,7 @@
               window.location.href = 'serephias-chamber.html';
             }, 900);
           }
+
           if (action === 'village') {
             dimOverlay.textContent = '風の音が、始まりの町へと導きます。';
             dimOverlay.classList.add('show');
@@ -1040,6 +1088,7 @@
               window.location.href = 'star-memory.html';
             }, 900);
           }
+
           if (action === 'talk') {
             dimOverlay.classList.remove('show');
             if (isConversation) return;
@@ -1056,28 +1105,21 @@
 
       document.body.addEventListener('click', ensureBgm, { once: true });
 
-function startSpeaking() {
-  document.getElementById('bustContainer').classList.add('speaking');
-}
-
-function stopSpeaking() {
-  document.getElementById('bustContainer').classList.remove('speaking');
-}
-
-      
-      
       /* --------------- 初期化 --------------- */
       const startLumiereGate = () => {
         createStars();
         preloadImages();
         setMute(localStorage.getItem(STORAGE_MUTE) === '1');
 
+        // ✅ common.js から再訪判定
+        cachedName = displayName();
+
         if (cachedName && cachedName.trim() !== '') {
-          // 再訪問：前室をスキップ
+          // 再訪：前室スキップ
           sceneFoyer.classList.remove('is-active');
           sceneHall.classList.add('is-active');
           hideDialogueWindow();
-          enterHall();  // enterHall 内で runInitialDialogue が呼ばれる
+          enterHall();
         } else {
           startFoyer();
         }
