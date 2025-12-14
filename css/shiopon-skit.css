@@ -326,3 +326,43 @@ body.sv-skit-lock{ overflow: hidden; }
 #sv-skit .sv-launch-btn:active{
   transform: translateY(0) !important;
 }
+
+/* ============================================================
+   FIX 1: キャラ画像を完全不透明にする
+============================================================ */
+
+/* 画像エリアは完全に透明（枠も消す） */
+#sv-skit .sv-stage{
+  background: transparent !important;
+}
+
+/* ポートレートを「不透明なキャンバス」に */
+#sv-skit .sv-portrait{
+  background: #ffffff !important;   /* ←完全不透明 */
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* backdrop / blur の影響を完全遮断 */
+#sv-skit .sv-portrait,
+#sv-skit .sv-face{
+  backdrop-filter: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   FIX 2: キャラ位置をユーザー目線に合わせる
+============================================================ */
+
+#sv-skit .sv-stage{
+  /* 上げすぎをやめて「少し下げる」 */
+  transform: translateY(-2vh) !important;
+}
+
+/* スマホはさらに慎重に */
+@media (max-width: 720px){
+  #sv-skit .sv-stage{
+    transform: translateY(0vh) !important; /* ←ほぼ中央 */
+  }
+}
