@@ -2,6 +2,9 @@
   "use strict";
 
   const Engine = {
+    // =========================
+    // Core State
+    // =========================
     skit: null,
     nodes: {},
     currentNode: null,
@@ -15,8 +18,50 @@
     keyHandler: null,
     waitingChoice: false,
 
-    // ====== Public API ======
-    async start({ rootEl, skitUrl }) {
+    // Exit / Bye
+    exiting: false,
+    userName: null,
+
+    // =========================
+    // Config (adjustable)
+    // =========================
+    config: {
+      hostId: "sv-skit",                 // ここが存在すると最強スコープになる
+      returnMode: "history",             // "history" | "href" | "callback"
+      returnHref: "/",                   // returnMode="href" の場合
+      onReturn: null,                    // returnMode="callback" の場合
+      byeDelayMs: 950,                   // 0.8〜1.2秒の中心値
+      byeFadeMs: 420,                    // フェードアウト長
+      randomByeSpeaker: true,            // 話者が取れない場合にランダム
+    },
+
+    // キャラ別「またね」台詞
+    byeLines: {
+      shiopon: [
+        "${userName}、またねっ！ぴょん！",
+        "${userName}、また来てね〜☆"
+      ],
+      shioriel: [
+        "${userName}、また星の窓で会おう。",
+        "別れは終わりじゃない。${userName}、またね。"
+      ],
+      lumiere: [
+        "${userName}様、今日もありがとう。またね。",
+        "${userName}様、道はいつでもここにあるよ。"
+      ],
+      shion: [
+        "${userName}、いつでも来てね。また今度。",
+        "またね、${userName}。寂しい時は一緒にいよう。"
+      ],
+      narration: [
+        "${userName}、またね。",
+      ],
+    },
+
+    // =========================
+    // Public API
+    // =========================
+    async start({ rootEl, skitUrl, userName, returnMode, returnHref, onReturn }) {
       this.stop();
 
       this.rootEl = rootEl;
@@ -26,6 +71,18 @@
       this.log = [];
       this.autoMode = false;
       this.waitingChoice = false;
+      this.exiting = false;
+
+      // userName（未指定ならlocalStorageから拾う）
+      this.userName =
+        (userName && String(userName).trim()) ||
+        (localStorage.getItem("sv_user_name") || "").trim() ||
+        "あなた";
+
+      // return設定（必要なら上書き）
+      if (returnMode) this.config.returnMode = returnMode;
+      if (returnHref) this.config.returnHref = returnHref;
+      if (onReturn) this.config.onReturn = onReturn;
 
       this.rootEl.innerHTML = this.renderShell();
       this.bindStaticElements();
@@ -42,7 +99,7 @@
 
         if (this.autoBtn) this.autoBtn.setAttribute("aria-pressed", "false");
 
-        // 先読み（最初の表示を安定させる）
+        // 先読み（初回表示の安定）
         this.primePreloadCache(data);
 
         this.gotoNode(data.start);
@@ -56,12 +113,14 @@
       this.autoTimer = null;
       this.autoMode = false;
       this.waitingChoice = false;
+      this.exiting = false;
 
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
         this.logPanel.setAttribute("aria-hidden", "true");
       }
 
+      // key handler cleanup
       if (this.keyHandler && this.rootEl) {
         const panel = this.rootEl.closest(".sv-overlay-panel");
         if (panel) panel.removeEventListener("keydown", this.keyHandler, true);
@@ -69,7 +128,9 @@
       this.keyHandler = null;
     },
 
-    // ====== Rendering ======
+    // =========================
+    // Rendering
+    // =========================
     renderShell() {
       return `
         <div class="sv-shell">
@@ -82,9 +143,7 @@
           </div>
 
           <div class="sv-stage" aria-live="polite">
-            ${["left", "center", "right"]
-              .map(
-                (slot) => `
+            ${["left", "center", "right"].map((slot) => `
               <div class="sv-slot" data-slot="${slot}">
                 <div class="sv-portrait" data-character="" data-motion="none">
                   <!-- ★2レイヤー：base=固定 / top=新規（ロード完了後にフェード） -->
@@ -92,9 +151,7 @@
                   <div class="sv-face-top" aria-hidden="true"></div>
                 </div>
               </div>
-            `
-              )
-              .join("")}
+            `).join("")}
           </div>
 
           <div class="sv-dialogue" tabindex="0">
@@ -103,6 +160,9 @@
             <div class="sv-choices" hidden></div>
             <div class="sv-hint">タップ / クリック / Spaceで進む</div>
           </div>
+
+          <!-- ★常駐「またね」 -->
+          <button type="button" class="sv-bye-btn" aria-label="またね">またね</button>
 
           <div class="sv-log-panel" aria-hidden="true">
             <div class="sv-log-header">
@@ -125,25 +185,45 @@
       this.logBody = this.rootEl.querySelector(".sv-log-body");
 
       this.autoBtn = this.rootEl.querySelector(".sv-auto-btn");
+      this.byeBtn = this.rootEl.querySelector(".sv-bye-btn");
 
+      // Advance click
       this.dialogueEl?.addEventListener("click", () => this.handleAdvance());
+
+      // Auto
       this.autoBtn?.addEventListener("click", () => this.toggleAuto());
 
+      // Log
       this.rootEl.querySelector(".sv-log-btn")?.addEventListener("click", () => this.toggleLog(true));
       this.rootEl.querySelector(".sv-log-close")?.addEventListener("click", () => this.toggleLog(false));
 
+      // Bye (always available)
+      this.byeBtn?.addEventListener("click", () => this.runByeSequence());
+
+      // Keyboard
       const panel = this.rootEl.closest(".sv-overlay-panel");
       this.keyHandler = (e) => {
         if (!this.rootEl || !this.rootEl.isConnected) return;
-        if (this.waitingChoice) return;
-        if (e.key === " " || e.code === "Space") {
+        if (this.exiting) return;
+
+        // Space: advance
+        if (!this.waitingChoice && (e.key === " " || e.code === "Space")) {
           e.preventDefault();
           this.handleAdvance();
+        }
+
+        // Esc: bye (world-friendly exit)
+        if (e.key === "Escape") {
+          e.preventDefault();
+          this.runByeSequence();
         }
       };
       if (panel) panel.addEventListener("keydown", this.keyHandler, true);
     },
 
+    // =========================
+    // Data
+    // =========================
     async fetchSkit(url) {
       const res = await fetch(url, { cache: "no-cache" });
       if (!res.ok) throw new Error("スキットデータを取得できませんでした。");
@@ -155,7 +235,12 @@
       if (!data.nodes[data.start]) throw new Error("開始ノードが見つかりません。");
     },
 
+    // =========================
+    // Node flow
+    // =========================
     gotoNode(id) {
+      if (this.exiting) return;
+
       const node = this.nodes[id];
       if (!node) {
         this.showError("次のシーンが見つかりません。");
@@ -165,10 +250,20 @@
       this.currentNode = node;
       this.waitingChoice = Array.isArray(node.choices) && node.choices.length > 0;
 
-      // 次に使いそうな画像を少し先読み（連続切替の体感を上げる）
+      // 画像先読み（連続切替の体感UP）
       this.preloadForNode(node);
 
       this.renderNode(node);
+
+      // 終端検出：end:true or nextなし（choiceもない）
+      const isEnd = !!node.end || (!node.next && !this.waitingChoice);
+      if (isEnd) {
+        // スキットが終わったら「またね」で優しく帰す（自動）
+        // ただし強制しない：1回だけ案内
+        this.scheduleEndAutoBye();
+        return;
+      }
+
       this.scheduleAuto();
     },
 
@@ -177,11 +272,18 @@
       this.renderDialogue(node);
     },
 
+    scheduleEndAutoBye() {
+      clearTimeout(this.__endByeTimer);
+      this.__endByeTimer = setTimeout(() => {
+        // ユーザーがまだ画面にいるなら実行
+        if (!this.exiting && this.rootEl && this.rootEl.isConnected) {
+          this.runByeSequence({ preferSpeakerFromCurrent: true });
+        }
+      }, 900);
+    },
+
     // ============================================================
     //  Smooth Swap Core
-    //  - base: 常に表示（前画像を固定）
-    //  - top : 新画像をロード完了後にフェードイン → 完了したらbaseへ確定
-    //  - token: 連続切替の競合を破棄（最新のみ採用）
     // ============================================================
     swapPortraitImage(portrait, baseEl, topEl, url, ariaLabel) {
       if (!portrait || !baseEl || !topEl || !url) return;
@@ -194,7 +296,7 @@
         return;
       }
 
-      // topへセット（ただしロード完了まで見せない）
+      // topにセット（ロード完了まで見せない）
       topEl.style.backgroundImage = `url("${url}")`;
       topEl.style.backgroundRepeat = "no-repeat";
       topEl.style.backgroundPosition = "center bottom";
@@ -228,11 +330,9 @@
             topEl.style.backgroundImage = "";
           };
 
-          // transitionend が来ない環境保険
           clearTimeout(portrait.__svSwapFallback);
           portrait.__svSwapFallback = setTimeout(finalize, 260);
 
-          // topのopacity遷移が終わったら確定
           const onEnd = () => {
             clearTimeout(portrait.__svSwapFallback);
             finalize();
@@ -241,20 +341,21 @@
         });
       };
 
-      if (img.complete) {
-        commit();
-      } else {
+      if (img.complete) commit();
+      else {
         img.onload = commit;
         img.onerror = () => {
           if (token !== portrait.__svSwapToken) return;
           portrait.classList.remove("sv-swapping");
           topEl.style.backgroundImage = "";
-          // エラー時もbase保持で“消えない”
+          // エラー時はbase保持で“消えない”
         };
       }
     },
 
-    // ====== Cast Rendering (512x512対応) ======
+    // =========================
+    // Cast
+    // =========================
     renderCast(castFrames, node) {
       const slots = ["left", "center", "right"];
       const slotMap = { left: null, center: null, right: null };
@@ -273,14 +374,13 @@
         const topEl = slotEl.querySelector(".sv-face-top");
         const frame = slotMap[slotName];
 
-        // 非表示（仕様は従来通り：visible:false は消す）
+        // 非表示
         if (!frame || frame.visible === false) {
           slotEl.classList.add("sv-hidden");
           slotEl.classList.remove("sv-speaking", "sv-dimmed");
           if (portrait) {
             portrait.dataset.character = "";
             portrait.dataset.motion = "none";
-            // 競合停止
             portrait.__svSwapToken = (portrait.__svSwapToken || 0) + 1;
             portrait.classList.remove("sv-swapping");
           }
@@ -313,7 +413,7 @@
         const url = this.resolvePortraitUrl(character, expression);
         const label = `${character} ${expression}`.trim();
 
-        // ★消さずにクロスフェード（前画像固定→上に新規）
+        // 消さずにクロスフェード
         this.swapPortraitImage(portrait, baseEl, topEl, url, label);
 
         // モーション
@@ -321,7 +421,6 @@
       }
     },
 
-    // "calm smile" -> "calm-smile"
     normalizeExpression(expression) {
       return (expression || "normal")
         .trim()
@@ -358,35 +457,18 @@
       }, duration);
     },
 
-    // ====== Dialogue / Choices ======
+    // =========================
+    // Dialogue / Choices
+    // =========================
     renderDialogue(node) {
       const speaker = node.speaker || "Narration";
       const text = node.text || "";
 
-      // 文字の正規化：記号/括弧/アクセント差を吸収
-      const norm = (s) =>
-        String(s || "")
-          .trim()
-          .toLowerCase()
-          .normalize("NFKD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[（）()【】\[\]「」『』]/g, " ")
-          .replace(/\s+/g, " ");
+      // speakerId判定（表記ゆれ吸収を強化）
+      const speakerId = this.getSpeakerIdFromSpeakerText(speaker);
 
-      const raw = norm(node.speaker);
-
-      const speakerId =
-        raw.includes("shiopon") || raw.includes("しおぽん") ? "shiopon" :
-        raw.includes("shioriel") || raw.includes("しおりえる") || raw.includes("シオリエル") ? "shioriel" :
-        raw.includes("lumiere") || raw.includes("りゅみえーる") || raw.includes("リュミエール") ? "lumiere" :
-        "narration";
-
-      // 最強スコープに付与（CSSで拾える）
-      const host = document.getElementById("sv-skit");
-      if (host) host.setAttribute("data-speaker-id", speakerId);
-
-      this.dialogueEl?.setAttribute("data-speaker-id", speakerId);
-      this.nameEl?.setAttribute("data-speaker-id", speakerId);
+      // data-speaker-id を刻印（CSSが必ず拾えるよう3点）
+      this.applySpeakerId(speakerId);
 
       if (this.nameEl) this.nameEl.textContent = speaker;
       if (this.textEl) this.textEl.textContent = text;
@@ -416,6 +498,7 @@
         btn.textContent = choice.label ?? choice.text ?? "";
 
         btn.addEventListener("click", () => {
+          if (this.exiting) return;
           this.waitingChoice = false;
           this.choicesEl.hidden = true;
 
@@ -427,13 +510,48 @@
       });
     },
 
-    // ====== Auto ======
+    // ========== SpeakerId helpers ==========
+    normSpeaker(s) {
+      return String(s || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[（）()【】\[\]「」『』]/g, " ")
+        .replace(/[・:：\-–—_]/g, " ")
+        .replace(/\s+/g, " ");
+    },
+
+    getSpeakerIdFromSpeakerText(speaker) {
+      const raw = this.normSpeaker(speaker);
+
+      // 日本語・英語・揺れ全部吸う
+      if (raw.includes("shiopon") || raw.includes("しおぽん")) return "shiopon";
+      if (raw.includes("shioriel") || raw.includes("しおりえる") || raw.includes("シオリエル")) return "shioriel";
+      if (raw.includes("lumiere") || raw.includes("りゅみえーる") || raw.includes("リュミエール")) return "lumiere";
+      if (raw.includes("shion") || raw.includes("シオン")) return "shion";
+
+      return "narration";
+    },
+
+    applySpeakerId(speakerId) {
+      const host = document.getElementById(this.config.hostId);
+      if (host) host.setAttribute("data-speaker-id", speakerId);
+
+      this.dialogueEl?.setAttribute("data-speaker-id", speakerId);
+      this.nameEl?.setAttribute("data-speaker-id", speakerId);
+    },
+
+    // =========================
+    // Auto
+    // =========================
     scheduleAuto() {
       clearTimeout(this.autoTimer);
       this.autoTimer = null;
 
       if (!this.autoMode) return;
       if (this.waitingChoice) return;
+      if (this.exiting) return;
       if (!this.currentNode?.next) return;
 
       this.autoTimer = setTimeout(() => this.handleAdvance(), this.autoDelay);
@@ -442,30 +560,176 @@
     handleAdvance() {
       if (this.waitingChoice) return;
       if (!this.currentNode) return;
+      if (this.exiting) return;
 
       const nextId = this.currentNode.next;
       if (nextId) this.gotoNode(nextId);
     },
 
     toggleAuto() {
+      if (this.exiting) return;
       this.autoMode = !this.autoMode;
       this.autoBtn?.setAttribute("aria-pressed", String(this.autoMode));
       this.scheduleAuto();
     },
 
-    // ====== Log ======
+    // =========================
+    // Bye Sequence (world-friendly return)
+    // =========================
+    runByeSequence(opts = {}) {
+      if (this.exiting) return;
+      this.exiting = true;
+
+      // lock
+      clearTimeout(this.autoTimer);
+      this.autoTimer = null;
+      this.autoMode = false;
+      this.autoBtn?.setAttribute("aria-pressed", "false");
+      this.waitingChoice = false;
+
+      // close log if open
+      if (this.logPanel) {
+        this.logPanel.classList.remove("sv-open");
+        this.logPanel.setAttribute("aria-hidden", "true");
+      }
+
+      // dialogue soft switch
+      this.dialogueEl?.classList.add("sv-exit");
+
+      // choose speaker
+      const chosen = this.pickByeSpeaker(opts.preferSpeakerFromCurrent);
+      const line = this.pickByeLine(chosen);
+
+      // apply speaker color
+      this.applySpeakerId(chosen);
+
+      // stage focus: one character forward (speaking)
+      this.focusSpeakerSlot(chosen);
+
+      // set name + text (do NOT log)
+      const nameLabel = this.speakerDisplayName(chosen);
+      if (this.nameEl) this.nameEl.textContent = nameLabel;
+      if (this.textEl) this.textEl.textContent = line;
+
+      // fadeout & return
+      const t1 = this.jitter(this.config.byeDelayMs, 180); // 0.8〜1.2秒帯
+      const t2 = this.config.byeFadeMs;
+
+      setTimeout(() => {
+        this.rootEl?.classList.add("sv-fadeout");
+      }, t1);
+
+      setTimeout(() => {
+        this.returnToPage();
+      }, t1 + t2);
+    },
+
+    jitter(base, range) {
+      // base ± range/2
+      const half = Math.floor(range / 2);
+      return base + (Math.random() * range - half);
+    },
+
+    speakerDisplayName(id) {
+      if (id === "shiopon") return "しおぽん";
+      if (id === "shioriel") return "シオリエル";
+      if (id === "lumiere") return "リュミエール";
+      if (id === "shion") return "シオン";
+      return "Narration";
+    },
+
+    pickByeLine(speakerId) {
+      const list = this.byeLines[speakerId] || this.byeLines.narration;
+      const raw = list[Math.floor(Math.random() * list.length)] || "${userName}、またね。";
+      return raw.replaceAll("${userName}", this.userName || "あなた");
+    },
+
+    pickByeSpeaker(preferCurrent) {
+      // 1) current speaker優先
+      if (preferCurrent && this.currentNode?.speaker) {
+        const s = this.getSpeakerIdFromSpeakerText(this.currentNode.speaker);
+        if (s && s !== "narration") return s;
+      }
+
+      // 2) 表示中のキャラからランダム（visibleなslot）
+      const visible = [];
+      for (const slotName of ["left", "center", "right"]) {
+        const slotEl = this.rootEl?.querySelector(`.sv-slot[data-slot="${slotName}"]`);
+        if (!slotEl || slotEl.classList.contains("sv-hidden")) continue;
+        const portrait = slotEl.querySelector(".sv-portrait");
+        const c = (portrait?.dataset?.character || "").trim().toLowerCase();
+        if (!c) continue;
+        // dataset.character は "shiopon" 等が入る想定
+        visible.push(c);
+      }
+      if (visible.length) {
+        // しおぽん/シオリエル/リュミエール/シオン以外が入っても安全に
+        const pick = visible[Math.floor(Math.random() * visible.length)];
+        if (this.byeLines[pick]) return pick;
+      }
+
+      // 3) fallback
+      return "shiopon";
+    },
+
+    focusSpeakerSlot(speakerId) {
+      // speaking強調を作る（該当がいなければ全員dim解除で自然に）
+      let found = false;
+
+      for (const slotName of ["left", "center", "right"]) {
+        const slotEl = this.rootEl?.querySelector(`.sv-slot[data-slot="${slotName}"]`);
+        if (!slotEl) continue;
+
+        const portrait = slotEl.querySelector(".sv-portrait");
+        const c = (portrait?.dataset?.character || "").trim().toLowerCase();
+
+        const isTarget = c && c === speakerId;
+        if (isTarget) found = true;
+
+        slotEl.classList.toggle("sv-speaking", isTarget);
+        slotEl.classList.toggle("sv-dimmed", !isTarget);
+      }
+
+      if (!found) {
+        // 該当がいないなら全部普通に（消えない世界観）
+        for (const slotName of ["left", "center", "right"]) {
+          const slotEl = this.rootEl?.querySelector(`.sv-slot[data-slot="${slotName}"]`);
+          if (!slotEl) continue;
+          slotEl.classList.remove("sv-dimmed");
+        }
+      }
+    },
+
+    returnToPage() {
+      // stopしてから戻る
+      this.stop();
+
+      if (this.config.returnMode === "callback" && typeof this.config.onReturn === "function") {
+        this.config.onReturn();
+        return;
+      }
+      if (this.config.returnMode === "href") {
+        location.href = this.config.returnHref || "/";
+        return;
+      }
+      // default: history
+      if (history.length > 1) history.back();
+      else location.href = this.config.returnHref || "/";
+    },
+
+    // =========================
+    // Log
+    // =========================
     toggleLog(open) {
       if (!this.logPanel) return;
+      if (this.exiting) return;
 
       const willOpen = open ?? !this.logPanel.classList.contains("sv-open");
       this.logPanel.classList.toggle("sv-open", willOpen);
       this.logPanel.setAttribute("aria-hidden", String(!willOpen));
 
-      if (willOpen) {
-        this.logPanel.querySelector(".sv-log-close")?.focus({ preventScroll: true });
-      } else {
-        this.dialogueEl?.focus({ preventScroll: true });
-      }
+      if (willOpen) this.logPanel.querySelector(".sv-log-close")?.focus({ preventScroll: true });
+      else this.dialogueEl?.focus({ preventScroll: true });
     },
 
     refreshLog() {
@@ -490,7 +754,9 @@
       });
     },
 
-    // ====== Preload Helpers ======
+    // =========================
+    // Preload Helpers
+    // =========================
     _preloadCache: new Map(),
 
     preloadImage(url) {
@@ -515,7 +781,7 @@
         this.preloadImage(url);
       }
 
-      // 次ノードが分かるなら、軽く先読み
+      // nextを軽く先読み
       const nextId = node?.next;
       if (nextId && this.nodes[nextId]) {
         const nextNode = this.nodes[nextId];
@@ -531,12 +797,13 @@
     },
 
     primePreloadCache(data) {
-      // 最低限：startノード＋その次ノードのcastだけ先読み
       const startNode = data?.nodes?.[data.start];
       if (startNode) this.preloadForNode(startNode);
     },
 
-    // ====== Error ======
+    // =========================
+    // Error
+    // =========================
     showError(msg) {
       if (!this.rootEl) return;
       this.rootEl.innerHTML = `
