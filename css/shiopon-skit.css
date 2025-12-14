@@ -584,3 +584,227 @@ body.sv-skit-lock {
   background-repeat: no-repeat;
   background-position: center bottom; /* ← 下寄せで立ち姿感 */
 }
+
+/* ============================================================
+   Shionverse Skit — Immersion UI-Less (FULL OVERRIDE)
+   操作UIを完全に消して、キャラ＋セリフだけで没入させる版
+   ※あなたの既存CSSの「最後」に追記するだけでOK
+============================================================ */
+
+/* ------------------------------------------------------------
+  0) 触れるのはスキットだけ：背景ページの“在席感”を残す
+------------------------------------------------------------ */
+#sv-skit .sv-overlay-backdrop{
+  background: rgba(5, 7, 12, 0.18);              /* さらに薄く */
+  backdrop-filter: blur(1.2px) saturate(1.08);   /* うっすら世界を重ねる */
+}
+
+/* パネルを“箱”にしない：ページと溶け合う星霧 */
+#sv-skit .sv-overlay-panel{
+  background:
+    radial-gradient(circle at 18% 18%, rgba(180, 220, 255, 0.26), transparent 46%),
+    radial-gradient(circle at 78% 38%, rgba(230, 180, 255, 0.22), transparent 44%),
+    radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.12), transparent 60%),
+    linear-gradient(160deg, rgba(22, 26, 40, 0.42) 0%, rgba(10, 12, 18, 0.38) 100%);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 18px 68px rgba(0,0,0,0.34);
+}
+
+/* ------------------------------------------------------------
+  1) 操作UIを完全に消す（トップバー/ログ/オート/閉じる等）
+------------------------------------------------------------ */
+#sv-skit .sv-topbar,
+#sv-skit .sv-controls,
+#sv-skit .sv-btn,
+#sv-skit .sv-log-btn,
+#sv-skit .sv-auto-btn,
+#sv-skit .sv-log-panel,
+#sv-skit .sv-log-header,
+#sv-skit .sv-log-body,
+#sv-skit .sv-log-close,
+#sv-skit .sv-overlay-header,
+#sv-skit .sv-overlay-title,
+#sv-skit .sv-overlay-actions{
+  display: none !important;
+}
+
+/* ※ヒントも消して“UI感”をゼロへ */
+#sv-skit .sv-hint{
+  display: none !important;
+}
+
+/* ------------------------------------------------------------
+  2) レイアウト再設計：キャラ(大きめ)＋セリフだけ
+     - stageを“回廊の窓”として明るく
+     - dialogueを白い霧ガラスで安心感
+------------------------------------------------------------ */
+#sv-skit .sv-overlay-body{
+  padding: 16px 16px 18px !important;
+  gap: 14px !important;
+}
+
+#sv-skit .sv-shell{
+  height: 100%;
+  gap: 14px !important;
+}
+
+/* STAGE：Shionverse象徴の“星霧回廊”を明るめに */
+#sv-skit .sv-stage{
+  flex: 1;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.10);
+  overflow: hidden;
+  padding: 18px 18px 14px !important;
+  gap: 14px !important;
+
+  background:
+    radial-gradient(circle at 22% 18%, rgba(170, 220, 255, 0.34), transparent 52%),
+    radial-gradient(circle at 82% 42%, rgba(230, 180, 255, 0.28), transparent 48%),
+    radial-gradient(circle at 52% 62%, rgba(255, 255, 255, 0.14), transparent 62%),
+    linear-gradient(180deg, rgba(30, 36, 56, 0.44) 0%, rgba(10, 12, 18, 0.30) 100%);
+}
+
+/* キャラを“今より少し大きめ”に */
+#sv-skit .sv-slot{
+  min-height: 300px; /* 240→300 */
+}
+
+#sv-skit .sv-portrait{
+  width: 96%;
+  max-width: 280px;    /* 220→280 */
+  aspect-ratio: 4 / 5; /* 3/5→4/5：512画像が馴染みやすい */
+  border-radius: 18px;
+
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.34);
+  backdrop-filter: blur(1.2px);
+  transform-origin: center bottom;
+}
+
+/* 角にキャラ名を出すのもUIっぽいので削除 */
+#sv-skit .sv-portrait::before{
+  content: "" !important;
+}
+
+/* 512x512画像：はみ出さず“下に立つ”感じで */
+#sv-skit .sv-face{
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  filter: saturate(1.06) contrast(1.03);
+}
+
+/* 話者の“光”と、同席の“安心感” */
+#sv-skit .sv-slot.sv-speaking .sv-portrait{
+  transform: scale(1.06);
+  filter: brightness(1.10) saturate(1.06);
+  border-color: rgba(200, 235, 255, 0.34);
+  box-shadow:
+    0 16px 40px rgba(0,0,0,0.32),
+    0 0 0 1px rgba(255,255,255,0.18) inset;
+}
+#sv-skit .sv-slot.sv-dimmed .sv-portrait{
+  filter: brightness(0.86) saturate(0.92);
+  opacity: 0.94;
+}
+
+/* ------------------------------------------------------------
+  3) セリフエリア：白〜明るい色で“ここにいる安心感”
+------------------------------------------------------------ */
+#sv-skit .sv-dialogue{
+  border-radius: 18px;
+  padding: 14px 16px 16px !important;
+  min-height: 132px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(246,249,255,0.88) 100%);
+  border: 1px solid rgba(160, 205, 255, 0.42);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.18),
+    0 0 0 1px rgba(255,255,255,0.40) inset;
+
+  cursor: pointer;
+}
+
+/* 名前タグ：柔らかい光（UIっぽくなく“名札”に） */
+#sv-skit .sv-name{
+  background: rgba(130, 175, 255, 0.22);
+  border: 1px solid rgba(130, 175, 255, 0.40);
+  color: rgba(10,12,18,0.92);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+}
+
+/* 本文：白背景なので濃く、でも優しい */
+#sv-skit .sv-text{
+  color: rgba(10,12,18,0.92);
+  font-size: 16px;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  white-space: pre-line;
+}
+
+/* 選択肢：白系で統一（世界の中の“分岐”に見せる） */
+#sv-skit .sv-choice-btn{
+  background: rgba(255,255,255,0.84);
+  border: 1px solid rgba(160,205,255,0.36);
+  color: rgba(10,12,18,0.88);
+  border-radius: 14px;
+  padding: 12px 12px;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+#sv-skit .sv-choice-btn:hover,
+#sv-skit .sv-choice-btn:focus-visible{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.96);
+  border-color: rgba(130,175,255,0.56);
+  outline: none;
+}
+
+/* 旧expressionタグは使わない前提：完全無効 */
+#sv-skit .sv-expression{
+  display: none !important;
+}
+
+/* ------------------------------------------------------------
+  4) スマホ最適化：キャラを大きく、読みやすく
+------------------------------------------------------------ */
+@media (max-width: 720px){
+  #sv-skit .sv-overlay-panel{
+    width: 94vw;
+    height: 90vh;
+    border-radius: 18px;
+  }
+
+  #sv-skit .sv-stage{
+    padding: 14px 12px 12px !important;
+    gap: 10px !important;
+  }
+
+  #sv-skit .sv-slot{
+    min-height: 240px;
+  }
+
+  #sv-skit .sv-portrait{
+    max-width: 240px;
+    border-radius: 16px;
+  }
+
+  #sv-skit .sv-dialogue{
+    border-radius: 16px;
+  }
+
+  #sv-skit .sv-text{
+    font-size: 15.5px;
+    line-height: 1.7;
+  }
+}
+
+/* ------------------------------------------------------------
+  5) もし“閉じるボタン”もUIレスにしたい場合：
+     画面外タップで閉じる等はJS側で。
+------------------------------------------------------------ */
