@@ -1,5 +1,5 @@
 // ============================================================
-//  Shiopon Companion System v2.0
+//  Shiopon Companion System v2.0 (Perfect Edition)
 //  --- CORE MODULE（状態管理・セリフ・学習・会話制御）---
 // ============================================================
 
@@ -91,30 +91,64 @@
   }
 
   // ------------------------------------------------------------
-  // ユーザー名
-  //  ※ shiopon_lines.txt 側は {name} さん まで書いてある前提なので
-  //    ここでは「さん」を付け足さない。
+  // ユーザー名（Shionverse共通）
+  //  - 優先：common.js の getUserName()
+  //  - fallback：localStorage "sv_user_name"
+  //  - 敬称は除去（様様/さんさん事故防止）
+  //  - ゲスト/guest は未登録扱い（→ "きみ"）
+  //
+  //  ※ shiopon_lines.txt 側は {name}さん 等が書いてある前提なので
+  //     ここでは「さん」を付け足さない（=素名だけ返す）
   // ------------------------------------------------------------
-  function getUserName() {
+  function stripHonorific(s) {
+    return String(s || "")
+      .trim()
+      .replace(/(様|さま|さん|ちゃん|くん)+$/u, "")
+      .trim();
+  }
+
+  function normalizeBaseName(s) {
+    const base = stripHonorific(s);
+    if (!base) return "";
+    if (/^(ゲスト|guest)$/i.test(base)) return "";
+    return base;
+  }
+
+  function getBaseUserName() {
     try {
-      const n = localStorage.getItem("lumiereVisitorName");
-      return n && n.trim() ? n.trim() : "きみ";
+      // ✅ common.js 優先
+      if (typeof window.getUserName === "function") {
+        return normalizeBaseName(window.getUserName());
+      }
+      // ✅ fallback（common.js 不在）
+      return normalizeBaseName(localStorage.getItem("sv_user_name") || "");
     } catch {
-      return "きみ";
+      return "";
     }
   }
 
+  function getUserName() {
+    const base = getBaseUserName();
+    return base || "きみ";
+  }
+
   function applyUserName(text) {
-    return (text || "").replace(/\{name\}/g, getUserName());
+    // 毎回 “最新” を参照する（他ページで更新されても即反映）
+    const name = getUserName();
+    return String(text || "").replace(/\{name\}/g, name);
   }
 
   // ------------------------------------------------------------
-  // TXT 読み込み & パース
-  // 形式：category|mood|expression|text
+  // TXT 読み込み & パース（v1/v2 両対応）
+  //
+  // v1: category|expression|text
+  // v2: category|mood|expression|text
+  //
+  // dict[category] = [{ mood, expression, text }]
   // ------------------------------------------------------------
   async function loadLinesTxt() {
     try {
-      const res = await fetch(LINES_TXT, { cache: "no-cache" });
+      const res = await fetch(LINES_TXT, { cache: "no-store" });
       if (!res.ok) throw new Error("response not ok");
       const txt = await res.text();
       lineDict = parseLines(txt);
@@ -126,38 +160,47 @@
     }
   }
 
-  // ------------------------------------------------------------
-// TXT 読み込み & パース
-// 形式：category|expression|text  （v1互換）
-//   category … greetingFirst / idle / night など
-//   expression … smile / worry / neutral など（= mood）
-//   text … セリフ本文
-// ------------------------------------------------------------
-function parseLines(raw) {
-  const dict = {};
-  const rows = raw.split(/\r?\n/);
+  function parseLines(raw) {
+    const dict = {};
+    const rows = String(raw || "").split(/\r?\n/);
 
-  rows.forEach((row) => {
-    const line = row.trim();
-    if (!line || line.startsWith("#")) return;
+    rows.forEach((row) => {
+      const line = row.trim();
+      if (!line || line.startsWith("#")) return;
 
-    const parts = line.split("|").map((v) => v.trim());
-    if (parts.length < 3) return;
+      const parts = line.split("|").map((v) => v.trim());
+      if (parts.length < 3) return;
 
-    const [category, expression, text] = parts;
-    if (!category || !text) return;
+      // v2: category|mood|expression|text
+      // v1: category|expression|text
+      let category = "";
+      let mood = "neutral";
+      let expression = "neutral";
+      let text = "";
 
-    if (!dict[category]) dict[category] = [];
-    dict[category].push({
-      mood: expression || "neutral",
-      expression: expression || "neutral",
-      text
+      if (parts.length >= 4) {
+        [category, mood, expression, text] = parts;
+        mood = mood || expression || "neutral";
+        expression = expression || mood || "neutral";
+      } else {
+        [category, expression, text] = parts;
+        mood = expression || "neutral";
+        expression = expression || "neutral";
+      }
+
+      if (!category || !text) return;
+
+      if (!dict[category]) dict[category] = [];
+      dict[category].push({
+        mood: mood || "neutral",
+        expression: expression || mood || "neutral",
+        text: text || ""
+      });
     });
-  });
 
-  return dict;
-}
-  
+    return dict;
+  }
+
   // ------------------------------------------------------------
   // ユーティリティ
   // ------------------------------------------------------------
@@ -339,9 +382,7 @@ function parseLines(raw) {
     }
 
     // 7️⃣ 案内好き
-    if (traits.likesGuide) {
-      return "guideIntro";
-    }
+    if (traits.likesGuide) return "guideIntro";
 
     // 8️⃣ それ以外は通常 idle
     return "idle";
@@ -359,6 +400,8 @@ function parseLines(raw) {
 
     const mood = line.mood || line.expression || "neutral";
     const expression = line.expression || line.mood || "neutral";
+
+    // ✅ 常に最新の名前を差し込む
     const finalText = applyUserName(line.text || "");
 
     state.lastMood = mood;
@@ -410,9 +453,7 @@ function parseLines(raw) {
 
   // 状況に応じて自動でカテゴリ → セリフ選択
   function autoSpeak() {
-    // テキスト未ロードなら何もしない or 簡易フォールバック
     if (!linesLoaded || !lineDict || Object.keys(lineDict).length === 0) {
-      // 最低限のフォールバック
       const fallback = {
         category: "idle",
         mood: "neutral",
@@ -496,7 +537,6 @@ function parseLines(raw) {
     if (action === "more") {
       updateProfileOnAction("more");
 
-      // idle / excited をゆるく行き来
       const traits = getUserTraits();
       const baseCat = traits.isTalkative ? "excited" : "idle";
       const candidates =
@@ -504,6 +544,7 @@ function parseLines(raw) {
       const chosenCat = pickRandom(candidates);
       const line = pickLine(chosenCat) || pickLine("idle");
       if (!line) return;
+
       updateProfileOnCategory(chosenCat);
       speakLineObject(line);
       return;
@@ -588,5 +629,3 @@ function parseLines(raw) {
     getUserTraits
   };
 })();
-
-
