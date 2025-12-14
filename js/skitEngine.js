@@ -275,24 +275,42 @@
 
     // ====== Dialogue / Choices ======
     renderDialogue(node) {
-      const speaker = node.speaker || "Narration";
-      const text = node.text || "";
+  const speaker = node.speaker || "Narration";
+  const text = node.text || "";
 
-      if (this.nameEl) this.nameEl.textContent = speaker;
-      if (this.textEl) this.textEl.textContent = text;
+  // ===== 追加：speakerId を作る（色切替用）=====
+  const raw = String(node.speaker || "").trim().toLowerCase();
+  // 表記ゆれ対応（必要なら増やしてOK）
+  const speakerId =
+    raw.includes("shiopon") || raw.includes("しおぽん") ? "shiopon" :
+    raw.includes("shioriel") || raw.includes("シオリエル") ? "shioriel" :
+    raw.includes("lumiere") || raw.includes("リュミエール") ? "lumiere" :
+    "narration";
 
-      if (!this.waitingChoice) {
-        if (this.choicesEl) {
-          this.choicesEl.hidden = true;
-          this.choicesEl.innerHTML = "";
-        }
-        this.log.push({ speaker, text });
-        this.refreshLog();
-      } else {
-        this.renderChoices(node.choices || []);
-      }
-    },
+  // ===== 追加：DOMに「今の話者」を刻印 =====
+  // #sv-skit に付与（推奨）
+  const host = document.getElementById("sv-skit");
+  if (host) host.setAttribute("data-speaker-id", speakerId);
 
+  // dialogue/nameにも付与（CSSの拾い漏れ防止）
+  if (this.dialogueEl) this.dialogueEl.setAttribute("data-speaker-id", speakerId);
+  if (this.nameEl) this.nameEl.setAttribute("data-speaker-id", speakerId);
+
+  // 既存の表示
+  if (this.nameEl) this.nameEl.textContent = speaker;
+  if (this.textEl) this.textEl.textContent = text;
+
+  if (!this.waitingChoice) {
+    if (this.choicesEl) {
+      this.choicesEl.hidden = true;
+      this.choicesEl.innerHTML = "";
+    }
+    this.log.push({ speaker, text });
+    this.refreshLog();
+  } else {
+    this.renderChoices(node.choices || []);
+  }
+},
     renderChoices(choices) {
       if (!this.choicesEl) return;
 
