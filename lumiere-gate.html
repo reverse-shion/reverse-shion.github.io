@@ -606,86 +606,117 @@
 
   <script>
     (() => {
-      const starField      = document.querySelector('.star-field');
-      const sceneFoyer     = document.querySelector('.scene-foyer');
-      const sceneHall      = document.querySelector('.scene-hall');
-      const welcomeText    = document.getElementById('welcomeText');
-      const fullFigure     = document.getElementById('fullFigure');
-      const bustContainer  = document.getElementById('bustContainer');
-      const bustOpen       = document.getElementById('bustOpen');
-      const bustClosed     = document.getElementById('bustClosed');
-      const dialogueWindow = document.getElementById('dialogueWindow');
-      const dialogueText   = document.getElementById('dialogueText');
-      const dialogueNext   = document.getElementById('dialogueNext');
-      const nameInput      = document.getElementById('nameInput');
-      const nameError      = document.getElementById('nameError');
-      const nameField      = document.getElementById('visitorName');
-      const nameSubmit     = document.getElementById('nameSubmit');
-      const menu           = document.getElementById('menu');
-      const menuButtons    = menu.querySelectorAll('button');
-      const soundToggle    = document.getElementById('soundToggle');
-      const bgm            = document.getElementById('bgm');
-      const dimOverlay     = document.getElementById('dimOverlay');
+      "use strict";
+
+      const starField      = document.querySelector(".star-field");
+      const sceneFoyer     = document.querySelector(".scene-foyer");
+      const sceneHall      = document.querySelector(".scene-hall");
+      const welcomeText    = document.getElementById("welcomeText");
+      const fullFigure     = document.getElementById("fullFigure");
+      const bustContainer  = document.getElementById("bustContainer");
+      const bustOpen       = document.getElementById("bustOpen");
+      const bustClosed     = document.getElementById("bustClosed");
+      const dialogueWindow = document.getElementById("dialogueWindow");
+      const dialogueText   = document.getElementById("dialogueText");
+      const dialogueNext   = document.getElementById("dialogueNext");
+      const nameInput      = document.getElementById("nameInput");
+      const nameError      = document.getElementById("nameError");
+      const nameField      = document.getElementById("visitorName");
+      const nameSubmit     = document.getElementById("nameSubmit");
+      const menu           = document.getElementById("menu");
+      const menuButtons    = menu.querySelectorAll("button");
+      const soundToggle    = document.getElementById("soundToggle");
+      const bgm            = document.getElementById("bgm");
+      const dimOverlay     = document.getElementById("dimOverlay");
 
       // ✅ BGMは前室固有でOK（名前はcommonへ統一）
-      const STORAGE_MUTE = 'lumiereBgmMuted';
+      const STORAGE_MUTE = "lumiereBgmMuted";
 
       const blinkMin = 3000;
       const blinkMax = 7000;
 
       // =========================================================
-      // ✅ 「様様」完全防止：入力・保存は"素の名前"だけ
-      //    表示の時だけ "様" を付与（Lumiere専用）
+      // ✅ 完全修正：名前は「素の名前」だけで管理する
+      //  - common.js が "ゲスト" を返しても「未登録扱い」にする
+      //  - 末尾敬称は保存時/読み込み時に除去（様様防止）
+      //  - 表示するときだけ「様」を付ける（Lumiere専用）
       // =========================================================
       const stripHonorific = (s) => {
-        return String(s || '')
+        return String(s || "")
           .trim()
-          // 末尾の敬称を全除去（複数連続もまとめて消す）
-          .replace(/(様|さま|さん|ちゃん|くん)+$/u, '')
+          .replace(/(様|さま|さん|ちゃん|くん)+$/u, "")
           .trim();
       };
 
-      const getRawUserName = () => {
-        if (typeof window.getUserName === 'function') return stripHonorific(window.getUserName());
-        return stripHonorific(localStorage.getItem('sv_user_name') || '');
+      const normalizeBaseName = (s) => {
+        const base = stripHonorific(s);
+        if (!base) return "";
+        if (/^(ゲスト|guest)$/i.test(base)) return ""; // ✅ ゲストは未登録扱い
+        return base;
       };
 
-      const displayName = () => {
-        const base = getRawUserName();
-        return base ? `${base}様` : '';
+      const getBaseUserName = () => {
+        if (typeof window.getUserName === "function") {
+          return normalizeBaseName(window.getUserName());
+        }
+        return normalizeBaseName(localStorage.getItem("sv_user_name") || "");
       };
 
-      // 現在の名前状態（空なら未登録扱い）
-      let cachedName = displayName(); // "〇〇様" or ""
+      const getNameWithHonor = () => {
+        const base = getBaseUserName();
+        return base ? `${base}様` : "";
+      };
+
+      // ✅ 外部TXTが {name}様 を含んでも二重敬称にならないようにする
+      const injectName = (arr) => {
+        const base = getBaseUserName();       // "シオン" or ""
+        const honor = base ? `${base}様` : ""; // "シオン様" or ""
+
+        return (arr || []).map((line) => {
+          let s = String(line);
+
+          // {name}様 / {name}さま は「敬称込み」として確定させる
+          s = s.replace(/\{name\}(様|さま)/gu, () => (base ? `${base}様` : ""));
+
+          // 推奨：敬称込み
+          s = s.replace(/\{nameWithHonor\}/g, honor);
+
+          // 素名
+          s = s.replace(/\{name\}/g, base);
+
+          return s;
+        });
+      };
 
       // =========================================================
-      // ✅ セリフ：あなた→あなた様 に統一
+      // ✅ セリフ：あなた→あなた様 に統一（内部デフォルト）
+      // ※ 外部TXTを読む場合も、書き方次第でここが上書きされます
       // =========================================================
       const fallbackLines = {
-        'first-visit': [
-          '……聞こえていますか？',
-          'あなた様の足音が、この星の間まで届いたの。',
-          '静かな光が揺れて……あなた様を迎えているみたい。'
+        "first-visit": [
+          "……聞こえていますか？",
+          "あなた様の足音が、この星の間まで届いたの。",
+          "静かな光が揺れて……あなた様を迎えているみたい。"
         ],
-        'ask-name': [
-          'ねぇ……あなた様のお名前を、わたしに教えてくれる？',
-          '呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。'
+        "ask-name": [
+          "ねぇ……あなた様のお名前を、わたしに教えてくれる？",
+          "呼ぶたびに、胸の奥があたたかくなるような……そんな響きを。"
         ],
-        'after-name': [
-          '……{name}。',
-          'うん……とても、きれいな音。',
-          'これからは、そのお名前で呼ばせてくださいね。'
+        "after-name": [
+          "……{nameWithHonor}。",
+          "うん……とても、きれいな音。",
+          "これからは、そのお名前で呼ばせてくださいね。"
         ],
-        'revisit': [
-          'おかえりなさい、{name}。',
-          'またひとつ、静かな光が灯りました。'
+        "revisit": [
+          "おかえりなさい、{nameWithHonor}。",
+          "またひとつ、静かな光が灯りました。"
         ],
-        'conversation': [
-          '今日は……少し話してもいい？',
-          '最近ね……星たちが、少しだけざわめいているの。',
-          'でも、大丈夫。あなた様が来てくれると、',
-          'この間は……なんだか落ち着くの。',
-          '疲れたら、いつでもここで休んでくださいね。'
+        "conversation": [
+          "今日は……少し話してもいい？",
+          "最近ね……星たちが、少しだけざわめいているの。",
+          "でも、大丈夫。あなた様が来てくれると、",
+          "この間は……なんだか落ち着くの。",
+          "疲れたら、いつでもここで休んでくださいね。"
         ]
       };
 
@@ -697,17 +728,17 @@
 
       let isConversation = false;
       let blinkTimer = null;
-      let currentExpression = 'neutral';
+      let currentExpression = "neutral";
 
       /* --------------- テキストファイル読み込み（あれば上書き） --------------- */
       const parseLumiereTxt = (txt) => {
         const lines = {};
         let current = null;
-        txt.split('\n').forEach(line => {
+        txt.split("\n").forEach((line) => {
           const trimmed = line.trim();
           if (!trimmed) return;
-          if (trimmed.startsWith('# ')) {
-            current = trimmed.replace('# ', '').trim();
+          if (trimmed.startsWith("# ")) {
+            current = trimmed.replace("# ", "").trim();
             lines[current] = [];
           } else if (current) {
             lines[current].push(trimmed);
@@ -718,12 +749,12 @@
 
       const loadExternalLines = async () => {
         try {
-          const res = await fetch('data/lumiere-lines.txt');
+          const res = await fetch("data/lumiere-lines.txt", { cache: "no-store" });
           if (!res.ok) return;
           const txt = await res.text();
           externalLines = parseLumiereTxt(txt);
         } catch (e) {
-          console.warn('TXT 読み込み失敗。内部デフォルトを使用します。', e);
+          console.warn("TXT 読み込み失敗。内部デフォルトを使用します。", e);
         }
       };
 
@@ -734,16 +765,11 @@
         return fallbackLines[category] || [];
       };
 
-      const injectName = (arr) => {
-        const name = cachedName || '';
-        return arr.map(l => l.replace('{name}', name));
-      };
-
       /* --------------- 星粒 --------------- */
       const createStars = () => {
         const total = 40;
         for (let i = 0; i < total; i++) {
-          const s = document.createElement('span');
+          const s = document.createElement("span");
           const size = Math.random() * 3 + 1;
           s.style.width = `${size}px`;
           s.style.height = `${size}px`;
@@ -757,11 +783,11 @@
 
       /* --------------- 粒子＆光柱 --------------- */
       const spawnParticles = (btn) => {
-        const layer = btn.querySelector('.particle-layer');
+        const layer = btn.querySelector(".particle-layer");
         if (!layer) return;
-        layer.innerHTML = '';
+        layer.innerHTML = "";
         for (let i = 0; i < 6; i++) {
-          const p = document.createElement('span');
+          const p = document.createElement("span");
           p.style.left = `${20 + Math.random() * 60}%`;
           p.style.top = `${60 + Math.random() * 30}%`;
           p.style.animationDelay = `${i * 60}ms`;
@@ -770,10 +796,10 @@
       };
 
       const spawnColumnLight = (btn) => {
-        const glow = document.createElement('div');
-        glow.className = 'button-column-glow';
+        const glow = document.createElement("div");
+        glow.className = "button-column-glow";
         btn.appendChild(glow);
-        glow.addEventListener('animationend', () => glow.remove());
+        glow.addEventListener("animationend", () => glow.remove());
       };
 
       /* --------------- セリフ周り --------------- */
@@ -783,11 +809,11 @@
       };
 
       const setSpeaking = (state) => {
-        bustContainer.classList.toggle('speaking', !!state);
+        bustContainer.classList.toggle("speaking", !!state);
       };
 
       const hideDialogueWindow = () => {
-        dialogueWindow.classList.remove('is-visible');
+        dialogueWindow.classList.remove("is-visible");
         resetDialogueHandlers();
         clearInterval(typingTimer);
         isTyping = false;
@@ -798,9 +824,9 @@
       const showLine = (line, onComplete) => {
         clearInterval(typingTimer);
         dialogueNext.style.opacity = 0;
-        const chars = line.split('');
+        const chars = String(line).split("");
         let idx = 0;
-        dialogueText.textContent = '';
+        dialogueText.textContent = "";
         isTyping = true;
         typingTimer = setInterval(() => {
           dialogueText.textContent += chars[idx];
@@ -817,7 +843,7 @@
       const showAll = (line) => {
         clearInterval(typingTimer);
         isTyping = false;
-        dialogueText.textContent = line;
+        dialogueText.textContent = String(line);
         dialogueNext.style.opacity = 1;
       };
 
@@ -831,7 +857,7 @@
           return;
         }
 
-        dialogueWindow.classList.add('is-visible');
+        dialogueWindow.classList.add("is-visible");
         setSpeaking(true);
 
         const next = () => {
@@ -864,13 +890,13 @@
       /* --------------- BGM --------------- */
       const setMute = (muted) => {
         bgm.muted = muted;
-        soundToggle.querySelector('span').textContent = muted ? '♪×' : '♪';
-        localStorage.setItem(STORAGE_MUTE, muted ? '1' : '0');
+        soundToggle.querySelector("span").textContent = muted ? "♪×" : "♪";
+        localStorage.setItem(STORAGE_MUTE, muted ? "1" : "0");
       };
 
       const ensureBgm = () => {
         if (bgm.dataset.started) return;
-        bgm.dataset.started = '1';
+        bgm.dataset.started = "1";
         bgm.volume = 0.6;
         if (!bgm.muted) {
           bgm.play().catch(() => {});
@@ -891,12 +917,12 @@
       };
 
       const showBust = () => {
-        bustContainer.classList.add('is-visible');
+        bustContainer.classList.add("is-visible");
         scheduleBlink();
       };
 
       const hideBust = () => {
-        bustContainer.classList.remove('is-visible');
+        bustContainer.classList.remove("is-visible");
         clearTimeout(blinkTimer);
         bustClosed.style.opacity = 0;
       };
@@ -904,14 +930,14 @@
       const setExpression = (type) => {
         currentExpression = type;
         const openMap = {
-          neutral: 'img/open1.png',
-          smile:  'img/smile1.png',
-          sad:    'img/sad1.png'
+          neutral: "img/open1.png",
+          smile:   "img/smile1.png",
+          sad:     "img/sad1.png"
         };
         const closedMap = {
-          neutral: 'img/open2.png',
-          smile:  'img/smile2.png',
-          sad:    'img/sad2.png'
+          neutral: "img/open2.png",
+          smile:   "img/smile2.png",
+          sad:     "img/sad2.png"
         };
         bustOpen.src   = openMap[type]   || openMap.neutral;
         bustClosed.src = closedMap[type] || closedMap.neutral;
@@ -919,31 +945,31 @@
 
       const preloadImages = () => {
         const files = [
-          'img/open1.png','img/open2.png',
-          'img/smile1.png','img/smile2.png',
-          'img/sad1.png','img/sad2.png'
+          "img/open1.png","img/open2.png",
+          "img/smile1.png","img/smile2.png",
+          "img/sad1.png","img/sad2.png"
         ];
-        files.forEach(src => { const img = new Image(); img.src = src; });
+        files.forEach((src) => { const img = new Image(); img.src = src; });
       };
 
       /* --------------- フォイヤー → ホール --------------- */
       const startFoyer = () => {
-        dialogueWindow.classList.remove('is-visible');
-        menu.classList.remove('is-visible');
+        dialogueWindow.classList.remove("is-visible");
+        menu.classList.remove("is-visible");
         hideBust();
 
-        setTimeout(() => welcomeText.classList.add('show'), 3000);
+        setTimeout(() => welcomeText.classList.add("show"), 3000);
 
         setTimeout(() => {
-          welcomeText.classList.remove('show');
-          sceneFoyer.classList.remove('is-active');
-          sceneHall.classList.add('is-active');
+          welcomeText.classList.remove("show");
+          sceneFoyer.classList.remove("is-active");
+          sceneHall.classList.add("is-active");
           enterHall();
         }, 6200);
       };
 
       const enterHall = () => {
-        fullFigure.classList.add('show');
+        fullFigure.classList.add("show");
         setTimeout(() => {
           runInitialDialogue();
         }, 1000);
@@ -951,23 +977,22 @@
 
       /* --------------- 初期セリフ（初回／再訪） --------------- */
       const runInitialDialogue = () => {
-        // ✅ common.js から毎回再取得（別ページで更新される可能性がある）
-        cachedName = displayName(); // "〇〇様" or ""
+        const base = getBaseUserName(); // ✅ ここが再訪判定の核（ゲストは空になる）
 
-        if (cachedName && cachedName.trim() !== '') {
+        if (base) {
           // 再訪問
-          fullFigure.classList.remove('show');
+          fullFigure.classList.remove("show");
           showBust();
-          setExpression('smile');
+          setExpression("smile");
 
           playLines(
-            injectName(getLines('revisit')),
+            injectName(getLines("revisit")),
             () => {
-              setExpression('neutral');
+              setExpression("neutral");
               hideDialogueWindow();
               isConversation = false;
               setTimeout(() => {
-                menu.classList.add('is-visible');
+                menu.classList.add("is-visible");
                 updateMenuForReturn();
               }, 350);
             }
@@ -977,10 +1002,10 @@
 
         // 初回
         hideBust();
-        fullFigure.classList.add('show');
+        fullFigure.classList.add("show");
 
-        const firstLines = getLines('first-visit');
-        const askLines   = getLines('ask-name');
+        const firstLines = injectName(getLines("first-visit"));
+        const askLines   = injectName(getLines("ask-name"));
 
         playLines(
           firstLines,
@@ -988,7 +1013,7 @@
             playLines(
               askLines,
               () => {
-                nameInput.style.display = 'flex';
+                nameInput.style.display = "flex";
                 nameField.focus();
                 resetDialogueHandlers();
               },
@@ -1000,18 +1025,15 @@
       };
 
       const showNameFixed = () => {
-        // ✅ 登録後、common.js と同じ中枢から再生成（様様防止のまま）
-        cachedName = displayName();
-
-        const linesToShow = injectName(getLines('after-name'));
+        const linesToShow = injectName(getLines("after-name"));
 
         playLines(linesToShow, () => {
           hideDialogueWindow();
-          fullFigure.classList.remove('show');
+          fullFigure.classList.remove("show");
 
           setTimeout(() => {
             showBust();
-            menu.classList.add('is-visible');
+            menu.classList.add("is-visible");
             updateMenuForReturn();
           }, 700);
         });
@@ -1019,106 +1041,109 @@
 
       const updateMenuForReturn = () => {
         const villageBtn = menu.querySelector('[data-action="village"]');
-        villageBtn.style.display = (displayName() ? 'inline-flex' : 'none');
+        villageBtn.style.display = (getBaseUserName() ? "inline-flex" : "none");
       };
 
       /* --------------- 会話モード --------------- */
       const startConversation = () => {
         isConversation = true;
-        menu.classList.remove('is-visible');
+        menu.classList.remove("is-visible");
 
         showBust();
-        setExpression('smile');
+        setExpression("smile");
 
-        playLines(injectName(getLines('conversation')), () => {
+        playLines(injectName(getLines("conversation")), () => {
           endConversation();
         });
       };
 
       const endConversation = () => {
         isConversation = false;
-        setExpression('neutral');
+        setExpression("neutral");
         hideDialogueWindow();
         setTimeout(() => {
-          menu.classList.add('is-visible');
+          menu.classList.add("is-visible");
         }, 350);
       };
 
       /* --------------- イベント --------------- */
-      nameSubmit.addEventListener('click', () => {
+      nameSubmit.addEventListener("click", () => {
         const value = nameField.value.trim();
         if (!value) {
-          nameError.textContent = '……お名前を教えてくれる？';
+          nameError.textContent = "……お名前を教えてくれる？";
           return;
         }
-        nameError.textContent = '';
+        nameError.textContent = "";
 
-        // ✅ 入力値に敬称が付いてても保存は"素"にする（様様防止の核）
-        const clean = stripHonorific(value);
+        const clean = normalizeBaseName(value); // ✅ 敬称除去 + ゲスト無効
+        if (!clean) {
+          nameError.textContent = "……そのお名前では登録できないの。別のお名前を教えてくださいね。";
+          return;
+        }
 
         // ✅ common.js 中枢へ保存（全ページ共通）
-        if (typeof window.setUserName === 'function') {
+        if (typeof window.setUserName === "function") {
           window.setUserName(clean);
         } else {
-          localStorage.setItem('sv_user_name', clean);
+          localStorage.setItem("sv_user_name", clean);
           window.ShioponUserName = clean;
         }
 
-        nameInput.style.display = 'none';
+        nameInput.style.display = "none";
         showNameFixed();
       });
 
-      menuButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
+      menuButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
           spawnParticles(btn);
           spawnColumnLight(btn);
           ensureBgm();
+
           const action = btn.dataset.action;
 
-          if (action === 'pray') {
-            dimOverlay.textContent = '静かに祈りを届けています……';
-            dimOverlay.classList.add('show');
+          if (action === "pray") {
+            dimOverlay.textContent = "静かに祈りを届けています……";
+            dimOverlay.classList.add("show");
             setTimeout(() => {
-              window.location.href = 'serephias-chamber.html';
+              window.location.href = "serephias-chamber.html";
             }, 900);
           }
 
-          if (action === 'village') {
-            dimOverlay.textContent = '風の音が、始まりの町へと導きます。';
-            dimOverlay.classList.add('show');
+          if (action === "village") {
+            dimOverlay.textContent = "風の音が、始まりの町へと導きます。";
+            dimOverlay.classList.add("show");
             setTimeout(() => {
-              window.location.href = 'star-memory.html';
+              window.location.href = "star-memory.html";
             }, 900);
           }
 
-          if (action === 'talk') {
-            dimOverlay.classList.remove('show');
+          if (action === "talk") {
+            dimOverlay.classList.remove("show");
             if (isConversation) return;
             startConversation();
           }
         });
       });
 
-      soundToggle.addEventListener('click', () => {
-        const muted = !(localStorage.getItem(STORAGE_MUTE) === '1');
+      soundToggle.addEventListener("click", () => {
+        const muted = !(localStorage.getItem(STORAGE_MUTE) === "1");
         setMute(muted);
         ensureBgm();
       });
 
-      document.body.addEventListener('click', ensureBgm, { once: true });
+      document.body.addEventListener("click", ensureBgm, { once: true });
 
       /* --------------- 初期化 --------------- */
       const startLumiereGate = () => {
         createStars();
         preloadImages();
-        setMute(localStorage.getItem(STORAGE_MUTE) === '1');
+        setMute(localStorage.getItem(STORAGE_MUTE) === "1");
 
-        // ✅ common.js から再訪判定（表示用は常に displayName()）
-        cachedName = displayName();
-
-        if (cachedName && cachedName.trim() !== '') {
-          sceneFoyer.classList.remove('is-active');
-          sceneHall.classList.add('is-active');
+        // ✅ 再訪判定は「素名」で行う（ゲストは空になる）
+        if (getBaseUserName()) {
+          // 再訪：前室スキップ
+          sceneFoyer.classList.remove("is-active");
+          sceneHall.classList.add("is-active");
           hideDialogueWindow();
           enterHall();
         } else {
@@ -1126,7 +1151,7 @@
         }
       };
 
-      window.addEventListener('DOMContentLoaded', async () => {
+      window.addEventListener("DOMContentLoaded", async () => {
         await loadExternalLines();
         startLumiereGate();
       });
