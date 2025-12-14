@@ -596,7 +596,9 @@
         this.logPanel.setAttribute("aria-hidden", "true");
       }
 
-      this.dialogueEl?.classList.add("sv-exit");
+      // dialogueEl は動かさない（位置ズレ防止）
+// this.dialogueEl?.classList.add("sv-exit");
+this.rootEl?.classList.add("sv-exiting");
 
       const chosen = this.pickByeSpeaker();
       const line = this.pickByeLine(chosen);
