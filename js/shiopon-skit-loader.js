@@ -5,17 +5,7 @@
     // ====== Config ======
     cssId: "sv-skit-style",
     engineUrl: "/js/skitEngine.js",
-
-    // ★ skit を固定せず、候補プールから選ぶ
-    skitPool: [
-      "/skits/skit_001.json",
-      "/skits/skit_002.json",
-      // "/skits/skit_003.json",
-    ],
-
-    // ★ 非重複シャッフル袋（全消化まで重複なし）＋「連続同一絶対禁止」用
-    skitBagKey: "sv_skit_bag_v1",
-    lastSkitKey: "sv_skit_last_v1",
+    manifestUrl: "/skits/manifest.json",
 
     rootId: "sv-skit",
     buttonId: "sv-skit-launch",
@@ -30,6 +20,14 @@
 
     // focus trap
     trapHandler: null,
+
+    // ====== Skit Random (No-Repeat) ======
+    skitBagKey: "sv_skit_bag_v2",
+    lastSkitKey: "sv_skit_last_v2",
+
+    // manifest cache
+    _manifestLoaded: false,
+    _skitPool: null,
 
     init() {
       if (document.readyState === "loading") {
@@ -100,7 +98,37 @@
       });
     },
 
-    // ====== Skit Selection ======
+    // ====== Manifest Loading ======
+    async loadManifest() {
+      if (this._manifestLoaded && Array.isArray(this._skitPool) && this._skitPool.length) {
+        return this._skitPool.slice();
+      }
+
+      try {
+        // cache-bust（更新反映を安定させる）
+        const res = await fetch(this.manifestUrl + "?v=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("manifest fetch failed: " + res.status);
+
+        const json = await res.json();
+        const list = Array.isArray(json?.skits) ? json.skits : [];
+        const urls = list
+          .map((s) => (s && typeof s.url === "string" ? s.url.trim() : ""))
+          .filter(Boolean);
+
+        if (!urls.length) throw new Error("manifest has no skits");
+
+        this._skitPool = urls;
+        this._manifestLoaded = true;
+        return urls.slice();
+      } catch (e) {
+        // 失敗時のフォールバック（最低限）
+        this._skitPool = ["/skits/skit_001.json"];
+        this._manifestLoaded = true;
+        return this._skitPool.slice();
+      }
+    },
+
+    // ====== Skit Selection (No repeat even across bag reset) ======
     _readJSON(key, fallback) {
       try {
         const v = JSON.parse(localStorage.getItem(key) || "null");
@@ -113,13 +141,10 @@
     _writeJSON(key, value) {
       try {
         localStorage.setItem(key, JSON.stringify(value));
-      } catch (_) {
-        // storage不可でも落とさない
-      }
+      } catch (_) {}
     },
 
     _shuffle(arr) {
-      // Fisher–Yates
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -127,69 +152,57 @@
       return arr;
     },
 
-    /**
-     * ★要件
-     * 1) ランダム
-     * 2) 同じ skit は袋が空になるまで出ない（全消化方式）
-     * 3) 袋リセット直後も含め「絶対に連続で同じ skit を出さない」
-     */
-    getNextSkitUrl() {
-      const pool = Array.isArray(this.skitPool) ? this.skitPool.filter(Boolean) : [];
-      if (pool.length === 0) return "/skits/skit_001.json";
+    async getNextSkitUrl() {
+      const pool = await this.loadManifest();
+      const cleanPool = Array.isArray(pool) ? pool.filter(Boolean) : [];
+      if (cleanPool.length === 0) return "/skits/skit_001.json";
 
       const last = String(localStorage.getItem(this.lastSkitKey) || "");
 
-      // bag を読む
+      // bag
       let bag = this._readJSON(this.skitBagKey, []);
       if (!Array.isArray(bag)) bag = [];
 
-      // bag が空なら新しい袋を作る（連続同一絶対禁止をここで担保）
+      // bag empty -> rebuild
       if (bag.length === 0) {
-        // pool が 1 個しかない場合は「連続禁止」は物理的に不可能なので、
-        // 仕様的に許容しつつ、安定動作を優先する（ここだけ例外）。
-        if (pool.length === 1) {
-          const only = pool[0];
+        if (cleanPool.length === 1) {
+          const only = cleanPool[0];
           localStorage.setItem(this.lastSkitKey, only);
           this._writeJSON(this.skitBagKey, []);
           return only;
         }
 
-        let nextBag = pool.slice();
+        let nextBag = cleanPool.slice();
         this._shuffle(nextBag);
 
-        // ★袋の先頭が last と同じなら先頭を入れ替える（必ず回避できる：pool>=2）
+        // ensure first != last
         if (nextBag[0] === last) {
-          // last と違う要素を探して swap
           const idx = nextBag.findIndex((u) => u !== last);
-          if (idx > 0) {
-            [nextBag[0], nextBag[idx]] = [nextBag[idx], nextBag[0]];
-          }
+          if (idx > 0) [nextBag[0], nextBag[idx]] = [nextBag[idx], nextBag[0]];
         }
 
         bag = nextBag;
       }
 
-      // 取り出し（通常はここで last と同じにならない。念のため二重保険）
+      // pop
       let next = bag.shift();
 
-      if (pool.length >= 2 && next === last) {
-        // bag内に別のがあるはずなので、次を優先し、今のを後ろへ
+      // hard guarantee: never consecutive same (when pool>=2)
+      if (cleanPool.length >= 2 && next === last) {
         const altIdx = bag.findIndex((u) => u !== last);
         if (altIdx >= 0) {
           const alt = bag.splice(altIdx, 1)[0];
-          bag.push(next); // 被り候補を末尾へ
+          bag.push(next);
           next = alt;
         } else {
-          // それでも無理なら pool から last 以外を強制選択（最終保険）
-          next = pool.find((u) => u !== last) || next;
+          next = cleanPool.find((u) => u !== last) || next;
         }
       }
 
-      // 保存
       this._writeJSON(this.skitBagKey, bag);
       localStorage.setItem(this.lastSkitKey, next);
 
-      return next;
+      return next || cleanPool[0];
     },
 
     // ====== DOM Injection ======
@@ -277,7 +290,7 @@
       document.body.classList.add("sv-skit-lock");
       this.overlayOpen = true;
 
-      // 前回残骸を消す（再openでの重なり防止）
+      // 前回残骸を消す
       engineRoot.innerHTML = "";
 
       // フォーカス
@@ -290,10 +303,10 @@
         (localStorage.getItem("sv_user_name") || "").trim() ||
         "ゲスト";
 
-      // ★ランダム＆非重複（全消化）＆連続同一禁止
-      const skitUrl = this.getNextSkitUrl();
+      // ★manifestから選ぶ（非重複＆連続禁止）
+      const skitUrl = await this.getNextSkitUrl();
 
-      // ★start は 1回だけ（二重起動バグを完全排除）
+      // ★startは1回だけ
       await window.SV_SkitEngine.start({
         rootEl: engineRoot,
         skitUrl,
@@ -315,12 +328,12 @@
 
       if (!overlay) return;
 
-      // エンジン停止（アニメ/タイマー/キー入力など）
+      // エンジン停止
       if (window.SV_SkitEngine && typeof window.SV_SkitEngine.stop === "function") {
         window.SV_SkitEngine.stop();
       }
 
-      // 残骸を消す（次回openをクリーンに）
+      // 残骸を消す
       if (engineRoot) engineRoot.innerHTML = "";
 
       // 非表示
@@ -354,8 +367,6 @@
     // ====== Focus Trap ======
     trapFocus(panel) {
       if (!panel) return;
-
-      // 二重登録防止
       if (this.trapHandler) return;
 
       const focusableSelectors =
