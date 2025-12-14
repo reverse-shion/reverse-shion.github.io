@@ -463,3 +463,72 @@ body.sv-skit-lock{ overflow: hidden; }
   opacity: 1 !important;
   filter: saturate(1.06) brightness(1.00) contrast(1.03) !important;
 }
+
+/* ============================================================
+   SV SKIT — PATCH 02
+   1) コメント（セリフ）エリアを透けさせない
+   2) 名前バッジをキャラ色に自動で切替
+   3) 枠線は色味バランス考慮（濃すぎない）
+============================================================ */
+
+/* 1) コメントエリア透け対策：完全不透明 + 背景合成を無効 */
+#sv-skit .sv-dialogue{
+  background: #FFFFFF !important;           /* ←完全不透明 */
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* セリフ内の文字も念のため透け対策 */
+#sv-skit .sv-name,
+#sv-skit .sv-text{
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
+
+/* 2) 名前バッジの基本形（色は後で上書き） */
+#sv-skit .sv-name{
+  background: #EEF2FF !important;
+  border: 1px solid rgba(0,0,0,.12) !important;
+  color: rgba(10,12,18,.92) !important;
+}
+
+/* ============================================================
+   2) キャラ別カラー（複数の付与方式に対応）
+   想定：
+   - #sv-skit[data-speaker="shiopon"]
+   - .sv-dialogue[data-speaker="shiopon"]
+   - .sv-name[data-speaker="shiopon"]
+   - .sv-name.sv-name--shiopon
+============================================================ */
+
+/* 🦊 しおぽん（#FFCA7A） */
+#sv-skit[data-speaker="shiopon"] .sv-name,
+#sv-skit .sv-dialogue[data-speaker="shiopon"] .sv-name,
+#sv-skit .sv-name[data-speaker="shiopon"],
+#sv-skit .sv-name.sv-name--shiopon{
+  background: #FFCA7A !important;
+  border-color: rgba(255, 202, 122, .60) !important; /* 柔らかめ */
+  color: rgba(10,12,18,.92) !important;
+}
+
+/* 🌌 シオリエル（#6E5AFF） */
+#sv-skit[data-speaker="shioriel"] .sv-name,
+#sv-skit .sv-dialogue[data-speaker="shioriel"] .sv-name,
+#sv-skit .sv-name[data-speaker="shioriel"],
+#sv-skit .sv-name.sv-name--shioriel{
+  background: #6E5AFF !important;
+  border-color: rgba(110, 90, 255, .55) !important;  /* 紫は濃く見えるので控えめ */
+  color: rgba(255,255,255,.96) !important;          /* 読みやすさ優先 */
+}
+
+/* 💛 リュミエール（#F5E08C） */
+#sv-skit[data-speaker="lumiere"] .sv-name,
+#sv-skit .sv-dialogue[data-speaker="lumiere"] .sv-name,
+#sv-skit .sv-name[data-speaker="lumiere"],
+#sv-skit .sv-name.sv-name--lumiere{
+  background: #F5E08C !important;
+  border-color: rgba(245, 224, 140, .62) !important; /* 金は薄く */
+  color: rgba(10,12,18,.92) !important;
+}
