@@ -1067,3 +1067,43 @@ body.sv-skit-lock {
     line-height: 1.7 !important;
   }
 }
+
+/* ============================================================
+   Skit: Center Lift Patch（キャラ＋セリフを中央寄りに）
+   最後に追記するだけ
+============================================================ */
+
+/* 1) ステージ全体を“少し上”へ（余白の再配分） */
+#sv-skit .sv-overlay-body{
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+/* 2) キャラの表示エリアを上げる（下段固定感を消す） */
+#sv-skit .sv-stage{
+  padding-top: 6vh !important;     /* ←ここで上に持ち上がる */
+  padding-bottom: 2vh !important;
+  align-items: center !important;  /* グリッド内の縦配置を中央寄りに */
+}
+
+/* 3) 3人同席でも“沈まない”ように各スロットを確保 */
+#sv-skit .sv-slot{
+  min-height: 34vh !important;     /* 端末により 30〜40vh で調整 */
+  align-items: center !important;  /* ここも中央寄りに */
+}
+
+/* 4) 画像を下に立たせたい場合は portrait 内だけ下寄せ */
+#sv-skit .sv-portrait{
+  display: flex !important;
+  align-items: flex-end !important;   /* 画像は下寄せ維持 */
+}
+
+/* 5) セリフを“中央寄り（やや下）”へ：bottom固定をやめて top 指定 */
+#sv-skit .sv-dialogue{
+  position: absolute !important;
+  left: 50% !important;
+  top: 58% !important;               /* ←ここが主調整。55〜65%でベスト探し */
+  transform: translateX(-50%) !important;
+  bottom: auto !important;
+  width: min(92%, 720px) !important;
+}
