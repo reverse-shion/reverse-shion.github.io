@@ -22,27 +22,19 @@
     exiting: false,
     userName: null,
 
-    __endByeTimer: null,
-    __byeT1: null,
-    __byeT2: null,
+    // End lock
+    isEndReached: false,
 
     // =========================
-    // Config
+    // Config (adjustable)
     // =========================
     config: {
       hostId: "sv-skit",
-      returnMode: "history",   // "history" | "href" | "callback"
+      returnMode: "callback",  // loader側がcloseを渡す前提で callback を推奨
       returnHref: "/",
       onReturn: null,
-
       byeDelayMs: 950,
       byeFadeMs: 420,
-      randomByeSpeaker: true,
-
-      // ★重要：LOADER と Esc が競合するなら true（推奨）
-      // true なら Engine 側は Esc を「またね」に使わない（×で閉じる/LOADER Escに任せる）
-      // falseなら Engine Esc = またね演出（没入優先）
-      disableEngineEsc: true,
     },
 
     // キャラ別「またね」台詞
@@ -69,7 +61,7 @@
     // =========================
     // Public API
     // =========================
-    async start({ rootEl, skitUrl, userName, returnMode, returnHref, onReturn, disableEngineEsc } = {}) {
+    async start({ rootEl, skitUrl, userName, returnMode, returnHref, onReturn }) {
       this.stop();
 
       this.rootEl = rootEl;
@@ -80,20 +72,18 @@
       this.autoMode = false;
       this.waitingChoice = false;
       this.exiting = false;
+      this.isEndReached = false;
 
-      // userName（未指定ならlocalStorage）
-      this.userName =
-        (userName && String(userName).trim()) ||
-        (localStorage.getItem("sv_user_name") || "").trim() ||
-        "あなた";
+      // ★ userName は「あなた」固定をやめる：必ずUser名優先
+      const stored = (localStorage.getItem("sv_user_name") || "").trim();
+      const passed = (userName && String(userName).trim()) || "";
+      this.userName = passed || stored || "ゲスト";
 
       // return設定（必要なら上書き）
       if (returnMode) this.config.returnMode = returnMode;
       if (returnHref) this.config.returnHref = returnHref;
-      if (typeof onReturn === "function") this.config.onReturn = onReturn;
-      if (typeof disableEngineEsc === "boolean") this.config.disableEngineEsc = disableEngineEsc;
+      if (onReturn) this.config.onReturn = onReturn;
 
-      // UI mount
       this.rootEl.innerHTML = this.renderShell();
       this.bindStaticElements();
 
@@ -107,9 +97,9 @@
         const titleEl = this.rootEl.querySelector(".sv-title");
         if (titleEl) titleEl.textContent = data.meta?.title || "Skit Window";
 
-        this.autoBtn?.setAttribute("aria-pressed", "false");
+        if (this.autoBtn) this.autoBtn.setAttribute("aria-pressed", "false");
 
-        // 先読み（初回表示の安定）
+        // 初回先読み
         this.primePreloadCache(data);
 
         this.gotoNode(data.start);
@@ -119,33 +109,18 @@
     },
 
     stop() {
-      // timers
       clearTimeout(this.autoTimer);
-      clearTimeout(this.__endByeTimer);
-      clearTimeout(this.__byeT1);
-      clearTimeout(this.__byeT2);
-
       this.autoTimer = null;
-      this.__endByeTimer = null;
-      this.__byeT1 = null;
-      this.__byeT2 = null;
-
-      // flags
       this.autoMode = false;
       this.waitingChoice = false;
       this.exiting = false;
+      this.isEndReached = false;
 
-      // panels
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
         this.logPanel.setAttribute("aria-hidden", "true");
       }
 
-      // remove exit classes
-      this.rootEl?.classList.remove("sv-fadeout");
-      this.dialogueEl?.classList.remove("sv-exit");
-
-      // key handler cleanup
       if (this.keyHandler && this.rootEl) {
         const panel = this.rootEl.closest(".sv-overlay-panel");
         if (panel) panel.removeEventListener("keydown", this.keyHandler, true);
@@ -182,11 +157,14 @@
             <div class="sv-name">...</div>
             <div class="sv-text">読み込み中...</div>
             <div class="sv-choices" hidden></div>
+
+            <!-- ★またね：セリフエリア直下 右下に常駐 -->
+            <div class="sv-dialogue-actions">
+              <button type="button" class="sv-bye-btn" aria-label="またね">またね</button>
+            </div>
+
             <div class="sv-hint">タップ / クリック / Spaceで進む</div>
           </div>
-
-          <!-- ★常駐「またね」 -->
-          <button type="button" class="sv-bye-btn" aria-label="またね">またね</button>
 
           <div class="sv-log-panel" aria-hidden="true">
             <div class="sv-log-header">
@@ -211,40 +189,35 @@
       this.autoBtn = this.rootEl.querySelector(".sv-auto-btn");
       this.byeBtn = this.rootEl.querySelector(".sv-bye-btn");
 
-      // Advance click
       this.dialogueEl?.addEventListener("click", () => this.handleAdvance());
-
-      // Auto
       this.autoBtn?.addEventListener("click", () => this.toggleAuto());
 
-      // Log
       this.rootEl.querySelector(".sv-log-btn")?.addEventListener("click", () => this.toggleLog(true));
       this.rootEl.querySelector(".sv-log-close")?.addEventListener("click", () => this.toggleLog(false));
 
-      // Bye (always available)
-      this.byeBtn?.addEventListener("click", () => this.runByeSequence({ preferSpeakerFromCurrent: true }));
+      // ★またね：常駐・押した時だけ発動
+      this.byeBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.runByeSequence();
+      });
 
-      // Keyboard
       const panel = this.rootEl.closest(".sv-overlay-panel");
       this.keyHandler = (e) => {
         if (!this.rootEl || !this.rootEl.isConnected) return;
         if (this.exiting) return;
 
-        // Space: advance
+        // Space: advance（終端でもOK：進めないだけ）
         if (!this.waitingChoice && (e.key === " " || e.code === "Space")) {
           e.preventDefault();
           this.handleAdvance();
-          return;
         }
 
-        // Esc: 競合回避（推奨は LOADER側の Esc close）
+        // Esc: ここは “閉じる” ではなく「またね」に統一したいなら有効
         if (e.key === "Escape") {
-          if (this.config.disableEngineEsc) return; // LOADERに任せる
           e.preventDefault();
-          this.runByeSequence({ preferSpeakerFromCurrent: true });
+          this.runByeSequence();
         }
       };
-
       if (panel) panel.addEventListener("keydown", this.keyHandler, true);
     },
 
@@ -277,15 +250,17 @@
       this.currentNode = node;
       this.waitingChoice = Array.isArray(node.choices) && node.choices.length > 0;
 
-      // 画像先読み
       this.preloadForNode(node);
-
       this.renderNode(node);
 
-      // 終端検出：end:true or nextなし（choiceもない）
+      // ★終端判定：到達したら “終端状態” にするだけ（自動またね禁止）
       const isEnd = !!node.end || (!node.next && !this.waitingChoice);
-      if (isEnd) {
-        this.scheduleEndAutoBye();
+      this.isEndReached = isEnd;
+
+      // Autoは終端なら止める（勝手に閉じない）
+      if (this.isEndReached) {
+        clearTimeout(this.autoTimer);
+        this.autoTimer = null;
         return;
       }
 
@@ -297,24 +272,15 @@
       this.renderDialogue(node);
     },
 
-    scheduleEndAutoBye() {
-      clearTimeout(this.__endByeTimer);
-      this.__endByeTimer = setTimeout(() => {
-        if (!this.exiting && this.rootEl && this.rootEl.isConnected) {
-          this.runByeSequence({ preferSpeakerFromCurrent: true, fromEnd: true });
-        }
-      }, 900);
-    },
-
-    // ============================================================
+    // =========================
     // Smooth Swap Core
-    // ============================================================
+    // =========================
     swapPortraitImage(portrait, baseEl, topEl, url, ariaLabel) {
       if (!portrait || !baseEl || !topEl || !url) return;
 
       const token = (portrait.__svSwapToken = (portrait.__svSwapToken || 0) + 1);
-      const currentUrl = baseEl.__svUrl || "";
 
+      const currentUrl = baseEl.__svUrl || "";
       if (currentUrl === url) {
         if (ariaLabel) baseEl.setAttribute("aria-label", ariaLabel);
         return;
@@ -396,7 +362,6 @@
         const topEl = slotEl.querySelector(".sv-face-top");
         const frame = slotMap[slotName];
 
-        // 非表示
         if (!frame || frame.visible === false) {
           slotEl.classList.add("sv-hidden");
           slotEl.classList.remove("sv-speaking", "sv-dimmed");
@@ -415,37 +380,28 @@
           continue;
         }
 
-        // 表示
         slotEl.classList.remove("sv-hidden");
 
         const character = (frame.character || "").trim().toLowerCase();
         const expression = (frame.expression || "").trim();
         if (portrait) portrait.dataset.character = character;
 
-        // speaking判定
         const speaking =
-          frame.speaking != null
-            ? !!frame.speaking
-            : (character && character === (node.speaker || "").toLowerCase());
+          frame.speaking != null ? !!frame.speaking : (character && character === (node.speaker || "").toLowerCase());
 
         slotEl.classList.toggle("sv-speaking", speaking);
         slotEl.classList.toggle("sv-dimmed", !speaking);
 
-        // 画像URL
         const url = this.resolvePortraitUrl(character, expression);
         const label = `${character} ${expression}`.trim();
 
         this.swapPortraitImage(portrait, baseEl, topEl, url, label);
-
         this.applyMotion(portrait, frame.motion);
       }
     },
 
     normalizeExpression(expression) {
-      return (expression || "normal")
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "-");
+      return (expression || "normal").trim().toLowerCase().replace(/\s+/g, "-");
     },
 
     resolvePortraitUrl(character, expression) {
@@ -527,7 +483,7 @@
       });
     },
 
-    // ========== SpeakerId helpers ==========
+    // ========== Speaker helpers ==========
     normSpeaker(s) {
       return String(s || "")
         .trim()
@@ -568,6 +524,7 @@
       if (!this.autoMode) return;
       if (this.waitingChoice) return;
       if (this.exiting) return;
+      if (this.isEndReached) return;
       if (!this.currentNode?.next) return;
 
       this.autoTimer = setTimeout(() => this.handleAdvance(), this.autoDelay);
@@ -590,33 +547,18 @@
     },
 
     // =========================
-    // Bye Sequence
+    // Bye Sequence (manual only)
     // =========================
-    runByeSequence(opts = {}) {
+    runByeSequence() {
       if (this.exiting) return;
       this.exiting = true;
 
-      // lock
       clearTimeout(this.autoTimer);
-      clearTimeout(this.__endByeTimer);
       this.autoTimer = null;
-      this.__endByeTimer = null;
-
       this.autoMode = false;
       this.autoBtn?.setAttribute("aria-pressed", "false");
-
-      // choices lock & hide
       this.waitingChoice = false;
-      if (this.choicesEl) {
-        this.choicesEl.hidden = true;
-        this.choicesEl.innerHTML = "";
-      }
 
-      // disable buttons to prevent double-tap race
-      this.autoBtn?.setAttribute("disabled", "disabled");
-      this.byeBtn?.setAttribute("disabled", "disabled");
-
-      // close log
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
         this.logPanel.setAttribute("aria-hidden", "true");
@@ -625,35 +567,22 @@
       // dialogue soft switch
       this.dialogueEl?.classList.add("sv-exit");
 
-      // choose speaker
-      const chosen = this.pickByeSpeaker(!!opts.preferSpeakerFromCurrent);
+      // speaker: 画面にいる中からランダム（いなければshiopon）
+      const chosen = this.pickByeSpeaker();
       const line = this.pickByeLine(chosen);
 
-      // apply speaker color
       this.applySpeakerId(chosen);
-
-      // stage focus: one character forward
       this.focusSpeakerSlot(chosen);
 
-      // set name + text (do NOT log)
       const nameLabel = this.speakerDisplayName(chosen);
       if (this.nameEl) this.nameEl.textContent = nameLabel;
       if (this.textEl) this.textEl.textContent = line;
 
-      // fadeout & return
-      const t1 = this.jitter(this.config.byeDelayMs, 180); // 0.8〜1.2秒帯
+      const t1 = this.jitter(this.config.byeDelayMs, 180);
       const t2 = this.config.byeFadeMs;
 
-      clearTimeout(this.__byeT1);
-      clearTimeout(this.__byeT2);
-
-      this.__byeT1 = setTimeout(() => {
-        this.rootEl?.classList.add("sv-fadeout");
-      }, t1);
-
-      this.__byeT2 = setTimeout(() => {
-        this.returnToPage();
-      }, t1 + t2);
+      setTimeout(() => this.rootEl?.classList.add("sv-fadeout"), t1);
+      setTimeout(() => this.returnToPage(), t1 + t2);
     },
 
     jitter(base, range) {
@@ -672,17 +601,10 @@
     pickByeLine(speakerId) {
       const list = this.byeLines[speakerId] || this.byeLines.narration;
       const raw = list[Math.floor(Math.random() * list.length)] || "${userName}、またね。";
-      return raw.replaceAll("${userName}", this.userName || "あなた");
+      return raw.replaceAll("${userName}", this.userName || "ゲスト");
     },
 
-    pickByeSpeaker(preferCurrent) {
-      // 1) current speaker優先
-      if (preferCurrent && this.currentNode?.speaker) {
-        const s = this.getSpeakerIdFromSpeakerText(this.currentNode.speaker);
-        if (s && s !== "narration") return s;
-      }
-
-      // 2) 表示中のキャラからランダム
+    pickByeSpeaker() {
       const visible = [];
       for (const slotName of ["left", "center", "right"]) {
         const slotEl = this.rootEl?.querySelector(`.sv-slot[data-slot="${slotName}"]`);
@@ -690,13 +612,9 @@
         const portrait = slotEl.querySelector(".sv-portrait");
         const c = (portrait?.dataset?.character || "").trim().toLowerCase();
         if (!c) continue;
-        visible.push(c);
+        if (this.byeLines[c]) visible.push(c);
       }
-      if (visible.length) {
-        const pick = visible[Math.floor(Math.random() * visible.length)];
-        if (this.byeLines[pick]) return pick;
-      }
-
+      if (visible.length) return visible[Math.floor(Math.random() * visible.length)];
       return "shiopon";
     },
 
@@ -726,29 +644,17 @@
       }
     },
 
-    // ★ここが「完全接続」の核：callback優先
     returnToPage() {
-      // エンジン内部を止める（タイマー/キー解除）
       this.stop();
 
-      // 1) callback（LOADER close）を最優先
       if (this.config.returnMode === "callback" && typeof this.config.onReturn === "function") {
-        try {
-          this.config.onReturn();
-        } catch (_) {
-          // fallback
-          window.dispatchEvent(new CustomEvent("sv:skit:close"));
-        }
+        this.config.onReturn();
         return;
       }
-
-      // 2) href
       if (this.config.returnMode === "href") {
         location.href = this.config.returnHref || "/";
         return;
       }
-
-      // 3) history
       if (history.length > 1) history.back();
       else location.href = this.config.returnHref || "/";
     },
@@ -791,7 +697,7 @@
     },
 
     // =========================
-    // Preload
+    // Preload Helpers
     // =========================
     _preloadCache: new Map(),
 
