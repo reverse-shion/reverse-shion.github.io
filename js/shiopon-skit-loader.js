@@ -5,7 +5,18 @@
     // ====== Config ======
     cssId: "sv-skit-style",
     engineUrl: "/js/skitEngine.js",
-    skitUrl: "/skits/skit_001.json",
+
+    // ★ skit を固定せず、候補プールから選ぶ
+    skitPool: [
+      "/skits/skit_001.json",
+      "/skits/skit_002.json",
+      // "/skits/skit_003.json",
+    ],
+
+    // ★ 非重複シャッフル袋（全消化まで重複なし）＋「連続同一絶対禁止」用
+    skitBagKey: "sv_skit_bag_v1",
+    lastSkitKey: "sv_skit_last_v1",
+
     rootId: "sv-skit",
     buttonId: "sv-skit-launch",
     overlayClass: "sv-overlay",
@@ -37,7 +48,6 @@
       this.loadEngine();
 
       // エンジン側からの「閉じて」要求（保険）
-      // 例：window.dispatchEvent(new CustomEvent("sv:skit:close"))
       window.addEventListener("sv:skit:close", () => this.close());
 
       // 例：window.dispatchEvent(new CustomEvent("sv:skit:open"))
@@ -69,7 +79,6 @@
       };
       script.onerror = () => {
         this.engineReady = false;
-        // 失敗時はボタンで通知したい場合ここで処理してOK
       };
       document.head.appendChild(script);
     },
@@ -89,6 +98,98 @@
         };
         poll();
       });
+    },
+
+    // ====== Skit Selection ======
+    _readJSON(key, fallback) {
+      try {
+        const v = JSON.parse(localStorage.getItem(key) || "null");
+        return v ?? fallback;
+      } catch (_) {
+        return fallback;
+      }
+    },
+
+    _writeJSON(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (_) {
+        // storage不可でも落とさない
+      }
+    },
+
+    _shuffle(arr) {
+      // Fisher–Yates
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    },
+
+    /**
+     * ★要件
+     * 1) ランダム
+     * 2) 同じ skit は袋が空になるまで出ない（全消化方式）
+     * 3) 袋リセット直後も含め「絶対に連続で同じ skit を出さない」
+     */
+    getNextSkitUrl() {
+      const pool = Array.isArray(this.skitPool) ? this.skitPool.filter(Boolean) : [];
+      if (pool.length === 0) return "/skits/skit_001.json";
+
+      const last = String(localStorage.getItem(this.lastSkitKey) || "");
+
+      // bag を読む
+      let bag = this._readJSON(this.skitBagKey, []);
+      if (!Array.isArray(bag)) bag = [];
+
+      // bag が空なら新しい袋を作る（連続同一絶対禁止をここで担保）
+      if (bag.length === 0) {
+        // pool が 1 個しかない場合は「連続禁止」は物理的に不可能なので、
+        // 仕様的に許容しつつ、安定動作を優先する（ここだけ例外）。
+        if (pool.length === 1) {
+          const only = pool[0];
+          localStorage.setItem(this.lastSkitKey, only);
+          this._writeJSON(this.skitBagKey, []);
+          return only;
+        }
+
+        let nextBag = pool.slice();
+        this._shuffle(nextBag);
+
+        // ★袋の先頭が last と同じなら先頭を入れ替える（必ず回避できる：pool>=2）
+        if (nextBag[0] === last) {
+          // last と違う要素を探して swap
+          const idx = nextBag.findIndex((u) => u !== last);
+          if (idx > 0) {
+            [nextBag[0], nextBag[idx]] = [nextBag[idx], nextBag[0]];
+          }
+        }
+
+        bag = nextBag;
+      }
+
+      // 取り出し（通常はここで last と同じにならない。念のため二重保険）
+      let next = bag.shift();
+
+      if (pool.length >= 2 && next === last) {
+        // bag内に別のがあるはずなので、次を優先し、今のを後ろへ
+        const altIdx = bag.findIndex((u) => u !== last);
+        if (altIdx >= 0) {
+          const alt = bag.splice(altIdx, 1)[0];
+          bag.push(next); // 被り候補を末尾へ
+          next = alt;
+        } else {
+          // それでも無理なら pool から last 以外を強制選択（最終保険）
+          next = pool.find((u) => u !== last) || next;
+        }
+      }
+
+      // 保存
+      this._writeJSON(this.skitBagKey, bag);
+      localStorage.setItem(this.lastSkitKey, next);
+
+      return next;
     },
 
     // ====== DOM Injection ======
@@ -165,22 +266,7 @@
 
       const overlay = root.querySelector(`.${this.overlayClass}`);
       const panel = overlay?.querySelector(".sv-overlay-panel");
-      // open() 内の start 呼び出しをこれに差し替え
-const engineRoot = overlay.querySelector('.sv-engine-root');
-
-const userName =
-  (window.ShioponUserName && String(window.ShioponUserName).trim()) ||
-  (localStorage.getItem("sv_user_name") || "").trim() ||
-  "ゲスト";
-
-await window.SV_SkitEngine.start({
-  rootEl: engineRoot,
-  skitUrl: this.skitUrl,
-  userName,
-  returnMode: "callback",
-  onReturn: () => this.close(),
-});
-
+      const engineRoot = overlay?.querySelector(".sv-engine-root");
       if (!overlay || !panel || !engineRoot) return;
 
       this.lastFocus = document.activeElement;
@@ -198,11 +284,20 @@ await window.SV_SkitEngine.start({
       panel.focus({ preventScroll: true });
       this.trapFocus(panel);
 
-      // ★ここが「またね」連携の本丸
-      // Engine側で onReturn() を呼べば、このローダーcloseに帰還する
+      // ユーザー名
+      const userName =
+        (window.ShioponUserName && String(window.ShioponUserName).trim()) ||
+        (localStorage.getItem("sv_user_name") || "").trim() ||
+        "ゲスト";
+
+      // ★ランダム＆非重複（全消化）＆連続同一禁止
+      const skitUrl = this.getNextSkitUrl();
+
+      // ★start は 1回だけ（二重起動バグを完全排除）
       await window.SV_SkitEngine.start({
         rootEl: engineRoot,
-        skitUrl: this.skitUrl,
+        skitUrl,
+        userName,
         returnMode: "callback",
         onReturn: () => this.close(),
       });
