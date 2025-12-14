@@ -898,3 +898,172 @@ body.sv-skit-lock {
     width: 94%;
   }
 }
+
+/* ============================================================
+   Shionverse Skit — 3人同席 / キャラ＋セリフだけ / 余白ゼロ
+   ※CSSは一番最後に追記（強制上書き）
+============================================================ */
+
+/* 1) UIは完全に消す（タイトル/ログ/オート/閉じる等） */
+#sv-skit .sv-overlay-header,
+#sv-skit .sv-topbar,
+#sv-skit .sv-controls,
+#sv-skit .sv-btn,
+#sv-skit .sv-log-panel,
+#sv-skit .sv-hint{
+  display: none !important;
+}
+
+/* 2) パネルの“箱感”を消し、ステージ＋セリフだけに */
+#sv-skit .sv-overlay-panel{
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+/* 3) 背景は“薄暗幕＋ほんのりぼかし”だけ */
+#sv-skit .sv-overlay-backdrop{
+  background: rgba(5, 7, 12, 0.20) !important;
+  backdrop-filter: blur(1.2px) saturate(1.08) !important;
+}
+
+/* 4) bodyの余白を削って、ステージを最大化 */
+#sv-skit .sv-overlay-body{
+  padding: 0 !important;
+  gap: 0 !important;
+  height: 100% !important;
+}
+#sv-skit .sv-shell{
+  height: 100% !important;
+  gap: 0 !important;
+}
+
+/* 5) ステージ：画面上部〜セリフ直前までを“キャラ領域”に */
+#sv-skit .sv-stage{
+  position: relative !important;
+  height: calc(100vh - 170px) !important; /* セリフ分を確保 */
+  min-height: 52vh !important;
+  padding: 0 10px 0 !important;
+  gap: 10px !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: end !important;
+
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+/* 6) ここが最重要：slotを潰さない（画像が消える原因を潰す） */
+#sv-skit .sv-slot{
+  height: 100% !important;
+  min-height: 240px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+
+/* 7) キャラ枠は“透明”にして画像だけ見せる */
+#sv-skit .sv-portrait{
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+
+  aspect-ratio: auto !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  overflow: visible !important;
+}
+
+/* キャラ名ラベルはUI感なので消す */
+#sv-skit .sv-portrait::before{
+  content: "" !important;
+}
+
+/* 512x512の画像を“下寄せで大きく” */
+#sv-skit .sv-face{
+  width: 100% !important;
+  height: 100% !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center bottom !important;
+  filter: saturate(1.06) contrast(1.03) !important;
+}
+
+/* 8) speaking/dimmedは“光だけ”で表現（枠はいらない） */
+#sv-skit .sv-slot.sv-speaking{
+  transform: translateY(-6px) scale(1.02) !important;
+}
+#sv-skit .sv-slot.sv-dimmed{
+  opacity: 0.86 !important;
+  filter: saturate(0.92) brightness(0.96) !important;
+}
+
+/* 9) セリフは下固定：ここだけ“霧ガラス”で安心感 */
+#sv-skit .sv-dialogue{
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 12px !important;
+  transform: translateX(-50%) !important;
+  width: min(94vw, 760px) !important;
+
+  margin: 0 !important;
+  border-radius: 16px !important;
+  padding: 14px 16px 16px !important;
+
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(246,249,255,0.88)) !important;
+  border: 1px solid rgba(160,205,255,0.42) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.40) inset !important;
+}
+
+/* 名前タグは“名札”として残す */
+#sv-skit .sv-name{
+  background: rgba(130,175,255,0.22) !important;
+  border: 1px solid rgba(130,175,255,0.40) !important;
+  color: rgba(10,12,18,0.92) !important;
+  border-radius: 999px !important;
+  padding: 5px 12px !important;
+  font-size: 13px !important;
+}
+
+/* 本文 */
+#sv-skit .sv-text{
+  color: rgba(10,12,18,0.92) !important;
+  font-size: 16px !important;
+  line-height: 1.65 !important;
+}
+
+/* 選択肢が出るなら、セリフ内で整える */
+#sv-skit .sv-choice-btn{
+  border-radius: 14px !important;
+  background: rgba(255,255,255,0.86) !important;
+  border: 1px solid rgba(160,205,255,0.36) !important;
+  color: rgba(10,12,18,0.88) !important;
+}
+
+/* 10) モバイル：セリフを少し上げて、キャラ領域を広げる */
+@media (max-width: 720px){
+  #sv-skit .sv-stage{
+    height: calc(100vh - 158px) !important;
+    padding: 0 6px !important;
+    gap: 6px !important;
+  }
+  #sv-skit .sv-dialogue{
+    width: 96vw !important;
+    bottom: 10px !important;
+    border-radius: 14px !important;
+  }
+  #sv-skit .sv-text{
+    font-size: 15.5px !important;
+    line-height: 1.7 !important;
+  }
+}
