@@ -366,3 +366,89 @@ body.sv-skit-lock{ overflow: hidden; }
     transform: translateY(0vh) !important; /* ←ほぼ中央 */
   }
 }
+
+/* ============================================================
+   SV SKIT — IMAGE ONLY (NO FRAME / NO BLEED / NO TRANSPARENCY)
+   完全最終版：画像そのものだけを表示
+============================================================ */
+
+/* --- 画像エリア自体を“箱”にしない --- */
+#sv-skit .sv-stage{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  height: auto !important;
+  transform: translateY(-1.5vh) !important; /* 目線：少し下げ */
+}
+
+/* --- slotもただの配置用に --- */
+#sv-skit .sv-slot{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  align-items: flex-end !important;
+}
+
+/* ============================================================
+   ★核心：縦長カード（sv-portrait）を完全に殺す
+============================================================ */
+#sv-skit .sv-portrait{
+  all: unset !important;        /* ← これが決定打 */
+  display: contents !important;/* ← DOM構造だけ残す */
+}
+
+/* 擬似要素も完全削除 */
+#sv-skit .sv-portrait::before,
+#sv-skit .sv-portrait::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* ============================================================
+   ★画像そのもの（sv-face）だけを表示
+============================================================ */
+#sv-skit .sv-face{
+  display: block !important;
+
+  width: min(28vw, 200px) !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+
+  background-color: transparent !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center bottom !important;
+
+  opacity: 1 !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* ============================================================
+   話者だけほんの少し動かす（自然）
+============================================================ */
+#sv-skit .sv-slot.sv-speaking .sv-face{
+  transform: translateY(-4px) scale(1.03) !important;
+}
+
+#sv-skit .sv-slot.sv-dimmed .sv-face{
+  opacity: .9 !important;
+}
+
+/* ============================================================
+   スマホ調整：目線をさらに自然に
+============================================================ */
+@media (max-width: 720px){
+  #sv-skit .sv-stage{
+    transform: translateY(0vh) !important;
+  }
+
+  #sv-skit .sv-face{
+    width: min(38vw, 160px) !important;
+  }
+}
