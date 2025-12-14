@@ -271,3 +271,150 @@ body.sv-skit-lock{ overflow: hidden; }
   #sv-skit .sv-dialogue{ border-radius: 16px; }
   #sv-skit .sv-text{ font-size: 15.5px; line-height: 1.7; }
 }
+
+/* ============================================================
+   SV SKIT — Minimal: "Images + Dialogue only"
+   - 余計な箱/余白/背景を撤去
+   - 画像は目線位置へ（上寄せ気味のセンター）
+   - セリフはその下（被りゼロ）
+============================================================ */
+
+#sv-skit .sv-overlay-panel{
+  /* “箱”を消す */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+
+  /* 画面を最大限使う（ただし左右は少しだけ余白） */
+  width: min(980px, 96vw) !important;
+  height: min(720px, 92vh) !important;
+}
+
+#sv-skit .sv-overlay-body{
+  /* 内側余白をゼロにして、余計な空白を無くす */
+  padding: 0 !important;
+  height: 100% !important;
+}
+
+/* 2段だけ：上=画像、下=セリフ */
+#sv-skit .sv-shell{
+  height: 100% !important;
+  display: grid !important;
+  grid-template-rows: 1fr auto !important;
+  gap: 0 !important; /* 余白ゼロ */
+}
+
+/* -------------------------
+   画像エリア（上段）
+-------------------------- */
+#sv-skit .sv-stage{
+  /* 背景/枠を消して“画像枠だけ”に */
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+
+  /* 余白を削る */
+  padding: 0 !important;
+  margin: 0 !important;
+
+  /* 画像を目線位置へ：少し上寄せで中央に置く */
+  align-self: center !important;
+  transform: translateY(-6vh) !important; /* ←ここが“目線調整”の主役（-4〜-10vhで調整） */
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(6px, 1.5vw, 12px) !important;
+  align-items: end !important;
+
+  /* 上段の高さを“絵に寄せる” */
+  height: min(46vh, 360px) !important; /* ←キャラ領域。大きくしたいなら 50vh */
+}
+
+/* slotは下寄せ */
+#sv-skit .sv-slot{
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+
+/* 画像“枠”だけ見せる（今の丸角は維持） */
+#sv-skit .sv-portrait{
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 280px !important;
+
+  border-radius: 18px !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.06) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.22) !important;
+
+  overflow: hidden !important;
+}
+#sv-skit .sv-portrait::before{ content: "" !important; }
+
+/* 512x512を自然に下寄せ */
+#sv-skit .sv-face{
+  width: 100% !important;
+  height: 100% !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center bottom !important;
+}
+
+/* 話者の強調だけ残す（UI感を増やさない） */
+#sv-skit .sv-slot.sv-speaking{
+  transform: translateY(-6px) scale(1.02) !important;
+}
+#sv-skit .sv-slot.sv-dimmed{
+  opacity: .88 !important;
+  filter: saturate(.92) brightness(.98) !important;
+}
+
+/* -------------------------
+   セリフ（下段）
+-------------------------- */
+#sv-skit .sv-dialogue{
+  /* 余白を最小化して“下にぴったり” */
+  margin: 0 !important;
+
+  /* 下段として固定の高さ感（余白が暴れない） */
+  min-height: 132px !important;
+
+  /* 余計な下の空白が出るのを防ぐ */
+  border-radius: 18px !important;
+
+  /* セリフだけは読みやすく */
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid rgba(160,205,255,.42) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.18), 0 0 0 1px rgba(255,255,255,.40) inset !important;
+
+  padding: 14px 16px 16px !important;
+}
+
+/* スマホ：目線位置を少し下げる（上げすぎ防止） */
+@media (max-width: 720px){
+  #sv-skit .sv-overlay-panel{
+    width: 96vw !important;
+    height: 92vh !important;
+  }
+
+  #sv-skit .sv-stage{
+    height: min(44vh, 320px) !important;
+    transform: translateY(-4vh) !important; /* ←スマホは控えめに */
+    gap: 8px !important;
+  }
+
+  #sv-skit .sv-portrait{
+    max-width: 240px !important;
+    border-radius: 16px !important;
+  }
+
+  #sv-skit .sv-text{
+    font-size: 15.5px !important;
+    line-height: 1.7 !important;
+  }
+}
