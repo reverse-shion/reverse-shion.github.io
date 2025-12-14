@@ -25,19 +25,22 @@
     // End lock
     isEndReached: false,
 
+    // ★ Bye timers（2回目事故防止）
+    byeTimer1: null,
+    byeTimer2: null,
+
     // =========================
     // Config (adjustable)
     // =========================
     config: {
       hostId: "sv-skit",
-      returnMode: "callback",  // loader側がcloseを渡す前提で callback を推奨
+      returnMode: "callback",
       returnHref: "/",
       onReturn: null,
       byeDelayMs: 950,
       byeFadeMs: 420,
     },
 
-    // キャラ別「またね」台詞
     byeLines: {
       shiopon: [
         "${userName}、またねっ！ぴょん！",
@@ -62,9 +65,16 @@
     // Public API
     // =========================
     async start({ rootEl, skitUrl, userName, returnMode, returnHref, onReturn }) {
+      // ① 前回の残骸を必ず止める
       this.stop();
 
+      // ② rootをセット
       this.rootEl = rootEl;
+
+      // ③ ★フェード/退出クラスを必ず剥がす（ここが本命）
+      this.hardResetVisualState();
+
+      // ④ 状態初期化
       this.skit = null;
       this.nodes = {};
       this.currentNode = null;
@@ -84,6 +94,7 @@
       if (returnHref) this.config.returnHref = returnHref;
       if (onReturn) this.config.onReturn = onReturn;
 
+      // ⑤ shell再描画
       this.rootEl.innerHTML = this.renderShell();
       this.bindStaticElements();
 
@@ -109,12 +120,26 @@
     },
 
     stop() {
+      // ★ timers all clear
       clearTimeout(this.autoTimer);
       this.autoTimer = null;
+
+      clearTimeout(this.byeTimer1);
+      clearTimeout(this.byeTimer2);
+      this.byeTimer1 = null;
+      this.byeTimer2 = null;
+
       this.autoMode = false;
       this.waitingChoice = false;
       this.exiting = false;
       this.isEndReached = false;
+
+      // ★ 退出クラスの残留掃除（2回目事故の根）
+      if (this.rootEl) {
+        this.rootEl.classList.remove("sv-fadeout");
+        const d = this.rootEl.querySelector(".sv-dialogue");
+        d?.classList.remove("sv-exit");
+      }
 
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
@@ -126,6 +151,14 @@
         if (panel) panel.removeEventListener("keydown", this.keyHandler, true);
       }
       this.keyHandler = null;
+    },
+
+    // ★ 完全に見た目の残骸を剥がす
+    hardResetVisualState() {
+      if (!this.rootEl) return;
+      this.rootEl.classList.remove("sv-fadeout");
+      const d = this.rootEl.querySelector(".sv-dialogue");
+      d?.classList.remove("sv-exit");
     },
 
     // =========================
@@ -158,7 +191,6 @@
             <div class="sv-text">読み込み中...</div>
             <div class="sv-choices" hidden></div>
 
-            <!-- ★またね：セリフエリア直下 右下に常駐 -->
             <div class="sv-dialogue-actions">
               <button type="button" class="sv-bye-btn" aria-label="またね">またね</button>
             </div>
@@ -195,7 +227,6 @@
       this.rootEl.querySelector(".sv-log-btn")?.addEventListener("click", () => this.toggleLog(true));
       this.rootEl.querySelector(".sv-log-close")?.addEventListener("click", () => this.toggleLog(false));
 
-      // ★またね：常駐・押した時だけ発動
       this.byeBtn?.addEventListener("click", (e) => {
         e.stopPropagation();
         this.runByeSequence();
@@ -206,13 +237,11 @@
         if (!this.rootEl || !this.rootEl.isConnected) return;
         if (this.exiting) return;
 
-        // Space: advance（終端でもOK：進めないだけ）
         if (!this.waitingChoice && (e.key === " " || e.code === "Space")) {
           e.preventDefault();
           this.handleAdvance();
         }
 
-        // Esc: ここは “閉じる” ではなく「またね」に統一したいなら有効
         if (e.key === "Escape") {
           e.preventDefault();
           this.runByeSequence();
@@ -253,11 +282,9 @@
       this.preloadForNode(node);
       this.renderNode(node);
 
-      // ★終端判定：到達したら “終端状態” にするだけ（自動またね禁止）
       const isEnd = !!node.end || (!node.next && !this.waitingChoice);
       this.isEndReached = isEnd;
 
-      // Autoは終端なら止める（勝手に閉じない）
       if (this.isEndReached) {
         clearTimeout(this.autoTimer);
         this.autoTimer = null;
@@ -273,7 +300,7 @@
     },
 
     // =========================
-    // Smooth Swap Core
+    // Smooth Swap Core（そのまま）
     // =========================
     swapPortraitImage(portrait, baseEl, topEl, url, ariaLabel) {
       if (!portrait || !baseEl || !topEl || !url) return;
@@ -483,7 +510,6 @@
       });
     },
 
-    // ========== Speaker helpers ==========
     normSpeaker(s) {
       return String(s || "")
         .trim()
@@ -559,15 +585,19 @@
       this.autoBtn?.setAttribute("aria-pressed", "false");
       this.waitingChoice = false;
 
+      // ★ 2回目事故防止：古いbyeタイマーを必ず潰す
+      clearTimeout(this.byeTimer1);
+      clearTimeout(this.byeTimer2);
+      this.byeTimer1 = null;
+      this.byeTimer2 = null;
+
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
         this.logPanel.setAttribute("aria-hidden", "true");
       }
 
-      // dialogue soft switch
       this.dialogueEl?.classList.add("sv-exit");
 
-      // speaker: 画面にいる中からランダム（いなければshiopon）
       const chosen = this.pickByeSpeaker();
       const line = this.pickByeLine(chosen);
 
@@ -581,8 +611,8 @@
       const t1 = this.jitter(this.config.byeDelayMs, 180);
       const t2 = this.config.byeFadeMs;
 
-      setTimeout(() => this.rootEl?.classList.add("sv-fadeout"), t1);
-      setTimeout(() => this.returnToPage(), t1 + t2);
+      this.byeTimer1 = setTimeout(() => this.rootEl?.classList.add("sv-fadeout"), t1);
+      this.byeTimer2 = setTimeout(() => this.returnToPage(), t1 + t2);
     },
 
     jitter(base, range) {
