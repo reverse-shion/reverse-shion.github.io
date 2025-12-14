@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "title": "Shionverse Skit 002",
+    "description": "A cozy moment: tea, tiny mishaps, and gentle teasing in the corridor.",
+    "version": "1.2"
+  },
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "みんなでお茶にしましょう。いい香り。…ふふ、落ち着くでしょ？",
+      "next": "shiopon_jump",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm smile" },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful" }
+      ]
+    },
+
+    "shiopon_jump": {
+      "id": "shiopon_jump",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "わぁ〜！おちゃ…おちゃちゃ…おちゃっ！ティーなの！キラキラ〜☆",
+      "next": "shion_react",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle" },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "excited", "speaking": true, "motion": { "type": "shake", "durationMs": 520, "intensity": "mild" } }
+      ]
+    },
+
+    "shion_react": {
+      "id": "shion_react",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "ふふ。言い直そうとしてる時点で、もう可愛いよ。…熱いから、ゆっくりね。",
+      "next": "lumiere_tease",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "smiling", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "soft-grin", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "lumiere_tease": {
+      "id": "lumiere_tease",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "シオン様が甘いと、しおぽんが調子に乗る。…いつもの法則だね。",
+      "next": "shiopon_counter",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "surprised", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "teasing", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "thinking", "speaking": false }
+      ]
+    },
+
+    "shiopon_counter": {
+      "id": "shiopon_counter",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "ち、ちがうの！の、乗ってないの！…ちょっとだけ、ふわってしただけなの！",
+      "next": "shion_soft",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "thoughtful", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "wondering", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "thinking", "speaking": true, "motion": { "type": "shake", "durationMs": 420, "intensity": "mild" } }
+      ]
+    },
+
+    "shion_soft": {
+      "id": "shion_soft",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "じゃあ…今日は“ふわってした日”ってことにしておこう。リュミエール、香りは何？",
+      "next": "lumiere_explain",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "curious", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "lumiere_explain": {
+      "id": "lumiere_explain",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "星灯りみたいに優しい香り。飲んだ人の“今日の心”が少しだけ軽くなる、ってやつです。",
+      "next": "choice",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "inspired", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful", "speaking": false }
+      ]
+    },
+
+    "choice": {
+      "id": "choice",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "じゃあしおぽんが配る係する〜！どっちの飲み方がいい？うらなっちゃうの〜！",
+      "choices": [
+        { "text": "ゆっくり香りを楽しむ", "next": "slow" },
+        { "text": "元気に一口でいく！", "next": "gulp" }
+      ],
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "excited", "speaking": true, "motion": { "type": "shake" } }
+      ]
+    },
+
+    "slow": {
+      "id": "slow",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "うん。今日は、ゆっくりでいい。香りって…“心の速度”を整えてくれるから。",
+      "next": "wrap",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "relief", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "gulp": {
+      "id": "gulp",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "ふふ。勢いはいいけど…熱いのだけは気をつけて。しおぽん、前もやったよね？",
+      "next": "wrap",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "surprised", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "teasing", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "thinking", "speaking": false }
+      ]
+    },
+
+    "wrap": {
+      "id": "wrap",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "へへ…今日は大丈夫！だってシオンさんとリュミエールがいるもん！ほら、ほのぼの〜☆",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile" },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful", "speaking": true, "motion": { "type": "shake", "durationMs": 520, "intensity": "mild" } }
+      ]
+    }
+  }
+}
