@@ -165,7 +165,21 @@
 
       const overlay = root.querySelector(`.${this.overlayClass}`);
       const panel = overlay?.querySelector(".sv-overlay-panel");
-      const engineRoot = overlay?.querySelector(".sv-engine-root");
+      // open() 内の start 呼び出しをこれに差し替え
+const engineRoot = overlay.querySelector('.sv-engine-root');
+
+const userName =
+  (window.ShioponUserName && String(window.ShioponUserName).trim()) ||
+  (localStorage.getItem("sv_user_name") || "").trim() ||
+  "ゲスト";
+
+await window.SV_SkitEngine.start({
+  rootEl: engineRoot,
+  skitUrl: this.skitUrl,
+  userName,
+  returnMode: "callback",
+  onReturn: () => this.close(),
+});
 
       if (!overlay || !panel || !engineRoot) return;
 
