@@ -1039,3 +1039,22 @@ body.sv-skit-lock{ overflow: hidden; }
     opacity: 0.88;
   }
 }
+
+.sv-talk__lumiere{
+  z-index: 3;              /* 前に出す */
+  opacity: 0.34;           /* 透明度アップ（0.30〜0.42推奨） */
+  pointer-events: none;    /* タップ邪魔しない */
+}
+
+.sv-talk__btn{
+  position: relative;      /* z-index効かせるため */
+  z-index: 2;              /* 画像より下 */
+}
+
+.sv-talk__lumiere{
+  mix-blend-mode: screen;        /* 光として馴染む */
+  filter: saturate(1.08) blur(0.12px);
+}
+.sv-talk{
+  isolation: isolate; /* これで重なりが安定しやすい */
+}
