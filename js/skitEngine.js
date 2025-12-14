@@ -41,6 +41,10 @@
         if (titleEl) titleEl.textContent = data.meta?.title || "Skit Window";
 
         if (this.autoBtn) this.autoBtn.setAttribute("aria-pressed", "false");
+
+        // 先読み（最初の表示を安定させる）
+        this.primePreloadCache(data);
+
         this.gotoNode(data.start);
       } catch (err) {
         this.showError(err?.message || "スキットの読み込みに失敗しました。");
@@ -58,7 +62,6 @@
         this.logPanel.setAttribute("aria-hidden", "true");
       }
 
-      // key handler cleanup
       if (this.keyHandler && this.rootEl) {
         const panel = this.rootEl.closest(".sv-overlay-panel");
         if (panel) panel.removeEventListener("keydown", this.keyHandler, true);
@@ -84,7 +87,9 @@
                 (slot) => `
               <div class="sv-slot" data-slot="${slot}">
                 <div class="sv-portrait" data-character="" data-motion="none">
-                  <div class="sv-face" role="img" aria-label=""></div>
+                  <!-- ★2レイヤー：base=固定 / top=新規（ロード完了後にフェード） -->
+                  <div class="sv-face-base" role="img" aria-label=""></div>
+                  <div class="sv-face-top" aria-hidden="true"></div>
                 </div>
               </div>
             `
@@ -156,8 +161,12 @@
         this.showError("次のシーンが見つかりません。");
         return;
       }
+
       this.currentNode = node;
       this.waitingChoice = Array.isArray(node.choices) && node.choices.length > 0;
+
+      // 次に使いそうな画像を少し先読み（連続切替の体感を上げる）
+      this.preloadForNode(node);
 
       this.renderNode(node);
       this.scheduleAuto();
@@ -166,6 +175,83 @@
     renderNode(node) {
       this.renderCast(node.cast || [], node);
       this.renderDialogue(node);
+    },
+
+    // ============================================================
+    //  Smooth Swap Core
+    //  - base: 常に表示（前画像を固定）
+    //  - top : 新画像をロード完了後にフェードイン → 完了したらbaseへ確定
+    //  - token: 連続切替の競合を破棄（最新のみ採用）
+    // ============================================================
+    swapPortraitImage(portrait, baseEl, topEl, url, ariaLabel) {
+      if (!portrait || !baseEl || !topEl || !url) return;
+
+      const token = (portrait.__svSwapToken = (portrait.__svSwapToken || 0) + 1);
+
+      const currentUrl = baseEl.__svUrl || "";
+      if (currentUrl === url) {
+        if (ariaLabel) baseEl.setAttribute("aria-label", ariaLabel);
+        return;
+      }
+
+      // topへセット（ただしロード完了まで見せない）
+      topEl.style.backgroundImage = `url("${url}")`;
+      topEl.style.backgroundRepeat = "no-repeat";
+      topEl.style.backgroundPosition = "center bottom";
+      topEl.style.backgroundSize = "contain";
+
+      const img = new Image();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.src = url;
+
+      const commit = () => {
+        if (token !== portrait.__svSwapToken) return;
+
+        portrait.classList.add("sv-swapping");
+
+        requestAnimationFrame(() => {
+          if (token !== portrait.__svSwapToken) return;
+
+          const finalize = () => {
+            if (token !== portrait.__svSwapToken) return;
+
+            baseEl.style.backgroundImage = `url("${url}")`;
+            baseEl.style.backgroundRepeat = "no-repeat";
+            baseEl.style.backgroundPosition = "center bottom";
+            baseEl.style.backgroundSize = "contain";
+            baseEl.__svUrl = url;
+
+            if (ariaLabel) baseEl.setAttribute("aria-label", ariaLabel);
+
+            portrait.classList.remove("sv-swapping");
+            topEl.style.backgroundImage = "";
+          };
+
+          // transitionend が来ない環境保険
+          clearTimeout(portrait.__svSwapFallback);
+          portrait.__svSwapFallback = setTimeout(finalize, 260);
+
+          // topのopacity遷移が終わったら確定
+          const onEnd = () => {
+            clearTimeout(portrait.__svSwapFallback);
+            finalize();
+          };
+          topEl.addEventListener("transitionend", onEnd, { once: true });
+        });
+      };
+
+      if (img.complete) {
+        commit();
+      } else {
+        img.onload = commit;
+        img.onerror = () => {
+          if (token !== portrait.__svSwapToken) return;
+          portrait.classList.remove("sv-swapping");
+          topEl.style.backgroundImage = "";
+          // エラー時もbase保持で“消えない”
+        };
+      }
     },
 
     // ====== Cast Rendering (512x512対応) ======
@@ -183,21 +269,27 @@
         if (!slotEl) continue;
 
         const portrait = slotEl.querySelector(".sv-portrait");
-        const faceEl = slotEl.querySelector(".sv-face");
+        const baseEl = slotEl.querySelector(".sv-face-base");
+        const topEl = slotEl.querySelector(".sv-face-top");
         const frame = slotMap[slotName];
 
-        // 非表示
+        // 非表示（仕様は従来通り：visible:false は消す）
         if (!frame || frame.visible === false) {
           slotEl.classList.add("sv-hidden");
           slotEl.classList.remove("sv-speaking", "sv-dimmed");
           if (portrait) {
             portrait.dataset.character = "";
             portrait.dataset.motion = "none";
+            // 競合停止
+            portrait.__svSwapToken = (portrait.__svSwapToken || 0) + 1;
+            portrait.classList.remove("sv-swapping");
           }
-          if (faceEl) {
-            faceEl.style.backgroundImage = "";
-            faceEl.setAttribute("aria-label", "");
+          if (baseEl) {
+            baseEl.style.backgroundImage = "";
+            baseEl.__svUrl = "";
+            baseEl.setAttribute("aria-label", "");
           }
+          if (topEl) topEl.style.backgroundImage = "";
           continue;
         }
 
@@ -206,30 +298,23 @@
 
         const character = (frame.character || "").trim().toLowerCase();
         const expression = (frame.expression || "").trim();
-
         if (portrait) portrait.dataset.character = character;
+
+        // speaking判定
+        const speaking =
+          frame.speaking != null
+            ? !!frame.speaking
+            : (character && character === (node.speaker || "").toLowerCase());
+
+        slotEl.classList.toggle("sv-speaking", speaking);
+        slotEl.classList.toggle("sv-dimmed", !speaking);
 
         // 画像URL
         const url = this.resolvePortraitUrl(character, expression);
+        const label = `${character} ${expression}`.trim();
 
-        if (faceEl) {
-          // 512x512 を「枠に綺麗に収める」基本設定
-          faceEl.style.backgroundImage = `url("${url}")`;
-          faceEl.style.backgroundRepeat = "no-repeat";
-          faceEl.style.backgroundPosition = "center";
-          // ↓ここ重要：切り抜きたくないなら contain / 迫力優先なら cover
-          faceEl.style.backgroundSize = "contain";
-
-          // 画像が見えない時の保険（透明背景想定）
-          faceEl.style.imageRendering = "auto";
-
-          faceEl.setAttribute("aria-label", `${character} ${expression}`.trim());
-        }
-
-        // 話者強調（frame.speaking 優先 → ないなら node.speaker と一致で speaking）
-        const speaking = frame.speaking != null ? !!frame.speaking : (character && character === (node.speaker || "").toLowerCase());
-        slotEl.classList.toggle("sv-speaking", speaking);
-        slotEl.classList.toggle("sv-dimmed", !speaking);
+        // ★消さずにクロスフェード（前画像固定→上に新規）
+        this.swapPortraitImage(portrait, baseEl, topEl, url, label);
 
         // モーション
         this.applyMotion(portrait, frame.motion);
@@ -275,49 +360,49 @@
 
     // ====== Dialogue / Choices ======
     renderDialogue(node) {
-  const speaker = node.speaker || "Narration";
-  const text = node.text || "";
+      const speaker = node.speaker || "Narration";
+      const text = node.text || "";
 
-  // 文字の正規化：記号/括弧/アクセント差を吸収
-  const norm = (s) => String(s || "")
-    .trim()
-    .toLowerCase()
-    .normalize("NFKD")                 // é 等を分解
-    .replace(/[\u0300-\u036f]/g, "")   // 分解した濁点/アクセント除去
-    .replace(/[（）()【】\[\]「」『』]/g, " ")
-    .replace(/\s+/g, " ");
+      // 文字の正規化：記号/括弧/アクセント差を吸収
+      const norm = (s) =>
+        String(s || "")
+          .trim()
+          .toLowerCase()
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[（）()【】\[\]「」『』]/g, " ")
+          .replace(/\s+/g, " ");
 
-  const raw = norm(node.speaker);
+      const raw = norm(node.speaker);
 
-  const speakerId =
-    raw.includes("shiopon") || raw.includes("しおぽん") ? "shiopon" :
-    raw.includes("shioriel") || raw.includes("しおりえる") || raw.includes("シオリエル") ? "shioriel" :
-    raw.includes("lumiere") || raw.includes("りゅみえーる") || raw.includes("リュミエール") ? "lumiere" :
-    "narration";
+      const speakerId =
+        raw.includes("shiopon") || raw.includes("しおぽん") ? "shiopon" :
+        raw.includes("shioriel") || raw.includes("しおりえる") || raw.includes("シオリエル") ? "shioriel" :
+        raw.includes("lumiere") || raw.includes("りゅみえーる") || raw.includes("リュミエール") ? "lumiere" :
+        "narration";
 
-  // #sv-skit（最強スコープ）へ付与
-  const host = document.getElementById("sv-skit");
-  if (host) host.setAttribute("data-speaker-id", speakerId);
+      // 最強スコープに付与（CSSで拾える）
+      const host = document.getElementById("sv-skit");
+      if (host) host.setAttribute("data-speaker-id", speakerId);
 
-  // 念のため dialogue / name にも付与
-  this.dialogueEl?.setAttribute("data-speaker-id", speakerId);
-  this.nameEl?.setAttribute("data-speaker-id", speakerId);
+      this.dialogueEl?.setAttribute("data-speaker-id", speakerId);
+      this.nameEl?.setAttribute("data-speaker-id", speakerId);
 
-  // 表示
-  if (this.nameEl) this.nameEl.textContent = speaker;
-  if (this.textEl) this.textEl.textContent = text;
+      if (this.nameEl) this.nameEl.textContent = speaker;
+      if (this.textEl) this.textEl.textContent = text;
 
-  if (!this.waitingChoice) {
-    if (this.choicesEl) {
-      this.choicesEl.hidden = true;
-      this.choicesEl.innerHTML = "";
-    }
-    this.log.push({ speaker, text });
-    this.refreshLog();
-  } else {
-    this.renderChoices(node.choices || []);
-  }
-},
+      if (!this.waitingChoice) {
+        if (this.choicesEl) {
+          this.choicesEl.hidden = true;
+          this.choicesEl.innerHTML = "";
+        }
+        this.log.push({ speaker, text });
+        this.refreshLog();
+      } else {
+        this.renderChoices(node.choices || []);
+      }
+    },
+
     renderChoices(choices) {
       if (!this.choicesEl) return;
 
@@ -403,6 +488,52 @@
         row.appendChild(tx);
         this.logBody.appendChild(row);
       });
+    },
+
+    // ====== Preload Helpers ======
+    _preloadCache: new Map(),
+
+    preloadImage(url) {
+      if (!url) return;
+      if (this._preloadCache.has(url)) return;
+
+      const img = new Image();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.src = url;
+
+      this._preloadCache.set(url, img);
+    },
+
+    preloadForNode(node) {
+      const cast = Array.isArray(node?.cast) ? node.cast : [];
+      for (const frame of cast) {
+        if (!frame || frame.visible === false) continue;
+        const c = (frame.character || "").trim().toLowerCase();
+        const e = (frame.expression || "").trim();
+        const url = this.resolvePortraitUrl(c, e);
+        this.preloadImage(url);
+      }
+
+      // 次ノードが分かるなら、軽く先読み
+      const nextId = node?.next;
+      if (nextId && this.nodes[nextId]) {
+        const nextNode = this.nodes[nextId];
+        const nextCast = Array.isArray(nextNode?.cast) ? nextNode.cast : [];
+        for (const frame of nextCast) {
+          if (!frame || frame.visible === false) continue;
+          const c = (frame.character || "").trim().toLowerCase();
+          const e = (frame.expression || "").trim();
+          const url = this.resolvePortraitUrl(c, e);
+          this.preloadImage(url);
+        }
+      }
+    },
+
+    primePreloadCache(data) {
+      // 最低限：startノード＋その次ノードのcastだけ先読み
+      const startNode = data?.nodes?.[data.start];
+      if (startNode) this.preloadForNode(startNode);
     },
 
     // ====== Error ======
