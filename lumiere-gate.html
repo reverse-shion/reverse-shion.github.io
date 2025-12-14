@@ -712,12 +712,12 @@
           "またひとつ、静かな光が灯りました。"
         ],
         "conversation": [
-          "今日は……少し話してもいい？",
-          "最近ね……星たちが、少しだけざわめいているの。",
-          "でも、大丈夫。あなた様が来てくれると、",
-          "この間は……なんだか落ち着くの。",
-          "疲れたら、いつでもここで休んでくださいね。"
-        ]
+  "……{nameWithHonor}。今日は……少し話してもいい？",
+  "最近ね……星たちが、少しだけざわめいているの。",
+  "でも、大丈夫。あなた様が来てくれると、",
+  "この間は……なんだか落ち着くの。",
+  "疲れたら、いつでもここで休んでくださいね。"
+]
       };
 
       let externalLines = {};
@@ -1046,17 +1046,19 @@
 
       /* --------------- 会話モード --------------- */
       const startConversation = () => {
-        isConversation = true;
-        menu.classList.remove("is-visible");
+  isConversation = true;
+  menu.classList.remove("is-visible");
 
-        showBust();
-        setExpression("smile");
+  showBust();
+  setExpression("smile");
 
-        playLines(injectName(getLines("conversation")), () => {
-          endConversation();
-        });
-      };
+  // ✅ ここで毎回「最新の名前」を取り直して差し込む
+  const lines = injectName(getLines("conversation"));
 
+  playLines(lines, () => {
+    endConversation();
+  });
+};
       const endConversation = () => {
         isConversation = false;
         setExpression("neutral");
