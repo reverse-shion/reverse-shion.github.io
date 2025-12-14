@@ -1,10 +1,12 @@
 /* ============================================================
-   Shionverse Skit UI — FINAL (Clean + Best Layout)
-   - 3人同席 / キャラ上・セリフ下（被りゼロ）
-   - UIはミニマル（閉じるは背景タップでJS側）
-   - 512x512画像に最適
+   SV SKIT — PERFECT MINIMAL (Images + Dialogue only)
+   - 余計な箱/面/背景を撤去
+   - 画像は“目線位置”に固定（上段）
+   - セリフはその直下（下段）
+   - 512x512想定 / 3人同席
 ============================================================ */
 
+/* ---- Root ---- */
 #sv-skit{
   position: fixed;
   inset: 0;
@@ -14,32 +16,7 @@
 }
 #sv-skit *{ box-sizing: border-box; }
 
-/* 起動ボタン（必要なら） */
-#sv-skit .sv-launch-btn{
-  pointer-events: auto;
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  background: rgba(20,24,39,.86);
-  color: #f4f5ff;
-  border: 1px solid rgba(255,255,255,.20);
-  border-radius: 999px;
-  padding: 12px 18px;
-  font-size: 14px;
-  letter-spacing: .03em;
-  cursor: pointer;
-  box-shadow: 0 10px 26px rgba(0,0,0,.35);
-  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
-}
-#sv-skit .sv-launch-btn:hover,
-#sv-skit .sv-launch-btn:focus-visible{
-  transform: translateY(-2px);
-  background: rgba(39,50,78,.95);
-  box-shadow: 0 14px 34px rgba(0,0,0,.45);
-  outline: none;
-}
-
-/* overlay */
+/* ---- Overlay ---- */
 #sv-skit .sv-overlay{
   position: fixed;
   inset: 0;
@@ -49,160 +26,178 @@
 }
 #sv-skit .sv-overlay.sv-hidden{ display: none; }
 
+/* 背景は“薄く”だけ（ページが見える前提） */
 #sv-skit .sv-overlay-backdrop{
   position: absolute;
   inset: 0;
-  background: rgba(5,7,12,.22);
-  backdrop-filter: blur(1.2px) saturate(1.08);
+  background: rgba(5,7,12,.16);
+  backdrop-filter: blur(1px) saturate(1.05);
 }
 
-/* “箱”は消してページに溶ける。中身はレイアウト基準として残す */
+/* ---- Panel = 箱を作らない / レイアウトの器だけ ---- */
 #sv-skit .sv-overlay-panel{
   position: relative;
-  width: min(960px, 96vw);
-  height: min(640px, 92vh);
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.10);
-  background:
-    radial-gradient(circle at 18% 18%, rgba(180,220,255,.18), transparent 46%),
-    radial-gradient(circle at 78% 38%, rgba(230,180,255,.14), transparent 44%),
-    linear-gradient(160deg, rgba(22,26,40,.30) 0%, rgba(10,12,18,.26) 100%);
-  box-shadow: 0 18px 68px rgba(0,0,0,.34);
-  overflow: hidden;
+  width: min(980px, 96vw);
+  height: min(720px, 92vh);
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  overflow: visible;
   pointer-events: auto;
 }
 
-/* 余計なヘッダーUIは使わない前提 */
+/* 使わないUIは完全に消す */
 #sv-skit .sv-overlay-header,
 #sv-skit .sv-topbar,
 #sv-skit .sv-controls,
 #sv-skit .sv-log-panel,
-#sv-skit .sv-hint{
+#sv-skit .sv-hint,
+#sv-skit .sv-launch-btn{
   display: none !important;
 }
 
-/* body */
+/* ---- Body ---- */
 #sv-skit .sv-overlay-body{
   height: 100%;
-  padding: 14px;
-  pointer-events: auto;
+  padding: 0;
 }
 
 /* ============================================================
-   ★ここが核心：上下2段グリッド（被りゼロ）
+   Layout: 2 rows (images / dialogue)
+   余白ゼロ、被りゼロ
 ============================================================ */
 #sv-skit .sv-shell{
   height: 100%;
   display: grid;
-  grid-template-rows: 1fr auto;   /* 上=キャラ / 下=セリフ */
-  gap: 12px;
+  grid-template-rows: 1fr auto;
+  gap: 0;
 }
 
-/* =========================
-   STAGE（キャラ3人）
-========================= */
+/* ============================================================
+   Images (Stage)
+   “目線位置”へ：上段の中で中央より少し上
+============================================================ */
 #sv-skit .sv-stage{
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.10);
-  overflow: hidden;
-  padding: 14px 14px 10px;
+  /* 余計な面を完全撤去 */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  margin: 0;
+  padding: 0;
+
   display: grid;
   grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 12px;
+  gap: clamp(6px, 1.6vw, 12px);
   align-items: end;
 
-  background:
-    radial-gradient(circle at 22% 18%, rgba(170,220,255,.26), transparent 52%),
-    radial-gradient(circle at 82% 42%, rgba(230,180,255,.20), transparent 48%),
-    linear-gradient(180deg, rgba(30,36,56,.28) 0%, rgba(10,12,18,.20) 100%);
+  /* ここが目線位置の要：上段を“固定高”にして、少し上へ */
+  height: min(46vh, 360px);
+  align-self: center;
+  transform: translateY(-5vh);
 }
 
-/* slot */
+/* Slot */
 #sv-skit .sv-slot{
   height: 100%;
-  min-height: 240px;
+  min-height: 0;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  transition: transform .25s ease, opacity .25s ease, filter .25s ease;
-}
-#sv-skit .sv-slot.sv-hidden{
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
+
+  /* うっすら面が出るのを防止 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
-/* portrait（枠は薄く、画像が主役） */
+/* Portrait = 画像を載せる最小の“縁”だけ（面は作らない） */
 #sv-skit .sv-portrait{
   width: 100%;
   height: 100%;
   max-width: 280px;
+
+  /* ★ここが“うっすらエリア残り”対策の核心 */
+  background: transparent;     /* 面を作らない */
+  border: none;                /* 枠も消す（必要なら後述でON） */
+  box-shadow: none;            /* 影も消す（必要なら speaking だけ付ける） */
+
   border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-  box-shadow: 0 14px 34px rgba(0,0,0,.32);
   overflow: hidden;
+
   position: relative;
 }
-
-/* キャラ名ラベル不要なら完全に消す */
 #sv-skit .sv-portrait::before{ content: "" !important; }
 
-/* 画像（background-image前提） */
+/* Face */
 #sv-skit .sv-face{
   width: 100%;
   height: 100%;
+  display: block;
+
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center bottom;
-  filter: saturate(1.06) contrast(1.03);
 }
 
-/* speaking / dimmed（“光”だけで演出） */
+/* Speaking = “存在感”だけ足す（箱を作らない光） */
 #sv-skit .sv-slot.sv-speaking{
   transform: translateY(-6px) scale(1.02);
 }
 #sv-skit .sv-slot.sv-speaking .sv-portrait{
-  border-color: rgba(200,235,255,.28);
-  box-shadow: 0 18px 44px rgba(0,0,0,.34);
+  /* 面ではなく“光の縁”だけ */
+  filter: brightness(1.04) saturate(1.03);
+  box-shadow: 0 10px 28px rgba(130,175,255,.25);
 }
+
+/* Dimmed */
 #sv-skit .sv-slot.sv-dimmed{
-  opacity: .88;
+  opacity: .86;
   filter: saturate(.92) brightness(.98);
 }
 
-/* =========================
-   DIALOGUE（セリフ）
-   → 下段に居るので、被りが起きない
-========================= */
+/* ============================================================
+   Dialogue (下段)
+   画像の直下 / 余白ゼロ / 読みやすさだけ確保
+============================================================ */
 #sv-skit .sv-dialogue{
-  border-radius: 18px;
+  margin: 0;
   padding: 14px 16px 16px;
+
   min-height: 132px;
+  border-radius: 18px;
+
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(160,205,255,.42);
+  box-shadow: 0 12px 30px rgba(0,0,0,.18), 0 0 0 1px rgba(255,255,255,.40) inset;
+
   display: flex;
   flex-direction: column;
   gap: 8px;
-  cursor: pointer;
 
-  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(246,249,255,.88));
-  border: 1px solid rgba(160,205,255,.42);
-  box-shadow: 0 12px 30px rgba(0,0,0,.18), 0 0 0 1px rgba(255,255,255,.40) inset;
+  cursor: pointer;
 }
 
 #sv-skit .sv-name{
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   width: fit-content;
   padding: 5px 12px;
+
   border-radius: 999px;
-  background: rgba(130,175,255,.22);
-  border: 1px solid rgba(130,175,255,.40);
+  background: rgba(130,175,255,.18);
+  border: 1px solid rgba(130,175,255,.34);
   color: rgba(10,12,18,.92);
+
   font-weight: 700;
   font-size: 13px;
   letter-spacing: .04em;
 }
+
 #sv-skit .sv-text{
   color: rgba(10,12,18,.92);
   font-size: 16px;
@@ -217,20 +212,22 @@
   margin-top: 6px;
 }
 #sv-skit .sv-choice-btn{
-  background: rgba(255,255,255,.86);
-  border: 1px solid rgba(160,205,255,.36);
+  background: rgba(255,255,255,.90);
+  border: 1px solid rgba(160,205,255,.34);
   color: rgba(10,12,18,.88);
+
   border-radius: 14px;
   padding: 12px 12px;
   text-align: left;
+
   cursor: pointer;
   transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
 #sv-skit .sv-choice-btn:hover,
 #sv-skit .sv-choice-btn:focus-visible{
   transform: translateY(-1px);
-  background: rgba(255,255,255,.96);
-  border-color: rgba(130,175,255,.56);
+  background: rgba(255,255,255,.98);
+  border-color: rgba(130,175,255,.52);
   outline: none;
 }
 
@@ -246,175 +243,36 @@
 }
 #sv-skit .sv-motion-zoomIn{ animation: sv-zoomIn .6s ease; }
 @keyframes sv-zoomIn{
-  0%{ transform: scale(.95); opacity: .6; }
+  0%{ transform: scale(.95); opacity: .65; }
   100%{ transform: scale(1); opacity: 1; }
 }
 
-/* lock */
 body.sv-skit-lock{ overflow: hidden; }
 
-/* mobile */
+/* ============================================================
+   Mobile tuning
+   - 目線位置を上げすぎない
+   - 画像を少しだけ大きく見せる
+============================================================ */
 @media (max-width: 720px){
   #sv-skit .sv-overlay-panel{
     width: 96vw;
     height: 92vh;
-    border-radius: 16px;
   }
-  #sv-skit .sv-overlay-body{ padding: 10px; }
-  #sv-skit .sv-shell{ gap: 10px; }
+
   #sv-skit .sv-stage{
-    padding: 10px 10px 8px;
+    height: min(44vh, 320px);
+    transform: translateY(-3.5vh);
     gap: 8px;
-  }
-  #sv-skit .sv-slot{ min-height: 200px; }
-  #sv-skit .sv-portrait{ max-width: 240px; border-radius: 16px; }
-  #sv-skit .sv-dialogue{ border-radius: 16px; }
-  #sv-skit .sv-text{ font-size: 15.5px; line-height: 1.7; }
-}
-
-/* ============================================================
-   SV SKIT — Minimal: "Images + Dialogue only"
-   - 余計な箱/余白/背景を撤去
-   - 画像は目線位置へ（上寄せ気味のセンター）
-   - セリフはその下（被りゼロ）
-============================================================ */
-
-#sv-skit .sv-overlay-panel{
-  /* “箱”を消す */
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-
-  /* 画面を最大限使う（ただし左右は少しだけ余白） */
-  width: min(980px, 96vw) !important;
-  height: min(720px, 92vh) !important;
-}
-
-#sv-skit .sv-overlay-body{
-  /* 内側余白をゼロにして、余計な空白を無くす */
-  padding: 0 !important;
-  height: 100% !important;
-}
-
-/* 2段だけ：上=画像、下=セリフ */
-#sv-skit .sv-shell{
-  height: 100% !important;
-  display: grid !important;
-  grid-template-rows: 1fr auto !important;
-  gap: 0 !important; /* 余白ゼロ */
-}
-
-/* -------------------------
-   画像エリア（上段）
--------------------------- */
-#sv-skit .sv-stage{
-  /* 背景/枠を消して“画像枠だけ”に */
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-
-  /* 余白を削る */
-  padding: 0 !important;
-  margin: 0 !important;
-
-  /* 画像を目線位置へ：少し上寄せで中央に置く */
-  align-self: center !important;
-  transform: translateY(-6vh) !important; /* ←ここが“目線調整”の主役（-4〜-10vhで調整） */
-
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: clamp(6px, 1.5vw, 12px) !important;
-  align-items: end !important;
-
-  /* 上段の高さを“絵に寄せる” */
-  height: min(46vh, 360px) !important; /* ←キャラ領域。大きくしたいなら 50vh */
-}
-
-/* slotは下寄せ */
-#sv-skit .sv-slot{
-  height: 100% !important;
-  min-height: 0 !important;
-  display: flex !important;
-  align-items: flex-end !important;
-  justify-content: center !important;
-}
-
-/* 画像“枠”だけ見せる（今の丸角は維持） */
-#sv-skit .sv-portrait{
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 280px !important;
-
-  border-radius: 18px !important;
-  border: 1px solid rgba(255,255,255,.18) !important;
-  background: rgba(255,255,255,.06) !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,.22) !important;
-
-  overflow: hidden !important;
-}
-#sv-skit .sv-portrait::before{ content: "" !important; }
-
-/* 512x512を自然に下寄せ */
-#sv-skit .sv-face{
-  width: 100% !important;
-  height: 100% !important;
-  background-size: contain !important;
-  background-repeat: no-repeat !important;
-  background-position: center bottom !important;
-}
-
-/* 話者の強調だけ残す（UI感を増やさない） */
-#sv-skit .sv-slot.sv-speaking{
-  transform: translateY(-6px) scale(1.02) !important;
-}
-#sv-skit .sv-slot.sv-dimmed{
-  opacity: .88 !important;
-  filter: saturate(.92) brightness(.98) !important;
-}
-
-/* -------------------------
-   セリフ（下段）
--------------------------- */
-#sv-skit .sv-dialogue{
-  /* 余白を最小化して“下にぴったり” */
-  margin: 0 !important;
-
-  /* 下段として固定の高さ感（余白が暴れない） */
-  min-height: 132px !important;
-
-  /* 余計な下の空白が出るのを防ぐ */
-  border-radius: 18px !important;
-
-  /* セリフだけは読みやすく */
-  background: rgba(255,255,255,.92) !important;
-  border: 1px solid rgba(160,205,255,.42) !important;
-  box-shadow: 0 12px 30px rgba(0,0,0,.18), 0 0 0 1px rgba(255,255,255,.40) inset !important;
-
-  padding: 14px 16px 16px !important;
-}
-
-/* スマホ：目線位置を少し下げる（上げすぎ防止） */
-@media (max-width: 720px){
-  #sv-skit .sv-overlay-panel{
-    width: 96vw !important;
-    height: 92vh !important;
-  }
-
-  #sv-skit .sv-stage{
-    height: min(44vh, 320px) !important;
-    transform: translateY(-4vh) !important; /* ←スマホは控えめに */
-    gap: 8px !important;
   }
 
   #sv-skit .sv-portrait{
-    max-width: 240px !important;
-    border-radius: 16px !important;
+    max-width: 240px;
+    border-radius: 16px;
   }
 
   #sv-skit .sv-text{
-    font-size: 15.5px !important;
-    line-height: 1.7 !important;
+    font-size: 15.5px;
+    line-height: 1.7;
   }
 }
