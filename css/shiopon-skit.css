@@ -564,3 +564,36 @@ body.sv-skit-lock{ overflow: hidden; }
   background: rgba(130,175,255,.22) !important;
   border-color: rgba(130,175,255,.40) !important;
 }
+
+
+/* =========================
+   Smooth swap (no blank)
+   画像2レイヤー：base(固定) + top(新規)
+========================= */
+#sv-skit .sv-portrait{
+  position: relative;         /* 重ねるため */
+  overflow: hidden;
+}
+
+/* base/top 共通 */
+#sv-skit .sv-face-base,
+#sv-skit .sv-face-top{
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  will-change: opacity;
+}
+
+/* 上レイヤー（新規） */
+#sv-skit .sv-face-top{
+  opacity: 0;
+  transition: opacity 160ms ease;
+  pointer-events: none;
+}
+
+/* 画像差し替え中：上をフェードイン */
+#sv-skit .sv-portrait.sv-swapping .sv-face-top{
+  opacity: 1;
+}
