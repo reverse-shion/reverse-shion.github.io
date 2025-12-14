@@ -597,3 +597,44 @@ body.sv-skit-lock{ overflow: hidden; }
 #sv-skit .sv-portrait.sv-swapping .sv-face-top{
   opacity: 1;
 }
+
+/* 2レイヤー切替：topがフェードインする */
+.sv-portrait { position: relative; }
+.sv-face-base, .sv-face-top{
+  position:absolute; inset:0;
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+}
+.sv-face-top{
+  opacity:0;
+  transition: opacity 0.22s ease-out;
+  pointer-events:none;
+}
+.sv-portrait.sv-swapping .sv-face-top{ opacity:1; }
+
+/* またね常駐 */
+.sv-bye-btn{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+}
+
+/* セリフふわっと切替 */
+.sv-dialogue.sv-exit{
+  animation: svDialogueExit 0.25s ease-out;
+}
+@keyframes svDialogueExit{
+  from{ opacity:1; transform:translateY(0); }
+  to  { opacity:0.92; transform:translateY(4px); }
+}
+
+/* 全体フェードアウト */
+.sv-fadeout{
+  animation: svFadeOut 0.42s ease-in forwards;
+}
+@keyframes svFadeOut{
+  from{ opacity:1; }
+  to  { opacity:0; }
+}
