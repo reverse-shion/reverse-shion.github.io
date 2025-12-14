@@ -671,3 +671,43 @@ body.sv-skit-lock{ overflow: hidden; }
 
 .sv-bye-btn:hover{ transform: translateY(-1px); }
 .sv-bye-btn:active{ transform: translateY(0px) scale(.98); }
+
+
+/* コメント（セリフ）エリアを基準にする */
+.sv-dialogue{
+  position: relative;
+}
+
+/* またねボタン：コメントエリアのすぐ右下 */
+.sv-dialogue-actions{
+  position: absolute;
+  right: 12px;          /* 吹き出し右端に寄せる */
+  bottom: -18px;        /* 吹き出しの「外側」下に少し出す */
+  z-index: 10;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* またねボタンの見た目（調整用） */
+.sv-bye-btn{
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+
+  /* 既存テーマに合わせて */
+  background: rgba(80,120,255,.9);
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,.18);
+}
+
+/* モバイル微調整 */
+@media (max-width: 480px){
+  .sv-dialogue-actions{
+    right: 10px;
+    bottom: -16px;
+  }
+}
