@@ -714,32 +714,31 @@ body.sv-skit-lock{ overflow: hidden; }
 
 
 /* =========================
-   Shionverse Talk Button (Clean v1)
+   Shionverse Talk Button (Final)
    ========================= */
 :root{
   --sv-talk-left: 16px;
   --sv-talk-bottom: 20px;
 
   --sv-btn-h: clamp(46px, 6.2vh, 56px);
-  --sv-btn-pad-x: clamp(16px, 4.2vw, 22px);
-  --sv-btn-minw: 156px;
+  --sv-btn-pad-x: clamp(18px, 4.6vw, 24px);
+  --sv-btn-minw: 164px;
 
   --sv-text: #F6F3FF;
   --sv-border: rgba(246, 243, 255, 0.42);
 
-  --sv-bg-1: #0a0b18;
-  --sv-bg-2: #1b1440;
-  --sv-bg-3: #3a2b73;
+  --sv-bg-1: #070813;
+  --sv-bg-2: #17103A;
+  --sv-bg-3: #34246B;
 
-  --sv-glow: rgba(196, 170, 255, 0.35);
-  --sv-glow-2: rgba(255, 236, 190, 0.20);
+  --sv-glow: rgba(196, 170, 255, 0.34);
+  --sv-glow-2: rgba(255, 236, 190, 0.22);
 
-  --sv-lumiere-opacity: 0.18; /* 0.15〜0.25 */
+  /* ここを上げる：認識できる“気配” */
+  --sv-lumiere-opacity: 0.28; /* 0.24〜0.34 推奨 */
 }
 
-/* =========================
-   Mount（fixedはここだけ）
-   ========================= */
+/* mount（fixedはここだけ） */
 .sv-talk-mount{
   position: fixed;
   left: var(--sv-talk-left);
@@ -748,78 +747,32 @@ body.sv-skit-lock{ overflow: hidden; }
 
   opacity: 0;
   transform: translateY(6px);
-  transition: opacity 260ms ease, transform 260ms ease;
-  pointer-events: none; /* readyになったら有効化 */
+  transition: opacity 240ms ease, transform 240ms ease;
+  pointer-events: none;
+  -webkit-transform: translateZ(0);
+  will-change: opacity, transform;
 }
-
 .sv-talk-mount--ready{
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
-
-.sv-talk-mount--loading{
-  opacity: 0;
-}
-
-/* iOS safe area */
 @supports (padding: max(0px)){
   .sv-talk-mount{
-    bottom: calc(var(--sv-talk-bottom) + env(safe-area-inset-bottom));
     left: calc(var(--sv-talk-left) + env(safe-area-inset-left));
+    bottom: calc(var(--sv-talk-bottom) + env(safe-area-inset-bottom));
   }
 }
 
-/* =========================
-   Wrapper（中身はrelative）
-   ========================= */
+/* wrapper */
 .sv-talk{
   position: relative;
   display: inline-block;
-  pointer-events: none; /* ボタンだけ押せる */
 }
 
-/* =========================
-   Lumiere bubble（丸抜き）
-   ========================= */
-.sv-talk__lumiere{
-  position: absolute;
-  left: -10px;
-  bottom: calc(var(--sv-btn-h) - 12px);
-
-  width: clamp(108px, 26vw, 160px);
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-
-  opacity: var(--sv-lumiere-opacity);
-  border-radius: 999px;
-  overflow: hidden;
-
-  /* “光の向こう” */
-  filter: saturate(1.06) blur(0.15px);
-  transform: translateZ(0);
-  user-select: none;
-  pointer-events: none;
-
-  /* 円形らしさ（縁＋内側のふわ） */
-  box-shadow:
-    0 10px 24px rgba(0,0,0,0.06),
-    0 0 0 1px rgba(255,255,255,0.10) inset,
-    0 0 28px rgba(255, 236, 190, 0.12);
-}
-
-/* 画像が四角に見えるのを完全に潰す保険（Safari対策） */
-.sv-talk__lumiere{
-  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%);
-}
-
-/* =========================
-   Button（文字が絶対はみ出ない）
-   ========================= */
+/* ===== ボタン本体 ===== */
 .sv-talk__btn{
-  pointer-events: auto;
   position: relative;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -833,14 +786,8 @@ body.sv-skit-lock{ overflow: hidden; }
   border: 1px solid var(--sv-border);
   color: var(--sv-text);
 
-  /* はみ出し封印 */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1;
-
   background:
-    radial-gradient(120% 140% at 20% 20%, rgba(255,255,255,0.08), transparent 55%),
+    radial-gradient(120% 140% at 20% 20%, rgba(255,255,255,0.10), transparent 55%),
     linear-gradient(135deg, var(--sv-bg-1), var(--sv-bg-2) 55%, var(--sv-bg-3));
 
   box-shadow:
@@ -848,31 +795,77 @@ body.sv-skit-lock{ overflow: hidden; }
     0 0 0 1px rgba(255,255,255,0.06) inset,
     0 0 18px var(--sv-glow);
 
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
+  /* 文字は絶対はみ出さない */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
 
-  transform-origin: 20% 80%;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  /* iOS “反応遅い感”対策 */
+  touch-action: manipulation;
+
+  /* 呼吸：控えめ */
+  transform-origin: 18% 80%;
   animation: svBreath 3.8s ease-in-out infinite;
 }
 
-/* Icon */
+/* リュミエール：ボタンに“被せて一体化” */
+.sv-talk__lumiere{
+  position: absolute;
+  left: -12px;                 /* ボタンの左から少しはみ出す */
+  top: 50%;
+  transform: translateY(-50%);
+  width: calc(var(--sv-btn-h) + 18px);
+  height: calc(var(--sv-btn-h) + 18px);
+
+  object-fit: cover;
+  border-radius: 999px;
+
+  opacity: var(--sv-lumiere-opacity);
+
+  /* “光の向こうで待ってる” */
+  filter: saturate(1.06) blur(0.18px);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.10),
+    0 0 0 1px rgba(255,255,255,0.12) inset,
+    0 0 26px rgba(255,236,190,0.16);
+
+  /* 画像が四角に見えるSafari保険 */
+  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%);
+  clip-path: circle(50% at 50% 50%);
+
+  pointer-events: none;
+  user-select: none;
+
+  z-index: 0; /* 文字より後ろ */
+}
+
+/* ボタンの中身を前に出す */
+.sv-talk__icon,
+.sv-talk__label{
+  position: relative;
+  z-index: 1;
+}
 .sv-talk__icon{
   flex: 0 0 auto;
   font-size: 14px;
-  line-height: 1;
   opacity: 0.95;
   text-shadow: 0 0 10px rgba(255,255,255,0.18);
 }
-
-/* Label（縮みすぎ防止） */
 .sv-talk__label{
   flex: 0 1 auto;
   font-size: clamp(14px, 3.6vw, 16px);
   letter-spacing: 0.02em;
   text-shadow: 0 0 14px rgba(255,255,255,0.14);
+
+  /* リュミエール分の余白を確保（はみ出し防止の要） */
+  padding-left: calc(var(--sv-btn-h) * 0.42);
 }
 
-/* Hover */
+/* hover（PC） */
 @media (hover:hover){
   .sv-talk__btn:hover{
     box-shadow:
@@ -884,21 +877,21 @@ body.sv-skit-lock{ overflow: hidden; }
   }
 }
 
-/* Tap / Active: 静かな反応 */
+/* Tap / Active：静かな反応（iOS含む） */
 .sv-talk__btn:active{
   transform: translateY(1px) scale(0.985);
 }
 
-/* gentle shimmer */
+/* しずかな“光の波紋” */
 .sv-talk__btn::after{
   content:"";
   position:absolute;
   inset:-2px;
   border-radius:999px;
-  background: radial-gradient(120px 60px at 30% 50%, rgba(255,255,255,0.20), transparent 70%);
+  background: radial-gradient(140px 70px at 30% 50%, rgba(255,255,255,0.18), transparent 72%);
   opacity: 0;
   transform: translateX(-18px);
-  transition: opacity 220ms ease, transform 420ms ease;
+  transition: opacity 200ms ease, transform 420ms ease;
   pointer-events:none;
 }
 .sv-talk__btn:active::after{
@@ -906,10 +899,48 @@ body.sv-skit-lock{ overflow: hidden; }
   transform: translateX(18px);
 }
 
-/* Breath */
+/* 呼吸 */
 @keyframes svBreath{
-  0%, 100%{ transform: scale(1); }
-  50%{ transform: scale(1.02); }
+  0%, 100%{ transform: translateZ(0) scale(1); }
+  50%{ transform: translateZ(0) scale(1.02); }
+}
+
+/* =========================
+   iOS Safari “青枠”を消す（タッチ環境のみ）
+   ========================= */
+@media (hover: none) and (pointer: coarse){
+  #sv-skit .sv-overlay-panel:focus,
+  #sv-skit .sv-overlay-panel:focus-visible{
+    outline: none !important;
+    box-shadow: none; /* フォーカスで増える枠も潰す */
+  }
+}
+
+/* =========================
+   Safari特有ゾーン：白チラ / ブラーずれ / タップ
+   ========================= */
+
+/* 白チラ：オーバーレイに“最初から”背景色を与える */
+#sv-skit .sv-overlay{
+  background: rgba(6, 7, 18, 0.30); /* 透明でも“白にならない”土台 */
+  -webkit-transform: translateZ(0);
+  will-change: opacity, transform;
+}
+
+/* ブラーの瞬間ズレ：backdrop-filterの対象を安定させる */
+#sv-skit .sv-overlay-backdrop{
+  background: rgba(6, 7, 18, 0.36);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transform: translateZ(0);
+  will-change: backdrop-filter;
+}
+
+/* iOSだけタップが“遅く感じる”対策 */
+#sv-skit button,
+#sv-skit .sv-talk__btn{
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =========================
@@ -919,13 +950,11 @@ body.sv-skit-lock{ overflow: hidden; }
   :root{
     --sv-talk-left: 14px;
     --sv-talk-bottom: 18px;
-    --sv-lumiere-opacity: 0.17;
-    --sv-btn-minw: 148px;
+    --sv-btn-minw: 154px;
+    --sv-lumiere-opacity: 0.30;
   }
-
   .sv-talk__lumiere{
-    width: clamp(104px, 30vw, 150px);
-    bottom: calc(var(--sv-btn-h) - 12px);
+    left: -10px;
   }
 }
 
@@ -934,4 +963,79 @@ body.sv-skit-lock{ overflow: hidden; }
   .sv-talk__btn{ animation: none; }
   .sv-talk__btn::after{ transition: none; }
   .sv-talk-mount{ transition: none; }
+}
+
+/* =========================
+   Star Iris Accent (Add-on)
+   - left-side only
+   ========================= */
+
+/* ボタン内：左側に“星雲”を薄く敷く（リュミエールと馴染ませる） */
+.sv-talk__btn{
+  isolation: isolate; /* 重なりを安定させる */
+}
+
+/* 左側の虹彩グラデ（紫→青）＋星粒 */
+.sv-talk__btn::before{
+  content:"";
+  position:absolute;
+  inset: 0;
+  border-radius: 999px;
+  pointer-events:none;
+
+  /* 左側に寄せた多層：紫×青×金の気配 */
+  background:
+    radial-gradient(180px 110px at 18% 55%, rgba(170,120,255,0.22), transparent 70%),
+    radial-gradient(160px 110px at 28% 45%, rgba(90,170,255,0.18), transparent 72%),
+    radial-gradient(120px 90px  at 38% 50%, rgba(255,236,190,0.12), transparent 70%),
+
+    /* 星粒（ドット）を“左半分だけ”に散らす */
+    radial-gradient(1.5px 1.5px at 12% 32%, rgba(255,255,255,0.35), transparent 60%),
+    radial-gradient(1.2px 1.2px at 22% 62%, rgba(255,255,255,0.28), transparent 60%),
+    radial-gradient(1.0px 1.0px at 30% 40%, rgba(255,255,255,0.22), transparent 60%),
+    radial-gradient(1.3px 1.3px at 34% 66%, rgba(255,255,255,0.20), transparent 60%),
+    radial-gradient(1.0px 1.0px at 18% 78%, rgba(255,255,255,0.18), transparent 60%);
+
+  /* 左だけに効かせる：右へ行くほど消す */
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 55%, transparent 85%);
+          mask-image: linear-gradient(90deg, #000 0%, #000 55%, transparent 85%);
+
+  opacity: 0.95;
+  z-index: 0; /* リュミエール画像と文字の“後ろ” */
+}
+
+/* リュミエールを星雲の上に、文字より下に（現在0でOKなら不要だけど保険） */
+.sv-talk__lumiere{
+  z-index: 0;
+}
+
+/* 文字は常に最前面 */
+.sv-talk__icon,
+.sv-talk__label{
+  z-index: 2;
+}
+
+/* “静かな反応”を上品に：押した時だけ星雲がふわっと前に出る */
+.sv-talk__btn:active::before{
+  opacity: 1;
+  filter: blur(0.25px);
+}
+
+/* ほんのり星の脈動（過剰にしない） */
+@media (prefers-reduced-motion: no-preference){
+  .sv-talk__btn::before{
+    animation: svIrisPulse 4.6s ease-in-out infinite;
+    transform: translateZ(0);
+  }
+  @keyframes svIrisPulse{
+    0%,100%{ opacity: 0.90; }
+    50%    { opacity: 1.00; }
+  }
+}
+
+/* モバイルは少し控えめ（視認性は確保） */
+@media (max-width: 420px){
+  .sv-talk__btn::before{
+    opacity: 0.88;
+  }
 }
