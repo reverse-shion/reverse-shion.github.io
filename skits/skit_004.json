@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "title": "Shionverse Skit 004",
+    "description": "A shared meal scene — gentle sounds, warm aromas, and the comfort of eating together.",
+    "version": "1.4"
+  },
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "お待たせいたしました、シオン様、しおぽん様。…湯気が立つうちに、どうぞお席へ。いい香りでしょう？",
+      "next": "shion_reply",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "excited", "speaking": false }
+      ]
+    },
+
+    "shion_reply": {
+      "id": "shion_reply",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……うん。湯気の音まで、あったかいな。こういう匂いがすると、自然と肩の力が抜ける。",
+      "next": "shiopon_first_bite",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful", "speaking": false }
+      ]
+    },
+
+    "shiopon_first_bite": {
+      "id": "shiopon_first_bite",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "いただきまーす！……もぐっ。……んん〜！あつあつで、やさしい味なの！おなかの奥までぽかぽかする〜☆",
+      "next": "lumiere_tease",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "smiling", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "soft-grin", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "excited", "speaking": true, "motion": { "type": "shake", "durationMs": 520, "intensity": "mild" } }
+      ]
+    },
+
+    "lumiere_tease": {
+      "id": "lumiere_tease",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "ふふ、しおぽん様。そんなに急いで召し上がると、味が逃げてしまいますよ。…ゆっくり、音も楽しんでくださいませ。",
+      "next": "shiopon_slow",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "teasing", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "thinking", "speaking": false }
+      ]
+    },
+
+    "shiopon_slow": {
+      "id": "shiopon_slow",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "はーい……。……もぐ、もぐ。……あ、ほんとだ。噛むたびに、ちょっとずつ甘くなるの！",
+      "next": "shion_soft",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": true }
+      ]
+    },
+
+    "shion_soft": {
+      "id": "shion_soft",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "こうして音を聞きながら食べると、不思議と時間がゆっくりになるな。…みんなの箸の音も、落ち着く。",
+      "next": "lumiere_reflect",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "thoughtful", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "lumiere_reflect": {
+      "id": "lumiere_reflect",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "はい、シオン様。食事は…味だけでなく、空気ごと分け合うものですから。こうしてご一緒できて、わたくしも嬉しゅうございます。",
+      "next": "shiopon_smile",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful", "speaking": false }
+      ]
+    },
+
+    "shiopon_smile": {
+      "id": "shiopon_smile",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "えへへ。みんなで食べるとね、なんでもおいしくなるの！おなかも、ここも、あったかいの〜。",
+      "next": "ending",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "relief", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": true }
+      ]
+    },
+
+    "ending": {
+      "id": "ending",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……うん。こういう時間があるなら、また歩いていけるな。食後の静けさも、悪くない。",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": true, "motion": { "type": "zoomIn" } },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    }
+  }
+}
