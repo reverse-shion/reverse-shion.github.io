@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "title": "Shionverse Skit 008",
+    "description": "Stopping to look at the stars — a quiet pause, constellation stories from the starrealm, and two gentle ways to end.",
+    "version": "1.2"
+  },
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……満点の星空だ。なんだか、空がぐっと近く感じる。",
+      "next": "shiopon_notice",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "shiopon_notice": {
+      "id": "shiopon_notice",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "ほんとだね。お星様、いっぱい……。あ、なんか並んでるのもあるよ。",
+      "next": "lumiere_constellation",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful", "speaking": true }
+      ]
+    },
+
+    "lumiere_constellation": {
+      "id": "lumiere_constellation",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "はい、しおぽん様。あちらは星界で『コンパス座』と呼ばれております。道しるべの役目を持つ星座でございます。",
+      "next": "shion_listen",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "thoughtful", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": true },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "shion_listen": {
+      "id": "shion_listen",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "コンパス、か……。たしかに。心が迷ってても、見てるだけで、なんとなく進む向きが分かる気がする。",
+      "next": "lumiere_detail",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "lumiere_detail": {
+      "id": "lumiere_detail",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "ええ、シオン様。星界の星座は未来を決めるものではなく、『今、どこに立っているのか』を思い出させてくれる存在でございます。",
+      "next": "shiopon_feel",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": true },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "shiopon_feel": {
+      "id": "shiopon_feel",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "そっか……。だからかな。ここにいると、なんだか落ち着く。",
+      "next": "shion_pause",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": true }
+      ]
+    },
+
+    "shion_pause": {
+      "id": "shion_pause",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……もう少し、ここで星を眺めてたいな。",
+      "next": "choice",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "choice": {
+      "id": "choice",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "ねぇ……もう少し星、見てく？ それとも、また歩く？",
+      "choices": [
+        { "text": "星座をもう少し眺める", "next": "ending_stay" },
+        { "text": "星を背に、歩き出す", "next": "ending_walk" }
+      ],
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "thinking", "speaking": true }
+      ]
+    },
+
+    "ending_stay": {
+      "id": "ending_stay",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "かしこまりました。では、この星座を心に留めておきましょう。迷われた時、きっと思い出せますから……シオン様、しおぽん様。",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": true },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    },
+
+    "ending_walk": {
+      "id": "ending_walk",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……行こうか。星は、またいつでも見れるよ。",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": false }
+      ]
+    }
+  }
+}
