@@ -25,18 +25,33 @@
     // End lock
     isEndReached: false,
 
-    // ★ Bye timers（2回目事故防止）
+    // timers
     byeTimer1: null,
     byeTimer2: null,
 
+    // elements
+    dialogueEl: null,
+    nameEl: null,
+    textEl: null,
+    choicesEl: null,
+    logPanel: null,
+    logBody: null,
+    autoBtn: null,
+    byeBtn: null,
+    nextBtn: null,
+
+    // preload cache
+    _preloadCache: new Map(),
+
     // =========================
-    // Config (adjustable)
+    // Config
     // =========================
     config: {
       hostId: "sv-skit",
       returnMode: "callback",
       returnHref: "/",
       onReturn: null,
+      onNext: null,
       byeDelayMs: 950,
       byeFadeMs: 420,
     },
@@ -64,14 +79,22 @@
     // =========================
     // Public API
     // =========================
-    async start({ rootEl, skitUrl, userName, returnMode, returnHref, onReturn }) {
-      // ① 前回の残骸を必ず止める
+    async start({
+      rootEl,
+      skitUrl,
+      userName,
+      returnMode,
+      returnHref,
+      onReturn,
+      onNext,
+    }) {
+      // ① 前回を必ず停止
       this.stop();
 
       // ② rootをセット
       this.rootEl = rootEl;
 
-      // ③ ★フェード/退出クラスを必ず剥がす（ここが本命）
+      // ③ 見た目の残骸掃除（2回目事故防止）
       this.hardResetVisualState();
 
       // ④ 状態初期化
@@ -84,17 +107,27 @@
       this.exiting = false;
       this.isEndReached = false;
 
-      // ★ userName は「あなた」固定をやめる：必ずUser名優先
+      // timers clear（念のため）
+      clearTimeout(this.autoTimer);
+      clearTimeout(this.byeTimer1);
+      clearTimeout(this.byeTimer2);
+      this.autoTimer = null;
+      this.byeTimer1 = null;
+      this.byeTimer2 = null;
+
+      // ★ userName: passed > stored > guest
       const stored = (localStorage.getItem("sv_user_name") || "").trim();
       const passed = (userName && String(userName).trim()) || "";
       this.userName = passed || stored || "ゲスト";
 
-      // return設定（必要なら上書き）
+      // config
       if (returnMode) this.config.returnMode = returnMode;
       if (returnHref) this.config.returnHref = returnHref;
-      if (onReturn) this.config.onReturn = onReturn;
+      if (typeof onReturn === "function") this.config.onReturn = onReturn;
+      if (typeof onNext === "function") this.config.onNext = onNext;
+      else this.config.onNext = null;
 
-      // ⑤ shell再描画
+      // ⑤ shell描画
       this.rootEl.innerHTML = this.renderShell();
       this.bindStaticElements();
 
@@ -110,9 +143,7 @@
 
         if (this.autoBtn) this.autoBtn.setAttribute("aria-pressed", "false");
 
-        // 初回先読み
         this.primePreloadCache(data);
-
         this.gotoNode(data.start);
       } catch (err) {
         this.showError(err?.message || "スキットの読み込みに失敗しました。");
@@ -120,12 +151,11 @@
     },
 
     stop() {
-      // ★ timers all clear
+      // timers
       clearTimeout(this.autoTimer);
-      this.autoTimer = null;
-
       clearTimeout(this.byeTimer1);
       clearTimeout(this.byeTimer2);
+      this.autoTimer = null;
       this.byeTimer1 = null;
       this.byeTimer2 = null;
 
@@ -134,29 +164,43 @@
       this.exiting = false;
       this.isEndReached = false;
 
-      // ★ 退出クラスの残留掃除（2回目事故の根）
+      // visual cleanup
       if (this.rootEl) {
-        this.rootEl.classList.remove("sv-fadeout");
+        this.rootEl.classList.remove("sv-fadeout", "sv-exiting");
         const d = this.rootEl.querySelector(".sv-dialogue");
         d?.classList.remove("sv-exit");
       }
 
+      // log panel
       if (this.logPanel) {
         this.logPanel.classList.remove("sv-open");
         this.logPanel.setAttribute("aria-hidden", "true");
       }
 
-      if (this.keyHandler && this.rootEl) {
-        const panel = this.rootEl.closest(".sv-overlay-panel");
-        if (panel) panel.removeEventListener("keydown", this.keyHandler, true);
+      // key handler remove (capture true)
+      if (this.keyHandler) {
+        try {
+          const panel = this.rootEl?.closest?.(".sv-overlay-panel");
+          if (panel) panel.removeEventListener("keydown", this.keyHandler, true);
+        } catch (_) {}
       }
       this.keyHandler = null;
+
+      // element refs reset
+      this.dialogueEl = null;
+      this.nameEl = null;
+      this.textEl = null;
+      this.choicesEl = null;
+      this.logPanel = null;
+      this.logBody = null;
+      this.autoBtn = null;
+      this.byeBtn = null;
+      this.nextBtn = null;
     },
 
-    // ★ 完全に見た目の残骸を剥がす
     hardResetVisualState() {
       if (!this.rootEl) return;
-      this.rootEl.classList.remove("sv-fadeout");
+      this.rootEl.classList.remove("sv-fadeout", "sv-exiting");
       const d = this.rootEl.querySelector(".sv-dialogue");
       d?.classList.remove("sv-exit");
     },
@@ -192,6 +236,7 @@
             <div class="sv-choices" hidden></div>
 
             <div class="sv-dialogue-actions">
+              <button type="button" class="sv-next-btn" aria-label="つづける" hidden>つづける</button>
               <button type="button" class="sv-bye-btn" aria-label="またね">またね</button>
             </div>
 
@@ -220,31 +265,58 @@
 
       this.autoBtn = this.rootEl.querySelector(".sv-auto-btn");
       this.byeBtn = this.rootEl.querySelector(".sv-bye-btn");
+      this.nextBtn = this.rootEl.querySelector(".sv-next-btn");
 
+      // click to advance
       this.dialogueEl?.addEventListener("click", () => this.handleAdvance());
+
+      // auto
       this.autoBtn?.addEventListener("click", () => this.toggleAuto());
 
+      // log open/close
       this.rootEl.querySelector(".sv-log-btn")?.addEventListener("click", () => this.toggleLog(true));
       this.rootEl.querySelector(".sv-log-close")?.addEventListener("click", () => this.toggleLog(false));
 
+      // bye
       this.byeBtn?.addEventListener("click", (e) => {
         e.stopPropagation();
         this.runByeSequence();
       });
 
+      // next (continue)
+      this.nextBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.requestNextEpisode();
+      });
+
+      // keyboard
       const panel = this.rootEl.closest(".sv-overlay-panel");
       this.keyHandler = (e) => {
         if (!this.rootEl || !this.rootEl.isConnected) return;
         if (this.exiting) return;
 
-        if (!this.waitingChoice && (e.key === " " || e.code === "Space")) {
+        const key = e.key;
+        const code = e.code;
+
+        // Space = advance (only if not choices & not end)
+        if (!this.waitingChoice && !this.isEndReached && (key === " " || code === "Space")) {
           e.preventDefault();
           this.handleAdvance();
+          return;
         }
 
-        if (e.key === "Escape") {
+        // Enter at end = next episode (if end)
+        if (this.isEndReached && (key === "Enter" || key === "Return")) {
+          e.preventDefault();
+          this.requestNextEpisode();
+          return;
+        }
+
+        // Escape = bye
+        if (key === "Escape") {
           e.preventDefault();
           this.runByeSequence();
+          return;
         }
       };
       if (panel) panel.addEventListener("keydown", this.keyHandler, true);
@@ -285,13 +357,32 @@
       const isEnd = !!node.end || (!node.next && !this.waitingChoice);
       this.isEndReached = isEnd;
 
+      // end UI
+      this.updateEndActions();
+
+      // auto schedule
       if (this.isEndReached) {
         clearTimeout(this.autoTimer);
         this.autoTimer = null;
         return;
       }
-
       this.scheduleAuto();
+    },
+
+    updateEndActions() {
+      if (!this.nextBtn || !this.byeBtn) return;
+
+      if (this.isEndReached) {
+        // show "continue", keep "bye" always visible
+        this.nextBtn.hidden = false;
+        // hint at end
+        const hint = this.rootEl?.querySelector?.(".sv-hint");
+        if (hint) hint.textContent = "Enter / つづける で次のエピソードへ";
+      } else {
+        this.nextBtn.hidden = true;
+        const hint = this.rootEl?.querySelector?.(".sv-hint");
+        if (hint) hint.textContent = "タップ / クリック / Spaceで進む";
+      }
     },
 
     renderNode(node) {
@@ -300,7 +391,7 @@
     },
 
     // =========================
-    // Smooth Swap Core（そのまま）
+    // Smooth Swap Core
     // =========================
     swapPortraitImage(portrait, baseEl, topEl, url, ariaLabel) {
       if (!portrait || !baseEl || !topEl || !url) return;
@@ -377,7 +468,7 @@
 
       for (const frame of castFrames) {
         if (!frame || !frame.slot) continue;
-        if (slotMap.hasOwnProperty(frame.slot)) slotMap[frame.slot] = frame;
+        if (Object.prototype.hasOwnProperty.call(slotMap, frame.slot)) slotMap[frame.slot] = frame;
       }
 
       for (const slotName of slots) {
@@ -414,7 +505,9 @@
         if (portrait) portrait.dataset.character = character;
 
         const speaking =
-          frame.speaking != null ? !!frame.speaking : (character && character === (node.speaker || "").toLowerCase());
+          frame.speaking != null
+            ? !!frame.speaking
+            : (character && character === (node.speaker || "").toLowerCase());
 
         slotEl.classList.toggle("sv-speaking", speaking);
         slotEl.classList.toggle("sv-dimmed", !speaking);
@@ -560,6 +653,7 @@
       if (this.waitingChoice) return;
       if (!this.currentNode) return;
       if (this.exiting) return;
+      if (this.isEndReached) return;
 
       const nextId = this.currentNode.next;
       if (nextId) this.gotoNode(nextId);
@@ -570,6 +664,40 @@
       this.autoMode = !this.autoMode;
       this.autoBtn?.setAttribute("aria-pressed", String(this.autoMode));
       this.scheduleAuto();
+    },
+
+    // =========================
+    // Next Episode (continuous)
+    // =========================
+    requestNextEpisode() {
+      if (this.exiting) return;
+
+      // End reached only: avoid accidental mid-skit jumps
+      if (!this.isEndReached) return;
+
+      // stop auto
+      clearTimeout(this.autoTimer);
+      this.autoTimer = null;
+      this.autoMode = false;
+      this.autoBtn?.setAttribute("aria-pressed", "false");
+
+      // Prefer callback
+      if (typeof this.config.onNext === "function") {
+        try {
+          this.config.onNext();
+        } catch (_) {}
+        return;
+      }
+
+      // Fallback: notify loader
+      try {
+        window.dispatchEvent(new CustomEvent("sv:skit:next"));
+      } catch (_) {
+        // very old fallback
+        try {
+          window.dispatchEvent(new Event("sv:skit:next"));
+        } catch (_) {}
+      }
     },
 
     // =========================
@@ -585,7 +713,7 @@
       this.autoBtn?.setAttribute("aria-pressed", "false");
       this.waitingChoice = false;
 
-      // ★ 2回目事故防止：古いbyeタイマーを必ず潰す
+      // old bye timers kill
       clearTimeout(this.byeTimer1);
       clearTimeout(this.byeTimer2);
       this.byeTimer1 = null;
@@ -596,9 +724,7 @@
         this.logPanel.setAttribute("aria-hidden", "true");
       }
 
-      // dialogueEl は動かさない（位置ズレ防止）
-// this.dialogueEl?.classList.add("sv-exit");
-this.rootEl?.classList.add("sv-exiting");
+      this.rootEl?.classList.add("sv-exiting");
 
       const chosen = this.pickByeSpeaker();
       const line = this.pickByeLine(chosen);
@@ -609,6 +735,9 @@ this.rootEl?.classList.add("sv-exiting");
       const nameLabel = this.speakerDisplayName(chosen);
       if (this.nameEl) this.nameEl.textContent = nameLabel;
       if (this.textEl) this.textEl.textContent = line;
+
+      // hide next button at exit
+      if (this.nextBtn) this.nextBtn.hidden = true;
 
       const t1 = this.jitter(this.config.byeDelayMs, 180);
       const t2 = this.config.byeFadeMs;
@@ -633,7 +762,7 @@ this.rootEl?.classList.add("sv-exiting");
     pickByeLine(speakerId) {
       const list = this.byeLines[speakerId] || this.byeLines.narration;
       const raw = list[Math.floor(Math.random() * list.length)] || "${userName}、またね。";
-      return raw.replaceAll("${userName}", this.userName || "ゲスト");
+      return raw.split("${userName}").join(this.userName || "ゲスト");
     },
 
     pickByeSpeaker() {
@@ -729,10 +858,8 @@ this.rootEl?.classList.add("sv-exiting");
     },
 
     // =========================
-    // Preload Helpers
+    // Preload
     // =========================
-    _preloadCache: new Map(),
-
     preloadImage(url) {
       if (!url) return;
       if (this._preloadCache.has(url)) return;
