@@ -42,6 +42,26 @@
     _engineRootEl: null,
 
     // ======================
+    // Storage / Memory fallback
+    // ======================
+    _storageOK: null,
+    _memBag: null,
+    _memLast: "",
+
+    _canUseStorage() {
+      if (this._storageOK !== null) return this._storageOK;
+      try {
+        const k = "__sv_storage_test__";
+        localStorage.setItem(k, "1");
+        localStorage.removeItem(k);
+        this._storageOK = true;
+      } catch {
+        this._storageOK = false;
+      }
+      return this._storageOK;
+    },
+
+    // ======================
     // Init
     // ======================
     init() {
@@ -133,7 +153,7 @@
     },
 
     // ======================
-    // Manifest
+    // Manifest (FIXED: supports object OR string entries)
     // ======================
     async loadManifest() {
       if (this._manifestLoaded && Array.isArray(this._skitPool) && this._skitPool.length) {
@@ -145,8 +165,15 @@
         if (!res.ok) throw new Error("manifest fetch failed");
 
         const json = await res.json();
-        const urls = (json && Array.isArray(json.skits) ? json.skits : [])
-          .map((s) => (typeof s && s ? s.url : undefined))
+        const src = json && Array.isArray(json.skits) ? json.skits : [];
+
+        const urls = src
+          .map((s) => {
+            // supports: [{url:"/skits/a.json"}] or ["/skits/a.json"]
+            if (typeof s === "string") return s;
+            if (s && typeof s === "object" && typeof s.url === "string") return s.url;
+            return "";
+          })
           .map((u) => (typeof u === "string" ? u.trim() : ""))
           .filter(Boolean);
 
@@ -164,9 +191,10 @@
     },
 
     // ======================
-    // Storage helpers
+    // Storage helpers (storage-safe)
     // ======================
     _readJSON(key, fallback) {
+      if (!this._canUseStorage()) return fallback;
       try {
         const raw = localStorage.getItem(key);
         if (!raw) return fallback;
@@ -178,10 +206,12 @@
     },
 
     _writeJSON(key, value) {
+      if (!this._canUseStorage()) return;
       try {
         localStorage.setItem(key, JSON.stringify(value));
       } catch {
-        // ignore
+        // storage failed -> switch to memory mode
+        this._storageOK = false;
       }
     },
 
@@ -196,16 +226,22 @@
     },
 
     // ======================
-    // Skit Selection (No-Repeat until exhausted)
+    // Skit Selection (No-Repeat until exhausted, with memory fallback)
     // ======================
     async getNextSkitUrl() {
       const pool = await this.loadManifest();
       if (!pool.length) return "/skits/skit_001.json";
 
-      const last = String(localStorage.getItem(this.lastSkitKey) || "");
+      const useStorage = this._canUseStorage();
 
-      // bag contains remaining URLs for this cycle
-      let bag = this._readJSON(this.skitBagKey, []);
+      const last = useStorage
+        ? String(localStorage.getItem(this.lastSkitKey) || "")
+        : String(this._memLast || "");
+
+      let bag = useStorage
+        ? this._readJSON(this.skitBagKey, [])
+        : (Array.isArray(this._memBag) ? this._memBag.slice() : []);
+
       bag = Array.isArray(bag) ? bag.filter((u) => typeof u === "string" && u) : [];
 
       // When bag is empty -> refill with shuffled pool
@@ -233,12 +269,20 @@
         }
       }
 
-      // Persist
-      this._writeJSON(this.skitBagKey, bag);
-      try {
-        localStorage.setItem(this.lastSkitKey, next);
-      } catch {
-        // ignore
+      // Persist (storage or memory)
+      if (useStorage) {
+        this._writeJSON(this.skitBagKey, bag);
+        try {
+          localStorage.setItem(this.lastSkitKey, next);
+        } catch {
+          // storage died mid-run -> fall back to memory immediately
+          this._storageOK = false;
+          this._memBag = bag.slice();
+          this._memLast = next || "";
+        }
+      } else {
+        this._memBag = bag.slice();
+        this._memLast = next || "";
       }
 
       return next || pool[0];
@@ -334,11 +378,7 @@
     // Open / Close / Next
     // ======================
     _getUserName() {
-      return (
-        window.ShioponUserName ||
-        localStorage.getItem("sv_user_name") ||
-        "ゲスト"
-      );
+      return window.ShioponUserName || localStorage.getItem("sv_user_name") || "ゲスト";
     },
 
     async open() {
@@ -387,16 +427,12 @@
         // ignore
       }
 
-      // clear DOM between episodes (Safari 안정)
+      // clear DOM between episodes (Safari stability)
       engineRoot.innerHTML = "";
 
       const userName = this._getUserName();
       const skitUrl = await this.getNextSkitUrl();
 
-      // Start engine with BOTH ways to continue:
-      // 1) engine calls onNext()
-      // 2) engine dispatches window event "sv:skit:next"
-      // 3) engine calls onReturn() when user chooses bye/close
       try {
         await window.SV_SkitEngine.start({
           rootEl: engineRoot,
