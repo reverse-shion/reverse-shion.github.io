@@ -236,9 +236,7 @@
             <div class="sv-choices" hidden></div>
 
             <div class="sv-dialogue-actions">
-              <button type="button" class="sv-next-btn" aria-label="つづける" hidden>つづける</button>
-              <button type="button" class="sv-bye-btn" aria-label="またね">またね</button>
-            </div>
+              <button type="button" class="sv-next-btn" aria-label="まだ一緒にいる" hidden>まだ一緒にいる</button>              <button type="button" class="sv-next-btn" aria-label="ま" hidden>つづける</button>       </div>
 
             <div class="sv-hint">タップ / クリック / Spaceで進む</div>
           </div>
