@@ -57,22 +57,10 @@
     },
 
     byeLines: {
-      shiopon: [
-        "${userName}、またねっ！ぴょん！",
-        "${userName}、また来てね〜☆",
-      ],
-      shioriel: [
-        "${userName}、また星の窓で会おう。",
-        "別れは終わりじゃない。${userName}、またね。",
-      ],
-      lumiere: [
-        "${userName}様、今日もありがとう。またね。",
-        "${userName}様、道はいつでもここにあるよ。",
-      ],
-      shion: [
-        "${userName}、いつでも来てね。また今度。",
-        "またね、${userName}。寂しい時は一緒にいよう。",
-      ],
+      shiopon: ["${userName}、またねっ！ぴょん！", "${userName}、また来てね〜☆"],
+      shioriel: ["${userName}、また星の窓で会おう。", "別れは終わりじゃない。${userName}、またね。"],
+      lumiere: ["${userName}様、今日もありがとう。またね。", "${userName}様、道はいつでもここにあるよ。"],
+      shion: ["${userName}、いつでも来てね。また今度。", "またね、${userName}。寂しい時は一緒にいよう。"],
       narration: ["${userName}、またね。"],
     },
 
@@ -236,7 +224,12 @@
             <div class="sv-choices" hidden></div>
 
             <div class="sv-dialogue-actions">
-              <button type="button" class="sv-next-btn" aria-label="まだ一緒にいる" hidden>まだ一緒にいる</button>              <button type="button" class="sv-next-btn" aria-label="ま" hidden>つづける</button>       </div>
+              <!-- END時だけ表示：次のエピソードへ -->
+              <button type="button" class="sv-next-btn" aria-label="まだ一緒にいる" hidden>まだ一緒にいる</button>
+
+              <!-- 常時表示：終了 -->
+              <button type="button" class="sv-bye-btn" aria-label="またね">またね</button>
+            </div>
 
             <div class="sv-hint">タップ / クリック / Spaceで進む</div>
           </div>
@@ -265,7 +258,7 @@
       this.byeBtn = this.rootEl.querySelector(".sv-bye-btn");
       this.nextBtn = this.rootEl.querySelector(".sv-next-btn");
 
-      // click to advance
+      // click to advance（ボタン押下時に親クリックが発火しないよう、ボタン側でstopPropagation）
       this.dialogueEl?.addEventListener("click", () => this.handleAdvance());
 
       // auto
@@ -286,6 +279,9 @@
         e.stopPropagation();
         this.requestNextEpisode();
       });
+
+      // 初期状態で「まだ一緒にいる」は必ず隠す
+      this.updateEndActions();
 
       // keyboard
       const panel = this.rootEl.closest(".sv-overlay-panel");
@@ -368,14 +364,13 @@
     },
 
     updateEndActions() {
-      if (!this.nextBtn || !this.byeBtn) return;
+      // nextBtn / byeBtn はどちらも存在する前提（renderShellで必ず生成）
+      if (!this.nextBtn) return;
 
       if (this.isEndReached) {
-        // show "continue", keep "bye" always visible
         this.nextBtn.hidden = false;
-        // hint at end
         const hint = this.rootEl?.querySelector?.(".sv-hint");
-        if (hint) hint.textContent = "Enter / つづける で次のエピソードへ";
+        if (hint) hint.textContent = "Enter / まだ一緒にいる で次のエピソードへ";
       } else {
         this.nextBtn.hidden = true;
         const hint = this.rootEl?.querySelector?.(".sv-hint");
@@ -588,7 +583,8 @@
         btn.className = "sv-choice-btn";
         btn.textContent = choice.label ?? choice.text ?? "";
 
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
           if (this.exiting) return;
           this.waitingChoice = false;
           this.choicesEl.hidden = true;
@@ -691,7 +687,6 @@
       try {
         window.dispatchEvent(new CustomEvent("sv:skit:next"));
       } catch (_) {
-        // very old fallback
         try {
           window.dispatchEvent(new Event("sv:skit:next"));
         } catch (_) {}
