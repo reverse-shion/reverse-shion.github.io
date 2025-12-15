@@ -28,11 +28,13 @@
     _nextEventBound: false,
 
     // ======================
-    // Skit Random (No-Repeat)
+    // Skit Random (No-Repeat, guaranteed per cycle)
     // ======================
-    // bag = remaining urls to play this cycle
-    skitBagKey: "sv_skit_bag_v2",
-    lastSkitKey: "sv_skit_last_v2",
+    lastSkitKey: "sv_skit_last_v3",
+    playedKey: "sv_skit_played_v3",
+
+    // snapshot per open (prevents pool changing mid-session)
+    _sessionPool: null,
 
     _manifestLoaded: false,
     _skitPool: null,
@@ -42,23 +44,98 @@
     _engineRootEl: null,
 
     // ======================
-    // Storage / Memory fallback
+    // Storage (local -> session -> memory)
     // ======================
-    _storageOK: null,
-    _memBag: null,
-    _memLast: "",
+    _storageMode: null, // "local" | "session" | "memory"
+    _memStore: Object.create(null),
 
-    _canUseStorage() {
-      if (this._storageOK !== null) return this._storageOK;
+    _getStoreMode() {
+      if (this._storageMode) return this._storageMode;
+
+      const test = (store) => {
+        try {
+          const k = "__sv_store_test__";
+          store.setItem(k, "1");
+          store.removeItem(k);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
       try {
-        const k = "__sv_storage_test__";
-        localStorage.setItem(k, "1");
-        localStorage.removeItem(k);
-        this._storageOK = true;
+        if (window.localStorage && test(window.localStorage)) {
+          this._storageMode = "local";
+          return this._storageMode;
+        }
+      } catch {}
+
+      try {
+        if (window.sessionStorage && test(window.sessionStorage)) {
+          this._storageMode = "session";
+          return this._storageMode;
+        }
+      } catch {}
+
+      this._storageMode = "memory";
+      return this._storageMode;
+    },
+
+    _storeGet(key) {
+      const mode = this._getStoreMode();
+      try {
+        if (mode === "local") return localStorage.getItem(key);
+        if (mode === "session") return sessionStorage.getItem(key);
+        return Object.prototype.hasOwnProperty.call(this._memStore, key) ? this._memStore[key] : null;
       } catch {
-        this._storageOK = false;
+        // downgrade
+        this._storageMode = "memory";
+        return Object.prototype.hasOwnProperty.call(this._memStore, key) ? this._memStore[key] : null;
       }
-      return this._storageOK;
+    },
+
+    _storeSet(key, val) {
+      const mode = this._getStoreMode();
+      try {
+        if (mode === "local") return localStorage.setItem(key, val);
+        if (mode === "session") return sessionStorage.setItem(key, val);
+        this._memStore[key] = val;
+      } catch {
+        // downgrade + save in memory
+        this._storageMode = "memory";
+        this._memStore[key] = val;
+      }
+    },
+
+    _storeRemove(key) {
+      const mode = this._getStoreMode();
+      try {
+        if (mode === "local") return localStorage.removeItem(key);
+        if (mode === "session") return sessionStorage.removeItem(key);
+        delete this._memStore[key];
+      } catch {
+        this._storageMode = "memory";
+        delete this._memStore[key];
+      }
+    },
+
+    _readJSON(key, fallback) {
+      try {
+        const raw = this._storeGet(key);
+        if (!raw) return fallback;
+        const v = JSON.parse(raw);
+        return v == null ? fallback : v;
+      } catch {
+        return fallback;
+      }
+    },
+
+    _writeJSON(key, value) {
+      try {
+        this._storeSet(key, JSON.stringify(value));
+      } catch {
+        // ignore
+      }
     },
 
     // ======================
@@ -88,7 +165,6 @@
       }
 
       // 「次へ」要求イベント（エンジン側が CustomEvent を投げる場合に対応）
-      // 例: window.dispatchEvent(new CustomEvent("sv:skit:next"));
       if (!this._nextEventBound) {
         this._nextEventBound = true;
         window.addEventListener("sv:skit:next", () => {
@@ -100,7 +176,7 @@
       window.ShioponSkit = window.ShioponSkit || {};
       window.ShioponSkit.open = () => this.open();
       window.ShioponSkit.close = () => this.close();
-      window.ShioponSkit.next = () => this.playNextEpisode(); // 任意：外から次へ
+      window.ShioponSkit.next = () => this.playNextEpisode();
 
       // 外部ボタンを監視して bind
       this.bindExternalLaunchButton();
@@ -153,7 +229,7 @@
     },
 
     // ======================
-    // Manifest (FIXED: supports object OR string entries)
+    // Manifest (supports object OR string, and dedupes)
     // ======================
     async loadManifest() {
       if (this._manifestLoaded && Array.isArray(this._skitPool) && this._skitPool.length) {
@@ -167,9 +243,8 @@
         const json = await res.json();
         const src = json && Array.isArray(json.skits) ? json.skits : [];
 
-        const urls = src
+        const rawUrls = src
           .map((s) => {
-            // supports: [{url:"/skits/a.json"}] or ["/skits/a.json"]
             if (typeof s === "string") return s;
             if (s && typeof s === "object" && typeof s.url === "string") return s.url;
             return "";
@@ -177,13 +252,14 @@
           .map((u) => (typeof u === "string" ? u.trim() : ""))
           .filter(Boolean);
 
+        const urls = Array.from(new Set(rawUrls)); // ★dedupe
+
         if (!urls.length) throw new Error("manifest empty");
 
         this._skitPool = urls;
         this._manifestLoaded = true;
         return urls.slice();
       } catch (_) {
-        // fallback
         this._skitPool = ["/skits/skit_001.json"];
         this._manifestLoaded = true;
         return this._skitPool.slice();
@@ -191,101 +267,59 @@
     },
 
     // ======================
-    // Storage helpers (storage-safe)
+    // Session Pool Snapshot
     // ======================
-    _readJSON(key, fallback) {
-      if (!this._canUseStorage()) return fallback;
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return fallback;
-        const v = JSON.parse(raw);
-        return v == null ? fallback : v;
-      } catch {
-        return fallback;
-      }
-    },
-
-    _writeJSON(key, value) {
-      if (!this._canUseStorage()) return;
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-      } catch {
-        // storage failed -> switch to memory mode
-        this._storageOK = false;
-      }
-    },
-
-    _shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const tmp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = tmp;
-      }
-      return arr;
+    async ensureSessionPool() {
+      if (Array.isArray(this._sessionPool) && this._sessionPool.length) return this._sessionPool.slice();
+      const pool = await this.loadManifest();
+      this._sessionPool = pool.slice(); // snapshot at open
+      return this._sessionPool.slice();
     },
 
     // ======================
-    // Skit Selection (No-Repeat until exhausted, with memory fallback)
+    // Skit Selection (guaranteed no repeat until pool exhausted)
+    // - Uses played[] for the current cycle.
+    // - Pool snapshot prevents mid-session changes.
     // ======================
     async getNextSkitUrl() {
-      const pool = await this.loadManifest();
+      const pool = await this.ensureSessionPool();
       if (!pool.length) return "/skits/skit_001.json";
-
-      const useStorage = this._canUseStorage();
-
-      const last = useStorage
-        ? String(localStorage.getItem(this.lastSkitKey) || "")
-        : String(this._memLast || "");
-
-      let bag = useStorage
-        ? this._readJSON(this.skitBagKey, [])
-        : (Array.isArray(this._memBag) ? this._memBag.slice() : []);
-
-      bag = Array.isArray(bag) ? bag.filter((u) => typeof u === "string" && u) : [];
-
-      // When bag is empty -> refill with shuffled pool
-      if (bag.length === 0) {
-        bag = this._shuffle(pool.slice());
-
-        // avoid same as last at head if possible
-        if (bag.length > 1 && bag[0] === last) {
-          const t = bag[0];
-          bag[0] = bag[1];
-          bag[1] = t;
-        }
+      if (pool.length === 1) {
+        // nothing we can do
+        this._storeSet(this.lastSkitKey, pool[0]);
+        this._writeJSON(this.playedKey, [pool[0]]);
+        return pool[0];
       }
 
-      // Pick next
-      let next = bag.shift();
+      const last = String(this._storeGet(this.lastSkitKey) || "");
 
-      // Safety: if still equals last (rare), swap with first different in bag
-      if (pool.length > 1 && next === last) {
-        const idx = bag.findIndex((u) => u !== last);
-        if (idx >= 0) {
-          const alt = bag[idx];
-          bag[idx] = next;
-          next = alt;
-        }
+      let played = this._readJSON(this.playedKey, []);
+      played = Array.isArray(played) ? played.filter((u) => typeof u === "string" && u) : [];
+      // keep only urls that still exist in pool
+      played = played.filter((u) => pool.includes(u));
+
+      // remaining = pool - played
+      let remaining = pool.filter((u) => !played.includes(u));
+
+      // cycle finished -> reset
+      if (remaining.length === 0) {
+        played = [];
+        remaining = pool.slice();
       }
 
-      // Persist (storage or memory)
-      if (useStorage) {
-        this._writeJSON(this.skitBagKey, bag);
-        try {
-          localStorage.setItem(this.lastSkitKey, next);
-        } catch {
-          // storage died mid-run -> fall back to memory immediately
-          this._storageOK = false;
-          this._memBag = bag.slice();
-          this._memLast = next || "";
-        }
-      } else {
-        this._memBag = bag.slice();
-        this._memLast = next || "";
+      // avoid immediate repeat if possible
+      if (remaining.length > 1 && last && remaining.includes(last)) {
+        remaining = remaining.filter((u) => u !== last);
       }
 
-      return next || pool[0];
+      const next = remaining[Math.floor(Math.random() * remaining.length)] || pool[0];
+
+      // persist
+      played.push(next);
+      this._writeJSON(this.playedKey, played);
+      this._storeSet(this.lastSkitKey, String(next));
+
+      return next;
     },
 
     // ======================
@@ -331,7 +365,7 @@
         document.addEventListener("keydown", (e) => this.handleGlobalKey(e));
       }
 
-      // Ensure focus trap works (panel always exists)
+      // Ensure focus trap works
       if (panel) this.untrapFocus(panel);
     },
 
@@ -368,7 +402,6 @@
       };
       reset();
 
-      // passive events where possible
       ["click", "mousemove", "keydown", "touchstart"].forEach((evt) => {
         document.addEventListener(evt, reset, { passive: true });
       });
@@ -378,7 +411,11 @@
     // Open / Close / Next
     // ======================
     _getUserName() {
-      return window.ShioponUserName || localStorage.getItem("sv_user_name") || "ゲスト";
+      try {
+        return window.ShioponUserName || localStorage.getItem("sv_user_name") || "ゲスト";
+      } catch {
+        return window.ShioponUserName || "ゲスト";
+      }
     },
 
     async open() {
@@ -392,6 +429,9 @@
       const panel = overlay?.querySelector(".sv-overlay-panel");
       const engineRoot = overlay?.querySelector(".sv-engine-root");
       if (!overlay || !panel || !engineRoot) return;
+
+      // snapshot pool + keep played state consistent
+      await this.ensureSessionPool();
 
       this.lastFocus = document.activeElement;
 
@@ -409,7 +449,7 @@
 
     async playNextEpisode() {
       if (!this.overlayOpen) return;
-      if (this._isStarting) return; // guard against double clicks/events
+      if (this._isStarting) return;
       if (!(await this.waitForEngine())) return;
 
       const root = document.getElementById(this.rootId);
@@ -420,14 +460,10 @@
 
       this._isStarting = true;
 
-      // stop current skit cleanly
       try {
         window.SV_SkitEngine?.stop?.();
-      } catch {
-        // ignore
-      }
+      } catch {}
 
-      // clear DOM between episodes (Safari stability)
       engineRoot.innerHTML = "";
 
       const userName = this._getUserName();
@@ -438,23 +474,14 @@
           rootEl: engineRoot,
           skitUrl,
           userName,
-
-          // keep overlay open by default
           returnMode: "callback",
-
-          // close request (bye button etc.)
           onReturn: () => this.close(),
-
-          // next request (new "next" button etc.)
           onNext: () => this.playNextEpisode(),
         });
       } finally {
-        // re-focus panel (keep keyboard nav stable)
         try {
           panel.focus({ preventScroll: true });
-        } catch {
-          // ignore
-        }
+        } catch {}
         this._isStarting = false;
       }
     },
@@ -467,12 +494,9 @@
       const engineRoot = overlay?.querySelector(".sv-engine-root");
       const panel = overlay?.querySelector(".sv-overlay-panel");
 
-      // stop engine first
       try {
         window.SV_SkitEngine?.stop?.();
-      } catch {
-        // ignore
-      }
+      } catch {}
 
       if (engineRoot) engineRoot.innerHTML = "";
 
@@ -487,11 +511,12 @@
 
       try {
         this.lastFocus?.focus?.({ preventScroll: true });
-      } catch {
-        // ignore
-      }
+      } catch {}
       this.lastFocus = null;
       this._isStarting = false;
+
+      // keep snapshot during page life; if you want reset each open, uncomment:
+      // this._sessionPool = null;
     },
 
     // ======================
