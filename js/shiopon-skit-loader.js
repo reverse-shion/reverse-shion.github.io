@@ -2,7 +2,9 @@
   "use strict";
 
   const LOADER = {
-    // ====== Config ======
+    // ======================
+    // Config
+    // ======================
     cssId: "sv-skit-style",
     engineUrl: "/js/skitEngine.js",
     manifestUrl: "/skits/manifest.json",
@@ -20,19 +22,31 @@
     // focus trap
     trapHandler: null,
 
-    // ====== Skit Random (No-Repeat) ======
+    // global listeners (avoid double bind)
+    _globalKeyBound: false,
+    _externalEventsBound: false,
+    _nextEventBound: false,
+
+    // ======================
+    // Skit Random (No-Repeat)
+    // ======================
+    // bag = remaining urls to play this cycle
     skitBagKey: "sv_skit_bag_v2",
     lastSkitKey: "sv_skit_last_v2",
 
     _manifestLoaded: false,
     _skitPool: null,
 
+    // runtime guards
+    _isStarting: false,
+    _engineRootEl: null,
+
     // ======================
     // Init
     // ======================
     init() {
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => this.setup());
+        document.addEventListener("DOMContentLoaded", () => this.setup(), { once: true });
       } else {
         this.setup();
       }
@@ -46,14 +60,27 @@
       this.injectRoot();
       this.loadEngine();
 
-      // 外部イベント
-      window.addEventListener("sv:skit:close", () => this.close());
-      window.addEventListener("sv:skit:open", () => this.open());
+      // 外部イベント（open/close）
+      if (!this._externalEventsBound) {
+        this._externalEventsBound = true;
+        window.addEventListener("sv:skit:close", () => this.close());
+        window.addEventListener("sv:skit:open", () => this.open());
+      }
+
+      // 「次へ」要求イベント（エンジン側が CustomEvent を投げる場合に対応）
+      // 例: window.dispatchEvent(new CustomEvent("sv:skit:next"));
+      if (!this._nextEventBound) {
+        this._nextEventBound = true;
+        window.addEventListener("sv:skit:next", () => {
+          if (this.overlayOpen) this.playNextEpisode();
+        });
+      }
 
       // 公開API（partials から呼ぶ）
       window.ShioponSkit = window.ShioponSkit || {};
       window.ShioponSkit.open = () => this.open();
       window.ShioponSkit.close = () => this.close();
+      window.ShioponSkit.next = () => this.playNextEpisode(); // 任意：外から次へ
 
       // 外部ボタンを監視して bind
       this.bindExternalLaunchButton();
@@ -82,13 +109,13 @@
 
       const script = document.createElement("script");
       script.src = this.engineUrl;
-      script.async = false;
+      script.async = false; // keep order
       script.onload = () => (this.engineReady = true);
       script.onerror = () => (this.engineReady = false);
       document.head.appendChild(script);
     },
 
-    waitForEngine(timeoutMs = 5000) {
+    waitForEngine(timeoutMs = 8000) {
       if (this.engineReady && window.SV_SkitEngine) return Promise.resolve(true);
 
       return new Promise((resolve) => {
@@ -99,7 +126,7 @@
             return resolve(true);
           }
           if (Date.now() - start > timeoutMs) return resolve(false);
-          setTimeout(poll, 50);
+          setTimeout(poll, 60);
         };
         poll();
       });
@@ -109,7 +136,7 @@
     // Manifest
     // ======================
     async loadManifest() {
-      if (this._manifestLoaded && this._skitPool?.length) {
+      if (this._manifestLoaded && Array.isArray(this._skitPool) && this._skitPool.length) {
         return this._skitPool.slice();
       }
 
@@ -118,8 +145,9 @@
         if (!res.ok) throw new Error("manifest fetch failed");
 
         const json = await res.json();
-        const urls = (json?.skits || [])
-          .map((s) => (typeof s?.url === "string" ? s.url.trim() : ""))
+        const urls = (json && Array.isArray(json.skits) ? json.skits : [])
+          .map((s) => (typeof s && s ? s.url : undefined))
+          .map((u) => (typeof u === "string" ? u.trim() : ""))
           .filter(Boolean);
 
         if (!urls.length) throw new Error("manifest empty");
@@ -128,6 +156,7 @@
         this._manifestLoaded = true;
         return urls.slice();
       } catch (_) {
+        // fallback
         this._skitPool = ["/skits/skit_001.json"];
         this._manifestLoaded = true;
         return this._skitPool.slice();
@@ -135,11 +164,14 @@
     },
 
     // ======================
-    // Skit Selection
+    // Storage helpers
     // ======================
     _readJSON(key, fallback) {
       try {
-        return JSON.parse(localStorage.getItem(key)) ?? fallback;
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const v = JSON.parse(raw);
+        return v == null ? fallback : v;
       } catch {
         return fallback;
       }
@@ -148,37 +180,68 @@
     _writeJSON(key, value) {
       try {
         localStorage.setItem(key, JSON.stringify(value));
-      } catch {}
+      } catch {
+        // ignore
+      }
     },
 
     _shuffle(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        const tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
       }
       return arr;
     },
 
+    // ======================
+    // Skit Selection (No-Repeat until exhausted)
+    // ======================
     async getNextSkitUrl() {
       const pool = await this.loadManifest();
+      if (!pool.length) return "/skits/skit_001.json";
+
       const last = String(localStorage.getItem(this.lastSkitKey) || "");
 
+      // bag contains remaining URLs for this cycle
       let bag = this._readJSON(this.skitBagKey, []);
-      if (!bag.length) {
+      bag = Array.isArray(bag) ? bag.filter((u) => typeof u === "string" && u) : [];
+
+      // When bag is empty -> refill with shuffled pool
+      if (bag.length === 0) {
         bag = this._shuffle(pool.slice());
-        if (bag[0] === last && bag.length > 1) {
-          [bag[0], bag[1]] = [bag[1], bag[0]];
+
+        // avoid same as last at head if possible
+        if (bag.length > 1 && bag[0] === last) {
+          const t = bag[0];
+          bag[0] = bag[1];
+          bag[1] = t;
         }
       }
 
+      // Pick next
       let next = bag.shift();
-      if (pool.length >= 2 && next === last) {
-        next = bag.find((u) => u !== last) || next;
+
+      // Safety: if still equals last (rare), swap with first different in bag
+      if (pool.length > 1 && next === last) {
+        const idx = bag.findIndex((u) => u !== last);
+        if (idx >= 0) {
+          const alt = bag[idx];
+          bag[idx] = next;
+          next = alt;
+        }
       }
 
+      // Persist
       this._writeJSON(this.skitBagKey, bag);
-      localStorage.setItem(this.lastSkitKey, next);
-      return next;
+      try {
+        localStorage.setItem(this.lastSkitKey, next);
+      } catch {
+        // ignore
+      }
+
+      return next || pool[0];
     },
 
     // ======================
@@ -205,13 +268,27 @@
       `;
 
       const overlay = root.querySelector(`.${this.overlayClass}`);
+      const panel = root.querySelector(".sv-overlay-panel");
+      const engineRoot = root.querySelector(".sv-engine-root");
+
+      this._engineRootEl = engineRoot;
 
       overlay.addEventListener("click", (e) => {
-        if (e.target?.dataset?.svClose === "backdrop") this.close();
+        if (e && e.target && e.target.dataset && e.target.dataset.svClose === "backdrop") {
+          this.close();
+        }
       });
 
       root.querySelector(".sv-overlay-close")?.addEventListener("click", () => this.close());
-      document.addEventListener("keydown", (e) => this.handleGlobalKey(e));
+
+      // Global Escape
+      if (!this._globalKeyBound) {
+        this._globalKeyBound = true;
+        document.addEventListener("keydown", (e) => this.handleGlobalKey(e));
+      }
+
+      // Ensure focus trap works (panel always exists)
+      if (panel) this.untrapFocus(panel);
     },
 
     // ======================
@@ -246,22 +323,35 @@
         this.pulseTimer = setTimeout(() => btn.classList.add("sv-pulse"), this.inactivityMs);
       };
       reset();
-      ["click", "mousemove", "keydown", "touchstart"].forEach((e) =>
-        document.addEventListener(e, reset, { passive: true })
-      );
+
+      // passive events where possible
+      ["click", "mousemove", "keydown", "touchstart"].forEach((evt) => {
+        document.addEventListener(evt, reset, { passive: true });
+      });
     },
 
     // ======================
-    // Open / Close
+    // Open / Close / Next
     // ======================
+    _getUserName() {
+      return (
+        window.ShioponUserName ||
+        localStorage.getItem("sv_user_name") ||
+        "ゲスト"
+      );
+    },
+
     async open() {
       if (this.overlayOpen) return;
       if (!(await this.waitForEngine())) return;
 
       const root = document.getElementById(this.rootId);
+      if (!root) return;
+
       const overlay = root.querySelector(`.${this.overlayClass}`);
-      const panel = overlay.querySelector(".sv-overlay-panel");
-      const engineRoot = overlay.querySelector(".sv-engine-root");
+      const panel = overlay?.querySelector(".sv-overlay-panel");
+      const engineRoot = overlay?.querySelector(".sv-engine-root");
+      if (!overlay || !panel || !engineRoot) return;
 
       this.lastFocus = document.activeElement;
 
@@ -274,63 +364,127 @@
       panel.focus({ preventScroll: true });
       this.trapFocus(panel);
 
-      const userName =
-        window.ShioponUserName ||
-        localStorage.getItem("sv_user_name") ||
-        "ゲスト";
+      await this.playNextEpisode();
+    },
 
+    async playNextEpisode() {
+      if (!this.overlayOpen) return;
+      if (this._isStarting) return; // guard against double clicks/events
+      if (!(await this.waitForEngine())) return;
+
+      const root = document.getElementById(this.rootId);
+      const overlay = root?.querySelector(`.${this.overlayClass}`);
+      const panel = overlay?.querySelector(".sv-overlay-panel");
+      const engineRoot = overlay?.querySelector(".sv-engine-root");
+      if (!overlay || !panel || !engineRoot) return;
+
+      this._isStarting = true;
+
+      // stop current skit cleanly
+      try {
+        window.SV_SkitEngine?.stop?.();
+      } catch {
+        // ignore
+      }
+
+      // clear DOM between episodes (Safari 안정)
+      engineRoot.innerHTML = "";
+
+      const userName = this._getUserName();
       const skitUrl = await this.getNextSkitUrl();
 
-      await window.SV_SkitEngine.start({
-        rootEl: engineRoot,
-        skitUrl,
-        userName,
-        returnMode: "callback",
-        onReturn: () => this.close(),
-      });
+      // Start engine with BOTH ways to continue:
+      // 1) engine calls onNext()
+      // 2) engine dispatches window event "sv:skit:next"
+      // 3) engine calls onReturn() when user chooses bye/close
+      try {
+        await window.SV_SkitEngine.start({
+          rootEl: engineRoot,
+          skitUrl,
+          userName,
+
+          // keep overlay open by default
+          returnMode: "callback",
+
+          // close request (bye button etc.)
+          onReturn: () => this.close(),
+
+          // next request (new "next" button etc.)
+          onNext: () => this.playNextEpisode(),
+        });
+      } finally {
+        // re-focus panel (keep keyboard nav stable)
+        try {
+          panel.focus({ preventScroll: true });
+        } catch {
+          // ignore
+        }
+        this._isStarting = false;
+      }
     },
 
     close() {
       if (!this.overlayOpen) return;
 
       const root = document.getElementById(this.rootId);
-      const overlay = root.querySelector(`.${this.overlayClass}`);
-      const engineRoot = overlay.querySelector(".sv-engine-root");
-      const panel = overlay.querySelector(".sv-overlay-panel");
+      const overlay = root?.querySelector(`.${this.overlayClass}`);
+      const engineRoot = overlay?.querySelector(".sv-engine-root");
+      const panel = overlay?.querySelector(".sv-overlay-panel");
 
-      window.SV_SkitEngine?.stop?.();
-      engineRoot.innerHTML = "";
+      // stop engine first
+      try {
+        window.SV_SkitEngine?.stop?.();
+      } catch {
+        // ignore
+      }
 
-      overlay.classList.add("sv-hidden");
-      overlay.setAttribute("aria-hidden", "true");
+      if (engineRoot) engineRoot.innerHTML = "";
+
+      if (overlay) {
+        overlay.classList.add("sv-hidden");
+        overlay.setAttribute("aria-hidden", "true");
+      }
       document.body.classList.remove("sv-skit-lock");
       this.overlayOpen = false;
 
       this.untrapFocus(panel);
-      this.lastFocus?.focus?.({ preventScroll: true });
+
+      try {
+        this.lastFocus?.focus?.({ preventScroll: true });
+      } catch {
+        // ignore
+      }
       this.lastFocus = null;
+      this._isStarting = false;
     },
 
     // ======================
     // Focus
     // ======================
     handleGlobalKey(e) {
-      if (this.overlayOpen && e.key === "Escape") {
+      if (!this.overlayOpen) return;
+      if (!e) return;
+
+      if (e.key === "Escape") {
         e.preventDefault();
         this.close();
       }
     },
 
     trapFocus(panel) {
-      if (this.trapHandler) return;
+      if (!panel || this.trapHandler) return;
+
       this.trapHandler = (e) => {
-        if (e.key !== "Tab") return;
-        const f = panel.querySelectorAll(
+        if (!e || e.key !== "Tab") return;
+
+        const focusables = panel.querySelectorAll(
           'button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'
         );
-        if (!f.length) return;
-        const first = f[0];
-        const last = f[f.length - 1];
+        if (!focusables || focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
         if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
           last.focus();
@@ -339,11 +493,13 @@
           first.focus();
         }
       };
+
       panel.addEventListener("keydown", this.trapHandler);
     },
 
     untrapFocus(panel) {
-      panel?.removeEventListener("keydown", this.trapHandler);
+      if (!panel || !this.trapHandler) return;
+      panel.removeEventListener("keydown", this.trapHandler);
       this.trapHandler = null;
     },
   };
