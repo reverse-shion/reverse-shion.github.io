@@ -1060,8 +1060,8 @@ body.sv-skit-lock{ overflow: hidden; }
 }
 
 /* =========================
-   Shionverse Stay Button
-   「一緒にいる」
+   Shionverse Warm Stay Button
+   「まだ一緒にいる」— あたたかい星灯り
    ========================= */
 
 .sv-next-btn{
@@ -1069,70 +1069,81 @@ body.sv-skit-lock{ overflow: hidden; }
   margin: 14px auto 6px;
   padding: 12px 26px;
 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: .12em;
 
-  color: rgba(255,255,255,.92);
+  /* ★金っぽく、でも上品に（シャンパンゴールド） */
+  color: rgba(248, 224, 160, .98);
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.55),
+    0 0 12px rgba(255, 214, 120, .18);
+
+  /* ★寒色→暖色へ。中心が“灯り”で、外が夜 */
   background:
-    radial-gradient(
-      120% 140% at 50% 0%,
-      rgba(180,200,255,.18),
-      rgba(40,50,90,.25) 45%,
-      rgba(10,12,28,.55) 100%
+    radial-gradient(140% 170% at 50% 0%,
+      rgba(255, 228, 170, .20),
+      rgba(180, 120, 80, .12) 35%,
+      rgba(40, 26, 44, .45) 70%,
+      rgba(10, 10, 22, .68) 100%
     );
 
-  border: 1px solid rgba(200,220,255,.28);
+  /* ★ガラス感＋あったかい縁取り */
+  border: 1px solid rgba(255, 220, 150, .32);
   border-radius: 999px;
 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
   box-shadow:
-    0 0 0 rgba(160,180,255,0),
-    0 8px 28px rgba(0,0,0,.35);
+    0 10px 28px rgba(0,0,0,.36),
+    0 0 0 rgba(255, 214, 120, 0);
 
   cursor: pointer;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 
   transition:
+    transform .18s ease,
     box-shadow .6s ease,
     border-color .6s ease,
     background .6s ease,
-    transform .25s ease;
+    filter .6s ease;
 
-  animation: sv-stay-breathe 5.5s ease-in-out infinite;
+  animation: sv-stay-breathe 5.8s ease-in-out infinite;
 }
 
-
 /* =========================
-   星の光輪
+   光輪（あたたかいハロー）
    ========================= */
 .sv-next-btn::before{
   content:"";
   position:absolute;
-  inset:-6px;
+  inset:-7px;
   border-radius:999px;
 
   background:
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(200,220,255,.35),
-      rgba(120,140,255,.18) 35%,
-      rgba(80,100,200,.08) 55%,
+    radial-gradient(circle at 50% 50%,
+      rgba(255, 228, 170, .42),
+      rgba(255, 190, 120, .18) 35%,
+      rgba(180, 120, 255, .08) 55%,
       transparent 70%
     );
 
-  opacity:.55;
-  filter: blur(10px);
+  opacity:.48;
+  filter: blur(12px);
   pointer-events:none;
 
-  animation: sv-halo-pulse 4.8s ease-in-out infinite;
+  animation: sv-halo-pulse 4.9s ease-in-out infinite;
 }
 
-
 /* =========================
-   星粒（きらきら）
+   星粒（きらきら：暖色寄り）
    ========================= */
 .sv-next-btn::after{
   content:"";
@@ -1141,68 +1152,67 @@ body.sv-skit-lock{ overflow: hidden; }
   border-radius:999px;
 
   background-image:
-    radial-gradient(1px 1px at 18% 30%, rgba(255,255,255,.7), transparent),
-    radial-gradient(1px 1px at 42% 68%, rgba(200,220,255,.8), transparent),
-    radial-gradient(1px 1px at 65% 22%, rgba(220,200,255,.6), transparent),
-    radial-gradient(1px 1px at 78% 55%, rgba(180,200,255,.7), transparent),
-    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,.5), transparent);
+    radial-gradient(1px 1px at 16% 28%, rgba(255,245,220,.75), transparent),
+    radial-gradient(1px 1px at 38% 70%, rgba(255,218,160,.85), transparent),
+    radial-gradient(1px 1px at 62% 24%, rgba(255,206,140,.70), transparent),
+    radial-gradient(1px 1px at 78% 58%, rgba(255,236,200,.65), transparent),
+    radial-gradient(1px 1px at 30% 82%, rgba(255,214,170,.55), transparent);
 
-  opacity:.65;
+  opacity:.62;
   pointer-events:none;
 
-  animation: sv-star-twinkle 6.5s linear infinite;
+  animation: sv-star-twinkle 6.2s linear infinite;
 }
 
-
 /* =========================
-   Hover / Active
+   Hover / Active（“寄り添う”反応）
    ========================= */
 .sv-next-btn:hover{
-  border-color: rgba(220,235,255,.55);
+  border-color: rgba(255, 232, 175, .55);
+  filter: brightness(1.05);
   box-shadow:
-    0 0 18px rgba(180,200,255,.35),
-    0 10px 32px rgba(0,0,0,.4);
+    0 0 18px rgba(255, 214, 120, .22),
+    0 12px 34px rgba(0,0,0,.42);
 }
 
 .sv-next-btn:active{
-  transform: translateY(1px);
+  transform: translateY(1px) scale(.99);
 }
 
-
 /* =========================
-   Focus（優しく）
+   Focus（優しく、でも見失わない）
    ========================= */
 .sv-next-btn:focus-visible{
   outline:none;
   box-shadow:
-    0 0 0 2px rgba(200,220,255,.55),
-    0 0 22px rgba(160,180,255,.45);
+    0 0 0 2px rgba(255, 228, 170, .55),
+    0 0 22px rgba(255, 214, 120, .22),
+    0 12px 34px rgba(0,0,0,.42);
 }
 
-
 /* =========================
-   Animations
+   Animations（呼吸する灯り）
    ========================= */
 @keyframes sv-stay-breathe{
   0%,100%{
     box-shadow:
-      0 0 0 rgba(160,180,255,0),
-      0 8px 28px rgba(0,0,0,.35);
+      0 10px 28px rgba(0,0,0,.36),
+      0 0 0 rgba(255, 214, 120, 0);
   }
   50%{
     box-shadow:
-      0 0 22px rgba(160,180,255,.35),
-      0 12px 34px rgba(0,0,0,.45);
+      0 12px 34px rgba(0,0,0,.44),
+      0 0 22px rgba(255, 214, 120, .22);
   }
 }
 
 @keyframes sv-halo-pulse{
-  0%,100%{ opacity:.45; }
-  50%{ opacity:.75; }
+  0%,100%{ opacity:.42; }
+  50%{ opacity:.78; }
 }
 
 @keyframes sv-star-twinkle{
-  0%{ opacity:.35; }
-  50%{ opacity:.8; }
-  100%{ opacity:.35; }
+  0%{ opacity:.30; transform: translateZ(0); }
+  50%{ opacity:.85; }
+  100%{ opacity:.30; }
 }
