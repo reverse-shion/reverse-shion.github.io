@@ -1206,3 +1206,39 @@ body.sv-skit-lock{ overflow: hidden; }
   50%{ opacity:.8; }
   100%{ opacity:.35; }
 }
+
+/* --- EMERGENCY: actions復活 --- */
+.sv-dialogue{
+  overflow: visible !important; /* 子要素が切られてる可能性を潰す */
+}
+
+.sv-dialogue-actions{
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+
+  margin-top: 12px !important;
+  padding-top: 8px !important;
+
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* ボタンそのものを強制可視化 */
+.sv-dialogue-actions .sv-bye-btn,
+.sv-dialogue-actions .sv-next-btn{
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 6 !important;
+}
+
+/* hidden属性で隠れてる場合の確認用（テストで一旦外す） */
+.sv-next-btn[hidden]{
+  display: none !important; /* ←本来はこれが正しい */
+}
+/* もし「ENDじゃないのに一緒にいるを常時見たい」確認をしたいなら一時的に↓にする
+.sv-next-btn[hidden]{ display:inline-flex !important; }
+*/
