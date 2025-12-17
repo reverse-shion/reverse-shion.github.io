@@ -716,11 +716,15 @@ body.sv-skit-lock{ overflow: hidden; }
 /* =========================
    Shionverse Talk Button (Image Square)
    - Align with #shiopon-toggle (right:22px / bottom:45px)
+   - Move with scroll (fixed + scrollY tracking)
    ========================= */
 :root{
   /* トグルと同じ座標に合わせる */
   --sv-talk-right: 22px;
   --sv-talk-bottom: 45px;
+
+  /* ★スクロール追従量（JSが入れる） */
+  --sv-scroll-y: 0px;
 
   /* 正方形サイズ（お好みで） */
   --sv-btn-size: clamp(62px, 9vh, 84px);
@@ -742,7 +746,13 @@ body.sv-skit-lock{ overflow: hidden; }
   z-index: 9999;
 
   opacity: 0;
-  transform: translateY(6px);
+
+  /* ★入場アニメ分（readyで0にする） */
+  --sv-mount-y: 6px;
+
+  /* ★スクロール量 + 入場アニメを合成（scrollしても一緒に動く） */
+  transform: translate3d(0, calc(var(--sv-scroll-y) + var(--sv-mount-y)), 0);
+
   transition: opacity 240ms ease, transform 240ms ease;
   pointer-events: none;
 
@@ -752,7 +762,7 @@ body.sv-skit-lock{ overflow: hidden; }
 
 .sv-talk-mount--ready{
   opacity: 1;
-  transform: translateY(0);
+  --sv-mount-y: 0px;
   pointer-events: auto;
 }
 
