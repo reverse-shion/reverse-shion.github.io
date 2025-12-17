@@ -1073,3 +1073,22 @@ body.sv-skit-lock{ overflow: hidden; }
   50%{ opacity:.8; }
   100%{ opacity:.35; }
 }
+
+:root{
+  --sv-scroll-y: 0px; /* JSが上書きする */
+}
+
+/* ボタンが mount に入ってる場合（あなたの既存構成で一番ありえる） */
+.sv-talk-mount{
+  /* 重要：スクロール分だけ上へ動かす＝ページと一緒に流れる */
+  transform: translate3d(0, calc(var(--sv-scroll-y) * -1), 0);
+}
+
+/* mount を使ってないで #svTalkBtn が直置きの場合の保険 */
+#svTalkBtn{
+  transform: translate3d(0, calc(var(--sv-scroll-y) * -1), 0);
+}
+
+.sv-talk-mount{
+  transform: translate3d(0, calc(var(--sv-scroll-y) * -1 + 6px), 0);
+}
