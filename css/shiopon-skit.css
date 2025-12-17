@@ -714,28 +714,21 @@ body.sv-skit-lock{ overflow: hidden; }
 
 
 /* =========================
-   Shionverse Talk Button (Final)
+   Shionverse Talk Button (Image Square)
    ========================= */
 :root{
   --sv-talk-left: 16px;
   --sv-talk-bottom: 20px;
 
-  --sv-btn-h: clamp(46px, 6.2vh, 56px);
-  --sv-btn-pad-x: clamp(18px, 4.6vw, 24px);
-  --sv-btn-minw: 164px;
+  /* 正方形サイズ（お好みで） */
+  --sv-btn-size: clamp(62px, 9vh, 84px);
 
-  --sv-text: #F6F3FF;
   --sv-border: rgba(246, 243, 255, 0.42);
-
-  --sv-bg-1: #070813;
-  --sv-bg-2: #17103A;
-  --sv-bg-3: #34246B;
-
   --sv-glow: rgba(196, 170, 255, 0.34);
   --sv-glow-2: rgba(255, 236, 190, 0.22);
 
-  /* ここを上げる：認識できる“気配” */
-  --sv-lumiere-opacity: 0.28; /* 0.24〜0.34 推奨 */
+  /* 角丸：少し丸くして柔らかく */
+  --sv-radius: 16px;
 }
 
 /* mount（fixedはここだけ） */
@@ -770,114 +763,60 @@ body.sv-skit-lock{ overflow: hidden; }
   display: inline-block;
 }
 
-/* ===== ボタン本体 ===== */
+/* ===== ボタン本体（画像だけ） ===== */
 .sv-talk__btn{
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  display: grid;
+  place-items: center;
 
-  height: var(--sv-btn-h);
-  min-width: var(--sv-btn-minw);
-  padding: 0 var(--sv-btn-pad-x);
+  width: var(--sv-btn-size);
+  height: var(--sv-btn-size);
+  aspect-ratio: 1 / 1;
 
-  border-radius: 999px;
+  padding: 0;
+  border-radius: var(--sv-radius);
   border: 1px solid var(--sv-border);
-  color: var(--sv-text);
-
-  background:
-    radial-gradient(120% 140% at 20% 20%, rgba(255,255,255,0.10), transparent 55%),
-    linear-gradient(135deg, var(--sv-bg-1), var(--sv-bg-2) 55%, var(--sv-bg-3));
+  background: rgba(10, 12, 28, 0.55);
 
   box-shadow:
-    0 10px 24px rgba(0,0,0,0.22),
+    0 12px 26px rgba(0,0,0,0.25),
     0 0 0 1px rgba(255,255,255,0.06) inset,
     0 0 18px var(--sv-glow);
 
-  /* 文字は絶対はみ出さない */
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1;
-
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-
-  /* iOS “反応遅い感”対策 */
   touch-action: manipulation;
 
-  /* 呼吸：控えめ */
-  transform-origin: 18% 80%;
+  transform-origin: 50% 70%;
   animation: svBreath 3.8s ease-in-out infinite;
 }
 
-/* リュミエール：ボタンに“被せて一体化” */
-.sv-talk__lumiere{
-  position: absolute;
-  left: -12px;                 /* ボタンの左から少しはみ出す */
-  top: 50%;
-  transform: translateY(-50%);
-  width: calc(var(--sv-btn-h) + 18px);
-  height: calc(var(--sv-btn-h) + 18px);
-
+/* ボタン内の画像 */
+.sv-talk__img{
+  width: 100%;
+  height: 100%;
+  display: block;
   object-fit: cover;
-  border-radius: 999px;
 
-  opacity: var(--sv-lumiere-opacity);
-
-  /* “光の向こうで待ってる” */
-  filter: saturate(1.06) blur(0.18px);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.10),
-    0 0 0 1px rgba(255,255,255,0.12) inset,
-    0 0 26px rgba(255,236,190,0.16);
-
-  /* 画像が四角に見えるSafari保険 */
-  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%);
-  clip-path: circle(50% at 50% 50%);
-
-  pointer-events: none;
-  user-select: none;
-
-  z-index: 0; /* 文字より後ろ */
-}
-
-/* ボタンの中身を前に出す */
-.sv-talk__icon,
-.sv-talk__label{
-  position: relative;
-  z-index: 1;
-}
-.sv-talk__icon{
-  flex: 0 0 auto;
-  font-size: 14px;
-  opacity: 0.95;
-  text-shadow: 0 0 10px rgba(255,255,255,0.18);
-}
-.sv-talk__label{
-  flex: 0 1 auto;
-  font-size: clamp(14px, 3.6vw, 16px);
-  letter-spacing: 0.02em;
-  text-shadow: 0 0 14px rgba(255,255,255,0.14);
-
-  /* リュミエール分の余白を確保（はみ出し防止の要） */
-  padding-left: calc(var(--sv-btn-h) * 0.42);
+  /* 画像が角丸にならないSafari保険 */
+  border-radius: var(--sv-radius);
+  transform: translateZ(0);
 }
 
 /* hover（PC） */
 @media (hover:hover){
   .sv-talk__btn:hover{
+    border-color: rgba(255, 248, 230, 0.52);
     box-shadow:
-      0 12px 28px rgba(0,0,0,0.24),
+      0 14px 30px rgba(0,0,0,0.28),
       0 0 0 1px rgba(255,255,255,0.08) inset,
       0 0 22px var(--sv-glow),
       0 0 18px var(--sv-glow-2);
-    border-color: rgba(255, 248, 230, 0.52);
   }
 }
 
-/* Tap / Active：静かな反応（iOS含む） */
+/* Tap / Active */
 .sv-talk__btn:active{
   transform: translateY(1px) scale(0.985);
 }
@@ -887,8 +826,8 @@ body.sv-skit-lock{ overflow: hidden; }
   content:"";
   position:absolute;
   inset:-2px;
-  border-radius:999px;
-  background: radial-gradient(140px 70px at 30% 50%, rgba(255,255,255,0.18), transparent 72%);
+  border-radius: var(--sv-radius);
+  background: radial-gradient(160px 100px at 35% 50%, rgba(255,255,255,0.18), transparent 72%);
   opacity: 0;
   transform: translateX(-18px);
   transition: opacity 200ms ease, transform 420ms ease;
@@ -899,12 +838,16 @@ body.sv-skit-lock{ overflow: hidden; }
   transform: translateX(18px);
 }
 
-/* 呼吸 */
+/* キーボード操作の可視化（地味に重要） */
+.sv-talk__btn:focus-visible{
+  outline: 2px solid rgba(255,255,255,0.35);
+  outline-offset: 3px;
+}
+
 @keyframes svBreath{
   0%, 100%{ transform: translateZ(0) scale(1); }
   50%{ transform: translateZ(0) scale(1.02); }
 }
-
 /* =========================
    iOS Safari “青枠”を消す（タッチ環境のみ）
    ========================= */
