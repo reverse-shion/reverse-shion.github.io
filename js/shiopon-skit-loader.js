@@ -521,17 +521,7 @@
 
     
 
-    (function(){
-  const root = document.documentElement;
-
-  function sync(){
-    root.style.setProperty('--sv-scroll-y', window.scrollY + 'px');
-  }
-
-  window.addEventListener('scroll', sync, { passive: true });
-  window.addEventListener('resize', sync);
-  sync();
-})();
+  
 
     // ======================
     // Focus
