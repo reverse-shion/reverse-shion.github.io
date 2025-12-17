@@ -28,21 +28,79 @@
     _nextEventBound: false,
 
     // ======================
-    // Scroll Sync (CSS var for "follow scroll")
+    // Follow Scroll (Hard guarantee)
+    // - Works even if window.scrollY is 0 (uses scrollingElement)
+    // - Forces "page-like scroll" by cancelling scroll amount on a fixed element
     // ======================
-    _scrollSyncBound: false,
-    bindScrollSync() {
-      if (this._scrollSyncBound) return;
-      this._scrollSyncBound = true;
+    _followBound: false,
+    _followRAF: 0,
+    _followLastY: null,
+    _followLastEl: null,
 
-      const root = document.documentElement;
-      const sync = () => {
-        root.style.setProperty("--sv-scroll-y", window.scrollY + "px");
+    _getScrollTop() {
+      // window優先、ダメなら scrollingElement
+      const se = document.scrollingElement || document.documentElement;
+      const y = window.scrollY || (se && se.scrollTop) || 0;
+      return y;
+    },
+
+    _getFollowTarget() {
+      // 1) mount運用
+      const m = document.querySelector(".sv-talk-mount");
+      if (m) return m;
+
+      // 2) 直置き運用
+      const b = document.getElementById("svTalkBtn");
+      if (b) return b;
+
+      return null;
+    },
+
+    _applyFollow() {
+      const el = this._getFollowTarget();
+      if (!el) return;
+
+      const y = this._getScrollTop();
+
+      // 変更がないなら無駄撃ちしない
+      if (this._followLastEl === el && this._followLastY === y) return;
+      this._followLastEl = el;
+      this._followLastY = y;
+
+      // 左上固定事故を潰す（他CSSに勝つためインライン指定）
+      el.style.left = "auto";
+      el.style.top = "auto";
+
+      // 「fixedのまま、見た目だけページと一緒に流す」
+      // = スクロール分だけ上に逃がす
+      // ※入場アニメ分などはCSS側で付けたい場合、ここで +6px みたいに足せる
+      el.style.transform = `translate3d(0, ${-y}px, 0)`;
+    },
+
+    bindFollowScroll() {
+      if (this._followBound) return;
+      this._followBound = true;
+
+      const tick = () => {
+        this._followRAF = 0;
+        this._applyFollow();
       };
 
-      window.addEventListener("scroll", sync, { passive: true });
-      window.addEventListener("resize", sync);
-      sync();
+      const onScroll = () => {
+        if (this._followRAF) return;
+        this._followRAF = requestAnimationFrame(tick);
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+
+      // 初回
+      this._applyFollow();
+
+      // ボタンが後から挿入されるケースに備える（MutationObserver）
+      const mo = new MutationObserver(() => this._applyFollow());
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+      this._followMO = mo;
     },
 
     // ======================
@@ -167,8 +225,8 @@
       // 二重注入防止
       if (document.getElementById(this.rootId)) return;
 
-      // ★スクロール追従のためのCSS変数同期
-      this.bindScrollSync();
+      // ★ボタン追従（最優先・最強）
+      this.bindFollowScroll();
 
       this.ensureCss();
       this.injectRoot();
@@ -387,6 +445,10 @@
         btn.dataset.svBound = "1";
         btn.addEventListener("click", () => this.open());
         this.setupPulse(btn);
+
+        // ボタンが現れた瞬間にも追従を当て直す
+        this._applyFollow();
+
         return true;
       };
 
