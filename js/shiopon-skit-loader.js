@@ -28,6 +28,24 @@
     _nextEventBound: false,
 
     // ======================
+    // Scroll Sync (CSS var for "follow scroll")
+    // ======================
+    _scrollSyncBound: false,
+    bindScrollSync() {
+      if (this._scrollSyncBound) return;
+      this._scrollSyncBound = true;
+
+      const root = document.documentElement;
+      const sync = () => {
+        root.style.setProperty("--sv-scroll-y", window.scrollY + "px");
+      };
+
+      window.addEventListener("scroll", sync, { passive: true });
+      window.addEventListener("resize", sync);
+      sync();
+    },
+
+    // ======================
     // Skit Random (No-Repeat, guaranteed per cycle)
     // ======================
     lastSkitKey: "sv_skit_last_v3",
@@ -88,7 +106,6 @@
         if (mode === "session") return sessionStorage.getItem(key);
         return Object.prototype.hasOwnProperty.call(this._memStore, key) ? this._memStore[key] : null;
       } catch {
-        // downgrade
         this._storageMode = "memory";
         return Object.prototype.hasOwnProperty.call(this._memStore, key) ? this._memStore[key] : null;
       }
@@ -101,7 +118,6 @@
         if (mode === "session") return sessionStorage.setItem(key, val);
         this._memStore[key] = val;
       } catch {
-        // downgrade + save in memory
         this._storageMode = "memory";
         this._memStore[key] = val;
       }
@@ -133,9 +149,7 @@
     _writeJSON(key, value) {
       try {
         this._storeSet(key, JSON.stringify(value));
-      } catch {
-        // ignore
-      }
+      } catch {}
     },
 
     // ======================
@@ -152,6 +166,9 @@
     setup() {
       // 二重注入防止
       if (document.getElementById(this.rootId)) return;
+
+      // ★スクロール追従のためのCSS変数同期
+      this.bindScrollSync();
 
       this.ensureCss();
       this.injectRoot();
@@ -278,14 +295,11 @@
 
     // ======================
     // Skit Selection (guaranteed no repeat until pool exhausted)
-    // - Uses played[] for the current cycle.
-    // - Pool snapshot prevents mid-session changes.
     // ======================
     async getNextSkitUrl() {
       const pool = await this.ensureSessionPool();
       if (!pool.length) return "/skits/skit_001.json";
       if (pool.length === 1) {
-        // nothing we can do
         this._storeSet(this.lastSkitKey, pool[0]);
         this._writeJSON(this.playedKey, [pool[0]]);
         return pool[0];
@@ -295,26 +309,21 @@
 
       let played = this._readJSON(this.playedKey, []);
       played = Array.isArray(played) ? played.filter((u) => typeof u === "string" && u) : [];
-      // keep only urls that still exist in pool
       played = played.filter((u) => pool.includes(u));
 
-      // remaining = pool - played
       let remaining = pool.filter((u) => !played.includes(u));
 
-      // cycle finished -> reset
       if (remaining.length === 0) {
         played = [];
         remaining = pool.slice();
       }
 
-      // avoid immediate repeat if possible
       if (remaining.length > 1 && last && remaining.includes(last)) {
         remaining = remaining.filter((u) => u !== last);
       }
 
       const next = remaining[Math.floor(Math.random() * remaining.length)] || pool[0];
 
-      // persist
       played.push(next);
       this._writeJSON(this.playedKey, played);
       this._storeSet(this.lastSkitKey, String(next));
@@ -359,13 +368,11 @@
 
       root.querySelector(".sv-overlay-close")?.addEventListener("click", () => this.close());
 
-      // Global Escape
       if (!this._globalKeyBound) {
         this._globalKeyBound = true;
         document.addEventListener("keydown", (e) => this.handleGlobalKey(e));
       }
 
-      // Ensure focus trap works
       if (panel) this.untrapFocus(panel);
     },
 
@@ -430,7 +437,6 @@
       const engineRoot = overlay?.querySelector(".sv-engine-root");
       if (!overlay || !panel || !engineRoot) return;
 
-      // snapshot pool + keep played state consistent
       await this.ensureSessionPool();
 
       this.lastFocus = document.activeElement;
@@ -514,14 +520,7 @@
       } catch {}
       this.lastFocus = null;
       this._isStarting = false;
-
-      // keep snapshot during page life; if you want reset each open, uncomment:
-      // this._sessionPool = null;
     },
-
-    
-
-  
 
     // ======================
     // Focus
