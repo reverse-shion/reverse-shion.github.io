@@ -690,145 +690,84 @@ body.sv-skit-lock{ overflow: hidden; }
 
 
 /* =========================
-   Shionverse Talk Button (Image Square)
-   - Align with #shiopon-toggle (right:22px / bottom:45px)
-   - Move with scroll (fixed + scrollY tracking)
+   Shionverse Talk Button (DIRECT FIX | LEFT-BOTTOM)
+   - Always fixed on screen
+   - No scroll follow
+   - ID override to avoid CSS conflicts
    ========================= */
 
 :root{
-  /* トグルと同じ座標に合わせる */
-  --sv-talk-right: 22px;
-  --sv-talk-bottom: 45px;
+  --sv-talk-left: 18px;
+  --sv-talk-bottom: 18px;
 
-  /* ★スクロール量（JSが更新する） */
-  --sv-scroll-y: 0px;
-
-  /* 正方形サイズ */
   --sv-btn-size: clamp(62px, 9vh, 84px);
-
   --sv-border: rgba(246, 243, 255, 0.42);
   --sv-glow: rgba(196, 170, 255, 0.34);
   --sv-glow-2: rgba(255, 236, 190, 0.22);
-
-  /* 角丸 */
   --sv-radius: 16px;
-
-  /* 入場アニメ分（readyで0に） */
-  --sv-mount-y: 6px;
 }
 
-/* =========================
-   Mount（位置と追従はここだけ）
-   - 「左上固定」対策として top/left を明示的に無効化
-   - 「ページと一緒に流れる」= scrollYを打ち消す（*-1）
-   ========================= */
-.sv-talk-mount{
-  position: fixed;
-  right: var(--sv-talk-right);
-  bottom: var(--sv-talk-bottom);
+#svTalkBtn{
+  position: fixed !important;
 
-  /* ★左上に吸われる事故を確実に潰す */
-  left: auto !important;
+  left: calc(var(--sv-talk-left) + env(safe-area-inset-left, 0px)) !important;
+  bottom: calc(var(--sv-talk-bottom) + env(safe-area-inset-bottom, 0px)) !important;
+
+  right: auto !important;
   top: auto !important;
 
-  z-index: 9999;
+  z-index: 9999 !important;
 
-  opacity: 0;
-  pointer-events: none;
+  width: var(--sv-btn-size) !important;
+  height: var(--sv-btn-size) !important;
+  padding: 0 !important;
 
-  /* ★スクロールで一緒に流れる（fixed + 打ち消し）＋入場分 */
-  transform: translate3d(0, calc(var(--sv-scroll-y) * -1 + var(--sv-mount-y)), 0);
-
-  transition: opacity 240ms ease, transform 240ms ease;
-
-  -webkit-transform: translateZ(0);
-  will-change: opacity, transform;
-}
-
-.sv-talk-mount--ready{
-  opacity: 1;
-  pointer-events: auto;
-  --sv-mount-y: 0px;
-}
-
-/* iOS safe-area 対応（右下基準） */
-@supports (padding: max(0px)){
-  .sv-talk-mount{
-    right: calc(var(--sv-talk-right) + env(safe-area-inset-right));
-    bottom: calc(var(--sv-talk-bottom) + env(safe-area-inset-bottom));
-  }
-}
-
-/* =========================
-   wrapper
-   ========================= */
-.sv-talk{
-  position: relative;
-  display: inline-block;
-}
-
-/* =========================
-   ボタン本体（画像だけ）
-   ========================= */
-.sv-talk__btn{
-  position: relative;
-  display: grid;
-  place-items: center;
-
-  width: var(--sv-btn-size);
-  height: var(--sv-btn-size);
-  aspect-ratio: 1 / 1;
-
-  padding: 0;
-  border-radius: var(--sv-radius);
-  border: 1px solid var(--sv-border);
-  background: rgba(10, 12, 28, 0.55);
+  border-radius: var(--sv-radius) !important;
+  border: 1px solid var(--sv-border) !important;
+  background: rgba(10, 12, 28, 0.55) !important;
 
   box-shadow:
     0 12px 26px rgba(0,0,0,0.25),
     0 0 0 1px rgba(255,255,255,0.06) inset,
-    0 0 18px var(--sv-glow);
+    0 0 18px var(--sv-glow) !important;
 
-  overflow: hidden;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  overflow: hidden !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
 
-  transform-origin: 50% 70%;
-  animation: svBreath 3.8s ease-in-out infinite;
+  transform-origin: 50% 70% !important;
+  animation: svBreath 3.8s ease-in-out infinite !important;
+
+  /* ★JSがtransformを触る事故を封じる（FollowScroll無効化が前提だが保険） */
+  transform: translateZ(0) !important;
 }
 
-/* ボタン内の画像 */
-.sv-talk__img{
+#svTalkBtn .sv-talk__img{
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
-
-  /* Safari保険 */
   border-radius: var(--sv-radius);
   transform: translateZ(0);
 }
 
-/* hover（PC） */
 @media (hover:hover){
-  .sv-talk__btn:hover{
-    border-color: rgba(255, 248, 230, 0.52);
+  #svTalkBtn:hover{
+    border-color: rgba(255, 248, 230, 0.52) !important;
     box-shadow:
       0 14px 30px rgba(0,0,0,0.28),
       0 0 0 1px rgba(255,255,255,0.08) inset,
       0 0 22px var(--sv-glow),
-      0 0 18px var(--sv-glow-2);
+      0 0 18px var(--sv-glow-2) !important;
   }
 }
 
-/* Tap / Active */
-.sv-talk__btn:active{
-  transform: translateY(1px) scale(0.985);
+#svTalkBtn:active{
+  transform: translateY(1px) scale(0.985) !important;
 }
 
-/* しずかな“光の波紋” */
-.sv-talk__btn::after{
+#svTalkBtn::after{
   content:"";
   position:absolute;
   inset:-2px;
@@ -839,13 +778,13 @@ body.sv-skit-lock{ overflow: hidden; }
   transition: opacity 200ms ease, transform 420ms ease;
   pointer-events:none;
 }
-.sv-talk__btn:active::after{
+
+#svTalkBtn:active::after{
   opacity: 0.45;
   transform: translateX(18px);
 }
 
-/* キーボード操作の可視化 */
-.sv-talk__btn:focus-visible{
+#svTalkBtn:focus-visible{
   outline: 2px solid rgba(255,255,255,0.35);
   outline-offset: 3px;
 }
@@ -855,15 +794,8 @@ body.sv-skit-lock{ overflow: hidden; }
   50%{ transform: translateZ(0) scale(1.02); }
 }
 
-/* =========================
-   保険：#svTalkBtn が直置きのページがある場合
-   （mountに入ってない構造用）
-   ※ mount運用が正なら効かなくてOK
-   ========================= */
-#svTalkBtn{
-  left: auto !important;
-  top: auto !important;
-}
+
+
 /* =========================
    iOS Safari “青枠”を消す（タッチ環境のみ）
    ========================= */
