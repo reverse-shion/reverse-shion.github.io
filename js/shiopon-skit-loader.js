@@ -225,9 +225,7 @@
       // 二重注入防止
       if (document.getElementById(this.rootId)) return;
 
-      // ★ボタン追従（最優先・最強）
-      this.bindFollowScroll();
-
+     
       this.ensureCss();
       this.injectRoot();
       this.loadEngine();
