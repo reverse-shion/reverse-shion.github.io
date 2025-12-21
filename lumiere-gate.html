@@ -252,12 +252,16 @@
       color: #6c5c2c;
       margin-bottom: 6px;
     }
+
+    /* ✅ \n を “会話としての改行” にする（固定改行） */
     .dialogue-text {
       white-space: pre-line;
       font-size: clamp(15px, 2.5vw, 17px);
       line-height: 1.7;
+      /* ✅ 2〜3行を美しく見せる最低高さ（長文でも崩れにくい） */
       min-height: 3.4em;
     }
+
     .dialogue-next {
       position: absolute;
       right: 14px;
@@ -586,6 +590,11 @@
         const honor = base ? `${base}様` : "";
         return (arr || []).map((line) => {
           let s = String(line);
+
+          // ✅ 文字列内の "\n"（バックスラッシュn）を実改行へ変換
+          // TXTで \n を書くと、そのまま改行として表示できる（会話としての改行）
+          s = s.replace(/\\n/g, "\n");
+
           s = s.replace(/\{name\}(様|さま)/gu, () => (base ? `${base}様` : ""));
           s = s.replace(/\{nameWithHonor\}/g, honor);
           s = s.replace(/\{name\}/g, base);
@@ -595,7 +604,7 @@
 
       // =========================================================
       // セリフ（TXTがあれば上書き）
-      // ✅ talk は「空行区切り」で1ブロック（2〜3行）＝1会話
+      // ✅ talk は「空行区切り」で1ブロック（2〜3行推奨）＝1会話
       // =========================================================
       const fallbackLines = {
         "first-visit": [
@@ -623,7 +632,6 @@
           "この間は……なんだか落ち着くの。",
           "疲れたら、いつでもここで休んでくださいね。"
         ],
-        /* ✅ 内部の talk も「ブロック」前提にしておく（空行＝区切り） */
         "talk": [
           "……{nameWithHonor}。",
           "今日の心は、どんな天気かな。",
@@ -655,25 +663,25 @@
         let current = null;
 
         txt.split("\n").forEach((raw) => {
-          const line = raw.replace(/\r/g, ""); // 念のため
-          const trimmed = line.trimEnd();      // 右端だけ整える（空行判定に使う）
+          const line = raw.replace(/\r/g, "");
+          const trimmedEnd = line.trimEnd();
 
-          if (trimmed.trim().startsWith("# ")) {
-            current = trimmed.trim().replace("# ", "").trim();
+          // 見出し： "# talk" みたいな形式
+          if (/^\s*#\s+\S+/.test(trimmedEnd)) {
+            current = trimmedEnd.trim().replace(/^#\s+/, "").trim();
             lines[current] = [];
             return;
           }
 
           if (!current) return;
 
-          // ✅ 空行は「区切り」として保持（"" を入れる）
-          if (trimmed.trim() === "") {
+          // ✅ 空行はブロック区切りとして保持
+          if (trimmedEnd.trim() === "") {
             lines[current].push("");
             return;
           }
 
-          // ✅ 通常行
-          lines[current].push(trimmed.trim());
+          lines[current].push(trimmedEnd.trim());
         });
 
         return lines;
@@ -695,14 +703,18 @@
         return fallbackLines[category] || [];
       };
 
-      /* ✅ talk を「空行区切り」でブロック化する（2〜3行×2〜3ターン運用OK） */
+      /* ✅ 空行区切りで talk をブロック化（1ブロック=1発話） */
       const splitIntoBlocks = (rawLines) => {
         const src = Array.isArray(rawLines) ? rawLines : [];
         const blocks = [];
         let buf = [];
 
         const pushBuf = () => {
-          const clean = buf.map(s => String(s || "").trim()).filter(Boolean);
+          const clean = buf
+            .map(s => String(s || "").trim())
+            .filter(Boolean);
+
+          // ✅ 2〜3行運用を想定（多すぎても動くけど、理想は2〜3）
           if (clean.length) blocks.push(clean);
           buf = [];
         };
@@ -717,9 +729,12 @@
         }
         pushBuf();
 
-        // もし「空行区切りが無い」＝旧形式だった場合は、1行=1ブロック扱いに寄せる
+        // 空行区切りが無い旧形式の場合：1行=1ブロック扱い
         if (blocks.length === 0) {
-          return src.map(s => String(s || "").trim()).filter(Boolean).map(one => [one]);
+          return src
+            .map(s => String(s || "").trim())
+            .filter(Boolean)
+            .map(one => [one]);
         }
         return blocks;
       };
@@ -795,9 +810,7 @@
         lumiereMouth.src = open ? "assets/lumiere/mouth_open.png" : "assets/lumiere/mouth.png";
       };
 
-      const stopMouth = () => {
-        setMouth(false);
-      };
+      const stopMouth = () => { setMouth(false); };
 
       const isPauseChar = (ch) => /[、。…！？\s]/u.test(ch);
 
@@ -1089,7 +1102,7 @@
       };
 
       // =========================================================
-      // ✅ talk：1回押すたびに「1ブロック(2〜3行)」を最後まで
+      // ✅ talk：1回押すたびに「1ブロック(2〜3行推奨)」を最後まで
       // - ブロックが終わるまでメニューに戻らない
       // =========================================================
       const startTalkOnce = () => {
@@ -1098,10 +1111,10 @@
 
         showBust();
 
-        const block = popNextTalkBlock();     // ← 配列（2〜3行）
-        const lines = injectName(block);      // ← 名前差し込み
+        const block = popNextTalkBlock(); // ← 2〜3行推奨（配列）
+        const lines = injectName(block);  // ← \n と名前置換を適用
 
-        playLines(lines, () => { endConversation(); });  // ← 全行終わってから戻る
+        playLines(lines, () => { endConversation(); });
       };
 
       const endConversation = () => {
