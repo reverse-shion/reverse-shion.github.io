@@ -53,13 +53,16 @@
     }
 
     /* 星粒レイヤー */
-    .star-field {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 1;
-    }
+    .star-field{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2; /* ←上げる */
+  mix-blend-mode: screen; /* 任意：光っぽく見せる */
+  opacity: 0.9;           /* 任意：少し強める */
+}
+
     .star-field span {
       position: absolute;
       display: block;
@@ -88,7 +91,7 @@
       transition: opacity var(--transition);
       opacity: 0;
       pointer-events: none;
-      z-index: 2;
+      z-index: 1;
     }
 
     .scene::after {
