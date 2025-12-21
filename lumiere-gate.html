@@ -18,6 +18,11 @@
       --shadow-soft: 0 8px 20px rgba(12, 12, 20, 0.12);
       --transition: 900ms ease;
       --font-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+      /* 口の微調整（必要なら） */
+      --lumiere-mouth-x: 0px;
+      --lumiere-mouth-y: 0px;
+      --lumiere-mouth-scale: 1;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -182,40 +187,27 @@
       100% { transform: translateX(-50%) translateY(2px); }
     }
 
-    /* ========= ここが新：顔レイヤー方式 ========= */
-    .lumiere-bust .frame {
+    /* ========= 顔レイヤー方式（face + eyes + mouth） ========= */
+    .lumiere-bust .frame.lumiere-face{
       position: relative;
       width: min(80vw, 420px);
-      height: auto;
-      min-height: 320px;
       margin: 0 auto;
     }
-
-    /* 共通：全部センターに重ねる */
-    .lumiere-bust .frame img {
+    .lumiere-layer{
       position: absolute;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
+      inset: 0;
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: contain;
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
     }
-
-    /* 目・口はデフォで非表示（状態で切替） */
-    .lumiere-bust .eyes,
-    .lumiere-bust .mouth {
-      opacity: 0;
-      transition: opacity 80ms linear;
+    .lumiere-layer.mouth{
+      transform: translate(var(--lumiere-mouth-x), var(--lumiere-mouth-y)) scale(var(--lumiere-mouth-scale));
+      transform-origin: center;
     }
 
-    /* 初期表示（open eyes / close mouth） */
-    .lumiere-bust .eyes-open { opacity: 1; }
-    .lumiere-bust .mouth-close { opacity: 1; }
-
-  
     /* セリフウィンドウ（バストアップの手前） */
     .dialogue-window {
       position: absolute;
@@ -454,7 +446,6 @@
 </head>
 
 <body>
-  <!-- ✅ common.js を先に読み込む（前室は必須） -->
   <script src="/js/common.js"></script>
 
   <div class="star-field" aria-hidden="true"></div>
@@ -470,23 +461,17 @@
     <section class="scene scene-hall" aria-label="リュミエールの間">
       <div class="hall-overlay"></div>
 
-      <!-- 全身 → 初回のみ使用 -->
+      <!-- 全身 → 初回のみ使用（ここは現状維持） -->
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
-      <!-- ✅ バストアップ（会話用）：顔レイヤー方式に置換 -->
+      <!-- バストアップ（顔レイヤー方式：face + eyes + mouth） -->
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
-        <div class="frame" id="lumiereFaceFrame">
-          <img src="assets/lumiere/face.png" alt="Lumiere face" class="face-base" id="faceBase">
-
-          <img src="assets/lumiere/eyes_open.png"  alt="" class="eyes eyes-open"  id="eyesOpen">
-          <img src="assets/lumiere/eyes_half.png"  alt="" class="eyes eyes-half"  id="eyesHalf">
-          <img src="assets/lumiere/eyes_close.png" alt="" class="eyes eyes-close" id="eyesClose">
-
-          <img src="assets/lumiere/mouth.png"      alt="" class="mouth mouth-close" id="mouthClose">
-          <img src="assets/lumiere/mouth_open.png" alt="" class="mouth mouth-open"  id="mouthOpen">
+        <div class="frame lumiere-face" id="lumiereFaceFrame">
+          <img class="lumiere-layer base"  src="assets/lumiere/face.png" alt="Lumiere face">
+          <img class="lumiere-layer eyes"  id="lumiereEyes"  src="assets/lumiere/eyes_open.png" alt="">
+          <img class="lumiere-layer mouth" id="lumiereMouth" src="assets/lumiere/mouth.png" alt="">
         </div>
-
-     
+      </div>
 
       <!-- セリフ -->
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
@@ -537,12 +522,9 @@
       const fullFigure     = document.getElementById("fullFigure");
       const bustContainer  = document.getElementById("bustContainer");
 
-      // ✅ 新：顔パーツ
-      const eyesOpen   = document.getElementById("eyesOpen");
-      const eyesHalf   = document.getElementById("eyesHalf");
-      const eyesClose  = document.getElementById("eyesClose");
-      const mouthClose = document.getElementById("mouthClose");
-      const mouthOpen  = document.getElementById("mouthOpen");
+      // 顔パーツ（新）
+      const lumiereEyes  = document.getElementById("lumiereEyes");
+      const lumiereMouth = document.getElementById("lumiereMouth");
 
       const dialogueWindow = document.getElementById("dialogueWindow");
       const dialogueText   = document.getElementById("dialogueText");
@@ -558,12 +540,11 @@
       const dimOverlay     = document.getElementById("dimOverlay");
 
       const STORAGE_MUTE = "lumiereBgmMuted";
-
       const blinkMin = 3000;
       const blinkMax = 7000;
 
       // =========================================================
-      // ✅ 名前（現状維持）
+      // 名前（現状維持）
       // =========================================================
       const stripHonorific = (s) => {
         return String(s || "")
@@ -599,7 +580,7 @@
       };
 
       // =========================================================
-      // ✅ セリフ（現状維持）
+      // セリフ（TXTがあれば上書き）
       // =========================================================
       const fallbackLines = {
         "first-visit": [
@@ -634,10 +615,11 @@
       let lineIndex = 0;
       let typingTimer = null;
       let isTyping = false;
-
       let isConversation = false;
 
-      /* --------------- テキストファイル読み込み（あれば上書き） --------------- */
+      // 会話（talk）用：重複なしランダム再生
+      let talkQueue = []; // 次に出す順番（シャッフル済み）
+
       const parseLumiereTxt = (txt) => {
         const lines = {};
         let current = null;
@@ -670,7 +652,9 @@
         return fallbackLines[category] || [];
       };
 
-      /* --------------- 星粒 --------------- */
+      // =========================================================
+      // 星粒
+      // =========================================================
       const createStars = () => {
         const total = 40;
         for (let i = 0; i < total; i++) {
@@ -686,7 +670,9 @@
         }
       };
 
-      /* --------------- 粒子＆光柱 --------------- */
+      // =========================================================
+      // 粒子＆光柱
+      // =========================================================
       const spawnParticles = (btn) => {
         const layer = btn.querySelector(".particle-layer");
         if (!layer) return;
@@ -707,62 +693,71 @@
         glow.addEventListener("animationend", () => glow.remove());
       };
 
-      /* --------------- 目ぱち・口パク（新） --------------- */
+      // =========================================================
+      // 目ぱち（open/half/close）
+      // =========================================================
       let blinkTimer = null;
-      let mouthTimer = null;
-
-      const setEyes = (state) => {
-        // state: "open" | "half" | "close"
-        eyesOpen.style.opacity  = (state === "open")  ? 1 : 0;
-        eyesHalf.style.opacity  = (state === "half")  ? 1 : 0;
-        eyesClose.style.opacity = (state === "close") ? 1 : 0;
-      };
-
-      const blinkOnce = () => {
-        // open -> half -> close -> open
-        setEyes("half");
-        setTimeout(() => {
-          setEyes("close");
-          setTimeout(() => {
-            setEyes("open");
-          }, 120);
-        }, 80);
-      };
 
       const scheduleBlink = () => {
         clearTimeout(blinkTimer);
         const delay = blinkMin + Math.random() * (blinkMax - blinkMin);
+
         blinkTimer = setTimeout(() => {
-          blinkOnce();
-          scheduleBlink();
+          // half -> close -> open
+          lumiereEyes.src = "assets/lumiere/eyes_half.png";
+          setTimeout(() => {
+            lumiereEyes.src = "assets/lumiere/eyes_close.png";
+            setTimeout(() => {
+              lumiereEyes.src = "assets/lumiere/eyes_open.png";
+              scheduleBlink();
+            }, 110);
+          }, 90);
         }, delay);
       };
 
-      const startLipSync = () => {
-        if (mouthTimer) return;
-        // 最初に開いてからランダムでパクパク
-        mouthClose.style.opacity = 0;
-        mouthOpen.style.opacity  = 1;
+      // =========================================================
+      // 口パク：typing中だけ動く（ずっと再生しない）
+      // =========================================================
+      let mouthTimer = null;
+      let mouthOpenState = false;
 
-        mouthTimer = setInterval(() => {
-          const open = Math.random() > 0.35; // 開く頻度
-          mouthOpen.style.opacity  = open ? 1 : 0;
-          mouthClose.style.opacity = open ? 0 : 1;
-        }, 120);
+      const setMouth = (open) => {
+        mouthOpenState = !!open;
+        lumiereMouth.src = mouthOpenState
+          ? "assets/lumiere/mouth_open.png"
+          : "assets/lumiere/mouth.png";
       };
 
-      const stopLipSync = () => {
+      const stopMouth = () => {
         clearInterval(mouthTimer);
         mouthTimer = null;
-        mouthOpen.style.opacity  = 0;
-        mouthClose.style.opacity = 1;
+        setMouth(false);
+      };
+
+      const startMouth = () => {
+        if (mouthTimer) return;
+
+        mouthTimer = setInterval(() => {
+          // 句読点・間は閉じ気味
+          const t = dialogueText.textContent || "";
+          const last = t.slice(-1);
+          const pause = /[、。…！？]/.test(last);
+
+          if (pause) {
+            setMouth(false);
+            return;
+          }
+
+          // 開閉を自然に揺らす
+          const r = Math.random();
+          setMouth(r > 0.45);
+        }, 85 + Math.floor(Math.random() * 55)); // 85〜140ms
       };
 
       const showBust = () => {
         bustContainer.classList.add("is-visible");
-        // 初期状態を明示
-        setEyes("open");
-        stopLipSync();
+        lumiereEyes.src = "assets/lumiere/eyes_open.png";
+        stopMouth();
         scheduleBlink();
       };
 
@@ -770,20 +765,22 @@
         bustContainer.classList.remove("is-visible");
         clearTimeout(blinkTimer);
         blinkTimer = null;
-        stopLipSync();
-        setEyes("open");
+        stopMouth();
+        lumiereEyes.src = "assets/lumiere/eyes_open.png";
       };
 
-      /* --------------- セリフ周り --------------- */
+      // =========================================================
+      // セリフ表示
+      // =========================================================
       const resetDialogueHandlers = () => {
         dialogueWindow.onclick = null;
         dialogueNext.onclick = null;
       };
 
       const setSpeaking = (state) => {
-        bustContainer.classList.toggle("speaking", !!state);
-        if (state) startLipSync();
-        else stopLipSync();
+        const on = !!state;
+        bustContainer.classList.toggle("speaking", on);
+        if (!on) stopMouth(); // 念のため
       };
 
       const hideDialogueWindow = () => {
@@ -792,23 +789,29 @@
         clearInterval(typingTimer);
         isTyping = false;
         dialogueNext.style.opacity = 0;
+        stopMouth();
         setSpeaking(false);
       };
 
       const showLine = (line, onComplete) => {
         clearInterval(typingTimer);
         dialogueNext.style.opacity = 0;
+
         const chars = String(line).split("");
         let idx = 0;
         dialogueText.textContent = "";
         isTyping = true;
 
+        startMouth(); // ✅ 打ってる間だけ
+
         typingTimer = setInterval(() => {
           dialogueText.textContent += chars[idx];
           idx++;
+
           if (idx >= chars.length) {
             clearInterval(typingTimer);
             isTyping = false;
+            stopMouth(); // ✅ 行が終わったら止める
             dialogueNext.style.opacity = 1;
             if (onComplete) onComplete();
           }
@@ -818,6 +821,11 @@
       const showAll = (line) => {
         clearInterval(typingTimer);
         isTyping = false;
+
+        // ✅ スキップ時は“一瞬だけ”喋った感→すぐ閉じる
+        startMouth();
+        setTimeout(stopMouth, 180);
+
         dialogueText.textContent = String(line);
         dialogueNext.style.opacity = 1;
       };
@@ -843,8 +851,7 @@
             if (callback) callback();
             return;
           }
-          const line = currentLines[lineIndex];
-          showLine(line, () => {});
+          showLine(currentLines[lineIndex], () => {});
         };
 
         const advance = () => {
@@ -862,7 +869,38 @@
         next();
       };
 
-      /* --------------- BGM --------------- */
+      // =========================================================
+      // 会話（talk）：TXT読み込み + 無限追加 + 重複なしランダム
+      // - # talk の行を1行=1セリフとして扱う（1回の会話で1行だけ喋る）
+      // - 全部消化するまで重複なし、尽きたら再シャッフル
+      // =========================================================
+      const shuffle = (arr) => {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      };
+
+      const refillTalkQueueIfNeeded = () => {
+        if (talkQueue.length > 0) return;
+
+        const raw = getLines("talk"); // ← TXTは # talk セクションを使う
+        const pool = (raw && raw.length ? raw : getLines("conversation")).filter(Boolean);
+
+        // injectNameは「表示直前」にやる（名前変更にも追従）
+        talkQueue = shuffle(pool);
+      };
+
+      const popNextTalkLine = () => {
+        refillTalkQueueIfNeeded();
+        return talkQueue.shift() || "";
+      };
+
+      // =========================================================
+      // BGM
+      // =========================================================
       const setMute = (muted) => {
         bgm.muted = muted;
         soundToggle.querySelector("span").textContent = muted ? "♪×" : "♪";
@@ -876,20 +914,23 @@
         if (!bgm.muted) bgm.play().catch(() => {});
       };
 
-      /* --------------- プリロード（新：assets/lumiere） --------------- */
+      // =========================================================
+      // プリロード
+      // =========================================================
       const preloadImages = () => {
-        const files = [
+        [
           "assets/lumiere/face.png",
           "assets/lumiere/eyes_open.png",
           "assets/lumiere/eyes_half.png",
           "assets/lumiere/eyes_close.png",
           "assets/lumiere/mouth.png",
-          "assets/lumiere/mouth_open.png"
-        ];
-        files.forEach((src) => { const img = new Image(); img.src = src; });
+          "assets/lumiere/mouth_open.png",
+        ].forEach((src) => { const img = new Image(); img.src = src; });
       };
 
-      /* --------------- フォイヤー → ホール --------------- */
+      // =========================================================
+      // フォイヤー → ホール
+      // =========================================================
       const startFoyer = () => {
         dialogueWindow.classList.remove("is-visible");
         menu.classList.remove("is-visible");
@@ -910,7 +951,9 @@
         setTimeout(() => { runInitialDialogue(); }, 1000);
       };
 
-      /* --------------- 初期セリフ（初回／再訪） --------------- */
+      // =========================================================
+      // 初期セリフ（初回／再訪）
+      // =========================================================
       const runInitialDialogue = () => {
         const base = getBaseUserName();
 
@@ -977,14 +1020,19 @@
         villageBtn.style.display = (getBaseUserName() ? "inline-flex" : "none");
       };
 
-      /* --------------- 会話モード --------------- */
-      const startConversation = () => {
+      // =========================================================
+      // 会話モード（talk）
+      // - 1回押すたびにランダム1行（重複なし）
+      // =========================================================
+      const startTalkOnce = () => {
         isConversation = true;
         menu.classList.remove("is-visible");
 
         showBust();
 
-        const lines = injectName(getLines("conversation"));
+        const one = popNextTalkLine();
+        const lines = injectName([one]);
+
         playLines(lines, () => { endConversation(); });
       };
 
@@ -994,7 +1042,9 @@
         setTimeout(() => { menu.classList.add("is-visible"); }, 350);
       };
 
-      /* --------------- イベント --------------- */
+      // =========================================================
+      // イベント
+      // =========================================================
       nameSubmit.addEventListener("click", () => {
         const value = nameField.value.trim();
         if (!value) {
@@ -1043,7 +1093,7 @@
           if (action === "talk") {
             dimOverlay.classList.remove("show");
             if (isConversation) return;
-            startConversation();
+            startTalkOnce();
           }
         });
       });
@@ -1056,7 +1106,9 @@
 
       document.body.addEventListener("click", ensureBgm, { once: true });
 
-      /* --------------- 初期化 --------------- */
+      // =========================================================
+      // 初期化
+      // =========================================================
       const startLumiereGate = () => {
         createStars();
         preloadImages();
@@ -1074,6 +1126,9 @@
 
       window.addEventListener("DOMContentLoaded", async () => {
         await loadExternalLines();
+
+        // talkQueueは最初から作ってもOK（押した瞬間に作るでもOK）
+        talkQueue = []; // 念のため
         startLumiereGate();
       });
     })();
