@@ -19,6 +19,9 @@
       --transition: 900ms ease;
       --font-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
+      /* ✅ 位置調整：バストアップを少し下げてセリフとのバランス最適化 */
+      --lumiere-bust-bottom: 22vh;
+
       /* 口の微調整（必要なら） */
       --lumiere-mouth-x: 0px;
       --lumiere-mouth-y: 0px;
@@ -167,7 +170,7 @@
     /* バストアップ（会話用） */
     .lumiere-bust {
       position: absolute;
-      bottom: 30vh;
+      bottom: calc(var(--lumiere-bust-bottom) + env(safe-area-inset-bottom, 0px));
       left: 50%;
       transform: translateX(-50%);
       max-width: min(58vh, 78vw);
@@ -194,7 +197,7 @@
       display: inline-block;
     }
 
-    /* ベースは通常配置（これが高さの基準になる） */
+    /* ベース */
     .lumiere-base{
       display: block;
       width: 100%;
@@ -222,7 +225,7 @@
       transform-origin: center;
     }
 
-    /* セリフウィンドウ（バストアップの手前） */
+    /* セリフウィンドウ */
     .dialogue-window {
       position: absolute;
       left: 50%;
@@ -445,16 +448,17 @@
       .gold-button { width: calc(50% - 8px); justify-content: center; text-align: center; }
       .name-input { flex-direction: column; align-items: stretch; }
       .name-input input { width: 100%; }
+      :root { --lumiere-bust-bottom: 20vh; }
     }
     @media (max-width: 480px) {
       .lumiere-full { bottom: 4vh; }
-      .lumiere-bust { bottom: 28vh; }
       .dialogue-window { padding: 12px 14px 18px; }
+      :root { --lumiere-bust-bottom: 18vh; }
     }
     @media (max-height: 700px) {
       .dialogue-window { bottom: 10vh; }
-      .lumiere-bust { bottom: 24vh; }
       .menu { bottom: 2.4vh; }
+      :root { --lumiere-bust-bottom: 16vh; }
     }
   </style>
 </head>
@@ -725,31 +729,39 @@
       };
 
       // =========================================================
-      // 口パク：typing中だけ
+      // ✅ 口パク：文字追従（自然に喋る・回数も増える）
+      // - typing中：出力文字に合わせて開閉
+      // - 句読点/間：閉じる
+      // - 速すぎない・単調にならない
       // =========================================================
-      let mouthTimer = null;
+      let mouthPulse = 0;
 
       const setMouth = (open) => {
         lumiereMouth.src = open ? "assets/lumiere/mouth_open.png" : "assets/lumiere/mouth.png";
       };
 
       const stopMouth = () => {
-        clearInterval(mouthTimer);
-        mouthTimer = null;
         setMouth(false);
       };
 
-      const startMouth = () => {
-        if (mouthTimer) return;
+      const isPauseChar = (ch) => /[、。…！？\s]/u.test(ch);
 
-        mouthTimer = setInterval(() => {
-          const t = dialogueText.textContent || "";
-          const last = t.slice(-1);
-          const pause = /[、。…！？]/.test(last);
+      const mouthStepByChar = (ch) => {
+        if (!ch) return;
+        if (isPauseChar(ch)) { setMouth(false); return; }
 
-          if (pause) { setMouth(false); return; }
-          setMouth(Math.random() > 0.45);
-        }, 85 + Math.floor(Math.random() * 55));
+        // パターンの揺らぎ（自然な喋り）
+        // 2回開いて1回閉じる、などのリズムを作る
+        mouthPulse++;
+        const mod = mouthPulse % 4;
+        if (mod === 0) { setMouth(false); return; }
+        setMouth(true);
+      };
+
+      const mouthMicroBounce = () => {
+        // タイピング完了直後に少しだけ余韻（最後の一息）
+        setMouth(true);
+        setTimeout(() => setMouth(false), 110);
       };
 
       const showBust = () => {
@@ -785,6 +797,7 @@
         dialogueWindow.classList.remove("is-visible");
         resetDialogueHandlers();
         clearInterval(typingTimer);
+        typingTimer = null;
         isTyping = false;
         dialogueNext.style.opacity = 0;
         stopMouth();
@@ -793,38 +806,47 @@
 
       const showLine = (line, onComplete) => {
         clearInterval(typingTimer);
+        typingTimer = null;
         dialogueNext.style.opacity = 0;
 
-        const chars = String(line).split("");
+        const chars = Array.from(String(line));
         let idx = 0;
         dialogueText.textContent = "";
         isTyping = true;
 
-        startMouth();
+        // 口パク位相リセット（毎行で自然に）
+        mouthPulse = 0;
 
         typingTimer = setInterval(() => {
-          dialogueText.textContent += chars[idx];
+          const ch = chars[idx];
+          dialogueText.textContent += ch;
+          mouthStepByChar(ch);
+
           idx++;
 
           if (idx >= chars.length) {
             clearInterval(typingTimer);
+            typingTimer = null;
             isTyping = false;
-            stopMouth();
+            mouthMicroBounce();
             dialogueNext.style.opacity = 1;
             if (onComplete) onComplete();
           }
-        }, 35);
+        }, 34);
       };
 
       const showAll = (line) => {
         clearInterval(typingTimer);
+        typingTimer = null;
         isTyping = false;
-
-        startMouth();
-        setTimeout(stopMouth, 180);
 
         dialogueText.textContent = String(line);
         dialogueNext.style.opacity = 1;
+
+        // 一瞬だけ口が動く（スキップ時でも違和感を減らす）
+        mouthPulse = 0;
+        setMouth(true);
+        setTimeout(() => setMouth(false), 140);
       };
 
       const playLines = (list, callback, { keepVisible = false } = {}) => {
