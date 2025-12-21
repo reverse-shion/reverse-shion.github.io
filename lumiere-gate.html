@@ -215,39 +215,7 @@
     .lumiere-bust .eyes-open { opacity: 1; }
     .lumiere-bust .mouth-close { opacity: 1; }
 
-    /* ===== リュミエール：光の口パク（既存） ===== */
-    .lumiere-mouth-glow {
-      position: absolute;
-      left: 50%;
-      bottom: 18%; /* 口の高さ：必要なら微調整 */
-      transform: translateX(-50%);
-      width: 22%;
-      height: 24px;
-      pointer-events: none;
-      opacity: 0;
-      filter: blur(6px);
-      mix-blend-mode: screen;
-      background: radial-gradient(
-        circle,
-        rgba(255, 230, 255, 0.95),
-        rgba(255, 150, 220, 0.4),
-        rgba(255, 150, 220, 0.0)
-      );
-      border-radius: 50%;
-      transition: opacity 0.3s ease;
-    }
-
-    .lumiere-bust.speaking .lumiere-mouth-glow {
-      opacity: 1;
-      animation: mouthPulse 0.45s ease-in-out infinite;
-    }
-    @keyframes mouthPulse {
-      0%   { transform: translateX(-50%) scaleY(0.55) scaleX(0.85); opacity: 0.35; }
-      40%  { transform: translateX(-50%) scaleY(1.15) scaleX(1.10); opacity: 0.95; }
-      70%  { transform: translateX(-50%) scaleY(0.85) scaleX(1.00); opacity: 0.65; }
-      100% { transform: translateX(-50%) scaleY(0.60) scaleX(0.90); opacity: 0.40; }
-    }
-
+  
     /* セリフウィンドウ（バストアップの手前） */
     .dialogue-window {
       position: absolute;
@@ -518,9 +486,7 @@
           <img src="assets/lumiere/mouth_open.png" alt="" class="mouth mouth-open"  id="mouthOpen">
         </div>
 
-        <!-- ★口元の光 -->
-        <div class="lumiere-mouth-glow"></div>
-      </div>
+     
 
       <!-- セリフ -->
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
