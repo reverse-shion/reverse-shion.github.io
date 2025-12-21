@@ -595,6 +595,7 @@
 
       // =========================================================
       // セリフ（TXTがあれば上書き）
+      // ✅ talk は「空行区切り」で1ブロック（2〜3行）＝1会話
       // =========================================================
       const fallbackLines = {
         "first-visit": [
@@ -621,6 +622,20 @@
           "でも、大丈夫。あなた様が来てくれると、",
           "この間は……なんだか落ち着くの。",
           "疲れたら、いつでもここで休んでくださいね。"
+        ],
+        /* ✅ 内部の talk も「ブロック」前提にしておく（空行＝区切り） */
+        "talk": [
+          "……{nameWithHonor}。",
+          "今日の心は、どんな天気かな。",
+          "雲があっても、空はちゃんとここにあるよ。",
+          "",
+          "焦りがある日は、光が少し細く見える。",
+          "でもね、細い光でも――",
+          "道を照らすには、十分なんだよ。",
+          "",
+          "涙は弱さじゃない。",
+          "光が溢れただけ。",
+          "だから、隠さなくていい。"
         ]
       };
 
@@ -631,22 +646,36 @@
       let isTyping = false;
       let isConversation = false;
 
-      // talk：重複なしランダム
+      // talk：重複なしランダム（ブロック単位）
       let talkQueue = [];
 
+      /* ✅ 空行を保持できるTXTパーサ（talkのブロック区切りに必要） */
       const parseLumiereTxt = (txt) => {
         const lines = {};
         let current = null;
-        txt.split("\n").forEach((line) => {
-          const trimmed = line.trim();
-          if (!trimmed) return;
-          if (trimmed.startsWith("# ")) {
-            current = trimmed.replace("# ", "").trim();
+
+        txt.split("\n").forEach((raw) => {
+          const line = raw.replace(/\r/g, ""); // 念のため
+          const trimmed = line.trimEnd();      // 右端だけ整える（空行判定に使う）
+
+          if (trimmed.trim().startsWith("# ")) {
+            current = trimmed.trim().replace("# ", "").trim();
             lines[current] = [];
-          } else if (current) {
-            lines[current].push(trimmed);
+            return;
           }
+
+          if (!current) return;
+
+          // ✅ 空行は「区切り」として保持（"" を入れる）
+          if (trimmed.trim() === "") {
+            lines[current].push("");
+            return;
+          }
+
+          // ✅ 通常行
+          lines[current].push(trimmed.trim());
         });
+
         return lines;
       };
 
@@ -664,6 +693,35 @@
       const getLines = (category) => {
         if (externalLines[category] && externalLines[category].length > 0) return externalLines[category];
         return fallbackLines[category] || [];
+      };
+
+      /* ✅ talk を「空行区切り」でブロック化する（2〜3行×2〜3ターン運用OK） */
+      const splitIntoBlocks = (rawLines) => {
+        const src = Array.isArray(rawLines) ? rawLines : [];
+        const blocks = [];
+        let buf = [];
+
+        const pushBuf = () => {
+          const clean = buf.map(s => String(s || "").trim()).filter(Boolean);
+          if (clean.length) blocks.push(clean);
+          buf = [];
+        };
+
+        for (const line of src) {
+          const s = String(line ?? "");
+          if (s.trim() === "") {
+            pushBuf();
+          } else {
+            buf.push(s);
+          }
+        }
+        pushBuf();
+
+        // もし「空行区切りが無い」＝旧形式だった場合は、1行=1ブロック扱いに寄せる
+        if (blocks.length === 0) {
+          return src.map(s => String(s || "").trim()).filter(Boolean).map(one => [one]);
+        }
+        return blocks;
       };
 
       // =========================================================
@@ -729,10 +787,7 @@
       };
 
       // =========================================================
-      // ✅ 口パク：文字追従（自然に喋る・回数も増える）
-      // - typing中：出力文字に合わせて開閉
-      // - 句読点/間：閉じる
-      // - 速すぎない・単調にならない
+      // ✅ 口パク：文字追従（自然に喋る）
       // =========================================================
       let mouthPulse = 0;
 
@@ -750,8 +805,6 @@
         if (!ch) return;
         if (isPauseChar(ch)) { setMouth(false); return; }
 
-        // パターンの揺らぎ（自然な喋り）
-        // 2回開いて1回閉じる、などのリズムを作る
         mouthPulse++;
         const mod = mouthPulse % 4;
         if (mod === 0) { setMouth(false); return; }
@@ -759,7 +812,6 @@
       };
 
       const mouthMicroBounce = () => {
-        // タイピング完了直後に少しだけ余韻（最後の一息）
         setMouth(true);
         setTimeout(() => setMouth(false), 110);
       };
@@ -814,7 +866,6 @@
         dialogueText.textContent = "";
         isTyping = true;
 
-        // 口パク位相リセット（毎行で自然に）
         mouthPulse = 0;
 
         typingTimer = setInterval(() => {
@@ -843,7 +894,6 @@
         dialogueText.textContent = String(line);
         dialogueNext.style.opacity = 1;
 
-        // 一瞬だけ口が動く（スキップ時でも違和感を減らす）
         mouthPulse = 0;
         setMouth(true);
         setTimeout(() => setMouth(false), 140);
@@ -886,7 +936,10 @@
       };
 
       // =========================================================
-      // talk：重複なしランダム（# talk があれば優先）
+      // ✅ talk：重複なしランダム（ブロック単位）
+      // - TXTの # talk は「空行区切り」で 1ブロック=1会話
+      // - ブロック内は行送りで進む
+      // - ブロックが終わるまでメニューに戻らない
       // =========================================================
       const shuffle = (arr) => {
         const a = arr.slice();
@@ -899,14 +952,20 @@
 
       const refillTalkQueueIfNeeded = () => {
         if (talkQueue.length > 0) return;
+
         const raw = getLines("talk");
-        const pool = (raw && raw.length ? raw : getLines("conversation")).filter(Boolean);
+        const blocks = splitIntoBlocks(raw);
+
+        // talkが無い場合は conversation をブロック化（空行なしなら 1行=1ブロックになる）
+        const fallbackBlocks = splitIntoBlocks(getLines("conversation"));
+
+        const pool = (blocks.length ? blocks : fallbackBlocks).filter(b => Array.isArray(b) && b.length);
         talkQueue = shuffle(pool);
       };
 
-      const popNextTalkLine = () => {
+      const popNextTalkBlock = () => {
         refillTalkQueueIfNeeded();
-        return talkQueue.shift() || "";
+        return talkQueue.shift() || [];
       };
 
       // =========================================================
@@ -1030,7 +1089,8 @@
       };
 
       // =========================================================
-      // talk：1回押すたびに1行
+      // ✅ talk：1回押すたびに「1ブロック(2〜3行)」を最後まで
+      // - ブロックが終わるまでメニューに戻らない
       // =========================================================
       const startTalkOnce = () => {
         isConversation = true;
@@ -1038,10 +1098,10 @@
 
         showBust();
 
-        const one = popNextTalkLine();
-        const lines = injectName([one]);
+        const block = popNextTalkBlock();     // ← 配列（2〜3行）
+        const lines = injectName(block);      // ← 名前差し込み
 
-        playLines(lines, () => { endConversation(); });
+        playLines(lines, () => { endConversation(); });  // ← 全行終わってから戻る
       };
 
       const endConversation = () => {
