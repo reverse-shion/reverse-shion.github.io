@@ -187,25 +187,48 @@
       100% { transform: translateX(-50%) translateY(2px); }
     }
 
-    /* ========= 顔レイヤー方式（face + eyes + mouth） ========= */
-    .lumiere-bust .frame.lumiere-face{
+    /* ========= ここが新：顔レイヤー方式 ========= */
+    .lumiere-bust .frame {
       position: relative;
       width: min(80vw, 420px);
+      height: auto;
+      min-height: 320px;
       margin: 0 auto;
     }
-    .lumiere-layer{
+
+    /* 共通：全部センターに重ねる */
+    .lumiere-bust .frame img {
       position: absolute;
-      inset: 0;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      height: auto;
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
     }
-    .lumiere-layer.mouth{
-      transform: translate(var(--lumiere-mouth-x), var(--lumiere-mouth-y)) scale(var(--lumiere-mouth-scale));
-      transform-origin: center;
+
+    /* 目・口はデフォで非表示（状態で切替） */
+    .lumiere-bust .eyes,
+    .lumiere-bust .mouth {
+      opacity: 0;
+      transition: opacity 80ms linear;
+    }
+
+    /* 初期表示（open eyes / close mouth） */
+    .lumiere-bust .eyes-open { opacity: 1; }
+    .lumiere-bust .mouth-close { opacity: 1; }
+
+     .lumiere-bust.speaking  {
+      opacity: 1;
+      animation: mouthPulse 0.45s ease-in-out infinite;
+    }
+    @keyframes mouthPulse {
+      0%   { transform: translateX(-50%) scaleY(0.55) scaleX(0.85); opacity: 0.35; }
+      40%  { transform: translateX(-50%) scaleY(1.15) scaleX(1.10); opacity: 0.95; }
+      70%  { transform: translateX(-50%) scaleY(0.85) scaleX(1.00); opacity: 0.65; }
+      100% { transform: translateX(-50%) scaleY(0.60) scaleX(0.90); opacity: 0.40; }
     }
 
     /* セリフウィンドウ（バストアップの手前） */
@@ -464,14 +487,18 @@
       <!-- 全身 → 初回のみ使用（ここは現状維持） -->
       <img src="img/lumiere-full.png" alt="リュミエール全身" class="lumiere-full" id="fullFigure">
 
-      <!-- バストアップ（顔レイヤー方式：face + eyes + mouth） -->
+    <!-- ✅ バストアップ（会話用）：顔レイヤー方式に置換 -->
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
-        <div class="frame lumiere-face" id="lumiereFaceFrame">
-          <img class="lumiere-layer base"  src="assets/lumiere/face.png" alt="Lumiere face">
-          <img class="lumiere-layer eyes"  id="lumiereEyes"  src="assets/lumiere/eyes_open.png" alt="">
-          <img class="lumiere-layer mouth" id="lumiereMouth" src="assets/lumiere/mouth.png" alt="">
+        <div class="frame" id="lumiereFaceFrame">
+          <img src="assets/lumiere/face.png" alt="Lumiere face" class="face-base" id="faceBase">
+
+          <img src="assets/lumiere/eyes_open.png"  alt="" class="eyes eyes-open"  id="eyesOpen">
+          <img src="assets/lumiere/eyes_half.png"  alt="" class="eyes eyes-half"  id="eyesHalf">
+          <img src="assets/lumiere/eyes_close.png" alt="" class="eyes eyes-close" id="eyesClose">
+
+          <img src="assets/lumiere/mouth.png"      alt="" class="mouth mouth-close" id="mouthClose">
+          <img src="assets/lumiere/mouth_open.png" alt="" class="mouth mouth-open"  id="mouthOpen">
         </div>
-      </div>
 
       <!-- セリフ -->
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
