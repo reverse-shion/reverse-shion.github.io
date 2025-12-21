@@ -258,7 +258,6 @@
       white-space: pre-line;
       font-size: clamp(15px, 2.5vw, 17px);
       line-height: 1.7;
-      /* ✅ 2〜3行を美しく見せる最低高さ（長文でも崩れにくい） */
       min-height: 3.4em;
     }
 
@@ -486,7 +485,7 @@
       <!-- 全身 → 初回のみ使用 -->
       <img src="img/lumiere-full.png" alt="" class="lumiere-full" id="fullFigure">
 
-      <!-- ✅ バストアップ（alt空：画像欠けても英語が出ない） -->
+      <!-- ✅ バストアップ -->
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
         <div class="frame lumiere-face" id="lumiereFaceFrame">
           <img class="lumiere-base" src="assets/lumiere/face.png" alt="">
@@ -568,25 +567,22 @@
       // 名前
       // =========================================================
       const stripHonorific = (s) => String(s || "").trim().replace(/(様|さま|さん|ちゃん|くん)+$/u, "").trim();
-
       const normalizeBaseName = (s) => {
         const base = stripHonorific(s);
         if (!base) return "";
         if (/^(ゲスト|guest)$/i.test(base)) return "";
         return base;
       };
-
       const getBaseUserName = () => {
         if (typeof window.getUserName === "function") return normalizeBaseName(window.getUserName());
         return normalizeBaseName(localStorage.getItem("sv_user_name") || "");
       };
-
       const injectName = (arr) => {
         const base = getBaseUserName();
         const honor = base ? `${base}様` : "";
         return (arr || []).map((line) => {
           let s = String(line ?? "");
-          s = s.replace(/\\n/g, "\n"); // "\n"文字を実改行へ
+          s = s.replace(/\\n/g, "\n");
           s = s.replace(/\{name\}(様|さま)/gu, () => (base ? `${base}様` : ""));
           s = s.replace(/\{nameWithHonor\}/g, honor);
           s = s.replace(/\{name\}/g, base);
@@ -596,8 +592,6 @@
 
       // =========================================================
       // セリフ（TXTがあれば上書き）
-      // - talk は「空行区切り」で1ブロック（2〜3行推奨）＝1会話
-      // - @expr xxx を入れれば表情が変わる
       // =========================================================
       const fallbackLines = {
         "first-visit": [
@@ -653,12 +647,10 @@
       };
 
       let externalLines = {};
-
-      // talk：重複なしランダム（ブロック単位）
       let talkQueue = [];
 
       // =========================================================
-      // TXTロード（空行を保持できるパーサ）
+      // TXTロード（空行保持）
       // =========================================================
       const parseLumiereTxt = (txt) => {
         const lines = {};
@@ -668,21 +660,14 @@
           const line = raw.replace(/\r/g, "");
           const trimmedEnd = line.trimEnd();
 
-          // 見出し： "# talk"
           if (/^\s*#\s+\S+/.test(trimmedEnd)) {
             current = trimmedEnd.trim().replace(/^#\s+/, "").trim();
             lines[current] = [];
             return;
           }
-
           if (!current) return;
 
-          // ✅ 空行は保持（talkのブロック区切りに必要）
-          if (trimmedEnd.trim() === "") {
-            lines[current].push("");
-            return;
-          }
-
+          if (trimmedEnd.trim() === "") { lines[current].push(""); return; }
           lines[current].push(trimmedEnd.trim());
         });
 
@@ -706,7 +691,7 @@
       };
 
       // =========================================================
-      // ✅ 2行1枚（ページ化） + undefined除去 + @expr表情対応
+      // 2行1枚（ページ化） + @expr 対応
       // =========================================================
       const buildPagesFromLines = (lines, { groupSize = 2 } = {}) => {
         const src = (Array.isArray(lines) ? lines : [])
@@ -726,32 +711,19 @@
 
         for (const raw of src) {
           const s = raw.trimEnd();
-
           const m = s.trim().match(/^@expr\s+([a-zA-Z0-9_-]+)\s*$/);
-          if (m) {
-            flush();
-            expr = m[1];
-            continue;
-          }
-
-          if (s.trim() === "") {
-            flush();
-            continue;
-          }
+          if (m) { flush(); expr = m[1]; continue; }
+          if (s.trim() === "") { flush(); continue; }
 
           buf.push(s.replace(/\\n/g, "\n"));
-
-          if (buf.filter(x => x.trim() !== "").length >= groupSize) {
-            flush();
-          }
+          if (buf.filter(x => x.trim() !== "").length >= groupSize) flush();
         }
         flush();
-
         return pages;
       };
 
       // =========================================================
-      // ✅ talk：空行区切りでブロック化（1ブロック=1会話）
+      // talk：空行区切りでブロック化
       // =========================================================
       const splitIntoBlocks = (rawLines) => {
         const src = Array.isArray(rawLines) ? rawLines : [];
@@ -760,7 +732,6 @@
 
         const pushBuf = () => {
           const clean = buf.map(s => String(s || "").trimEnd());
-          // 空だけのブロックは捨てる
           if (clean.some(x => x.trim() !== "")) blocks.push(clean);
           buf = [];
         };
@@ -779,10 +750,7 @@
       };
 
       // =========================================================
-      // 表情システム（拡張しやすい）
-      // 追加したい表情があればファイルを増やすだけでOK:
-      // - eyes_smile_open.png / eyes_smile_half.png / eyes_smile_close.png
-      // - mouth_smile.png / mouth_smile_open.png
+      // 表情
       // =========================================================
       const EXPRESSIONS = {
         default: { eyes: "default", mouth: "default" },
@@ -808,7 +776,7 @@
 
       const setExpression = (exprKey) => {
         currentExpr = EXPRESSIONS[exprKey] ? exprKey : "default";
-        lumiereEyes.src = eyesPath(currentExpr, "open");
+        lumiereEyes.src  = eyesPath(currentExpr, "open");
         lumiereMouth.src = mouthPath(currentExpr, false);
       };
 
@@ -875,33 +843,110 @@
       };
 
       // =========================================================
-      // 口パク：文字追従（表情対応）
+      // ✅ 口パク：アニメ式（8〜10fps） + 句読点で“間”
       // =========================================================
-      let mouthPulse = 0;
+      let mouthAnimTimer = null;
+      let mouthOpen = false;
+      let mouthEnergy = 0; // 0〜1
+      let mouthFps = 9;    // 8〜10推奨
 
       const setMouth = (open) => {
-        lumiereMouth.src = mouthPath(currentExpr, open);
+        mouthOpen = !!open;
+        lumiereMouth.src = mouthPath(currentExpr, mouthOpen);
       };
 
-      const stopMouth = () => { setMouth(false); };
+      const stopMouth = () => {
+        if (mouthAnimTimer) {
+          clearInterval(mouthAnimTimer);
+          mouthAnimTimer = null;
+        }
+        mouthEnergy = 0;
+        setMouth(false);
+      };
 
       const isPauseChar = (ch) => /[、。…！？\s]/u.test(ch);
 
-      const mouthStepByChar = (ch) => {
-        if (!ch) return;
-        if (isPauseChar(ch)) { setMouth(false); return; }
-
-        mouthPulse++;
-        const mod = mouthPulse % 4;
-        if (mod === 0) { setMouth(false); return; }
-        setMouth(true);
+      const calcMouthFps = (text) => {
+        const t = String(text || "");
+        const speakChars = Array.from(t).filter(c => !isPauseChar(c)).length;
+        const fps = 10 - Math.min(2, Math.floor(speakChars / 45)); // 長文ほど落ち着く
+        return Math.max(8, Math.min(10, fps));
       };
 
-      const mouthMicroBounce = () => {
+      const startMouthAnime = (lineText) => {
+        if (mouthAnimTimer) clearInterval(mouthAnimTimer);
+
+        mouthFps = calcMouthFps(lineText);
+        const baseInterval = Math.round(1000 / mouthFps); // 100〜125ms
+
+        mouthAnimTimer = setInterval(() => {
+          if (mouthEnergy < 0.18) { setMouth(false); return; }
+
+          const chanceClose = 0.28;
+          if (mouthOpen) setMouth(false);
+          else setMouth(Math.random() > chanceClose);
+
+          mouthEnergy *= 0.84; // 減衰
+        }, baseInterval);
+      };
+
+      const feedMouthByChar = (ch) => {
+        if (!ch) return;
+
+        if (isPauseChar(ch)) {
+          mouthEnergy *= 0.35; // “間”
+          setMouth(false);
+          return;
+        }
+        mouthEnergy = Math.min(1, mouthEnergy + 0.38);
+      };
+
+      const mouthFinishTick = () => {
+        mouthEnergy = Math.max(mouthEnergy, 0.35);
         setMouth(true);
         setTimeout(() => setMouth(false), 110);
       };
 
+      // =========================================================
+      // ✅ アニメ会話テンポ：タイピング速度も自動最適化
+      // - 短文：気持ち早い
+      // - 長文：落ち着く
+      // - 句読点/…：自然に“間”が入る
+      // =========================================================
+      const calcTypingProfile = (text) => {
+        const t = String(text || "");
+        const chars = Array.from(t);
+
+        const speakChars = chars.filter(c => !isPauseChar(c) && c !== "\n").length;
+        const pauseChars = chars.filter(c => isPauseChar(c)).length;
+
+        // ベース（ms/char）：短いほど速い・長いほど遅い
+        // 目安：26〜46ms/char
+        const base = 26 + Math.min(20, Math.floor(speakChars / 14));
+
+        // 上限/下限をきっちり固定
+        const baseMs = Math.max(26, Math.min(46, base));
+
+        // “間”の強さ：句読点が多いほどゆったり
+        const pauseBoost = Math.min(1.0, pauseChars / 10);
+
+        return { baseMs, pauseBoost };
+      };
+
+      const extraDelayForChar = (ch, pauseBoost) => {
+        // 句読点は「アニメの呼吸」
+        if (ch === "、") return 120 + Math.round(80 * pauseBoost);
+        if (ch === "。") return 260 + Math.round(140 * pauseBoost);
+        if (ch === "…")  return 120 + Math.round(120 * pauseBoost);
+        if (ch === "！" || ch === "？") return 160 + Math.round(120 * pauseBoost);
+        if (ch === "\n") return 180; // 改行は一拍
+        if (/\s/u.test(ch)) return 20; // 半角スペース等
+        return 0;
+      };
+
+      // =========================================================
+      // Bust表示
+      // =========================================================
       const showBust = () => {
         bustContainer.classList.add("is-visible");
         setExpression(currentExpr || "default");
@@ -938,55 +983,73 @@
       const hideDialogueWindow = () => {
         dialogueWindow.classList.remove("is-visible");
         resetDialogueHandlers();
-        clearInterval(typingTimer);
-        typingTimer = null;
+        if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
         isTyping = false;
         dialogueNext.style.opacity = 0;
         stopMouth();
         setSpeaking(false);
       };
 
+      // ✅ タイピングを setInterval から setTimeout チェーンへ（間が自然）
       const showLine = (line, onComplete) => {
-        clearInterval(typingTimer);
-        typingTimer = null;
+        if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
         dialogueNext.style.opacity = 0;
 
         const safe = String(line ?? "");
         const chars = Array.from(safe);
-        let idx = 0;
+        const { baseMs, pauseBoost } = calcTypingProfile(safe);
 
+        let idx = 0;
         dialogueText.textContent = "";
         isTyping = true;
-        mouthPulse = 0;
 
-        typingTimer = setInterval(() => {
+        // 口パク開始（行に合わせ最適化）
+        startMouthAnime(safe);
+        mouthEnergy = 0;
+
+        const tick = () => {
+          if (!isTyping) return;
+
           const ch = chars[idx];
-          dialogueText.textContent += ch;
-          mouthStepByChar(ch);
+          dialogueText.textContent += (ch ?? "");
+
+          // 口は“勢い”だけ渡す（開閉はアニメ周期）
+          feedMouthByChar(ch);
 
           idx++;
           if (idx >= chars.length) {
-            clearInterval(typingTimer);
-            typingTimer = null;
             isTyping = false;
-            mouthMicroBounce();
+            mouthFinishTick();
+            setTimeout(() => stopMouth(), 220);
             dialogueNext.style.opacity = 1;
             if (onComplete) onComplete();
+            return;
           }
-        }, 34);
+
+          // 次の文字までの待ち時間（ベース＋句読点の間＋微ランダム）
+          const jitter = Math.floor(Math.random() * 9) - 4; // -4..+4
+          const extra  = extraDelayForChar(ch, pauseBoost);
+          const nextDelay = Math.max(18, baseMs + extra + jitter);
+
+          typingTimer = setTimeout(tick, nextDelay);
+        };
+
+        tick();
       };
 
       const showAll = (line) => {
-        clearInterval(typingTimer);
-        typingTimer = null;
+        if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
         isTyping = false;
 
-        dialogueText.textContent = String(line ?? "");
+        const safe = String(line ?? "");
+        dialogueText.textContent = safe;
         dialogueNext.style.opacity = 1;
 
-        mouthPulse = 0;
-        setMouth(true);
-        setTimeout(() => setMouth(false), 140);
+        // スキップでも一瞬だけ口が動く
+        startMouthAnime(safe);
+        mouthEnergy = 0.7;
+        mouthFinishTick();
+        setTimeout(() => stopMouth(), 260);
       };
 
       let currentPages = [];
@@ -996,7 +1059,6 @@
         currentPages = Array.isArray(pages) ? pages : [];
         pageIndex = 0;
 
-        // ✅ 空/undefined対策
         currentPages = currentPages
           .filter(p => p && typeof p.text === "string")
           .map(p => ({ text: p.text, expr: p.expr || "default" }))
@@ -1021,7 +1083,7 @@
           }
 
           const p = currentPages[pageIndex];
-          setExpression(p.expr);      // ✅ 表情反映
+          setExpression(p.expr);
           showLine(p.text, () => {});
         };
 
@@ -1039,7 +1101,7 @@
       };
 
       // =========================================================
-      // ✅ talk：重複なしランダム（ブロック単位）
+      // talk：重複なしランダム（ブロック単位）
       // =========================================================
       const shuffle = (arr) => {
         const a = arr.slice();
@@ -1094,7 +1156,6 @@
           "assets/lumiere/eyes_close.png",
           "assets/lumiere/mouth.png",
           "assets/lumiere/mouth_open.png",
-          // 追加表情がある場合もここに足してOK（なくても動く）
           "assets/lumiere/eyes_smile_open.png",
           "assets/lumiere/eyes_smile_half.png",
           "assets/lumiere/eyes_smile_close.png",
@@ -1186,7 +1247,7 @@
       };
 
       // =========================================================
-      // talk：1回押すたびに「1ブロック」を最後まで（2行1枚表示）
+      // talk：1回押すたびに「1ブロック」を最後まで
       // =========================================================
       const startTalkOnce = () => {
         isConversation = true;
