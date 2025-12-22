@@ -560,6 +560,8 @@
       const dimOverlay     = document.getElementById("dimOverlay");
 
       const STORAGE_MUTE = "lumiereBgmMuted";
+
+      // 目ぱち幅（通常）
       const blinkMin = 3000;
       const blinkMax = 7000;
 
@@ -631,6 +633,10 @@
           "@expr gentle",
           "……{nameWithHonor}。",
           "今日は、心の中…どんな天気かな。",
+          "",
+          "@expr shy",
+          "……言いにくいことは、",
+          "無理に言わなくてもいいよ。",
           "",
           "@expr gentle",
           "もし雲があってもね、",
@@ -750,7 +756,7 @@
       };
 
       // =========================================================
-      // 表情
+      // 表情（shyは“目だけ特別扱い”）
       // =========================================================
       const EXPRESSIONS = {
         default: { eyes: "default", mouth: "default" },
@@ -758,26 +764,119 @@
         smile:   { eyes: "smile",   mouth: "smile" },
         sad:     { eyes: "sad",     mouth: "sad" },
         serious: { eyes: "serious", mouth: "default" },
+        shy:     { eyes: "shy",     mouth: "default" } // ✅ 目は shy.png 固定（目ぱち停止）
       };
 
       let currentExpr = "default";
 
+      // ✅ shy用：目固定フラグ
+      let eyesLockedShy = false;
+
       const eyesPath = (exprKey, state) => {
+        // shyは固定画像（state無視）
+        if (exprKey === "shy") return "assets/lumiere/shy.png";
+
         const e = (EXPRESSIONS[exprKey]?.eyes || "default");
         if (e === "default") return `assets/lumiere/eyes_${state}.png`;
         return `assets/lumiere/eyes_${e}_${state}.png`;
       };
 
-      const mouthPath = (exprKey, open) => {
+      // ✅ 口：3枚（close/half/open）＋表情差分（あれば使う）
+      // 期待ファイル例：
+      // default: mouth.png / mouth_half.png / mouth_open.png
+      // smile  : mouth_smile.png / mouth_smile_half.png / mouth_smile_open.png（halfがなければ自動でclose代用）
+      const mouthFramePath = (exprKey, frame) => {
         const m = (EXPRESSIONS[exprKey]?.mouth || "default");
-        if (m === "default") return `assets/lumiere/${open ? "mouth_open.png" : "mouth.png"}`;
-        return `assets/lumiere/${open ? `mouth_${m}_open.png` : `mouth_${m}.png`}`;
+
+        const base = (m === "default") ? "mouth" : `mouth_${m}`;
+        if (frame === "open") return `assets/lumiere/${base}_open.png`;
+        if (frame === "half") return `assets/lumiere/${base}_half.png`;
+        return `assets/lumiere/${base}.png`;
+      };
+
+      // halfが存在しない表情用の保険：ロード失敗時にcloseへ
+      const setImgSrcWithFallback = (imgEl, primary, fallback) => {
+        if (!imgEl) return;
+        if (imgEl.dataset._want === primary) return; // 無駄な再設定防止
+        imgEl.dataset._want = primary;
+
+        imgEl.onerror = null;
+        imgEl.src = primary;
+        imgEl.onerror = () => {
+          imgEl.onerror = null;
+          imgEl.src = fallback;
+        };
+      };
+
+      const refreshEyesNow = () => {
+        if (eyesLockedShy) {
+          setImgSrcWithFallback(lumiereEyes, "assets/lumiere/shy.png", "assets/lumiere/shy.png");
+          return;
+        }
+        // 通常はopenを基準に
+        setImgSrcWithFallback(lumiereEyes, eyesPath(currentExpr, "open"), "assets/lumiere/eyes_open.png");
+      };
+
+      // 口は“今の口状態”を維持して差分だけ更新
+      let mouthState = "close"; // "close" | "half" | "open"
+      const refreshMouthNow = () => {
+        const want =
+          (mouthState === "open") ? mouthFramePath(currentExpr, "open") :
+          (mouthState === "half") ? mouthFramePath(currentExpr, "half") :
+          mouthFramePath(currentExpr, "close");
+
+        const fallback =
+          (mouthState === "open") ? "assets/lumiere/mouth_open.png" :
+          (mouthState === "half") ? "assets/lumiere/mouth.png" :
+          "assets/lumiere/mouth.png";
+
+        // halfがない表情はcloseに落とす（見た目破綻を防ぐ）
+        const fallback2 =
+          (mouthState === "half") ? mouthFramePath(currentExpr, "close") : fallback;
+
+        setImgSrcWithFallback(lumiereMouth, want, fallback2);
+      };
+
+      let blinkTimer = null;
+
+      const stopBlink = () => {
+        if (blinkTimer) { clearTimeout(blinkTimer); blinkTimer = null; }
+      };
+
+      const scheduleBlink = () => {
+        stopBlink();
+        if (eyesLockedShy) return; // ✅ shyは目ぱち停止
+
+        const delay = blinkMin + Math.random() * (blinkMax - blinkMin);
+        blinkTimer = setTimeout(() => {
+          // half
+          setImgSrcWithFallback(lumiereEyes, eyesPath(currentExpr, "half"), eyesPath(currentExpr, "open"));
+          setTimeout(() => {
+            // close
+            setImgSrcWithFallback(lumiereEyes, eyesPath(currentExpr, "close"), eyesPath(currentExpr, "open"));
+            setTimeout(() => {
+              // open
+              setImgSrcWithFallback(lumiereEyes, eyesPath(currentExpr, "open"), "assets/lumiere/eyes_open.png");
+              scheduleBlink();
+            }, 110);
+          }, 90);
+        }, delay);
       };
 
       const setExpression = (exprKey) => {
-        currentExpr = EXPRESSIONS[exprKey] ? exprKey : "default";
-        lumiereEyes.src  = eyesPath(currentExpr, "open");
-        lumiereMouth.src = mouthPath(currentExpr, false);
+        const key = EXPRESSIONS[exprKey] ? exprKey : "default";
+        currentExpr = key;
+
+        // ✅ shy判定：目を固定して目ぱち停止
+        eyesLockedShy = (currentExpr === "shy");
+
+        // 目更新 + 目ぱち制御
+        refreshEyesNow();
+        if (eyesLockedShy) stopBlink();
+        else scheduleBlink();
+
+        // 口は状態を維持したまま差分更新（口パクは止めない）
+        refreshMouthNow();
       };
 
       // =========================================================
@@ -822,96 +921,83 @@
       };
 
       // =========================================================
-      // 目ぱち（表情対応）
-      // =========================================================
-      let blinkTimer = null;
-
-      const scheduleBlink = () => {
-        clearTimeout(blinkTimer);
-        const delay = blinkMin + Math.random() * (blinkMax - blinkMin);
-
-        blinkTimer = setTimeout(() => {
-          lumiereEyes.src = eyesPath(currentExpr, "half");
-          setTimeout(() => {
-            lumiereEyes.src = eyesPath(currentExpr, "close");
-            setTimeout(() => {
-              lumiereEyes.src = eyesPath(currentExpr, "open");
-              scheduleBlink();
-            }, 110);
-          }, 90);
-        }, delay);
-      };
-
-      // =========================================================
-      // ✅ 口パク：アニメ式（8〜10fps） + 句読点で“間”
+      // ✅ 口パク：3枚（close/half/open）
+      // - タイピングに同期して「その行の間だけ」動く
+      // - 句読点で口が閉じる（呼吸）
       // =========================================================
       let mouthAnimTimer = null;
-      let mouthOpen = false;
-      let mouthEnergy = 0; // 0〜1
-      let mouthFps = 9;    // 8〜10推奨
-
-      const setMouth = (open) => {
-        mouthOpen = !!open;
-        lumiereMouth.src = mouthPath(currentExpr, mouthOpen);
-      };
-
-      const stopMouth = () => {
-        if (mouthAnimTimer) {
-          clearInterval(mouthAnimTimer);
-          mouthAnimTimer = null;
-        }
-        mouthEnergy = 0;
-        setMouth(false);
-      };
-
+      let mouthEnergy = 0;     // 0..1
+      let mouthFps = 9;        // 8..10
+      let mouthUntil = 0;      // ms
       const isPauseChar = (ch) => /[、。…！？\s]/u.test(ch);
 
       const calcMouthFps = (text) => {
         const t = String(text || "");
-        const speakChars = Array.from(t).filter(c => !isPauseChar(c)).length;
+        const speakChars = Array.from(t).filter(c => !isPauseChar(c) && c !== "\n").length;
         const fps = 10 - Math.min(2, Math.floor(speakChars / 45)); // 長文ほど落ち着く
         return Math.max(8, Math.min(10, fps));
       };
 
-      const startMouthAnime = (lineText) => {
+      const setMouthState = (state) => {
+        mouthState = state;
+        refreshMouthNow();
+      };
+
+      const stopMouth = () => {
+        if (mouthAnimTimer) { clearInterval(mouthAnimTimer); mouthAnimTimer = null; }
+        mouthEnergy = 0;
+        mouthUntil = 0;
+        setMouthState("close");
+      };
+
+      const startMouthForLine = (lineText, durationMs) => {
         if (mouthAnimTimer) clearInterval(mouthAnimTimer);
 
         mouthFps = calcMouthFps(lineText);
-        const baseInterval = Math.round(1000 / mouthFps); // 100〜125ms
+        const interval = Math.round(1000 / mouthFps);
+
+        mouthUntil = Date.now() + Math.max(240, durationMs) + 220;
+        mouthEnergy = Math.max(mouthEnergy, 0.55);
 
         mouthAnimTimer = setInterval(() => {
-          if (mouthEnergy < 0.18) { setMouth(false); return; }
+          const now = Date.now();
+          if (now > mouthUntil) { stopMouth(); return; }
 
-          const chanceClose = 0.28;
-          if (mouthOpen) setMouth(false);
-          else setMouth(Math.random() > chanceClose);
+          if (mouthEnergy < 0.18) { setMouthState("close"); mouthEnergy *= 0.92; return; }
 
-          mouthEnergy *= 0.84; // 減衰
-        }, baseInterval);
+          const r = Math.random();
+          if (mouthEnergy > 0.72) {
+            setMouthState(r < 0.22 ? "half" : "open");
+          } else if (mouthEnergy > 0.42) {
+            if (r < 0.18) setMouthState("close");
+            else if (r < 0.78) setMouthState("half");
+            else setMouthState("open");
+          } else {
+            setMouthState(r < 0.62 ? "close" : "half");
+          }
+
+          mouthEnergy *= 0.90;
+        }, interval);
       };
 
       const feedMouthByChar = (ch) => {
         if (!ch) return;
 
-        if (isPauseChar(ch)) {
-          mouthEnergy *= 0.35; // “間”
-          setMouth(false);
+        if (ch === "\n") {
+          mouthEnergy *= 0.55;
+          setMouthState("close");
           return;
         }
-        mouthEnergy = Math.min(1, mouthEnergy + 0.38);
-      };
-
-      const mouthFinishTick = () => {
-        mouthEnergy = Math.max(mouthEnergy, 0.35);
-        setMouth(true);
-        setTimeout(() => setMouth(false), 110);
+        if (isPauseChar(ch)) {
+          mouthEnergy *= 0.35;
+          setMouthState("close");
+          return;
+        }
+        mouthEnergy = Math.min(1, mouthEnergy + 0.28);
       };
 
       // =========================================================
-      // ✅ アニメ会話テンポ：タイピング速度も自動最適化
-      // - 短文：気持ち早い
-      // - 長文：落ち着く
-      // - 句読点/…：自然に“間”が入る
+      // ✅ アニメ会話テンポ：タイピング速度
       // =========================================================
       const calcTypingProfile = (text) => {
         const t = String(text || "");
@@ -920,28 +1006,34 @@
         const speakChars = chars.filter(c => !isPauseChar(c) && c !== "\n").length;
         const pauseChars = chars.filter(c => isPauseChar(c)).length;
 
-        // ベース（ms/char）：短いほど速い・長いほど遅い
         // 目安：26〜46ms/char
         const base = 26 + Math.min(20, Math.floor(speakChars / 14));
-
-        // 上限/下限をきっちり固定
         const baseMs = Math.max(26, Math.min(46, base));
-
-        // “間”の強さ：句読点が多いほどゆったり
         const pauseBoost = Math.min(1.0, pauseChars / 10);
-
         return { baseMs, pauseBoost };
       };
 
       const extraDelayForChar = (ch, pauseBoost) => {
-        // 句読点は「アニメの呼吸」
         if (ch === "、") return 120 + Math.round(80 * pauseBoost);
         if (ch === "。") return 260 + Math.round(140 * pauseBoost);
         if (ch === "…")  return 120 + Math.round(120 * pauseBoost);
         if (ch === "！" || ch === "？") return 160 + Math.round(120 * pauseBoost);
-        if (ch === "\n") return 180; // 改行は一拍
-        if (/\s/u.test(ch)) return 20; // 半角スペース等
+        if (ch === "\n") return 180;
+        if (/\s/u.test(ch)) return 20;
         return 0;
+      };
+
+      const estimateLineDurationMs = (text) => {
+        const safe = String(text || "");
+        const chars = Array.from(safe);
+        const { baseMs, pauseBoost } = calcTypingProfile(safe);
+
+        let total = 0;
+        for (const ch of chars) {
+          total += baseMs;
+          total += extraDelayForChar(ch, pauseBoost);
+        }
+        return Math.max(420, Math.round(total));
       };
 
       // =========================================================
@@ -949,17 +1041,18 @@
       // =========================================================
       const showBust = () => {
         bustContainer.classList.add("is-visible");
-        setExpression(currentExpr || "default");
+        refreshEyesNow();
+        refreshMouthNow();
         stopMouth();
         scheduleBlink();
       };
 
       const hideBust = () => {
         bustContainer.classList.remove("is-visible");
-        clearTimeout(blinkTimer);
-        blinkTimer = null;
+        stopBlink();
         stopMouth();
-        lumiereEyes.src = "assets/lumiere/eyes_open.png";
+        eyesLockedShy = false;
+        setImgSrcWithFallback(lumiereEyes, "assets/lumiere/eyes_open.png", "assets/lumiere/eyes_open.png");
       };
 
       // =========================================================
@@ -990,7 +1083,7 @@
         setSpeaking(false);
       };
 
-      // ✅ タイピングを setInterval から setTimeout チェーンへ（間が自然）
+      // ✅ タイピング：setTimeoutチェーン（自然な間）
       const showLine = (line, onComplete) => {
         if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
         dialogueNext.style.opacity = 0;
@@ -1003,31 +1096,26 @@
         dialogueText.textContent = "";
         isTyping = true;
 
-        // 口パク開始（行に合わせ最適化）
-        startMouthAnime(safe);
-        mouthEnergy = 0;
+        // ✅ 行の想定表示時間に同期して口パク開始（exprがshyでも口は動く）
+        const durationMs = estimateLineDurationMs(safe);
+        startMouthForLine(safe, durationMs);
 
         const tick = () => {
           if (!isTyping) return;
 
           const ch = chars[idx];
           dialogueText.textContent += (ch ?? "");
-
-          // 口は“勢い”だけ渡す（開閉はアニメ周期）
           feedMouthByChar(ch);
 
           idx++;
           if (idx >= chars.length) {
             isTyping = false;
-            mouthFinishTick();
-            setTimeout(() => stopMouth(), 220);
             dialogueNext.style.opacity = 1;
             if (onComplete) onComplete();
             return;
           }
 
-          // 次の文字までの待ち時間（ベース＋句読点の間＋微ランダム）
-          const jitter = Math.floor(Math.random() * 9) - 4; // -4..+4
+          const jitter = Math.floor(Math.random() * 9) - 4;
           const extra  = extraDelayForChar(ch, pauseBoost);
           const nextDelay = Math.max(18, baseMs + extra + jitter);
 
@@ -1045,11 +1133,10 @@
         dialogueText.textContent = safe;
         dialogueNext.style.opacity = 1;
 
-        // スキップでも一瞬だけ口が動く
-        startMouthAnime(safe);
-        mouthEnergy = 0.7;
-        mouthFinishTick();
-        setTimeout(() => stopMouth(), 260);
+        // ✅ スキップでも“一瞬しゃべって止まる”
+        startMouthForLine(safe, 380);
+        mouthEnergy = 0.85;
+        setTimeout(() => stopMouth(), 520);
       };
 
       let currentPages = [];
@@ -1083,7 +1170,7 @@
           }
 
           const p = currentPages[pageIndex];
-          setExpression(p.expr);
+          setExpression(p.expr);          // ✅ shyのとき目固定＆目ぱち停止、口パクは継続
           showLine(p.text, () => {});
         };
 
@@ -1151,15 +1238,28 @@
       const preloadImages = () => {
         [
           "assets/lumiere/face.png",
+
+          // eyes default
           "assets/lumiere/eyes_open.png",
           "assets/lumiere/eyes_half.png",
           "assets/lumiere/eyes_close.png",
+
+          // shy
+          "assets/lumiere/shy.png",
+
+          // mouth default 3 frames
           "assets/lumiere/mouth.png",
+          "assets/lumiere/mouth_half.png",
           "assets/lumiere/mouth_open.png",
+
+          // eyes smile
           "assets/lumiere/eyes_smile_open.png",
           "assets/lumiere/eyes_smile_half.png",
           "assets/lumiere/eyes_smile_close.png",
+
+          // mouth smile (halfがない場合でもOK)
           "assets/lumiere/mouth_smile.png",
+          "assets/lumiere/mouth_smile_half.png",
           "assets/lumiere/mouth_smile_open.png",
         ].forEach((src) => { const img = new Image(); img.src = src; });
       };
@@ -1336,6 +1436,8 @@
         preloadImages();
         setMute(localStorage.getItem(STORAGE_MUTE) === "1");
 
+        setExpression("default");
+
         if (getBaseUserName()) {
           sceneFoyer.classList.remove("is-active");
           sceneHall.classList.add("is-active");
@@ -1349,7 +1451,6 @@
       window.addEventListener("DOMContentLoaded", async () => {
         await loadExternalLines();
         talkQueue = [];
-        setExpression("default");
         startLumiereGate();
       });
     })();
