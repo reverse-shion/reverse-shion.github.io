@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "title": "Shionverse Skit 021",
+    "description": "Doubt about words spoken aloud. Shion trusts Lumiere completely, including her uncertainty. She is told she is enough as she is.",
+    "version": "final"
+  },
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "……最近、自分の言葉に、確信が持てなくなることがございます。",
+      "next": "shion_listen",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "wondering", "speaking": true }
+      ]
+    },
+
+    "shion_listen": {
+      "id": "shion_listen",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……うん。",
+      "next": "lumiere_detail",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false }
+      ]
+    },
+
+    "lumiere_detail": {
+      "id": "lumiere_detail",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "星を読み、道を示すことはできます。それでも……その言葉が、本当に誰かの役に立っているのか、分からなくなるのです。",
+      "next": "shion_wait",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": true }
+      ]
+    },
+
+    "shion_wait": {
+      "id": "shion_wait",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……それで？",
+      "next": "lumiere_confess",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "patient", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": false }
+      ]
+    },
+
+    "lumiere_confess": {
+      "id": "lumiere_confess",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "正しい言葉を選ぼうとするほど……声が、慎重になりすぎてしまいます。",
+      "next": "shion_reply",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "thoughtful", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "wondering", "speaking": true }
+      ]
+    },
+
+    "shion_reply": {
+      "id": "shion_reply",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "……それは、誰かを大事にしてるってことだ。",
+      "next": "lumiere_react",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "curious", "speaking": false }
+      ]
+    },
+
+    "lumiere_react": {
+      "id": "lumiere_react",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "……それでも、迷いは消えません。",
+      "next": "shion_accept",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "listening", "speaking": true }
+      ]
+    },
+
+    "shion_accept": {
+      "id": "shion_accept",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "消えなくていい。……その迷いも含めて、俺はリュミエールを信じてる。",
+      "next": "lumiere_soften",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": false }
+      ]
+    },
+
+    "lumiere_soften": {
+      "id": "lumiere_soften",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "……迷ったままでも、よろしいのでしょうか。",
+      "next": "shion_answer",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "relief", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": true }
+      ]
+    },
+
+    "shion_answer": {
+      "id": "shion_answer",
+      "type": "dialogue",
+      "speaker": "shion",
+      "text": "ああ。……そのままでいい。変わらなくていい。",
+      "next": "shiopon_enter",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "calm-smile", "speaking": true },
+        { "slot": "center", "character": "lumiere", "expression": "soft-smile", "speaking": false }
+      ]
+    },
+
+    "shiopon_enter": {
+      "id": "shiopon_enter",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "……今の、しおぽんの胸があったかくなるやつ〜。",
+      "next": "shiopon_joke",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "surprised", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "soft-grin", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "warm", "speaking": true }
+      ]
+    },
+
+    "shiopon_joke": {
+      "id": "shiopon_joke",
+      "type": "dialogue",
+      "speaker": "shiopon",
+      "text": "考えすぎる星の日はね〜、信じてる人が隣にいれば合格なの！",
+      "next": "ending",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "smiling", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": false },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful", "speaking": true }
+      ]
+    },
+
+    "ending": {
+      "id": "ending",
+      "type": "dialogue",
+      "speaker": "lumiere",
+      "text": "……ありがとうございます。では私は、この言葉のままで、進みます。",
+      "cast": [
+        { "slot": "left", "character": "shion", "expression": "gentle", "speaking": false },
+        { "slot": "center", "character": "lumiere", "expression": "grateful", "speaking": true },
+        { "slot": "right", "character": "shiopon", "expression": "cheerful", "speaking": false }
+      ]
+    }
+  }
+}
