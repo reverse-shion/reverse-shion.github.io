@@ -10,7 +10,6 @@
     :root{
       --bg0:#05060e;
       --bg1:#0a0b18;
-      --stone:#0f122a;
       --ink:#eef1ff;
       --muted:#aeb7e6;
       --edge:#ffffff24;
@@ -22,7 +21,6 @@
       --glass: rgba(255,255,255,.06);
       --panel: rgba(12,16,44,.58);
       --shadow: 0 28px 90px rgba(0,0,0,.62);
-
       --r: 18px;
     }
     *{box-sizing:border-box}
@@ -36,6 +34,21 @@
         radial-gradient(900px 600px at 85% 22%, rgba(155,231,255,.10), transparent 60%),
         linear-gradient(160deg, var(--bg0), var(--bg1));
       overflow-x:hidden;
+    }
+
+    /* optional background image */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.62)),
+        url("./assets/chronologium.jpg");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.95) contrast(1.05);
+      opacity:.55;
+      pointer-events:none;
+      z-index:-3;
     }
 
     /* drifting dust + scan noise */
@@ -54,16 +67,14 @@
           rgba(255,255,255,.03) 0px,
           rgba(255,255,255,.02) 1px,
           rgba(0,0,0,0) 3px,
-          rgba(0,0,0,0) 5px
+          rgba(0,0,0,0) 6px
         );
-      background-size: 420px 420px, 520px 520px, 640px 640px, 780px 780px, 980px 980px, 100% 6px;
+      background-size: 420px 420px, 520px 520px, 640px 640px, 780px 780px, 980px 980px, 100% 7px;
       animation: drift 18s linear infinite;
       mix-blend-mode: screen;
+      z-index:-2;
     }
-    @keyframes drift{
-      from{transform:translateY(0)}
-      to{transform:translateY(18px)}
-    }
+    @keyframes drift{ from{transform:translateY(0)} to{transform:translateY(18px)} }
 
     .wrap{
       max-width: 1040px;
@@ -82,15 +93,14 @@
         radial-gradient(1200px 600px at 50% -10%, rgba(255,211,138,.10), transparent 60%),
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
     }
     .hall::before{
       content:"";
       position:absolute; inset:0;
       background:
-        /* stone grain */
         radial-gradient(900px 700px at 20% 60%, rgba(255,255,255,.04), transparent 60%),
         radial-gradient(900px 700px at 80% 40%, rgba(255,255,255,.03), transparent 62%),
-        /* faint circuit lines */
         linear-gradient(90deg, rgba(155,231,255,.08), transparent 40%),
         linear-gradient(270deg, rgba(210,168,255,.07), transparent 42%);
       opacity:.55;
@@ -119,11 +129,7 @@
         rgba(255,255,255,.45);
       box-shadow: 0 0 18px rgba(155,231,255,.22);
     }
-    h1{
-      margin: 14px 0 0;
-      font-size: 22px;
-      letter-spacing: .08em;
-    }
+    h1{ margin: 14px 0 0; font-size: 22px; letter-spacing: .08em; }
     .lore{
       margin: 10px 0 0;
       color: var(--muted);
@@ -131,7 +137,7 @@
       font-size: 13px;
       max-width: 80ch;
     }
-    .lore em{color: var(--amber); font-style: normal;}
+    .lore em{ color: var(--amber); font-style: normal; }
 
     .layout{
       display:grid;
@@ -144,14 +150,15 @@
       .layout{ grid-template-columns: 420px 1fr; gap: 16px; padding: 16px 16px 20px;}
     }
 
-    /* CRT screen panel (Turn-A vibe) */
+    /* CRT screen */
     .crt{
       border:1px solid var(--edge);
       border-radius: var(--r);
-      background: rgba(8,10,26,.72);
+      background: rgba(8,10,26,.74);
       overflow:hidden;
       position:relative;
       min-height: 320px;
+      animation: flicker 6.8s infinite;
     }
     .crt::before{
       content:"";
@@ -168,11 +175,15 @@
       border-bottom: 1px solid var(--edge);
       background: rgba(255,255,255,.04);
       position:relative;
+      gap:10px;
     }
     .crtHead .title{
       font-size: 12px;
       color: var(--muted);
       letter-spacing: .10em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .status{
       font-size: 11px;
@@ -189,7 +200,6 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Noto Sans Mono", monospace;
     }
     .screen::after{
-      /* CRT vignette + scanlines */
       content:"";
       position:absolute; inset:0;
       background:
@@ -199,6 +209,7 @@
       opacity:.55;
       pointer-events:none;
     }
+
     .logline{
       margin: 0 0 10px;
       color: rgba(155,231,255,.95);
@@ -206,6 +217,59 @@
       font-size: 12px;
       line-height: 1.65;
     }
+
+    /* NEW: latest preview block */
+    .preview{
+      margin: 10px 0 12px;
+      border:1px solid rgba(255,211,138,.26);
+      background: rgba(255,211,138,.06);
+      border-radius: 14px;
+      padding: 12px 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .preview::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(260px 120px at 10% 10%, rgba(255,211,138,.14), transparent 62%),
+        linear-gradient(90deg, rgba(155,231,255,.10), transparent 40%, rgba(210,168,255,.10));
+      opacity:.35;
+      pointer-events:none;
+    }
+    .previewHead{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      margin-bottom: 8px;
+      position:relative;
+    }
+    .previewHead .k{
+      font-size: 11px;
+      letter-spacing:.12em;
+      color: rgba(255,211,138,.92);
+    }
+    .previewHead a{
+      font-size: 11px;
+      color: rgba(255,255,255,.88);
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.12);
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space:nowrap;
+    }
+    .previewText{
+      margin:0;
+      font-size: 13px;
+      line-height: 1.85;
+      color: rgba(255,255,255,.92);
+      white-space: pre-wrap; /* keep newlines from latest.txt */
+      position:relative;
+    }
+    .previewText .ghost{
+      color: rgba(174,183,230,.95);
+    }
+
     .logbox{
       border:1px solid rgba(255,255,255,.18);
       background: rgba(0,0,0,.18);
@@ -231,11 +295,11 @@
       position:relative;
       padding: 2px 0;
     }
-    .k{color: rgba(255,211,138,.92)}
-    .v{color: rgba(255,255,255,.92)}
-    .dim{color: rgba(174,183,230,.95)}
+    .row .k{color: rgba(255,211,138,.92)}
+    .row .v{color: rgba(255,255,255,.92)}
+    .row .dim{color: rgba(174,183,230,.95)}
 
-    /* archive nodes (links) */
+    /* nodes */
     .nodes{
       border:1px solid var(--edge);
       border-radius: var(--r);
@@ -244,6 +308,7 @@
       overflow:hidden;
       position:relative;
       min-height: 320px;
+      animation: flicker 6.8s infinite;
     }
     .nodes::before{
       content:"";
@@ -284,9 +349,7 @@
       padding: 12px 12px 14px;
       position:relative;
     }
-    @media (min-width: 640px){
-      .grid{grid-template-columns: 1fr 1fr;}
-    }
+    @media (min-width: 640px){ .grid{grid-template-columns: 1fr 1fr;} }
 
     .node{
       text-decoration:none;
@@ -329,25 +392,10 @@
       background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
       flex: 0 0 auto;
     }
-    .ico span{
-      font-size: 18px;
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,.45));
-    }
+    .ico span{ font-size: 18px; filter: drop-shadow(0 8px 16px rgba(0,0,0,.45)); }
     .meta{min-width:0}
-    .ttl{
-      margin:0;
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing:.02em;
-    }
-    .desc{
-      margin: 4px 0 0;
-      font-size: 12px;
-      color: var(--muted);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
+    .ttl{ margin:0; font-size: 14px; font-weight: 800; letter-spacing:.02em; }
+    .desc{ margin: 4px 0 0; font-size: 12px; color: var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     .node.latest{
       border-color: rgba(255,211,138,.38);
@@ -398,13 +446,7 @@
       background: rgba(255,255,255,.09);
     }
 
-    /* tiny flicker */
-    @keyframes flicker {
-      0%, 100% { opacity: .98; }
-      50% { opacity: .93; }
-      70% { opacity: 1; }
-    }
-    .crt, .nodes { animation: flicker 6.8s infinite; }
+    @keyframes flicker { 0%,100%{opacity:.98} 50%{opacity:.93} 70%{opacity:1} }
   </style>
 </head>
 
@@ -433,18 +475,28 @@
         <section class="crt" aria-label="観測スクリーン">
           <div class="crtHead">
             <div class="title">OBSERVATION SCREEN // ARCHIVE PLAYBACK</div>
-            <div class="status">SYNC: OK · NOISE: LOW</div>
+            <div class="status" id="syncStatus">SYNC: …</div>
           </div>
 
           <div class="screen">
-            <p class="logline">> 再生開始：古い戦記映像のように、記録は“今”として映る。</p>
+            <p class="logline">> 再生開始：記録は“今”として映る。</p>
+
+            <!-- Latest preview -->
+            <div class="preview" aria-label="最新話ログプレビュー">
+              <div class="previewHead">
+                <div class="k">LATEST LOG // PROLOGUE</div>
+                <a href="https://ncode.syosetu.com/n8578lq/12/" target="_blank" rel="noopener">▶ 続きを再生</a>
+              </div>
+              <p id="latestPreview" class="previewText">
+                <span class="ghost">LOADING…</span>
+              </p>
+            </div>
 
             <div class="logbox" aria-label="ログ">
               <div class="row"><span class="k">[NODE]</span> <span class="v">TAROT BREAKER</span> <span class="dim">/ star-memory</span></div>
               <div class="row"><span class="k">[RULE]</span> <span class="v">呼ぶ／返事／名前</span> <span class="dim">= 不可逆</span></div>
               <div class="row"><span class="k">[MODE]</span> <span class="v">TIME-LOG</span> <span class="dim">（感情ではなく記録が残る）</span></div>
               <div class="row"><span class="k">[NOTE]</span> <span class="v">ここで開くリンクは“移動”ではなく“接続”</span></div>
-              <div class="row"><span class="k">[HINT]</span> <span class="v">最新話は最上段。まず、そこでログの温度を掴む。</span></div>
             </div>
 
             <p class="logline" style="margin-top:12px;color:rgba(210,168,255,.95)">
@@ -461,7 +513,6 @@
           </div>
 
           <div class="grid" role="list">
-            <!-- 最新話 -->
             <a class="node latest" role="listitem"
                href="https://ncode.syosetu.com/n8578lq/12/"
                target="_blank" rel="noopener">
@@ -473,7 +524,6 @@
               <div class="badge">LATEST</div>
             </a>
 
-            <!-- なろう -->
             <a class="node" role="listitem"
                href="https://ncode.syosetu.com/n8578lq/"
                target="_blank" rel="noopener">
@@ -484,7 +534,6 @@
               </div>
             </a>
 
-            <!-- カクヨム -->
             <a class="node" role="listitem"
                href="https://kakuyomu.jp/works/822139843408910379"
                target="_blank" rel="noopener">
@@ -495,7 +544,6 @@
               </div>
             </a>
 
-            <!-- note -->
             <a class="node" role="listitem"
                href="https://note.com/shion_uranai369"
                target="_blank" rel="noopener">
@@ -506,7 +554,6 @@
               </div>
             </a>
 
-            <!-- X -->
             <a class="node" role="listitem"
                href="https://x.com/TaroBure"
                target="_blank" rel="noopener">
@@ -517,7 +564,6 @@
               </div>
             </a>
 
-            <!-- Instagram -->
             <a class="node" role="listitem"
                href="https://www.instagram.com/shionverse_official"
                target="_blank" rel="noopener">
@@ -528,7 +574,6 @@
               </div>
             </a>
 
-            <!-- back -->
             <a class="node" role="listitem" href="./star-memory.html">
               <div class="ico" aria-hidden="true"><span>🗝️</span></div>
               <div class="meta">
@@ -547,5 +592,39 @@
       </footer>
     </main>
   </div>
+
+  <!-- JS: latest.txt を読み込んでスクリーンに映す -->
+  <script>
+    const PREVIEW_FILE = "./latest.txt";
+    const previewEl = document.getElementById("latestPreview");
+    const statusEl = document.getElementById("syncStatus");
+
+    function setStatus(text){
+      if (statusEl) statusEl.textContent = text;
+    }
+
+    async function loadLatest(){
+      try{
+        setStatus("SYNC: …");
+        const res = await fetch(PREVIEW_FILE, { cache: "no-store" });
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        const text = (await res.text()).trim();
+
+        // 空なら保険
+        const safeText = text.length ? text : "（ログが未転記です）\nlatest.txt に冒頭3〜5行を貼ってください。";
+        if(previewEl) previewEl.textContent = safeText;
+
+        setStatus("SYNC: OK · NOISE: LOW");
+      }catch(err){
+        if(previewEl){
+          previewEl.textContent =
+            "（接続失敗）\nlatest.txt が見つからないか、読み込みできません。\n同じ階層に latest.txt を置いてください。";
+        }
+        setStatus("SYNC: FAIL · NOISE: HIGH");
+      }
+    }
+
+    loadLatest();
+  </script>
 </body>
 </html>
