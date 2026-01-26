@@ -3,21 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>星記録聖堂｜TAROT BREAKER</title>
-  <meta name="description" content="記憶が集まる場所。TAROT BREAKERの最新話と記録リンク。" />
+  <title>時間記録殿｜TAROT BREAKER</title>
+  <meta name="description" content="図書館ではない。時間のログが残る場所。TAROT BREAKERの記録リンク。" />
 
   <style>
     :root{
-      --bg0:#060713;
-      --bg1:#080a1f;
+      --bg0:#05060e;
+      --bg1:#0a0b18;
+      --stone:#0f122a;
       --ink:#eef1ff;
-      --muted:#b7bfe6;
-      --glass:#ffffff10;
+      --muted:#aeb7e6;
       --edge:#ffffff24;
+
       --aqua:#9be7ff;
       --violet:#d2a8ff;
-      --gold:#ffd38a;
-      --shadow: 0 30px 80px rgba(0,0,0,.55);
+      --amber:#ffd38a;
+
+      --glass: rgba(255,255,255,.06);
+      --panel: rgba(12,16,44,.58);
+      --shadow: 0 28px 90px rgba(0,0,0,.62);
+
       --r: 18px;
     }
     *{box-sizing:border-box}
@@ -27,24 +32,31 @@
       color:var(--ink);
       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
       background:
-        radial-gradient(900px 600px at 20% 20%, rgba(210,168,255,.16), transparent 60%),
-        radial-gradient(900px 600px at 85% 25%, rgba(155,231,255,.12), transparent 60%),
+        radial-gradient(900px 600px at 15% 18%, rgba(210,168,255,.14), transparent 60%),
+        radial-gradient(900px 600px at 85% 22%, rgba(155,231,255,.10), transparent 60%),
         linear-gradient(160deg, var(--bg0), var(--bg1));
       overflow-x:hidden;
     }
 
-    /* subtle star dust */
-    .stars{
+    /* drifting dust + scan noise */
+    .fx{
       position:fixed; inset:0;
       pointer-events:none;
-      opacity:.45;
+      opacity:.65;
       background-image:
         radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.55) 50%, transparent 51%),
-        radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,.35) 50%, transparent 51%),
-        radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.45) 50%, transparent 51%),
-        radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,.25) 50%, transparent 51%),
-        radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,.35) 50%, transparent 51%);
-      background-size: 420px 420px, 520px 520px, 640px 640px, 780px 780px, 980px 980px;
+        radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,.30) 50%, transparent 51%),
+        radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.40) 50%, transparent 51%),
+        radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,.22) 50%, transparent 51%),
+        radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,.30) 50%, transparent 51%),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.03) 0px,
+          rgba(255,255,255,.02) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 5px
+        );
+      background-size: 420px 420px, 520px 520px, 640px 640px, 780px 780px, 980px 980px, 100% 6px;
       animation: drift 18s linear infinite;
       mix-blend-mode: screen;
     }
@@ -54,36 +66,42 @@
     }
 
     .wrap{
-      max-width: 980px;
+      max-width: 1040px;
       margin: 0 auto;
-      padding: 26px 16px 70px;
+      padding: 26px 16px 72px;
       position:relative;
     }
 
-    /* chapel frame */
-    .chapel{
-      border:1px solid var(--edge);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      box-shadow: var(--shadow);
-      border-radius: 24px;
-      overflow:hidden;
+    /* main hall (stone + circuitry) */
+    .hall{
       position:relative;
-    }
-    .chapel::before{
-      content:"";
-      position:absolute; inset:-2px;
+      border-radius: 26px;
+      overflow:hidden;
+      border: 1px solid var(--edge);
       background:
-        radial-gradient(700px 240px at 20% 10%, rgba(155,231,255,.20), transparent 60%),
-        radial-gradient(700px 240px at 80% 10%, rgba(210,168,255,.16), transparent 60%),
-        radial-gradient(900px 450px at 50% 120%, rgba(255,211,138,.10), transparent 65%);
+        radial-gradient(1200px 600px at 50% -10%, rgba(255,211,138,.10), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+    }
+    .hall::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        /* stone grain */
+        radial-gradient(900px 700px at 20% 60%, rgba(255,255,255,.04), transparent 60%),
+        radial-gradient(900px 700px at 80% 40%, rgba(255,255,255,.03), transparent 62%),
+        /* faint circuit lines */
+        linear-gradient(90deg, rgba(155,231,255,.08), transparent 40%),
+        linear-gradient(270deg, rgba(210,168,255,.07), transparent 42%);
+      opacity:.55;
       pointer-events:none;
     }
 
-    .header{
-      padding: 26px 22px 10px;
+    .top{
+      padding: 22px 22px 10px;
       position:relative;
     }
-    .seal{
+    .sig{
       display:inline-flex;
       align-items:center;
       gap:10px;
@@ -93,112 +111,161 @@
       border-radius: 999px;
       backdrop-filter: blur(8px);
     }
-    .seal .dot{
+    .sig .dot{
       width:10px;height:10px;border-radius:99px;
-      background: radial-gradient(circle at 30% 30%, var(--aqua), transparent 60%),
-                  radial-gradient(circle at 70% 70%, var(--violet), transparent 60%),
-                  rgba(255,255,255,.45);
-      box-shadow: 0 0 20px rgba(155,231,255,.25);
+      background:
+        radial-gradient(circle at 30% 30%, var(--aqua), transparent 60%),
+        radial-gradient(circle at 70% 70%, var(--violet), transparent 60%),
+        rgba(255,255,255,.45);
+      box-shadow: 0 0 18px rgba(155,231,255,.22);
     }
     h1{
       margin: 14px 0 0;
       font-size: 22px;
-      letter-spacing: .06em;
+      letter-spacing: .08em;
     }
-    .prologue{
+    .lore{
       margin: 10px 0 0;
       color: var(--muted);
-      line-height: 1.8;
+      line-height: 1.85;
       font-size: 13px;
-      max-width: 70ch;
+      max-width: 80ch;
     }
-    .prologue em{
-      color: var(--gold);
-      font-style: normal;
-    }
+    .lore em{color: var(--amber); font-style: normal;}
 
-    /* columns */
-    .columns{
+    .layout{
       display:grid;
       grid-template-columns: 1fr;
       gap: 14px;
-      padding: 16px 16px 22px;
+      padding: 14px 14px 18px;
       position:relative;
     }
-    @media (min-width: 860px){
-      .columns{
-        grid-template-columns: 280px 1fr 280px;
-        gap: 16px;
-      }
+    @media (min-width: 920px){
+      .layout{ grid-template-columns: 420px 1fr; gap: 16px; padding: 16px 16px 20px;}
     }
 
-    .glass{
+    /* CRT screen panel (Turn-A vibe) */
+    .crt{
       border:1px solid var(--edge);
       border-radius: var(--r);
-      background: rgba(255,255,255,.05);
-      backdrop-filter: blur(8px);
+      background: rgba(8,10,26,.72);
       overflow:hidden;
       position:relative;
-      min-height: 120px;
+      min-height: 320px;
     }
-    .glass::before{
+    .crt::before{
       content:"";
       position:absolute; inset:-2px;
       background:
-        radial-gradient(220px 180px at 30% 25%, rgba(155,231,255,.22), transparent 60%),
-        radial-gradient(260px 200px at 70% 35%, rgba(210,168,255,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+        radial-gradient(420px 220px at 20% 20%, rgba(155,231,255,.16), transparent 60%),
+        radial-gradient(520px 260px at 85% 25%, rgba(210,168,255,.12), transparent 65%),
+        radial-gradient(600px 360px at 50% 120%, rgba(255,211,138,.09), transparent 70%);
       pointer-events:none;
     }
-    .glass .inner{
-      padding: 16px 14px;
+    .crtHead{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--edge);
+      background: rgba(255,255,255,.04);
       position:relative;
     }
-    .glass h2{
+    .crtHead .title{
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .10em;
+    }
+    .status{
+      font-size: 11px;
+      color: rgba(255,255,255,.88);
+      border: 1px solid rgba(155,231,255,.25);
+      background: rgba(155,231,255,.07);
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space:nowrap;
+    }
+    .screen{
+      padding: 14px 14px 16px;
+      position:relative;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Noto Sans Mono", monospace;
+    }
+    .screen::after{
+      /* CRT vignette + scanlines */
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 600px at 50% 45%, rgba(255,255,255,.05), transparent 60%),
+        repeating-linear-gradient(to bottom, rgba(255,255,255,.04) 0px, rgba(255,255,255,.02) 1px, rgba(0,0,0,0) 4px);
+      mix-blend-mode: screen;
+      opacity:.55;
+      pointer-events:none;
+    }
+    .logline{
+      margin: 0 0 10px;
+      color: rgba(155,231,255,.95);
+      text-shadow: 0 0 18px rgba(155,231,255,.15);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+    .logbox{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.18);
+      border-radius: 14px;
+      padding: 12px 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .logbox::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        linear-gradient(90deg, rgba(155,231,255,.12), transparent 35%, rgba(210,168,255,.10)),
+        radial-gradient(260px 110px at 10% 10%, rgba(255,211,138,.10), transparent 60%);
+      opacity:.45;
+      pointer-events:none;
+    }
+    .row{
+      display:flex; gap:10px; align-items:flex-start;
+      font-size: 12px;
+      line-height: 1.75;
+      color: rgba(255,255,255,.90);
+      position:relative;
+      padding: 2px 0;
+    }
+    .k{color: rgba(255,211,138,.92)}
+    .v{color: rgba(255,255,255,.92)}
+    .dim{color: rgba(174,183,230,.95)}
+
+    /* archive nodes (links) */
+    .nodes{
+      border:1px solid var(--edge);
+      border-radius: var(--r);
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+      position:relative;
+      min-height: 320px;
+    }
+    .nodes::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(520px 220px at 60% 0%, rgba(255,211,138,.10), transparent 60%),
+        radial-gradient(680px 420px at 50% 120%, rgba(155,231,255,.12), transparent 70%);
+      pointer-events:none;
+    }
+    .nodesHead{
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--edge);
+      background: rgba(255,255,255,.04);
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px;
+      position:relative;
+    }
+    .nodesHead h2{
       margin:0;
       font-size: 13px;
-      letter-spacing: .08em;
+      letter-spacing:.10em;
       color: var(--muted);
-    }
-    .glass p{
-      margin: 10px 0 0;
-      font-size: 12px;
-      line-height: 1.7;
-      color: var(--muted);
-    }
-
-    /* altar center */
-    .altar{
-      border:1px solid var(--edge);
-      border-radius: var(--r);
-      background: rgba(10,14,38,.55);
-      backdrop-filter: blur(10px);
-      position:relative;
-      overflow:hidden;
-      min-height: 280px;
-    }
-    .altar::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(520px 220px at 50% 18%, rgba(255,211,138,.12), transparent 60%),
-        radial-gradient(600px 340px at 50% 120%, rgba(155,231,255,.12), transparent 70%);
-      pointer-events:none;
-    }
-    .altar .inner{
-      padding: 16px 14px 18px;
-      position:relative;
-    }
-    .altarTitle{
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .altarTitle h2{
-      margin:0;
-      font-size: 14px;
-      letter-spacing:.08em;
-      color: var(--ink);
     }
     .tag{
       font-size: 11px;
@@ -207,22 +274,24 @@
       background: rgba(255,255,255,.06);
       padding: 6px 10px;
       border-radius: 999px;
+      white-space:nowrap;
     }
 
     .grid{
       display:grid;
       grid-template-columns: 1fr;
       gap: 12px;
-      margin-top: 10px;
+      padding: 12px 12px 14px;
+      position:relative;
     }
-    @media (min-width: 520px){
+    @media (min-width: 640px){
       .grid{grid-template-columns: 1fr 1fr;}
     }
 
-    .relic{
+    .node{
       text-decoration:none;
       color: var(--ink);
-      border:1px solid var(--edge);
+      border:1px solid rgba(255,255,255,.18);
       background: rgba(255,255,255,.05);
       border-radius: 16px;
       padding: 14px 14px;
@@ -232,9 +301,9 @@
       transition: transform .12s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease;
       position:relative;
       overflow:hidden;
-      min-height: 70px;
+      min-height: 72px;
     }
-    .relic::before{
+    .node::before{
       content:"";
       position:absolute; inset:-2px;
       background:
@@ -244,23 +313,23 @@
       transition: opacity .12s ease;
       pointer-events:none;
     }
-    .relic:hover{
+    .node:hover{
       transform: translateY(-2px);
       border-color: rgba(155,231,255,.35);
       background: rgba(255,255,255,.07);
       box-shadow: 0 18px 40px rgba(0,0,0,.35);
     }
-    .relic:hover::before{opacity:1}
+    .node:hover::before{opacity:1}
 
-    .sigil{
+    .ico{
       width:42px; height:42px;
       border-radius: 14px;
-      border:1px solid var(--edge);
+      border:1px solid rgba(255,255,255,.18);
       display:grid; place-items:center;
       background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
       flex: 0 0 auto;
     }
-    .sigil span{
+    .ico span{
       font-size: 18px;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,.45));
     }
@@ -280,13 +349,12 @@
       text-overflow:ellipsis;
     }
 
-    /* special (latest) */
-    .relic.latest{
-      border-color: rgba(255,211,138,.35);
+    .node.latest{
+      border-color: rgba(255,211,138,.38);
       background: rgba(255,211,138,.06);
     }
-    .relic.latest:hover{
-      border-color: rgba(255,211,138,.55);
+    .node.latest:hover{
+      border-color: rgba(255,211,138,.58);
       background: rgba(255,211,138,.085);
     }
     .badge{
@@ -329,146 +397,153 @@
       border-color: rgba(210,168,255,.35);
       background: rgba(255,255,255,.09);
     }
-    .small{opacity:.9}
+
+    /* tiny flicker */
+    @keyframes flicker {
+      0%, 100% { opacity: .98; }
+      50% { opacity: .93; }
+      70% { opacity: 1; }
+    }
+    .crt, .nodes { animation: flicker 6.8s infinite; }
   </style>
 </head>
 
 <body>
-  <div class="stars" aria-hidden="true"></div>
+  <div class="fx" aria-hidden="true"></div>
 
   <div class="wrap">
-    <main class="chapel" role="main" aria-label="星記録聖堂">
-      <header class="header">
-        <div class="seal">
+    <main class="hall" role="main" aria-label="時間記録殿">
+      <header class="top">
+        <div class="sig">
           <div class="dot" aria-hidden="true"></div>
-          <div style="font-size:12px;color:var(--muted);letter-spacing:.08em;">STAR MEMORY · SANCTUARY</div>
+          <div style="font-size:12px;color:var(--muted);letter-spacing:.10em;">CHRONOLOGIUM · TIME LOG ARCHIVE</div>
         </div>
 
-        <h1>星記録聖堂（Star Memory Sanctuary）</h1>
-        <p class="prologue">
-          ここは、呼ばれた名が落ちない場所。<br/>
-          返事にならなかった言葉が、記録として残る場所。<br/>
-          ——触れた瞬間、あなたの中の記憶も <em>ひとつ</em> だけ動く。
+        <h1>時間記録殿（Chronologium）</h1>
+        <p class="lore">
+          ここは図書館ではない。<br/>
+          <em>読まれるため</em>に並ぶ棚ではなく、<em>起きたこと</em>が沈殿する場所。<br/>
+          ——ログは祈りではない。祈りのふりをした“記録”だ。
         </p>
       </header>
 
-      <section class="columns">
-        <!-- Left stained glass -->
-        <aside class="glass" aria-label="碑文">
-          <div class="inner">
-            <h2>《碑文》</h2>
-            <p>
-              ・名は、呼ばれた瞬間に固定される。<br/>
-              ・記録は、嘘をつかない。<br/>
-              ・ここで開くリンクは、“移動”ではなく“接続”。
-            </p>
+      <section class="layout">
+
+        <!-- CRT observation screen -->
+        <section class="crt" aria-label="観測スクリーン">
+          <div class="crtHead">
+            <div class="title">OBSERVATION SCREEN // ARCHIVE PLAYBACK</div>
+            <div class="status">SYNC: OK · NOISE: LOW</div>
           </div>
-        </aside>
 
-        <!-- Center altar -->
-        <section class="altar" aria-label="祭壇">
-          <div class="inner">
-            <div class="altarTitle">
-              <h2>《祭壇》記録への接続</h2>
-              <div class="tag">LINK RELICS</div>
+          <div class="screen">
+            <p class="logline">> 再生開始：古い戦記映像のように、記録は“今”として映る。</p>
+
+            <div class="logbox" aria-label="ログ">
+              <div class="row"><span class="k">[NODE]</span> <span class="v">TAROT BREAKER</span> <span class="dim">/ star-memory</span></div>
+              <div class="row"><span class="k">[RULE]</span> <span class="v">呼ぶ／返事／名前</span> <span class="dim">= 不可逆</span></div>
+              <div class="row"><span class="k">[MODE]</span> <span class="v">TIME-LOG</span> <span class="dim">（感情ではなく記録が残る）</span></div>
+              <div class="row"><span class="k">[NOTE]</span> <span class="v">ここで開くリンクは“移動”ではなく“接続”</span></div>
+              <div class="row"><span class="k">[HINT]</span> <span class="v">最新話は最上段。まず、そこでログの温度を掴む。</span></div>
             </div>
 
-            <div class="grid" role="list">
-              <!-- 最新話（最上段） -->
-              <a class="relic latest" role="listitem"
-                 href="https://ncode.syosetu.com/n8578lq/12/"
-                 target="_blank" rel="noopener">
-                <div class="sigil" aria-hidden="true"><span>🕯️</span></div>
-                <div class="meta">
-                  <p class="ttl">最新話｜第12話（なろう）</p>
-                  <p class="desc">相談が消える日、名だけが残る夜（——）</p>
-                </div>
-                <div class="badge">LATEST</div>
-              </a>
-
-              <!-- なろう（作品トップ） -->
-              <a class="relic" role="listitem"
-                 href="https://ncode.syosetu.com/n8578lq/"
-                 target="_blank" rel="noopener">
-                <div class="sigil" aria-hidden="true"><span>📘</span></div>
-                <div class="meta">
-                  <p class="ttl">小説家になろう｜記録庫</p>
-                  <p class="desc">TAROT BREAKER 作品トップ</p>
-                </div>
-              </a>
-
-              <!-- カクヨム -->
-              <a class="relic" role="listitem"
-                 href="https://kakuyomu.jp/works/822139843408910379"
-                 target="_blank" rel="noopener">
-                <div class="sigil" aria-hidden="true"><span>📙</span></div>
-                <div class="meta">
-                  <p class="ttl">カクヨム｜別系統の記録</p>
-                  <p class="desc">観測ログを追う</p>
-                </div>
-              </a>
-
-              <!-- note -->
-              <a class="relic" role="listitem"
-                 href="https://note.com/shion_uranai369"
-                 target="_blank" rel="noopener">
-                <div class="sigil" aria-hidden="true"><span>📝</span></div>
-                <div class="meta">
-                  <p class="ttl">note｜祈りの書</p>
-                  <p class="desc">世界観・思想・補遺</p>
-                </div>
-              </a>
-
-              <!-- X -->
-              <a class="relic" role="listitem"
-                 href="https://x.com/TaroBure"
-                 target="_blank" rel="noopener">
-                <div class="sigil" aria-hidden="true"><span>✖️</span></div>
-                <div class="meta">
-                  <p class="ttl">X｜通信ログ（@TaroBure）</p>
-                  <p class="desc">更新・観測・告知</p>
-                </div>
-              </a>
-
-              <!-- Instagram -->
-              <a class="relic" role="listitem"
-                 href="https://www.instagram.com/shionverse_official"
-                 target="_blank" rel="noopener">
-                <div class="sigil" aria-hidden="true"><span>📷</span></div>
-                <div class="meta">
-                  <p class="ttl">Instagram｜星映</p>
-                  <p class="desc">ビジュアル記憶（shionverse_official）</p>
-                </div>
-              </a>
-
-              <!-- Star Memoryへ戻る -->
-              <a class="relic" role="listitem" href="./star-memory.html">
-                <div class="sigil" aria-hidden="true"><span>🗝️</span></div>
-                <div class="meta">
-                  <p class="ttl">Star Memory｜入口へ</p>
-                  <p class="desc">記憶の回廊に戻る</p>
-                </div>
-              </a>
-            </div>
+            <p class="logline" style="margin-top:12px;color:rgba(210,168,255,.95)">
+              > 古い石壁の奥で、端末だけが光っている。——それが、この場所。
+            </p>
           </div>
         </section>
 
-        <!-- Right stained glass -->
-        <aside class="glass" aria-label="案内">
-          <div class="inner">
-            <h2>《案内》</h2>
-            <p>
-              記録は増えるほど、静かに強くなる。<br/>
-              反応が少ない日でも、ログは積もる。<br/>
-              ——積もった分だけ、次の一話が“戻れない形”になる。
-            </p>
+        <!-- Link nodes -->
+        <section class="nodes" aria-label="記録ノード">
+          <div class="nodesHead">
+            <h2>LINK NODES（記録への接続）</h2>
+            <div class="tag">RELICS · LOGS · VISUALS</div>
           </div>
-        </aside>
+
+          <div class="grid" role="list">
+            <!-- 最新話 -->
+            <a class="node latest" role="listitem"
+               href="https://ncode.syosetu.com/n8578lq/12/"
+               target="_blank" rel="noopener">
+              <div class="ico" aria-hidden="true"><span>🕯️</span></div>
+              <div class="meta">
+                <p class="ttl">最新話｜第12話（なろう）</p>
+                <p class="desc">相談が消える日、名だけが残る夜（——）</p>
+              </div>
+              <div class="badge">LATEST</div>
+            </a>
+
+            <!-- なろう -->
+            <a class="node" role="listitem"
+               href="https://ncode.syosetu.com/n8578lq/"
+               target="_blank" rel="noopener">
+              <div class="ico" aria-hidden="true"><span>📘</span></div>
+              <div class="meta">
+                <p class="ttl">なろう｜記録庫（作品トップ）</p>
+                <p class="desc">正史ログ：TAROT BREAKER</p>
+              </div>
+            </a>
+
+            <!-- カクヨム -->
+            <a class="node" role="listitem"
+               href="https://kakuyomu.jp/works/822139843408910379"
+               target="_blank" rel="noopener">
+              <div class="ico" aria-hidden="true"><span>📙</span></div>
+              <div class="meta">
+                <p class="ttl">カクヨム｜観測記録</p>
+                <p class="desc">別系統ログ：同じ影を別角度で</p>
+              </div>
+            </a>
+
+            <!-- note -->
+            <a class="node" role="listitem"
+               href="https://note.com/shion_uranai369"
+               target="_blank" rel="noopener">
+              <div class="ico" aria-hidden="true"><span>📝</span></div>
+              <div class="meta">
+                <p class="ttl">note｜補遺（思想・祈りの書）</p>
+                <p class="desc">世界観・詩韻思想・裏側の言葉</p>
+              </div>
+            </a>
+
+            <!-- X -->
+            <a class="node" role="listitem"
+               href="https://x.com/TaroBure"
+               target="_blank" rel="noopener">
+              <div class="ico" aria-hidden="true"><span>✖️</span></div>
+              <div class="meta">
+                <p class="ttl">X｜通信ログ（@TaroBure）</p>
+                <p class="desc">更新・観測・告知（ログが増える場所）</p>
+              </div>
+            </a>
+
+            <!-- Instagram -->
+            <a class="node" role="listitem"
+               href="https://www.instagram.com/shionverse_official"
+               target="_blank" rel="noopener">
+              <div class="ico" aria-hidden="true"><span>📷</span></div>
+              <div class="meta">
+                <p class="ttl">Instagram｜星映（shionverse_official）</p>
+                <p class="desc">ビジュアル記憶（古さと光の混ざり）</p>
+              </div>
+            </a>
+
+            <!-- back -->
+            <a class="node" role="listitem" href="./star-memory.html">
+              <div class="ico" aria-hidden="true"><span>🗝️</span></div>
+              <div class="meta">
+                <p class="ttl">Star Memory｜入口へ戻る</p>
+                <p class="desc">回廊へ（記憶の続き）</p>
+              </div>
+            </a>
+          </div>
+        </section>
+
       </section>
 
       <footer class="footer">
         <a class="btn" href="./star-memory.html">← Star Memoryへ戻る</a>
-        <span class="small">© TAROT BREAKER / 詩韻 -シオン-</span>
+        <span>© TAROT BREAKER / 詩韻 -シオン-</span>
       </footer>
     </main>
   </div>
