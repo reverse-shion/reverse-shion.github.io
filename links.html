@@ -1,858 +1,510 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>時間記録殿｜TAROT BREAKER</title>
-  <meta name="description" content="図書館ではない。時間のログが残る場所。TAROT BREAKERの記録リンク。" />
-
+  <title>TAROT BREAKER / 時間記録殿（Chronologium）</title>
   <style>
-    :root{
-      --bg0:#05060e;
-      --bg1:#0a0b18;
-      --ink:#eef1ff;
-      --muted:#aeb7e6;
-      --edge:#ffffff24;
-
-      --aqua:#9be7ff;
-      --violet:#d2a8ff;
-      --amber:#ffd38a;
-
-      --glass: rgba(255,255,255,.06);
-      --panel: rgba(12,16,44,.58);
-      --shadow: 0 28px 90px rgba(0,0,0,.62);
-      --r: 18px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      color:var(--ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-      background:
-        radial-gradient(900px 600px at 15% 18%, rgba(210,168,255,.14), transparent 60%),
-        radial-gradient(900px 600px at 85% 22%, rgba(155,231,255,.10), transparent 60%),
-        linear-gradient(160deg, var(--bg0), var(--bg1));
-      overflow-x:hidden;
+    :root {
+      color-scheme: dark;
+      --bg: #05070d;
+      --glass: rgba(10, 16, 28, 0.55);
+      --glass-strong: rgba(6, 10, 20, 0.75);
+      --line: rgba(120, 220, 255, 0.35);
+      --cyan: #7fe6ff;
+      --violet: #c6a6ff;
+      --amber: #ffe0a6;
+      --muted: rgba(230, 240, 255, 0.7);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
     }
 
-    /* optional background image */
-    body::before{
-      content:"";
-      position:fixed; inset:0;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.62)),
-        url("./assets/chronologium.png");
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      background: var(--bg);
+      color: #edf7ff;
+    }
+
+    body {
+      min-height: 100vh;
+      background-image: url("assets/chronologium.png");
       background-size: cover;
       background-position: center;
-      filter: saturate(0.95) contrast(1.05);
-      opacity:.55;
-      pointer-events:none;
-      z-index:-3;
+      background-attachment: fixed;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    /* drifting dust + scan noise */
-    .fx{
-      position:fixed; inset:0;
-      pointer-events:none;
-      opacity:.65;
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      background:
+        linear-gradient(180deg, rgba(5, 6, 12, 0.45) 0%, rgba(6, 8, 16, 0.25) 40%, rgba(4, 6, 10, 0.45) 100%);
+    }
+
+    body::after {
       background-image:
-        radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.55) 50%, transparent 51%),
-        radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,.30) 50%, transparent 51%),
-        radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.40) 50%, transparent 51%),
-        radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,.22) 50%, transparent 51%),
-        radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,.30) 50%, transparent 51%),
-        repeating-linear-gradient(
-          to bottom,
-          rgba(255,255,255,.03) 0px,
-          rgba(255,255,255,.02) 1px,
-          rgba(0,0,0,0) 3px,
-          rgba(0,0,0,0) 6px
-        );
-      background-size: 420px 420px, 520px 520px, 640px 640px, 780px 780px, 980px 980px, 100% 7px;
-      animation: drift 18s linear infinite;
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 4px),
+        radial-gradient(circle at 20% 20%, rgba(125, 220, 255, 0.1), transparent 40%),
+        radial-gradient(circle at 80% 15%, rgba(205, 170, 255, 0.08), transparent 45%),
+        radial-gradient(circle at 40% 80%, rgba(255, 220, 150, 0.05), transparent 50%);
+      opacity: 0.6;
       mix-blend-mode: screen;
-      z-index:-2;
     }
-    @keyframes drift{ from{transform:translateY(0)} to{transform:translateY(18px)} }
 
-    .wrap{
-      max-width: 1040px;
+    main {
+      position: relative;
+      z-index: 1;
+      padding: 120px 6vw 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+
+    header {
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 26px 16px 72px;
-      position:relative;
-    }
-
-    /* main hall (stone + circuitry) */
-    .hall{
-      position:relative;
-      border-radius: 26px;
-      overflow:hidden;
-      border: 1px solid var(--edge);
-      background:
-        radial-gradient(1200px 600px at 50% -10%, rgba(255,211,138,.10), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      width: min(1100px, 100%);
+      padding: 28px 32px;
+      border-radius: 24px;
+      background: var(--glass);
+      border: 1px solid rgba(140, 220, 255, 0.2);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(6px);
-    }
-    .hall::before{
-      content:"";
-      position:absolute; inset:0;
-      background:
-        radial-gradient(900px 700px at 20% 60%, rgba(255,255,255,.04), transparent 60%),
-        radial-gradient(900px 700px at 80% 40%, rgba(255,255,255,.03), transparent 62%),
-        linear-gradient(90deg, rgba(155,231,255,.08), transparent 40%),
-        linear-gradient(270deg, rgba(210,168,255,.07), transparent 42%);
-      opacity:.55;
-      pointer-events:none;
+      backdrop-filter: blur(12px);
     }
 
-    .top{
-      padding: 22px 22px 10px;
-      position:relative;
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      text-shadow: 0 0 20px rgba(120, 220, 255, 0.35);
     }
-    .sig{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      border:1px solid var(--edge);
-      background: rgba(255,255,255,.06);
-      padding: 10px 12px;
-      border-radius: 999px;
-      backdrop-filter: blur(8px);
-    }
-    .sig .dot{
-      width:10px;height:10px;border-radius:99px;
-      background:
-        radial-gradient(circle at 30% 30%, var(--aqua), transparent 60%),
-        radial-gradient(circle at 70% 70%, var(--violet), transparent 60%),
-        rgba(255,255,255,.45);
-      box-shadow: 0 0 18px rgba(155,231,255,.22);
-    }
-    h1{ margin: 14px 0 0; font-size: 22px; letter-spacing: .08em; }
-    .lore{
-      margin: 10px 0 0;
+
+    header p {
+      margin: 0;
       color: var(--muted);
-      line-height: 1.85;
-      font-size: 13px;
-      max-width: 80ch;
+      font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+      letter-spacing: 0.12em;
     }
-    .lore em{ color: var(--amber); font-style: normal; }
 
-    .layout{
-      display:grid;
-      grid-template-columns: 1fr;
+    .panel {
+      max-width: 1100px;
+      margin: 0 auto;
+      width: min(1100px, 100%);
+      background: var(--glass);
+      border-radius: 26px;
+      border: 1px solid rgba(120, 220, 255, 0.2);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(120, 220, 255, 0.1), rgba(198, 166, 255, 0.08), transparent 60%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .latest {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .latest h2 {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      color: var(--amber);
+    }
+
+    .latest pre {
+      margin: 0;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(6, 10, 20, 0.7);
+      border: 1px solid rgba(120, 220, 255, 0.25);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #eef7ff;
+      white-space: pre-wrap;
+    }
+
+    .latest .actions {
+      display: flex;
+      flex-direction: column;
       gap: 14px;
-      padding: 14px 14px 18px;
-      position:relative;
-    }
-    @media (min-width: 920px){
-      .layout{ grid-template-columns: 420px 1fr; gap: 16px; padding: 16px 16px 20px;}
+      align-items: stretch;
     }
 
-    /* CRT screen */
-    .crt{
-      border:1px solid var(--edge);
-      border-radius: var(--r);
-      background: rgba(8,10,26,.74);
-      overflow:hidden;
-      position:relative;
-      min-height: 320px;
-      animation: flicker 6.8s infinite;
-    }
-    .crt::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(420px 220px at 20% 20%, rgba(155,231,255,.16), transparent 60%),
-        radial-gradient(520px 260px at 85% 25%, rgba(210,168,255,.12), transparent 65%),
-        radial-gradient(600px 360px at 50% 120%, rgba(255,211,138,.09), transparent 70%);
-      pointer-events:none;
-    }
-    .crtHead{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--edge);
-      background: rgba(255,255,255,.04);
-      position:relative;
-      gap:10px;
-    }
-    .crtHead .title{
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: .10em;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .status{
-      font-size: 11px;
-      color: rgba(255,255,255,.88);
-      border: 1px solid rgba(155,231,255,.25);
-      background: rgba(155,231,255,.07);
-      padding: 6px 10px;
-      border-radius: 999px;
-      white-space:nowrap;
-    }
-    .screen{
-      padding: 14px 14px 16px;
-      position:relative;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Noto Sans Mono", monospace;
-    }
-    .screen::after{
-      content:"";
-      position:absolute; inset:0;
-      background:
-        radial-gradient(900px 600px at 50% 45%, rgba(255,255,255,.05), transparent 60%),
-        repeating-linear-gradient(to bottom, rgba(255,255,255,.04) 0px, rgba(255,255,255,.02) 1px, rgba(0,0,0,0) 4px);
-      mix-blend-mode: screen;
-      opacity:.55;
-      pointer-events:none;
-    }
-
-    .logline{
-      margin: 0 0 10px;
-      color: rgba(155,231,255,.95);
-      text-shadow: 0 0 18px rgba(155,231,255,.15);
-      font-size: 12px;
-      line-height: 1.65;
-    }
-
-    /* NEW: latest preview block */
-    .preview{
-      margin: 10px 0 12px;
-      border:1px solid rgba(255,211,138,.26);
-      background: rgba(255,211,138,.06);
+    .btn {
+      appearance: none;
+      border: 1px solid rgba(120, 220, 255, 0.45);
+      background: linear-gradient(135deg, rgba(24, 44, 76, 0.9), rgba(14, 22, 40, 0.95));
+      color: #eef7ff;
+      padding: 12px 20px;
       border-radius: 14px;
-      padding: 12px 12px;
-      position:relative;
-      overflow:hidden;
-    }
-    .preview::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(260px 120px at 10% 10%, rgba(255,211,138,.14), transparent 62%),
-        linear-gradient(90deg, rgba(155,231,255,.10), transparent 40%, rgba(210,168,255,.10));
-      opacity:.35;
-      pointer-events:none;
-    }
-    .previewHead{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px;
-      margin-bottom: 8px;
-      position:relative;
-    }
-    .previewHead .k{
-      font-size: 11px;
-      letter-spacing:.12em;
-      color: rgba(255,211,138,.92);
-    }
-    .previewHead a{
-      font-size: 11px;
-      color: rgba(255,255,255,.88);
-      text-decoration:none;
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.12);
-      padding: 6px 10px;
-      border-radius: 999px;
-      white-space:nowrap;
-    }
-    .previewText{
-      margin:0;
-      font-size: 13px;
-      line-height: 1.85;
-      color: rgba(255,255,255,.92);
-      white-space: pre-wrap; /* keep newlines from latest.txt */
-      position:relative;
-    }
-    .previewText .ghost{
-      color: rgba(174,183,230,.95);
+      font-size: 0.95rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     }
 
-    .logbox{
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.18);
-      border-radius: 14px;
-      padding: 12px 12px;
-      position:relative;
-      overflow:hidden;
-    }
-    .logbox::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        linear-gradient(90deg, rgba(155,231,255,.12), transparent 35%, rgba(210,168,255,.10)),
-        radial-gradient(260px 110px at 10% 10%, rgba(255,211,138,.10), transparent 60%);
-      opacity:.45;
-      pointer-events:none;
-    }
-    .row{
-      display:flex; gap:10px; align-items:flex-start;
-      font-size: 12px;
-      line-height: 1.75;
-      color: rgba(255,255,255,.90);
-      position:relative;
-      padding: 2px 0;
-    }
-    .row .k{color: rgba(255,211,138,.92)}
-    .row .v{color: rgba(255,255,255,.92)}
-    .row .dim{color: rgba(174,183,230,.95)}
-
-    /* nodes */
-    .nodes{
-      border:1px solid var(--edge);
-      border-radius: var(--r);
-      background: var(--panel);
-      backdrop-filter: blur(10px);
-      overflow:hidden;
-      position:relative;
-      min-height: 320px;
-      animation: flicker 6.8s infinite;
-    }
-    .nodes::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(520px 220px at 60% 0%, rgba(255,211,138,.10), transparent 60%),
-        radial-gradient(680px 420px at 50% 120%, rgba(155,231,255,.12), transparent 70%);
-      pointer-events:none;
-    }
-    .nodesHead{
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--edge);
-      background: rgba(255,255,255,.04);
-      display:flex; justify-content:space-between; align-items:center;
-      gap:10px;
-      position:relative;
-    }
-    .nodesHead h2{
-      margin:0;
-      font-size: 13px;
-      letter-spacing:.10em;
-      color: var(--muted);
-    }
-    .tag{
-      font-size: 11px;
-      color: var(--muted);
-      border:1px solid var(--edge);
-      background: rgba(255,255,255,.06);
-      padding: 6px 10px;
-      border-radius: 999px;
-      white-space:nowrap;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      padding: 12px 12px 14px;
-      position:relative;
-    }
-    @media (min-width: 640px){ .grid{grid-template-columns: 1fr 1fr;} }
-
-    .node{
-      text-decoration:none;
-      color: var(--ink);
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.05);
-      border-radius: 16px;
-      padding: 14px 14px;
-      display:flex;
-      gap: 12px;
-      align-items:center;
-      transition: transform .12s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease;
-      position:relative;
-      overflow:hidden;
-      min-height: 72px;
-    }
-    .node::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(220px 110px at 20% 30%, rgba(155,231,255,.16), transparent 60%),
-        radial-gradient(240px 120px at 80% 35%, rgba(210,168,255,.13), transparent 60%);
-      opacity:.0;
-      transition: opacity .12s ease;
-      pointer-events:none;
-    }
-    .node:hover{
+    .btn:hover,
+    .btn:focus-visible {
       transform: translateY(-2px);
-      border-color: rgba(155,231,255,.35);
-      background: rgba(255,255,255,.07);
-      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      box-shadow: 0 18px 40px rgba(75, 190, 255, 0.2);
+      outline: none;
     }
-    .node:hover::before{opacity:1}
 
-    .ico{
-      width:42px; height:42px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.18);
-      display:grid; place-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
-      flex: 0 0 auto;
+    .btn.secondary {
+      border-color: rgba(198, 166, 255, 0.45);
+      color: var(--violet);
     }
-    .ico span{ font-size: 18px; filter: drop-shadow(0 8px 16px rgba(0,0,0,.45)); }
-    .meta{min-width:0}
-    .ttl{ margin:0; font-size: 14px; font-weight: 800; letter-spacing:.02em; }
-    .desc{ margin: 4px 0 0; font-size: 12px; color: var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    .node.latest{
-      border-color: rgba(255,211,138,.38);
-      background: rgba(255,211,138,.06);
+    .log-band {
+      padding: 20px 0;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(120, 220, 255, 0.18);
+      background: rgba(6, 10, 20, 0.65);
     }
-    .node.latest:hover{
-      border-color: rgba(255,211,138,.58);
-      background: rgba(255,211,138,.085);
+
+    .log-track {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      animation: marquee 40s linear infinite;
+      width: max-content;
     }
-    .badge{
-      margin-left:auto;
-      font-size: 11px;
-      color: rgba(255,255,255,.92);
-      border:1px solid rgba(255,211,138,.42);
-      background: rgba(255,211,138,.12);
+
+    .log-band:hover .log-track,
+    .log-band:focus-within .log-track {
+      animation-play-state: paused;
+    }
+
+    .log-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .log-item a {
+      color: var(--cyan);
+      text-decoration: none;
       padding: 6px 10px;
       border-radius: 999px;
-      white-space:nowrap;
+      border: 1px solid rgba(120, 220, 255, 0.25);
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
-    .footer{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding: 14px 18px 18px;
-      border-top: 1px solid var(--edge);
-      color: var(--muted);
-      font-size: 12px;
-      position:relative;
+    .log-item a:hover,
+    .log-item a:focus-visible {
+      color: #08101c;
+      background: rgba(120, 220, 255, 0.7);
+      outline: none;
     }
-    .btn{
-      display:inline-flex;
-      align-items:center;
+
+    @keyframes marquee {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .log-track {
+        animation: none;
+      }
+    }
+
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .link-node {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
-      padding: 10px 12px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(120, 220, 255, 0.2);
+      background: rgba(6, 12, 22, 0.6);
+      text-decoration: none;
+      color: #edf7ff;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .link-node span {
+      font-size: 0.8rem;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+    }
+
+    .link-node strong {
+      font-size: 1.05rem;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+    }
+
+    .link-node:hover,
+    .link-node:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(120, 220, 255, 0.6);
+      outline: none;
+    }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--violet);
+      text-decoration: none;
+      letter-spacing: 0.2em;
+      font-size: 0.9rem;
+      padding: 10px 16px;
       border-radius: 999px;
-      border:1px solid var(--edge);
-      background: rgba(255,255,255,.06);
-      color: var(--ink);
-      text-decoration:none;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-      white-space:nowrap;
-    }
-    .btn:hover{
-      transform: translateY(-1px);
-      border-color: rgba(210,168,255,.35);
-      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(198, 166, 255, 0.45);
     }
 
-    @keyframes flicker { 0%,100%{opacity:.98} 50%{opacity:.93} 70%{opacity:1} }
+    .return-link:hover,
+    .return-link:focus-visible {
+      color: #0c101b;
+      background: rgba(198, 166, 255, 0.6);
+      outline: none;
+    }
 
-    /* ===== BOOT OVERLAY ===== */
-.boot{
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0,0,0,.86);
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .28s ease;
-}
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 12, 0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
 
-.boot.is-on{
-  opacity: 1;
-  pointer-events: auto;
-}
+    .overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
 
-.bootFx{
-  position:absolute; inset:0;
-  background:
-    radial-gradient(900px 600px at 25% 20%, rgba(210,168,255,.10), transparent 60%),
-    radial-gradient(900px 600px at 80% 25%, rgba(155,231,255,.08), transparent 60%),
-    repeating-linear-gradient(to bottom, rgba(255,255,255,.05) 0px, rgba(255,255,255,.02) 1px, rgba(0,0,0,0) 4px, rgba(0,0,0,0) 7px);
-  opacity:.75;
-  mix-blend-mode: screen;
-  animation: bootDrift 2.2s linear infinite;
-  pointer-events:none;
-}
-@keyframes bootDrift{
-  from{ transform: translateY(0); }
-  to{ transform: translateY(10px); }
-}
+    .boot-panel {
+      width: min(620px, 90vw);
+      padding: 28px 30px;
+      border-radius: 20px;
+      background: var(--glass-strong);
+      border: 1px solid rgba(120, 220, 255, 0.3);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      color: var(--muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
 
-.bootBox{
-  width: min(720px, calc(100vw - 26px));
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(10,12,32,.72);
-  box-shadow: 0 36px 120px rgba(0,0,0,.66);
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
+    .boot-line {
+      font-size: 0.85rem;
+    }
 
-.bootHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-  padding: 12px 12px;
-  background: rgba(255,255,255,.04);
-  border-bottom: 1px solid rgba(255,255,255,.16);
-}
+    .boot-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
 
-.bootSig{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  min-width:0;
-}
-.bootDot{
-  width:10px;height:10px;border-radius:99px;
-  background:
-    radial-gradient(circle at 30% 30%, var(--aqua), transparent 60%),
-    radial-gradient(circle at 70% 70%, var(--violet), transparent 60%),
-    rgba(255,255,255,.45);
-  box-shadow: 0 0 18px rgba(155,231,255,.22);
-}
-.bootTitle{
-  font-size: 12px;
-  letter-spacing: .12em;
-  color: var(--muted);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+    .skip-button {
+      appearance: none;
+      border: 1px solid rgba(198, 166, 255, 0.5);
+      background: transparent;
+      color: var(--violet);
+      padding: 8px 16px;
+      border-radius: 999px;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+    }
 
-.bootSkip{
-  font-size: 11px;
-  letter-spacing: .10em;
-  color: rgba(255,255,255,.9);
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(255,255,255,.06);
-  padding: 8px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: transform .12s ease, background .12s ease, border-color .12s ease;
-}
-.bootSkip:hover{
-  transform: translateY(-1px);
-  border-color: rgba(210,168,255,.35);
-  background: rgba(255,255,255,.10);
-}
+    .skip-button:focus-visible {
+      outline: 2px solid rgba(198, 166, 255, 0.6);
+      outline-offset: 2px;
+    }
 
-.bootBody{
-  padding: 14px 14px 12px;
-  position: relative;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Noto Sans Mono", monospace;
-}
+    @media (max-width: 820px) {
+      .latest {
+        grid-template-columns: 1fr;
+      }
 
-.bootLog{
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.85;
-  color: rgba(155,231,255,.96);
-  text-shadow: 0 0 18px rgba(155,231,255,.14);
-  white-space: pre-wrap;
-  min-height: 8.2em;
-}
+      .latest .actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
 
-.bootFooter{
-  display:flex;
-  justify-content:flex-end;
-  margin-top: 8px;
-}
-.bootHint{
-  font-size: 11px;
-  color: rgba(174,183,230,.92);
-}
-
-/* fade out */
-.boot.is-off{
-  opacity: 0;
-  pointer-events: none;
-}
+      main {
+        padding-top: 100px;
+      }
+    }
   </style>
 </head>
-
 <body>
-
-  <!-- BOOT OVERLAY : 1日1回 / スキップ可 -->
-<div id="boot" class="boot" aria-hidden="false">
-  <div class="bootFx" aria-hidden="true"></div>
-
-  <div class="bootBox" role="dialog" aria-label="起動ログ">
-    <div class="bootHead">
-      <div class="bootSig">
-        <span class="bootDot" aria-hidden="true"></span>
-        <span class="bootTitle">CHRONOLOGIUM · BOOT</span>
-      </div>
-      <button id="bootSkip" class="bootSkip" type="button">SKIP</button>
-    </div>
-
-    <div class="bootBody">
-      <pre id="bootLog" class="bootLog">> …</pre>
-
-      <div class="bootFooter">
-        <span class="bootHint">※この演出は1日1回だけ表示されます</span>
+  <div class="overlay" id="bootOverlay" role="dialog" aria-modal="true" aria-label="Chronologium boot">
+    <div class="boot-panel">
+      <div class="boot-line">&gt; CHRONOLOGIUM // BOOT</div>
+      <div class="boot-line">&gt; LINK : STAR MEMORY</div>
+      <div class="boot-line">&gt; NAME / REPLY / IRREVERSIBLE</div>
+      <div class="boot-line">&gt; SYNC ...</div>
+      <div class="boot-line">&gt; ACCESS GRANTED</div>
+      <div class="boot-actions">
+        <button class="skip-button" type="button" id="skipBoot" aria-label="skip boot">SKIP</button>
       </div>
     </div>
   </div>
-</div>
-  
-  <div class="fx" aria-hidden="true"></div>
 
-  <div class="wrap">
-    <main class="hall" role="main" aria-label="時間記録殿">
-      <header class="top">
-        <div class="sig">
-          <div class="dot" aria-hidden="true"></div>
-          <div style="font-size:12px;color:var(--muted);letter-spacing:.10em;">CHRONOLOGIUM · TIME LOG ARCHIVE</div>
-        </div>
+  <main>
+    <header>
+      <h1>時間記録殿（Chronologium）</h1>
+      <p>諸界を結ぶ、光のログ。</p>
+    </header>
 
-        <h1>時間記録殿（Chronologium）</h1>
-        <p class="lore">
-          ここは図書館ではない。<br/>
-          <em>読まれるため</em>に並ぶ棚ではなく、<em>起きたこと</em>が沈殿する場所。<br/>
-          ——ログは祈りではない。祈りのふりをした“記録”だ。
-        </p>
-      </header>
+    <section class="panel latest" aria-labelledby="latest-title">
+      <div>
+        <h2 id="latest-title">最新話プレビュー</h2>
+        <pre id="latestPreview" aria-live="polite">LOADING LOG...</pre>
+      </div>
+      <div class="actions">
+        <a class="btn" href="https://ncode.syosetu.com/n8578lq/12/" target="_blank" rel="noopener noreferrer" aria-label="最新話を再生">▶ 続きを再生</a>
+        <a class="btn secondary" href="star-memory.html" aria-label="Star Memory入口へ戻る">STAR MEMORY 入口</a>
+      </div>
+    </section>
 
-      <section class="layout">
+    <section class="panel log-band" aria-label="流れるログ帯">
+      <div class="log-track" role="list">
+        <div class="log-item" role="listitem"><a href="https://ncode.syosetu.com/n8578lq/" target="_blank" rel="noopener noreferrer">TAROT BREAKER 正史 / NAROU</a></div>
+        <div class="log-item" role="listitem"><a href="https://kakuyomu.jp/works/822139843408910379" target="_blank" rel="noopener noreferrer">観測記録 / KAKUYOMU</a></div>
+        <div class="log-item" role="listitem"><a href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">補遺ログ / NOTE</a></div>
+        <div class="log-item" role="listitem"><a href="https://x.com/TaroBure" target="_blank" rel="noopener noreferrer">通信ログ / X</a></div>
+        <div class="log-item" role="listitem"><a href="https://www.instagram.com/shionverse_official" target="_blank" rel="noopener noreferrer">星映記録 / INSTAGRAM</a></div>
+        <div class="log-item" role="listitem"><a href="https://ncode.syosetu.com/n8578lq/" target="_blank" rel="noopener noreferrer">TAROT BREAKER 正史 / NAROU</a></div>
+        <div class="log-item" role="listitem"><a href="https://kakuyomu.jp/works/822139843408910379" target="_blank" rel="noopener noreferrer">観測記録 / KAKUYOMU</a></div>
+        <div class="log-item" role="listitem"><a href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">補遺ログ / NOTE</a></div>
+        <div class="log-item" role="listitem"><a href="https://x.com/TaroBure" target="_blank" rel="noopener noreferrer">通信ログ / X</a></div>
+        <div class="log-item" role="listitem"><a href="https://www.instagram.com/shionverse_official" target="_blank" rel="noopener noreferrer">星映記録 / INSTAGRAM</a></div>
+      </div>
+    </section>
 
-        <!-- CRT observation screen -->
-        <section class="crt" aria-label="観測スクリーン">
-          <div class="crtHead">
-            <div class="title">OBSERVATION SCREEN // ARCHIVE PLAYBACK</div>
-            <div class="status" id="syncStatus">SYNC: …</div>
-          </div>
+    <section class="panel" aria-label="リンクノード">
+      <div class="link-grid">
+        <a class="link-node" href="https://ncode.syosetu.com/n8578lq/" target="_blank" rel="noopener noreferrer">
+          <span>CHRONO NODE</span>
+          <strong>なろう作品トップ</strong>
+        </a>
+        <a class="link-node" href="https://kakuyomu.jp/works/822139843408910379" target="_blank" rel="noopener noreferrer">
+          <span>ARCHIVE NODE</span>
+          <strong>カクヨム</strong>
+        </a>
+        <a class="link-node" href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">
+          <span>SUPPLEMENT NODE</span>
+          <strong>note</strong>
+        </a>
+        <a class="link-node" href="https://x.com/TaroBure" target="_blank" rel="noopener noreferrer">
+          <span>TRANSMISSION NODE</span>
+          <strong>X</strong>
+        </a>
+        <a class="link-node" href="https://www.instagram.com/shionverse_official" target="_blank" rel="noopener noreferrer">
+          <span>LIGHT NODE</span>
+          <strong>インスタ</strong>
+        </a>
+        <a class="link-node" href="star-memory.html">
+          <span>GATE NODE</span>
+          <strong>Star Memory入口</strong>
+        </a>
+      </div>
+    </section>
+  </main>
 
-          <div class="screen">
-            <p class="logline">> 再生開始：記録は“今”として映る。</p>
-
-            <!-- Latest preview -->
-            <div class="preview" aria-label="最新話ログプレビュー">
-              <div class="previewHead">
-                <div class="k">LATEST LOG // PROLOGUE</div>
-                <a href="https://ncode.syosetu.com/n8578lq/12/" target="_blank" rel="noopener">▶ 続きを再生</a>
-              </div>
-              <p id="latestPreview" class="previewText">
-                <span class="ghost">LOADING…</span>
-              </p>
-            </div>
-
-            <div class="logbox" aria-label="ログ">
-              <div class="row"><span class="k">[NODE]</span> <span class="v">TAROT BREAKER</span> <span class="dim">/ star-memory</span></div>
-              <div class="row"><span class="k">[RULE]</span> <span class="v">呼ぶ／返事／名前</span> <span class="dim">= 不可逆</span></div>
-              <div class="row"><span class="k">[MODE]</span> <span class="v">TIME-LOG</span> <span class="dim">（感情ではなく記録が残る）</span></div>
-              <div class="row"><span class="k">[NOTE]</span> <span class="v">ここで開くリンクは“移動”ではなく“接続”</span></div>
-            </div>
-
-            <p class="logline" style="margin-top:12px;color:rgba(210,168,255,.95)">
-              > 古い石壁の奥で、端末だけが光っている。——それが、この場所。
-            </p>
-          </div>
-        </section>
-
-        <!-- Link nodes -->
-        <section class="nodes" aria-label="記録ノード">
-          <div class="nodesHead">
-            <h2>LINK NODES（記録への接続）</h2>
-            <div class="tag">RELICS · LOGS · VISUALS</div>
-          </div>
-
-          <div class="grid" role="list">
-            <a class="node latest" role="listitem"
-               href="https://ncode.syosetu.com/n8578lq/12/"
-               target="_blank" rel="noopener">
-              <div class="ico" aria-hidden="true"><span>🕯️</span></div>
-              <div class="meta">
-                <p class="ttl">最新話｜第12話（なろう）</p>
-                <p class="desc">相談が消える日、名だけが残る夜（——）</p>
-              </div>
-              <div class="badge">LATEST</div>
-            </a>
-
-            <a class="node" role="listitem"
-               href="https://ncode.syosetu.com/n8578lq/"
-               target="_blank" rel="noopener">
-              <div class="ico" aria-hidden="true"><span>📘</span></div>
-              <div class="meta">
-                <p class="ttl">なろう｜記録庫（作品トップ）</p>
-                <p class="desc">正史ログ：TAROT BREAKER</p>
-              </div>
-            </a>
-
-            <a class="node" role="listitem"
-               href="https://kakuyomu.jp/works/822139843408910379"
-               target="_blank" rel="noopener">
-              <div class="ico" aria-hidden="true"><span>📙</span></div>
-              <div class="meta">
-                <p class="ttl">カクヨム｜観測記録</p>
-                <p class="desc">別系統ログ：同じ影を別角度で</p>
-              </div>
-            </a>
-
-            <a class="node" role="listitem"
-               href="https://note.com/shion_uranai369"
-               target="_blank" rel="noopener">
-              <div class="ico" aria-hidden="true"><span>📝</span></div>
-              <div class="meta">
-                <p class="ttl">note｜補遺（思想・祈りの書）</p>
-                <p class="desc">世界観・詩韻思想・裏側の言葉</p>
-              </div>
-            </a>
-
-            <a class="node" role="listitem"
-               href="https://x.com/TaroBure"
-               target="_blank" rel="noopener">
-              <div class="ico" aria-hidden="true"><span>✖️</span></div>
-              <div class="meta">
-                <p class="ttl">X｜通信ログ（@TaroBure）</p>
-                <p class="desc">更新・観測・告知（ログが増える場所）</p>
-              </div>
-            </a>
-
-            <a class="node" role="listitem"
-               href="https://www.instagram.com/shionverse_official"
-               target="_blank" rel="noopener">
-              <div class="ico" aria-hidden="true"><span>📷</span></div>
-              <div class="meta">
-                <p class="ttl">Instagram｜星映（shionverse_official）</p>
-                <p class="desc">ビジュアル記憶（古さと光の混ざり）</p>
-              </div>
-            </a>
-
-            <a class="node" role="listitem" href="./star-memory.html">
-              <div class="ico" aria-hidden="true"><span>🗝️</span></div>
-              <div class="meta">
-                <p class="ttl">Star Memory｜入口へ戻る</p>
-                <p class="desc">回廊へ（記憶の続き）</p>
-              </div>
-            </a>
-          </div>
-        </section>
-
-      </section>
-
-      <footer class="footer">
-        <a class="btn" href="./star-memory.html">← Star Memoryへ戻る</a>
-        <span>© TAROT BREAKER / 詩韻 -シオン-</span>
-      </footer>
-    </main>
-  </div>
-
-  <!-- JS: latest.txt を読み込んでスクリーンに映す -->
   <script>
-    const PREVIEW_FILE = "./latest.txt";
-    const previewEl = document.getElementById("latestPreview");
-    const statusEl = document.getElementById("syncStatus");
+    const overlay = document.getElementById("bootOverlay");
+    const skipButton = document.getElementById("skipBoot");
+    const preview = document.getElementById("latestPreview");
 
-    function setStatus(text){
-      if (statusEl) statusEl.textContent = text;
-    }
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    const storageKey = "chronologium-boot";
 
-    async function loadLatest(){
-      try{
-        setStatus("SYNC: …");
-        const res = await fetch(PREVIEW_FILE, { cache: "no-store" });
-        if(!res.ok) throw new Error("HTTP " + res.status);
-        const text = (await res.text()).trim();
+    const hideOverlay = () => {
+      overlay.classList.add("hidden");
+      overlay.setAttribute("aria-hidden", "true");
+      localStorage.setItem(storageKey, todayKey);
+    };
 
-        // 空なら保険
-        const safeText = text.length ? text : "（ログが未転記です）\nlatest.txt に冒頭3〜5行を貼ってください。";
-        if(previewEl) previewEl.textContent = safeText;
+    const shouldShow = localStorage.getItem(storageKey) !== todayKey;
 
-        setStatus("SYNC: OK · NOISE: LOW");
-      }catch(err){
-        if(previewEl){
-          previewEl.textContent =
-            "（接続失敗）\nlatest.txt が見つからないか、読み込みできません。\n同じ階層に latest.txt を置いてください。";
+    if (shouldShow) {
+      const timer = window.setTimeout(hideOverlay, 1800);
+      overlay.addEventListener("click", () => {
+        window.clearTimeout(timer);
+        hideOverlay();
+      });
+      skipButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        window.clearTimeout(timer);
+        hideOverlay();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          window.clearTimeout(timer);
+          hideOverlay();
         }
-        setStatus("SYNC: FAIL · NOISE: HIGH");
-      }
+      });
+    } else {
+      overlay.classList.add("hidden");
+      overlay.setAttribute("aria-hidden", "true");
     }
 
-    loadLatest();
+    fetch("./latest.txt", { cache: "no-store" })
+      .then((response) => response.text())
+      .then((text) => {
+        preview.textContent = text.trim();
+      })
+      .catch(() => {
+        preview.textContent = "LOG NOT FOUND";
+      });
   </script>
-
-  <script>
-  // ===== BOOT OVERLAY (1 day once) =====
-  (function(){
-    const boot = document.getElementById("boot");
-    const logEl = document.getElementById("bootLog");
-    const skipBtn = document.getElementById("bootSkip");
-
-    if(!boot || !logEl || !skipBtn) return;
-
-    // 1日1回（JST想定）キー
-    const todayKey = new Date().toISOString().slice(0,10); // YYYY-MM-DD
-    const STORAGE_KEY = "chronologium_boot_seen_" + todayKey;
-
-    const alreadySeen = localStorage.getItem(STORAGE_KEY) === "1";
-    if (alreadySeen){
-      // 今日はもう出さない
-      boot.classList.remove("is-on");
-      boot.classList.add("is-off");
-      return;
-    }
-
-    // ログ内容（短い／説明しない／タロブレ語彙）
-    const lines = [
-      "> CHRONOLOGIUM // BOOT",
-      "> LINK : STAR MEMORY",
-      "> NAME / REPLY / IRREVERSIBLE",
-      "> SYNC …",
-      "> ACCESS GRANTED"
-    ];
-
-    // 表示開始
-    boot.classList.add("is-on");
-    let idx = 0;
-
-    const typeSpeed = 110; // 速め（ダルさ防止）
-    function step(){
-      // 1行ずつ追加
-      if(idx < lines.length){
-        const current = logEl.textContent.trim() === ">" || logEl.textContent.trim() === "> …"
-          ? ""
-          : logEl.textContent.replace("> …", "").trimEnd();
-        logEl.textContent = (current ? current + "\n" : "") + lines[idx];
-        idx++;
-        setTimeout(step, typeSpeed);
-      }
-    }
-    logEl.textContent = "> …";
-    setTimeout(step, 120);
-
-    function closeBoot(){
-      // 今日の表示済みを記録
-      localStorage.setItem(STORAGE_KEY, "1");
-      boot.classList.remove("is-on");
-      boot.classList.add("is-off");
-      // 念のためDOMから消す（クリック透過）
-      setTimeout(() => { boot.style.display = "none"; }, 320);
-    }
-
-    // 自動で閉じる（約1.8秒）
-    const autoCloseMs = 1800;
-    const timer = setTimeout(closeBoot, autoCloseMs);
-
-    // スキップ
-    skipBtn.addEventListener("click", () => {
-      clearTimeout(timer);
-      closeBoot();
-    });
-
-    // 画面タップでもスキップ（スマホ向け）
-    boot.addEventListener("click", (e) => {
-      // ボタン押下は二重処理しない
-      if (e.target === skipBtn) return;
-      clearTimeout(timer);
-      closeBoot();
-    });
-  })();
-</script>
 </body>
 </html>
