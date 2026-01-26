@@ -18,16 +18,15 @@
   --muted:rgba(230,240,255,.7);
   --shadow:0 24px 60px rgba(0,0,0,.45);
 
-  /* Safe area */
   --sat: env(safe-area-inset-top);
   --sab: env(safe-area-inset-bottom);
 
-  /* JSで上書きされる。未対応環境の保険 */
   --vh: 1vh;
-
-  /* 基本余白 */
   --pad-top: 120px;
   --pad-bottom: 140px;
+
+  /* ロール速度（秒） */
+  --roll-speed: 44s;
 }
 
 *{ box-sizing:border-box; }
@@ -41,7 +40,6 @@ html,body{
 }
 
 body{
-  /* iOS系のvh揺れ対策：innerHeight基準（--vh）で固定 */
   min-height: calc(var(--vh) * 100);
   overflow-x:hidden;
 
@@ -51,12 +49,10 @@ body{
   background-attachment:fixed;
 }
 
-/* iOS/モバイルでfixed背景は不安定なので無効化 */
 @media (max-width: 820px){
   body{ background-attachment:scroll; }
 }
 
-/* オーバーレイ表示中のスクロールロック用 */
 body.is-locked{
   overflow:hidden !important;
   touch-action:none;
@@ -88,19 +84,15 @@ body::after{
 main{
   position:relative;
   z-index:1;
-
-  /* safe-area吸収：上も下も必ず足す */
   padding:
     calc(var(--pad-top) + var(--sat))
     6vw
     calc(var(--pad-bottom) + var(--sab));
-
   display:flex;
   flex-direction:column;
   gap:36px;
 }
 
-/* 画面が狭い時の微調整（親指導線を守る） */
 @media (max-width: 820px){
   main{
     padding-top: calc(100px + var(--sat));
@@ -171,27 +163,35 @@ header p{
   font-size:1.1rem;
 }
 
+/* ====== LOG WINDOW (枠) ====== */
 #latestPreview{
   margin:0;
   background:rgba(6,10,20,.74);
   border:1px solid rgba(120,220,255,.25);
   border-radius:18px;
   padding:18px 20px;
-  line-height:1.75;
+
   position:relative;
   overflow:hidden;
-  white-space:pre-wrap;
+  white-space:normal;
   word-break:break-word;
+
+  /* 読みやすさ */
+  line-height:1.75;
+  font-size:.95rem;
+
+  /* ループ中のタップUX */
+  user-select:text;
 }
 
-/* scanline：動きは軽く、reduce-motionで停止 */
+/* scanline */
 #latestPreview::after{
   content:"";
   position:absolute;
   inset:-10%;
   pointer-events:none;
   mix-blend-mode:screen;
-  opacity:.32;
+  opacity:.30;
   background:
     repeating-linear-gradient(
       180deg,
@@ -216,6 +216,116 @@ header p{
 #latestPreview[data-error="true"]{
   color:#ffb1b1;
   border-color:rgba(255,120,120,.35);
+}
+
+/* ====== ENDROLL VIEWPORT ====== */
+.roll-viewport{
+  position:relative;
+  height: clamp(220px, 28vh, 340px); /* “今の枠内”で自然に */
+  overflow:hidden;
+  border-radius:14px;
+}
+
+/* 上下フェード：物語が“ログに溶ける” */
+.roll-viewport::before,
+.roll-viewport::after{
+  content:"";
+  position:absolute;
+  left:0; right:0;
+  height:22%;
+  pointer-events:none;
+  z-index:2;
+}
+.roll-viewport::before{
+  top:0;
+  background:linear-gradient(to bottom, rgba(6,10,20,.98), transparent);
+}
+.roll-viewport::after{
+  bottom:0;
+  background:linear-gradient(to top, rgba(6,10,20,.98), transparent);
+}
+
+/* ループする本文（2連結） */
+.roll-track{
+  position:absolute;
+  left:0; right:0;
+  top:0;
+  white-space:pre-wrap;
+  transform: translate3d(0,0,0);
+  will-change: transform;
+
+  /* 読める文字密度 */
+  line-height:1.75;
+  font-size:.95rem;
+  color:#eef7ff;
+  opacity:.95;
+
+  animation: roll var(--roll-speed) linear infinite;
+}
+@keyframes roll{
+  from{ transform: translate3d(0,0,0); }
+  to  { transform: translate3d(0,-50%,0); }
+}
+
+/* ログが“語り始める”とき：区切り線が通過すると発光 */
+.roll-track.is-pulsing{
+  animation-play-state: running;
+}
+
+/* 区切り線（amber） */
+.chrono-divider{
+  display:block;
+  text-align:center;
+  margin: 1.2em 0;
+  color: var(--amber);
+  letter-spacing: .28em;
+  font-size: .85rem;
+  text-shadow:
+    0 0 12px rgba(255,224,166,.55),
+    0 0 28px rgba(255,224,166,.25);
+  opacity: .96;
+}
+
+/* EP番号（amber） */
+.ep-mark{
+  display:block;
+  margin: .2em 0 .6em;
+  color: var(--amber);
+  letter-spacing: .22em;
+  font-weight: 700;
+  text-shadow:
+    0 0 10px rgba(255,224,166,.45);
+}
+
+/* “装置の声”タグ（例：> STATUS:） */
+.sys-mark{
+  color: rgba(230,240,255,.82);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.sys-mark strong{
+  color: var(--cyan);
+  font-weight: 700;
+  text-shadow: 0 0 14px rgba(127,230,255,.22);
+}
+
+/* 区切り線通過フラッシュ（軽量：opacityだけ） */
+.flash{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:3;
+  opacity:0;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,224,166,.14), transparent 55%),
+    linear-gradient(180deg, rgba(255,224,166,.05), transparent 45%, rgba(127,230,255,.05));
+  transition: opacity .24s ease;
+}
+.flash.on{ opacity:1; }
+
+@media(prefers-reduced-motion:reduce){
+  .roll-track{ animation:none; transform:none; }
+  .flash{ display:none; }
 }
 
 /* アクション */
@@ -274,7 +384,7 @@ header p{
 /* ログ帯 */
 .log-band{
   padding:18px;
-  padding-bottom: calc(18px + var(--sab)); /* 下の食い込み防止 */
+  padding-bottom: calc(18px + var(--sab));
   background:rgba(6,10,20,.65);
   border-radius:22px;
   border:1px solid rgba(120,220,255,.18);
@@ -391,7 +501,15 @@ header p{
     <section class="panel latest" aria-labelledby="latest-title">
       <div>
         <h2 id="latest-title">最新話ログ</h2>
-        <pre id="latestPreview" aria-live="polite">&gt; LOADING LOG...</pre>
+
+        <!-- ここが“観測窓”：永遠ループ＋区切り線/EP発光 -->
+        <div id="latestPreview" aria-live="polite">
+          <div class="flash" id="flash"></div>
+          <div class="roll-viewport" id="rollViewport" aria-label="Latest log roll">
+            <div class="roll-track" id="rollTrack">> LOADING LOG...</div>
+          </div>
+        </div>
+
       </div>
       <div class="actions">
         <a class="btn" href="https://ncode.syosetu.com/n8578lq/12/" target="_blank" rel="noopener noreferrer">▶ 再生</a>
@@ -401,7 +519,6 @@ header p{
 
     <section class="panel log-band" aria-label="流れるログ帯（タップで停止/再開）">
       <div class="log-track" role="list">
-        <!-- 2周ぶん並べると「-50%」で途切れない -->
         <div class="log-item" role="listitem"><a href="https://ncode.syosetu.com/n8578lq/" target="_blank" rel="noopener noreferrer">NAROU</a></div>
         <div class="log-item" role="listitem"><a href="https://kakuyomu.jp/works/822139843408910379" target="_blank" rel="noopener noreferrer">KAKUYOMU</a></div>
         <div class="log-item" role="listitem"><a href="https://note.com/shion_uranai369" target="_blank" rel="noopener noreferrer">NOTE</a></div>
@@ -420,16 +537,13 @@ header p{
 <script>
 /* =========================
    1) iOS/Chrome(iOS)ズレ対策：
-      実測のinnerHeightをCSS変数に反映
+      実測innerHeightをCSS変数へ
 ========================= */
 function setVH(){
-  // 1vh = innerHeight * 0.01
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 setVH();
-
-// iOSはアドレスバーの伸縮で頻繁に変わるので、resize + orientation + pageshow を拾う
 window.addEventListener('resize', setVH, { passive:true });
 window.addEventListener('orientationchange', setVH, { passive:true });
 window.addEventListener('pageshow', setVH, { passive:true });
@@ -441,7 +555,6 @@ const overlay = document.getElementById("bootOverlay");
 const skipButton = document.getElementById("skipBoot");
 const bootLines = document.querySelectorAll(".boot-line");
 
-// 日替わりログ
 const seed = new Date().getDate();
 const bootText = [
   "> CHRONOLOGIUM // BOOT",
@@ -452,7 +565,7 @@ const bootText = [
 ];
 bootLines.forEach((l,i)=> l.textContent = bootText[i] ?? "");
 
-// 1日1回の起動演出（必要ならOFF可）
+// 1日1回の起動演出
 const today = new Date();
 const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
 const storageKey = "chronologium-boot";
@@ -471,7 +584,6 @@ function hideOverlay(){
 
 if (shouldShow){
   lockScroll(true);
-
   const timer = window.setTimeout(hideOverlay, 1800);
 
   overlay.addEventListener("click", () => {
@@ -498,77 +610,135 @@ if (shouldShow){
 }
 
 /* =========================
-   3) latest.txt（タイピング＋空/失敗対応）
+   3) LATEST LOG：永遠ロール
+      - latest.txtはテキストのまま
+      - EP番号/区切り線だけamber化
+      - 区切り線通過で一瞬フラッシュ
 ========================= */
-const preview = document.getElementById("latestPreview");
-let typingTimer = null;
-let typingAbort = null;
-
-function setLoading(){
-  preview.textContent = "> LOADING LOG...\n> PARSING...";
-  preview.removeAttribute("data-error");
-}
+const latestBox = document.getElementById("latestPreview");
+const rollTrack  = document.getElementById("rollTrack");
+const flash = document.getElementById("flash");
 
 function setError(message){
-  preview.textContent = message;
-  preview.setAttribute("data-error", "true");
+  latestBox.setAttribute("data-error","true");
+  rollTrack.textContent = message;
 }
 
-function typeText(text, speed = 16){
-  if (typingTimer) window.clearInterval(typingTimer);
-  if (typingAbort) typingAbort.aborted = true;
-
-  const abort = { aborted:false };
-  typingAbort = abort;
-
-  preview.textContent = "";
-  let i = 0;
-
-  typingTimer = window.setInterval(() => {
-    if (abort.aborted){
-      window.clearInterval(typingTimer);
-      typingTimer = null;
-      return;
-    }
-    preview.textContent += text[i] ?? "";
-    i++;
-    if (i >= text.length){
-      window.clearInterval(typingTimer);
-      typingTimer = null;
-    }
-  }, speed);
+/* HTMLエスケープ（安全） */
+function escapeHTML(str){
+  return str
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
 }
 
-async function loadLatest(){
+/* タロブレ演出：UIが語り始める（最小コストで最大効果） */
+function stylizeLog(rawText){
+  // 1) 安全にエスケープ
+  let s = escapeHTML(rawText);
+
+  // 2) EP番号をamber化（行頭 "EP12" / "EP 12" どちらも対応）
+  //    ※ 先頭のEPがタイトルでなくても“ログ上のマーカー”として効く
+  s = s.replace(/(^|\n)(EP\s*\d+)(?=\n|$)/g, (m, p1, ep) => {
+    return `${p1}<span class="ep-mark">${ep}</span>`;
+  });
+
+  // 3) 区切り線（— CHRONOLOGIUM —）をamber化
+  const divider = "— CHRONOLOGIUM —";
+  s = s.replaceAll(divider, `<span class="chrono-divider">${divider}</span>`);
+
+  // 4) “装置の声”っぽい行を軽く強調（例：> STATUS: / > NAME: など）
+  //    行頭の "> " をトリガーに、KEY:VALUEのKEYをcyanに
+  s = s.replace(/(^|\n)(&gt;\s*)([A-Z0-9_\/ -]{2,20})(\s*:\s*)([^\n]+)/g,
+    (m, p1, gt, key, sep, val) => {
+      const k = key.trim();
+      return `${p1}<span class="sys-mark">${gt}<strong>${k}</strong>${sep}${val}</span>`;
+    }
+  );
+
+  return s;
+}
+
+/* 途切れないループ：2回連結（-50%まで移動） */
+function applyLoopHTML(html){
+  const spacer = `<span class="chrono-divider">— CHRONOLOGIUM —</span>`;
+  rollTrack.innerHTML = html + spacer + html;
+}
+
+/* 区切り線通過フラッシュ（時間ベース・軽量） */
+let pulseTimer = null;
+function startDividerPulse(){
+  // ループ速度に応じて“たまに”光る。読み疲れしない程度に。
+  // 44s想定で約11sごとに一回（4回/周）＝過剰にならない。
+  const interval = Math.max(9000, Math.floor(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--roll-speed')) * 250));
+  if (pulseTimer) clearInterval(pulseTimer);
+
+  pulseTimer = setInterval(() => {
+    flash.classList.add("on");
+    setTimeout(()=> flash.classList.remove("on"), 260);
+  }, interval);
+}
+
+/* prefers-reduced-motionならロール停止＆フラッシュ停止 */
+const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+async function loadLatestRoll(){
   try{
-    setLoading();
+    latestBox.removeAttribute("data-error");
+
     const res = await fetch("./latest.txt", { cache:"no-store" });
     if (!res.ok) throw new Error("HTTP_NOT_OK");
 
     const raw = await res.text();
     const text = raw.trim();
+    if (!text) throw new Error("EMPTY");
 
-    if (!text){
-      setError("> ERROR: LOG_EMPTY\n> STATUS: NO_CONTENT");
+    const styled = stylizeLog(raw);
+
+    if (reducedMotion){
+      // 動かさない代わりに“装置の画面”として表示
+      rollTrack.style.animation = "none";
+      rollTrack.style.transform = "none";
+      rollTrack.innerHTML = styled;
+      flash.style.display = "none";
       return;
     }
-    typeText(text, 16);
+
+    applyLoopHTML(styled);
+    startDividerPulse();
+
   }catch{
     setError("> ERROR: LOG_FETCH_FAILED\n> STATUS: UNAVAILABLE");
   }
 }
-loadLatest();
+loadLatestRoll();
 
 /* =========================
    4) ログ帯：タップで停止/再開
 ========================= */
 const band = document.querySelector(".log-band");
-const track = document.querySelector(".log-track");
-let paused = false;
+const marquee = document.querySelector(".log-band .log-track");
+let marqueePaused = false;
 
 band.addEventListener("click", () => {
-  paused = !paused;
-  track.style.animationPlayState = paused ? "paused" : "running";
+  marqueePaused = !marqueePaused;
+  marquee.style.animationPlayState = marqueePaused ? "paused" : "running";
+});
+
+/* おまけ：観測窓（最新話ロール）もタップで一時停止できると“装置感”が増す */
+const rollViewport = document.getElementById("rollViewport");
+let rollPaused = false;
+rollViewport.addEventListener("click", () => {
+  if (reducedMotion) return;
+  rollPaused = !rollPaused;
+  rollTrack.style.animationPlayState = rollPaused ? "paused" : "running";
+  // 停止中はフラッシュも抑える
+  if (rollPaused && pulseTimer){
+    clearInterval(pulseTimer);
+    pulseTimer = null;
+  }else if(!rollPaused){
+    startDividerPulse();
+  }
 });
 </script>
 </body>
