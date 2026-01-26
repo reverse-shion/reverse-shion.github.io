@@ -447,10 +447,160 @@
     }
 
     @keyframes flicker { 0%,100%{opacity:.98} 50%{opacity:.93} 70%{opacity:1} }
+
+    /* ===== BOOT OVERLAY ===== */
+.boot{
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.86);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .28s ease;
+}
+
+.boot.is-on{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bootFx{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(900px 600px at 25% 20%, rgba(210,168,255,.10), transparent 60%),
+    radial-gradient(900px 600px at 80% 25%, rgba(155,231,255,.08), transparent 60%),
+    repeating-linear-gradient(to bottom, rgba(255,255,255,.05) 0px, rgba(255,255,255,.02) 1px, rgba(0,0,0,0) 4px, rgba(0,0,0,0) 7px);
+  opacity:.75;
+  mix-blend-mode: screen;
+  animation: bootDrift 2.2s linear infinite;
+  pointer-events:none;
+}
+@keyframes bootDrift{
+  from{ transform: translateY(0); }
+  to{ transform: translateY(10px); }
+}
+
+.bootBox{
+  width: min(720px, calc(100vw - 26px));
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(10,12,32,.72);
+  box-shadow: 0 36px 120px rgba(0,0,0,.66);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.bootHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 12px 12px;
+  background: rgba(255,255,255,.04);
+  border-bottom: 1px solid rgba(255,255,255,.16);
+}
+
+.bootSig{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  min-width:0;
+}
+.bootDot{
+  width:10px;height:10px;border-radius:99px;
+  background:
+    radial-gradient(circle at 30% 30%, var(--aqua), transparent 60%),
+    radial-gradient(circle at 70% 70%, var(--violet), transparent 60%),
+    rgba(255,255,255,.45);
+  box-shadow: 0 0 18px rgba(155,231,255,.22);
+}
+.bootTitle{
+  font-size: 12px;
+  letter-spacing: .12em;
+  color: var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.bootSkip{
+  font-size: 11px;
+  letter-spacing: .10em;
+  color: rgba(255,255,255,.9);
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.06);
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+.bootSkip:hover{
+  transform: translateY(-1px);
+  border-color: rgba(210,168,255,.35);
+  background: rgba(255,255,255,.10);
+}
+
+.bootBody{
+  padding: 14px 14px 12px;
+  position: relative;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Noto Sans Mono", monospace;
+}
+
+.bootLog{
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(155,231,255,.96);
+  text-shadow: 0 0 18px rgba(155,231,255,.14);
+  white-space: pre-wrap;
+  min-height: 8.2em;
+}
+
+.bootFooter{
+  display:flex;
+  justify-content:flex-end;
+  margin-top: 8px;
+}
+.bootHint{
+  font-size: 11px;
+  color: rgba(174,183,230,.92);
+}
+
+/* fade out */
+.boot.is-off{
+  opacity: 0;
+  pointer-events: none;
+}
   </style>
 </head>
 
 <body>
+
+  <!-- BOOT OVERLAY : 1日1回 / スキップ可 -->
+<div id="boot" class="boot" aria-hidden="false">
+  <div class="bootFx" aria-hidden="true"></div>
+
+  <div class="bootBox" role="dialog" aria-label="起動ログ">
+    <div class="bootHead">
+      <div class="bootSig">
+        <span class="bootDot" aria-hidden="true"></span>
+        <span class="bootTitle">CHRONOLOGIUM · BOOT</span>
+      </div>
+      <button id="bootSkip" class="bootSkip" type="button">SKIP</button>
+    </div>
+
+    <div class="bootBody">
+      <pre id="bootLog" class="bootLog">> …</pre>
+
+      <div class="bootFooter">
+        <span class="bootHint">※この演出は1日1回だけ表示されます</span>
+      </div>
+    </div>
+  </div>
+</div>
+  
   <div class="fx" aria-hidden="true"></div>
 
   <div class="wrap">
@@ -626,5 +776,83 @@
 
     loadLatest();
   </script>
+
+  <script>
+  // ===== BOOT OVERLAY (1 day once) =====
+  (function(){
+    const boot = document.getElementById("boot");
+    const logEl = document.getElementById("bootLog");
+    const skipBtn = document.getElementById("bootSkip");
+
+    if(!boot || !logEl || !skipBtn) return;
+
+    // 1日1回（JST想定）キー
+    const todayKey = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+    const STORAGE_KEY = "chronologium_boot_seen_" + todayKey;
+
+    const alreadySeen = localStorage.getItem(STORAGE_KEY) === "1";
+    if (alreadySeen){
+      // 今日はもう出さない
+      boot.classList.remove("is-on");
+      boot.classList.add("is-off");
+      return;
+    }
+
+    // ログ内容（短い／説明しない／タロブレ語彙）
+    const lines = [
+      "> CHRONOLOGIUM // BOOT",
+      "> LINK : STAR MEMORY",
+      "> NAME / REPLY / IRREVERSIBLE",
+      "> SYNC …",
+      "> ACCESS GRANTED"
+    ];
+
+    // 表示開始
+    boot.classList.add("is-on");
+    let idx = 0;
+
+    const typeSpeed = 110; // 速め（ダルさ防止）
+    function step(){
+      // 1行ずつ追加
+      if(idx < lines.length){
+        const current = logEl.textContent.trim() === ">" || logEl.textContent.trim() === "> …"
+          ? ""
+          : logEl.textContent.replace("> …", "").trimEnd();
+        logEl.textContent = (current ? current + "\n" : "") + lines[idx];
+        idx++;
+        setTimeout(step, typeSpeed);
+      }
+    }
+    logEl.textContent = "> …";
+    setTimeout(step, 120);
+
+    function closeBoot(){
+      // 今日の表示済みを記録
+      localStorage.setItem(STORAGE_KEY, "1");
+      boot.classList.remove("is-on");
+      boot.classList.add("is-off");
+      // 念のためDOMから消す（クリック透過）
+      setTimeout(() => { boot.style.display = "none"; }, 320);
+    }
+
+    // 自動で閉じる（約1.8秒）
+    const autoCloseMs = 1800;
+    const timer = setTimeout(closeBoot, autoCloseMs);
+
+    // スキップ
+    skipBtn.addEventListener("click", () => {
+      clearTimeout(timer);
+      closeBoot();
+    });
+
+    // 画面タップでもスキップ（スマホ向け）
+    boot.addEventListener("click", (e) => {
+      // ボタン押下は二重処理しない
+      if (e.target === skipBtn) return;
+      clearTimeout(timer);
+      closeBoot();
+    });
+  })();
+</script>
 </body>
 </html>
