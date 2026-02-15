@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECRU | Digital Fashion Archive</title>
+  <style>
+    :root {
+      --bg: #060606;
+      --panel: #111111;
+      --text: #f1f1ef;
+      --muted: #b9b9b6;
+      --line: rgba(255, 255, 255, 0.2);
+      --gold: #b7a173;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    header {
+      min-height: 45vh;
+      display: grid;
+      align-content: end;
+      padding: 3.2rem 1.2rem 2rem;
+      background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.9));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wrap {
+      width: min(940px, 100%);
+      margin: 0 auto;
+    }
+
+    .kicker {
+      margin: 0;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #d8d8d2;
+      font-size: 0.8rem;
+    }
+
+    h1 {
+      margin: 0.5rem 0 0;
+      font-size: clamp(2rem, 6vw, 3.7rem);
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      color: #ffffff;
+    }
+
+    .section {
+      padding: 2.8rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .section h2 {
+      margin: 0 0 0.8rem;
+      color: #ffffff;
+      font-size: clamp(1.15rem, 3vw, 1.55rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .section p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 62ch;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.2rem;
+    }
+
+    .shot {
+      aspect-ratio: 2 / 3;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      background:
+        linear-gradient(165deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
+        repeating-linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02) 0,
+          rgba(255, 255, 255, 0.02) 2px,
+          rgba(0, 0, 0, 0.22) 2px,
+          rgba(0, 0, 0, 0.22) 4px
+        );
+      display: grid;
+      place-items: end start;
+      padding: 0.6rem;
+      color: #cbc8bf;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .return {
+      display: block;
+      width: min(940px, calc(100% - 2.4rem));
+      margin: 2rem auto 3rem;
+      color: #e3dccd;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(227, 220, 205, 0.55);
+      padding-bottom: 0.25rem;
+      width: fit-content;
+    }
+
+    .return:hover,
+    .return:focus-visible {
+      opacity: 0.75;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap fade-in">
+      <p class="kicker">ECRU Digital Publication</p>
+      <h1>ECRU FASHION ARCHIVE</h1>
+    </div>
+  </header>
+
+  <main>
+    <section class="section fade-in">
+      <div class="wrap">
+        <h2>EDITORIAL</h2>
+        <p>Precision silhouettes in high-contrast rooms. The frame favors restraint: long lines, controlled gaze, and quiet excess.</p>
+        <div class="gallery" aria-label="Editorial image placeholders">
+          <article class="shot">SHOT 01 — VERTICAL STUDY</article>
+          <article class="shot">SHOT 02 — LIGHT CONTOUR</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section fade-in">
+      <div class="wrap">
+        <h2>INTERVIEW</h2>
+        <p>On composure, tension, and silhouette memory. The voice behind the camera describes beauty as discipline, not decoration.</p>
+        <div class="gallery" aria-label="Interview image placeholders">
+          <article class="shot">SHOT 03 — GESTURE STILL</article>
+          <article class="shot">SHOT 04 — PROFILE STATIC</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section fade-in">
+      <div class="wrap">
+        <h2>ARCHIVE</h2>
+        <p>Recovered pages from prior issues: grain, crease, and silver-halide ghosts preserved in digital depth.</p>
+        <div class="gallery" aria-label="Archive image placeholders">
+          <article class="shot">SHOT 05 — PRINT GRAIN</article>
+          <article class="shot">SHOT 06 — RETAINED FRAME</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section fade-in">
+      <div class="wrap">
+        <h2>PRIVATE NOTES</h2>
+        <p>Margins contain direction marks, timing cues, and fabric annotations — an index of what the final image chose to hide.</p>
+      </div>
+    </section>
+  </main>
+
+  <a class="return" href="campus.html">Return to Campus</a>
+
+  <script>
+    const observers = document.querySelectorAll('.fade-in');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    observers.forEach((item) => io.observe(item));
+  </script>
+</body>
+</html>

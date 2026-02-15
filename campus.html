@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAROT BREAKER | Reality Hub</title>
+  <style>
+    :root {
+      --bg: #0f1012;
+      --bg-soft: #17191d;
+      --text: #f3f3f1;
+      --muted: #b6b9bf;
+      --gold: #b79d6d;
+      --border: rgba(255, 255, 255, 0.18);
+      --card: rgba(255, 255, 255, 0.03);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Georgia", "Times New Roman", serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.07), transparent 42%),
+        radial-gradient(circle at 90% 80%, rgba(183, 157, 109, 0.08), transparent 52%),
+        linear-gradient(160deg, #0d0f13 0%, #14161a 48%, #0f1012 100%);
+      display: grid;
+      place-items: center;
+      padding: 3rem 1.2rem;
+      overflow-x: hidden;
+    }
+
+    main {
+      width: min(980px, 100%);
+      display: grid;
+      gap: 2.4rem;
+    }
+
+    .intro {
+      border-left: 1px solid var(--border);
+      padding: 0.2rem 0 0.2rem 1.2rem;
+      animation: fadeIn 0.8s ease both;
+    }
+
+    .intro p {
+      margin: 0.2rem 0;
+      color: #ececea;
+      letter-spacing: 0.02em;
+      line-height: 1.7;
+      font-size: clamp(1rem, 1.7vw, 1.2rem);
+      text-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
+    }
+
+    .intro p:nth-child(4),
+    .intro p:nth-child(5) {
+      color: #d8d4c9;
+    }
+
+    .location-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      animation: fadeIn 0.8s ease 0.2s both;
+    }
+
+    .location-card {
+      display: grid;
+      gap: 0.9rem;
+      align-content: space-between;
+      text-decoration: none;
+      color: inherit;
+      min-height: 230px;
+      border: 1px solid var(--border);
+      background: linear-gradient(165deg, var(--card), rgba(255, 255, 255, 0.015));
+      backdrop-filter: blur(1.5px);
+      padding: 1.15rem;
+      border-radius: 14px;
+      transition: transform 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+    }
+
+    .location-card:hover,
+    .location-card:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(183, 157, 109, 0.7);
+      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.38), 0 0 26px rgba(183, 157, 109, 0.09);
+      outline: none;
+    }
+
+    .location-card h2 {
+      margin: 0;
+      font-size: 1.06rem;
+      letter-spacing: 0.13em;
+      font-weight: 500;
+      color: #f8f7f3;
+    }
+
+    .location-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .location-card span {
+      color: #ddd5c5;
+      font-size: 0.85rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .return-anchor {
+      color: #d5c9b2;
+      text-decoration: none;
+      width: fit-content;
+      border-bottom: 1px solid rgba(213, 201, 178, 0.45);
+      padding-bottom: 0.2rem;
+      transition: opacity 0.5s ease;
+      animation: fadeIn 0.8s ease 0.3s both;
+    }
+
+    .return-anchor:hover,
+    .return-anchor:focus-visible {
+      opacity: 0.7;
+      outline: none;
+    }
+
+    .sync-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.95);
+      color: #efefec;
+      letter-spacing: 0.12em;
+      text-transform: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.7s ease;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .sync-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sync-overlay p {
+      margin: 0;
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: #dedbd3;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="intro" aria-label="Reality hub introduction">
+      <p>Fluorescent light hums softly.</p>
+      <p>Paper brushes against fingers.</p>
+      <p>Footsteps echo down the hallway.</p>
+      <p>This is not the Star Realm.</p>
+      <p>This is where choices become real.</p>
+    </section>
+
+    <section class="location-grid" aria-label="Reality locations">
+      <a class="location-card" href="amato.html" data-destination="amato.html">
+        <h2>AMATO — Cosmetics Floor</h2>
+        <p>Glass counters. Perfume in the air. Reflections layered over identity.</p>
+        <span>Enter location</span>
+      </a>
+
+      <a class="location-card" href="ouin-shoot.html" data-destination="ouin-shoot.html">
+        <h2>OUIN — Shooting Stage</h2>
+        <p>White light. Fabric tension. A body turned into form.</p>
+        <span>Enter location</span>
+      </a>
+
+      <a class="location-card" href="ecru-magazine.html" data-destination="ecru-magazine.html">
+        <h2>ECRU — Fashion Archive</h2>
+        <p>Pages that remember. Images that refuse to fade.</p>
+        <span>Enter location</span>
+      </a>
+    </section>
+
+    <a class="return-anchor" href="star-memory.html">Return to Astral Hub (Star Memory)</a>
+  </main>
+
+  <div class="sync-overlay" id="syncOverlay" aria-hidden="true">
+    <p>《Reality coordinates synchronizing…》</p>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('syncOverlay');
+    const cards = document.querySelectorAll('.location-card');
+
+    cards.forEach((card) => {
+      card.addEventListener('click', (event) => {
+        event.preventDefault();
+        const destination = card.dataset.destination;
+
+        overlay.classList.add('active');
+        setTimeout(() => {
+          window.location.href = destination;
+        }, 700);
+      });
+    });
+  </script>
+</body>
+</html>
