@@ -1,210 +1,422 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TAROT BREAKER | Reality Hub</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TAROT BREAKER｜現実界キャンパス・回廊</title>
   <style>
-    :root {
-      --bg: #0f1012;
-      --bg-soft: #17191d;
-      --text: #f3f3f1;
-      --muted: #b6b9bf;
-      --gold: #b79d6d;
-      --border: rgba(255, 255, 255, 0.18);
-      --card: rgba(255, 255, 255, 0.03);
+    :root{
+      --bg: #f4f6f8;          /* 廊下の白 */
+      --bg2: #eef1f5;         /* 光のムラ */
+      --panel: rgba(255,255,255,0.78);
+      --line: rgba(20, 24, 32, 0.18);
+      --line2: rgba(20, 24, 32, 0.10);
+      --text: #141820;
+      --muted: rgba(20, 24, 32, 0.65);
+      --muted2: rgba(20, 24, 32, 0.48);
+      --accent: rgba(140, 170, 210, 0.55); /* うっすい青（蛍光灯の冷たさ） */
+      --gold: rgba(183, 157, 109, 0.35);   /* 伏線の薄金 */
+      --shadow: 0 18px 45px rgba(10, 16, 25, 0.12);
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    body{
       margin: 0;
       min-height: 100vh;
-      font-family: "Georgia", "Times New Roman", serif;
+      font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.07), transparent 42%),
-        radial-gradient(circle at 90% 80%, rgba(183, 157, 109, 0.08), transparent 52%),
-        linear-gradient(160deg, #0d0f13 0%, #14161a 48%, #0f1012 100%);
-      display: grid;
-      place-items: center;
-      padding: 3rem 1.2rem;
+        /* 窓からの光が床に落ちる長方形 */
+        linear-gradient(90deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.00) 46%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
       overflow-x: hidden;
     }
 
-    main {
+    /* うっすい粒子（廊下の空気の埃） */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 22%, rgba(255,255,255,0.55) 0 2px, transparent 3px),
+        radial-gradient(circle at 68% 12%, rgba(255,255,255,0.35) 0 1px, transparent 2px),
+        radial-gradient(circle at 82% 65%, rgba(255,255,255,0.25) 0 1px, transparent 2px),
+        radial-gradient(circle at 30% 78%, rgba(255,255,255,0.25) 0 1px, transparent 2px);
+      opacity: 0.35;
+      filter: blur(0.2px);
+    }
+
+    /* 上部：蛍光灯の帯 */
+    header{
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(6px);
+      background: linear-gradient(180deg, rgba(244,246,248,0.92), rgba(244,246,248,0.55));
+      border-bottom: 1px solid var(--line2);
+      z-index: 5;
+    }
+
+    .topbar{
       width: min(980px, 100%);
-      display: grid;
-      gap: 2.4rem;
-    }
-
-    .intro {
-      border-left: 1px solid var(--border);
-      padding: 0.2rem 0 0.2rem 1.2rem;
-      animation: fadeIn 0.8s ease both;
-    }
-
-    .intro p {
-      margin: 0.2rem 0;
-      color: #ececea;
-      letter-spacing: 0.02em;
-      line-height: 1.7;
-      font-size: clamp(1rem, 1.7vw, 1.2rem);
-      text-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
-    }
-
-    .intro p:nth-child(4),
-    .intro p:nth-child(5) {
-      color: #d8d4c9;
-    }
-
-    .location-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin: 0 auto;
+      padding: 0.9rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 1rem;
-      animation: fadeIn 0.8s ease 0.2s both;
     }
 
-    .location-card {
+    .crumb{
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      letter-spacing: 0.08em;
+      font-size: 0.9rem;
+      color: var(--muted);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .crumb strong{
+      color: rgba(20,24,32,0.85);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .return-anchor{
+      color: rgba(20,24,32,0.75);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(20,24,32,0.25);
+      padding-bottom: 0.15rem;
+      transition: opacity 0.25s ease;
+      font-size: 0.92rem;
+      white-space: nowrap;
+    }
+    .return-anchor:hover,
+    .return-anchor:focus-visible{
+      opacity: 0.72;
+      outline: none;
+    }
+
+    main{
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: 2.2rem 1.2rem 3.2rem;
       display: grid;
-      gap: 0.9rem;
-      align-content: space-between;
+      gap: 1.8rem;
+    }
+
+    /* 導入：廊下の文章 */
+    .intro{
+      background: var(--panel);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow);
+      border-radius: 14px;
+      padding: 1.15rem 1.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 掲示物っぽい端のテープ */
+    .intro::before{
+      content:"";
+      position:absolute;
+      top: 0.75rem;
+      right: 1rem;
+      width: 52px;
+      height: 18px;
+      background: rgba(240, 230, 210, 0.65);
+      border: 1px solid rgba(20,24,32,0.08);
+      transform: rotate(3deg);
+      box-shadow: 0 8px 16px rgba(10,16,25,0.10);
+    }
+
+    .intro p{
+      margin: 0.35rem 0;
+      line-height: 1.9;
+      color: rgba(20,24,32,0.86);
+      font-size: clamp(0.98rem, 1.6vw, 1.12rem);
+      letter-spacing: 0.02em;
+    }
+    .intro p.muted{
+      color: var(--muted);
+    }
+
+    /* ロケーション：縦積みで “廊下の掲示板” みたいに */
+    .location-stack{
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .location-card{
+      display: grid;
+      gap: 0.55rem;
       text-decoration: none;
       color: inherit;
-      min-height: 230px;
-      border: 1px solid var(--border);
-      background: linear-gradient(165deg, var(--card), rgba(255, 255, 255, 0.015));
-      backdrop-filter: blur(1.5px);
-      padding: 1.15rem;
       border-radius: 14px;
-      transition: transform 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.72);
+      padding: 1.05rem 1.1rem;
+      box-shadow: 0 10px 30px rgba(10,16,25,0.08);
+      transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 床の反射みたいなハイライト */
+    .location-card::after{
+      content:"";
+      position:absolute;
+      inset: -40% -30%;
+      background: linear-gradient(110deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.40) 46%, rgba(255,255,255,0.0) 65%);
+      transform: translateX(-25%);
+      opacity: 0.35;
+      pointer-events: none;
     }
 
     .location-card:hover,
-    .location-card:focus-visible {
+    .location-card:focus-visible{
       transform: translateY(-2px);
-      border-color: rgba(183, 157, 109, 0.7);
-      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.38), 0 0 26px rgba(183, 157, 109, 0.09);
+      border-color: rgba(140,170,210,0.75);
+      box-shadow: 0 18px 45px rgba(10,16,25,0.14);
       outline: none;
     }
 
-    .location-card h2 {
-      margin: 0;
-      font-size: 1.06rem;
-      letter-spacing: 0.13em;
-      font-weight: 500;
-      color: #f8f7f3;
+    .card-top{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
-    .location-card p {
+    .glyph{
+      font-size: 0.95rem;
+      letter-spacing: 0.22em;
+      color: rgba(20,24,32,0.55);
+      user-select: none;
+    }
+
+    .location-card h2{
+      margin: 0;
+      font-size: 1.02rem;
+      letter-spacing: 0.12em;
+      font-weight: 800;
+      color: rgba(20,24,32,0.92);
+    }
+
+    .location-card p{
       margin: 0;
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.9;
       font-size: 0.95rem;
     }
 
-    .location-card span {
-      color: #ddd5c5;
-      font-size: 0.85rem;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
+    .hint{
+      margin-top: 0.15rem;
+      font-size: 0.86rem;
+      color: var(--muted2);
+      letter-spacing: 0.08em;
     }
 
-    .return-anchor {
-      color: #d5c9b2;
-      text-decoration: none;
-      width: fit-content;
-      border-bottom: 1px solid rgba(213, 201, 178, 0.45);
-      padding-bottom: 0.2rem;
-      transition: opacity 0.5s ease;
-      animation: fadeIn 0.8s ease 0.3s both;
+    /* 右上：右目（Arete）微熱の点 */
+    .pulse-dot{
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(183,157,109,0.28);
+      border: 1px solid rgba(183,157,109,0.35);
+      box-shadow: 0 0 0 0 rgba(183,157,109,0.25);
+      cursor: pointer;
+      z-index: 10;
     }
 
-    .return-anchor:hover,
-    .return-anchor:focus-visible {
-      opacity: 0.7;
-      outline: none;
+    .pulse-dot:hover{
+      background: rgba(183,157,109,0.38);
+      border-color: rgba(183,157,109,0.55);
     }
 
-    .sync-overlay {
+    .tooltip{
+      position: fixed;
+      top: 10px;
+      right: 32px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--line2);
+      color: rgba(20,24,32,0.82);
+      padding: 0.35rem 0.55rem;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      letter-spacing: 0.03em;
+      box-shadow: 0 12px 28px rgba(10,16,25,0.12);
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 10;
+      max-width: 260px;
+    }
+
+    .tooltip.show{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 同期オーバーレイ */
+    .sync-overlay{
       position: fixed;
       inset: 0;
       display: grid;
       place-items: center;
-      background: rgba(0, 0, 0, 0.95);
-      color: #efefec;
+      background: rgba(10, 12, 16, 0.92);
+      color: rgba(245,245,245,0.92);
       letter-spacing: 0.12em;
-      text-transform: none;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.7s ease;
-      z-index: 20;
+      transition: opacity 0.5s ease;
+      z-index: 30;
       pointer-events: none;
     }
 
-    .sync-overlay.active {
+    .sync-overlay.active{
       opacity: 1;
       visibility: visible;
+      pointer-events: auto;
     }
 
-    .sync-overlay p {
-      margin: 0;
-      font-size: clamp(0.95rem, 2vw, 1.1rem);
-      color: #dedbd3;
+    .sync-box{
       text-align: center;
+      padding: 1.1rem 1.2rem;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(4px);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .sync-box p{
+      margin: 0.25rem 0;
+      font-size: clamp(0.95rem, 2vw, 1.08rem);
+      color: rgba(240,240,240,0.92);
+    }
+
+    .sync-sub{
+      font-size: 0.86rem !important;
+      letter-spacing: 0.18em;
+      color: rgba(220,220,220,0.75) !important;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      * { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
+
 <body>
+  <header>
+    <div class="topbar">
+      <div class="crumb" aria-label="現在地">
+        <strong>現実界</strong> / キャンパス・回廊
+      </div>
+      <a class="return-anchor" href="star-memory.html">星の記憶へ戻る</a>
+    </div>
+  </header>
+
+  <button class="pulse-dot" id="pulseDot" aria-label="右目の微熱（Areteの気配）"></button>
+  <div class="tooltip" id="tooltip" role="status" aria-live="polite">右目の奥が、ほんの少し熱い。</div>
+
   <main>
-    <section class="intro" aria-label="Reality hub introduction">
-      <p>Fluorescent light hums softly.</p>
-      <p>Paper brushes against fingers.</p>
-      <p>Footsteps echo down the hallway.</p>
-      <p>This is not the Star Realm.</p>
-      <p>This is where choices become real.</p>
+    <section class="intro" aria-label="導入">
+      <p>蛍光灯が、白い音を立てている。</p>
+      <p>床のワックスが、乾いた匂いで鼻の奥に残る。</p>
+      <p class="muted">紙の擦れる音。遠い笑い声。教室の扉が閉まる気配。</p>
+      <p>ここは星界じゃない。</p>
+      <p>選んだ言葉が、そのまま形になる場所だ。</p>
+      <p class="muted">——だからこそ、逃げられない。</p>
     </section>
 
-    <section class="location-grid" aria-label="Reality locations">
+    <section class="location-stack" aria-label="現実の行き先">
       <a class="location-card" href="amato.html" data-destination="amato.html">
-        <h2>AMATO — Cosmetics Floor</h2>
-        <p>Glass counters. Perfume in the air. Reflections layered over identity.</p>
-        <span>Enter location</span>
+        <div class="card-top">
+          <h2>アマト｜化粧品売り場</h2>
+          <div class="glyph">◇</div>
+        </div>
+        <p>ガラスのカウンター。香りの層。鏡に重なる「なりたい自分」。</p>
+        <div class="hint">行き先へ進む</div>
       </a>
 
       <a class="location-card" href="ouin-shoot.html" data-destination="ouin-shoot.html">
-        <h2>OUIN — Shooting Stage</h2>
-        <p>White light. Fabric tension. A body turned into form.</p>
-        <span>Enter location</span>
+        <div class="card-top">
+          <h2>OUIN｜撮影ステージ</h2>
+          <div class="glyph">▢</div>
+        </div>
+        <p>白い照明。布の張り。身体が「形」へ変換される瞬間。</p>
+        <div class="hint">行き先へ進む</div>
       </a>
 
       <a class="location-card" href="ecru-magazine.html" data-destination="ecru-magazine.html">
-        <h2>ECRU — Fashion Archive</h2>
-        <p>Pages that remember. Images that refuse to fade.</p>
-        <span>Enter location</span>
+        <div class="card-top">
+          <h2>ECRU｜ファッション誌アーカイブ</h2>
+          <div class="glyph">◻</div>
+        </div>
+        <p>ページが記憶する。写真が拒む。——消えない白。</p>
+        <div class="hint">閲覧へ進む</div>
       </a>
     </section>
-
-    <a class="return-anchor" href="star-memory.html">Return to Astral Hub (Star Memory)</a>
   </main>
 
   <div class="sync-overlay" id="syncOverlay" aria-hidden="true">
-    <p>《Reality coordinates synchronizing…》</p>
+    <div class="sync-box">
+      <p>《現実座標を同期中…》</p>
+      <p class="sync-sub">COORDINATE SYNC</p>
+    </div>
   </div>
 
   <script>
     const overlay = document.getElementById('syncOverlay');
     const cards = document.querySelectorAll('.location-card');
 
+    const pulseDot = document.getElementById('pulseDot');
+    const tooltip = document.getElementById('tooltip');
+
+    let tooltipTimer = null;
+
+    function showTooltip(text){
+      tooltip.textContent = text;
+      tooltip.classList.add('show');
+      clearTimeout(tooltipTimer);
+      tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
+    }
+
+    // Hoverで「右目」気配
+    pulseDot.addEventListener('mouseenter', () => {
+      showTooltip('右目の奥が、ほんの少し熱い。');
+    });
+
+    // Clickで脈（短く）
+    pulseDot.addEventListener('click', () => {
+      showTooltip('ドクン　／　ドクン　／　ドクン');
+      // さりげなく光を1回だけ
+      pulseDot.animate([
+        { boxShadow: '0 0 0 0 rgba(183,157,109,0.28)' },
+        { boxShadow: '0 0 0 10px rgba(183,157,109,0.00)' }
+      ], { duration: 520, easing: 'ease-out' });
+    });
+
+    // 移動：同期演出
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     cards.forEach((card) => {
       card.addEventListener('click', (event) => {
         event.preventDefault();
         const destination = card.dataset.destination;
+
+        if (prefersReducedMotion) {
+          window.location.href = destination;
+          return;
+        }
 
         overlay.classList.add('active');
         setTimeout(() => {
