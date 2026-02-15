@@ -1,101 +1,265 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TAROT BREAKER | OUIN Shooting Stage</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TAROT BREAKER｜OUIN 撮影ステージ</title>
   <style>
-    :root {
-      --bg: #121317;
-      --text: #f4f4f3;
-      --muted: #c2c4cb;
-      --line: rgba(255, 255, 255, 0.2);
-      --gold: #b7a173;
+    :root{
+      --bg:#0f1115;
+      --panel: rgba(255,255,255,0.04);
+      --line: rgba(255,255,255,0.16);
+      --text:#f3f3f2;
+      --muted: rgba(243,243,242,0.68);
+      --muted2: rgba(243,243,242,0.52);
+      --gold: rgba(183,161,115,0.62);
+      --shadow: 0 18px 48px rgba(0,0,0,0.55);
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing:border-box; }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Georgia", "Times New Roman", serif;
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 78% 20%, rgba(255, 255, 255, 0.18), transparent 35%),
-        radial-gradient(circle at 30% 80%, rgba(183, 161, 115, 0.09), transparent 50%),
-        linear-gradient(170deg, #0f1013 0%, #171a20 55%, #101115 100%);
-      display: grid;
-      place-items: center;
-      padding: 3rem 1.2rem;
+        radial-gradient(circle at 74% 22%, rgba(255,255,255,0.12), transparent 36%),
+        radial-gradient(circle at 22% 82%, rgba(183,161,115,0.10), transparent 50%),
+        linear-gradient(170deg, #0b0c10 0%, #141722 55%, #0f1115 100%);
+      padding: 2.2rem 1.2rem 3.2rem;
     }
 
-    main {
-      width: min(780px, 100%);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(15, 16, 20, 0.62);
-      padding: 2rem;
-      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42);
-      animation: fadeIn 0.8s ease both;
-    }
-
-    h1 {
-      margin: 0 0 1rem;
-      font-size: clamp(1.4rem, 2.5vw, 1.9rem);
-      letter-spacing: 0.09em;
-      font-weight: 500;
-      color: #f8f8f7;
-    }
-
-    p {
-      margin: 0 0 1rem;
-      line-height: 1.8;
-      color: var(--muted);
-    }
-
-    .links {
-      margin-top: 1.1rem;
-      display: flex;
-      flex-wrap: wrap;
+    .wrap{
+      width:min(980px, 100%);
+      margin: 0 auto;
+      display:grid;
       gap: 1.2rem;
     }
 
-    .links a {
-      text-decoration: none;
-      color: #e6dcc8;
-      border-bottom: 1px solid rgba(230, 220, 200, 0.55);
-      padding-bottom: 0.2rem;
-      transition: opacity 0.5s ease;
+    /* 雑誌のヘッダーっぽい */
+    .masthead{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap: 1rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.9rem;
+      margin-bottom: 0.4rem;
     }
 
+    .kicker{
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: var(--muted2);
+    }
+
+    h1{
+      margin: 0.2rem 0 0;
+      font-weight: 800;
+      letter-spacing: 0.10em;
+      font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+    }
+
+    .issue{
+      text-align:right;
+      color: var(--muted2);
+      font-size: 0.82rem;
+      letter-spacing: 0.16em;
+      white-space:nowrap;
+    }
+
+    /* ヒーロー */
+    .hero{
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow:hidden;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero img{
+      width:100%;
+      height: auto;
+      display:block;
+    }
+
+    .hero-cap{
+      padding: 0.9rem 1.05rem 1.05rem;
+      display:grid;
+      gap: 0.35rem;
+      border-top: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .hero-cap strong{
+      color: rgba(255,255,255,0.92);
+      letter-spacing: 0.08em;
+    }
+
+    .hero-cap span{
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 0.98rem;
+    }
+
+    /* 文章＋写真の“誌面” */
+    .spread{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 860px){
+      .spread{ grid-template-columns: 1fr; }
+    }
+
+    .textblock{
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 1.2rem 1.2rem 1.1rem;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .textblock p{
+      margin: 0.65rem 0;
+      line-height: 2.0;
+      color: var(--muted);
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .textblock p.lead{
+      color: rgba(255,255,255,0.88);
+      margin-top: 0;
+    }
+
+    .side{
+      display:grid;
+      gap: 1rem;
+    }
+
+    .photo{
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 16px;
+      overflow:hidden;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .photo img{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    .caption{
+      padding: 0.7rem 0.9rem 0.85rem;
+      color: var(--muted2);
+      line-height: 1.8;
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255,255,255,0.10);
+    }
+
+    /* 小さな仕切り線 */
+    .rule{
+      height:1px;
+      background: rgba(255,255,255,0.12);
+      margin: 0.3rem 0;
+    }
+
+    /* ナビ */
+    .links{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      margin-top: 0.3rem;
+    }
+
+    .links a{
+      color: rgba(230,220,200,0.92);
+      text-decoration:none;
+      border-bottom: 1px solid rgba(230,220,200,0.45);
+      padding-bottom: 0.15rem;
+      transition: opacity 0.25s ease;
+      letter-spacing: 0.06em;
+    }
     .links a:hover,
-    .links a:focus-visible {
-      opacity: 0.72;
-      outline: none;
+    .links a:focus-visible{
+      opacity:0.72;
+      outline:none;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* 高級誌っぽい小要素 */
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.70);
+    }
+    .dot{
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      background: var(--gold);
+      box-shadow: 0 0 14px rgba(183,161,115,0.18);
     }
   </style>
 </head>
-<body>
-  <main>
-    <header>
-      <h1>OUIN — Shooting Stage</h1>
-    </header>
 
-    <section aria-label="Studio scene">
-      <p>The studio is a chamber of white light and measured silence, broken only by camera shutters and quiet directives.</p>
-      <p>Steam rises from heated styling tools, dissolving into the cool air while assistants pull seams smooth and lay fabric so every fold catches intention.</p>
-      <p>OUIN stands at the center in controlled elegance — posture precise, expression restrained, each movement converting cloth and angle into a deliberate architecture of form.</p>
+<body>
+  <div class="wrap">
+    <div class="masthead">
+      <div>
+        <div class="kicker">Editorial Location</div>
+        <h1>OUIN｜撮影ステージ</h1>
+      </div>
+      <div class="issue">ECRU / STAGE LOG</div>
+    </div>
+
+    <!-- ヒーロー写真（縦推奨） -->
+    <section class="hero" aria-label="撮影ステージ：ヒーロー">
+      <img src="assets/img/ouin/ouin_stage_hero_01.jpg" alt="OUIN 撮影ステージのヒーローカット">
+      <div class="hero-cap">
+        <strong>白い光の部屋。</strong>
+        <span>シャッター音と、抑えた指示だけが、静けさを割る。</span>
+      </div>
     </section>
 
-    <nav class="links" aria-label="Location links">
-      <a href="ecru-magazine.html">Open ECRU feature</a>
-      <a href="campus.html">Return to Campus</a>
-    </nav>
-  </main>
+    <div class="spread" aria-label="誌面スプレッド">
+      <!-- 左：文章 -->
+      <section class="textblock" aria-label="撮影現場の文章">
+        <div class="tag"><span class="dot"></span>shooting stage</div>
+        <div class="rule"></div>
+
+        <p class="lead">ここは、光が支配する。</p>
+        <p>ヘアアイロンの熱が、細い蒸気になってほどける。スプレーの甘い霧が、空気に残る。</p>
+        <p>アシスタントが縫い目を整え、布を引き、折り目を作る。<br>“偶然”が入る余地を、丁寧に消していく。</p>
+        <p>OUINは中心に立つ。姿勢は正確で、表情は抑えられている。<br>衣服と角度が、ひとつの建築に変換されるみたいに。</p>
+        <p>その完璧さは、温度を持たない。<br>——けれど、見ている側の呼吸だけが、わずかに乱れる。</p>
+
+        <div class="rule"></div>
+        <nav class="links" aria-label="リンク">
+          <a href="ecru-magazine.html">ECRU特集を開く</a>
+          <a href="campus.html">キャンパスへ戻る</a>
+        </nav>
+      </section>
+
+      <!-- 右：現場写真2枚＋キャプション -->
+      <aside class="side" aria-label="現場写真">
+        <figure class="photo">
+          <img src="assets/img/ouin/ouin_stage_02.jpg" alt="照明と立ち位置の調整">
+          <figcaption class="caption">照明は白い。白すぎるほど、影が薄い。</figcaption>
+        </figure>
+
+        <figure class="photo">
+          <img src="assets/img/ouin/ouin_detail_fabric_01.jpg" alt="布のディテールと手元">
+          <figcaption class="caption">指先が布を撫でる。質感だけが現実を主張する。</figcaption>
+        </figure>
+      </aside>
+    </div>
+  </div>
 </body>
 </html>
