@@ -6,17 +6,18 @@
   <title>TAROT BREAKER｜現実界キャンパス・回廊</title>
   <style>
     :root{
-      --bg: #f4f6f8;          /* 廊下の白 */
-      --bg2: #eef1f5;         /* 光のムラ */
       --panel: rgba(255,255,255,0.78);
       --line: rgba(20, 24, 32, 0.18);
       --line2: rgba(20, 24, 32, 0.10);
       --text: #141820;
       --muted: rgba(20, 24, 32, 0.65);
       --muted2: rgba(20, 24, 32, 0.48);
-      --accent: rgba(140, 170, 210, 0.55); /* うっすい青（蛍光灯の冷たさ） */
-      --gold: rgba(183, 157, 109, 0.35);   /* 伏線の薄金 */
+      --accent: rgba(140, 170, 210, 0.55);
+      --gold: rgba(183, 157, 109, 0.35);
       --shadow: 0 18px 45px rgba(10, 16, 25, 0.12);
+
+      /* 背景画像パス（ここだけ差し替えでOK） */
+      --bg-image: url("assets/bg/campus-hallway.jpg");
     }
 
     * { box-sizing: border-box; }
@@ -26,14 +27,28 @@
       min-height: 100vh;
       font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
       color: var(--text);
-      background:
-        /* 窓からの光が床に落ちる長方形 */
-        linear-gradient(90deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.00) 46%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
       overflow-x: hidden;
+
+      /* 廊下画像をベースにする */
+      background:
+        var(--bg-image) center / cover no-repeat fixed;
     }
 
-    /* うっすい粒子（廊下の空気の埃） */
+    /* 乳白ガラス膜（読みやすさ最優先） */
+    body::after{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.58)),
+        radial-gradient(circle at 18% 20%, rgba(255,255,255,0.40), transparent 55%),
+        radial-gradient(circle at 80% 65%, rgba(255,255,255,0.28), transparent 58%);
+      mix-blend-mode: screen;
+      opacity: 1;
+    }
+
+    /* うっすい粒子（埃） */
     body::before{
       content:"";
       position: fixed;
@@ -46,14 +61,14 @@
         radial-gradient(circle at 30% 78%, rgba(255,255,255,0.25) 0 1px, transparent 2px);
       opacity: 0.35;
       filter: blur(0.2px);
+      z-index: 0;
     }
 
-    /* 上部：蛍光灯の帯 */
     header{
       position: sticky;
       top: 0;
-      backdrop-filter: blur(6px);
-      background: linear-gradient(180deg, rgba(244,246,248,0.92), rgba(244,246,248,0.55));
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.60));
       border-bottom: 1px solid var(--line2);
       z-index: 5;
     }
@@ -106,9 +121,10 @@
       padding: 2.2rem 1.2rem 3.2rem;
       display: grid;
       gap: 1.8rem;
+      position: relative;
+      z-index: 2; /* 背景膜より前へ */
     }
 
-    /* 導入：廊下の文章 */
     .intro{
       background: var(--panel);
       border: 1px solid var(--line2);
@@ -119,7 +135,6 @@
       overflow: hidden;
     }
 
-    /* 掲示物っぽい端のテープ */
     .intro::before{
       content:"";
       position:absolute;
@@ -140,15 +155,9 @@
       font-size: clamp(0.98rem, 1.6vw, 1.12rem);
       letter-spacing: 0.02em;
     }
-    .intro p.muted{
-      color: var(--muted);
-    }
+    .intro p.muted{ color: var(--muted); }
 
-    /* ロケーション：縦積みで “廊下の掲示板” みたいに */
-    .location-stack{
-      display: grid;
-      gap: 0.85rem;
-    }
+    .location-stack{ display: grid; gap: 0.85rem; }
 
     .location-card{
       display: grid;
@@ -157,7 +166,7 @@
       color: inherit;
       border-radius: 14px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,0.72);
+      background: rgba(255,255,255,0.74);
       padding: 1.05rem 1.1rem;
       box-shadow: 0 10px 30px rgba(10,16,25,0.08);
       transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
@@ -165,7 +174,21 @@
       overflow: hidden;
     }
 
-    /* 床の反射みたいなハイライト */
+    /* “扉”の縦スリット + 奥行き */
+    .location-card::before{
+      content:"";
+      position:absolute;
+      top: 10%;
+      bottom: 10%;
+      left: 12px;
+      width: 3px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(140,170,210,0.0), rgba(140,170,210,0.55), rgba(140,170,210,0.0));
+      opacity: 0.55;
+      filter: blur(0.1px);
+      pointer-events: none;
+    }
+
     .location-card::after{
       content:"";
       position:absolute;
@@ -179,7 +202,7 @@
     .location-card:hover,
     .location-card:focus-visible{
       transform: translateY(-2px);
-      border-color: rgba(140,170,210,0.75);
+      border-color: rgba(140,170,210,0.78);
       box-shadow: 0 18px 45px rgba(10,16,25,0.14);
       outline: none;
     }
@@ -220,7 +243,7 @@
       letter-spacing: 0.08em;
     }
 
-    /* 右上：右目（Arete）微熱の点 */
+    /* 右上：右目（Arete）微熱 */
     .pulse-dot{
       position: fixed;
       top: 14px;
@@ -259,13 +282,8 @@
       z-index: 10;
       max-width: 260px;
     }
+    .tooltip.show{ opacity: 1; transform: translateY(0); }
 
-    .tooltip.show{
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* 同期オーバーレイ */
     .sync-overlay{
       position: fixed;
       inset: 0;
@@ -280,13 +298,11 @@
       z-index: 30;
       pointer-events: none;
     }
-
     .sync-overlay.active{
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
     }
-
     .sync-box{
       text-align: center;
       padding: 1.1rem 1.2rem;
@@ -295,13 +311,11 @@
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(4px);
     }
-
     .sync-box p{
       margin: 0.25rem 0;
       font-size: clamp(0.95rem, 2vw, 1.08rem);
       color: rgba(240,240,240,0.92);
     }
-
     .sync-sub{
       font-size: 0.86rem !important;
       letter-spacing: 0.18em;
@@ -364,6 +378,26 @@
         <p>ページが記憶する。写真が拒む。——消えない白。</p>
         <div class="hint">閲覧へ進む</div>
       </a>
+
+      <!-- 追加①：DiCo -->
+      <a class="location-card" href="dico-play.html" data-destination="dico-play.html">
+        <div class="card-top">
+          <h2>DiCo｜遊び場</h2>
+          <div class="glyph">△</div>
+        </div>
+        <p>軽口。ノイズ。笑いの中に、たまに“本音”が落ちる。</p>
+        <div class="hint">遊びに行く</div>
+      </a>
+
+      <!-- 追加②：シオンのコラム -->
+      <a class="location-card" href="shion-column.html" data-destination="shion-column.html">
+        <div class="card-top">
+          <h2>シオン｜コラム</h2>
+          <div class="glyph">—</div>
+        </div>
+        <p>言葉で整える。整えすぎない。——余白のための記録。</p>
+        <div class="hint">読む</div>
+      </a>
     </section>
   </main>
 
@@ -390,22 +424,18 @@
       tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
     }
 
-    // Hoverで「右目」気配
     pulseDot.addEventListener('mouseenter', () => {
       showTooltip('右目の奥が、ほんの少し熱い。');
     });
 
-    // Clickで脈（短く）
     pulseDot.addEventListener('click', () => {
       showTooltip('ドクン　／　ドクン　／　ドクン');
-      // さりげなく光を1回だけ
       pulseDot.animate([
         { boxShadow: '0 0 0 0 rgba(183,157,109,0.28)' },
         { boxShadow: '0 0 0 10px rgba(183,157,109,0.00)' }
       ], { duration: 520, easing: 'ease-out' });
     });
 
-    // 移動：同期演出
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     cards.forEach((card) => {
