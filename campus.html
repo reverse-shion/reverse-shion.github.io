@@ -3,26 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TAROT BREAKER｜現実界キャンパス・回廊</title>
+  <title>TAROT BREAKER｜現実界キャンパス</title>
 
   <style>
     :root{
       --text: rgba(18, 22, 30, 0.92);
       --muted: rgba(18, 22, 30, 0.62);
-      --muted2: rgba(18, 22, 30, 0.48);
 
       /* Tarot / Tech palette */
       --ink: rgba(18, 22, 30, 0.16);
       --ink2: rgba(18, 22, 30, 0.10);
-      --accent: rgba(120, 170, 235, 0.70);      /* 薄青（AIの冷光） */
-      --accent2: rgba(120, 170, 235, 0.35);
-      --gold: rgba(183, 157, 109, 0.52);        /* Arete薄金 */
+      --accent: rgba(120, 170, 235, 0.72);   /* AIの冷光 */
+      --accent2: rgba(120, 170, 235, 0.28);
+      --gold: rgba(183, 157, 109, 0.55);     /* Arete薄金 */
       --gold2: rgba(183, 157, 109, 0.28);
 
-      --glass: rgba(255,255,255,0.72);
+      --glass: rgba(255,255,255,0.74);
       --glass2: rgba(255,255,255,0.60);
 
-      --shadow: 0 22px 55px rgba(10, 16, 25, 0.16);
+      --shadow: 0 26px 62px rgba(10, 16, 25, 0.18);
       --shadow2: 0 14px 34px rgba(10, 16, 25, 0.12);
 
       --radius: 18px;
@@ -40,158 +39,141 @@
       font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
       color: var(--text);
       overflow-x: hidden;
-
-      /* 背景を“見せる” */
-      background: var(--bg-image) center / cover no-repeat fixed;
+      background: #0b0f16;
     }
 
-    /* 背景を薄めすぎない“先端的な視認補助” */
-    body::before{
-      content:"";
+    /* 背景：絵を“読ませる”ための二層設計 */
+    .bg{
       position: fixed;
       inset: 0;
-      pointer-events: none;
       z-index: 0;
-      background:
-        radial-gradient(circle at 20% 18%, rgba(255,255,255,0.22), transparent 55%),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.14), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
-      /* 背景は見せたいので“薄め”だけ */
-    }
-
-    /* 微細ノイズ（高級UI感） */
-    body::after{
-      content:"";
-      position: fixed;
-      inset: 0;
       pointer-events: none;
-      z-index: 1;
-      background-image:
-        linear-gradient(0deg, rgba(0,0,0,0.035), rgba(0,0,0,0.035)),
-        radial-gradient(circle at 12% 26%, rgba(255,255,255,0.12) 0 1px, transparent 2px),
+      background: var(--bg-image) center / cover no-repeat;
+      transform: translateZ(0);
+    }
+    /* “薄い”問題は、暗幕＋コントラストで解決（ぼかしすぎない） */
+    .bg::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(7,10,16,0.58), rgba(7,10,16,0.38)),
+        radial-gradient(circle at 20% 18%, rgba(255,255,255,0.16), transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.10), transparent 60%);
+      mix-blend-mode: normal;
+    }
+    /* 微細ノイズ：最先端UIの“質感” */
+    .bg::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(0deg, rgba(255,255,255,0.035), rgba(255,255,255,0.035)),
+        radial-gradient(circle at 12% 26%, rgba(255,255,255,0.10) 0 1px, transparent 2px),
         radial-gradient(circle at 72% 12%, rgba(255,255,255,0.08) 0 1px, transparent 2px),
         radial-gradient(circle at 82% 72%, rgba(255,255,255,0.06) 0 1px, transparent 2px);
-      opacity: 0.26;
+      opacity: 0.18;
       mix-blend-mode: soft-light;
     }
 
     header{
       position: sticky;
       top: 0;
-      z-index: 20;
-      backdrop-filter: blur(12px);
-      background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(255,255,255,0.56));
-      border-bottom: 1px solid var(--ink2);
+      z-index: 30;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.56));
+      border-bottom: 1px solid rgba(255,255,255,0.22);
     }
 
     .topbar{
       width: min(var(--maxw), 100%);
       margin: 0 auto;
       padding: 0.95rem 1.2rem;
-      display: flex;
-      align-items: center;
+      display:flex;
+      align-items:center;
       justify-content: space-between;
       gap: 1rem;
     }
 
     .crumb{
-      display: flex;
-      align-items: baseline;
-      gap: 0.6rem;
-      letter-spacing: 0.08em;
-      font-size: 0.92rem;
-      color: rgba(18,22,30,0.60);
-      user-select: none;
-      white-space: nowrap;
+      display:flex;
+      align-items:baseline;
+      gap: .6rem;
+      letter-spacing: .08em;
+      font-size: .92rem;
+      color: rgba(18,22,30,0.62);
+      user-select:none;
+      white-space:nowrap;
     }
     .crumb strong{
-      color: rgba(18,22,30,0.90);
-      font-weight: 900;
-      letter-spacing: 0.13em;
+      color: rgba(18,22,30,0.92);
+      font-weight: 950;
+      letter-spacing: .13em;
     }
 
     .return-anchor{
       color: rgba(18,22,30,0.78);
-      text-decoration: none;
-      padding: 0.35rem 0.55rem;
-      border-radius: 10px;
+      text-decoration:none;
+      padding: .38rem .60rem;
+      border-radius: 12px;
       border: 1px solid rgba(18,22,30,0.14);
-      background: rgba(255,255,255,0.40);
-      backdrop-filter: blur(10px);
-      transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+      background: rgba(255,255,255,0.42);
+      backdrop-filter: blur(12px);
+      transition: transform .2s ease, box-shadow .2s ease;
       white-space: nowrap;
     }
     .return-anchor:hover,
     .return-anchor:focus-visible{
       transform: translateY(-1px);
-      box-shadow: 0 10px 26px rgba(10,16,25,0.12);
+      box-shadow: 0 12px 28px rgba(10,16,25,0.14);
       outline: none;
     }
 
     main{
       width: min(var(--maxw), 100%);
       margin: 0 auto;
-      padding: 2.2rem 1.2rem 3.2rem;
+      padding: 1.7rem 1.2rem 3.2rem;
       display: grid;
-      gap: 1.3rem;
+      gap: 1.05rem;
       position: relative;
-      z-index: 5;
+      z-index: 10;
     }
 
-    /* Intro: 背景は見せたいので panel の白を弱め、境界線を精密に */
-    .intro{
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0.52));
-      border: 1px solid rgba(18,22,30,0.14);
+    /* ページ説明を消した代わりに“キャンパス”だけを示す最小ヘッダ */
+    .page-title{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .65rem .85rem;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.70), rgba(255,255,255,0.54));
+      border: 1px solid rgba(255,255,255,0.26);
       box-shadow: var(--shadow2);
-      backdrop-filter: blur(10px);
-      padding: 1.15rem 1.2rem;
+      backdrop-filter: blur(12px);
     }
-
-    .intro::before{
-      content:"";
-      position:absolute;
-      inset: 10px;
-      border-radius: calc(var(--radius) - 10px);
-      border: 1px solid rgba(255,255,255,0.40);
-      pointer-events: none;
-      opacity: 0.8;
+    .page-title .label{
+      font-weight: 900;
+      letter-spacing: .14em;
+      color: rgba(18,22,30,0.84);
+      font-size: .95rem;
+      user-select: none;
     }
-
-    .intro::after{
-      /* 右上の“紙テープ”をより現代的に（薄金のラベル） */
-      content:"";
-      position:absolute;
-      top: 0.75rem;
-      right: 1rem;
-      width: 74px;
-      height: 18px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(183,157,109,0.18), rgba(183,157,109,0.32));
-      border: 1px solid rgba(183,157,109,0.20);
-      box-shadow: 0 10px 22px rgba(10,16,25,0.10);
-      pointer-events: none;
+    .page-title .sub{
+      font-size: .85rem;
+      letter-spacing: .12em;
+      color: rgba(18,22,30,0.50);
+      user-select: none;
     }
-
-    .intro p{
-      margin: 0.35rem 0;
-      line-height: 1.9;
-      color: rgba(18,22,30,0.90);
-      font-size: clamp(0.98rem, 1.6vw, 1.12rem);
-      letter-spacing: 0.02em;
-    }
-    .intro p.muted{ color: rgba(18,22,30,0.62); }
 
     .location-stack{
-      display: grid;
-      gap: 0.95rem;
-      margin-top: 0.4rem;
+      display:grid;
+      gap: .95rem;
+      margin-top: .2rem;
     }
 
     /* ===========================================
-       完全タロット風カード UI（本気）
+       完全タロット風カード UI（白余白 + 薄枠 + 小グリフ）
        =========================================== */
     .location-card{
       position: relative;
@@ -201,51 +183,48 @@
       color: inherit;
 
       border-radius: calc(var(--radius) + 2px);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.60));
+      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.66));
       border: 1px solid rgba(18,22,30,0.16);
 
       box-shadow: var(--shadow2);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
 
-      padding: 1.05rem 1.1rem 1.05rem 1.1rem;
+      padding: 1.0rem 1.05rem;
       transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
     }
 
-    /* 外枠の“タロット額縁” */
+    /* 外枠（タロット額縁） */
     .location-card::before{
       content:"";
-      position: absolute;
+      position:absolute;
       inset: 10px;
       border-radius: calc(var(--radius) - 2px);
       border: 1px solid rgba(18,22,30,0.14);
-      box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.36);
-      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.40);
+      pointer-events:none;
       z-index: 1;
     }
 
-    /* 角の装飾（タロットらしいが現代的） */
+    /* 角点（カードらしさ） */
     .location-card::after{
       content:"";
       position:absolute;
-      inset: 0;
+      inset:0;
       pointer-events:none;
       z-index: 1;
       background:
         radial-gradient(circle at 18px 18px, rgba(183,157,109,0.34) 0 2px, transparent 3px),
         radial-gradient(circle at calc(100% - 18px) 18px, rgba(183,157,109,0.34) 0 2px, transparent 3px),
         radial-gradient(circle at 18px calc(100% - 18px), rgba(183,157,109,0.34) 0 2px, transparent 3px),
-        radial-gradient(circle at calc(100% - 18px) calc(100% - 18px), rgba(183,157,109,0.34) 0 2px, transparent 3px),
-        linear-gradient(90deg, rgba(183,157,109,0.0), rgba(183,157,109,0.18), rgba(183,157,109,0.0));
-      opacity: 0.55;
+        radial-gradient(circle at calc(100% - 18px) calc(100% - 18px), rgba(183,157,109,0.34) 0 2px, transparent 3px);
+      opacity: .62;
       mix-blend-mode: multiply;
     }
 
-    /* タイトル帯（タロットの“名”プレート） */
+    /* タイトル行：説明は消して“名前だけ” */
     .card-top{
       display:flex;
-      align-items: center;
+      align-items:center;
       justify-content: space-between;
       gap: 1rem;
       position: relative;
@@ -253,149 +232,112 @@
     }
 
     .title-plate{
-      display: inline-flex;
-      align-items: baseline;
-      gap: 0.6rem;
-      padding: 0.35rem 0.55rem;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.44);
+      display:inline-flex;
+      align-items:center;
+      gap: .7rem;
+      padding: .40rem .60rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.46);
       border: 1px solid rgba(18,22,30,0.12);
-      box-shadow: 0 10px 22px rgba(10,16,25,0.08);
-      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 26px rgba(10,16,25,0.08);
+      backdrop-filter: blur(14px);
     }
 
     .location-card h2{
       margin: 0;
       font-size: 1.02rem;
       font-weight: 950;
-      letter-spacing: 0.12em;
+      letter-spacing: .12em;
       color: rgba(18,22,30,0.92);
     }
 
-    /* グリフは“カード角のシンボル”として扱う */
     .glyph{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       width: 34px;
       height: 34px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.44);
+      background: rgba(255,255,255,0.46);
       border: 1px solid rgba(18,22,30,0.12);
-      box-shadow: 0 10px 22px rgba(10,16,25,0.08);
-      backdrop-filter: blur(12px);
-
-      font-size: 0.92rem;
-      letter-spacing: 0.18em;
+      box-shadow: 0 12px 26px rgba(10,16,25,0.08);
+      backdrop-filter: blur(14px);
+      font-size: .92rem;
+      letter-spacing: .18em;
       color: rgba(18,22,30,0.60);
-      user-select: none;
+      user-select:none;
     }
 
-    .location-card p{
-      margin: 0.55rem 0 0;
-      color: rgba(18,22,30,0.66);
-      line-height: 1.9;
-      font-size: 0.95rem;
-      position: relative;
-      z-index: 3;
-    }
-
-    .hint{
-      margin-top: 0.52rem;
-      font-size: 0.86rem;
-      color: rgba(18,22,30,0.50);
-      letter-spacing: 0.08em;
-      position: relative;
-      z-index: 3;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .hint::after{
-      content:"→";
-      opacity: 0.55;
-      transform: translateY(-0.5px);
-    }
-
-    /* 左端：ドアの縦スリット（常時うっすら） */
+    /* 左端：ゲートの“常時スリット” */
     .slit{
       position:absolute;
-      top: 12%;
-      bottom: 12%;
+      top: 14%;
+      bottom: 14%;
       left: 16px;
       width: 3px;
       border-radius: 999px;
       background: linear-gradient(180deg,
         rgba(120,170,235,0.00),
-        rgba(120,170,235,0.62),
+        rgba(120,170,235,0.68),
         rgba(120,170,235,0.00)
       );
-      opacity: 0.40;
-      filter: blur(0.1px);
+      opacity: .42;
       pointer-events:none;
       z-index: 2;
     }
 
-    /* カード表面の“床反射”ハイライト */
+    /* 表面の“反射” */
     .sheen{
       position:absolute;
       inset: -35% -35%;
       background: linear-gradient(115deg,
         rgba(255,255,255,0.00) 0%,
-        rgba(255,255,255,0.30) 46%,
+        rgba(255,255,255,0.26) 46%,
         rgba(255,255,255,0.00) 70%
       );
-      transform: translateX(-22%);
-      opacity: 0.28;
+      transform: translateX(-24%);
+      opacity: .26;
       pointer-events:none;
       z-index: 2;
     }
 
-    /* Hover/Focus：現代的に“起動” */
     .location-card:hover,
     .location-card:focus-visible{
       transform: translateY(-3px);
-      border-color: rgba(120,170,235,0.55);
+      border-color: rgba(120,170,235,0.60);
       box-shadow: var(--shadow);
-      outline: none;
+      outline:none;
     }
     .location-card:hover .slit,
     .location-card:focus-visible .slit{
-      opacity: 0.62;
+      opacity: .70;
     }
 
-    /* ゲート走査線（縦光が走る） */
+    /* ===========================================
+       ゲート縦光：確実に見える & 2回走らせる前提の描画
+       =========================================== */
     .gate-sweep{
       position:absolute;
       inset:0;
       pointer-events:none;
-      z-index: 4;
+      z-index: 10;               /* 最上位 */
       opacity: 0;
-      transform: translateX(-120%);
+      transform: translate3d(-140%,0,0);
       background: linear-gradient(90deg,
         rgba(255,255,255,0.00) 0%,
-        rgba(255,255,255,0.72) 50%,
+        rgba(255,255,255,0.88) 50%,
         rgba(255,255,255,0.00) 100%
       );
-      filter: blur(0.25px);
-    }
-    .location-card.gate-on .gate-sweep{
-      opacity: 1;
-      animation: gateSweep 380ms ease-out forwards;
-    }
-    @keyframes gateSweep{
-      0%   { transform: translateX(-120%); opacity: 0; }
-      12%  { opacity: 1; }
-      100% { transform: translateX(120%); opacity: 0; }
+      mix-blend-mode: screen;
+      filter: blur(0.35px);
     }
 
-    /* クリック中に“タロットが開く”感じ（ほんの少しだけ） */
     .location-card.gate-armed{
-      border-color: rgba(120,170,235,0.68);
+      border-color: rgba(120,170,235,0.76);
       box-shadow: var(--shadow);
     }
 
-    /* Arete Dot */
+    /* Arete dot */
     .pulse-dot{
       position: fixed;
       top: 14px;
@@ -403,51 +345,51 @@
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: rgba(183,157,109,0.32);
-      border: 1px solid rgba(183,157,109,0.44);
+      background: rgba(183,157,109,0.34);
+      border: 1px solid rgba(183,157,109,0.46);
       box-shadow: 0 0 0 0 rgba(183,157,109,0.22);
-      cursor: pointer;
-      z-index: 50;
+      cursor:pointer;
+      z-index: 60;
     }
     .pulse-dot:hover{
-      background: rgba(183,157,109,0.42);
-      border-color: rgba(183,157,109,0.62);
+      background: rgba(183,157,109,0.46);
+      border-color: rgba(183,157,109,0.64);
     }
 
     .tooltip{
       position: fixed;
       top: 10px;
       right: 32px;
-      background: rgba(255,255,255,0.90);
+      background: rgba(255,255,255,0.92);
       border: 1px solid rgba(18,22,30,0.12);
       color: rgba(18,22,30,0.84);
-      padding: 0.40rem 0.60rem;
+      padding: .42rem .64rem;
       border-radius: 12px;
-      font-size: 0.86rem;
-      letter-spacing: 0.03em;
+      font-size: .86rem;
+      letter-spacing: .03em;
       box-shadow: 0 12px 28px rgba(10,16,25,0.12);
       opacity: 0;
       transform: translateY(-4px);
-      pointer-events: none;
+      pointer-events:none;
       transition: opacity .18s ease, transform .18s ease;
-      z-index: 50;
+      z-index: 60;
       max-width: 320px;
     }
     .tooltip.show{ opacity: 1; transform: translateY(0); }
 
-    /* Sync Overlay（出すタイミングはJSで遅らせる） */
+    /* Sync overlay（縦光が見えた後に出す） */
     .sync-overlay{
       position: fixed;
       inset: 0;
-      display: grid;
-      place-items: center;
-      background: rgba(10, 12, 16, 0.90);
+      display:grid;
+      place-items:center;
+      background: rgba(8, 10, 14, 0.92);
       color: rgba(245,245,245,0.92);
-      letter-spacing: 0.12em;
+      letter-spacing: .12em;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.40s ease;
-      z-index: 80;
+      transition: opacity .40s ease;
+      z-index: 90;
       pointer-events: none;
     }
     .sync-overlay.active{
@@ -456,15 +398,15 @@
       pointer-events: auto;
     }
     .sync-box{
-      text-align: center;
+      text-align:center;
       padding: 1.1rem 1.2rem;
       border: 1px solid rgba(255,255,255,0.16);
       border-radius: 16px;
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(6px);
     }
-    .sync-box p{ margin: .25rem 0; font-size: clamp(.95rem, 2vw, 1.08rem); }
-    .sync-sub{ font-size: .86rem !important; letter-spacing: .18em; color: rgba(220,220,220,0.78) !important; }
+    .sync-box p{ margin:.25rem 0; font-size: clamp(.95rem, 2vw, 1.08rem); }
+    .sync-sub{ font-size:.86rem !important; letter-spacing:.18em; color: rgba(220,220,220,0.78) !important; }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
@@ -473,10 +415,12 @@
 </head>
 
 <body>
+  <div class="bg" aria-hidden="true"></div>
+
   <header>
     <div class="topbar">
       <div class="crumb" aria-label="現在地">
-        <strong>現実界</strong> / キャンパス・回廊
+        <strong>現実界</strong> / キャンパス
       </div>
       <a class="return-anchor" href="star-memory.html">星の記憶へ戻る</a>
     </div>
@@ -486,16 +430,12 @@
   <div class="tooltip" id="tooltip" role="status" aria-live="polite">右目の奥が、ほんの少し熱い。</div>
 
   <main>
-    <section class="intro" aria-label="導入">
-      <p>蛍光灯が、白い音を立てている。</p>
-      <p>床のワックスが、乾いた匂いで鼻の奥に残る。</p>
-      <p class="muted">紙の擦れる音。遠い笑い声。教室の扉が閉まる気配。</p>
-      <p>ここは星界じゃない。</p>
-      <p>選んだ言葉が、そのまま形になる場所だ。</p>
-      <p class="muted">——だからこそ、逃げられない。</p>
-    </section>
+    <div class="page-title" aria-label="ページ見出し">
+      <div class="label">CAMPUS</div>
+      <div class="sub">corridor access</div>
+    </div>
 
-    <section class="location-stack" aria-label="現実の行き先">
+    <section class="location-stack" aria-label="行き先">
       <a class="location-card" href="amato.html" data-destination="amato.html">
         <span class="slit" aria-hidden="true"></span>
         <span class="sheen" aria-hidden="true"></span>
@@ -504,8 +444,6 @@
           <span class="title-plate"><h2>アマト｜化粧品売り場</h2></span>
           <span class="glyph">◇</span>
         </div>
-        <p>ガラスのカウンター。香りの層。鏡に重なる「なりたい自分」。</p>
-        <div class="hint">行き先へ進む</div>
 
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
@@ -518,8 +456,6 @@
           <span class="title-plate"><h2>OUIN｜撮影ステージ</h2></span>
           <span class="glyph">▢</span>
         </div>
-        <p>白い照明。布の張り。身体が「形」へ変換される瞬間。</p>
-        <div class="hint">行き先へ進む</div>
 
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
@@ -529,11 +465,9 @@
         <span class="sheen" aria-hidden="true"></span>
 
         <div class="card-top">
-          <span class="title-plate"><h2>ECRU｜ファッション誌アーカイブ</h2></span>
+          <span class="title-plate"><h2>ECRU｜アーカイブ</h2></span>
           <span class="glyph">◻</span>
         </div>
-        <p>ページが記憶する。写真が拒む。——消えない白。</p>
-        <div class="hint">閲覧へ進む</div>
 
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
@@ -546,8 +480,6 @@
           <span class="title-plate"><h2>DiCo｜遊び場</h2></span>
           <span class="glyph">△</span>
         </div>
-        <p>軽口。ノイズ。笑いの中に、たまに“本音”が落ちる。</p>
-        <div class="hint">遊びに行く</div>
 
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
@@ -560,8 +492,6 @@
           <span class="title-plate"><h2>シオン｜コラム</h2></span>
           <span class="glyph">—</span>
         </div>
-        <p>言葉で整える。整えすぎない。——余白のための記録。</p>
-        <div class="hint">読む</div>
 
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
@@ -588,45 +518,66 @@
       tooltip.textContent = text;
       tooltip.classList.add('show');
       clearTimeout(tooltipTimer);
-      tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
+      tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1200);
     }
 
-    // 走査線を1回、確実に発火（iOS対策：reflow）
-    function playGateOnce(card){
-      card.classList.remove('gate-on');
-      void card.offsetWidth;
-      card.classList.add('gate-on');
+    // Areteの“ドクン”に合わせた点滅（2拍）
+    function pulseArete(){
+      pulseDot.getAnimations().forEach(a => a.cancel());
 
-      setTimeout(() => card.classList.remove('gate-on'), 420);
+      pulseDot.animate(
+        [
+          { boxShadow: '0 0 0 0 rgba(183,157,109,0.22)' },
+          { boxShadow: '0 0 0 12px rgba(183,157,109,0.00)' }
+        ],
+        { duration: 520, easing: 'ease-out' }
+      );
+
+      setTimeout(() => {
+        pulseDot.animate(
+          [
+            { boxShadow: '0 0 0 0 rgba(183,157,109,0.18)' },
+            { boxShadow: '0 0 0 12px rgba(183,157,109,0.00)' }
+          ],
+          { duration: 520, easing: 'ease-out' }
+        );
+      }, 320);
     }
 
-    // ドクン＝2拍（確実に2回）
+    // ===== 確実に見える縦光：Web Animations API（iOS強い） =====
+    function animateGate(card){
+      const sweep = card.querySelector('.gate-sweep');
+      if (!sweep) return;
+
+      // 連打でも確実に：既存アニメを全キャンセル
+      sweep.getAnimations().forEach(a => a.cancel());
+
+      // いったん表示状態へ
+      sweep.style.opacity = '1';
+      sweep.style.transform = 'translate3d(-140%,0,0)';
+
+      const anim = sweep.animate(
+        [
+          { transform: 'translate3d(-140%,0,0)', opacity: 0 },
+          { transform: 'translate3d(-40%,0,0)',  opacity: 1, offset: 0.20 },
+          { transform: 'translate3d(140%,0,0)',  opacity: 0 }
+        ],
+        { duration: 380, easing: 'ease-out', fill: 'forwards' }
+      );
+
+      anim.onfinish = () => {
+        sweep.style.opacity = '0';
+      };
+    }
+
+    // ドクン＝2拍：必ず2回走る
     function playDoubleGate(card){
       card.classList.add('gate-armed');
 
-      // 1拍目
-      playGateOnce(card);
+      animateGate(card);                 // 1拍目
+      setTimeout(() => animateGate(card), 260); // 2拍目
 
-      // 2拍目
-      setTimeout(() => playGateOnce(card), 260);
-
-      // 終了
       setTimeout(() => card.classList.remove('gate-armed'), 900);
-    }
-
-    // Arete dot pulse
-    function pulseArete(){
-      pulseDot.animate([
-        { boxShadow: '0 0 0 0 rgba(183,157,109,0.22)' },
-        { boxShadow: '0 0 0 12px rgba(183,157,109,0.00)' }
-      ], { duration: 520, easing: 'ease-out' });
-
-      setTimeout(() => {
-        pulseDot.animate([
-          { boxShadow: '0 0 0 0 rgba(183,157,109,0.18)' },
-          { boxShadow: '0 0 0 12px rgba(183,157,109,0.00)' }
-        ], { duration: 520, easing: 'ease-out' });
-      }, 320);
     }
 
     // Arete hover/click
@@ -634,12 +585,11 @@
     pulseDot.addEventListener('click', () => {
       showTooltip('ドクン　／　ドクン');
       pulseArete();
-      // 最上段カードに反応（雰囲気）
       const firstCard = document.querySelector('.location-card');
       if (firstCard) playDoubleGate(firstCard);
     });
 
-    // Card click → 2拍ゲート → overlay（遅らせる）→ 遷移
+    // Card click → 2拍ゲート → overlay（縦光が見えた後）→ 遷移
     cards.forEach((card) => {
       card.addEventListener('click', (event) => {
         event.preventDefault();
@@ -653,11 +603,11 @@
         playDoubleGate(card);
         pulseArete();
 
-        // overlayが先に被って見えない問題を回避：少し遅らせる
-        setTimeout(() => overlay.classList.add('active'), 140);
+        // overlayが早すぎて“縦光を覆う”問題を回避
+        setTimeout(() => overlay.classList.add('active'), 220);
 
         // 遷移は2拍が見えた後
-        setTimeout(() => window.location.href = destination, 760);
+        setTimeout(() => window.location.href = destination, 860);
       });
     });
   </script>
