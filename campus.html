@@ -4,23 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TAROT BREAKER｜現実界キャンパス・回廊</title>
+
   <style>
     :root{
-      --panel: rgba(255,255,255,0.78);
-      --line: rgba(20, 24, 32, 0.18);
-      --line2: rgba(20, 24, 32, 0.10);
       --text: #141820;
       --muted: rgba(20, 24, 32, 0.65);
       --muted2: rgba(20, 24, 32, 0.48);
-      --accent: rgba(140, 170, 210, 0.55);
-      --gold: rgba(183, 157, 109, 0.35);
+
+      --panel: rgba(255,255,255,0.78);
+      --panel2: rgba(255,255,255,0.70);
+
+      --line: rgba(20, 24, 32, 0.18);
+      --line2: rgba(20, 24, 32, 0.10);
+
+      --accent: rgba(140, 170, 210, 0.55); /* 蛍光灯の冷たさ */
+      --gold: rgba(183, 157, 109, 0.38);   /* Arete薄金 */
       --shadow: 0 18px 45px rgba(10, 16, 25, 0.12);
 
-      /* 背景画像パス（ここだけ差し替えでOK） */
-      --bg-image: url("assets/bg/campus-hallway.jpg");
+      --bg-image: url("images/campus.png");
+
+      --radius: 14px;
+      --maxw: 980px;
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing: border-box; }
+
+    html, body { height: 100%; }
 
     body{
       margin: 0;
@@ -29,26 +38,25 @@
       color: var(--text);
       overflow-x: hidden;
 
-      /* 廊下画像をベースにする */
-      background:
-        var(--bg-image) center / cover no-repeat fixed;
+      /* 背景イラスト */
+      background: var(--bg-image) center / cover no-repeat fixed;
     }
 
-    /* 乳白ガラス膜（読みやすさ最優先） */
+    /* 乳白ガラス膜：読みやすさ最優先 */
     body::after{
       content:"";
       position: fixed;
       inset: 0;
       pointer-events: none;
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.58)),
+        linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.58)),
         radial-gradient(circle at 18% 20%, rgba(255,255,255,0.40), transparent 55%),
-        radial-gradient(circle at 80% 65%, rgba(255,255,255,0.28), transparent 58%);
+        radial-gradient(circle at 82% 70%, rgba(255,255,255,0.26), transparent 60%);
       mix-blend-mode: screen;
-      opacity: 1;
+      z-index: 0;
     }
 
-    /* うっすい粒子（埃） */
+    /* うっすい粒子（廊下の空気） */
     body::before{
       content:"";
       position: fixed;
@@ -59,24 +67,25 @@
         radial-gradient(circle at 68% 12%, rgba(255,255,255,0.35) 0 1px, transparent 2px),
         radial-gradient(circle at 82% 65%, rgba(255,255,255,0.25) 0 1px, transparent 2px),
         radial-gradient(circle at 30% 78%, rgba(255,255,255,0.25) 0 1px, transparent 2px);
-      opacity: 0.35;
+      opacity: 0.33;
       filter: blur(0.2px);
       z-index: 0;
     }
 
+    /* 上部：蛍光灯の帯 */
     header{
       position: sticky;
       top: 0;
+      z-index: 10;
       backdrop-filter: blur(10px);
-      background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.60));
+      background: linear-gradient(180deg, rgba(255,255,255,0.90), rgba(255,255,255,0.62));
       border-bottom: 1px solid var(--line2);
-      z-index: 5;
     }
 
     .topbar{
-      width: min(980px, 100%);
+      width: min(var(--maxw), 100%);
       margin: 0 auto;
-      padding: 0.9rem 1.2rem;
+      padding: 0.95rem 1.2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -95,15 +104,15 @@
     }
 
     .crumb strong{
-      color: rgba(20,24,32,0.85);
-      font-weight: 700;
+      color: rgba(20,24,32,0.88);
+      font-weight: 800;
       letter-spacing: 0.12em;
     }
 
     .return-anchor{
-      color: rgba(20,24,32,0.75);
+      color: rgba(20,24,32,0.78);
       text-decoration: none;
-      border-bottom: 1px solid rgba(20,24,32,0.25);
+      border-bottom: 1px solid rgba(20,24,32,0.26);
       padding-bottom: 0.15rem;
       transition: opacity 0.25s ease;
       font-size: 0.92rem;
@@ -116,25 +125,26 @@
     }
 
     main{
-      width: min(980px, 100%);
+      width: min(var(--maxw), 100%);
       margin: 0 auto;
       padding: 2.2rem 1.2rem 3.2rem;
       display: grid;
-      gap: 1.8rem;
+      gap: 1.2rem;
       position: relative;
-      z-index: 2; /* 背景膜より前へ */
+      z-index: 2;
     }
 
     .intro{
       background: var(--panel);
       border: 1px solid var(--line2);
       box-shadow: var(--shadow);
-      border-radius: 14px;
+      border-radius: var(--radius);
       padding: 1.15rem 1.2rem;
       position: relative;
       overflow: hidden;
     }
 
+    /* 掲示物っぽい端のテープ */
     .intro::before{
       content:"";
       position:absolute;
@@ -142,7 +152,7 @@
       right: 1rem;
       width: 52px;
       height: 18px;
-      background: rgba(240, 230, 210, 0.65);
+      background: rgba(240, 230, 210, 0.68);
       border: 1px solid rgba(20,24,32,0.08);
       transform: rotate(3deg);
       box-shadow: 0 8px 16px rgba(10,16,25,0.10);
@@ -157,14 +167,19 @@
     }
     .intro p.muted{ color: var(--muted); }
 
-    .location-stack{ display: grid; gap: 0.85rem; }
+    /* “廊下の掲示板”のように縦積み */
+    .location-stack{
+      display: grid;
+      gap: 0.85rem;
+      margin-top: 0.6rem;
+    }
 
     .location-card{
       display: grid;
       gap: 0.55rem;
       text-decoration: none;
       color: inherit;
-      border-radius: 14px;
+      border-radius: var(--radius);
       border: 1px solid var(--line);
       background: rgba(255,255,255,0.74);
       padding: 1.05rem 1.1rem;
@@ -172,31 +187,43 @@
       transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
       position: relative;
       overflow: hidden;
+      isolation: isolate;
     }
 
-    /* “扉”の縦スリット + 奥行き */
+    /* 扉の縦スリット（常時） */
     .location-card::before{
       content:"";
       position:absolute;
       top: 10%;
       bottom: 10%;
-      left: 12px;
+      left: 14px;
       width: 3px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(140,170,210,0.0), rgba(140,170,210,0.55), rgba(140,170,210,0.0));
-      opacity: 0.55;
-      filter: blur(0.1px);
+      background: linear-gradient(180deg,
+        rgba(140,170,210,0.00),
+        rgba(140,170,210,0.55),
+        rgba(140,170,210,0.00)
+      );
+      opacity: 0.45;
       pointer-events: none;
+      z-index: 1;
+      filter: blur(0.1px);
     }
 
+    /* 床反射っぽいハイライト */
     .location-card::after{
       content:"";
       position:absolute;
       inset: -40% -30%;
-      background: linear-gradient(110deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.40) 46%, rgba(255,255,255,0.0) 65%);
+      background: linear-gradient(110deg,
+        rgba(255,255,255,0.0) 0%,
+        rgba(255,255,255,0.40) 46%,
+        rgba(255,255,255,0.0) 65%
+      );
       transform: translateX(-25%);
-      opacity: 0.35;
+      opacity: 0.32;
       pointer-events: none;
+      z-index: 1;
     }
 
     .location-card:hover,
@@ -212,6 +239,7 @@
       align-items: baseline;
       justify-content: space-between;
       gap: 1rem;
+      z-index: 2;
     }
 
     .glyph{
@@ -219,14 +247,16 @@
       letter-spacing: 0.22em;
       color: rgba(20,24,32,0.55);
       user-select: none;
+      z-index: 2;
     }
 
     .location-card h2{
       margin: 0;
       font-size: 1.02rem;
       letter-spacing: 0.12em;
-      font-weight: 800;
+      font-weight: 900;
       color: rgba(20,24,32,0.92);
+      z-index: 2;
     }
 
     .location-card p{
@@ -234,6 +264,7 @@
       color: var(--muted);
       line-height: 1.9;
       font-size: 0.95rem;
+      z-index: 2;
     }
 
     .hint{
@@ -241,9 +272,45 @@
       font-size: 0.86rem;
       color: var(--muted2);
       letter-spacing: 0.08em;
+      z-index: 2;
     }
 
-    /* 右上：右目（Arete）微熱 */
+    /* ゲート走査線（カード内部を縦光が走る） */
+    .gate-sweep{
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 3;
+      background:
+        linear-gradient(90deg,
+          rgba(255,255,255,0.00) 0%,
+          rgba(255,255,255,0.62) 48%,
+          rgba(255,255,255,0.00) 100%
+        );
+      transform: translateX(-120%);
+      filter: blur(0.2px);
+    }
+
+    /* 2拍（ドクン×2）で2回走る */
+    .location-card.gate-double .gate-sweep{
+      opacity: 1;
+      animation: gateSweep 520ms ease-out 2;
+    }
+
+    @keyframes gateSweep{
+      0%   { transform: translateX(-120%); opacity: 0.0; }
+      12%  { opacity: 1.0; }
+      100% { transform: translateX(120%); opacity: 0.0; }
+    }
+
+    /* 2拍中：カードがわずかに“開く” */
+    .location-card.gate-double{
+      border-color: rgba(140,170,210,0.86);
+      box-shadow: 0 22px 55px rgba(10,16,25,0.16);
+    }
+
+    /* 右上：右目（Arete）微熱の点 */
     .pulse-dot{
       position: fixed;
       top: 14px;
@@ -251,16 +318,16 @@
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: rgba(183,157,109,0.28);
-      border: 1px solid rgba(183,157,109,0.35);
-      box-shadow: 0 0 0 0 rgba(183,157,109,0.25);
+      background: rgba(183,157,109,0.30);
+      border: 1px solid rgba(183,157,109,0.38);
+      box-shadow: 0 0 0 0 rgba(183,157,109,0.24);
       cursor: pointer;
-      z-index: 10;
+      z-index: 30;
     }
 
     .pulse-dot:hover{
-      background: rgba(183,157,109,0.38);
-      border-color: rgba(183,157,109,0.55);
+      background: rgba(183,157,109,0.40);
+      border-color: rgba(183,157,109,0.58);
     }
 
     .tooltip{
@@ -270,7 +337,7 @@
       background: rgba(255,255,255,0.92);
       border: 1px solid var(--line2);
       color: rgba(20,24,32,0.82);
-      padding: 0.35rem 0.55rem;
+      padding: 0.38rem 0.58rem;
       border-radius: 10px;
       font-size: 0.86rem;
       letter-spacing: 0.03em;
@@ -279,11 +346,12 @@
       transform: translateY(-4px);
       pointer-events: none;
       transition: opacity 0.18s ease, transform 0.18s ease;
-      z-index: 10;
-      max-width: 260px;
+      z-index: 30;
+      max-width: 280px;
     }
     .tooltip.show{ opacity: 1; transform: translateY(0); }
 
+    /* 同期オーバーレイ */
     .sync-overlay{
       position: fixed;
       inset: 0;
@@ -295,14 +363,16 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.5s ease;
-      z-index: 30;
+      z-index: 40;
       pointer-events: none;
     }
+
     .sync-overlay.active{
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
     }
+
     .sync-box{
       text-align: center;
       padding: 1.1rem 1.2rem;
@@ -311,17 +381,20 @@
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(4px);
     }
+
     .sync-box p{
       margin: 0.25rem 0;
       font-size: clamp(0.95rem, 2vw, 1.08rem);
       color: rgba(240,240,240,0.92);
     }
+
     .sync-sub{
       font-size: 0.86rem !important;
       letter-spacing: 0.18em;
       color: rgba(220,220,220,0.75) !important;
     }
 
+    /* Reduce motion */
     @media (prefers-reduced-motion: reduce){
       * { transition: none !important; animation: none !important; }
     }
@@ -338,6 +411,7 @@
     </div>
   </header>
 
+  <!-- Arete Dot -->
   <button class="pulse-dot" id="pulseDot" aria-label="右目の微熱（Areteの気配）"></button>
   <div class="tooltip" id="tooltip" role="status" aria-live="polite">右目の奥が、ほんの少し熱い。</div>
 
@@ -359,6 +433,7 @@
         </div>
         <p>ガラスのカウンター。香りの層。鏡に重なる「なりたい自分」。</p>
         <div class="hint">行き先へ進む</div>
+        <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
       <a class="location-card" href="ouin-shoot.html" data-destination="ouin-shoot.html">
@@ -368,6 +443,7 @@
         </div>
         <p>白い照明。布の張り。身体が「形」へ変換される瞬間。</p>
         <div class="hint">行き先へ進む</div>
+        <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
       <a class="location-card" href="ecru-magazine.html" data-destination="ecru-magazine.html">
@@ -377,9 +453,9 @@
         </div>
         <p>ページが記憶する。写真が拒む。——消えない白。</p>
         <div class="hint">閲覧へ進む</div>
+        <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
-      <!-- 追加①：DiCo -->
       <a class="location-card" href="dico-play.html" data-destination="dico-play.html">
         <div class="card-top">
           <h2>DiCo｜遊び場</h2>
@@ -387,9 +463,9 @@
         </div>
         <p>軽口。ノイズ。笑いの中に、たまに“本音”が落ちる。</p>
         <div class="hint">遊びに行く</div>
+        <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
-      <!-- 追加②：シオンのコラム -->
       <a class="location-card" href="shion-column.html" data-destination="shion-column.html">
         <div class="card-top">
           <h2>シオン｜コラム</h2>
@@ -397,6 +473,7 @@
         </div>
         <p>言葉で整える。整えすぎない。——余白のための記録。</p>
         <div class="hint">読む</div>
+        <span class="gate-sweep" aria-hidden="true"></span>
       </a>
     </section>
   </main>
@@ -415,6 +492,8 @@
     const pulseDot = document.getElementById('pulseDot');
     const tooltip = document.getElementById('tooltip');
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     let tooltipTimer = null;
 
     function showTooltip(text){
@@ -424,20 +503,51 @@
       tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
     }
 
+    // カードに2拍ゲートを走らせる（ドクン×2）
+    function triggerDoubleGate(card){
+      if (!card) return;
+      // 連打対策：一旦リセットして確実に再発火
+      card.classList.remove('gate-double');
+      void card.offsetWidth; // reflow
+
+      card.classList.add('gate-double');
+
+      // 2拍：1拍目すぐ、2拍目を遅延して“ドクン”感
+      // CSSは animation-iteration-count:2 だが、体感を合わせたいので
+      // 2拍目のタイミングに合わせて Arete dot も軽く脈動させる
+      pulseDot.animate([
+        { boxShadow: '0 0 0 0 rgba(183,157,109,0.26)' },
+        { boxShadow: '0 0 0 10px rgba(183,157,109,0.00)' }
+      ], { duration: 520, easing: 'ease-out' });
+
+      setTimeout(() => {
+        pulseDot.animate([
+          { boxShadow: '0 0 0 0 rgba(183,157,109,0.22)' },
+          { boxShadow: '0 0 0 10px rgba(183,157,109,0.00)' }
+        ], { duration: 520, easing: 'ease-out' });
+      }, 320);
+
+      // 終了後にクラス解除（見た目を戻す）
+      setTimeout(() => {
+        card.classList.remove('gate-double');
+      }, 1200);
+    }
+
+    // Arete dot hover
     pulseDot.addEventListener('mouseenter', () => {
       showTooltip('右目の奥が、ほんの少し熱い。');
     });
 
+    // Arete dot click：ドクン×2 ＋ 近いカードに2回縦光
     pulseDot.addEventListener('click', () => {
-      showTooltip('ドクン　／　ドクン　／　ドクン');
-      pulseDot.animate([
-        { boxShadow: '0 0 0 0 rgba(183,157,109,0.28)' },
-        { boxShadow: '0 0 0 10px rgba(183,157,109,0.00)' }
-      ], { duration: 520, easing: 'ease-out' });
+      showTooltip('ドクン　／　ドクン');
+
+      // 近い“1枚目”に反応させる（最上段カード）
+      const firstCard = document.querySelector('.location-card');
+      triggerDoubleGate(firstCard);
     });
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+    // カードクリック：2拍ゲート → 同期 → 遷移
     cards.forEach((card) => {
       card.addEventListener('click', (event) => {
         event.preventDefault();
@@ -448,10 +558,16 @@
           return;
         }
 
+        // ① ドクン×2 に合わせて縦光2回
+        triggerDoubleGate(card);
+
+        // ② 同期オーバーレイ
         overlay.classList.add('active');
+
+        // ③ 遷移（2拍が見え切るタイミングに合わせる）
         setTimeout(() => {
           window.location.href = destination;
-        }, 700);
+        }, 780);
       });
     });
   </script>
