@@ -121,34 +121,34 @@
     }
 
     /* ===========================================
-       Compact Tarot Card Row (Icon + Name only)
+       Row (Glass Button) : Centered, Balanced Width
        =========================================== */
-.row{
-  position:relative;
-  overflow:hidden;
-  isolation:isolate;
-  text-decoration:none;
-  color:inherit;
+    .row{
+      position:relative;
+      overflow:hidden;
+      isolation:isolate;
+      text-decoration:none;
+      color:inherit;
 
-  /* ★ 追加部分 */
-  width: 50%;
-  margin: 0 auto;
+      /* ★ 全画面共通：中央寄せ＆省略されにくい幅（50%はスマホで細すぎるため改善） */
+      width: 60%;
+      margin: 0 auto;
 
-  border-radius: calc(var(--r) + 2px);
-  background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(255,255,255,0.60));
-  border: 1px solid rgba(18,22,30,0.16);
-  box-shadow: var(--shadow2);
-  backdrop-filter: blur(12px);
+      border-radius: calc(var(--r) + 2px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(255,255,255,0.60));
+      border: 1px solid rgba(18,22,30,0.16);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(12px);
 
-  padding: 0.85rem 0.9rem;
-  transition: transform .26s ease, box-shadow .26s ease, border-color .26s ease;
-  min-height: 78px;
-  display:flex;
-  align-items:center;
-  gap: 0.85rem;
-}
+      padding: 0.85rem 0.9rem;
+      transition: transform .26s ease, box-shadow .26s ease, border-color .26s ease;
+      min-height: 78px;
+      display:flex;
+      align-items:center;
+      gap: 0.85rem;
+    }
 
-    /* tarot frame */
+    /* frame */
     .row::before{
       content:"";
       position:absolute;
@@ -184,7 +184,7 @@
       outline:none;
     }
 
-    /* Left icon tile */
+    /* Left icon tile（タロット絵は不要＝キャラアイコンだけに） */
     .icon{
       position:relative;
       z-index:3;
@@ -202,11 +202,11 @@
     .icon img{
       width: 100%;
       height: 100%;
-      object-fit: cover; /* 顔アイコン前提 */
+      object-fit: cover;
       transform: scale(1.02);
     }
 
-    /* Name only */
+    /* Name */
     .name{
       position:relative;
       z-index:3;
@@ -221,7 +221,7 @@
       text-overflow: ellipsis;
     }
 
-    /* Right: glyph (small) */
+    /* Right: glyph */
     .glyph{
       position:relative;
       z-index:3;
@@ -238,11 +238,11 @@
       flex: 0 0 auto;
     }
 
-    /* right empty space for vertical speech (overlay) */
+    /* vertical speech */
     .speech{
       position:absolute;
       top: 8px;
-      right: 56px; /* glyphの左に出す */
+      right: 56px;
       bottom: 8px;
       width: 74px;
       padding: 10px 8px;
@@ -278,7 +278,7 @@
       user-select:none;
     }
 
-    /* subtle slit (always) */
+    /* subtle slit */
     .slit{
       position:absolute;
       top: 14%;
@@ -300,7 +300,7 @@
       opacity: 0.58;
     }
 
-    /* gate sweep (vertical light) */
+    /* gate sweep */
     .gate-sweep{
       position:absolute;
       inset:0;
@@ -401,6 +401,109 @@
     .sync-box p{ margin:.25rem 0; font-size: clamp(.95rem, 2vw, 1.08rem); }
     .sync-sub{ font-size:.86rem !important; letter-spacing:.18em; color: rgba(220,220,220,0.78) !important; }
 
+    /* ===========================================
+       Right Slide (Character Drawer) : Bust-up
+       =========================================== */
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100dvh;
+      width: min(78vw, 420px);
+      transform: translateX(105%);
+      transition: transform .32s ease;
+      z-index: 110;
+
+      border-left: 1px solid rgba(18,22,30,0.16);
+      background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.60));
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+
+      display: grid;
+      grid-template-rows: auto 1fr;
+      padding: 14px;
+    }
+    .drawer.is-open{ transform: translateX(0); }
+
+    .drawerOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(10,12,18,.28);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+      z-index: 109;
+    }
+    .drawerOverlay.is-open{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawerClose{
+      justify-self: end;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(18,22,30,0.14);
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.10);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .drawerInner{
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 14px;
+      padding-top: 6px;
+      min-height: 0;
+    }
+
+    /* Bust-up size control: frame height + safe bounds */
+    .charFrame{
+      border-radius: 18px;
+      border: 1px solid rgba(18,22,30,0.12);
+      background: rgba(255,255,255,0.45);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+
+      height: 56dvh;       /* ★ 立ち絵（バストアップ）の主サイズ */
+      min-height: 320px;   /* ★ 小さすぎ防止 */
+      max-height: 560px;   /* ★ 大きすぎ防止 */
+    }
+
+    .charImg{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;           /* バストアップ前提＝大きく見せる */
+      object-position: 50% 12%;    /* ★ 顔寄せ（上を見せる） */
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,.18));
+    }
+
+    .charMeta{
+      border-radius: 18px;
+      border: 1px solid rgba(18,22,30,0.12);
+      background: rgba(255,255,255,0.55);
+      padding: 14px 14px;
+    }
+
+    .charName{
+      font-weight: 900;
+      letter-spacing: .08em;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .charLine{
+      font-size: 13px;
+      line-height: 1.6;
+      opacity: .92;
+    }
+
+    body.drawer-lock{ overflow: hidden; }
+
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
     }
@@ -424,11 +527,13 @@
     <section class="stack" aria-label="行き先">
 
       <!-- AMATO -->
-      <a class="row" href="amato.html" data-destination="amato.html" data-speech="鏡の前で、選ぶの。今日の顔。">
+      <a class="row" href="amato.html"
+         data-key="amato"
+         data-destination="amato.html"
+         data-speech="鏡の前で、選ぶの。今日の顔。">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
-          <!-- ここを差し替え：images/icons/amato.png -->
           <img src="images/icons/amato.png" alt="">
         </span>
 
@@ -441,7 +546,10 @@
       </a>
 
       <!-- OUIN -->
-      <a class="row" href="ouin-shoot.html" data-destination="ouin-shoot.html" data-speech="光は残酷。だから、私が使う。">
+      <a class="row" href="ouin-shoot.html"
+         data-key="ouin"
+         data-destination="ouin-shoot.html"
+         data-speech="光は残酷。だから、私が使う。">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -457,7 +565,10 @@
       </a>
 
       <!-- ECRU -->
-      <a class="row" href="ecru-magazine.html" data-destination="ecru-magazine.html" data-speech="ページは嘘をつかない。視線だけが残る。">
+      <a class="row" href="ecru-magazine.html"
+         data-key="ecru"
+         data-destination="ecru-magazine.html"
+         data-speech="ページは嘘をつかない。視線だけが残る。">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -473,7 +584,10 @@
       </a>
 
       <!-- DiCo -->
-      <a class="row" href="dico-play.html" data-destination="dico-play.html" data-speech="ねぇ、笑って。重いのは、あとでいい。">
+      <a class="row" href="dico-play.html"
+         data-key="dico"
+         data-destination="dico-play.html"
+         data-speech="ねぇ、笑って。重いのは、あとでいい。">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -488,8 +602,11 @@
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
-      <!-- COLUMN (no Shion appearance) -->
-      <a class="row" href="column.html" data-destination="column.html" data-speech="記録。余白。言葉は、整えすぎない。">
+      <!-- COLUMN -->
+      <a class="row" href="column.html"
+         data-key="column"
+         data-destination="column.html"
+         data-speech="記録。余白。言葉は、整えすぎない。">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -507,6 +624,23 @@
     </section>
   </main>
 
+  <!-- Right Drawer (Character bust-up) -->
+  <div id="charDrawer" class="drawer" aria-hidden="true">
+    <button class="drawerClose" id="drawerClose" aria-label="close">×</button>
+
+    <div class="drawerInner">
+      <div class="charFrame">
+        <img id="drawerImg" class="charImg" src="" alt="">
+      </div>
+
+      <div class="charMeta">
+        <div id="drawerName" class="charName">NAME</div>
+        <div id="drawerLine" class="charLine">…</div>
+      </div>
+    </div>
+  </div>
+  <div id="drawerOverlay" class="drawerOverlay" aria-hidden="true"></div>
+
   <div class="sync-overlay" id="syncOverlay" aria-hidden="true">
     <div class="sync-box">
       <p>《現実座標を同期中…》</p>
@@ -521,8 +655,55 @@
     const tooltip = document.getElementById('tooltip');
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // 読める長さにする表示時間（必要ならここだけ変える）
+    // Drawer
+    const drawer = document.getElementById('charDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawerClose = document.getElementById('drawerClose');
+    const drawerImg = document.getElementById('drawerImg');
+    const drawerName = document.getElementById('drawerName');
+    const drawerLine = document.getElementById('drawerLine');
+
+    // 文字を読みやすい表示時間
     const SPEECH_MS = 2400;
+
+    // キャラ（バストアップ画像パスをここに）
+    const CHAR = {
+      amato:  { name: "アマト", img: "images/bust/amato.png",  line: "……何か用？" },
+      ouin:   { name: "OUIN",  img: "images/bust/ouin.png",   line: "選ぶのは、あなた。" },
+      ecru:   { name: "ECRU",  img: "images/bust/ecru.png",   line: "ページをめくって。" },
+      dico:   { name: "DiCo",  img: "images/bust/dico.png",   line: "ディディディ…来た！" },
+      column: { name: "コラム", img: "images/bust/column.png", line: "記録は、まだ途中だ。" }
+    };
+
+    function openDrawer(key){
+      const c = CHAR[key];
+      if(!c) return;
+
+      drawerName.textContent = c.name;
+      drawerLine.textContent = c.line;
+      drawerImg.src = c.img;
+      drawerImg.alt = c.name;
+
+      drawer.classList.add('is-open');
+      drawerOverlay.classList.add('is-open');
+      document.body.classList.add('drawer-lock');
+
+      drawer.setAttribute('aria-hidden', 'false');
+      drawerOverlay.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeDrawer(){
+      drawer.classList.remove('is-open');
+      drawerOverlay.classList.remove('is-open');
+      document.body.classList.remove('drawer-lock');
+
+      drawer.setAttribute('aria-hidden', 'true');
+      drawerOverlay.setAttribute('aria-hidden', 'true');
+    }
+
+    drawerClose.addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeDrawer(); });
 
     let tooltipTimer = null;
     function showTooltip(text){
@@ -532,7 +713,7 @@
       tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
     }
 
-    // 縦光を1回、確実に発火（iOS対策：reflow）
+    // gate sweep 1回（iOS対策）
     function playGateOnce(row){
       row.classList.remove('gate-on');
       void row.offsetWidth;
@@ -540,15 +721,15 @@
       setTimeout(() => row.classList.remove('gate-on'), 420);
     }
 
-    // ドクン＝2拍（確実に2回）
+    // 2拍
     function playDoubleGate(row){
       row.classList.add('gate-armed');
-      playGateOnce(row);                 // 1拍目
-      setTimeout(() => playGateOnce(row), 260); // 2拍目
+      playGateOnce(row);
+      setTimeout(() => playGateOnce(row), 260);
       setTimeout(() => row.classList.remove('gate-armed'), 900);
     }
 
-    // 右側の縦台詞表示
+    // 縦台詞
     function showVerticalSpeech(row, text){
       const box = row.querySelector('.speech');
       const span = box?.querySelector('span');
@@ -556,19 +737,16 @@
 
       span.textContent = text || '';
       row.classList.add('speaking');
-
-      // 表示を伸ばす（読める）
       setTimeout(() => row.classList.remove('speaking'), SPEECH_MS);
     }
 
-    // Arete dot pulse
+    // Arete pulse
     function pulseArete(){
       pulseDot.animate(
         [{ boxShadow:'0 0 0 0 rgba(183,157,109,0.22)' },
          { boxShadow:'0 0 0 12px rgba(183,157,109,0.00)' }],
         { duration:520, easing:'ease-out' }
       );
-
       setTimeout(() => {
         pulseDot.animate(
           [{ boxShadow:'0 0 0 0 rgba(183,157,109,0.18)' },
@@ -578,7 +756,6 @@
       }, 320);
     }
 
-    // Arete hover/click
     pulseDot.addEventListener('mouseenter', () => showTooltip('右目の奥が、ほんの少し熱い。'));
     pulseDot.addEventListener('click', () => {
       showTooltip('ドクン　／　ドクン');
@@ -587,33 +764,33 @@
       if (first){
         playDoubleGate(first);
         showVerticalSpeech(first, first.dataset.speech);
+        openDrawer(first.dataset.key);
       }
     });
 
-    // Tap row: speech -> double gate -> overlay -> navigate
+    // クリック：①台詞→②ドクン→③右スライドで顕現→④（任意で遷移）
     rows.forEach((row) => {
       row.addEventListener('click', (event) => {
         event.preventDefault();
         const destination = row.dataset.destination;
         const speech = row.dataset.speech;
+        const key = row.dataset.key;
 
         if (prefersReducedMotion) {
           window.location.href = destination;
           return;
         }
 
-        // 1) 縦台詞（すぐ出す）
         showVerticalSpeech(row, speech);
-
-        // 2) ドクン2拍 + 縦光2回
         playDoubleGate(row);
         pulseArete();
 
-        // 3) overlayは“演出が見えた後”に被せる
-        setTimeout(() => overlay.classList.add('active'), 220);
+        // 右から顕現（観測＝顕現）
+        setTimeout(() => openDrawer(key), 160);
 
-        // 4) 遷移（2拍が見え切った後）
-        setTimeout(() => window.location.href = destination, 780);
+        // ★ 遷移したいなら有効化（右スライド確認後に移動）
+        // setTimeout(() => overlay.classList.add('active'), 320);
+        // setTimeout(() => window.location.href = destination, 900);
       }, { passive:false });
     });
   </script>
