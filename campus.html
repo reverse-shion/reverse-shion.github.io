@@ -17,13 +17,7 @@
       --ink2: rgba(18, 22, 30, 0.10);
 
       --ai: rgba(120, 170, 235, 0.78);
-      --ai2: rgba(120, 170, 235, 0.26);
-
       --gold: rgba(183, 157, 109, 0.62);
-      --gold2: rgba(183, 157, 109, 0.28);
-
-      --glass: rgba(255,255,255,0.78);
-      --glass2: rgba(255,255,255,0.60);
 
       --shadow: 0 22px 55px rgba(10, 16, 25, 0.16);
       --shadow2: 0 14px 34px rgba(10, 16, 25, 0.12);
@@ -31,8 +25,9 @@
       --bg-image: url("images/campus.png");
     }
 
-    *{ box-sizing: border-box; }
-    html, body { height: 100%; }
+    *{ box-sizing:border-box; }
+    html, body { height:100%; }
+
     body{
       margin:0;
       font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
@@ -41,39 +36,32 @@
       overflow-x:hidden;
     }
 
-    /* 背景視認性：薄すぎない、でも潰さない */
     body::before{
       content:"";
-      position: fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
+      position:fixed; inset:0;
+      pointer-events:none; z-index:0;
       background:
         radial-gradient(circle at 20% 18%, rgba(255,255,255,0.22), transparent 58%),
         radial-gradient(circle at 78% 72%, rgba(255,255,255,0.16), transparent 62%),
         linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.10));
     }
     body::after{
-      /* 高級感ノイズ */
       content:"";
-      position: fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:1;
-      background-image:
-        linear-gradient(0deg, rgba(0,0,0,0.035), rgba(0,0,0,0.035));
+      position:fixed; inset:0;
+      pointer-events:none; z-index:1;
+      background-image: linear-gradient(0deg, rgba(0,0,0,0.035), rgba(0,0,0,0.035));
       opacity:0.22;
       mix-blend-mode: soft-light;
     }
 
     header{
-      position: sticky;
-      top:0;
-      z-index: 30;
+      position:sticky; top:0;
+      z-index:30;
       backdrop-filter: blur(12px);
       background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.58));
       border-bottom: 1px solid var(--ink2);
     }
+
     .topbar{
       width:min(var(--maxw), 100%);
       margin:0 auto;
@@ -83,6 +71,7 @@
       justify-content:space-between;
       gap:1rem;
     }
+
     .crumb{
       display:flex;
       align-items:baseline;
@@ -98,6 +87,7 @@
       font-weight: 950;
       letter-spacing:.14em;
     }
+
     .return-anchor{
       color: rgba(18,22,30,0.78);
       text-decoration:none;
@@ -106,7 +96,7 @@
       border: 1px solid rgba(18,22,30,0.14);
       background: rgba(255,255,255,0.40);
       backdrop-filter: blur(10px);
-      transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+      transition: transform .2s ease, box-shadow .2s ease;
       white-space:nowrap;
     }
     .return-anchor:hover,
@@ -119,99 +109,57 @@
     main{
       width:min(var(--maxw), 100%);
       margin:0 auto;
-      padding: 1.6rem 1.2rem 3.0rem;
-      position: relative;
-      z-index: 5;
-      display:grid;
-      gap: 1.1rem;
+      padding: 1.2rem 1.2rem 2.8rem;
+      position:relative;
+      z-index:10;
     }
 
-    /* タイトルプレート（最小） */
-    .campus-plate{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:1rem;
-      padding: .85rem 1rem;
-      border-radius: calc(var(--r) + 10px);
-      border: 1px solid rgba(18,22,30,0.14);
-      background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.56));
-      box-shadow: var(--shadow2);
-      backdrop-filter: blur(12px);
-    }
-    .campus-plate .left{
-      display:flex;
-      align-items:baseline;
-      gap:.8rem;
-      letter-spacing:.14em;
-    }
-    .campus-plate .left .ttl{
-      font-weight: 980;
-      font-size: 1.06rem;
-    }
-    .campus-plate .left .sub{
-      color: rgba(18,22,30,0.56);
-      font-size: .88rem;
-      letter-spacing:.18em;
-    }
-    .campus-plate .sigil{
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
+    /* ==== STACK ==== */
+    .stack{
       display:grid;
-      place-items:center;
-      background: rgba(255,255,255,0.42);
-      border: 1px solid rgba(18,22,30,0.12);
-      box-shadow: 0 10px 22px rgba(10,16,25,0.08);
-      backdrop-filter: blur(12px);
-      color: rgba(18,22,30,0.58);
-      user-select:none;
+      gap: 0.9rem;
     }
 
     /* ===========================================
-       完全タロット風 “顔アイコンカード” UI
+       Compact Tarot Card Row (Icon + Name only)
        =========================================== */
-    .grid{
-      display:grid;
-      gap: 0.95rem;
-    }
-
-    .card{
-      position: relative;
+    .row{
+      position:relative;
       overflow:hidden;
-      isolation: isolate;
-      border-radius: calc(var(--r) + 12px);
+      isolation:isolate;
+      text-decoration:none;
+      color:inherit;
+
+      border-radius: calc(var(--r) + 2px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(255,255,255,0.60));
       border: 1px solid rgba(18,22,30,0.16);
-      background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.60));
       box-shadow: var(--shadow2);
       backdrop-filter: blur(12px);
-      padding: 1.05rem 1.05rem;
+
+      padding: 0.85rem 0.9rem;
+      transition: transform .26s ease, box-shadow .26s ease, border-color .26s ease;
+      min-height: 78px;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap: 1rem;
-      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-      text-decoration:none;
-      color: inherit;
+      gap: 0.85rem;
     }
 
-    /* タロット額縁 */
-    .card::before{
+    /* tarot frame */
+    .row::before{
       content:"";
       position:absolute;
       inset: 10px;
-      border-radius: calc(var(--r) + 2px);
+      border-radius: calc(var(--r) - 2px);
       border: 1px solid rgba(18,22,30,0.14);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.36);
       pointer-events:none;
       z-index:1;
     }
 
-    /* 角の薄金点＋薄い横帯（現代×タロット） */
-    .card::after{
+    /* corner dots + faint gold bar */
+    .row::after{
       content:"";
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       pointer-events:none;
       z-index:1;
       background:
@@ -219,144 +167,166 @@
         radial-gradient(circle at calc(100% - 18px) 18px, rgba(183,157,109,0.34) 0 2px, transparent 3px),
         radial-gradient(circle at 18px calc(100% - 18px), rgba(183,157,109,0.34) 0 2px, transparent 3px),
         radial-gradient(circle at calc(100% - 18px) calc(100% - 18px), rgba(183,157,109,0.34) 0 2px, transparent 3px),
-        linear-gradient(90deg, rgba(183,157,109,0.0), rgba(183,157,109,0.16), rgba(183,157,109,0.0));
-      opacity: 0.52;
+        linear-gradient(90deg, rgba(183,157,109,0.00), rgba(183,157,109,0.14), rgba(183,157,109,0.00));
+      opacity: 0.55;
       mix-blend-mode: multiply;
     }
 
-    .card:hover,
-    .card:focus-visible{
+    .row:hover,
+    .row:focus-visible{
       transform: translateY(-2px);
       border-color: rgba(120,170,235,0.55);
       box-shadow: var(--shadow);
       outline:none;
     }
 
-    /* 左：顔アイコン */
-    .face{
-      position: relative;
-      z-index: 3;
-      display:flex;
-      align-items:center;
-      gap: .9rem;
-      min-width: 0;
-    }
-    .avatar{
-      width: 54px;
-      height: 54px;
-      border-radius: 16px;
-      border: 1px solid rgba(18,22,30,0.14);
-      background: rgba(255,255,255,0.45);
-      box-shadow: 0 10px 22px rgba(10,16,25,0.10);
-      overflow:hidden;
-      flex: 0 0 auto;
-      position: relative;
-    }
-    .avatar img{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display:block;
-      transform: translateZ(0);
-    }
-
-    /* キャラ色：外枠だけ色で匂わせ（やりすぎない） */
-    .avatar::after{
-      content:"";
-      position:absolute;
-      inset: -1px;
-      border-radius: 16px;
-      border: 2px solid var(--c, rgba(255,255,255,0.0));
-      opacity: .55;
-      pointer-events:none;
-    }
-
-    /* 右：小グリフだけ */
-    .mini-glyph{
-      position: relative;
-      z-index: 3;
-      width: 42px;
-      height: 42px;
-      border-radius: 16px;
-      display:grid;
-      place-items:center;
-      background: rgba(255,255,255,0.42);
+    /* Left icon tile */
+    .icon{
+      position:relative;
+      z-index:3;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.52);
       border: 1px solid rgba(18,22,30,0.12);
       box-shadow: 0 10px 22px rgba(10,16,25,0.08);
-      backdrop-filter: blur(12px);
-      color: rgba(18,22,30,0.58);
-      user-select:none;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
       flex: 0 0 auto;
-      font-weight: 800;
+    }
+    .icon img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 顔アイコン前提 */
+      transform: scale(1.02);
     }
 
-    /* タップ時の縦スリット（常時うっすら） */
+    /* Name only */
+    .name{
+      position:relative;
+      z-index:3;
+      font-weight: 950;
+      letter-spacing: 0.18em;
+      font-size: 1.02rem;
+      color: rgba(18,22,30,0.92);
+      padding-left: 0.2rem;
+      flex: 1 1 auto;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Right: glyph (small) */
+    .glyph{
+      position:relative;
+      z-index:3;
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.50);
+      border: 1px solid rgba(18,22,30,0.12);
+      box-shadow: 0 10px 22px rgba(10,16,25,0.08);
+      display:grid;
+      place-items:center;
+      color: rgba(18,22,30,0.56);
+      user-select:none;
+      flex: 0 0 auto;
+    }
+
+    /* right empty space for vertical speech (overlay) */
+    .speech{
+      position:absolute;
+      top: 8px;
+      right: 56px; /* glyphの左に出す */
+      bottom: 8px;
+      width: 74px;
+      padding: 10px 8px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0.36));
+      border: 1px solid rgba(18,22,30,0.10);
+      border-radius: 14px;
+      box-shadow: 0 12px 26px rgba(10,16,25,0.10);
+      backdrop-filter: blur(10px);
+
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events:none;
+      z-index: 6;
+
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .row.speaking .speech{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .speech span{
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 0.10em;
+      line-height: 1.55;
+      font-size: 0.84rem;
+      color: rgba(18,22,30,0.78);
+      user-select:none;
+    }
+
+    /* subtle slit (always) */
     .slit{
       position:absolute;
-      top: 12%;
-      bottom: 12%;
-      left: 16px;
+      top: 14%;
+      bottom: 14%;
+      left: 12px;
       width: 3px;
       border-radius: 999px;
       background: linear-gradient(180deg,
         rgba(120,170,235,0.00),
-        rgba(120,170,235,0.60),
+        rgba(120,170,235,0.62),
         rgba(120,170,235,0.00)
       );
-      opacity: 0.34;
+      opacity: 0.36;
       pointer-events:none;
       z-index:2;
     }
-
-    /* 床反射のシーン */
-    .sheen{
-      position:absolute;
-      inset: -35% -35%;
-      background: linear-gradient(115deg,
-        rgba(255,255,255,0.00) 0%,
-        rgba(255,255,255,0.28) 46%,
-        rgba(255,255,255,0.00) 70%
-      );
-      transform: translateX(-22%);
-      opacity: 0.26;
-      pointer-events:none;
-      z-index:2;
+    .row:hover .slit,
+    .row:focus-visible .slit{
+      opacity: 0.58;
     }
 
-    /* 縦光スイープ（確実に見える太さ） */
+    /* gate sweep (vertical light) */
     .gate-sweep{
       position:absolute;
       inset:0;
       pointer-events:none;
-      z-index: 4;
-      opacity: 0;
-      transform: translateX(-130%);
+      z-index:5;
+      opacity:0;
+      transform: translateX(-120%);
       background: linear-gradient(90deg,
         rgba(255,255,255,0.00) 0%,
-        rgba(255,255,255,0.00) 40%,
-        rgba(255,255,255,0.76) 50%,
-        rgba(255,255,255,0.00) 60%,
+        rgba(255,255,255,0.78) 50%,
         rgba(255,255,255,0.00) 100%
       );
-      filter: blur(0.2px);
+      filter: blur(0.25px);
     }
-
-    .card.gate-on .gate-sweep{
+    .row.gate-on .gate-sweep{
       opacity: 1;
       animation: gateSweep 380ms ease-out forwards;
     }
     @keyframes gateSweep{
-      0%   { transform: translateX(-130%); opacity: 0; }
-      10%  { opacity: 1; }
-      100% { transform: translateX(130%); opacity: 0; }
+      0%   { transform: translateX(-120%); opacity: 0; }
+      12%  { opacity: 1; }
+      100% { transform: translateX(120%); opacity: 0; }
     }
 
-    .card.gate-armed{
-      border-color: rgba(120,170,235,0.66);
+    .row.gate-armed{
+      border-color: rgba(120,170,235,0.68);
       box-shadow: var(--shadow);
     }
 
-    /* Arete Dot（右上） */
+    /* Arete dot */
     .pulse-dot{
       position: fixed;
       top: 14px;
@@ -364,75 +334,68 @@
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: rgba(183,157,109,0.34);
-      border: 1px solid rgba(183,157,109,0.50);
+      background: rgba(183,157,109,0.32);
+      border: 1px solid rgba(183,157,109,0.44);
       box-shadow: 0 0 0 0 rgba(183,157,109,0.22);
-      cursor: pointer;
-      z-index: 60;
+      cursor:pointer;
+      z-index: 80;
     }
     .pulse-dot:hover{
-      background: rgba(183,157,109,0.44);
-      border-color: rgba(183,157,109,0.66);
+      background: rgba(183,157,109,0.42);
+      border-color: rgba(183,157,109,0.62);
     }
 
-    /* 吹き出し（喋る） */
-    .speech{
+    .tooltip{
       position: fixed;
-      left: 50%;
-      top: 86px;
-      transform: translateX(-50%) translateY(-8px);
-      width: min(680px, calc(100% - 28px));
-      padding: .75rem .95rem;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(18,22,30,0.14);
-      box-shadow: 0 18px 42px rgba(10,16,25,0.14);
-      backdrop-filter: blur(10px);
+      top: 10px;
+      right: 32px;
+      background: rgba(255,255,255,0.90);
+      border: 1px solid rgba(18,22,30,0.12);
+      color: rgba(18,22,30,0.84);
+      padding: 0.40rem 0.60rem;
+      border-radius: 12px;
+      font-size: 0.86rem;
+      letter-spacing: 0.03em;
+      box-shadow: 0 12px 28px rgba(10,16,25,0.12);
       opacity: 0;
+      transform: translateY(-4px);
       pointer-events: none;
       transition: opacity .18s ease, transform .18s ease;
-      z-index: 70;
-      letter-spacing: .02em;
-      color: rgba(18,22,30,0.86);
-      text-align: center;
-      line-height: 1.7;
-      font-weight: 650;
+      z-index: 80;
+      max-width: 320px;
     }
-    .speech.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .tooltip.show{ opacity:1; transform: translateY(0); }
 
-    /* 同期オーバーレイ（最後に出す） */
+    /* Sync overlay */
     .sync-overlay{
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
+      position:fixed;
+      inset:0;
+      display:grid;
+      place-items:center;
       background: rgba(10, 12, 16, 0.90);
       color: rgba(245,245,245,0.92);
       letter-spacing: 0.12em;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.40s ease;
-      z-index: 90;
-      pointer-events: none;
+      opacity:0;
+      visibility:hidden;
+      transition: opacity .40s ease;
+      z-index: 120;
+      pointer-events:none;
     }
     .sync-overlay.active{
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
+      opacity:1;
+      visibility:visible;
+      pointer-events:auto;
     }
     .sync-box{
-      text-align: center;
-      padding: 1.1rem 1.2rem;
+      text-align:center;
+      padding: 1.05rem 1.2rem;
       border: 1px solid rgba(255,255,255,0.16);
       border-radius: 16px;
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(6px);
     }
-    .sync-box p{ margin: .25rem 0; font-size: clamp(.95rem, 2vw, 1.08rem); }
-    .sync-sub{ font-size: .86rem !important; letter-spacing: .18em; color: rgba(220,220,220,0.78) !important; }
+    .sync-box p{ margin:.25rem 0; font-size: clamp(.95rem, 2vw, 1.08rem); }
+    .sync-sub{ font-size:.86rem !important; letter-spacing:.18em; color: rgba(220,220,220,0.78) !important; }
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
@@ -451,121 +414,92 @@
   </header>
 
   <button class="pulse-dot" id="pulseDot" aria-label="右目の微熱（Areteの気配）"></button>
-  <div class="speech" id="speech" role="status" aria-live="polite"></div>
+  <div class="tooltip" id="tooltip" role="status" aria-live="polite">右目の奥が、ほんの少し熱い。</div>
 
   <main>
-    <div class="campus-plate" aria-label="CAMPUS">
-      <div class="left">
-        <div class="ttl">CAMPUS</div>
-        <div class="sub">corridor access</div>
-      </div>
-      <div class="sigil">◇</div>
-    </div>
+    <section class="stack" aria-label="行き先">
 
-    <section class="grid" aria-label="回廊の接続先">
-      <!--
-        ▼ 画像ファイルを用意してね：
-        images/icons/amato.png
-        images/icons/ouin.png
-        images/icons/ecru.png
-        images/icons/dico.png
-        images/icons/shion.png
-      -->
-
-      <a class="card" href="amato.html" data-destination="amato.html"
-         data-id="amato" data-line="似合うかどうかより、選ぶかどうか。"
-         style="--c: rgba(215, 164, 164, 0.78);">
+      <!-- AMATO -->
+      <a class="row" href="amato.html" data-destination="amato.html" data-speech="鏡の前で、選ぶの。今日の顔。">
         <span class="slit" aria-hidden="true"></span>
-        <span class="sheen" aria-hidden="true"></span>
+
+        <span class="icon" aria-hidden="true">
+          <!-- ここを差し替え：images/icons/amato.png -->
+          <img src="images/icons/amato.png" alt="">
+        </span>
+
+        <div class="name">アマト</div>
+
+        <div class="speech" aria-hidden="true"><span></span></div>
+        <div class="glyph" aria-hidden="true">◇</div>
+
         <span class="gate-sweep" aria-hidden="true"></span>
-
-        <div class="face">
-          <div class="avatar" aria-hidden="true">
-            <img src="images/icons/amato.png" alt="">
-          </div>
-          <div class="label" aria-hidden="true" style="color:rgba(18,22,30,0.72); font-weight:850; letter-spacing:.12em;">
-            アマト
-          </div>
-        </div>
-
-        <div class="mini-glyph">◇</div>
       </a>
 
-      <a class="card" href="ouin-shoot.html" data-destination="ouin-shoot.html"
-         data-id="ouin" data-line="形は、後からついてくるわ。"
-         style="--c: rgba(120, 170, 235, 0.72);">
+      <!-- OUIN -->
+      <a class="row" href="ouin-shoot.html" data-destination="ouin-shoot.html" data-speech="光は残酷。だから、私が使う。">
         <span class="slit" aria-hidden="true"></span>
-        <span class="sheen" aria-hidden="true"></span>
+
+        <span class="icon" aria-hidden="true">
+          <img src="images/icons/ouin.png" alt="">
+        </span>
+
+        <div class="name">OUIN</div>
+
+        <div class="speech" aria-hidden="true"><span></span></div>
+        <div class="glyph" aria-hidden="true">▢</div>
+
         <span class="gate-sweep" aria-hidden="true"></span>
-
-        <div class="face">
-          <div class="avatar" aria-hidden="true">
-            <img src="images/icons/ouin.png" alt="">
-          </div>
-          <div class="label" aria-hidden="true" style="color:rgba(18,22,30,0.72); font-weight:850; letter-spacing:.12em;">
-            OUIN
-          </div>
-        </div>
-
-        <div class="mini-glyph">▢</div>
       </a>
 
-      <a class="card" href="ecru-magazine.html" data-destination="ecru-magazine.html"
-         data-id="ecru" data-line="ページは閉じても、記憶は閉じない。"
-         style="--c: rgba(183, 157, 109, 0.72);">
+      <!-- ECRU -->
+      <a class="row" href="ecru-magazine.html" data-destination="ecru-magazine.html" data-speech="ページは嘘をつかない。視線だけが残る。">
         <span class="slit" aria-hidden="true"></span>
-        <span class="sheen" aria-hidden="true"></span>
+
+        <span class="icon" aria-hidden="true">
+          <img src="images/icons/ecru.png" alt="">
+        </span>
+
+        <div class="name">ECRU</div>
+
+        <div class="speech" aria-hidden="true"><span></span></div>
+        <div class="glyph" aria-hidden="true">◻</div>
+
         <span class="gate-sweep" aria-hidden="true"></span>
-
-        <div class="face">
-          <div class="avatar" aria-hidden="true">
-            <img src="images/icons/ecru.png" alt="">
-          </div>
-          <div class="label" aria-hidden="true" style="color:rgba(18,22,30,0.72); font-weight:850; letter-spacing:.12em;">
-            ECRU
-          </div>
-        </div>
-
-        <div class="mini-glyph">◻</div>
       </a>
 
-      <a class="card" href="dico-play.html" data-destination="dico-play.html"
-         data-id="dico" data-line="重い顔してるー？ほら、笑って。"
-         style="--c: rgba(79, 179, 255, 0.78);">
+      <!-- DiCo -->
+      <a class="row" href="dico-play.html" data-destination="dico-play.html" data-speech="ねぇ、笑って。重いのは、あとでいい。">
         <span class="slit" aria-hidden="true"></span>
-        <span class="sheen" aria-hidden="true"></span>
+
+        <span class="icon" aria-hidden="true">
+          <img src="images/icons/dico.png" alt="">
+        </span>
+
+        <div class="name">DiCo</div>
+
+        <div class="speech" aria-hidden="true"><span></span></div>
+        <div class="glyph" aria-hidden="true">△</div>
+
         <span class="gate-sweep" aria-hidden="true"></span>
-
-        <div class="face">
-          <div class="avatar" aria-hidden="true">
-            <img src="images/icons/dico.png" alt="">
-          </div>
-          <div class="label" aria-hidden="true" style="color:rgba(18,22,30,0.72); font-weight:850; letter-spacing:.12em;">
-            DiCo
-          </div>
-        </div>
-
-        <div class="mini-glyph">△</div>
       </a>
 
-      <a class="card" href="shion-column.html" data-destination="shion-column.html"
-         data-id="shion" data-line="……行くか。"
-         style="--c: rgba(183, 157, 109, 0.62);">
+      <!-- COLUMN (no Shion appearance) -->
+      <a class="row" href="column.html" data-destination="column.html" data-speech="記録。余白。言葉は、整えすぎない。">
         <span class="slit" aria-hidden="true"></span>
-        <span class="sheen" aria-hidden="true"></span>
+
+        <span class="icon" aria-hidden="true">
+          <img src="images/icons/column.png" alt="">
+        </span>
+
+        <div class="name">コラム</div>
+
+        <div class="speech" aria-hidden="true"><span></span></div>
+        <div class="glyph" aria-hidden="true">—</div>
+
         <span class="gate-sweep" aria-hidden="true"></span>
-
-        <div class="face">
-          <div class="avatar" aria-hidden="true">
-            <img src="images/icons/shion.png" alt="">
-          </div>
-          <div class="label" aria-hidden="true" style="color:rgba(18,22,30,0.72); font-weight:850; letter-spacing:.12em;">
-            シオン
-          </div>
-        </div>
-
-        <div class="mini-glyph">—</div>
       </a>
+
     </section>
   </main>
 
@@ -578,129 +512,106 @@
 
   <script>
     const overlay = document.getElementById('syncOverlay');
-    const cards = document.querySelectorAll('.card');
+    const rows = document.querySelectorAll('.row');
     const pulseDot = document.getElementById('pulseDot');
-    const speech = document.getElementById('speech');
+    const tooltip = document.getElementById('tooltip');
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    let speechTimer = null;
-    let navigating = false;
+    // 読める長さにする表示時間（必要ならここだけ変える）
+    const SPEECH_MS = 2400;
 
-    function showSpeech(text){
-      speech.textContent = text;
-      speech.classList.add('show');
-      clearTimeout(speechTimer);
-      speechTimer = setTimeout(() => speech.classList.remove('show'), 900);
+    let tooltipTimer = null;
+    function showTooltip(text){
+      tooltip.textContent = text;
+      tooltip.classList.add('show');
+      clearTimeout(tooltipTimer);
+      tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
     }
 
-    // ======== 音声（使えない場合は黙る） ========
-    function speakJP(text){
-      try{
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'ja-JP';
-        u.rate = 1.05;
-        u.pitch = 1.0;
-        u.volume = 1.0;
-
-        // 可能なら日本語voiceを選ぶ（なければOSデフォルト）
-        const voices = window.speechSynthesis.getVoices?.() || [];
-        const ja = voices.find(v => /ja-JP/i.test(v.lang));
-        if (ja) u.voice = ja;
-
-        window.speechSynthesis.speak(u);
-      }catch(e){
-        // silent fail
-      }
+    // 縦光を1回、確実に発火（iOS対策：reflow）
+    function playGateOnce(row){
+      row.classList.remove('gate-on');
+      void row.offsetWidth;
+      row.classList.add('gate-on');
+      setTimeout(() => row.classList.remove('gate-on'), 420);
     }
 
-    // ======== 確実に縦光を1回発火（iOS対策：reflow） ========
-    function playGateOnce(card){
-      card.classList.remove('gate-on');
-      // 強制reflowでアニメを確実に再スタート
-      void card.offsetWidth;
-      card.classList.add('gate-on');
-      setTimeout(() => card.classList.remove('gate-on'), 420);
+    // ドクン＝2拍（確実に2回）
+    function playDoubleGate(row){
+      row.classList.add('gate-armed');
+      playGateOnce(row);                 // 1拍目
+      setTimeout(() => playGateOnce(row), 260); // 2拍目
+      setTimeout(() => row.classList.remove('gate-armed'), 900);
     }
 
-    // ======== ドクン＝2拍（確実に2回） ========
-    function playDoubleGate(card){
-      card.classList.add('gate-armed');
+    // 右側の縦台詞表示
+    function showVerticalSpeech(row, text){
+      const box = row.querySelector('.speech');
+      const span = box?.querySelector('span');
+      if (!box || !span) return;
 
-      // 1拍目
-      playGateOnce(card);
+      span.textContent = text || '';
+      row.classList.add('speaking');
 
-      // 2拍目（テンポ固定：見えやすい間隔）
-      setTimeout(() => playGateOnce(card), 260);
-
-      setTimeout(() => card.classList.remove('gate-armed'), 900);
+      // 表示を伸ばす（読める）
+      setTimeout(() => row.classList.remove('speaking'), SPEECH_MS);
     }
 
-    // ======== Arete dot pulse（2回） ========
+    // Arete dot pulse
     function pulseArete(){
-      pulseDot.animate([
-        { boxShadow: '0 0 0 0 rgba(183,157,109,0.22)' },
-        { boxShadow: '0 0 0 12px rgba(183,157,109,0.00)' }
-      ], { duration: 520, easing: 'ease-out' });
+      pulseDot.animate(
+        [{ boxShadow:'0 0 0 0 rgba(183,157,109,0.22)' },
+         { boxShadow:'0 0 0 12px rgba(183,157,109,0.00)' }],
+        { duration:520, easing:'ease-out' }
+      );
 
       setTimeout(() => {
-        pulseDot.animate([
-          { boxShadow: '0 0 0 0 rgba(183,157,109,0.18)' },
-          { boxShadow: '0 0 0 12px rgba(183,157,109,0.00)' }
-        ], { duration: 520, easing: 'ease-out' });
+        pulseDot.animate(
+          [{ boxShadow:'0 0 0 0 rgba(183,157,109,0.18)' },
+           { boxShadow:'0 0 0 12px rgba(183,157,109,0.00)' }],
+          { duration:520, easing:'ease-out' }
+        );
       }, 320);
     }
 
-    // 右上Arete：雰囲気用（押したら最上段が反応）
+    // Arete hover/click
+    pulseDot.addEventListener('mouseenter', () => showTooltip('右目の奥が、ほんの少し熱い。'));
     pulseDot.addEventListener('click', () => {
-      if (navigating) return;
+      showTooltip('ドクン　／　ドクン');
       pulseArete();
-      showSpeech('ドクン　／　ドクン');
-      const first = document.querySelector('.card');
-      if (first) playDoubleGate(first);
-      // 音声はここでは鳴らさない（うるさくなるため）
+      const first = document.querySelector('.row');
+      if (first){
+        playDoubleGate(first);
+        showVerticalSpeech(first, first.dataset.speech);
+      }
     });
 
-    // ======== タップ → 一言 → ドクン2拍 → 縦光2回 → 遷移 ========
-    cards.forEach((card) => {
-      // iOSの「タップ感」優先で pointerdown を使う（clickも残す）
-      const handler = (event) => {
+    // Tap row: speech -> double gate -> overlay -> navigate
+    rows.forEach((row) => {
+      row.addEventListener('click', (event) => {
         event.preventDefault();
-        if (navigating) return;
-        navigating = true;
-
-        const destination = card.dataset.destination;
-        const line = card.dataset.line || '';
+        const destination = row.dataset.destination;
+        const speech = row.dataset.speech;
 
         if (prefersReducedMotion) {
-          // reduced motion は演出省略
           window.location.href = destination;
           return;
         }
 
-        // しゃべる（吹き出し＋音声）
-        showSpeech(line);
-        speakJP(line);
+        // 1) 縦台詞（すぐ出す）
+        showVerticalSpeech(row, speech);
 
-        // 2拍演出（同期）
+        // 2) ドクン2拍 + 縦光2回
+        playDoubleGate(row);
         pulseArete();
-        playDoubleGate(card);
 
-        // overlayが早すぎて縦光を潰さないよう、遅らせる
-        setTimeout(() => overlay.classList.add('active'), 160);
+        // 3) overlayは“演出が見えた後”に被せる
+        setTimeout(() => overlay.classList.add('active'), 220);
 
-        // 2拍が視認できるタイミングで遷移
-        setTimeout(() => window.location.href = destination, 820);
-      };
-
-      card.addEventListener('pointerdown', handler, { passive: false });
-      card.addEventListener('click', handler, { passive: false });
+        // 4) 遷移（2拍が見え切った後）
+        setTimeout(() => window.location.href = destination, 780);
+      }, { passive:false });
     });
-
-    // voicesロード（iOS対策）
-    try { window.speechSynthesis?.getVoices?.(); } catch(e){}
   </script>
 </body>
 </html>
