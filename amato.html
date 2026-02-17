@@ -591,6 +591,141 @@
       .reveal{ transition: none; }
       .cta:hover{ transform: none; }
     }
+
+    /* ===== Mobile Header Fix ===== */
+
+/* ヘッダー高さを固定して、折り返しで肥大化しないようにする */
+.header__inner{
+  min-height: 56px;            /* スマホで1段 */
+  align-items: center;
+}
+
+/* 既存 nav のリンク群はスマホでは出さない（折り返しの原因） */
+.nav a{ display: none; }       /* 一旦全部隠す（PCで戻す） */
+
+.menuBtn{
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(183,161,115,0.45);
+  background: rgba(255,255,255,0.78);
+  box-shadow: 0 10px 22px rgba(10,16,25,0.08);
+  cursor: pointer;
+}
+.menuBtn__bar{
+  width: 18px;
+  height: 2px;
+  background: rgba(18,22,30,0.70);
+  border-radius: 999px;
+  margin: 0 auto;
+}
+
+/* PCでは通常ナビを表示 */
+@media (min-width: 860px){
+  .nav a{ display: inline-flex; }
+  .menuBtn{ display: none; }
+  .cta--desktop{ display: inline-flex; }
+}
+
+/* ===== Drawer Menu (mobile) ===== */
+.drawer{
+  position: fixed;
+  inset: 0;
+  background: rgba(18,22,30,0.35);
+  backdrop-filter: blur(6px);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease;
+}
+.drawer.is-open{
+  opacity: 1;
+  pointer-events: auto;
+}
+.drawer__panel{
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: min(340px, 86vw);
+  background: rgba(255,255,255,0.92);
+  border-left: 1px solid rgba(183,161,115,0.22);
+  box-shadow: -20px 0 60px rgba(10,16,25,0.18);
+  transform: translateX(8px);
+  transition: transform .22s ease;
+  padding: 16px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 14px;
+}
+.drawer.is-open .drawer__panel{
+  transform: translateX(0);
+}
+
+.drawer__top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(18,22,30,0.08);
+}
+.drawer__title{
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(18,22,30,0.62);
+}
+.drawer__close{
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(18,22,30,0.10);
+  background: rgba(255,255,255,0.9);
+  cursor: pointer;
+}
+
+.drawer__links{
+  display: grid;
+  gap: 10px;
+  padding-top: 6px;
+}
+.drawer__link{
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(18,22,30,0.08);
+  background: rgba(255,255,255,0.88);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: rgba(18,22,30,0.78);
+}
+.drawer__link:hover{
+  background: rgba(183,161,115,0.10);
+}
+
+.drawer__cta{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(183,161,115,0.55);
+  background: rgba(255,255,255,0.92);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: rgba(18,22,30,0.82);
+  box-shadow: 0 16px 40px rgba(10,16,25,0.10);
+}
+
+/* Heroの上余白：ヘッダーが小さくなるので微調整 */
+.hero{
+  padding-top: 78px; /* 既存 86px なら少し詰めてもOK */
+}
   </style>
 </head>
 
@@ -603,17 +738,38 @@
         <div class="brand__sub">Cosmetics Counter</div>
       </a>
 
-      <nav class="nav" aria-label="Primary">
-        <a href="#about">About</a>
-        <a href="#concept">Concept</a>
-        <a href="#items">Items</a>
-        <a href="#message">Message</a>
-        <a href="#access">Access</a>
-        <a class="cta" href="#access">
-          <span class="cta__dot" aria-hidden="true"></span>
-          <span class="cta__txt">Visit</span>
-        </a>
-      </nav>
+     <nav class="nav" aria-label="Primary">
+  <button class="menuBtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+    <span class="menuBtn__bar"></span>
+    <span class="menuBtn__bar"></span>
+    <span class="menuBtn__bar"></span>
+  </button>
+
+  <a class="cta cta--desktop" href="#access">
+    <span class="cta__dot" aria-hidden="true"></span>
+    <span class="cta__txt">Visit</span>
+  </a>
+</nav>
+
+<!-- Drawer (mobile menu) -->
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer__panel" role="dialog" aria-label="Menu">
+    <div class="drawer__top">
+      <div class="drawer__title">MENU</div>
+      <button class="drawer__close" id="closeDrawer" aria-label="Close menu">✕</button>
+    </div>
+
+    <div class="drawer__links">
+      <a href="#about" class="drawer__link">ABOUT</a>
+      <a href="#concept" class="drawer__link">CONCEPT</a>
+      <a href="#items" class="drawer__link">ITEMS</a>
+      <a href="#message" class="drawer__link">MESSAGE</a>
+      <a href="#access" class="drawer__link">ACCESS</a>
+    </div>
+
+    <a class="drawer__cta" href="#access">VISIT</a>
+  </div>
+</aside>
     </div>
   </header>
 
@@ -841,6 +997,37 @@
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Mobile drawer menu
+const drawer = document.getElementById('drawer');
+const menuBtn = document.getElementById('menuBtn');
+const closeDrawer = document.getElementById('closeDrawer');
+
+function openDrawer(){
+  drawer.classList.add('is-open');
+  drawer.setAttribute('aria-hidden', 'false');
+  menuBtn.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawerFn(){
+  drawer.classList.remove('is-open');
+  drawer.setAttribute('aria-hidden', 'true');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+}
+
+menuBtn?.addEventListener('click', openDrawer);
+closeDrawer?.addEventListener('click', closeDrawerFn);
+
+// 背景タップで閉じる
+drawer?.addEventListener('click', (e) => {
+  if (e.target === drawer) closeDrawerFn();
+});
+
+// ドロワー内リンク押したら閉じる
+drawer?.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', () => closeDrawerFn());
+});
   </script>
 </body>
 </html>
