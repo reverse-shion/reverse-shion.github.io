@@ -130,7 +130,6 @@
       text-decoration:none;
       color:inherit;
 
-      /* ★ 全画面共通：中央寄せ＆省略されにくい幅（50%はスマホで細すぎるため改善） */
       width: 60%;
       margin: 0 auto;
 
@@ -146,9 +145,9 @@
       display:flex;
       align-items:center;
       gap: 0.85rem;
+      cursor:pointer;
     }
 
-    /* frame */
     .row::before{
       content:"";
       position:absolute;
@@ -160,7 +159,6 @@
       z-index:1;
     }
 
-    /* corner dots + faint gold bar */
     .row::after{
       content:"";
       position:absolute; inset:0;
@@ -184,7 +182,7 @@
       outline:none;
     }
 
-    /* Left icon tile（タロット絵は不要＝キャラアイコンだけに） */
+    /* Left icon tile */
     .icon{
       position:relative;
       z-index:3;
@@ -219,63 +217,6 @@
       white-space: nowrap;
       overflow:hidden;
       text-overflow: ellipsis;
-    }
-
-    /* Right: glyph */
-    .glyph{
-      position:relative;
-      z-index:3;
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.50);
-      border: 1px solid rgba(18,22,30,0.12);
-      box-shadow: 0 10px 22px rgba(10,16,25,0.08);
-      display:grid;
-      place-items:center;
-      color: rgba(18,22,30,0.56);
-      user-select:none;
-      flex: 0 0 auto;
-    }
-
-    /* vertical speech */
-    .speech{
-      position:absolute;
-      top: 8px;
-      right: 56px;
-      bottom: 8px;
-      width: 74px;
-      padding: 10px 8px;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0.36));
-      border: 1px solid rgba(18,22,30,0.10);
-      border-radius: 14px;
-      box-shadow: 0 12px 26px rgba(10,16,25,0.10);
-      backdrop-filter: blur(10px);
-
-      opacity: 0;
-      transform: translateY(4px);
-      pointer-events:none;
-      z-index: 6;
-
-      transition: opacity .18s ease, transform .18s ease;
-    }
-    .row.speaking .speech{
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .speech span{
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      letter-spacing: 0.10em;
-      line-height: 1.55;
-      font-size: 0.84rem;
-      color: rgba(18,22,30,0.78);
-      user-select:none;
     }
 
     /* subtle slit */
@@ -370,7 +311,7 @@
     }
     .tooltip.show{ opacity:1; transform: translateY(0); }
 
-    /* Sync overlay */
+    /* Sync overlay (commercial feel) */
     .sync-overlay{
       position:fixed;
       inset:0;
@@ -382,7 +323,7 @@
       opacity:0;
       visibility:hidden;
       transition: opacity .40s ease;
-      z-index: 120;
+      z-index: 140;
       pointer-events:none;
     }
     .sync-overlay.active{
@@ -397,6 +338,7 @@
       border-radius: 16px;
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(6px);
+      box-shadow: 0 20px 70px rgba(0,0,0,.35);
     }
     .sync-box p{ margin:.25rem 0; font-size: clamp(.95rem, 2vw, 1.08rem); }
     .sync-sub{ font-size:.86rem !important; letter-spacing:.18em; color: rgba(220,220,220,0.78) !important; }
@@ -412,7 +354,7 @@
       width: min(78vw, 420px);
       transform: translateX(105%);
       transition: transform .32s ease;
-      z-index: 110;
+      z-index: 150;
 
       border-left: 1px solid rgba(18,22,30,0.16);
       background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.60));
@@ -432,7 +374,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity .25s ease;
-      z-index: 109;
+      z-index: 149;
     }
     .drawerOverlay.is-open{
       opacity: 1;
@@ -461,7 +403,7 @@
       min-height: 0;
     }
 
-    /* Bust-up size control: frame height + safe bounds */
+    /* Bust-up size control */
     .charFrame{
       border-radius: 18px;
       border: 1px solid rgba(18,22,30,0.12);
@@ -470,16 +412,16 @@
       display: grid;
       place-items: center;
 
-      height: 56dvh;       /* ★ 立ち絵（バストアップ）の主サイズ */
-      min-height: 320px;   /* ★ 小さすぎ防止 */
-      max-height: 560px;   /* ★ 大きすぎ防止 */
+      height: 56dvh;
+      min-height: 320px;
+      max-height: 560px;
     }
 
     .charImg{
       width: 100%;
       height: 100%;
-      object-fit: cover;           /* バストアップ前提＝大きく見せる */
-      object-position: 50% 12%;    /* ★ 顔寄せ（上を見せる） */
+      object-fit: cover;
+      object-position: 50% 12%;
       filter: drop-shadow(0 20px 30px rgba(0,0,0,.18));
     }
 
@@ -500,6 +442,41 @@
       font-size: 13px;
       line-height: 1.6;
       opacity: .92;
+      white-space: pre-line;
+    }
+
+    /* Choice buttons (commercial) */
+    .choiceArea{
+      margin-top: 14px;
+      display:flex;
+      gap:10px;
+    }
+    .choiceBtn{
+      flex:1;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid rgba(18,22,30,0.15);
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(10px);
+      cursor:pointer;
+      font-size:13px;
+      letter-spacing:.08em;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    .choiceBtn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 26px rgba(0,0,0,.14);
+      border-color: rgba(120,170,235,0.35);
+    }
+    .choiceBtn:active{
+      transform: translateY(0);
+      box-shadow:0 8px 18px rgba(0,0,0,.12);
+    }
+    .choiceBtn.primary{
+      background: linear-gradient(180deg, rgba(120,170,235,.92), rgba(120,170,235,.70));
+      color:#fff;
+      border-color: rgba(120,170,235,.85);
     }
 
     body.drawer-lock{ overflow: hidden; }
@@ -529,8 +506,7 @@
       <!-- AMATO -->
       <a class="row" href="amato.html"
          data-key="amato"
-         data-destination="amato.html"
-         data-speech="鏡の前で、選ぶの。今日の顔。">
+         data-destination="amato.html">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -538,18 +514,13 @@
         </span>
 
         <div class="name">アマト</div>
-
-        <div class="speech" aria-hidden="true"><span></span></div>
-        <div class="glyph" aria-hidden="true">◇</div>
-
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
       <!-- OUIN -->
       <a class="row" href="ouin-shoot.html"
          data-key="ouin"
-         data-destination="ouin-shoot.html"
-         data-speech="光は残酷。だから、私が使う。">
+         data-destination="ouin-shoot.html">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -557,18 +528,13 @@
         </span>
 
         <div class="name">OUIN</div>
-
-        <div class="speech" aria-hidden="true"><span></span></div>
-        <div class="glyph" aria-hidden="true">▢</div>
-
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
       <!-- ECRU -->
       <a class="row" href="ecru-magazine.html"
          data-key="ecru"
-         data-destination="ecru-magazine.html"
-         data-speech="ページは嘘をつかない。視線だけが残る。">
+         data-destination="ecru-magazine.html">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -576,18 +542,13 @@
         </span>
 
         <div class="name">ECRU</div>
-
-        <div class="speech" aria-hidden="true"><span></span></div>
-        <div class="glyph" aria-hidden="true">◻</div>
-
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
       <!-- DiCo -->
       <a class="row" href="dico-play.html"
          data-key="dico"
-         data-destination="dico-play.html"
-         data-speech="ねぇ、笑って。重いのは、あとでいい。">
+         data-destination="dico-play.html">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -595,18 +556,13 @@
         </span>
 
         <div class="name">DiCo</div>
-
-        <div class="speech" aria-hidden="true"><span></span></div>
-        <div class="glyph" aria-hidden="true">△</div>
-
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
       <!-- COLUMN -->
       <a class="row" href="column.html"
          data-key="column"
-         data-destination="column.html"
-         data-speech="記録。余白。言葉は、整えすぎない。">
+         data-destination="column.html">
         <span class="slit" aria-hidden="true"></span>
 
         <span class="icon" aria-hidden="true">
@@ -614,10 +570,6 @@
         </span>
 
         <div class="name">コラム</div>
-
-        <div class="speech" aria-hidden="true"><span></span></div>
-        <div class="glyph" aria-hidden="true">—</div>
-
         <span class="gate-sweep" aria-hidden="true"></span>
       </a>
 
@@ -636,6 +588,11 @@
       <div class="charMeta">
         <div id="drawerName" class="charName">NAME</div>
         <div id="drawerLine" class="charLine">…</div>
+
+        <div class="choiceArea">
+          <button id="goBtn" class="choiceBtn primary">行く</button>
+          <button id="backBtn" class="choiceBtn">行かない</button>
+        </div>
       </div>
     </div>
   </div>
@@ -663,19 +620,58 @@
     const drawerName = document.getElementById('drawerName');
     const drawerLine = document.getElementById('drawerLine');
 
-    // 文字を読みやすい表示時間
-    const SPEECH_MS = 2400;
+    // Choice buttons
+    const goBtn = document.getElementById('goBtn');
+    const backBtn = document.getElementById('backBtn');
 
-    // キャラ（バストアップ画像パスをここに）
+    // キャラ（バストアップ画像パス / セリフ / 選択肢文言）
     const CHAR = {
-      amato:  { name: "アマト", img: "images/bust/amato.png",  line: "……何か用？" },
-      ouin:   { name: "OUIN",  img: "images/bust/ouin.png",   line: "選ぶのは、あなた。" },
-      ecru:   { name: "ECRU",  img: "images/bust/ecru.png",   line: "ページをめくって。" },
-      dico:   { name: "DiCo",  img: "images/bust/dico.png",   line: "ディディディ…来た！" },
-      column: { name: "コラム", img: "images/bust/column.png", line: "記録は、まだ途中だ。" }
+      amato:  {
+        name: "アマト",
+        img: "images/bust/amato.png",
+        line: "これからバイト先に\n遊びに行くの、一緒に行く？",
+        go: "メイクしてあげよっか？",
+        back: "今日はやめておく"
+      },
+      ouin:   {
+        name: "OUIN",
+        img: "images/bust/ouin.png",
+        line: "今日これから撮影。\n一緒に行かない？\nカメラマンがあなたみたいな人\n撮りたいって言ってたから",
+        go: "えっ行きたい",
+        back: "うーん、興味ないな"
+      },
+      ecru:   {
+        name: "ECRU",
+        img: "images/bust/ecru.png",
+        line: "ECRUだ、\n今月号まだ見てなかった",
+        go: "読んでみる",
+        back: "また今度"
+      },
+      dico:   {
+        name: "DiCo",
+        img: "images/bust/dico.png",
+        line: "ねぇ、ちょっとだけ。\n“くだらない”をしよ？",
+        go: "行く（ディディディ）",
+        back: "今日はやめとく"
+      },
+      column: {
+        name: "コラム",
+        img: "images/bust/column.png",
+        line: "記録は、まだ途中だ。\n余白の中に、答えがある。",
+        go: "読む",
+        back: "今は閉じる"
+      }
     };
 
-    function openDrawer(key){
+    let tooltipTimer = null;
+    function showTooltip(text){
+      tooltip.textContent = text;
+      tooltip.classList.add('show');
+      clearTimeout(tooltipTimer);
+      tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
+    }
+
+    function openDrawer(key, destination){
       const c = CHAR[key];
       if(!c) return;
 
@@ -684,12 +680,25 @@
       drawerImg.src = c.img;
       drawerImg.alt = c.name;
 
+      goBtn.textContent = c.go || "行く";
+      backBtn.textContent = c.back || "行かない";
+
       drawer.classList.add('is-open');
       drawerOverlay.classList.add('is-open');
       document.body.classList.add('drawer-lock');
 
       drawer.setAttribute('aria-hidden', 'false');
       drawerOverlay.setAttribute('aria-hidden', 'false');
+
+      // 行く：同期演出 → 遷移
+      goBtn.onclick = () => {
+        closeDrawer();
+        overlay.classList.add('active');
+        setTimeout(() => window.location.href = destination, 820);
+      };
+
+      // 行かない：廊下に戻る（ドロワー閉じる）
+      backBtn.onclick = () => closeDrawer();
     }
 
     function closeDrawer(){
@@ -705,14 +714,6 @@
     drawerOverlay.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeDrawer(); });
 
-    let tooltipTimer = null;
-    function showTooltip(text){
-      tooltip.textContent = text;
-      tooltip.classList.add('show');
-      clearTimeout(tooltipTimer);
-      tooltipTimer = setTimeout(()=> tooltip.classList.remove('show'), 1400);
-    }
-
     // gate sweep 1回（iOS対策）
     function playGateOnce(row){
       row.classList.remove('gate-on');
@@ -727,17 +728,6 @@
       playGateOnce(row);
       setTimeout(() => playGateOnce(row), 260);
       setTimeout(() => row.classList.remove('gate-armed'), 900);
-    }
-
-    // 縦台詞
-    function showVerticalSpeech(row, text){
-      const box = row.querySelector('.speech');
-      const span = box?.querySelector('span');
-      if (!box || !span) return;
-
-      span.textContent = text || '';
-      row.classList.add('speaking');
-      setTimeout(() => row.classList.remove('speaking'), SPEECH_MS);
     }
 
     // Arete pulse
@@ -763,17 +753,16 @@
       const first = document.querySelector('.row');
       if (first){
         playDoubleGate(first);
-        showVerticalSpeech(first, first.dataset.speech);
-        openDrawer(first.dataset.key);
+        openDrawer(first.dataset.key, first.dataset.destination);
       }
     });
 
-    // クリック：①台詞→②ドクン→③右スライドで顕現→④（任意で遷移）
+    // クリック：ゲート演出→右から顕現→選択肢
     rows.forEach((row) => {
       row.addEventListener('click', (event) => {
         event.preventDefault();
+
         const destination = row.dataset.destination;
-        const speech = row.dataset.speech;
         const key = row.dataset.key;
 
         if (prefersReducedMotion) {
@@ -781,16 +770,10 @@
           return;
         }
 
-        showVerticalSpeech(row, speech);
         playDoubleGate(row);
         pulseArete();
 
-        // 右から顕現（観測＝顕現）
-        setTimeout(() => openDrawer(key), 160);
-
-        // ★ 遷移したいなら有効化（右スライド確認後に移動）
-        // setTimeout(() => overlay.classList.add('active'), 320);
-        // setTimeout(() => window.location.href = destination, 900);
+        setTimeout(() => openDrawer(key, destination), 160);
       }, { passive:false });
     });
   </script>
