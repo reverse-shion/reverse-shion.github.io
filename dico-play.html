@@ -7,25 +7,27 @@
 
   <style>
     :root{
-      --bg0:#06060a;
-      --bg1:#07070c;
-      --panel: rgba(255,255,255,0.06);
-      --panel2: rgba(255,255,255,0.10);
+      --bg0:#05060b;
+      --bg1:#070816;
+
       --text: rgba(245,245,242,0.92);
-      --muted: rgba(245,245,242,0.68);
-      --line: rgba(255,255,255,0.16);
+      --muted: rgba(245,245,242,0.66);
+      --line: rgba(255,255,255,0.14);
+
+      --cyan: rgba(120,255,235,0.95);
+      --cyanSoft: rgba(120,255,235,0.18);
+
+      --violet: rgba(186,120,255,0.95);
+      --violetSoft: rgba(186,120,255,0.16);
+
+      --hotpink: rgba(255,105,220,0.90);
+      --hotpinkSoft: rgba(255,105,220,0.14);
 
       --gold: rgba(183,161,115,0.95);
-      --goldSoft: rgba(183,161,115,0.25);
+      --goldSoft: rgba(183,161,115,0.16);
 
-      --cyan: rgba(120, 255, 235, 0.95);
-      --cyanSoft: rgba(120, 255, 235, 0.25);
-
-      --violet: rgba(186, 120, 255, 0.95);
-      --violetSoft: rgba(186, 120, 255, 0.25);
-
-      --hotpink: rgba(255, 105, 220, 0.90);
-      --hotpinkSoft: rgba(255, 105, 220, 0.22);
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.10);
 
       --shadow: 0 26px 80px rgba(0,0,0,0.55);
       --shadow2: 0 14px 42px rgba(0,0,0,0.40);
@@ -34,8 +36,8 @@
       --maxw: 1100px;
     }
 
-    *{ box-sizing: border-box; }
-    html, body{ height: 100%; }
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
     body{
       margin:0;
       color: var(--text);
@@ -49,96 +51,96 @@
       overflow-x:hidden;
     }
 
-    /* --- moving neon haze (FF7 casino vibe but luxe) --- */
+    /* cyber grid + scan + noise */
     body::before{
       content:"";
-      position: fixed; inset: -40vh -40vw;
+      position:fixed; inset:0;
       pointer-events:none;
       z-index:0;
       background:
-        conic-gradient(from 180deg,
-          rgba(186,120,255,0.10),
-          rgba(120,255,235,0.10),
-          rgba(255,105,220,0.10),
-          rgba(183,161,115,0.08),
-          rgba(186,120,255,0.10)
+        linear-gradient(rgba(255,255,255,0.00), rgba(255,255,255,0.00)),
+        repeating-linear-gradient(90deg,
+          rgba(120,255,235,0.06) 0,
+          rgba(120,255,235,0.06) 1px,
+          rgba(0,0,0,0.00) 2px,
+          rgba(0,0,0,0.00) 70px
+        ),
+        repeating-linear-gradient(0deg,
+          rgba(186,120,255,0.05) 0,
+          rgba(186,120,255,0.05) 1px,
+          rgba(0,0,0,0.00) 2px,
+          rgba(0,0,0,0.00) 70px
         );
-      filter: blur(34px);
-      opacity: 0.55;
-      animation: haze 14s linear infinite;
-    }
-    @keyframes haze{
-      0% { transform: rotate(0deg) scale(1.05); }
-      50%{ transform: rotate(180deg) scale(1.12); }
-      100%{ transform: rotate(360deg) scale(1.05); }
+      opacity:.22;
+      mix-blend-mode: screen;
+      filter: blur(.2px);
     }
 
-    /* --- subtle scanlines (not horror) --- */
     body::after{
       content:"";
-      position: fixed; inset:0;
+      position:fixed; inset:0;
       pointer-events:none;
       z-index:1;
       background:
         repeating-linear-gradient(
           180deg,
-          rgba(255,255,255,0.03) 0,
-          rgba(255,255,255,0.03) 1px,
+          rgba(255,255,255,0.025) 0,
+          rgba(255,255,255,0.025) 1px,
           rgba(0,0,0,0.00) 2px,
-          rgba(0,0,0,0.00) 5px
+          rgba(0,0,0,0.00) 6px
         );
-      opacity: 0.15;
+      opacity:.14;
       mix-blend-mode: soft-light;
     }
 
     header{
       position: sticky;
       top:0;
-      z-index: 40;
+      z-index:50;
       border-bottom: 1px solid rgba(255,255,255,0.10);
       backdrop-filter: blur(16px);
-      background: linear-gradient(180deg, rgba(10,10,16,0.75), rgba(10,10,16,0.45));
+      background: linear-gradient(180deg, rgba(8,9,14,0.78), rgba(8,9,14,0.45));
     }
 
     .topbar{
       width: min(var(--maxw), calc(100% - 2.2rem));
       margin: 0 auto;
-      padding: 0.95rem 0;
+      padding: .95rem 0;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap: 1rem;
-      position: relative;
+      position:relative;
       z-index:2;
     }
 
     .brand{
       display:flex;
       flex-direction:column;
-      gap: 0.18rem;
+      gap:.18rem;
       user-select:none;
     }
     .brand .kicker{
-      font-size: .78rem;
-      letter-spacing: .22em;
-      color: rgba(245,245,242,0.68);
+      font-size:.78rem;
+      letter-spacing:.22em;
+      color: rgba(245,245,242,0.66);
       text-transform: uppercase;
     }
     .brand .title{
       display:flex;
       align-items:baseline;
       gap:.55rem;
-      letter-spacing: .12em;
-      font-weight: 900;
+      letter-spacing:.12em;
+      font-weight: 950;
       line-height:1;
     }
     .brand .title strong{
-      font-size: 1.12rem;
+      font-size:1.12rem;
     }
     .brand .title span{
-      font-size: .86rem;
+      font-size:.86rem;
       color: rgba(245,245,242,0.70);
-      font-weight: 700;
+      font-weight: 750;
       letter-spacing: .18em;
     }
 
@@ -166,7 +168,7 @@
     }
     .chip:hover, .chip:focus-visible{
       transform: translateY(-1px);
-      border-color: rgba(183,161,115,0.45);
+      border-color: rgba(120,255,235,0.45);
       background: rgba(255,255,255,0.10);
       outline:none;
       box-shadow: 0 16px 46px rgba(0,0,0,0.35);
@@ -175,110 +177,111 @@
     main{
       width: min(var(--maxw), calc(100% - 2.2rem));
       margin: 0 auto;
-      padding: 1.4rem 0 4rem;
-      position: relative;
-      z-index: 10;
+      padding: 1.25rem 0 4rem;
+      position:relative;
+      z-index:10;
     }
 
-    /* --- HERO STAGE --- */
+    /* ===== STAGE (video must be fully visible) ===== */
     .stage{
       position:relative;
-      border-radius: calc(var(--r) + 4px);
+      border-radius: calc(var(--r) + 6px);
       overflow:hidden;
       border: 1px solid rgba(255,255,255,0.14);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.30));
+      background: rgba(0,0,0,0.26);
       box-shadow: var(--shadow);
-      isolation: isolate;
-      min-height: clamp(460px, 70vh, 720px);
+      isolation:isolate;
     }
 
-    /* gold & neon frame */
-    .stage::before{
-      content:"";
-      position:absolute; inset: 10px;
-      border-radius: calc(var(--r) + 0px);
-      border: 1px solid rgba(183,161,115,0.25);
-      box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.08),
-        0 0 0 1px rgba(255,255,255,0.06);
+    /* HUD corner lines */
+    .stage .hudCorners{
+      position:absolute; inset:0;
       pointer-events:none;
-      z-index: 2;
-    }
-    /* moving beam sweep */
-    .stage::after{
-      content:"";
-      position:absolute; inset:-20%;
-      background: linear-gradient(120deg,
-        rgba(255,255,255,0.00) 0%,
-        rgba(120,255,235,0.14) 30%,
-        rgba(186,120,255,0.14) 50%,
-        rgba(255,105,220,0.12) 70%,
-        rgba(255,255,255,0.00) 100%
-      );
-      transform: translateX(-35%) rotate(8deg);
-      filter: blur(10px);
-      opacity: 0.55;
-      animation: sweep 6.8s ease-in-out infinite;
-      pointer-events:none;
-      z-index: 1;
+      z-index:3;
+      opacity:.85;
+      background:
+        linear-gradient(var(--cyan), var(--cyan)) left 16px top 16px / 48px 2px no-repeat,
+        linear-gradient(var(--cyan), var(--cyan)) left 16px top 16px / 2px 48px no-repeat,
+
+        linear-gradient(var(--violet), var(--violet)) right 16px top 16px / 48px 2px no-repeat,
+        linear-gradient(var(--violet), var(--violet)) right 16px top 16px / 2px 48px no-repeat,
+
+        linear-gradient(var(--hotpink), var(--hotpink)) left 16px bottom 16px / 48px 2px no-repeat,
+        linear-gradient(var(--hotpink), var(--hotpink)) left 16px bottom 16px / 2px 48px no-repeat,
+
+        linear-gradient(var(--gold), var(--gold)) right 16px bottom 16px / 48px 2px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) right 16px bottom 16px / 2px 48px no-repeat;
+      filter: drop-shadow(0 0 14px rgba(120,255,235,0.20));
       mix-blend-mode: screen;
     }
-    @keyframes sweep{
-      0%   { transform: translateX(-55%) rotate(8deg); opacity: .35; }
-      50%  { transform: translateX(30%) rotate(8deg); opacity: .60; }
-      100% { transform: translateX(-55%) rotate(8deg); opacity: .35; }
-    }
 
-    .stageMedia{
-      position:absolute; inset:0;
-      z-index:0;
-      background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), rgba(0,0,0,0.55));
-    }
-
-  .stageVideo{
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:177.77vh; /* 縦動画用 */
-  height:100vh;
-  transform: translate(-50%, -50%) scale(1.02);
-  pointer-events:none;
-  filter: brightness(.86) contrast(1.05) saturate(1.02);
-}
-    .stageMedia{
-  position:absolute;
-  inset:0;
-  overflow:hidden;
-}
-
-    /* gradient for readability */
-    .stageShade{
-      position:absolute; inset:0;
-      background:
-        radial-gradient(circle at 50% 20%, rgba(0,0,0,0.15), rgba(0,0,0,0.78)),
-        linear-gradient(to top, rgba(0,0,0,0.86), rgba(0,0,0,0.10));
-      z-index: 1;
-    }
-
-    .stageContent{
+    .stageFrame{
       position:relative;
-      z-index: 3;
+      z-index:2;
+      padding: 12px;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.45));
+    }
+
+    /* Video area: no text overlay */
+    .videoWrap{
+      position:relative;
+      border-radius: calc(var(--r) + 2px);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.55);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.55);
+      /* vertical video friendly */
+      aspect-ratio: 9 / 16;
+      max-height: min(78vh, 820px);
+      margin: 0 auto;
+    }
+
+    .videoWrap iframe{
+      position:absolute; inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      /* look a bit cyber */
+      filter: brightness(.90) contrast(1.08) saturate(1.05);
+    }
+
+    /* Under-video info panel (text never covers video) */
+    .info{
+      margin-top: 12px;
+      border-radius: calc(var(--r) + 2px);
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+    }
+    .info::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(120,255,235,0.16), transparent 60%),
+        radial-gradient(circle at 78% 25%, rgba(186,120,255,0.16), transparent 62%),
+        radial-gradient(circle at 62% 82%, rgba(255,105,220,0.12), transparent 62%);
+      mix-blend-mode: screen;
+      opacity: .85;
+    }
+    .infoInner{
+      position:relative;
+      z-index:2;
+      padding: 1.05rem 1.05rem 1.0rem;
       display:grid;
-      align-content:end;
-      gap: 1.0rem;
-      padding: 2.2rem 1.4rem 1.6rem;
-      min-height: clamp(460px, 70vh, 720px);
+      gap:.65rem;
     }
 
-    .stageTop{
+    .badges{
       display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 1rem;
-      margin-bottom: auto;
+      gap:.55rem;
+      flex-wrap:wrap;
+      align-items:center;
     }
-
     .badge{
       display:inline-flex;
       align-items:center;
@@ -286,17 +289,17 @@
       padding: .42rem .70rem;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      box-shadow: 0 16px 46px rgba(0,0,0,0.30);
+      background: rgba(0,0,0,0.18);
+      box-shadow: 0 14px 46px rgba(0,0,0,0.26);
       letter-spacing: .18em;
       font-size: .74rem;
       text-transform: uppercase;
       user-select:none;
       white-space:nowrap;
     }
-    .badge .dot{
+    .dot{
       width:8px; height:8px; border-radius:999px;
-      background: rgba(120,255,235,0.70);
+      background: rgba(120,255,235,0.78);
       box-shadow: 0 0 0 0 rgba(120,255,235,0.25);
       animation: pulse 1.6s ease-in-out infinite;
     }
@@ -306,32 +309,29 @@
       100%{ box-shadow: 0 0 0 0 rgba(120,255,235,0.00); }
     }
 
-    .stageTitle{
-      display:grid;
-      gap:.45rem;
-      max-width: 72ch;
-    }
-    .stageTitle h1{
+    .info h1{
       margin:0;
-      font-size: clamp(2.0rem, 4.8vw, 3.4rem);
-      letter-spacing: .10em;
+      font-size: clamp(1.55rem, 4.6vw, 2.35rem);
+      letter-spacing:.10em;
       font-weight: 950;
-      line-height: 1.05;
-    }
-    .stageTitle p{
-      margin:0;
-      color: rgba(245,245,242,0.78);
-      letter-spacing: .08em;
-      line-height: 1.6;
-      max-width: 62ch;
+      line-height:1.12;
+      text-shadow: 0 0 26px rgba(120,255,235,0.14);
     }
 
-    .stageActions{
+    .info p{
+      margin:0;
+      color: rgba(245,245,242,0.78);
+      letter-spacing:.06em;
+      line-height:1.7;
+      max-width: 70ch;
+    }
+
+    .actions{
       display:flex;
-      gap:.7rem;
-      flex-wrap: wrap;
+      gap:.65rem;
+      flex-wrap:wrap;
       align-items:center;
-      margin-top: .25rem;
+      margin-top:.25rem;
     }
 
     .btn{
@@ -340,10 +340,10 @@
       cursor:pointer;
       text-decoration:none;
       color: rgba(245,245,242,0.92);
-      padding: .78rem 1.00rem;
+      padding: .76rem 1.00rem;
       border-radius: 14px;
       letter-spacing: .12em;
-      font-weight: 850;
+      font-weight: 900;
       font-size: .92rem;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.14);
@@ -358,7 +358,7 @@
     .btn:hover, .btn:focus-visible{
       transform: translateY(-2px);
       background: rgba(255,255,255,0.12);
-      border-color: rgba(183,161,115,0.35);
+      border-color: rgba(120,255,235,0.40);
       outline:none;
       box-shadow: 0 26px 72px rgba(0,0,0,0.44);
     }
@@ -371,15 +371,15 @@
     }
     .btn.gold{
       background: linear-gradient(135deg, rgba(183,161,115,0.22), rgba(255,255,255,0.06));
-      border-color: rgba(183,161,115,0.40);
+      border-color: rgba(183,161,115,0.38);
     }
 
-    /* --- Ticker (casino sign vibe) --- */
+    /* ticker under info */
     .tickerWrap{
-      margin-top: .8rem;
+      margin-top:.4rem;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.30);
+      background: rgba(0,0,0,0.32);
       overflow:hidden;
       box-shadow: var(--shadow2);
     }
@@ -389,9 +389,9 @@
       padding: .55rem 0;
       white-space: nowrap;
       will-change: transform;
-      animation: ticker 16s linear infinite;
-      font-weight: 800;
-      letter-spacing: .20em;
+      animation: ticker 14s linear infinite;
+      font-weight: 900;
+      letter-spacing: .24em;
       text-transform: uppercase;
       font-size: .78rem;
       color: rgba(245,245,242,0.70);
@@ -402,369 +402,24 @@
     }
     .ticker em{
       font-style: normal;
-      color: rgba(183,161,115,0.92);
-      letter-spacing: .26em;
+      color: rgba(120,255,235,0.92);
+      letter-spacing: .28em;
     }
     @keyframes ticker{
       0%{ transform: translateX(0); }
       100%{ transform: translateX(-50%); }
     }
 
-    /* --- Sections --- */
-    .grid{
-      margin-top: 1.25rem;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 1rem;
-      align-items: start;
-    }
-
-    .panel{
-      border-radius: calc(var(--r) + 2px);
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow2);
-      overflow:hidden;
-      position:relative;
-    }
-    .panel::before{
-      content:"";
-      position:absolute; inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 22% 18%, rgba(120,255,235,0.10), transparent 55%),
-        radial-gradient(circle at 72% 28%, rgba(186,120,255,0.10), transparent 56%),
-        radial-gradient(circle at 70% 78%, rgba(255,105,220,0.08), transparent 55%);
-      opacity: .70;
-      mix-blend-mode: screen;
-    }
-
-    .panelHead{
-      padding: 1.0rem 1.0rem .75rem;
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap: .8rem;
-      position:relative;
-      z-index:2;
-    }
-    .panelHead h2{
-      margin:0;
-      font-size: .92rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      font-weight: 950;
-    }
-    .panelHead .sub{
-      font-size: .80rem;
-      color: rgba(245,245,242,0.62);
-      letter-spacing: .12em;
-      white-space:nowrap;
-    }
-
-    .panelBody{
-      padding: 1.0rem;
-      position:relative;
-      z-index:2;
-    }
-
-    /* --- Arcade Cards --- */
-    .arcade{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: .85rem;
-    }
-    .card{
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.22);
-      padding: .95rem .95rem;
-      box-shadow: 0 18px 52px rgba(0,0,0,0.35);
-      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
-      cursor: pointer;
-      position:relative;
-      overflow:hidden;
-      user-select:none;
-    }
-    .card:hover, .card:focus-visible{
-      transform: translateY(-2px);
-      border-color: rgba(120,255,235,0.40);
-      background: rgba(0,0,0,0.28);
-      outline:none;
-      box-shadow: 0 26px 74px rgba(0,0,0,0.44);
-    }
-
-    .card::after{
-      content:"";
-      position:absolute; inset:-20%;
-      background: linear-gradient(120deg,
-        rgba(255,255,255,0.00) 0%,
-        rgba(120,255,235,0.12) 40%,
-        rgba(186,120,255,0.12) 55%,
-        rgba(255,105,220,0.10) 70%,
-        rgba(255,255,255,0.00) 100%
-      );
-      transform: translateX(-65%) rotate(8deg);
-      filter: blur(8px);
-      opacity: 0.0;
-      transition: opacity .18s ease;
-      mix-blend-mode: screen;
-      pointer-events:none;
-    }
-    .card:hover::after{ opacity: .70; }
-
-    .cardTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:.8rem;
-    }
-
-    .cardTitle{
-      font-weight: 950;
-      letter-spacing: .14em;
-    }
-    .cardTag{
-      font-size: .72rem;
-      letter-spacing:.18em;
-      text-transform: uppercase;
-      padding: .25rem .50rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color: rgba(245,245,242,0.78);
-      white-space:nowrap;
-    }
-    .cardDesc{
-      margin: .55rem 0 0;
-      color: rgba(245,245,242,0.70);
-      font-size: .88rem;
-      line-height: 1.55;
-      letter-spacing: .04em;
-    }
-
-    /* --- Scoreboard --- */
-    .score{
-      display:grid;
-      gap:.65rem;
-    }
-    .scoreRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:.8rem;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.22);
-      padding: .72rem .80rem;
-    }
-    .scoreRow strong{
-      letter-spacing:.16em;
-    }
-    .scoreRow span{
-      font-size: .82rem;
-      color: rgba(245,245,242,0.72);
-      letter-spacing:.10em;
-      white-space:nowrap;
-    }
-
-    /* --- Footer hint --- */
-    .hint{
-      margin-top: .8rem;
-      color: rgba(245,245,242,0.62);
-      font-size: .86rem;
-      letter-spacing:.04em;
-      line-height: 1.7;
-    }
-    .hint b{
-      color: rgba(183,161,115,0.92);
-      letter-spacing:.12em;
-    }
-
-    /* --- Floating DiCo chat button --- */
-    .dicoFab{
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      z-index: 90;
-      display:flex;
-      align-items:center;
-      gap: .55rem;
-    }
-    .fabBtn{
-      width: 54px; height: 54px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 22px 70px rgba(0,0,0,0.55);
-      cursor: pointer;
-      position: relative;
-      overflow:hidden;
-    }
-    .fabBtn::before{
-      content:"";
-      position:absolute; inset:-20%;
-      background: radial-gradient(circle at 30% 30%, rgba(120,255,235,0.22), transparent 55%),
-                  radial-gradient(circle at 70% 40%, rgba(186,120,255,0.22), transparent 55%),
-                  radial-gradient(circle at 60% 70%, rgba(255,105,220,0.18), transparent 55%);
-      filter: blur(8px);
-      opacity: .9;
-    }
-    .fabBtn::after{
-      content:"Di";
-      position:absolute; inset:0;
-      display:grid; place-items:center;
-      font-weight: 950;
-      letter-spacing:.14em;
-      color: rgba(245,245,242,0.92);
-      text-shadow: 0 0 18px rgba(120,255,235,0.24);
-    }
-    .fabBtn:hover{ transform: translateY(-1px); }
-
-    .bubble{
-      max-width: 290px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 22px 70px rgba(0,0,0,0.55);
-      padding: .70rem .80rem;
-      color: rgba(245,245,242,0.86);
-      letter-spacing:.04em;
-      line-height: 1.55;
-      display:none;
-      transform: translateY(6px);
-      opacity: 0;
-      transition: opacity .18s ease, transform .18s ease;
-    }
-    .bubble.show{
-      display:block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .bubble .small{
-      display:block;
-      margin-top: .35rem;
-      color: rgba(245,245,242,0.62);
-      font-size: .80rem;
-      letter-spacing:.10em;
-    }
-
-    /* --- Modal (game shell / video settings) --- */
-    .modalOverlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.74);
-      backdrop-filter: blur(8px);
-      z-index: 120;
-      display:none;
-      place-items:center;
-      padding: 16px;
-    }
-    .modalOverlay.open{ display:grid; }
-
-    .modal{
-      width: min(980px, 100%);
-      border-radius: calc(var(--r) + 6px);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(10,10,16,0.72);
-      box-shadow: 0 40px 140px rgba(0,0,0,0.70);
-      overflow:hidden;
-      position:relative;
-    }
-    .modal::before{
-      content:"";
-      position:absolute; inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 18% 20%, rgba(120,255,235,0.14), transparent 60%),
-        radial-gradient(circle at 78% 25%, rgba(186,120,255,0.14), transparent 62%),
-        radial-gradient(circle at 62% 82%, rgba(255,105,220,0.10), transparent 62%);
-      mix-blend-mode: screen;
-      opacity: .8;
-    }
-
-    .modalHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 1rem;
-      padding: 1rem 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-      position:relative;
-      z-index:2;
-    }
-    .modalHead strong{
-      letter-spacing:.18em;
-      text-transform: uppercase;
-      font-weight: 950;
-    }
-    .modalClose{
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.08);
-      color: rgba(245,245,242,0.88);
-      border-radius: 14px;
-      padding: .55rem .75rem;
-      cursor:pointer;
-      letter-spacing:.16em;
-      font-weight: 850;
-    }
-    .modalBody{
-      padding: 1rem;
-      position:relative;
-      z-index:2;
-    }
-
-    .gameShell{
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.28);
-      padding: 1rem;
-      min-height: 360px;
-      display:grid;
-      place-items:center;
-    }
-    .gameShell p{
-      margin:0;
-      text-align:center;
-      color: rgba(245,245,242,0.78);
-      letter-spacing:.08em;
-      line-height:1.7;
-      max-width: 60ch;
-    }
-
-    .mini{
-      margin-top: .75rem;
-      display:flex;
-      justify-content:center;
-      gap: .55rem;
-      flex-wrap:wrap;
-    }
-
-    .pill{
-      border-radius: 999px;
-      padding: .42rem .62rem;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color: rgba(245,245,242,0.78);
-      font-size: .78rem;
-      letter-spacing:.14em;
-      text-transform: uppercase;
-    }
-
-    /* responsive */
-    @media (max-width: 960px){
-      .grid{ grid-template-columns: 1fr; }
-      .arcade{ grid-template-columns: 1fr; }
-      .ticker{ animation-duration: 18s; }
+    /* responsive: keep video visible and centered */
+    @media (max-width: 560px){
+      .topbar{ padding:.85rem 0; }
+      .videoWrap{ max-height: 72vh; }
+      .ticker{ animation-duration: 16s; }
     }
 
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition:none !important; }
-      body::before{ display:none !important; }
+      body::before, body::after{ display:none !important; }
     }
   </style>
 </head>
@@ -779,363 +434,61 @@
 
       <nav class="nav" aria-label="Quick nav">
         <a class="chip" href="#stage">STAGE</a>
-        <a class="chip" href="#play">PLAY ZONE</a>
-        <a class="chip" href="#score">SCORE</a>
         <a class="chip" href="campus.html">RETURN</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- HERO STAGE -->
     <section class="stage" id="stage" aria-label="DiCo Stage">
-      <div class="stageMedia" aria-hidden="true"></div>
+      <div class="hudCorners" aria-hidden="true"></div>
 
-      <!-- video (autoplay muted loop) -->
-      <iframe
-  class="stageVideo"
-  src="https://www.youtube.com/embed/e6qIEx85fDk?autoplay=1&mute=1&loop=1&playlist=e6qIEx85fDk"
-  frameborder="0"
-  allow="autoplay"
-  allowfullscreen>
-</iframe>
-
-      <div class="stageShade" aria-hidden="true"></div>
-
-      <div class="stageContent">
-        <div class="stageTop">
-          <div class="badge"><span class="dot" aria-hidden="true"></span> LIVE MODE</div>
-          <div class="badge" style="border-color: rgba(183,161,115,0.30); background: rgba(183,161,115,0.10);">
-            <span style="width:8px;height:8px;border-radius:999px;background:rgba(183,161,115,0.85);" aria-hidden="true"></span>
-            GOLD SAUCER VIBE
-          </div>
+      <div class="stageFrame">
+        <!-- VIDEO (no overlay text) -->
+        <div class="videoWrap" aria-label="DiCo Video">
+          <iframe
+            src="https://www.youtube.com/embed/e6qIEx85fDk?autoplay=1&mute=1&loop=1&playlist=e6qIEx85fDk&playsinline=1&controls=0&modestbranding=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen>
+          </iframe>
         </div>
 
-        <div class="stageTitle">
-          <h1>DiCo / Night Bright.</h1>
-          <p>
-            眩しいのに、軽い。軽いのに、残る。<br>
-            ここは“遊び”で未来を柔らかくするフロア。
-          </p>
-
-          <div class="stageActions">
-            <button class="btn primary" id="btnPlayNow" type="button">▶ PLAY ZONEへ</button>
-            <button class="btn gold" id="btnOpenGame" type="button">🎮 いま遊ぶ（モーダル）</button>
-            <button class="btn" id="btnToggleVideo" type="button">🎥 動画：ON/OFF</button>
-          </div>
-
-          <div class="tickerWrap" aria-label="Neon ticker">
-            <div class="ticker" aria-hidden="true" id="ticker">
-              <span><em>DiDiDi</em> — tap / flip / dance</span>
-              <span>not only “correct” is future</span>
-              <span><em>PLAY</em> makes you breathe</span>
-              <span>score = resonance</span>
-              <span><em>DiDiDi</em> — tap / flip / dance</span>
-              <span>not only “correct” is future</span>
-              <span><em>PLAY</em> makes you breathe</span>
-              <span>score = resonance</span>
+        <!-- TEXT BELOW VIDEO (never hides video) -->
+        <div class="info" aria-label="DiCo Info">
+          <div class="infoInner">
+            <div class="badges">
+              <div class="badge"><span class="dot" aria-hidden="true"></span> LIVE SIGNAL</div>
+              <div class="badge" style="border-color: rgba(186,120,255,0.28);">NEON / HUD</div>
+              <div class="badge" style="border-color: rgba(183,161,115,0.26);">NIGHT BRIGHT</div>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- GRID -->
-    <section class="grid" aria-label="Play Zone and Score">
-      <!-- PLAY ZONE -->
-      <div class="panel" id="play" aria-label="Play Zone">
-        <div class="panelHead">
-          <h2>PLAY ZONE</h2>
-          <div class="sub">tap & loop / bright arcade</div>
-        </div>
-        <div class="panelBody">
-          <div class="arcade">
-            <div class="card" tabindex="0" role="button" data-game="Re:Flip">
-              <div class="cardTop">
-                <div class="cardTitle">Re:Flip</div>
-                <div class="cardTag">PUZZLE</div>
+            <h1>DiCo / Night Bright.</h1>
+            <p>
+              眩しいのに、軽い。軽いのに、残る。<br>
+              ここは“遊び”で未来を柔らかくするフロア。
+            </p>
+
+            <div class="actions">
+              <a class="btn primary" href="#stage">▶ STAGE SYNC</a>
+              <a class="btn gold" href="campus.html">↩ RETURN</a>
+            </div>
+
+            <div class="tickerWrap" aria-label="Neon ticker">
+              <div class="ticker" aria-hidden="true">
+                <span><em>DIDIDI</em> / tap the night / brighten the doubt</span>
+                <span>not only “correct” is future</span>
+                <span><em>CYBER</em> / glow / loop / resonance</span>
+                <span><em>DIDIDI</em> / tap the night / brighten the doubt</span>
+                <span>not only “correct” is future</span>
+                <span><em>CYBER</em> / glow / loop / resonance</span>
               </div>
-              <p class="cardDesc">
-                カードを反転して整える。<br>
-                でも“全部正しい”が勝ちとは限らない。
-              </p>
             </div>
 
-            <div class="card" tabindex="0" role="button" data-game="DiDi Beat">
-              <div class="cardTop">
-                <div class="cardTitle">DiDi Beat</div>
-                <div class="cardTag">RHYTHM</div>
-              </div>
-              <p class="cardDesc">
-                ディディディでタップ。<br>
-                ビートが“迷い”を踊りに変える。
-              </p>
-            </div>
-
-            <div class="card" tabindex="0" role="button" data-game="Etera Escape">
-              <div class="cardTop">
-                <div class="cardTitle">Etera Escape</div>
-                <div class="cardTag">RUN</div>
-              </div>
-              <p class="cardDesc">
-                最適化から逃げろ。<br>
-                速いほど、正しさが追ってくる。
-              </p>
-            </div>
-
-            <div class="card" tabindex="0" role="button" data-game="Lucky Draw">
-              <div class="cardTop">
-                <div class="cardTitle">Lucky Draw</div>
-                <div class="cardTag">CASINO</div>
-              </div>
-              <p class="cardDesc">
-                1枚引く。結果は固定じゃない。<br>
-                “読む”じゃなく“選ぶ”ために引く。
-              </p>
-            </div>
-          </div>
-
-          <div class="hint">
-            <b>DiCo</b>：「ねぇ、笑って。重いのは、あとでいい。」<br>
-            ※ゲームはこのUIに “差し込み式” で実装できる設計（次のステップで実装する）
           </div>
         </div>
-      </div>
 
-      <!-- SCORE -->
-      <div class="panel" id="score" aria-label="Scoreboard">
-        <div class="panelHead">
-          <h2>SCORE</h2>
-          <div class="sub">resonance / today</div>
-        </div>
-        <div class="panelBody">
-          <div class="score">
-            <div class="scoreRow">
-              <strong>DAILY RANK</strong>
-              <span id="rankText">—</span>
-            </div>
-            <div class="scoreRow">
-              <strong>BEST SCORE</strong>
-              <span id="bestScore">0</span>
-            </div>
-            <div class="scoreRow">
-              <strong>PLAY COUNT</strong>
-              <span id="playCount">0</span>
-            </div>
-          </div>
-
-          <div class="hint" style="margin-top:1rem;">
-            ここは“憧れの雑誌サイト”の対極。<br>
-            静寂のECRUの裏側で、DiCoが夜を明るくする。
-          </div>
-
-          <div class="mini" aria-label="Quick actions">
-            <button class="btn" id="btnReset" type="button">RESET</button>
-            <button class="btn" id="btnTip" type="button">DiCoの一言</button>
-          </div>
-        </div>
       </div>
     </section>
   </main>
-
-  <!-- Floating DiCo -->
-  <div class="dicoFab" aria-label="DiCo assistant">
-    <div class="bubble" id="bubble">
-      ディディディ〜♪ 今日はどれで遊ぶ？<br>
-      <span class="small">Tip：勝ち方はひとつじゃないよ。</span>
-    </div>
-    <button class="fabBtn" id="fabBtn" type="button" aria-label="Open DiCo message"></button>
-  </div>
-
-  <!-- Modal -->
-  <div class="modalOverlay" id="modalOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Game Modal">
-      <div class="modalHead">
-        <strong id="modalTitle">PLAY</strong>
-        <button class="modalClose" id="modalClose" type="button">CLOSE</button>
-      </div>
-      <div class="modalBody">
-        <div class="gameShell" id="gameShell">
-          <div>
-            <p id="gameText">
-              ここにゲームを差し込みます。<br>
-              次のステップで <b>Re:Flip</b> をこの枠に“実装”していこう。
-            </p>
-            <div class="mini">
-              <span class="pill">NEON</span>
-              <span class="pill">ARCADE</span>
-              <span class="pill">DIDIDI</span>
-              <span class="pill">NOT ONLY CORRECT</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ----- smooth jump to play zone
-    const btnPlayNow = document.getElementById('btnPlayNow');
-    btnPlayNow.addEventListener('click', () => {
-      document.getElementById('play').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-
-    // ----- video toggle (iOS safe-ish)
-    const dicoVideo = document.getElementById('dicoVideo');
-    const btnToggleVideo = document.getElementById('btnToggleVideo');
-    let videoOn = true;
-
-    function setVideoState(on){
-      videoOn = on;
-      if(on){
-        dicoVideo.style.display = '';
-        // try play
-        dicoVideo.play().catch(()=>{ /* autoplay may be blocked */ });
-        btnToggleVideo.textContent = '🎥 動画：ON/OFF';
-      }else{
-        dicoVideo.pause();
-        dicoVideo.style.display = 'none';
-        btnToggleVideo.textContent = '🎥 動画：OFF（軽量）';
-      }
-    }
-    btnToggleVideo.addEventListener('click', () => setVideoState(!videoOn));
-
-    // if video fails, keep poster
-    dicoVideo.addEventListener('error', () => {
-      // keep poster visual; no hard stop
-      setVideoState(false);
-    });
-
-    // ----- scoreboard (localStorage)
-    const bestScoreEl = document.getElementById('bestScore');
-    const playCountEl = document.getElementById('playCount');
-    const rankTextEl = document.getElementById('rankText');
-
-    const LS_BEST = 'dico_bestScore';
-    const LS_PLAY = 'dico_playCount';
-
-    function calcRank(score){
-      if(score >= 9000) return 'SSS';
-      if(score >= 6000) return 'SS';
-      if(score >= 3500) return 'S';
-      if(score >= 1800) return 'A';
-      if(score >= 800)  return 'B';
-      return 'C';
-    }
-
-    function loadScore(){
-      const best = Number(localStorage.getItem(LS_BEST) || 0);
-      const play = Number(localStorage.getItem(LS_PLAY) || 0);
-      bestScoreEl.textContent = best.toString();
-      playCountEl.textContent = play.toString();
-      rankTextEl.textContent = calcRank(best);
-    }
-    loadScore();
-
-    // ----- DiCo bubble
-    const fabBtn = document.getElementById('fabBtn');
-    const bubble = document.getElementById('bubble');
-    let bubbleTimer = null;
-
-    function showBubble(text){
-      bubble.innerHTML = text;
-      bubble.classList.add('show');
-      clearTimeout(bubbleTimer);
-      bubbleTimer = setTimeout(()=> bubble.classList.remove('show'), 3200);
-    }
-
-    fabBtn.addEventListener('click', () => {
-      showBubble('ディディディ〜♪ ね、遊ぼ？<br><span class="small">押したら“PLAY ZONE”から選んでね。</span>');
-    });
-
-    // ----- Modal open/close
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalClose = document.getElementById('modalClose');
-    const modalTitle = document.getElementById('modalTitle');
-    const gameText = document.getElementById('gameText');
-
-    function openModal(title){
-      modalTitle.textContent = title.toUpperCase();
-      modalOverlay.classList.add('open');
-      modalOverlay.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal(){
-      modalOverlay.classList.remove('open');
-      modalOverlay.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
-    }
-    modalClose.addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', (e)=>{ if(e.target === modalOverlay) closeModal(); });
-    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
-
-    // ----- Cards hook (placeholder for now)
-    const cards = document.querySelectorAll('.card');
-    function bumpPlayCount(){
-      const play = Number(localStorage.getItem(LS_PLAY) || 0) + 1;
-      localStorage.setItem(LS_PLAY, String(play));
-      loadScore();
-    }
-
-    cards.forEach(card => {
-      card.addEventListener('click', () => {
-        const game = card.dataset.game || 'PLAY';
-        bumpPlayCount();
-        openModal(game);
-
-        // different flavor text per game
-        const textMap = {
-          'Re:Flip': 'Re:Flip をここに実装するよ。<br>“全部正しい”が勝ちとは限らない。<br><span style="color:rgba(183,161,115,0.92);letter-spacing:.12em;font-weight:900;">DiCo：</span>「正解だけが未来じゃないよ？」',
-          'DiDi Beat': 'DiDi Beat（リズム）をここに実装するよ。<br>タップでビート、ミスっても笑える感じに。',
-          'Etera Escape': 'Etera Escape（ラン）をここに実装するよ。<br>最適化が追ってくる、でも逃げ方は選べる。',
-          'Lucky Draw': 'Lucky Draw（カジノ）をここに実装するよ。<br>1枚引く、でも“意味”はあなたが決める。'
-        };
-        gameText.innerHTML = textMap[game] || 'ここにゲームを差し込みます。';
-        showBubble('よしっ♪ ' + game + ' いこ！<br><span class="small">ディディディ〜！</span>');
-      });
-
-      card.addEventListener('keydown', (e)=>{
-        if(e.key === 'Enter' || e.key === ' '){
-          e.preventDefault();
-          card.click();
-        }
-      });
-    });
-
-    // quick open
-    document.getElementById('btnOpenGame').addEventListener('click', ()=>{
-      bumpPlayCount();
-      openModal('PLAY');
-      gameText.innerHTML = 'ゲームを選ぶなら <b>PLAY ZONE</b> から！<br><span style="color:rgba(183,161,115,0.92);letter-spacing:.12em;font-weight:900;">DiCo：</span>「迷ったら、まずひっくり返そ？」';
-      showBubble('モーダル開いたよ〜♪<br><span class="small">次は Re:Flip を入れよう。</span>');
-    });
-
-    // reset & tip
-    document.getElementById('btnReset').addEventListener('click', ()=>{
-      localStorage.setItem(LS_BEST, '0');
-      localStorage.setItem(LS_PLAY, '0');
-      loadScore();
-      showBubble('リセットした！<br><span class="small">“また最初から”も、未来だよ。</span>');
-    });
-
-    document.getElementById('btnTip').addEventListener('click', ()=>{
-      const tips = [
-        'ディディディ〜♪ 勝つより“気持ちよく”いこ？<br><span class="small">スコアは共鳴の目安だよ。</span>',
-        '正解だけが未来じゃないよ？<br><span class="small">逆位置のままでも綺麗。</span>',
-        '笑って！重いのはあとで！<br><span class="small">ここは遊びのフロア。</span>',
-      ];
-      const t = tips[Math.floor(Math.random()*tips.length)];
-      showBubble(t);
-    });
-
-    // optional: reduce CPU if not visible
-    document.addEventListener('visibilitychange', ()=>{
-      if(document.hidden){
-        try{ dicoVideo.pause(); }catch{}
-      }else{
-        if(videoOn) dicoVideo.play().catch(()=>{});
-      }
-    });
-  </script>
 </body>
 </html>
