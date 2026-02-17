@@ -236,14 +236,21 @@
       background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), rgba(0,0,0,0.55));
     }
 
-    .stageVideo{
-      position:absolute; inset:0;
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      filter: brightness(.86) contrast(1.05) saturate(1.02);
-      transform: scale(1.02);
-    }
+  .stageVideo{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:177.77vh; /* 縦動画用 */
+  height:100vh;
+  transform: translate(-50%, -50%) scale(1.02);
+  pointer-events:none;
+  filter: brightness(.86) contrast(1.05) saturate(1.02);
+}
+    .stageMedia{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
 
     /* gradient for readability */
     .stageShade{
@@ -785,10 +792,13 @@
       <div class="stageMedia" aria-hidden="true"></div>
 
       <!-- video (autoplay muted loop) -->
-      <video class="stageVideo" id="dicoVideo" autoplay muted loop playsinline preload="metadata"
-        poster="images/dico-poster.png">
-        <source src="videos/dico-dance.mp4" type="video/mp4">
-      </video>
+      <iframe
+  class="stageVideo"
+  src="https://www.youtube.com/embed/e6qIEx85fDk?autoplay=1&mute=1&loop=1&playlist=e6qIEx85fDk"
+  frameborder="0"
+  allow="autoplay"
+  allowfullscreen>
+</iframe>
 
       <div class="stageShade" aria-hidden="true"></div>
 
