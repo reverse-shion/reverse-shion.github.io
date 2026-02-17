@@ -1,94 +1,846 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TAROT BREAKER | AMATO Cosmetics Floor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMATO Cosmetics Counter</title>
+  <meta name="description" content="AMATO｜百貨店コスメカウンター。流行を押しつけない。正解を急がせない。「似合う」を一緒に探す場所。" />
+
   <style>
-    :root {
-      --bg: #181614;
-      --warm: #a98758;
-      --text: #f4eee6;
-      --muted: #c9bcae;
-      --line: rgba(255, 240, 220, 0.25);
+    :root{
+      --bg: #ffffff;
+      --ink: rgba(18,22,30,0.92);
+      --muted: rgba(18,22,30,0.60);
+      --hairline: rgba(18,22,30,0.12);
+      --gold: rgba(183,161,115,0.85);
+      --gold2: rgba(183,161,115,0.45);
+
+      --maxw: 1040px;
+      --r: 18px;
+
+      --shadow: 0 24px 70px rgba(10,16,25,0.12);
+      --shadow2: 0 10px 25px rgba(10,16,25,0.10);
+
+      --serif: ui-serif, "Georgia", "Times New Roman", serif;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Arial, sans-serif;
     }
 
-    * { box-sizing: border-box; }
-
-    body {
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
       margin: 0;
-      min-height: 100vh;
-      font-family: "Georgia", "Times New Roman", serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 20% 20%, rgba(212, 167, 96, 0.18), transparent 48%),
-        radial-gradient(circle at 80% 85%, rgba(255, 245, 232, 0.08), transparent 50%),
-        linear-gradient(160deg, #161311 0%, #211c18 55%, #14100d 100%);
-      display: grid;
-      place-items: center;
-      padding: 3rem 1.2rem;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.7;
+      letter-spacing: 0.02em;
+      overflow-x: hidden;
     }
 
-    main {
-      width: min(760px, 100%);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 2rem;
-      background: rgba(19, 16, 14, 0.55);
-      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.45);
-      animation: fadeIn 0.8s ease both;
+    a{ color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible{
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+      border-radius: 10px;
     }
 
-    h1 {
-      margin: 0 0 1rem;
-      letter-spacing: 0.08em;
-      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-      color: #f8e8d4;
-      font-weight: 500;
+    /* ---------- Header ---------- */
+    .header{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 30;
+      background: rgba(255,255,255,0.68);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.55);
     }
-
-    p {
-      margin: 0 0 1rem;
+    .header__inner{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand{
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 180px;
+    }
+    .brand__logo{
+      font-family: var(--serif);
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .brand__sub{
+      font-size: 12px;
       color: var(--muted);
+      letter-spacing: 0.08em;
+      display: none;
+    }
+    @media (min-width: 820px){
+      .brand__sub{ display: inline; }
+    }
+
+    .nav{
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav a{
+      font-size: 12px;
+      color: rgba(18,22,30,0.72);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      border-radius: 999px;
+      transition: background .18s ease, color .18s ease;
+    }
+    .nav a:hover{
+      background: rgba(183,161,115,0.10);
+      color: rgba(18,22,30,0.92);
+    }
+
+    .cta{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1px solid rgba(183,161,115,0.55);
+      border-radius: 999px;
+      box-shadow: var(--shadow2);
+      background: rgba(255,255,255,0.78);
+      transition: transform .18s ease, background .18s ease;
+    }
+    .cta:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.92); }
+    .cta__dot{
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 4px rgba(183,161,115,0.18);
+    }
+    .cta__txt{
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: rgba(18,22,30,0.82);
+      white-space: nowrap;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero{
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      place-items: end;
+      padding: 86px 18px 26px; /* account for fixed header */
+      overflow: hidden;
+      border-bottom: 1px solid rgba(18,22,30,0.06);
+    }
+    .hero__bg{
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.72) 72%, rgba(255,255,255,0.96) 100%),
+        url("images/amato-counter-hero.png");
+      /* ↑ ここを差し替え：あなたの画像パスに変更してOK
+         例）url("./assets/amato/hero.jpg")  */
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.02);
+      filter: saturate(1.04) contrast(1.03);
+    }
+    .hero__grain{
+      position: absolute;
+      inset: -40%;
+      opacity: 0.10;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,0.45) 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.35) 0 2px, transparent 3px),
+        radial-gradient(circle at 40% 70%, rgba(255,255,255,0.25) 0 2px, transparent 3px);
+      background-size: 220px 220px;
+      transform: rotate(10deg);
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+    .hero__content{
+      position: relative;
+      width: 100%;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+    .hero__card{
+      width: min(640px, 100%);
+      border-radius: var(--r);
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 16px;
+    }
+    .eyebrow{
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(18,22,30,0.58);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eyebrow::before{
+      content:"";
+      width: 34px;
+      height: 1px;
+      background: var(--gold2);
+    }
+    .hero__title{
+      margin: 10px 0 0;
+      font-family: var(--serif);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      font-size: clamp(24px, 3.2vw, 36px);
+      line-height: 1.22;
+    }
+    .hero__lead{
+      margin: 10px 0 0;
+      color: rgba(18,22,30,0.70);
+      font-size: 14px;
+    }
+
+    .scrollhint{
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(18,22,30,0.58);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    .scrollhint__line{
+      width: 36px; height: 1px;
+      background: rgba(18,22,30,0.18);
+      position: relative;
+      overflow: hidden;
+      border-radius: 999px;
+    }
+    .scrollhint__line::after{
+      content:"";
+      position: absolute;
+      left: -35%;
+      top: 0;
+      width: 35%;
+      height: 100%;
+      background: var(--gold);
+      animation: glide 1.6s ease-in-out infinite;
+      opacity: 0.85;
+    }
+    @keyframes glide{
+      0%{ transform: translateX(0); opacity: .35; }
+      50%{ opacity: .95; }
+      100%{ transform: translateX(240%); opacity: .35; }
+    }
+
+    /* ---------- Layout Sections ---------- */
+    main{ padding: 0 18px 70px; }
+    .wrap{
+      max-width: var(--maxw);
+      margin: 0 auto;
+    }
+
+    .section{
+      padding: 58px 0;
+      border-bottom: 1px solid rgba(18,22,30,0.06);
+    }
+    .section:last-child{ border-bottom: none; }
+
+    .section__head{
+      display: grid;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .section__kicker{
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(18,22,30,0.56);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section__kicker::before{
+      content:"";
+      width: 46px;
+      height: 1px;
+      background: rgba(183,161,115,0.55);
+    }
+    .section__title{
+      margin: 0;
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+    }
+    .section__desc{
+      margin: 0;
+      color: var(--muted);
+      max-width: 68ch;
+      font-size: 14px;
+    }
+
+    /* ---------- About ---------- */
+    .about{
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px){
+      .about{ grid-template-columns: 1fr; }
+    }
+    .card{
+      border-radius: var(--r);
+      background: #fff;
+      border: 1px solid rgba(18,22,30,0.08);
+      box-shadow: 0 16px 38px rgba(10,16,25,0.08);
+      padding: 18px;
+    }
+    .card--soft{
+      background: linear-gradient(180deg, rgba(183,161,115,0.06), rgba(255,255,255,0.98));
+    }
+    .quote{
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 16px;
+      line-height: 1.7;
+      color: rgba(18,22,30,0.86);
+    }
+    .quote small{
+      display: block;
+      margin-top: 10px;
+      font-family: var(--sans);
+      font-size: 12px;
+      color: rgba(18,22,30,0.60);
+      letter-spacing: 0.08em;
+    }
+    .bullets{
+      margin: 0;
+      padding-left: 16px;
+      color: rgba(18,22,30,0.76);
+      font-size: 14px;
+    }
+    .bullets li{ margin: 8px 0; }
+    .bullets strong{
+      font-weight: 600;
+      color: rgba(18,22,30,0.90);
+    }
+
+    /* ---------- Concept ---------- */
+    .concept{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 900px){
+      .concept{ grid-template-columns: 1fr; }
+    }
+    .concept__text{
+      color: rgba(18,22,30,0.80);
+      font-size: 14px;
+    }
+    .concept__frame{
+      border-radius: var(--r);
+      border: 1px solid rgba(183,161,115,0.30);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86)),
+        radial-gradient(circle at 18% 20%, rgba(183,161,115,0.14), transparent 55%),
+        radial-gradient(circle at 82% 68%, rgba(183,161,115,0.10), transparent 55%);
+      padding: 18px;
+      box-shadow: 0 18px 50px rgba(10,16,25,0.08);
+      min-height: 180px;
+      display: grid;
+      align-content: center;
+      gap: 10px;
+    }
+    .concept__frame p{
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 16px;
       line-height: 1.8;
-      font-size: 1rem;
+      color: rgba(18,22,30,0.84);
+    }
+    .concept__frame span{
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: rgba(18,22,30,0.58);
     }
 
-    .return-link {
-      display: inline-block;
-      margin-top: 1rem;
-      color: #e8dbc7;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(232, 219, 199, 0.55);
-      padding-bottom: 0.2rem;
-      transition: opacity 0.5s ease;
+    /* ---------- Items ---------- */
+    .grid3{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 980px){
+      .grid3{ grid-template-columns: 1fr; }
+    }
+    .item{
+      border-radius: var(--r);
+      border: 1px solid rgba(18,22,30,0.10);
+      background: #fff;
+      box-shadow: 0 18px 45px rgba(10,16,25,0.08);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 220px;
+    }
+    .item__top{
+      padding: 16px 16px 10px;
+      border-bottom: 1px solid rgba(18,22,30,0.06);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(183,161,115,0.14), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.94));
+    }
+    .item__name{
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .item__tag{
+      margin-top: 6px;
+      font-size: 12px;
+      color: rgba(18,22,30,0.58);
+      letter-spacing: 0.08em;
+    }
+    .item__body{
+      padding: 14px 16px 16px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .item__copy{
+      margin: 0;
+      color: rgba(18,22,30,0.76);
+      font-size: 14px;
+    }
+    .item__note{
+      margin: 0;
+      color: rgba(18,22,30,0.54);
+      font-size: 12px;
+      letter-spacing: 0.03em;
     }
 
-    .return-link:hover,
-    .return-link:focus-visible {
-      opacity: 0.72;
-      outline: none;
+    /* ---------- Message ---------- */
+    .message{
+      display: grid;
+      gap: 14px;
+      max-width: 72ch;
+    }
+    .message__box{
+      border-radius: var(--r);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(183,161,115,0.30);
+      box-shadow: 0 18px 50px rgba(10,16,25,0.08);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .message__box::before{
+      content:"";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(183,161,115,0.18), transparent 58%),
+        radial-gradient(circle at 76% 75%, rgba(183,161,115,0.10), transparent 60%);
+      transform: rotate(10deg);
+      pointer-events: none;
+    }
+    .message__text{
+      position: relative;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.85;
+      color: rgba(18,22,30,0.86);
+    }
+    .message__sig{
+      position: relative;
+      margin-top: 12px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: rgba(18,22,30,0.60);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* ---------- Access ---------- */
+    .access{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 900px){
+      .access{ grid-template-columns: 1fr; }
+    }
+    .dl{
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      font-size: 14px;
+      color: rgba(18,22,30,0.78);
+    }
+    .row{
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(18,22,30,0.06);
+    }
+    .row:last-child{ border-bottom: none; }
+    .dt{
+      color: rgba(18,22,30,0.58);
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .dd{
+      margin: 0;
+      color: rgba(18,22,30,0.82);
+    }
+    .map{
+      border-radius: var(--r);
+      border: 1px solid rgba(18,22,30,0.10);
+      overflow: hidden;
+      box-shadow: 0 18px 45px rgba(10,16,25,0.08);
+      min-height: 260px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.96)),
+        repeating-linear-gradient(90deg, rgba(18,22,30,0.06) 0 1px, transparent 1px 22px),
+        repeating-linear-gradient(0deg, rgba(18,22,30,0.04) 0 1px, transparent 1px 22px);
+      position: relative;
+    }
+    .map__pin{
+      position: absolute;
+      left: 62%;
+      top: 46%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 8px rgba(183,161,115,0.18);
+    }
+    .map__label{
+      position: absolute;
+      left: calc(62% + 16px);
+      top: calc(46% - 12px);
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(183,161,115,0.28);
+      font-size: 12px;
+      color: rgba(18,22,30,0.72);
+      letter-spacing: 0.08em;
+      box-shadow: 0 10px 22px rgba(10,16,25,0.08);
+      white-space: nowrap;
+    }
+
+    /* ---------- Footer ---------- */
+    footer{
+      padding: 30px 18px 44px;
+      color: rgba(18,22,30,0.58);
+      font-size: 12px;
+      border-top: 1px solid rgba(18,22,30,0.06);
+    }
+    .footer__inner{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .fine{
+      letter-spacing: 0.08em;
+    }
+
+    /* ---------- Reveal (subtle) ---------- */
+    .reveal{
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.is-in{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---------- Reduced Motion ---------- */
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior: auto !important; }
+      .scrollhint__line::after{ animation: none; }
+      .reveal{ transition: none; }
+      .cta:hover{ transform: none; }
     }
   </style>
 </head>
+
 <body>
-  <main>
-    <header>
-      <h1>AMATO — Cosmetics Floor</h1>
-    </header>
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <a class="brand" href="#top" aria-label="AMATO Home">
+        <div class="brand__logo">AMATO</div>
+        <div class="brand__sub">Cosmetics Counter</div>
+      </a>
 
-    <section aria-label="Atmospheric scene">
-      <p>Amber ceiling lamps soften every edge of the room, and rows of cosmetic counters stretch like polished altars beneath mirrored glass.</p>
-      <p>Powder, citrus, and the trace of white floral perfume drift together in the conditioned air, while brushes and palettes rest in silent geometric order.</p>
-      <p>Somewhere behind the reflections, Amato is present — not seen directly, only hinted by the measured movement of staff and the subtle recalibration of attention each time footsteps pass.</p>
-    </section>
+      <nav class="nav" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#concept">Concept</a>
+        <a href="#items">Items</a>
+        <a href="#message">Message</a>
+        <a href="#access">Access</a>
+        <a class="cta" href="#access">
+          <span class="cta__dot" aria-hidden="true"></span>
+          <span class="cta__txt">Visit</span>
+        </a>
+      </nav>
+    </div>
+  </header>
 
-    <a class="return-link" href="campus.html">Return to Campus</a>
+  <!-- Hero -->
+  <section class="hero" id="top" aria-label="Hero">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__grain" aria-hidden="true"></div>
+
+    <div class="hero__content">
+      <div class="hero__card reveal">
+        <div class="eyebrow">Department Cosmetics</div>
+        <h1 class="hero__title">色は、武装じゃない。</h1>
+        <p class="hero__lead">今日を選ぶためのもの。</p>
+
+        <div class="scrollhint" aria-hidden="true">
+          <span class="scrollhint__line"></span>
+          <span>Scroll</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main role="main">
+    <div class="wrap">
+      <!-- About -->
+      <section class="section" id="about" aria-label="About AMATO">
+        <div class="section__head reveal">
+          <div class="section__kicker">About</div>
+          <h2 class="section__title">AMATO</h2>
+          <p class="section__desc">
+            ビューティーアドバイザー。流行を押しつけない。正解を急がせない。<br />
+            「似合う」を一緒に探す人。
+          </p>
+        </div>
+
+        <div class="about">
+          <div class="card reveal">
+            <p class="quote">
+              声を張らない。急かさない。<br />
+              でも、流されない。<br />
+              <small>— その静けさが、あなたの輪郭を守る。</small>
+            </p>
+          </div>
+
+          <div class="card card--soft reveal">
+            <ul class="bullets">
+              <li><strong>提案</strong>：選択肢を増やすのではなく、迷いを減らす</li>
+              <li><strong>接客</strong>：決めつけず、観察する</li>
+              <li><strong>哲学</strong>：決めるのは、あなた。私は隣にいる</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Concept -->
+      <section class="section" id="concept" aria-label="Counter Concept">
+        <div class="section__head reveal">
+          <div class="section__kicker">Counter Concept</div>
+          <h2 class="section__title">自分に戻る場所</h2>
+          <p class="section__desc">
+            光は柔らかく、鏡は正直に、色は静かに並ぶ。<br />
+            ここは、誰かになる場所ではなく、自分に戻る場所。
+          </p>
+        </div>
+
+        <div class="concept">
+          <div class="concept__text card reveal">
+            <p style="margin:0;">
+              テスターの先端で、色は変わる。<br />
+              けれど、変わらないものがある。<br />
+              <br />
+              「今日の気分に近い色」を見つけること。<br />
+              それだけで、人は少しだけ前に進める。<br />
+              <br />
+              AMATOは、流行の答えよりも、あなたの温度を優先する。
+            </p>
+          </div>
+
+          <div class="concept__frame reveal" role="note" aria-label="Key lines">
+            <p>無理に明るくしなくていいですよ。</p>
+            <p>今日の気分に近い色を、選びましょう。</p>
+            <span>Quiet • Strong • Real</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Items -->
+      <section class="section" id="items" aria-label="Recommended items">
+        <div class="section__head reveal">
+          <div class="section__kicker">Recommended</div>
+          <h2 class="section__title">おすすめ 3 アイテム</h2>
+          <p class="section__desc">
+            “似合う”は、急いで決めない。<br />
+            まず、今日のあなたに一番近いものから。
+          </p>
+        </div>
+
+        <div class="grid3">
+          <article class="item reveal">
+            <div class="item__top">
+              <h3 class="item__name">Re:Rose Lip Tint</h3>
+              <div class="item__tag">soft red / quiet courage</div>
+            </div>
+            <div class="item__body">
+              <p class="item__copy">やわらかい赤。背伸びしない強さ。</p>
+              <p class="item__note">※ 色名はストーリー用の架空表記です。実商品名に差し替えOK。</p>
+            </div>
+          </article>
+
+          <article class="item reveal">
+            <div class="item__top">
+              <h3 class="item__name">Silent Glow Foundation</h3>
+              <div class="item__tag">balance / texture / calm</div>
+            </div>
+            <div class="item__body">
+              <p class="item__copy">光を足すのではなく、肌を整える。</p>
+              <p class="item__note">※ パフ・ブラシ・指のどれが心地いいかから選びましょう。</p>
+            </div>
+          </article>
+
+          <article class="item reveal">
+            <div class="item__top">
+              <h3 class="item__name">Bloom Veil Blush</h3>
+              <div class="item__tag">temperature / breath / natural</div>
+            </div>
+            <div class="item__body">
+              <p class="item__copy">頬にのせるのは色ではなく、今日の温度。</p>
+              <p class="item__note">※ 迷ったら「今の気分」を言葉にしてみてください。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Message -->
+      <section class="section" id="message" aria-label="Message from AMATO">
+        <div class="section__head reveal">
+          <div class="section__kicker">Message</div>
+          <h2 class="section__title">選ぶのは、あなた</h2>
+          <p class="section__desc">
+            流行は変わる。似合うは、変わらない。<br />
+            AMATOは、あなたの選択を急かさない。
+          </p>
+        </div>
+
+        <div class="message reveal">
+          <div class="message__box">
+            <p class="message__text">
+              流行りは変わります。<br />
+              似合うは、変わりません。<br /><br />
+              選ぶのは、あなたです。<br />
+              私は、その隣にいるだけ。
+            </p>
+            <div class="message__sig">— AMATO</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Access -->
+      <section class="section" id="access" aria-label="Access">
+        <div class="section__head reveal">
+          <div class="section__kicker">Access</div>
+          <h2 class="section__title">店舗情報</h2>
+          <p class="section__desc">
+            ※ 下記はテンプレです。百貨店名・住所・時間は実設定に合わせて差し替えてください。
+          </p>
+        </div>
+
+        <div class="access">
+          <div class="card reveal">
+            <dl class="dl">
+              <div class="row">
+                <div class="dt">Store</div>
+                <p class="dd">KIRISAME Department Store（架空） 1F Cosmetics</p>
+              </div>
+              <div class="row">
+                <div class="dt">Hours</div>
+                <p class="dd">10:00 – 20:00（最終受付 19:30）</p>
+              </div>
+              <div class="row">
+                <div class="dt">Service</div>
+                <p class="dd">カラー提案 / ベースメイク調整 / ポイントメイク相談</p>
+              </div>
+              <div class="row">
+                <div class="dt">Note</div>
+                <p class="dd">混雑時は順番にご案内します。急がせません。</p>
+              </div>
+            </dl>
+          </div>
+
+          <div class="map reveal" aria-label="Map placeholder">
+            <div class="map__pin" aria-hidden="true"></div>
+            <div class="map__label">Cosmetics Floor</div>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
+
+  <footer role="contentinfo">
+    <div class="footer__inner">
+      <div class="fine">© AMATO Cosmetics Counter</div>
+      <div class="fine">Designed for a realistic department-store aesthetic.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scroll for in-page anchors (without heavy libraries)
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href');
+        if (!id || id === '#') return;
+        const el = document.querySelector(id);
+        if (!el) return;
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.pushState(null, '', id);
+      });
+    });
+
+    // Subtle reveal on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('is-in');
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
 </body>
 </html>
