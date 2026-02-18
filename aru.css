@@ -367,3 +367,29 @@ button:hover,.linkbtn:hover{border-color:rgba(230,201,107,.65);box-shadow:0 0 10
   .result-grid{grid-template-columns:1fr;}
   .ring-wrap{width:min(86vw,80vh,520px);}
 }
+:root{
+  --safeB: env(safe-area-inset-bottom, 0px);
+  --safeT: env(safe-area-inset-top, 0px);
+  --dock: 84px; /* Safari下バー対策の予備 */
+}
+
+/* #app の padding を強化（下に余白を足す） */
+#app{
+  padding: var(--safeT) 16px calc(var(--safeB) + var(--dock)) 16px;
+}
+
+/* 下のボタン列が確実に見えるように */
+.controls{
+  padding-bottom: calc(var(--safeB) + 10px);
+}
+
+/* DiCo吹き出しも下バーに食われないように */
+.dico{
+  bottom: calc(var(--safeB) + 110px); /* controlsより上に退避 */
+}
+
+/* 画面が低い端末用にリングを少し縮める */
+@media (max-height: 760px){
+  .ring-wrap{ width: min(86vw, 60vh, 520px); }
+  .dico{ bottom: calc(var(--safeB) + 120px); }
+}
