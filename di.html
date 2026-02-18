@@ -1,38 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>DiCo Rhythm</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>DiCo | Ring Rhythm</title>
   <link rel="stylesheet" href="di.css" />
 </head>
 <body>
+  <main class="app" id="app">
+    <!-- 背景動画（iOS対策：muted + playsinline 必須） -->
+    <video id="bgVideo" class="bgVideo" src="di_dance.mp4"
+      autoplay muted loop playsinline webkit-playsinline></video>
 
-<div class="game">
+    <!-- HUD -->
+    <header class="hud">
+      <div class="hudBox">
+        <div class="hudLabel">SCORE</div>
+        <div class="hudValue" id="score">0</div>
+      </div>
+      <div class="hudBox">
+        <div class="hudLabel">COMBO</div>
+        <div class="hudValue" id="combo">0</div>
+      </div>
+      <div class="hudBox">
+        <div class="hudLabel">TIME</div>
+        <div class="hudValue" id="time">0:00</div>
+      </div>
+    </header>
 
-  <video id="bgVideo"
-         src="di_dance.mp4"
-         muted
-         loop
-         playsinline></video>
+    <!-- ゲーム面（canvasは全面） -->
+    <canvas id="noteCanvas" class="noteCanvas"></canvas>
 
-  <canvas id="noteCanvas"></canvas>
+    <!-- 中央のリングUI -->
+    <section class="stage" aria-hidden="true">
+      <div class="ringWrap">
+        <svg class="ringSvg" viewBox="0 0 500 500">
+          <!-- 外周リング -->
+          <circle cx="250" cy="250" r="170" class="ringBase"/>
+          <!-- 判定ライン（6時固定） -->
+          <rect x="247" y="410" width="6" height="32" rx="3" class="judgeBar"/>
+          <!-- 判定ヒットフラッシュ -->
+          <circle cx="250" cy="250" r="170" class="ringFlash" id="ringFlash"/>
+        </svg>
 
-  <div class="ring">
-    <div class="judge-line"></div>
-  </div>
+        <div class="centerLabel" id="centerLabel">
+          TAP<br><span class="sub">DiCo is dancing…</span>
+        </div>
+      </div>
+    </section>
 
-  <div class="hud">
-    <div id="score">0</div>
-    <div id="combo">0</div>
-  </div>
+    <!-- 操作ボタン -->
+    <footer class="controls">
+      <button class="btn primary" id="startBtn">START</button>
+      <button class="btn" id="retryBtn">RETRY</button>
+      <button class="btn" id="muteBtn">MUTE</button>
+    </footer>
 
-  <button id="startBtn">START</button>
+    <!-- 音楽 -->
+    <audio id="music" src="music.mp3" preload="auto" playsinline></audio>
 
-  <audio id="music" src="music.mp3"></audio>
+    <!-- タロット展開オーバーレイ（フィーバー演出） -->
+    <div class="tarotOverlay" id="tarotOverlay" aria-hidden="true">
+      <div class="tarotBurst"></div>
+      <div class="tarotText">タロット展開</div>
+      <div class="tarotCards">
+        <div class="tcard">COMPASS</div>
+        <div class="tcard">TRIGGER</div>
+        <div class="tcard">ROUTE</div>
+      </div>
+    </div>
 
-</div>
+    <div class="toast" id="toast"></div>
+  </main>
 
-<script src="di.js"></script>
+  <script src="di.js"></script>
 </body>
 </html>
