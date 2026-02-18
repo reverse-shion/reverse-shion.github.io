@@ -393,3 +393,117 @@ button:hover,.linkbtn:hover{border-color:rgba(230,201,107,.65);box-shadow:0 0 10
   .ring-wrap{ width: min(86vw, 60vh, 520px); }
   .dico{ bottom: calc(var(--safeB) + 120px); }
 }
+
+/* =========================
+   VISUAL CLARITY PATCH
+   - zone vs indicator
+   - perfect center line
+   - dico show-on-event
+========================= */
+
+:root{
+  --zoneA: rgba(156,60,255,.95); /* violet */
+  --zoneB: rgba(230,201,107,.92); /* gold */
+  --zoneSoft: rgba(156,60,255,.22);
+  --centerLine: rgba(230,201,107,.92);
+  --indicatorFill: rgba(255,255,255,.95);
+  --indicatorEdge: rgba(0,240,255,.85);
+}
+
+/* ① indicator を白＋縁取りにして識別性UP */
+.indicator{
+  fill: var(--indicatorFill);
+  stroke: rgba(0,0,0,.35);
+  stroke-width: 2;
+  filter:
+    drop-shadow(0 0 12px rgba(0,240,255,.85))
+    drop-shadow(0 0 4px rgba(255,255,255,.45));
+}
+
+/* ② zone を紫→金の“狙う帯”に */
+.zoneRing{
+  stroke: url(#gradZONE);
+  stroke-width: 16;
+  opacity: 1;
+  filter:
+    drop-shadow(0 0 16px rgba(156,60,255,.35))
+    drop-shadow(0 0 10px rgba(230,201,107,.18));
+}
+
+/* ③ zone の外側に薄い“ハロー”を足して帯だと分かるように */
+.zoneRing.is-halo{
+  stroke: rgba(156,60,255,.22);
+  stroke-width: 28;
+  opacity: .55;
+  filter: drop-shadow(0 0 18px rgba(156,60,255,.18));
+}
+
+/* ④ PERFECTの中心ライン（ゾーン中央） */
+#zoneCenterLine{
+  stroke: var(--centerLine);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: .95;
+  filter:
+    drop-shadow(0 0 12px rgba(230,201,107,.55))
+    drop-shadow(0 0 6px rgba(0,240,255,.18));
+  transition: opacity .12s, transform .12s, filter .12s;
+}
+
+/* perfect瞬間だけ中心ラインを強く */
+.zonePerfect #zoneCenterLine{
+  opacity: 1;
+  filter:
+    drop-shadow(0 0 20px rgba(230,201,107,.8))
+    drop-shadow(0 0 10px rgba(255,255,255,.35));
+}
+
+/* GOOD時は控えめに光らせる */
+.zoneGood #zoneCenterLine{
+  opacity: .8;
+  filter: drop-shadow(0 0 14px rgba(110,231,255,.35));
+}
+
+/* MISS時の“ノイズ”状態 */
+.zoneMiss .ring-wrap{
+  filter:
+    drop-shadow(0 0 10px rgba(156,60,255,.28))
+    drop-shadow(0 0 20px rgba(255,107,138,.10));
+}
+
+/* ⑤ DiCoを常時表示しない：初期は非表示 */
+.dico{
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+/* 表示トリガ */
+.dico.show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* スマホ時（あなたの既存指定と干渉しないように） */
+@media (max-width:760px){
+  .dico{ transform: translateY(10px); }
+  .dico.show{ transform: translateY(0); }
+}
+
+/* Dicoバブルの“出来事感”を増す */
+.bubble{
+  background: rgba(5,12,24,.86);
+  border: 1px solid rgba(156,60,255,.55);
+  box-shadow:
+    0 0 14px rgba(156,60,255,.22),
+    0 0 10px rgba(0,240,255,.08);
+}
+
+/* "PERFECT狙い"のための軽いガイド（初回だけJSで付与する） */
+.ringGuideHint{
+  animation: ringGuideHint 1.4s ease-in-out infinite;
+}
+@keyframes ringGuideHint{
+  0%,100%{ filter: drop-shadow(0 0 16px rgba(230,201,107,.18)); }
+  50%{ filter: drop-shadow(0 0 28px rgba(230,201,107,.35)); }
+}
