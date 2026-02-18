@@ -17,10 +17,13 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;background:var(--bg);font-family:Inter,"Noto Sans JP",system-ui,sans-serif;color:var(--txt);}
 body{
-  height:100%;
+  min-height:100vh;
+  min-height:100svh;
   min-height:100dvh;
+  min-height:calc(var(--vh, 1vh) * 100);
   overflow:hidden;
   touch-action:manipulation;
+  padding-bottom:env(safe-area-inset-bottom, 0px);
 }
 
 body::before{
@@ -37,9 +40,12 @@ body::before{
 /* ===== Layout ===== */
 #app{
   position:fixed;inset:0;
-  height:100dvh;
+  min-height:100vh;
+  min-height:100svh;
+  min-height:100dvh;
+  height:calc(var(--vh, 1vh) * 100);
   display:grid;grid-template-rows:auto 1fr auto;
-  padding:calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 8px);
+  padding:calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 10px);
   z-index:1;
 }
 
@@ -88,8 +94,6 @@ body::before{
   stroke-width:20;
   fill:none;
   stroke-linecap:round;
-  transform:rotate(-90deg);
-  transform-origin:50% 50%;
 }
 
 /* Zone pulse */
@@ -98,8 +102,6 @@ body::before{
   stroke-width:14;
   fill:none;
   stroke-linecap:round;
-  transform:rotate(-90deg);
-  transform-origin:50% 50%;
   filter:drop-shadow(0 0 8px rgba(0,240,255,.55));
   transition:filter .12s, stroke-width .12s, stroke .12s, opacity .12s;
   opacity:.95;
@@ -227,7 +229,7 @@ body::before{
 /* ===== Controls ===== */
 .controls{
   display:flex;gap:8px;justify-content:center;
-  padding:8px 0 4px;z-index:6;flex-wrap:wrap;
+  padding:8px 0 calc(env(safe-area-inset-bottom, 0px) + 12px);z-index:6;flex-wrap:wrap;
 }
 button,.linkbtn{
   border:1px solid rgba(0,240,255,.35);
@@ -370,12 +372,12 @@ button:hover,.linkbtn:hover{border-color:rgba(230,201,107,.65);box-shadow:0 0 10
 :root{
   --safeB: env(safe-area-inset-bottom, 0px);
   --safeT: env(safe-area-inset-top, 0px);
-  --dock: 84px; /* Safari下バー対策の予備 */
+  --dock: 72px; /* Safari下バー対策の予備 */
 }
 
 /* #app の padding を強化（下に余白を足す） */
 #app{
-  padding: var(--safeT) 16px calc(var(--safeB) + var(--dock)) 16px;
+  padding: calc(var(--safeT) + 8px) 16px calc(var(--safeB) + var(--dock)) 16px;
 }
 
 /* 下のボタン列が確実に見えるように */
