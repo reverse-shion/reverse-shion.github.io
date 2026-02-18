@@ -6,15 +6,15 @@
   ========================= */
   const SESSION_SECONDS = 25;
   const STORAGE_KEY = 'aru_collective_v1';
-
   const TAU = Math.PI * 2;
-  const circleRadius = 170;
-  const circleLen = TAU * circleRadius;
 
-  // SVG viewBox is 0 0 500 500
-  const RING_VIEW = 500;
-  const RING_CX = RING_VIEW / 2;
-  const RING_CY = RING_VIEW / 2;
+  // FX thresholds
+  const OVERDRIVE_ARU = 80;        // ARU>=80 -> overdrive
+  const LEGEND_COMBO_STEP = 12;    // every N combo -> legend card
+  const HAND_SIZE = 3;             // 3-card hand bonus
+  const SCORE_FLASH_1 = 2000;
+  const SCORE_FLASH_2 = 4500;
+  const SCORE_FLASH_3 = 8000;
 
   /* =========================
      DOM
@@ -73,6 +73,26 @@
   // first-time guide (center line hint)
   let guidedOnce = false;
 
+  // RING metrics (measured from SVG)
+  let circleLen = 0;
+  let circleRadius = 170;
+  const RING_VIEW = 500;
+  const RING_CX = RING_VIEW / 2;
+  const RING_CY = RING_VIEW / 2;
+
+  // SVG path direction: +1 means increasing length goes CCW, -1 means CW
+  let svgDir = +1;
+
+  // FX: cyber cards
+  let cardLayer = null;
+  const hand = []; // store last 3 types: 'common'|'rare'|'legend'
+
+  // FX: overdrive drone nodes
+  let drone = { osc: null, gain: null, on: false };
+
+  // FX: score tier once flags
+  let scoreTier = 0;
+
   /* =========================
      STORAGE
   ========================= */
@@ -126,15 +146,248 @@
     return { x, y, rect };
   }
 
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  /* =========================
+     INJECT CSS (for FX, no HTML edits)
+  ========================= */
+  function injectFxCssOnce() {
+    if (document.getElementById('aruFxCss')) return;
+    const css = document.createElement('style');
+    css.id = 'aruFxCss';
+    css.textContent = `
+      /* --- Cyber Cards Layer --- */
+      .aruCardLayer{
+        position:fixed; inset:0;
+        pointer-events:none; z-index: 9999;
+        overflow:hidden;
+        mix-blend-mode: screen;
+      }
+      .aruCard{
+        position:absolute;
+        width: 94px; height: 128px;
+        transform: translate(-50%,-50%) rotate(var(--rot)) scale(var(--s));
+        border-radius: 14px;
+        background:
+          radial-gradient(circle at 25% 15%, rgba(255,255,255,.85), rgba(255,255,255,0) 45%),
+          linear-gradient(135deg, rgba(156,60,255,.85), rgba(0,240,255,.45), rgba(230,201,107,.70));
+        box-shadow:
+          0 0 22px rgba(0,240,255,.22),
+          0 0 38px rgba(156,60,255,.18),
+          0 0 70px rgba(230,201,107,.12);
+        filter: saturate(1.1);
+        opacity: .0;
+        animation: aruCardIn .72s ease-out forwards;
+      }
+      .aruCard::before{
+        content:"";
+        position:absolute; inset:10px;
+        border-radius: 10px;
+        background:
+          linear-gradient(180deg, rgba(0,0,0,.08), rgba(255,255,255,.06)),
+          repeating-linear-gradient(90deg, rgba(255,255,255,.0) 0px, rgba(255,255,255,.0) 6px, rgba(255,255,255,.08) 7px);
+        mix-blend-mode: overlay;
+      }
+      .aruCard .sig{
+        position:absolute; left:10px; right:10px; bottom:10px;
+        font: 700 11px/1.1 ui-sans-serif, system-ui;
+        letter-spacing:.22em; text-transform: uppercase;
+        color: rgba(255,255,255,.92);
+        text-shadow: 0 0 10px rgba(0,240,255,.28);
+      }
+      .aruCard.common{ filter: saturate(1.0); }
+      .aruCard.rare{
+        background:
+          radial-gradient(circle at 22% 14%, rgba(255,255,255,.95), rgba(255,255,255,0) 50%),
+          linear-gradient(135deg, rgba(0,240,255,.85), rgba(156,60,255,.55), rgba(230,201,107,.85));
+        box-shadow:
+          0 0 26px rgba(0,240,255,.28),
+          0 0 54px rgba(230,201,107,.16);
+      }
+      .aruCard.legend{
+        background:
+          radial-gradient(circle at 22% 14%, rgba(255,255,255,.98), rgba(255,255,255,0) 55%),
+          linear-gradient(135deg, rgba(230,201,107,.95), rgba(0,240,255,.55), rgba(156,60,255,.75));
+        box-shadow:
+          0 0 30px rgba(230,201,107,.28),
+          0 0 80px rgba(0,240,255,.12),
+          0 0 120px rgba(156,60,255,.10);
+      }
+      @keyframes aruCardIn{
+        0%{ opacity:0; transform: translate(-50%,-50%) rotate(var(--rot)) scale(calc(var(--s) * .86)); filter: blur(1px); }
+        20%{ opacity:1; }
+        70%{ opacity:.98; filter: blur(0px); }
+        100%{ opacity:0; transform: translate(-50%,-50%) rotate(var(--rot)) scale(calc(var(--s) * 1.12)) translate(var(--dx), var(--dy)); }
+      }
+
+      /* --- Glitch line --- */
+      .aruGlitchLine{
+        position:fixed; left:-10vw; width:120vw; height:2px;
+        background: linear-gradient(90deg, rgba(0,240,255,0), rgba(0,240,255,.65), rgba(230,201,107,.65), rgba(156,60,255,.65), rgba(0,240,255,0));
+        opacity:.0;
+        mix-blend-mode: screen;
+        filter: blur(.2px);
+        animation: aruGlitch .22s linear forwards;
+        z-index:9998;
+      }
+      @keyframes aruGlitch{
+        0%{ opacity:0; transform: translateY(0) skewX(-18deg); }
+        30%{ opacity:.92; }
+        100%{ opacity:0; transform: translateY(0) skewX(18deg); }
+      }
+
+      /* --- Overdrive --- */
+      .overdrivePulse{
+        animation: overdrivePulse 1.05s ease-in-out infinite;
+      }
+      @keyframes overdrivePulse{
+        0%,100%{ filter: drop-shadow(0 0 18px rgba(0,240,255,.32)) drop-shadow(0 0 40px rgba(230,201,107,.18)); }
+        50%{ filter: drop-shadow(0 0 28px rgba(156,60,255,.28)) drop-shadow(0 0 80px rgba(0,240,255,.14)); }
+      }
+      .aruScreenFlash{
+        position:fixed; inset:0; z-index:9997; pointer-events:none;
+        background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.85), rgba(255,255,255,0) 55%),
+                    linear-gradient(135deg, rgba(0,240,255,.28), rgba(156,60,255,.22), rgba(230,201,107,.18));
+        opacity:0;
+        mix-blend-mode: screen;
+      }
+    `;
+    document.head.appendChild(css);
+  }
+
+  function ensureFxLayers() {
+    injectFxCssOnce();
+    if (!cardLayer) {
+      cardLayer = document.createElement('div');
+      cardLayer.className = 'aruCardLayer';
+      document.body.appendChild(cardLayer);
+    }
+    if (!document.getElementById('aruScreenFlash')) {
+      const f = document.createElement('div');
+      f.id = 'aruScreenFlash';
+      f.className = 'aruScreenFlash';
+      document.body.appendChild(f);
+    }
+  }
+
+  function screenFlash(alpha = 0.95, ms = 140) {
+    const el = document.getElementById('aruScreenFlash');
+    if (!el) return;
+    el.style.opacity = String(alpha);
+    setTimeout(() => (el.style.opacity = '0'), ms);
+  }
+
+  function spawnGlitchLine() {
+    const line = document.createElement('div');
+    line.className = 'aruGlitchLine';
+    line.style.top = `${Math.floor(rand(8, innerHeight - 8))}px`;
+    document.body.appendChild(line);
+    setTimeout(() => line.remove(), 260);
+  }
+
+  function spawnCyberCard(type, x, y) {
+    if (!cardLayer) return;
+
+    const el = document.createElement('div');
+    el.className = `aruCard ${type}`;
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+
+    const rot = `${Math.floor(rand(-16, 16))}deg`;
+    const s = (type === 'legend') ? rand(1.10, 1.24) : (type === 'rare' ? rand(0.98, 1.12) : rand(0.92, 1.06));
+    const dx = `${Math.floor(rand(-220, 220))}px`;
+    const dy = `${Math.floor(rand(-220, 220))}px`;
+    el.style.setProperty('--rot', rot);
+    el.style.setProperty('--s', String(s));
+    el.style.setProperty('--dx', dx);
+    el.style.setProperty('--dy', dy);
+
+    const sig = document.createElement('div');
+    sig.className = 'sig';
+    sig.textContent = type === 'legend' ? 'ARCANA LEGEND' : (type === 'rare' ? 'RESONANCE RARE' : 'SYNC COMMON');
+    el.appendChild(sig);
+
+    cardLayer.appendChild(el);
+    setTimeout(() => el.remove(), 820);
+  }
+
+  function pushHand(type, tapX, tapY) {
+    hand.push(type);
+    if (hand.length > HAND_SIZE) hand.shift();
+
+    if (hand.length === HAND_SIZE) {
+      // evaluate bonus
+      const c = hand.filter(t => t === 'common').length;
+      const r = hand.filter(t => t === 'rare').length;
+      const l = hand.filter(t => t === 'legend').length;
+
+      let bonus = 0;
+      let label = '';
+
+      if (l >= 1 && r >= 1) { bonus = 850; label = 'HAND BONUS: LEGEND/RARE'; }
+      else if (r >= 2)     { bonus = 540; label = 'HAND BONUS: DOUBLE RARE'; }
+      else if (c >= 3)     { bonus = 360; label = 'HAND BONUS: TRIPLE COMMON'; }
+      else                 { bonus = 420; label = 'HAND BONUS: MIX'; }
+
+      state.score += bonus;
+      state.aru = Math.min(100, state.aru + 12);
+
+      // big FX burst
+      screenFlash(0.92, 160);
+      spawnGlitchLine();
+      for (let i = 0; i < 6; i++) spawnCyberCard('legend', tapX, tapY);
+      setDico(`《${label} +${bonus}》`, 1100);
+
+      // clear hand for next
+      hand.length = 0;
+
+      hud.combo.textContent = String(state.combo);
+      updateProgress();
+    }
+  }
+
+  /* =========================
+     RING CALIBRATION (IMPORTANT FIX)
+  ========================= */
+  function ensureRingMetrics() {
+    if (!ui.zone) return;
+
+    try {
+      circleLen = ui.zone.getTotalLength();
+    } catch {
+      circleLen = TAU * circleRadius;
+    }
+
+    const rAttr = ui.zone.getAttribute('r');
+    const r = rAttr ? parseFloat(rAttr) : NaN;
+    if (!Number.isNaN(r) && r > 10) circleRadius = r;
+
+    const L = circleLen || 1;
+    const p0 = ui.zone.getPointAtLength(0);
+    const p1 = ui.zone.getPointAtLength(L * 0.01);
+
+    const a0 = Math.atan2(p0.y - RING_CY, p0.x - RING_CX);
+    const a1 = Math.atan2(p1.y - RING_CY, p1.x - RING_CX);
+
+    const d = ((a1 - a0 + Math.PI * 3) % TAU) - Math.PI;
+    svgDir = d >= 0 ? +1 : -1;
+  }
+
+  function gameAngleToSvgLen(gameAngle) {
+    const a = normalizeAngle(gameAngle);
+    const std = normalizeAngle((Math.PI / 2) - a); // CCW from +X
+    const fracCCW = std / TAU;
+    const frac = svgDir === +1 ? fracCCW : (1 - fracCCW);
+    return frac * circleLen;
+  }
+
   /* =========================
      UI: DiCo (event-only)
-     - requirement: show only on MISS / special events
   ========================= */
   function showDico(text, ms = 1500) {
     if (!ui.dico) return;
     ui.dico.textContent = text;
 
-    // if .dico.show CSS exists, use it; otherwise just fade by inline
     if (ui.dicoWrap) {
       ui.dicoWrap.classList.add('show');
       clearTimeout(dicoTimer);
@@ -145,11 +398,7 @@
       dicoTimer = setTimeout(() => (ui.dico.style.opacity = '0'), ms);
     }
   }
-
-  // keep API name, but behavior becomes event-only
-  function setDico(text, ms = 1500) {
-    showDico(text, ms);
-  }
+  function setDico(text, ms = 1500) { showDico(text, ms); }
 
   function setZoneState(kind) {
     if (!ui.ringWrap) return;
@@ -168,21 +417,17 @@
 
   /* =========================
      SVG VISUALS INJECTION
-     - zone gradient, halo ring, center line
-     (no HTML edits required)
   ========================= */
   function injectZoneVisuals() {
     const svg = ui.ringSvg;
     if (!svg || !ui.zone) return;
 
-    // defs
     let defs = svg.querySelector('defs');
     if (!defs) {
       defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
       svg.insertBefore(defs, svg.firstChild);
     }
 
-    // gradient for ZONE
     if (!svg.querySelector('#gradZONE')) {
       const lg = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
       lg.setAttribute('id', 'gradZONE');
@@ -209,10 +454,8 @@
       defs.appendChild(lg);
     }
 
-    // ensure zone uses gradient stroke (CSS can override too)
     ui.zone.style.stroke = 'url(#gradZONE)';
 
-    // halo clone (thicker, softer)
     if (!ui.zone._haloMade) {
       const halo = ui.zone.cloneNode(true);
       halo.classList.add('is-halo');
@@ -222,7 +465,6 @@
       ui.zone._haloEl = halo;
     }
 
-    // center line arc (short circle segment)
     if (!svg.querySelector('#zoneCenterLine')) {
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       line.setAttribute('id', 'zoneCenterLine');
@@ -230,8 +472,6 @@
       line.setAttribute('cy', String(RING_CY));
       line.setAttribute('r', String(circleRadius));
       line.setAttribute('fill', 'none');
-      // align with zone stroke convention
-      line.setAttribute('transform', `rotate(-90 ${RING_CX} ${RING_CY})`);
       svg.appendChild(line);
     }
   }
@@ -242,6 +482,13 @@
   function resetState() {
     cancelAnimationFrame(rafId);
     rafId = 0;
+
+    ensureFxLayers();
+    ensureRingMetrics();
+
+    scoreTier = 0;
+    hand.length = 0;
+    setOverdrive(false);
 
     state = {
       running: false,
@@ -260,17 +507,14 @@
       playCount: (state?.playCount || 0),
 
       baseSpeed: 1.55,
-      angle: Math.random() * TAU,
-
-      zoneCenter: Math.random() * TAU,
+      angle: Math.random() * TAU,      // indicator angle (GAME)
+      zoneCenter: Math.random() * TAU, // zone center (GAME)
       zoneWidth: Math.PI / 7,
 
       freezeUntil: 0
     };
 
-    // visuals injection once (safe to call repeatedly)
     injectZoneVisuals();
-
     updateZone();
     updateProgress();
     updateIndicator(0);
@@ -280,12 +524,10 @@
     hud.aru.textContent = '0%';
 
     ui.core.innerHTML = 'AWAITING<br>INPUT';
-    // requirement: do NOT show dico always
-    // (no setDico here)
     drawConstellation(0.08);
 
     ui.coreVoid.classList.remove('coreGlowGood', 'coreGlowPerfect');
-    ui.ringWrap.classList.remove('freeze', 'shake');
+    ui.ringWrap.classList.remove('freeze', 'shake', 'overdrivePulse');
     setZoneState(null);
   }
 
@@ -336,33 +578,26 @@
      RING / ZONE / INDICATOR
   ========================= */
   function updateZone() {
-    // zone start angle (0..2π)
-    const start = normalizeAngle(state.zoneCenter - state.zoneWidth / 2);
-
-    // length of arc
+    const startAngle = normalizeAngle(state.zoneCenter - state.zoneWidth / 2);
     const zoneLen = circleLen * (state.zoneWidth / TAU);
-
-    // dash offset (12 o'clock aligned)
-    const offset = (circleLen * 0.25) - (circleLen * (start / TAU));
+    const startLen = gameAngleToSvgLen(startAngle);
 
     ui.zone.style.strokeDasharray = `${zoneLen} ${circleLen - zoneLen}`;
-    ui.zone.style.strokeDashoffset = `${offset}`;
+    ui.zone.style.strokeDashoffset = `${-startLen}`;
 
-    // halo mirrors dash
     if (ui.zone._haloEl) {
       ui.zone._haloEl.style.strokeDasharray = ui.zone.style.strokeDasharray;
       ui.zone._haloEl.style.strokeDashoffset = ui.zone.style.strokeDashoffset;
     }
 
-    // center line: tiny arc at exact center (shows "aim here")
     const line = ui.ringSvg?.querySelector('#zoneCenterLine');
     if (line) {
-      const centerWidth = Math.PI / 45; // short arc
+      const centerWidth = Math.PI / 45;
       const centerStart = normalizeAngle(state.zoneCenter - centerWidth / 2);
       const centerLen = circleLen * (centerWidth / TAU);
-      const centerOffset = (circleLen * 0.25) - (circleLen * (centerStart / TAU));
+      const centerStartLen = gameAngleToSvgLen(centerStart);
       line.style.strokeDasharray = `${centerLen} ${circleLen - centerLen}`;
-      line.style.strokeDashoffset = `${centerOffset}`;
+      line.style.strokeDashoffset = `${-centerStartLen}`;
     }
   }
 
@@ -371,7 +606,9 @@
     const fill = circleLen * (pct / 100);
 
     ui.progress.style.strokeDasharray = `${fill} ${circleLen - fill}`;
-    ui.progress.style.strokeDashoffset = `${circleLen * 0.25}`;
+    const startLen = gameAngleToSvgLen(0);
+    ui.progress.style.strokeDashoffset = `${-startLen}`;
+
     hud.aru.textContent = `${pct.toFixed(0)}%`;
 
     const t = pct / 100;
@@ -379,6 +616,16 @@
     ui.ringWrap.style.filter = `drop-shadow(0 0 ${16 + t * 24}px ${glow})`;
 
     drawConstellation(0.08 + t * 0.45);
+
+    // overdrive toggle
+    if (pct >= OVERDRIVE_ARU) setOverdrive(true);
+    else setOverdrive(false);
+
+    // score-tier flash (based on score)
+    const s = state.score;
+    if (scoreTier < 1 && s >= SCORE_FLASH_1) { scoreTier = 1; screenFlash(0.85, 120); spawnGlitchLine(); }
+    if (scoreTier < 2 && s >= SCORE_FLASH_2) { scoreTier = 2; screenFlash(0.92, 140); spawnGlitchLine(); spawnGlitchLine(); }
+    if (scoreTier < 3 && s >= SCORE_FLASH_3) { scoreTier = 3; screenFlash(0.98, 160); spawnGlitchLine(); spawnGlitchLine(); spawnGlitchLine(); }
   }
 
   function updateIndicator(dt) {
@@ -387,7 +634,6 @@
 
     state.angle = (state.angle + speed * dt) % TAU;
 
-    // Our 0 angle = 12 o'clock, clockwise
     const x = RING_CX + Math.cos(state.angle - Math.PI / 2) * circleRadius;
     const y = RING_CY + Math.sin(state.angle - Math.PI / 2) * circleRadius;
 
@@ -402,15 +648,12 @@
     } while (deltaAngle(next, state.zoneCenter) < Math.PI / 5);
 
     state.zoneCenter = next;
-
-    // zone narrows slightly with combo (good stays wide, perfect is center line)
     state.zoneWidth = Math.max(Math.PI / 9.2, Math.PI / 7.2 - Math.min(0.2, state.combo * 0.006));
-
     updateZone();
   }
 
   /* =========================
-     FX: RIPPLE / SPARK / IGNITE / CORE GLOW
+     FX
   ========================= */
   function spawnRipple(x, y, type = 'good') {
     const el = document.createElement('div');
@@ -422,14 +665,14 @@
   }
 
   function spawnSparks(x, y) {
-    const count = 6;
+    const count = 7;
     for (let i = 0; i < count; i++) {
       const s = document.createElement('div');
       s.className = 'spark';
       s.style.setProperty('--x', `${x}px`);
       s.style.setProperty('--y', `${y}px`);
       const ang = Math.random() * TAU;
-      const dist = 30 + Math.random() * 55;
+      const dist = 40 + Math.random() * 70;
       s.style.setProperty('--dx', `${(Math.cos(ang) * dist).toFixed(1)}px`);
       s.style.setProperty('--dy', `${(Math.sin(ang) * dist).toFixed(1)}px`);
       ui.rippleLayer.appendChild(s);
@@ -438,7 +681,7 @@
   }
 
   function spawnMissNoise() {
-    const count = 5;
+    const count = 6;
     for (let i = 0; i < count; i++) {
       const line = document.createElement('div');
       line.className = 'ringNoiseLine';
@@ -456,22 +699,86 @@
     setTimeout(() => ui.missBadge.classList.remove('show'), 360);
   }
 
-  // NOTE: zone visual is now CSS/gradient-driven. We only add state classes.
   function coreGlow(kind = 'good') {
     ui.coreVoid.classList.remove('coreGlowGood', 'coreGlowPerfect');
-
     if (kind === 'perfect') {
       ui.coreVoid.classList.add('coreGlowPerfect');
       setTimeout(() => ui.coreVoid.classList.remove('coreGlowPerfect'), 220);
       return;
     }
-
     ui.coreVoid.classList.add('coreGlowGood');
     setTimeout(() => ui.coreVoid.classList.remove('coreGlowGood'), 170);
   }
 
   /* =========================
-     JUDGE
+     OVERDRIVE (visual + drone)
+  ========================= */
+  function setOverdrive(on) {
+    if (!state) return;
+    if (on && !state.overdrive) {
+      state.overdrive = true;
+      ui.ringWrap?.classList.add('overdrivePulse');
+      screenFlash(0.78, 160);
+      spawnGlitchLine();
+      startDrone();
+      setDico('《OVERDRIVE：共鳴上昇》', 1200);
+    } else if (!on && state.overdrive) {
+      state.overdrive = false;
+      ui.ringWrap?.classList.remove('overdrivePulse');
+      stopDrone();
+    }
+  }
+
+  function startDrone() {
+    enableAudio();
+    if (!audioCtx || drone.on) return;
+
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(48, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.035, audioCtx.currentTime + 0.25);
+
+    // slight wobble (LFO)
+    const lfo = audioCtx.createOscillator();
+    const lfoG = audioCtx.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(0.9, audioCtx.currentTime);
+    lfoG.gain.setValueAtTime(3.5, audioCtx.currentTime);
+    lfo.connect(lfoG);
+    lfoG.connect(osc.frequency);
+
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+
+    lfo.start();
+    osc.start();
+
+    drone = { osc, gain: g, lfo, lfoG, on: true };
+  }
+
+  function stopDrone() {
+    if (!audioCtx || !drone.on) return;
+    try {
+      const now = audioCtx.currentTime;
+      drone.gain.gain.cancelScheduledValues(now);
+      drone.gain.gain.setValueAtTime(Math.max(0.0001, drone.gain.gain.value || 0.02), now);
+      drone.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+      setTimeout(() => {
+        try { drone.lfo?.stop(); } catch {}
+        try { drone.osc?.stop(); } catch {}
+        try { drone.lfo?.disconnect(); } catch {}
+        try { drone.lfoG?.disconnect(); } catch {}
+        try { drone.osc?.disconnect(); } catch {}
+        try { drone.gain?.disconnect(); } catch {}
+      }, 220);
+    } catch {}
+    drone.on = false;
+  }
+
+  /* =========================
+     JUDGE (timing-based)
   ========================= */
   function judgeTap(localX, localY) {
     if (!state.running || state.ended || state.unfolding) return;
@@ -481,17 +788,21 @@
     const isCompact = window.matchMedia('(max-width: 760px)').matches;
     const halfZone = state.zoneWidth / 2;
 
-    // state.angle and zoneCenter share same convention (0=12 o'clock clockwise)
+    // timing judge
     const d = deltaAngle(normalizeAngle(state.angle), normalizeAngle(state.zoneCenter));
 
-    // PERFECT is center-biased (narrow), GOOD is band (wider)
     const perfectWin = halfZone * (isCompact ? 0.62 : 0.52);
     const goodWin = halfZone * (isCompact ? 1.2 : 1.05);
+
+    // tap position -> screen coords for card spawn
+    const tapRect = ui.tapLayer.getBoundingClientRect();
+    const tapX = tapRect.left + localX;
+    const tapY = tapRect.top + localY;
 
     if (d <= perfectWin) {
       const gain = 15 + Math.min(10, state.combo * 0.4);
       state.aru = Math.min(100, state.aru + gain);
-      state.score += 180 + state.combo * 18;
+      state.score += 190 + state.combo * 20;
       state.perfect++;
       state.combo++;
 
@@ -501,13 +812,22 @@
       spawnSparks(localX, localY);
       coreGlow('perfect');
 
-      // requirement: no constant speech; success speech optional -> keep OFF
+      // CYBER CARD
+      spawnCyberCard('rare', tapX, tapY);
+      if (state.combo % LEGEND_COMBO_STEP === 0) spawnCyberCard('legend', tapX, tapY);
+      pushHand(state.combo % LEGEND_COMBO_STEP === 0 ? 'legend' : 'rare', tapX, tapY);
+
+      // extra punch
+      screenFlash(state.overdrive ? 0.88 : 0.70, 120);
+      spawnGlitchLine();
+
       ui.core.innerHTML = 'PERFECT<br>RESONANCE';
       moveZone();
       maybeGuide();
+
     } else if (d <= goodWin) {
       state.aru = Math.min(100, state.aru + 10);
-      state.score += 100 + state.combo * 8;
+      state.score += 105 + state.combo * 9;
       state.good++;
       state.combo++;
 
@@ -516,10 +836,17 @@
       spawnRipple(localX, localY, 'good');
       coreGlow('good');
 
-      // requirement: no constant speech; success speech optional -> keep OFF
+      // CYBER CARD
+      spawnCyberCard('common', tapX, tapY);
+      pushHand('common', tapX, tapY);
+
+      // light flash sometimes
+      if (state.combo % 5 === 0) spawnGlitchLine();
+
       ui.core.innerHTML = 'GOOD<br>SYNC';
       moveZone();
       maybeGuide();
+
     } else {
       state.aru = Math.max(0, state.aru - 2);
       state.score = Math.max(0, state.score - 10);
@@ -537,10 +864,14 @@
       ui.ringWrap.classList.add('shake');
 
       ui.coreVoid.classList.remove('coreGlowGood', 'coreGlowPerfect');
-
-      // requirement: MISS only + auto hide
       setDico('ノイズ混入。中心線を狙って。', 1600);
       ui.core.innerHTML = 'NOISE<br>DETECTED';
+
+      // reset hand on miss
+      hand.length = 0;
+
+      // miss glitch
+      spawnGlitchLine();
     }
 
     hud.combo.textContent = String(state.combo);
@@ -577,6 +908,8 @@
     state.ended = true;
     cancelAnimationFrame(rafId);
 
+    setOverdrive(false);
+
     const totalHit = state.perfect + state.good + state.miss;
     const acc = totalHit ? (state.perfect * 1 + state.good * 0.65) / totalHit : 0;
     const contribution = Math.max(1, Math.round(state.score / 120 + state.perfect * 2 + state.good));
@@ -612,7 +945,6 @@
     if (state.unfolding) return;
 
     state.unfolding = true;
-    // requirement: event-only is OK (unfold is an event)
     setDico('観測値を超えた。開くよ、しーちゃん', 1400);
 
     setZoneState('perfect');
@@ -621,22 +953,23 @@
     unfoldFx();
     overlays.unfold.classList.add('show');
 
+    // big unfold burst
+    screenFlash(0.98, 180);
+    for (let i = 0; i < 10; i++) spawnGlitchLine();
+
     setTimeout(() => {
       overlays.unfold.classList.remove('show');
       finishSession(true);
     }, 1000);
   }
 
-  /* =========================
-     UI Helpers
-  ========================= */
   function closeOverlays() {
     overlays.how.classList.remove('show');
     overlays.result.classList.remove('show');
   }
 
   /* =========================
-     INPUT (single source)
+     INPUT
   ========================= */
   function handlePointerDown(e) {
     const t = nowMs();
@@ -654,7 +987,7 @@
     if (!state.running && !state.ended && !state.unfolding) {
       startGame();
       spawnRipple(x, y, 'good');
-      maybeGuide(); // first-time: visually emphasize center line, no text spam
+      maybeGuide();
       return;
     }
 
@@ -752,9 +1085,7 @@
      AUDIO
   ========================= */
   function enableAudio() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
   }
 
@@ -841,6 +1172,7 @@
   ========================= */
   function showToast(msg) {
     const t = $('toast');
+    if (!t) return;
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 1400);
@@ -873,7 +1205,7 @@
     btn.addEventListener('click', () => $(btn.dataset.close)?.classList.remove('show'));
   });
 
-  ui.tapLayer.addEventListener('pointerdown', handlePointerDown, { passive: false });
+  ui.tapLayer?.addEventListener('pointerdown', handlePointerDown, { passive: false });
 
   ui.gameArea?.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
