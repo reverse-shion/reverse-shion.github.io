@@ -12,6 +12,7 @@
   const OVERDRIVE_ARU = 80;        // ARU>=80 -> overdrive
   const LEGEND_COMBO_STEP = 12;    // every N combo -> legend card
   const HAND_SIZE = 3;             // 3-card hand bonus
+  const DEBUG_MODE = new URLSearchParams(location.search).get('debug') === '1';
   const SCORE_FLASH_1 = 2000;
   const SCORE_FLASH_2 = 4500;
   const SCORE_FLASH_3 = 8000;
@@ -76,12 +77,13 @@
   // RING metrics (measured from SVG)
   let circleLen = 0;
   let circleRadius = 170;
-  const RING_VIEW = 500;
-  const RING_CX = RING_VIEW / 2;
-  const RING_CY = RING_VIEW / 2;
+  let ringCx = 250;
+  let ringCy = 250;
+  let phaseOffset = 0;
 
   // SVG path direction: +1 means increasing length goes CCW, -1 means CW
   let svgDir = +1;
+  let debugHud = null;
 
   // FX: cyber cards
   let cardLayer = null;
@@ -285,7 +287,11 @@
     setTimeout(() => line.remove(), 260);
   }
 
-  function spawnCyberCard(type, x, y) {
+  function viewportCenter() {
+    return { x: innerWidth * 0.5, y: innerHeight * 0.5 };
+  }
+
+  function spawnCyberCard(type, x, y, opts = {}) {
     if (!cardLayer) return;
 
     const el = document.createElement('div');
@@ -293,10 +299,12 @@
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
 
+    const angle = (typeof opts.angle === 'number') ? opts.angle : rand(0, TAU);
+    const distance = opts.distance ?? rand(120, 230);
     const rot = `${Math.floor(rand(-16, 16))}deg`;
     const s = (type === 'legend') ? rand(1.10, 1.24) : (type === 'rare' ? rand(0.98, 1.12) : rand(0.92, 1.06));
-    const dx = `${Math.floor(rand(-220, 220))}px`;
-    const dy = `${Math.floor(rand(-220, 220))}px`;
+    const dx = `${Math.cos(angle) * distance}px`;
+    const dy = `${Math.sin(angle) * distance}px`;
     el.style.setProperty('--rot', rot);
     el.style.setProperty('--s', String(s));
     el.style.setProperty('--dx', dx);
@@ -309,6 +317,16 @@
 
     cardLayer.appendChild(el);
     setTimeout(() => el.remove(), 820);
+  }
+
+  function spawnCenterCardBurst(type = 'common', count = 1, spread = Math.PI * 1.6, anchorAngle = null) {
+    const c = viewportCenter();
+    const start = (anchorAngle ?? rand(0, TAU)) - spread / 2;
+    for (let i = 0; i < count; i++) {
+      const t = count === 1 ? 0.5 : i / (count - 1);
+      const angle = start + spread * t + rand(-0.1, 0.1);
+      spawnCyberCard(type, c.x, c.y, { angle, distance: rand(120, type === 'legend' ? 260 : 210) });
+    }
   }
 
   function pushHand(type, tapX, tapY) {
@@ -335,7 +353,7 @@
       // big FX burst
       screenFlash(0.92, 160);
       spawnGlitchLine();
-      for (let i = 0; i < 6; i++) spawnCyberCard('legend', tapX, tapY);
+      spawnCenterCardBurst('legend', 7, Math.PI * 1.8, rand(0, TAU));
       setDico(`《${label} +${bonus}》`, 1100);
 
       // clear hand for next
@@ -349,8 +367,33 @@
   /* =========================
      RING CALIBRATION (IMPORTANT FIX)
   ========================= */
+  function syncViewportUnit() {
+    const h = window.visualViewport?.height || innerHeight;
+    document.documentElement.style.setProperty('--vh', `${h * 0.01}px`);
+  }
+
+  function ensureDebugHud() {
+    if (!DEBUG_MODE || debugHud) return;
+    debugHud = document.createElement('div');
+    debugHud.style.cssText = 'position:fixed;top:8px;right:8px;z-index:99999;background:rgba(2,8,18,.78);border:1px solid rgba(0,240,255,.4);padding:8px 10px;border-radius:8px;font:12px/1.45 ui-monospace,monospace;white-space:pre;pointer-events:none;';
+    document.body.appendChild(debugHud);
+  }
+
+  function updateDebugHud(delta) {
+    if (!DEBUG_MODE || !debugHud || !state) return;
+    debugHud.textContent = `zone=${(state.zoneCenter * 180 / Math.PI).toFixed(1)}°
+ind=${(state.angle * 180 / Math.PI).toFixed(1)}°
+Δ=${(delta * 180 / Math.PI).toFixed(2)}°
+phase=${(phaseOffset * 180 / Math.PI).toFixed(2)}°`;
+  }
+
   function ensureRingMetrics() {
     if (!ui.zone) return;
+
+    const bb = ui.zone.getBBox();
+    ringCx = bb.x + bb.width * 0.5;
+    ringCy = bb.y + bb.height * 0.5;
+    circleRadius = Math.max(1, (bb.width + bb.height) * 0.25);
 
     try {
       circleLen = ui.zone.getTotalLength();
@@ -358,26 +401,23 @@
       circleLen = TAU * circleRadius;
     }
 
-    const rAttr = ui.zone.getAttribute('r');
-    const r = rAttr ? parseFloat(rAttr) : NaN;
-    if (!Number.isNaN(r) && r > 10) circleRadius = r;
-
-    const L = circleLen || 1;
+    const L = Math.max(1, circleLen);
     const p0 = ui.zone.getPointAtLength(0);
-    const p1 = ui.zone.getPointAtLength(L * 0.01);
+    const p1 = ui.zone.getPointAtLength(Math.min(L, L * 0.01));
 
-    const a0 = Math.atan2(p0.y - RING_CY, p0.x - RING_CX);
-    const a1 = Math.atan2(p1.y - RING_CY, p1.x - RING_CX);
+    const len0Game = normalizeAngle(Math.PI / 2 - Math.atan2(p0.y - ringCy, p0.x - ringCx));
+    phaseOffset = len0Game;
 
+    const a0 = Math.atan2(p0.y - ringCy, p0.x - ringCx);
+    const a1 = Math.atan2(p1.y - ringCy, p1.x - ringCx);
     const d = ((a1 - a0 + Math.PI * 3) % TAU) - Math.PI;
     svgDir = d >= 0 ? +1 : -1;
   }
 
   function gameAngleToSvgLen(gameAngle) {
-    const a = normalizeAngle(gameAngle);
-    const std = normalizeAngle((Math.PI / 2) - a); // CCW from +X
-    const fracCCW = std / TAU;
-    const frac = svgDir === +1 ? fracCCW : (1 - fracCCW);
+    const target = normalizeAngle(gameAngle - phaseOffset);
+    const fracGameCW = target / TAU;
+    const frac = svgDir === +1 ? (1 - fracGameCW) : fracGameCW;
     return frac * circleLen;
   }
 
@@ -468,8 +508,8 @@
     if (!svg.querySelector('#zoneCenterLine')) {
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       line.setAttribute('id', 'zoneCenterLine');
-      line.setAttribute('cx', String(RING_CX));
-      line.setAttribute('cy', String(RING_CY));
+      line.setAttribute('cx', String(ringCx));
+      line.setAttribute('cy', String(ringCy));
       line.setAttribute('r', String(circleRadius));
       line.setAttribute('fill', 'none');
       svg.appendChild(line);
@@ -562,6 +602,7 @@
     state.timeLeft -= dt;
 
     updateIndicator(dt);
+    updateDebugHud(deltaAngle(normalizeAngle(state.angle), normalizeAngle(state.zoneCenter)));
     hud.time.textContent = `${Math.max(0, state.timeLeft).toFixed(1)}s`;
 
     animateStars(dt);
@@ -592,6 +633,9 @@
 
     const line = ui.ringSvg?.querySelector('#zoneCenterLine');
     if (line) {
+      line.setAttribute('cx', String(ringCx));
+      line.setAttribute('cy', String(ringCy));
+      line.setAttribute('r', String(circleRadius));
       const centerWidth = Math.PI / 45;
       const centerStart = normalizeAngle(state.zoneCenter - centerWidth / 2);
       const centerLen = circleLen * (centerWidth / TAU);
@@ -634,8 +678,8 @@
 
     state.angle = (state.angle + speed * dt) % TAU;
 
-    const x = RING_CX + Math.cos(state.angle - Math.PI / 2) * circleRadius;
-    const y = RING_CY + Math.sin(state.angle - Math.PI / 2) * circleRadius;
+    const x = ringCx + Math.cos(state.angle - Math.PI / 2) * circleRadius;
+    const y = ringCy + Math.sin(state.angle - Math.PI / 2) * circleRadius;
 
     ui.indicator.setAttribute('cx', x.toFixed(2));
     ui.indicator.setAttribute('cy', y.toFixed(2));
@@ -790,9 +834,11 @@
 
     // timing judge
     const d = deltaAngle(normalizeAngle(state.angle), normalizeAngle(state.zoneCenter));
+    updateDebugHud(d);
 
-    const perfectWin = halfZone * (isCompact ? 0.62 : 0.52);
-    const goodWin = halfZone * (isCompact ? 1.2 : 1.05);
+    const overdriveNarrow = state.overdrive ? 0.94 : 1;
+    const perfectWin = halfZone * (isCompact ? 0.68 : 0.56) * overdriveNarrow;
+    const goodWin = halfZone * (isCompact ? 1.28 : 1.1);
 
     // tap position -> screen coords for card spawn
     const tapRect = ui.tapLayer.getBoundingClientRect();
@@ -812,9 +858,9 @@
       spawnSparks(localX, localY);
       coreGlow('perfect');
 
-      // CYBER CARD
-      spawnCyberCard('rare', tapX, tapY);
-      if (state.combo % LEGEND_COMBO_STEP === 0) spawnCyberCard('legend', tapX, tapY);
+      // CYBER CARD (viewport center burst)
+      spawnCenterCardBurst('rare', 2, Math.PI * 0.9, state.angle);
+      if (state.combo % LEGEND_COMBO_STEP === 0) spawnCenterCardBurst('legend', 5, Math.PI * 1.3, state.angle);
       pushHand(state.combo % LEGEND_COMBO_STEP === 0 ? 'legend' : 'rare', tapX, tapY);
 
       // extra punch
@@ -836,8 +882,8 @@
       spawnRipple(localX, localY, 'good');
       coreGlow('good');
 
-      // CYBER CARD
-      spawnCyberCard('common', tapX, tapY);
+      // CYBER CARD (viewport center burst)
+      spawnCenterCardBurst('common', 1, Math.PI * 0.45, state.angle);
       pushHand('common', tapX, tapY);
 
       // light flash sometimes
@@ -848,8 +894,8 @@
       maybeGuide();
 
     } else {
-      state.aru = Math.max(0, state.aru - 2);
-      state.score = Math.max(0, state.score - 10);
+      state.aru = Math.max(0, state.aru - 1.2);
+      state.score = Math.max(0, state.score - 6);
       state.miss++;
       state.combo = 0;
 
@@ -1001,6 +1047,7 @@
   const c2d = canvas.getContext('2d', { alpha: true });
 
   function resizeCanvas() {
+    syncViewportUnit();
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.floor(innerWidth * dpr);
     canvas.height = Math.floor(innerHeight * dpr);
@@ -1228,10 +1275,14 @@
   });
 
   window.addEventListener('resize', resizeCanvas);
+  window.visualViewport?.addEventListener('resize', syncViewportUnit);
+  window.visualViewport?.addEventListener('scroll', syncViewportUnit);
 
   /* =========================
      INIT
   ========================= */
+  syncViewportUnit();
+  ensureDebugHud();
   resizeCanvas();
   resetState();
 
