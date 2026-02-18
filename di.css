@@ -1,238 +1,280 @@
 :root{
-  --bg:#05060a;
-  --text:rgba(245,245,242,.92);
-  --muted:rgba(245,245,242,.62);
+  --bg: #05060b;
+  --txt: rgba(245,245,245,.92);
+  --muted: rgba(245,245,245,.65);
   --cyan: rgba(0,240,255,.95);
-  --gold: rgba(230,201,107,.92);
-  --panel: rgba(255,255,255,.06);
-  --line: rgba(255,255,255,.16);
+  --gold: rgba(230,201,107,.95);
+  --vio: rgba(156,60,255,.95);
+
   --safeB: env(safe-area-inset-bottom, 0px);
   --safeT: env(safe-area-inset-top, 0px);
-  --vh: 1vh; /* JSで更新 */
+
+  /* JSが更新 */
+  --vh: 1vh;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
+*{ box-sizing:border-box; }
+html, body{ height:100%; }
 body{
   margin:0;
   background: var(--bg);
-  color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  color: var(--txt);
+  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
   overflow:hidden;
 }
 
 .app{
   position:relative;
+  width:100%;
   height: calc(var(--vh) * 100);
   padding-top: calc(var(--safeT) + 10px);
-  padding-bottom: calc(var(--safeB) + 10px);
+  padding-bottom: calc(var(--safeB) + 12px);
 }
 
 .bgVideo{
-  position:absolute; inset:0;
-  width:100%; height:100%;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
   object-fit:cover;
-  filter: saturate(1.1) contrast(1.08) brightness(.55);
-  opacity:.55;
+  opacity:.28;
+  filter: saturate(1.2) contrast(1.05);
   transform: translateZ(0);
+}
+
+.fxLayer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
 }
 
 .hud{
   position:relative;
   z-index:5;
-  display:flex;
-  gap:10px;
-  padding: 10px 12px 6px;
+  display:grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap:12px;
+  padding: 0 14px;
+  align-items:start;
 }
-.hudBox{
-  flex:1;
-  min-width:0;
-  padding:10px 12px;
-  border:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  border-radius:14px;
-  backdrop-filter: blur(10px);
-}
-.hudLabel{
+
+.hud .label{
   font-size:12px;
-  letter-spacing:.14em;
+  letter-spacing:.12em;
   color: var(--muted);
 }
-.hudValue{
-  margin-top:4px;
-  font-size:20px;
-  font-weight:700;
+
+.hud .value{
+  font-size:22px;
+  font-weight:800;
+  text-shadow: 0 0 18px rgba(0,240,255,.25);
+}
+
+.hudMid{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+}
+
+.combo{
+  display:flex;
+  gap:10px;
+  align-items:baseline;
+}
+
+.combo .value{
+  font-size:26px;
+}
+
+.fever{
+  width:min(320px, 92%);
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(10px);
+  border-radius:14px;
+}
+
+.feverTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.feverBar{
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.10);
+  overflow:hidden;
+}
+
+.feverFill{
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--vio), var(--cyan), var(--gold));
+  box-shadow: 0 0 18px rgba(0,240,255,.35);
 }
 
 .noteCanvas{
-  position:absolute; inset:0;
-  z-index:4;
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
+  z-index:4;
   touch-action: manipulation;
 }
 
-.stage{
+.bottom{
   position:absolute;
-  left:0; right:0;
-  top: 50%;
-  transform: translateY(-46%);
-  display:grid;
-  place-items:center;
-  z-index:3;
-  pointer-events:none;
-}
-
-.ringWrap{
-  width:min(78vw, 360px);
-  aspect-ratio: 1 / 1;
-  position:relative;
-  filter: drop-shadow(0 0 24px rgba(0,240,255,.18));
-}
-
-.ringSvg{
-  width:100%;
-  height:100%;
-  display:block;
-}
-
-.ringBase{
-  fill:none;
-  stroke: rgba(0,240,255,.22);
-  stroke-width: 14;
-}
-
-.judgeBar{
-  fill: rgba(230,201,107,.92);
-  filter: drop-shadow(0 0 10px rgba(230,201,107,.35));
-}
-
-.ringFlash{
-  fill:none;
-  stroke: rgba(0,240,255,.0);
-  stroke-width: 22;
-}
-
-.centerLabel{
-  position:absolute;
-  inset:0;
-  display:grid;
-  place-items:center;
-  text-align:center;
-  letter-spacing:.12em;
-  font-weight:800;
-  text-shadow: 0 10px 40px rgba(0,0,0,.65);
-}
-.centerLabel .sub{
-  display:block;
-  margin-top:8px;
-  font-size:12px;
-  color: var(--muted);
-  font-weight:600;
-  letter-spacing:.08em;
-}
-
-.controls{
-  position:absolute;
-  left:0; right:0;
+  left:0;
+  right:0;
   bottom:0;
   z-index:6;
   display:flex;
   gap:10px;
-  padding: 10px 12px calc(var(--safeB) + 12px);
+  justify-content:center;
+  padding: 12px 14px calc(var(--safeB) + 12px);
 }
 
 .btn{
-  flex:1;
-  padding: 14px 12px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.07);
+  color: var(--txt);
+  padding: 12px 14px;
   border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(0,0,0,.35);
-  color: var(--text);
   font-weight:800;
-  letter-spacing:.12em;
+  letter-spacing:.06em;
 }
+
 .btn.primary{
   border-color: rgba(0,240,255,.35);
-  background: linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.06));
+  background: rgba(0,240,255,.12);
+  box-shadow: 0 0 20px rgba(0,240,255,.12);
 }
 
-.toast{
+.centerBanner{
   position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom: calc(var(--safeB) + 84px);
-  z-index:9;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border:1px solid var(--line);
-  background: rgba(0,0,0,.45);
-  opacity:0;
-  transition: opacity .18s ease, transform .18s ease;
-  pointer-events:none;
-  backdrop-filter: blur(10px);
-}
-.toast.show{
-  opacity:1;
-  transform: translateX(-50%) translateY(-6px);
-}
-
-/* タロット展開（中央から広がる） */
-.tarotOverlay{
-  position:absolute; inset:0;
-  z-index:10;
-  display:none;
-  place-items:center;
-  background: radial-gradient(circle at 50% 50%, rgba(0,240,255,.10), rgba(0,0,0,.55));
-}
-.tarotOverlay.show{ display:grid; }
-
-.tarotBurst{
-  position:absolute;
-  width: 24vmin;
-  height: 24vmin;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(230,201,107,.55), rgba(0,240,255,.20), rgba(0,0,0,0));
-  filter: blur(1px);
-  animation: burst 900ms ease-out forwards;
-}
-@keyframes burst{
-  from{ transform: scale(.3); opacity:.0; }
-  20%{ opacity:1; }
-  to{ transform: scale(4.2); opacity:0; }
-}
-
-.tarotText{
-  font-weight:900;
-  letter-spacing:.22em;
-  font-size: 22px;
-  text-shadow: 0 18px 60px rgba(0,0,0,.75);
-  margin-bottom: 16px;
-}
-
-.tarotCards{
-  display:flex;
-  gap:10px;
-}
-.tcard{
-  width: 110px;
-  height: 150px;
-  border-radius: 14px;
-  border: 1px solid rgba(0,240,255,.35);
-  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+  inset:0;
   display:grid;
   place-items:center;
-  font-weight:900;
-  letter-spacing:.12em;
-  transform: scale(.6);
+  z-index:7;
+  pointer-events:none;
   opacity:0;
-  animation: cards 900ms cubic-bezier(.2,.8,.2,1) forwards;
+  transform: scale(.96);
 }
-.tcard:nth-child(2){ animation-delay: 90ms; }
-.tcard:nth-child(3){ animation-delay: 160ms; }
 
-@keyframes cards{
-  from{ transform: translateY(18px) scale(.6); opacity:0; }
-  35%{ opacity:1; }
-  to{ transform: translateY(0) scale(1); opacity:1; }
+.centerBanner.show{
+  opacity:1;
+  transform: scale(1);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.bannerInner{
+  width:min(520px, 88vw);
+  padding:18px 18px;
+  border-radius:18px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(6,6,12,.55);
+  backdrop-filter: blur(14px);
+  text-align:center;
+  box-shadow: 0 0 40px rgba(0,240,255,.18);
+}
+
+.bannerSmall{
+  color: rgba(245,245,245,.74);
+  font-weight:700;
+  letter-spacing:.18em;
+  font-size:12px;
+}
+
+.bannerBig{
+  margin:10px 0 6px;
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-shadow: 0 0 22px rgba(230,201,107,.20);
+}
+
+/* ====== 判定ライン（6時固定）を見せる ====== */
+.app::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:82%;
+  width:min(520px, 86vw);
+  height:2px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, transparent, rgba(0,240,255,.75), transparent);
+  opacity:.75;
+  z-index:5;
+  pointer-events:none;
+}
+
+/* ====== FEVER（静かな威） ====== */
+body.feverOn .bgVideo{
+  opacity:.36;
+  filter: saturate(1.35) contrast(1.08);
+}
+
+body.feverOn .app{
+  animation: pulseGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow{
+  0%,100% { filter: drop-shadow(0 0 10px rgba(230,201,107,.10)); }
+  50%     { filter: drop-shadow(0 0 22px rgba(0,240,255,.18)); }
+}
+
+/* ====== 中央から広がる「サイバーカード」 ====== */
+.card{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width: 120px;
+  height: 170px;
+  transform: translate(-50%, -50%) scale(.35) rotate(var(--rot, 0deg));
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.18);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(0,240,255,.20), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(230,201,107,.18), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  box-shadow:
+    0 0 24px rgba(0,240,255,.16),
+    0 0 44px rgba(156,60,255,.10);
+  opacity:0;
+  will-change: transform, opacity;
+}
+
+.card::before{
+  content: attr(data-title);
+  position:absolute;
+  left:10px;
+  top:10px;
+  font-size:12px;
+  letter-spacing:.18em;
+  color: rgba(245,245,245,.8);
+}
+
+.card::after{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:10px;
+  border: 1px solid rgba(0,240,255,.18);
+  box-shadow: inset 0 0 22px rgba(0,240,255,.10);
+}
+
+@keyframes cardBurst{
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(.3) rotate(var(--rot,0deg)); }
+  10%  { opacity:1; }
+  60%  { opacity:1; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.95) rotate(calc(var(--rot,0deg) + 18deg)); }
+  100% { opacity:0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.05) rotate(calc(var(--rot,0deg) + 28deg)); }
+}
+
+.card.play{
+  animation: cardBurst .85s ease-out both;
 }
