@@ -34,7 +34,8 @@
     indicator: $('indicator'),
     constellation: $('constellation'),
     rippleLayer: $('rippleLayer'),
-    tapLayer: $('tapLayer')
+    tapLayer: $('tapLayer'),
+    missBadge: $('missBadge')
   };
 
   const overlays = {
@@ -153,9 +154,9 @@
      RING / ZONE / INDICATOR
   ========================= */
   function updateZone(){
-    const start = state.zoneCenter - state.zoneWidth / 2;
+    const start = normalizeAngle(state.zoneCenter - state.zoneWidth / 2);
     const zoneLen = circleLen * (state.zoneWidth / (Math.PI*2));
-    const offset = circleLen * (1 - (start / (Math.PI*2))) + circleLen*0.25;
+    const offset = circleLen * (1 - (start / (Math.PI*2)));
     ui.zone.style.strokeDasharray = `${zoneLen} ${circleLen - zoneLen}`;
     ui.zone.style.strokeDashoffset = `${offset}`;
   }
@@ -188,9 +189,16 @@
     ui.indicator.setAttribute('cy', cy.toFixed(2));
   }
 
+  function normalizeAngle(a){
+    return (a % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+  }
+
+  function signedDelta(a,b){
+    return ((a-b+Math.PI*3)%(Math.PI*2))-Math.PI;
+  }
+
   function deltaAngle(a,b){
-    let d = ((a-b+Math.PI*3)%(Math.PI*2))-Math.PI;
-    return Math.abs(d);
+    return Math.abs(signedDelta(a,b));
   }
 
   function moveZone(){
@@ -229,6 +237,26 @@
       ui.rippleLayer.appendChild(s);
       s.addEventListener('animationend', ()=>s.remove(), {once:true});
     }
+  }
+
+
+  function spawnMissNoise(){
+    const count = 5;
+    for(let i=0;i<count;i++){
+      const line = document.createElement('div');
+      line.className = 'ringNoiseLine';
+      line.style.setProperty('--rot', `${Math.random()*360}deg`);
+      ui.rippleLayer.appendChild(line);
+      line.addEventListener('animationend', ()=>line.remove(), {once:true});
+    }
+  }
+
+  function showMissBadge(){
+    if(!ui.missBadge) return;
+    ui.missBadge.classList.remove('show');
+    void ui.missBadge.offsetWidth;
+    ui.missBadge.classList.add('show');
+    setTimeout(()=>ui.missBadge.classList.remove('show'), 360);
   }
 
   function zoneIgnite(kind='good'){
@@ -275,8 +303,11 @@
 
     enableAudio();
 
-    const d = deltaAngle(state.angle, state.zoneCenter);
-    const perfectWin = state.zoneWidth*0.35;
+    const isCompact = window.matchMedia('(max-width: 760px)').matches;
+    const halfZone = state.zoneWidth / 2;
+    const d = deltaAngle(normalizeAngle(state.angle), normalizeAngle(state.zoneCenter));
+    const perfectWin = halfZone * (isCompact ? 0.62 : 0.52);
+    const goodWin = halfZone * (isCompact ? 1.2 : 1.05);
 
     if(d <= perfectWin){
       const gain = 15 + Math.min(10, state.combo*0.4);
@@ -295,7 +326,7 @@
       ui.core.innerHTML = 'PERFECT<br>RESONANCE';
       moveZone();
 
-    } else if(d <= state.zoneWidth/2){
+    } else if(d <= goodWin){
       state.aru = Math.min(100, state.aru + 10);
       state.score += 100 + state.combo*8;
       state.good++;
@@ -318,6 +349,13 @@
 
       missFx();
       spawnRipple(x, y, 'miss');
+      spawnMissNoise();
+      showMissBadge();
+
+      ui.ringWrap.classList.remove('shake');
+      void ui.ringWrap.offsetWidth;
+      ui.ringWrap.classList.add('shake');
+
       ui.coreVoid.classList.remove('coreGlowGood','coreGlowPerfect');
 
       setDico('ノイズ混入。でもまだ間に合う');
@@ -611,8 +649,9 @@
   }
 
   function missFx(){
-    noise(.09,.07);
-    tone(180,.08,'sawtooth',.05);
+    noise(.11,.1);
+    tone(165,.11,'sawtooth',.07);
+    tone(96,.16,'triangle',.055,.03);
   }
 
   function unfoldFx(){
