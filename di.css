@@ -1,80 +1,238 @@
-:root {
-  --vh: 1vh;
+:root{
+  --bg:#05060a;
+  --text:rgba(245,245,242,.92);
+  --muted:rgba(245,245,242,.62);
+  --cyan: rgba(0,240,255,.95);
+  --gold: rgba(230,201,107,.92);
+  --panel: rgba(255,255,255,.06);
+  --line: rgba(255,255,255,.16);
+  --safeB: env(safe-area-inset-bottom, 0px);
+  --safeT: env(safe-area-inset-top, 0px);
+  --vh: 1vh; /* JSで更新 */
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  overflow:hidden;
 }
 
-html, body {
-  height: 100%;
-  background: #000;
-  overflow: hidden;
-}
-
-.game {
-  position: relative;
-  width: 100%;
-  height: 100svh;
-  height: 100dvh;
+.app{
+  position:relative;
   height: calc(var(--vh) * 100);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: calc(var(--safeT) + 10px);
+  padding-bottom: calc(var(--safeB) + 10px);
 }
 
-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.6;
-  pointer-events: none;
+.bgVideo{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  filter: saturate(1.1) contrast(1.08) brightness(.55);
+  opacity:.55;
+  transform: translateZ(0);
 }
 
-canvas {
-  position: absolute;
-  inset: 0;
+.hud{
+  position:relative;
+  z-index:5;
+  display:flex;
+  gap:10px;
+  padding: 10px 12px 6px;
+}
+.hudBox{
+  flex:1;
+  min-width:0;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  border-radius:14px;
+  backdrop-filter: blur(10px);
+}
+.hudLabel{
+  font-size:12px;
+  letter-spacing:.14em;
+  color: var(--muted);
+}
+.hudValue{
+  margin-top:4px;
+  font-size:20px;
+  font-weight:700;
 }
 
-.ring {
-  position: absolute;
-  bottom: 18%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  height: 260px;
+.noteCanvas{
+  position:absolute; inset:0;
+  z-index:4;
+  width:100%;
+  height:100%;
+  touch-action: manipulation;
+}
+
+.stage{
+  position:absolute;
+  left:0; right:0;
+  top: 50%;
+  transform: translateY(-46%);
+  display:grid;
+  place-items:center;
+  z-index:3;
+  pointer-events:none;
+}
+
+.ringWrap{
+  width:min(78vw, 360px);
+  aspect-ratio: 1 / 1;
+  position:relative;
+  filter: drop-shadow(0 0 24px rgba(0,240,255,.18));
+}
+
+.ringSvg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.ringBase{
+  fill:none;
+  stroke: rgba(0,240,255,.22);
+  stroke-width: 14;
+}
+
+.judgeBar{
+  fill: rgba(230,201,107,.92);
+  filter: drop-shadow(0 0 10px rgba(230,201,107,.35));
+}
+
+.ringFlash{
+  fill:none;
+  stroke: rgba(0,240,255,.0);
+  stroke-width: 22;
+}
+
+.centerLabel{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  letter-spacing:.12em;
+  font-weight:800;
+  text-shadow: 0 10px 40px rgba(0,0,0,.65);
+}
+.centerLabel .sub{
+  display:block;
+  margin-top:8px;
+  font-size:12px;
+  color: var(--muted);
+  font-weight:600;
+  letter-spacing:.08em;
+}
+
+.controls{
+  position:absolute;
+  left:0; right:0;
+  bottom:0;
+  z-index:6;
+  display:flex;
+  gap:10px;
+  padding: 10px 12px calc(var(--safeB) + 12px);
+}
+
+.btn{
+  flex:1;
+  padding: 14px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.35);
+  color: var(--text);
+  font-weight:800;
+  letter-spacing:.12em;
+}
+.btn.primary{
+  border-color: rgba(0,240,255,.35);
+  background: linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.06));
+}
+
+.toast{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: calc(var(--safeB) + 84px);
+  z-index:9;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.45);
+  opacity:0;
+  transition: opacity .18s ease, transform .18s ease;
+  pointer-events:none;
+  backdrop-filter: blur(10px);
+}
+.toast.show{
+  opacity:1;
+  transform: translateX(-50%) translateY(-6px);
+}
+
+/* タロット展開（中央から広がる） */
+.tarotOverlay{
+  position:absolute; inset:0;
+  z-index:10;
+  display:none;
+  place-items:center;
+  background: radial-gradient(circle at 50% 50%, rgba(0,240,255,.10), rgba(0,0,0,.55));
+}
+.tarotOverlay.show{ display:grid; }
+
+.tarotBurst{
+  position:absolute;
+  width: 24vmin;
+  height: 24vmin;
   border-radius: 50%;
-  border: 3px solid rgba(0,240,255,.6);
+  background: radial-gradient(circle, rgba(230,201,107,.55), rgba(0,240,255,.20), rgba(0,0,0,0));
+  filter: blur(1px);
+  animation: burst 900ms ease-out forwards;
+}
+@keyframes burst{
+  from{ transform: scale(.3); opacity:.0; }
+  20%{ opacity:1; }
+  to{ transform: scale(4.2); opacity:0; }
 }
 
-.judge-line {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6px;
-  height: 20px;
-  background: gold;
+.tarotText{
+  font-weight:900;
+  letter-spacing:.22em;
+  font-size: 22px;
+  text-shadow: 0 18px 60px rgba(0,0,0,.75);
+  margin-bottom: 16px;
 }
 
-.hud {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  color: white;
-  font-family: sans-serif;
-  z-index: 10;
+.tarotCards{
+  display:flex;
+  gap:10px;
 }
+.tcard{
+  width: 110px;
+  height: 150px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,240,255,.35);
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  letter-spacing:.12em;
+  transform: scale(.6);
+  opacity:0;
+  animation: cards 900ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+.tcard:nth-child(2){ animation-delay: 90ms; }
+.tcard:nth-child(3){ animation-delay: 160ms; }
 
-#startBtn {
-  position: absolute;
-  bottom: calc(env(safe-area-inset-bottom) + 20px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 24px;
-  background: cyan;
-  border: none;
-  font-size: 18px;
+@keyframes cards{
+  from{ transform: translateY(18px) scale(.6); opacity:0; }
+  35%{ opacity:1; }
+  to{ transform: translateY(0) scale(1); opacity:1; }
 }
