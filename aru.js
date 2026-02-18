@@ -11,7 +11,7 @@
   const circleRadius = 170;
   const circleLen = TAU * circleRadius;
 
-  // SVG viewBox is 0 0 500 500 (assumed)
+  // SVG viewBox is 0 0 500 500
   const RING_VIEW = 500;
   const RING_CX = RING_VIEW / 2;
   const RING_CY = RING_VIEW / 2;
@@ -31,6 +31,7 @@
 
   const ui = {
     dico: $('dicoLine'),
+    dicoWrap: document.querySelector('.dico'),
     core: $('coreLabel'),
     coreVoid: $('coreVoid'),
     flash: $('fxFlash'),
@@ -42,7 +43,8 @@
     constellation: $('constellation'),
     rippleLayer: $('rippleLayer'),
     tapLayer: $('tapLayer'),
-    missBadge: $('missBadge')
+    missBadge: $('missBadge'),
+    ringSvg: $('ringSvg')
   };
 
   const overlays = {
@@ -64,6 +66,12 @@
   // input de-dup (iOS ghost click / multi-fire)
   let lastInputTs = 0;
   const INPUT_COOLDOWN_MS = 90;
+
+  // dico toast timer
+  let dicoTimer = 0;
+
+  // first-time guide (center line hint)
+  let guidedOnce = false;
 
   /* =========================
      STORAGE
@@ -119,10 +127,119 @@
   }
 
   /* =========================
+     UI: DiCo (event-only)
+     - requirement: show only on MISS / special events
+  ========================= */
+  function showDico(text, ms = 1500) {
+    if (!ui.dico) return;
+    ui.dico.textContent = text;
+
+    // if .dico.show CSS exists, use it; otherwise just fade by inline
+    if (ui.dicoWrap) {
+      ui.dicoWrap.classList.add('show');
+      clearTimeout(dicoTimer);
+      dicoTimer = setTimeout(() => ui.dicoWrap.classList.remove('show'), ms);
+    } else {
+      ui.dico.style.opacity = '1';
+      clearTimeout(dicoTimer);
+      dicoTimer = setTimeout(() => (ui.dico.style.opacity = '0'), ms);
+    }
+  }
+
+  // keep API name, but behavior becomes event-only
+  function setDico(text, ms = 1500) {
+    showDico(text, ms);
+  }
+
+  function setZoneState(kind) {
+    if (!ui.ringWrap) return;
+    ui.ringWrap.classList.remove('zonePerfect', 'zoneGood', 'zoneMiss');
+    if (kind === 'perfect') ui.ringWrap.classList.add('zonePerfect');
+    else if (kind === 'good') ui.ringWrap.classList.add('zoneGood');
+    else if (kind === 'miss') ui.ringWrap.classList.add('zoneMiss');
+  }
+
+  function maybeGuide() {
+    if (guidedOnce) return;
+    guidedOnce = true;
+    ui.ringWrap?.classList.add('ringGuideHint');
+    setTimeout(() => ui.ringWrap?.classList.remove('ringGuideHint'), 2800);
+  }
+
+  /* =========================
+     SVG VISUALS INJECTION
+     - zone gradient, halo ring, center line
+     (no HTML edits required)
+  ========================= */
+  function injectZoneVisuals() {
+    const svg = ui.ringSvg;
+    if (!svg || !ui.zone) return;
+
+    // defs
+    let defs = svg.querySelector('defs');
+    if (!defs) {
+      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      svg.insertBefore(defs, svg.firstChild);
+    }
+
+    // gradient for ZONE
+    if (!svg.querySelector('#gradZONE')) {
+      const lg = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+      lg.setAttribute('id', 'gradZONE');
+      lg.setAttribute('x1', '0');
+      lg.setAttribute('y1', '0');
+      lg.setAttribute('x2', '1');
+      lg.setAttribute('y2', '1');
+
+      const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+      s1.setAttribute('offset', '0%');
+      s1.setAttribute('stop-color', 'rgba(156,60,255,.95)');
+
+      const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+      s2.setAttribute('offset', '55%');
+      s2.setAttribute('stop-color', 'rgba(0,240,255,.55)');
+
+      const s3 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+      s3.setAttribute('offset', '100%');
+      s3.setAttribute('stop-color', 'rgba(230,201,107,.92)');
+
+      lg.appendChild(s1);
+      lg.appendChild(s2);
+      lg.appendChild(s3);
+      defs.appendChild(lg);
+    }
+
+    // ensure zone uses gradient stroke (CSS can override too)
+    ui.zone.style.stroke = 'url(#gradZONE)';
+
+    // halo clone (thicker, softer)
+    if (!ui.zone._haloMade) {
+      const halo = ui.zone.cloneNode(true);
+      halo.classList.add('is-halo');
+      halo.removeAttribute('id');
+      ui.zone.parentNode.insertBefore(halo, ui.zone);
+      ui.zone._haloMade = true;
+      ui.zone._haloEl = halo;
+    }
+
+    // center line arc (short circle segment)
+    if (!svg.querySelector('#zoneCenterLine')) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      line.setAttribute('id', 'zoneCenterLine');
+      line.setAttribute('cx', String(RING_CX));
+      line.setAttribute('cy', String(RING_CY));
+      line.setAttribute('r', String(circleRadius));
+      line.setAttribute('fill', 'none');
+      // align with zone stroke convention
+      line.setAttribute('transform', `rotate(-90 ${RING_CX} ${RING_CY})`);
+      svg.appendChild(line);
+    }
+  }
+
+  /* =========================
      GAME CORE
   ========================= */
   function resetState() {
-    // stop loop if running
     cancelAnimationFrame(rafId);
     rafId = 0;
 
@@ -151,6 +268,9 @@
       freezeUntil: 0
     };
 
+    // visuals injection once (safe to call repeatedly)
+    injectZoneVisuals();
+
     updateZone();
     updateProgress();
     updateIndicator(0);
@@ -160,11 +280,13 @@
     hud.aru.textContent = '0%';
 
     ui.core.innerHTML = 'AWAITING<br>INPUT';
-    setDico('準備OK。ゾーンに入った瞬間タップ');
+    // requirement: do NOT show dico always
+    // (no setDico here)
     drawConstellation(0.08);
 
     ui.coreVoid.classList.remove('coreGlowGood', 'coreGlowPerfect');
     ui.ringWrap.classList.remove('freeze', 'shake');
+    setZoneState(null);
   }
 
   function startGame() {
@@ -174,7 +296,6 @@
     state.running = true;
     state.playCount += 1;
 
-    // HUD play shows stored plays + this session running
     hud.play.textContent = String(collective.plays + 1);
 
     enableAudio();
@@ -216,19 +337,33 @@
   ========================= */
   function updateZone() {
     // zone start angle (0..2π)
-    let start = normalizeAngle(state.zoneCenter - state.zoneWidth / 2);
+    const start = normalizeAngle(state.zoneCenter - state.zoneWidth / 2);
 
     // length of arc
     const zoneLen = circleLen * (state.zoneWidth / TAU);
 
-    // IMPORTANT:
-    // SVG strokeDashoffset uses path direction.
-    // We align visual zone with our angle convention by using 12 o'clock offset (0.25 circle).
-    // 12 o'clock base: +0.25 circle
+    // dash offset (12 o'clock aligned)
     const offset = (circleLen * 0.25) - (circleLen * (start / TAU));
 
     ui.zone.style.strokeDasharray = `${zoneLen} ${circleLen - zoneLen}`;
     ui.zone.style.strokeDashoffset = `${offset}`;
+
+    // halo mirrors dash
+    if (ui.zone._haloEl) {
+      ui.zone._haloEl.style.strokeDasharray = ui.zone.style.strokeDasharray;
+      ui.zone._haloEl.style.strokeDashoffset = ui.zone.style.strokeDashoffset;
+    }
+
+    // center line: tiny arc at exact center (shows "aim here")
+    const line = ui.ringSvg?.querySelector('#zoneCenterLine');
+    if (line) {
+      const centerWidth = Math.PI / 45; // short arc
+      const centerStart = normalizeAngle(state.zoneCenter - centerWidth / 2);
+      const centerLen = circleLen * (centerWidth / TAU);
+      const centerOffset = (circleLen * 0.25) - (circleLen * (centerStart / TAU));
+      line.style.strokeDasharray = `${centerLen} ${circleLen - centerLen}`;
+      line.style.strokeDashoffset = `${centerOffset}`;
+    }
   }
 
   function updateProgress() {
@@ -268,7 +403,7 @@
 
     state.zoneCenter = next;
 
-    // zone narrows slightly with combo
+    // zone narrows slightly with combo (good stays wide, perfect is center line)
     state.zoneWidth = Math.max(Math.PI / 9.2, Math.PI / 7.2 - Math.min(0.2, state.combo * 0.006));
 
     updateZone();
@@ -321,29 +456,7 @@
     setTimeout(() => ui.missBadge.classList.remove('show'), 360);
   }
 
-  function zoneIgnite(kind = 'good') {
-    if (kind === 'perfect') {
-      ui.zone.style.stroke = 'rgba(230,201,107,.92)';
-      ui.zone.style.strokeWidth = '16';
-      ui.zone.style.filter = 'drop-shadow(0 0 16px rgba(230,201,107,.65))';
-      setTimeout(() => {
-        ui.zone.style.stroke = 'rgba(0,240,255,.75)';
-        ui.zone.style.strokeWidth = '14';
-        ui.zone.style.filter = 'drop-shadow(0 0 8px rgba(0,240,255,.55))';
-      }, 170);
-      return;
-    }
-
-    ui.zone.style.stroke = 'rgba(110,231,255,.95)';
-    ui.zone.style.strokeWidth = '15';
-    ui.zone.style.filter = 'drop-shadow(0 0 14px rgba(110,231,255,.65))';
-    setTimeout(() => {
-      ui.zone.style.stroke = 'rgba(0,240,255,.75)';
-      ui.zone.style.strokeWidth = '14';
-      ui.zone.style.filter = 'drop-shadow(0 0 8px rgba(0,240,255,.55))';
-    }, 140);
-  }
-
+  // NOTE: zone visual is now CSS/gradient-driven. We only add state classes.
   function coreGlow(kind = 'good') {
     ui.coreVoid.classList.remove('coreGlowGood', 'coreGlowPerfect');
 
@@ -371,6 +484,7 @@
     // state.angle and zoneCenter share same convention (0=12 o'clock clockwise)
     const d = deltaAngle(normalizeAngle(state.angle), normalizeAngle(state.zoneCenter));
 
+    // PERFECT is center-biased (narrow), GOOD is band (wider)
     const perfectWin = halfZone * (isCompact ? 0.62 : 0.52);
     const goodWin = halfZone * (isCompact ? 1.2 : 1.05);
 
@@ -381,35 +495,38 @@
       state.perfect++;
       state.combo++;
 
+      setZoneState('perfect');
       perfectFx();
       spawnRipple(localX, localY, 'perfect');
       spawnSparks(localX, localY);
-      zoneIgnite('perfect');
       coreGlow('perfect');
 
-      setDico('Perfect。観測線、押し上げた');
+      // requirement: no constant speech; success speech optional -> keep OFF
       ui.core.innerHTML = 'PERFECT<br>RESONANCE';
       moveZone();
+      maybeGuide();
     } else if (d <= goodWin) {
       state.aru = Math.min(100, state.aru + 10);
       state.score += 100 + state.combo * 8;
       state.good++;
       state.combo++;
 
+      setZoneState('good');
       goodFx();
       spawnRipple(localX, localY, 'good');
-      zoneIgnite('good');
       coreGlow('good');
 
-      setDico('安定。次で跳ねる');
+      // requirement: no constant speech; success speech optional -> keep OFF
       ui.core.innerHTML = 'GOOD<br>SYNC';
       moveZone();
+      maybeGuide();
     } else {
       state.aru = Math.max(0, state.aru - 2);
       state.score = Math.max(0, state.score - 10);
       state.miss++;
       state.combo = 0;
 
+      setZoneState('miss');
       missFx();
       spawnRipple(localX, localY, 'miss');
       spawnMissNoise();
@@ -421,7 +538,8 @@
 
       ui.coreVoid.classList.remove('coreGlowGood', 'coreGlowPerfect');
 
-      setDico('ノイズ混入。でもまだ間に合う');
+      // requirement: MISS only + auto hide
+      setDico('ノイズ混入。中心線を狙って。', 1600);
       ui.core.innerHTML = 'NOISE<br>DETECTED';
     }
 
@@ -494,7 +612,10 @@
     if (state.unfolding) return;
 
     state.unfolding = true;
-    setDico('観測値を超えた。開くよ、しーちゃん');
+    // requirement: event-only is OK (unfold is an event)
+    setDico('観測値を超えた。開くよ、しーちゃん', 1400);
+
+    setZoneState('perfect');
     ui.core.innerHTML = 'UNFOLD<br>READY';
 
     unfoldFx();
@@ -509,27 +630,20 @@
   /* =========================
      UI Helpers
   ========================= */
-  function setDico(text) {
-    ui.dico.textContent = text;
-  }
-
   function closeOverlays() {
     overlays.how.classList.remove('show');
     overlays.result.classList.remove('show');
   }
 
   /* =========================
-     INPUT (FIXED: single source, no double-fire)
+     INPUT (single source)
   ========================= */
   function handlePointerDown(e) {
-    // block double fire
     const t = nowMs();
     if (t - lastInputTs < INPUT_COOLDOWN_MS) return;
     lastInputTs = t;
 
     const target = e.target;
-
-    // allow UI controls to work
     if (target && (target.closest('button') || target.closest('a') || target.closest('.panel'))) return;
 
     e.preventDefault();
@@ -540,6 +654,7 @@
     if (!state.running && !state.ended && !state.unfolding) {
       startGame();
       spawnRipple(x, y, 'good');
+      maybeGuide(); // first-time: visually emphasize center line, no text spam
       return;
     }
 
@@ -758,7 +873,6 @@
     btn.addEventListener('click', () => $(btn.dataset.close)?.classList.remove('show'));
   });
 
-  // IMPORTANT: Single input source (pointerdown only)
   ui.tapLayer.addEventListener('pointerdown', handlePointerDown, { passive: false });
 
   ui.gameArea?.addEventListener('keydown', (e) => {
