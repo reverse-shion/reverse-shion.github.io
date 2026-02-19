@@ -1057,13 +1057,52 @@ button{
 }
 
 .btn.primary{
-  border-color: rgba(0,240,255,.35);
-  background: rgba(0,240,255,.12);
-  box-shadow: 0 0 20px rgba(0,240,255,.12);
+  border-color: rgba(0,240,255,.62);
+  background: rgba(0,240,255,.20);
+  box-shadow: 0 0 24px rgba(0,240,255,.32), inset 0 0 20px rgba(0,240,255,.10);
+}
+
+.btn:focus-visible{
+  outline: 3px solid rgba(255,255,255,.95);
+  outline-offset: 3px;
 }
 
 .btn:active{
   transform: translateY(1px) scale(.99);
+}
+
+
+@keyframes pulseStartGlow{
+  0%,100%{ transform: scale(1); box-shadow: 0 0 24px rgba(0,240,255,.30), 0 0 42px rgba(0,240,255,.20); }
+  50%{ transform: scale(1.03); box-shadow: 0 0 34px rgba(0,240,255,.48), 0 0 56px rgba(156,60,255,.24); }
+}
+
+#app[data-state="idle"] #startBtn{
+  min-height: 84px;
+  min-width: min(520px, 86vw);
+  font-size: clamp(24px, 5.6vw, 34px);
+  letter-spacing: .22em;
+  border-width: 2px;
+  animation: pulseStartGlow 1.9s ease-in-out infinite;
+}
+
+#app[data-state="idle"] .bottom{
+  justify-content: center;
+}
+
+#app[data-state="idle"] .bottom .btn,
+#app[data-state="running"] .bottom .btn{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#app[data-state="idle"] #startBtn,
+#app[data-state="running"] #stopBtn,
+#app[data-state="running"] #restartBtn{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 /* =========================
