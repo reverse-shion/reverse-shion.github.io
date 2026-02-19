@@ -446,3 +446,53 @@ button{
 @media (prefers-reduced-motion: reduce){
   .targetCore,.scanLine,#app[data-state="idle"] #startBtn{ animation:none !important; }
 }
+
+/* --- 追加/置換: bottomを中央固定にする --- */
+.bottom{
+  position: fixed;
+  left:0; right:0; bottom:0;
+  z-index: 9999;
+
+  display:grid;
+  place-items:center;
+
+  padding: 10px 14px calc(var(--safeB) + 12px);
+  pointer-events:auto;
+}
+
+/* idle時 STARTだけ中央にドーン */
+#app[data-state="idle"] #startBtn{
+  opacity:1; visibility:visible; pointer-events:auto;
+
+  min-height: 84px;
+  width: min(560px, 90vw);  /* ←常に中央に見える */
+  font-size: clamp(24px, 5.6vw, 34px);
+  letter-spacing: .22em;
+  border-width: 2px;
+
+  margin: 0 auto;
+}
+
+/* running時はSTOP/RESTARTだけ（横並びにしたいならfooter内をflexに戻してもOK） */
+#app[data-state="running"] .bottom{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+#app[data-state="running"] #stopBtn,
+#app[data-state="running"] #restartBtn{
+  opacity:1; visibility:visible; pointer-events:auto;
+}
+
+/* --- HOLD中のターゲット演出（気持ちいいやつ） --- */
+.targetRoot.holding .targetOuter{
+  border-color: rgba(230,201,107,.28);
+  box-shadow:
+    inset 0 0 34px rgba(230,201,107,.12),
+    inset 0 0 22px rgba(0,240,255,.10);
+  animation: holdHalo 1.0s ease-in-out infinite;
+}
+@keyframes holdHalo{
+  0%,100%{ filter: drop-shadow(0 0 16px rgba(230,201,107,.10)); }
+  50%{ filter: drop-shadow(0 0 28px rgba(0,240,255,.14)); }
+}
