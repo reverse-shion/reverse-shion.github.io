@@ -28,38 +28,88 @@
   --vh: 1vh;
 
   /* layout tokens */
-  --hudH: 92px;     /* HUDの高さ目安 */
-  --btnH: 66px;     /* ボタン帯の高さ目安 */
-  --stagePadTop: 10px;
-  --stagePadBottom: 10px;
+  --hudH: 92px;
+  --btnH: 74px; /* STOP/RESUME増やすので少し余裕 */
+  --stageTopPad: 10px;
+  --stageBottomPad: 10px;
+
+  /* Tarot card tokens */
+  --tarotW: 92px;      /* 1枚の幅（縦長） */
+  --tarotH: 132px;     /* 1枚の高さ */
+  --tarotGap: 10px;    /* 3枚の間隔 */
+  --tarotLift: 10px;   /* 下から浮かせる */
+
+  /* God pack */
+  --godA: rgba(255,255,255,.18);
+  --godB: rgba(255,210,110,.22);
+  --godC: rgba(0,240,255,.18);
+  --godD: rgba(156,60,255,.14);
+
+  --shake: 0px;
 }
 
-/* ========== reset ========== */
-*{ box-sizing:border-box; }
+/* =========================
+   RESET / ANTI-LONGPRESS
+   ========================= */
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 html, body{ height:100%; }
+
 body{
   margin:0;
   background: var(--bg);
   color: var(--txt);
   font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-  overflow:hidden;                 /* スクロール禁止＝崩れ防止 */
+
+  overflow:hidden;
   overscroll-behavior: none;
-  -webkit-tap-highlight-color: transparent;
+
+  /* 選択/長押しメニュー抑制 */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: 100%;
+  touch-action: none;
 }
 
-/* ========== app fixed container ========== */
+/* テキストを選択させたくない（青枠の原因を減らす） */
+.app, .stage, .overlay, .underlay, .hud, .bottom, .centerBanner{
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ボタンだけは押しやすく */
+button{
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+/* =========================
+   APP CONTAINER
+   ========================= */
 .app{
-  position: fixed;                 /* ←重要：absoluteじゃなく固定 */
+  position: fixed;
   inset: 0;
   width:100%;
   height: calc(var(--vh) * 100);
   padding-top: var(--safeT);
   padding-bottom: var(--safeB);
-  overflow: hidden;
-  touch-action: none;              /* iOSの変なスクロール系を根絶 */
+  overflow:hidden;
+
+  /* iOSのジェスチャ干渉を抑える */
+  touch-action: none;
 }
 
-/* ========== background video ========== */
+/* =========================
+   BACKGROUND VIDEO
+   ========================= */
 .bgVideo{
   position:absolute;
   inset:0;
@@ -72,24 +122,23 @@ body{
   z-index: 1;
 }
 
-/* ========== fx layer ========== */
+/* =========================
+   FX / MYTH
+   ========================= */
 .fxLayer{
   position:absolute;
   inset:0;
   pointer-events:none;
   overflow:hidden;
-  z-index: 6;
+  z-index: 9;
 }
 
-/* ========== myth layer ========== */
 .mythLayer{
   position:absolute;
   inset:0;
   z-index: 2;
   pointer-events:none;
 }
-
-/* 神殿床×サイバー薄膜 */
 .mythLayer::before{
   content:"";
   position:absolute;
@@ -201,6 +250,7 @@ body{
   border:1px solid rgba(255,255,255,.14);
   background: rgba(6,6,12,.22);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-shadow:
     0 0 22px rgba(0,240,255,.08),
     inset 0 0 20px rgba(230,201,107,.08);
@@ -274,7 +324,6 @@ body{
   to{ transform: translate(-50%,-50%) scale(.96) rotate(360deg); }
 }
 
-/* particle field */
 .particleField{ position:absolute; inset:0; opacity:0; }
 .particleField.on{
   opacity:1;
@@ -285,19 +334,31 @@ body{
   50%{ filter: drop-shadow(0 0 16px rgba(0,240,255,.10)); }
 }
 
-/* ========== HUD (TOP FIXED) ========== */
+/* =========================
+   HUD (TOP FIXED)
+   ========================= */
 .hud{
-  position: fixed;                 /* ←重要 */
+  position: fixed;
   top: calc(var(--safeT) + 10px);
   left: 0;
   right: 0;
-  z-index: 20;
+  z-index: 30;
+
   display:grid;
   grid-template-columns: 1fr 1.2fr 1fr;
   gap:12px;
   padding: 0 14px;
+
   align-items:start;
-  pointer-events: none;            /* ゲーム操作を邪魔しない */
+  pointer-events: none; /* HUDはタップ阻害しない */
+}
+
+.hudLeft, .hudRight{ display:flex; flex-direction:column; gap:4px; }
+.hudMid{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
 }
 
 .hud .label{
@@ -310,12 +371,6 @@ body{
   font-weight:900;
   text-shadow: 0 0 18px rgba(0,240,255,.25);
 }
-.hudMid{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  align-items:center;
-}
 .combo{ display:flex; gap:10px; align-items:baseline; }
 .combo .value{ font-size:26px; }
 
@@ -325,6 +380,7 @@ body{
   border:1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.06);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius:14px;
 }
 .feverTop{
@@ -346,28 +402,47 @@ body{
   box-shadow: 0 0 18px rgba(0,240,255,.35);
 }
 
-/* ========== STAGE (FIXED PLAYFIELD) ========== */
+/* =========================
+   STAGE (FIXED PLAYFIELD)
+   ========================= */
 .stage{
-  position: fixed;                 /* ←重要：絶対に崩れない */
+  position: fixed;
   top: calc(var(--safeT) + var(--hudH));
   left: 0;
   right: 0;
   bottom: calc(var(--safeB) + var(--btnH));
-  z-index: 10;
-  overflow: hidden;
+  z-index: 20;
+  overflow:hidden;
 }
 
-/* canvas full stage */
+/* レイヤ分離：カードは下、ゲームは上 */
+.underlay{
+  position:absolute;
+  inset:0;
+  z-index: 21; /* カードはゲームより下だが、stage内では持たせる */
+  pointer-events:none;
+}
+.overlay{
+  position:absolute;
+  inset:0;
+  z-index: 25; /* 常にゲームが最前面 */
+  pointer-events:auto;
+
+  /* “ゲーム層”はここだけタップを許可 */
+  touch-action: manipulation;
+}
+
+/* canvas */
 .noteCanvas{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  z-index: 11;
+  z-index: 26;
   touch-action: manipulation;
 }
 
-/* 判定ライン（ターゲット位置と一致させる） */
+/* 判定ライン */
 .stage::after{
   content:"";
   position:absolute;
@@ -378,25 +453,27 @@ body{
   transform: translate(-50%, -50%);
   background: linear-gradient(90deg, transparent, rgba(0,240,255,.78), transparent);
   opacity:.72;
-  z-index: 12;
+  z-index: 27;
   pointer-events:none;
 }
 
-/* ========== TARGET ========== */
+/* =========================
+   TARGET
+   ========================= */
 .targetRoot{
   position:absolute;
   left:50%;
-  top: 78%;                         /* stage内で固定 */
+  top: 78%;
   width:min(260px, 56vw);
   aspect-ratio: 1/1;
   transform: translate(-50%,-50%);
-  z-index: 13;
+  z-index: 28;
   pointer-events:none;
   opacity:.96;
   filter: drop-shadow(0 0 18px rgba(0,240,255,.12));
 }
 
-.targetOuter, .targetCore, .targetHitRing, .scanLine{
+.targetOuter, .targetCore, .targetHitRing, .scanLine, .holdRing{
   position:absolute;
   inset:0;
   border-radius:999px;
@@ -449,30 +526,26 @@ body{
 }
 @keyframes scanSpin{ to{ transform: rotate(360deg); } }
 
-/* form variants */
-.targetRoot[data-form="eye"] .targetOuter{
-  border-radius: 999px 999px 980px 980px;
+/* hold ring */
+.holdRing{
+  inset: -6%;
+  border-radius:999px;
+  border: 2px solid rgba(0,240,255,.0);
+  box-shadow: 0 0 0 rgba(0,240,255,0);
+  opacity:0;
 }
-.targetRoot[data-form="ankh"] .targetOuter{
-  border-radius: 999px;
-  /* iOSのmask-composite互換を考え、軽い表現に寄せる */
-  background:
-    radial-gradient(circle at 50% 26%, rgba(0,240,255,.14), transparent 32%),
-    radial-gradient(circle at 50% 52%, rgba(230,201,107,.10), transparent 38%),
-    conic-gradient(from 90deg, rgba(0,240,255,.0), rgba(0,240,255,.18), rgba(0,240,255,.0));
+.targetRoot.holding .holdRing{
+  opacity:1;
+  border-color: rgba(255,210,110,.22);
+  box-shadow: 0 0 26px rgba(255,210,110,.12), 0 0 18px rgba(0,240,255,.10);
+  animation: holdPulse 1.0s ease-in-out infinite;
 }
-.targetRoot[data-form="pyramid"] .targetOuter{
-  border-radius: 16px;
-  clip-path: polygon(50% 6%, 92% 82%, 8% 82%);
-}
-.targetRoot[data-form="solar"] .targetOuter{
-  background:
-    radial-gradient(circle, rgba(255,210,110,.18), rgba(255,120,60,.08) 60%, transparent 72%),
-    repeating-conic-gradient(from 0deg, rgba(255,210,110,.0) 0 10deg, rgba(255,210,110,.12) 10deg 11deg, rgba(255,210,110,.0) 11deg 20deg);
-  mask: radial-gradient(circle, transparent 42%, #000 43%);
+@keyframes holdPulse{
+  0%,100%{ transform: scale(1); opacity:.70; }
+  50%{ transform: scale(1.03); opacity:1; }
 }
 
-/* tier growth */
+/* tier */
 .targetRoot[data-tier="0"]{ filter: drop-shadow(0 0 16px rgba(0,240,255,.14)); }
 .targetRoot[data-tier="1"]{ filter: drop-shadow(0 0 18px rgba(230,201,107,.16)); }
 .targetRoot[data-tier="2"]{ filter: drop-shadow(0 0 20px rgba(156,60,255,.18)); }
@@ -485,13 +558,15 @@ body{
   100%{ transform: translate(-50%,-50%) scale(1.01); }
 }
 
-/* ========== JUDGE TEXT ========== */
+/* =========================
+   JUDGE
+   ========================= */
 .judgeText{
   position:absolute;
   left:50%;
-  top: 63%;                         /* ターゲットより上 */
+  top: 63%;
   transform: translate(-50%,-50%);
-  z-index: 14;
+  z-index: 29;
   opacity:0;
   pointer-events:none;
   text-align:center;
@@ -519,137 +594,221 @@ body{
   100%{ opacity:0; transform: translate(-50%,-62%) scale(1.06); }
 }
 
-/* ========== PROTOCOL STACK（左上：邪魔しない） ========== */
-.protocolStack{
-  position:absolute;
-  left:12px;
-  top: 14px;
-  z-index: 14;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  opacity:0;
-  transform: translateY(-6px);
-  pointer-events:none;
-}
-.protocolStack.on{
-  opacity:1;
-  transform: translateY(0);
-  transition: opacity .22s ease, transform .22s ease;
-}
-.protocolItem{
-  width: min(260px, 64vw);
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(6,6,12,.40);
-  backdrop-filter: blur(14px);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow: 0 0 30px rgba(0,240,255,.10);
-}
-.pTag{
-  font-size:11px;
-  font-weight:1000;
-  letter-spacing:.24em;
-  color: rgba(230,201,107,.86);
-}
-.pText{
-  font-size:12px;
-  font-weight:900;
-  letter-spacing:.14em;
-  color: rgba(245,245,245,.78);
-}
-.protocolItem[data-state="idle"]{ opacity:.50; }
-.protocolItem[data-state="on"]{
-  opacity:1;
-  border-color: rgba(230,201,107,.26);
-  box-shadow: 0 0 34px rgba(230,201,107,.12), 0 0 38px rgba(0,240,255,.10);
-}
-.protocolItem[data-state="done"]{
-  opacity:.92;
-  border-color: rgba(0,240,255,.18);
-}
-
-/* ========== TRIAD CARDS（音ゲーの邪魔をしない：下側） ========== */
+/* =========================
+   TAROT TRIAD (UNDERLAY)
+   - 縦長カード
+   - ゲームを邪魔しない：小さめ、透過、下寄せ
+   ========================= */
 .arcanaTriad{
   position:absolute;
   left:50%;
-  bottom: 10px;                     /* stage内の下 */
+  bottom: calc(var(--tarotLift) + var(--stageBottomPad));
   transform: translateX(-50%);
-  width:min(520px, 92vw);
-  display:grid;
-  grid-template-columns: 1fr;
-  gap:10px;
-  z-index: 14;
+  display:flex;
+  gap: var(--tarotGap);
+  z-index: 22;
   opacity:0;
   pointer-events:none;
 }
 
 .arcanaTriad[data-visible="1"]{
   opacity:1;
-  animation: triadIn .28s ease-out both;
+  animation: triadIn .24s ease-out both;
 }
 @keyframes triadIn{
   0%{ transform: translateX(-50%) translateY(10px) scale(.98); opacity:0; }
   100%{ transform: translateX(-50%) translateY(0) scale(1); opacity:1; }
 }
 
-.cardSlot{
+/* tarot card base */
+.tarotCard{
+  width: var(--tarotW);
+  height: var(--tarotH);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.18);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(0,240,255,.14), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(230,201,107,.12), transparent 58%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  box-shadow:
+    0 0 20px rgba(0,240,255,.10),
+    0 0 34px rgba(156,60,255,.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   position:relative;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.16);
-  background: rgba(6,6,12,.42);
-  backdrop-filter: blur(16px);
   overflow:hidden;
-  box-shadow: 0 0 34px rgba(0,240,255,.10);
-  min-height: 88px;                 /* 小さめ＝邪魔しない */
+
+  /* 少しだけ透けて邪魔しない */
+  opacity: .86;
 }
 
-.cardGlow{
+/* 内枠 */
+.tarotCard::before{
+  content:"";
   position:absolute;
-  inset:-40%;
-  opacity:.55;
-  filter: blur(26px);
-  transform: rotate(18deg);
+  inset:8px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,240,255,.16);
+  box-shadow: inset 0 0 22px rgba(0,240,255,.10);
+  opacity:.9;
 }
-.cardGlow.compass{ background: radial-gradient(circle, rgba(0,240,255,.22), transparent 60%); }
-.cardGlow.trigger{ background: radial-gradient(circle, rgba(255,120,60,.18), transparent 60%); }
-.cardGlow.route{ background: radial-gradient(circle, rgba(156,60,255,.18), transparent 60%); }
 
-.cardFace{ position:relative; padding:12px 12px; display:flex; flex-direction:column; gap:8px; }
-.cardHead{ display:flex; justify-content:space-between; align-items:center; }
-.cardRole{ font-size:11px; font-weight:1000; letter-spacing:.24em; color: rgba(245,245,245,.78); }
-.cardSigil{ font-size:14px; color: rgba(230,201,107,.86); text-shadow: 0 0 16px rgba(230,201,107,.12); }
-.cardName{ font-size:16px; font-weight:1000; letter-spacing:.08em; }
-.cardMeta{ font-size:10px; font-weight:900; letter-spacing:.18em; color: rgba(245,245,245,.62); }
+/* 上品な縁のきらめき */
+.tarotCard::after{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  background:
+    repeating-linear-gradient(120deg,
+      rgba(230,201,107,.00) 0 12px,
+      rgba(230,201,107,.06) 12px 13px,
+      rgba(230,201,107,.00) 13px 24px),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.05), transparent 60%);
+  opacity:.55;
+  transform: rotate(8deg);
+  mix-blend-mode: screen;
+  pointer-events:none;
+}
 
+/* 中身 */
+.tarotInner{
+  position:relative;
+  z-index:1;
+  height:100%;
+  padding:10px 10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.tarotTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.tarotRole{
+  font-size:10px;
+  font-weight:1000;
+  letter-spacing:.20em;
+  color: rgba(245,245,245,.78);
+}
+.tarotMark{
+  font-size:14px;
+  color: rgba(230,201,107,.86);
+  text-shadow: 0 0 16px rgba(230,201,107,.12);
+}
+
+.tarotTitle{
+  margin-top:10px;
+  font-size:14px;
+  font-weight:1000;
+  letter-spacing:.10em;
+  line-height:1.15;
+  text-shadow: 0 0 18px rgba(0,240,255,.10);
+}
+.tarotSub{
+  margin-top:auto;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.18em;
+  color: rgba(245,245,245,.58);
+  line-height:1.2;
+  opacity:.92;
+}
+
+/* slot flavor */
+.tarotCard[data-slot="compass"]{
+  box-shadow: 0 0 22px rgba(0,240,255,.12), 0 0 34px rgba(156,60,255,.06);
+}
+.tarotCard[data-slot="trigger"]{
+  box-shadow: 0 0 22px rgba(255,120,60,.10), 0 0 34px rgba(0,240,255,.06);
+}
+.tarotCard[data-slot="route"]{
+  box-shadow: 0 0 22px rgba(156,60,255,.10), 0 0 34px rgba(0,240,255,.06);
+}
+
+/* absorb seal */
 .absorbSeal{
   position:absolute;
   inset:0;
   opacity:0;
   background:
     radial-gradient(circle at 50% 50%, rgba(230,201,107,.18), transparent 62%),
-    repeating-linear-gradient(90deg, rgba(230,201,107,.0) 0 10px, rgba(230,201,107,.10) 10px 11px, rgba(230,201,107,.0) 11px 22px);
+    repeating-linear-gradient(90deg,
+      rgba(230,201,107,.0) 0 10px,
+      rgba(230,201,107,.10) 10px 11px,
+      rgba(230,201,107,.0) 11px 22px);
   mix-blend-mode: screen;
+  pointer-events:none;
 }
-
-.cardSlot.absorb{ animation: cardAbsorb .55s ease-in both; }
-.cardSlot.absorb .absorbSeal{ opacity:1; animation: sealPulse .55s ease-in both; }
-
-@keyframes sealPulse{ 0%{ filter: blur(10px); } 100%{ filter: blur(0px); } }
+.tarotCard.absorb .absorbSeal{
+  opacity:1;
+  animation: sealPulse .55s ease-in both;
+}
+@keyframes sealPulse{
+  0%{ filter: blur(10px); }
+  100%{ filter: blur(0px); }
+}
+.tarotCard.absorb{
+  animation: cardAbsorb .55s ease-in both;
+}
 @keyframes cardAbsorb{
-  0%{ opacity:1; transform: translateY(0) scale(1); }
-  55%{ opacity:1; transform: translateY(2px) scale(.98); }
+  0%{ opacity:.86; transform: translateY(0) scale(1); }
+  55%{ opacity:.86; transform: translateY(2px) scale(.98); }
   100%{ opacity:0; transform: translateY(10px) scale(.94); }
 }
+.tarotCard.absorb::after{
+  content:"";
+  position:absolute;
+  left:-20%;
+  top:0;
+  width:40%;
+  height:100%;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,.00),
+      rgba(255,210,110,.16),
+      rgba(0,240,255,.12),
+      rgba(255,255,255,.00));
+  mix-blend-mode: screen;
+  transform: skewX(-18deg) translateX(-60%);
+  opacity:0;
+  pointer-events:none;
+  animation: threadSweep .55s ease-out both;
+}
+@keyframes threadSweep{
+  0%{ opacity:0; transform: skewX(-18deg) translateX(-70%); }
+  25%{ opacity:1; }
+  100%{ opacity:0; transform: skewX(-18deg) translateX(420%); }
+}
 
-/* ========== GOD MODE ========== */
+/* =========================
+   GOD FLASH / GOD MODE
+   ========================= */
+.godFlash{
+  position:absolute;
+  inset:0;
+  z-index: 31;
+  opacity:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,210,110,.16), transparent 58%),
+    radial-gradient(circle at 30% 80%, rgba(0,240,255,.10), transparent 56%),
+    radial-gradient(circle at 80% 75%, rgba(156,60,255,.08), transparent 60%);
+  mix-blend-mode: screen;
+}
+.godFlash.on{ animation: flashPop .38s ease-out both; }
+@keyframes flashPop{
+  0%{ opacity:0; }
+  30%{ opacity:1; }
+  100%{ opacity:0; }
+}
+
 .godMode{
   position:absolute;
   inset:0;
-  z-index: 15;
+  z-index: 32;
   display:grid;
   place-items:center;
   opacity:0;
@@ -663,6 +822,66 @@ body{
   0%{ opacity:0; transform: scale(.98); }
   100%{ opacity:1; transform: scale(1); }
 }
+
+.godMode::before{
+  content:"";
+  position:absolute;
+  inset:-18%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,210,110,.18), transparent 55%),
+    repeating-conic-gradient(from 0deg,
+      rgba(255,210,110,.0) 0 8deg,
+      rgba(255,210,110,.12) 8deg 9deg,
+      rgba(255,210,110,.0) 9deg 16deg),
+    radial-gradient(circle at 50% 50%, rgba(0,240,255,.10), transparent 62%);
+  mask: radial-gradient(circle, transparent 34%, #000 35%);
+  mix-blend-mode: screen;
+  opacity:0;
+  transform: scale(.94);
+  filter: blur(.4px);
+  pointer-events:none;
+}
+.godMode[data-on="1"]::before{
+  opacity:.92;
+  animation: sigilBloom .48s ease-out both, sigilSpin 7s linear infinite;
+}
+@keyframes sigilBloom{
+  0%{ opacity:0; transform: scale(.84); }
+  65%{ opacity:1; transform: scale(1.02); }
+  100%{ opacity:.92; transform: scale(.98); }
+}
+@keyframes sigilSpin{
+  to{ transform: scale(.98) rotate(360deg); }
+}
+
+.godMode::after{
+  content:"";
+  position:absolute;
+  left:-10%;
+  right:-10%;
+  top:-20%;
+  height:38%;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.00),
+      rgba(255,210,110,.10),
+      rgba(0,240,255,.08),
+      rgba(255,255,255,.00));
+  opacity:0;
+  mix-blend-mode: screen;
+  transform: translateY(-40%);
+  pointer-events:none;
+}
+.godMode[data-on="1"]::after{
+  opacity:.8;
+  animation: scanDrop .95s ease-out infinite;
+}
+@keyframes scanDrop{
+  0%{ transform: translateY(-65%); }
+  75%{ opacity:.85; }
+  100%{ transform: translateY(220%); opacity:0; }
+}
+
 .godFrame{
   width:min(560px, 90vw);
   padding:18px 18px;
@@ -673,11 +892,68 @@ body{
     radial-gradient(circle at 70% 80%, rgba(0,240,255,.12), transparent 55%),
     rgba(6,6,12,.58);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   box-shadow:
     0 0 56px rgba(255,210,110,.10),
     0 0 44px rgba(0,240,255,.14);
   text-align:center;
+  position:relative;
+  overflow:hidden;
 }
+.godFrame::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:20px;
+  padding:2px;
+  background:
+    conic-gradient(from 180deg,
+      rgba(255,210,110,.0),
+      rgba(255,210,110,.55),
+      rgba(0,240,255,.40),
+      rgba(156,60,255,.28),
+      rgba(255,210,110,.55),
+      rgba(255,210,110,.0));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity:0;
+  pointer-events:none;
+  filter: blur(.3px);
+}
+.godFrame::after{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.06), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(0,240,255,.07), transparent 58%),
+    radial-gradient(circle at 50% 50%, rgba(255,210,110,.08), transparent 60%),
+    repeating-linear-gradient(120deg,
+      rgba(255,210,110,.00) 0 12px,
+      rgba(255,210,110,.06) 12px 13px,
+      rgba(255,210,110,.00) 13px 24px);
+  mix-blend-mode: screen;
+  opacity:0;
+  transform: rotate(6deg);
+  pointer-events:none;
+}
+.godMode[data-on="1"] .godFrame::before{
+  opacity:1;
+  animation: rimSpin 2.8s linear infinite;
+}
+.godMode[data-on="1"] .godFrame::after{
+  opacity:.9;
+  animation: sandFloat 1.6s ease-in-out infinite;
+}
+@keyframes rimSpin{ to{ transform: rotate(360deg); } }
+@keyframes sandFloat{
+  0%,100%{ transform: translate3d(0,0,0) rotate(6deg); filter: blur(.0px); }
+  50%{ transform: translate3d(0,-6px,0) rotate(8deg); filter: blur(.3px); }
+}
+
 .godTitle{
   font-size:12px;
   font-weight:1000;
@@ -691,6 +967,13 @@ body{
   letter-spacing:.10em;
   text-shadow: 0 0 24px rgba(255,210,110,.14);
 }
+.godMode[data-on="1"] .godName{
+  animation: godTextGlow 1.1s ease-in-out infinite;
+}
+@keyframes godTextGlow{
+  0%,100%{ text-shadow: 0 0 24px rgba(255,210,110,.14), 0 0 14px rgba(0,240,255,.12); }
+  50%{ text-shadow: 0 0 34px rgba(255,210,110,.20), 0 0 22px rgba(156,60,255,.12); }
+}
 .godLine{
   margin-top:8px;
   font-size:13px;
@@ -699,16 +982,61 @@ body{
   color: rgba(245,245,245,.78);
 }
 
-/* ========== BOTTOM CONTROLS (FIXED) ========== */
+/* =========================
+   PAUSE OVERLAY
+   ========================= */
+.pauseOverlay{
+  position:absolute;
+  inset:0;
+  z-index: 33;
+  display:grid;
+  place-items:center;
+  opacity:0;
+  pointer-events:none;
+  background: rgba(3,4,8,.38);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.pauseOverlay[data-on="1"]{
+  opacity:1;
+}
+.pauseBox{
+  width:min(360px, 86vw);
+  padding:18px 16px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(6,6,12,.58);
+  box-shadow: 0 0 40px rgba(0,240,255,.14);
+  text-align:center;
+}
+.pauseTitle{
+  font-size:22px;
+  font-weight:1000;
+  letter-spacing:.16em;
+}
+.pauseSub{
+  margin-top:8px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.14em;
+  color: rgba(245,245,245,.70);
+}
+
+/* =========================
+   BOTTOM CONTROLS
+   ========================= */
 .bottom{
-  position: fixed;                 /* ←重要 */
+  position: fixed;
   left:0;
   right:0;
   bottom:0;
-  z-index: 30;
+  z-index: 40;
+
   display:flex;
   gap:10px;
   justify-content:center;
+  align-items:center;
+
   padding: 10px 14px calc(var(--safeB) + 12px);
   pointer-events:auto;
 }
@@ -721,20 +1049,32 @@ body{
   border-radius: 14px;
   font-weight:900;
   letter-spacing:.06em;
+
+  /* 長押し抑制 */
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
 }
+
 .btn.primary{
   border-color: rgba(0,240,255,.35);
   background: rgba(0,240,255,.12);
   box-shadow: 0 0 20px rgba(0,240,255,.12);
 }
 
-/* ========== CENTER BANNER (overlay) ========== */
+.btn:active{
+  transform: translateY(1px) scale(.99);
+}
+
+/* =========================
+   CENTER BANNER
+   ========================= */
 .centerBanner{
   position: fixed;
   inset:0;
   display:grid;
   place-items:center;
-  z-index: 40;
+  z-index: 50;
   pointer-events:none;
   opacity:0;
   transform: scale(.96);
@@ -751,6 +1091,7 @@ body{
   border: 1px solid rgba(255,255,255,.18);
   background: rgba(6,6,12,.58);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   text-align:center;
   box-shadow: 0 0 40px rgba(0,240,255,.18);
   position:relative;
@@ -802,7 +1143,9 @@ body{
   text-shadow: 0 0 18px rgba(230,201,107,.10);
 }
 
-/* ========== FEVER ========== */
+/* =========================
+   FEVER
+   ========================= */
 body.feverOn .bgVideo{
   opacity:.38;
   filter: saturate(1.38) contrast(1.10);
@@ -815,7 +1158,71 @@ body.feverOn .app{
   50%     { filter: drop-shadow(0 0 22px rgba(0,240,255,.18)); }
 }
 
-/* ========== CENTER BURST CARD (existing) ========== */
+/* fever aura layer (mythより上・stageより下に) */
+body.feverOn::before,
+body.feverOn::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index: 5;
+  pointer-events:none;
+}
+body.feverOn::before{
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,210,110,.10), transparent 58%),
+    radial-gradient(circle at 30% 80%, rgba(0,240,255,.08), transparent 56%),
+    radial-gradient(circle at 80% 75%, rgba(156,60,255,.06), transparent 60%),
+    conic-gradient(from 180deg,
+      rgba(255,210,110,.0) 0 20%,
+      rgba(255,210,110,.10) 20% 22%,
+      rgba(0,240,255,.0) 22% 44%,
+      rgba(0,240,255,.08) 44% 46%,
+      rgba(156,60,255,.0) 46% 68%,
+      rgba(156,60,255,.06) 68% 70%,
+      rgba(255,210,110,.0) 70% 100%);
+  mix-blend-mode: screen;
+  opacity:.9;
+  filter: blur(.2px);
+  animation: godAuras 1.4s ease-in-out infinite;
+}
+body.feverOn::after{
+  background:
+    repeating-linear-gradient(115deg,
+      rgba(255,255,255,.00) 0 9px,
+      rgba(255,255,255,.03) 9px 10px,
+      rgba(255,255,255,.00) 10px 18px),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.06), transparent 60%);
+  mix-blend-mode: overlay;
+  opacity:.35;
+  animation: godNoise 1.2s linear infinite;
+}
+@keyframes godAuras{
+  0%,100%{ transform: scale(1); filter: blur(.2px); }
+  50%{ transform: scale(1.03); filter: blur(.4px); }
+}
+@keyframes godNoise{
+  to{ transform: translate3d(-8px, 6px, 0); }
+}
+
+body.feverOn .targetOuter{
+  border-color: rgba(255,210,110,.28);
+  box-shadow:
+    inset 0 0 34px rgba(255,210,110,.12),
+    inset 0 0 22px rgba(0,240,255,.10);
+  animation: targetHalo 1.2s ease-in-out infinite;
+}
+@keyframes targetHalo{
+  0%,100%{ filter: drop-shadow(0 0 18px rgba(255,210,110,.14)); }
+  50%{ filter: drop-shadow(0 0 30px rgba(0,240,255,.16)); }
+}
+body.feverOn .scanLine{
+  opacity:.68;
+  animation-duration: 1.8s;
+}
+
+/* =========================
+   CENTER BURST CARD (existing)
+   ========================= */
 .card{
   position:absolute;
   left:50%;
@@ -834,7 +1241,8 @@ body.feverOn .app{
     0 0 44px rgba(156,60,255,.10);
   opacity:0;
   will-change: transform, opacity;
-  z-index: 50;
+  z-index: 60;
+  pointer-events:none;
 }
 .card::before{
   content: attr(data-title);
@@ -861,7 +1269,9 @@ body.feverOn .app{
 }
 .card.play{ animation: cardBurst .85s ease-out both; }
 
-/* ========== SR only ========== */
+/* =========================
+   SR only
+   ========================= */
 .srOnly{
   position:absolute;
   width:1px; height:1px;
@@ -872,301 +1282,8 @@ body.feverOn .app{
 }
 
 /* =========================
-   GOD演出 追加パック（追記するだけでOK）
-   - FEVER/GOD MODEを「神回」へ
-   - 画面崩れなし（全部 pointer-events:none）
-   - 既存の .feverOn / .godMode[data-on="1"] と連動
+   REDUCED MOTION
    ========================= */
-
-/* ---------------------------------
-   0) 変数追加（そのまま :root に追記OK）
---------------------------------- */
-:root{
-  --godA: rgba(255,255,255,.18);
-  --godB: rgba(255,210,110,.22);
-  --godC: rgba(0,240,255,.18);
-  --godD: rgba(156,60,255,.14);
-
-  --shake: 0px; /* 将来JSで揺れ強度入れる用（今は0） */
-}
-
-/* ---------------------------------
-   1) GOD / FEVER 共通：画面全体の神気フィルター
---------------------------------- */
-body.feverOn::before,
-body.feverOn::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index: 4;                 /* mythLayer(2)より上、stage(10)より下 */
-  pointer-events:none;
-}
-
-/* 神気の「光膜」 */
-body.feverOn::before{
-  background:
-    radial-gradient(circle at 50% 40%, rgba(255,210,110,.10), transparent 58%),
-    radial-gradient(circle at 30% 80%, rgba(0,240,255,.08), transparent 56%),
-    radial-gradient(circle at 80% 75%, rgba(156,60,255,.06), transparent 60%),
-    conic-gradient(from 180deg,
-      rgba(255,210,110,.0) 0 20%,
-      rgba(255,210,110,.10) 20% 22%,
-      rgba(0,240,255,.0) 22% 44%,
-      rgba(0,240,255,.08) 44% 46%,
-      rgba(156,60,255,.0) 46% 68%,
-      rgba(156,60,255,.06) 68% 70%,
-      rgba(255,210,110,.0) 70% 100%);
-  mix-blend-mode: screen;
-  opacity: .9;
-  filter: blur(.2px);
-  animation: godAuras 1.4s ease-in-out infinite;
-}
-
-/* 神紋の「微粒子ノイズ」 */
-body.feverOn::after{
-  background:
-    repeating-linear-gradient(115deg,
-      rgba(255,255,255,.00) 0 9px,
-      rgba(255,255,255,.03) 9px 10px,
-      rgba(255,255,255,.00) 10px 18px),
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,.06), transparent 60%);
-  mix-blend-mode: overlay;
-  opacity: .35;
-  animation: godNoise 1.2s linear infinite;
-}
-
-@keyframes godAuras{
-  0%,100%{ transform: scale(1); filter: blur(.2px); }
-  50%{ transform: scale(1.03); filter: blur(.4px); }
-}
-@keyframes godNoise{
-  to{ transform: translate3d(-8px, 6px, 0); }
-}
-
-/* ---------------------------------
-   2) GOD MODE：太陽紋章・走査・祝福フレア
-   （.godMode は z-index:15 なので、その中で演出を完結）
---------------------------------- */
-
-/* godModeの背面に「巨大紋章」 */
-.godMode::before{
-  content:"";
-  position:absolute;
-  inset:-18%;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,210,110,.18), transparent 55%),
-    repeating-conic-gradient(from 0deg,
-      rgba(255,210,110,.0) 0 8deg,
-      rgba(255,210,110,.12) 8deg 9deg,
-      rgba(255,210,110,.0) 9deg 16deg),
-    radial-gradient(circle at 50% 50%, rgba(0,240,255,.10), transparent 62%);
-  mask: radial-gradient(circle, transparent 34%, #000 35%);
-  mix-blend-mode: screen;
-  opacity:0;
-  transform: scale(.94);
-  filter: blur(.4px);
-  pointer-events:none;
-}
-
-.godMode[data-on="1"]::before{
-  opacity:.92;
-  animation: sigilBloom .48s ease-out both, sigilSpin 7s linear infinite;
-}
-
-@keyframes sigilBloom{
-  0%{ opacity:0; transform: scale(.84); }
-  65%{ opacity:1; transform: scale(1.02); }
-  100%{ opacity:.92; transform: scale(.98); }
-}
-@keyframes sigilSpin{
-  to{ transform: scale(.98) rotate(360deg); }
-}
-
-/* 神の走査線（上から落ちる） */
-.godMode::after{
-  content:"";
-  position:absolute;
-  left:-10%;
-  right:-10%;
-  top:-20%;
-  height:38%;
-  background:
-    linear-gradient(180deg,
-      rgba(255,255,255,.00),
-      rgba(255,210,110,.10),
-      rgba(0,240,255,.08),
-      rgba(255,255,255,.00));
-  opacity:0;
-  mix-blend-mode: screen;
-  filter: blur(0px);
-  transform: translateY(-40%);
-  pointer-events:none;
-}
-.godMode[data-on="1"]::after{
-  opacity:.8;
-  animation: scanDrop .95s ease-out infinite;
-}
-@keyframes scanDrop{
-  0%{ transform: translateY(-65%); }
-  75%{ opacity:.85; }
-  100%{ transform: translateY(220%); opacity:0; }
-}
-
-/* ---------------------------------
-   3) GOD FRAME：縁取りが「生きる」
---------------------------------- */
-.godFrame{
-  position:relative;
-  overflow:hidden;
-}
-
-/* 祝福の縁（発光リム） */
-.godFrame::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  border-radius:20px;
-  padding:2px;
-  background:
-    conic-gradient(from 180deg,
-      rgba(255,210,110,.0),
-      rgba(255,210,110,.55),
-      rgba(0,240,255,.40),
-      rgba(156,60,255,.28),
-      rgba(255,210,110,.55),
-      rgba(255,210,110,.0));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity:0;
-  pointer-events:none;
-  filter: blur(.3px);
-}
-
-/* 内側の星砂 */
-.godFrame::after{
-  content:"";
-  position:absolute;
-  inset:-30%;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255,255,255,.06), transparent 55%),
-    radial-gradient(circle at 70% 80%, rgba(0,240,255,.07), transparent 58%),
-    radial-gradient(circle at 50% 50%, rgba(255,210,110,.08), transparent 60%),
-    repeating-linear-gradient(120deg,
-      rgba(255,210,110,.00) 0 12px,
-      rgba(255,210,110,.06) 12px 13px,
-      rgba(255,210,110,.00) 13px 24px);
-  mix-blend-mode: screen;
-  opacity:0;
-  transform: rotate(6deg);
-  pointer-events:none;
-}
-
-.godMode[data-on="1"] .godFrame::before{
-  opacity:1;
-  animation: rimSpin 2.8s linear infinite;
-}
-.godMode[data-on="1"] .godFrame::after{
-  opacity:.9;
-  animation: sandFloat 1.6s ease-in-out infinite;
-}
-
-@keyframes rimSpin{
-  to{ transform: rotate(360deg); }
-}
-@keyframes sandFloat{
-  0%,100%{ transform: translate3d(0,0,0) rotate(6deg); filter: blur(.0px); }
-  50%{ transform: translate3d(0,-6px,0) rotate(8deg); filter: blur(.3px); }
-}
-
-/* タイトル/名前の「神格グリッチ（上品）」 */
-.godName{
-  position:relative;
-}
-.godMode[data-on="1"] .godName{
-  animation: godTextGlow 1.1s ease-in-out infinite;
-}
-@keyframes godTextGlow{
-  0%,100%{ text-shadow: 0 0 24px rgba(255,210,110,.14), 0 0 14px rgba(0,240,255,.12); }
-  50%{ text-shadow: 0 0 34px rgba(255,210,110,.20), 0 0 22px rgba(156,60,255,.12); }
-}
-
-/* ---------------------------------
-   4) TARGET：FEVER中は「太陽眼」へ寄せる
---------------------------------- */
-body.feverOn .targetOuter{
-  border-color: rgba(255,210,110,.28);
-  box-shadow:
-    inset 0 0 34px rgba(255,210,110,.12),
-    inset 0 0 22px rgba(0,240,255,.10);
-  animation: targetHalo 1.2s ease-in-out infinite;
-}
-@keyframes targetHalo{
-  0%,100%{ filter: drop-shadow(0 0 18px rgba(255,210,110,.14)); }
-  50%{ filter: drop-shadow(0 0 30px rgba(0,240,255,.16)); }
-}
-
-body.feverOn .scanLine{
-  opacity:.68;
-  animation-duration: 1.8s;
-}
-
-/* HOLD中：核が“封印陣”みたいに */
-.targetRoot.holding .targetCore{
-  border-color: rgba(255,210,110,.22);
-  box-shadow:
-    0 0 28px rgba(255,210,110,.18),
-    0 0 22px rgba(0,240,255,.12);
-}
-
-/* ---------------------------------
-   5) CENTER BANNER：GOD時だけ「降臨リップル」
---------------------------------- */
-.centerBanner.show .bannerInner{
-  position:relative;
-}
-body.feverOn .centerBanner.show .bannerInner{
-  animation: bannerRipple .52s ease-out both;
-}
-@keyframes bannerRipple{
-  0%{ transform: translateZ(0) scale(.98); box-shadow: 0 0 18px rgba(255,210,110,.10); }
-  55%{ transform: translateZ(0) scale(1.01); box-shadow: 0 0 52px rgba(255,210,110,.16), 0 0 36px rgba(0,240,255,.14); }
-  100%{ transform: translateZ(0) scale(1); box-shadow: 0 0 40px rgba(0,240,255,.18); }
-}
-
-/* ---------------------------------
-   6) TRIAD：吸収時に「光の糸」が走る（邪魔しない）
---------------------------------- */
-.cardSlot.absorb::after{
-  content:"";
-  position:absolute;
-  left:-20%;
-  top:0;
-  width:40%;
-  height:100%;
-  background:
-    linear-gradient(90deg,
-      rgba(255,255,255,.00),
-      rgba(255,210,110,.16),
-      rgba(0,240,255,.12),
-      rgba(255,255,255,.00));
-  mix-blend-mode: screen;
-  transform: skewX(-18deg) translateX(-60%);
-  opacity:.0;
-  pointer-events:none;
-  animation: threadSweep .55s ease-out both;
-}
-@keyframes threadSweep{
-  0%{ opacity:0; transform: skewX(-18deg) translateX(-70%); }
-  25%{ opacity:1; }
-  100%{ opacity:0; transform: skewX(-18deg) translateX(420%); }
-}
-
-/* ---------------------------------
-   7) 安全策：重い環境で自動OFF（省電力）
---------------------------------- */
 @media (prefers-reduced-motion: reduce){
   body.feverOn::before,
   body.feverOn::after,
@@ -1175,7 +1292,9 @@ body.feverOn .centerBanner.show .bannerInner{
   .godFrame::before,
   .godFrame::after,
   body.feverOn .targetOuter,
-  body.feverOn .scanLine{
+  body.feverOn .scanLine,
+  .hieroRing.on,
+  .solarDisc.on{
     animation: none !important;
   }
 }
