@@ -2,8 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport"
-        content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#05060b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -83,13 +82,8 @@
   <!-- STAGE -->
   <section class="stage" id="stage" aria-label="Game Stage">
 
-    <!-- =========================
-         UNDERLAY（カード：ゲームの下）
-         ※ここは「ゲームの邪魔をしない層」
-    ========================== -->
+    <!-- UNDERLAY（カード：ゲームの下） -->
     <div class="underlay" id="underlay" aria-hidden="true">
-
-      <!-- TRIAD（普通のタロットカード風はCSS側で作る） -->
       <div class="arcanaTriad" id="arcanaTriad" data-visible="0">
 
         <!-- COMPASS -->
@@ -134,13 +128,8 @@
       </div>
     </div>
 
-    <!-- =========================
-         OVERLAY（ゲーム：常に最前面）
-         ※ここが「1番上に見える」層
-    ========================== -->
+    <!-- OVERLAY（ゲーム：常に最前面） -->
     <div class="overlay" id="overlay" aria-label="Play Layer">
-
-      <!-- ノーツ描画 -->
       <canvas id="noteCanvas" class="noteCanvas"></canvas>
 
       <!-- TARGET -->
@@ -149,13 +138,10 @@
            data-form="eye"
            data-tier="0"
            aria-hidden="true">
-
         <div class="targetOuter"></div>
         <div class="targetCore"></div>
         <div class="targetHitRing"></div>
         <div class="scanLine"></div>
-
-        <!-- ホールドリング -->
         <div class="holdRing" id="holdRing" aria-hidden="true"></div>
       </div>
 
@@ -176,37 +162,14 @@
           <div class="godLine" id="godLine">計測完了。だが選ぶのは、あなた。</div>
         </div>
       </div>
-
-      <!-- PAUSE OVERLAY（停止中の表示：CSS/JSでon/off） -->
-      <div class="pauseOverlay" id="pauseOverlay" aria-hidden="true" data-on="0">
-        <div class="pauseBox">
-          <div class="pauseTitle">PAUSED</div>
-          <div class="pauseSub">RESUMEで再開</div>
-        </div>
-      </div>
-
     </div>
   </section>
 
-  <!-- CONTROLS（下固定） -->
+  <!-- CONTROLS（下固定）: 状態UI完成形（START/STOP/RESTARTのみ） -->
   <footer class="bottom" aria-label="Controls">
     <button id="startBtn" class="btn primary" type="button" aria-label="Start game">START</button>
-
-    <!-- 一時停止 -->
-    <button id="pauseBtn" class="btn" type="button">PAUSE</button>
-
-    <!-- 再開（必要ならJSで表示切替） -->
-    <button id="restartBtn" class="btn" type="button" aria-label="Restart">RESTART</button>
-
-    <!-- 中断（リセット/終了） -->
     <button id="stopBtn" class="btn" type="button" aria-label="Stop">STOP</button>
-
-    <!-- タイミング補正（旧CALIB） -->
-    <button id="calibBtn" class="btn" type="button"
-            aria-label="Offset / Timing Calibration"
-            title="音ズレ・判定ズレ補正（OFFSET）">OFFSET</button>
-
-    <button id="muteBtn" class="btn" type="button">MUTE</button>
+    <button id="restartBtn" class="btn" type="button" aria-label="Restart">RESTART</button>
   </footer>
 
   <!-- BGM -->
