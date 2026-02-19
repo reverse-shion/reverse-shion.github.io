@@ -1,3 +1,4 @@
+<!-- di.html -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -6,97 +7,123 @@
   <meta name="theme-color" content="#05060b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>DiCo ARU – Solar Protocol</title>
+  <title>DiCo ARU – Phase1</title>
   <link rel="stylesheet" href="di.css" />
 </head>
-<body>
-<main class="app" id="app" data-state="idle" data-myth="egypt" data-protocol="record-balance-solar" aria-label="DiCo ARU Rhythm">
-  <video id="bgVideo" class="bgVideo" src="di_dance.mp4" playsinline muted loop preload="metadata"></video>
 
+<body>
+<main class="app" id="app" data-state="idle" aria-label="DiCo ARU Rhythm">
+
+  <!-- 背景（Phase1は“青×ネイビー”が主役。動画は薄く） -->
+  <video id="bgVideo" class="bgVideo"
+         src="video/di_dance.mp4"
+         playsinline muted loop preload="metadata"></video>
+
+  <!-- FX（タップ貫通） -->
   <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
 
-  <section class="mythLayer" aria-hidden="true">
-    <div class="hieroRing" id="hieroRing"></div>
-    <div class="maatScale" id="maatScale">
-      <div class="scaleBeam"></div>
-      <div class="scalePlate left"></div>
-      <div class="scalePlate right"></div>
-    </div>
-    <div class="solarDisc" id="solarDisc">
-      <div class="solarCore"></div>
-      <div class="solarRays"></div>
-    </div>
-    <div class="particleField" id="particleField"></div>
-  </section>
-
+  <!-- HUD（上固定・タップ貫通） -->
   <header class="hud" aria-label="HUD">
-    <div class="hudLeft"><div class="label">SCORE</div><div class="value" id="score">0</div></div>
-    <div class="hudMid">
-      <div class="combo" id="comboWrap"><span class="label">COMBO</span><span class="value" id="combo">0</span></div>
-      <div class="fever" aria-label="Fever">
-        <div class="feverTop"><span class="label">FEVER</span><span class="value" id="feverText">0%</span></div>
-        <div class="feverBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="feverFill" id="feverFill"></div></div>
+    <div class="hudBlock">
+      <div class="hudLabel">SCORE</div>
+      <div class="hudValue" id="score">0</div>
+    </div>
+
+    <div class="hudBlock hudCenter">
+      <div class="hudCombo">
+        <span class="hudLabel">COMBO</span>
+        <span class="hudValue" id="combo">0</span>
+      </div>
+      <div class="hudSmall">
+        <span class="hudLabel">MAX</span>
+        <span class="hudValue" id="maxCombo">0</span>
       </div>
     </div>
-    <div class="hudRight"><div class="label">TIME</div><div class="value" id="time">--</div></div>
+
+    <div class="hudBlock hudRight">
+      <div class="hudLabel">TIME</div>
+      <div class="hudValue" id="time">--</div>
+    </div>
   </header>
 
+  <!-- STAGE -->
   <section class="stage" id="stage" aria-label="Game Stage">
-    <div class="underlay" id="underlay" aria-hidden="true">
-      <div class="arcanaTriad" id="arcanaTriad" data-visible="0">
-        <div class="tarotCard" id="slotCompass" data-slot="compass" aria-label="Compass card"><div class="tarotInner"><div class="tarotTop"><span class="tarotRole">COMPASS</span><span class="tarotMark">✦</span></div><div class="tarotTitle">星の方向</div><div class="tarotSub">NILE FLOW / ORIENT</div></div><div class="absorbSeal" aria-hidden="true"></div></div>
-        <div class="tarotCard" id="slotTrigger" data-slot="trigger" aria-label="Trigger card"><div class="tarotInner"><div class="tarotTop"><span class="tarotRole">TRIGGER</span><span class="tarotMark">⚡</span></div><div class="tarotTitle">門の起動</div><div class="tarotSub">ANUBIS GATE / IGNITE</div></div><div class="absorbSeal" aria-hidden="true"></div></div>
-        <div class="tarotCard" id="slotRoute" data-slot="route" aria-label="Route card"><div class="tarotInner"><div class="tarotTop"><span class="tarotRole">ROUTE</span><span class="tarotMark">➤</span></div><div class="tarotTitle">航路の線</div><div class="tarotSub">SOLAR BARGE / PATH</div></div><div class="absorbSeal" aria-hidden="true"></div></div>
-      </div>
+    <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
+
+    <!-- TARGET（中央神域：UIは置かない） -->
+    <div class="targetRoot" id="targetRoot" aria-hidden="true">
+      <div class="targetOuter"></div>
+      <div class="targetCore"></div>
+      <div class="targetRing"></div>
+      <div class="scanLine"></div>
+      <div class="hitFlash" id="hitFlash" aria-hidden="true"></div>
     </div>
 
-    <div class="overlay" id="overlay" aria-label="Play Layer">
-      <canvas id="noteCanvas" class="noteCanvas"></canvas>
+    <!-- JUDGE（中央に邪魔な文字を置かない：ターゲット“上”で一瞬だけ） -->
+    <div class="judge" id="judge" aria-hidden="true">
+      <div class="judgeMain" id="judgeMain">GREAT</div>
+      <div class="judgeSub"  id="judgeSub">SYNC</div>
+    </div>
 
-      <div class="targetRoot" id="targetRoot" data-form="eye" data-tier="0" aria-hidden="true">
-        <div class="targetOuter"></div>
-        <div class="targetCore"></div>
-        <div class="targetHitRing"></div>
-        <div class="scanLine"></div>
-        <div class="holdRing" id="holdRing" aria-hidden="true"></div>
-      </div>
+    <!-- RESULT（終わったらここを出す：ARUリングは“結果画面のみ”） -->
+    <div class="result" id="result" aria-hidden="true">
+      <div class="resultCard">
+        <div class="resultTitle">RESULT</div>
 
-      <div class="judgeText" id="judgeText" aria-hidden="true">
-        <span class="judgeMain" id="judgeMain"></span>
-        <span class="judgeSub" id="judgeSub"></span>
-      </div>
+        <div class="resultRow">
+          <div class="resultKey">SCORE</div>
+          <div class="resultVal" id="resultScore">0</div>
+        </div>
 
-      <div class="godFlash" id="godFlash" aria-hidden="true"></div>
-      <div class="godMode" id="godMode" aria-hidden="true" data-on="0"><div class="godFrame"><div class="godTitle">SOLAR SCRIBE MODE</div><div class="godName">D•code</div><div class="godLine" id="godLine">計測完了。だが選ぶのは、あなた。</div></div></div>
+        <div class="resultRow">
+          <div class="resultKey">MAX COMBO</div>
+          <div class="resultVal" id="resultMaxCombo">0</div>
+        </div>
 
-      <div class="upgradeOverlay" id="upgradeOverlay" aria-hidden="true" data-on="0" data-phase="idle">
-        <div class="upgradeFreeze" id="upgradeFreeze" aria-hidden="true"></div>
-        <div class="cutin" id="cutin" aria-hidden="true">
-          <div class="cutinFace" id="cutinFace" aria-hidden="true"></div>
-          <div class="cutinText">
-            <div class="cutinTitle" id="cutinTitle">SYNC OVERDRIVE</div>
-            <div class="cutinLine" id="cutinLine">星界と神話、融合開始。</div>
+        <div class="resultDivider"></div>
+
+        <div class="aruWrap" aria-label="ARU Gauge">
+          <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
+            <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
+              <defs>
+                <linearGradient id="aruGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"  stop-color="rgba(156,60,255,0.95)"/>
+                  <stop offset="55%" stop-color="rgba(0,240,255,0.95)"/>
+                  <stop offset="100%" stop-color="rgba(230,201,107,0.95)"/>
+                </linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="44" class="aruTrack"/>
+              <circle cx="60" cy="60" r="44" class="aruProg" id="aruProg"/>
+            </svg>
+            <div class="aruText">
+              <div class="aruLabel">ARU ENERGY</div>
+              <div class="aruValue" id="aruValue">0%</div>
+            </div>
           </div>
-          <div class="upgradeMsg" id="upgradeMsg">UPGRADE SEQUENCE</div>
+
+          <div class="dicoLine" id="dicoLine">しーちゃんに、君の想いは届いたよ。</div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- CONTROLS（下固定） -->
   <footer class="bottom" aria-label="Controls">
-    <button id="startBtn" class="btn primary" type="button" aria-label="Start game">START</button>
-    <button id="stopBtn" class="btn" type="button" aria-label="Stop">STOP</button>
-    <button id="restartBtn" class="btn" type="button" aria-label="Restart">RESTART</button>
+    <button id="startBtn" class="btn primary" type="button">START</button>
+    <button id="stopBtn" class="btn" type="button">STOP</button>
+    <button id="restartBtn" class="btn" type="button">RESTART</button>
   </footer>
 
-  <audio id="music" src="music.mp3" preload="auto"></audio>
+  <!-- AUDIO -->
+  <audio id="music" src="audio/music.mp3" preload="auto"></audio>
   <audio id="seTap" src="audio/se_tap.wav" preload="auto"></audio>
-  <audio id="sePerfect" src="audio/se_perfect.wav" preload="auto"></audio>
-  <audio id="seAbsorb" src="audio/se_absorb.wav" preload="auto"></audio>
-  <audio id="seGod" src="audio/se_god.wav" preload="auto"></audio>
+  <audio id="seGreat" src="audio/se_perfect.wav" preload="auto"></audio>
 
+  <!-- SR -->
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
+
 </main>
+
 <script src="di.js"></script>
 </body>
 </html>
