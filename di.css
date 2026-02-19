@@ -1281,6 +1281,35 @@ body.feverOn .scanLine{
   clip-path: inset(50%);
 }
 
+
+/* 下の操作パネルは絶対最前面＆タップ可能 */
+.bottom{
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 0;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+/* overlayが下まで覆ってるとボタンが死ぬので保険 */
+.overlay{
+  pointer-events: none;
+}
+#noteCanvas{
+  pointer-events: auto; /* ゲーム操作はキャンバスだけ受ける */
+}
+
+/* 演出レイヤは全部タップ貫通 */
+.fxLayer, .mythLayer, .underlay, .centerBanner,
+.godMode, .godFlash, .pauseOverlay{
+  pointer-events: none;
+}
+
+/* ボタン自体も保険 */
+.bottom button{
+  pointer-events: auto;
+}
+
 /* =========================
    REDUCED MOTION
    ========================= */
