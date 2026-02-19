@@ -1,3 +1,16 @@
+/* ==========================================================
+  DiCo ARU – Solar Protocol (di.css) / FULL REWRITE
+  目的:
+  - 中央(プレイ聖域)に意味UIを置かない
+  - STARTは「最初だけ」巨大＆発光で迷わせない
+  - ゲーム開始後は STOP / RESTART のみ表示
+  - タップ受付は canvas だけ（iOS誤タップ・重なり事故を防ぐ）
+  - Tarot/演出/バナー類は「タップ貫通」＆邪魔しない配置
+========================================================== */
+
+/* =========================
+   TOKENS
+   ========================= */
 :root{
   --bg: #05060b;
 
@@ -6,14 +19,14 @@
 
   --cyan: rgba(0,240,255,.95);
   --gold: rgba(230,201,107,.95);
-  --vio: rgba(156,60,255,.95);
+  --vio:  rgba(156,60,255,.95);
+
+  /* glass */
+  --glass:  rgba(255,255,255,.06);
+  --glass2: rgba(255,255,255,.10);
+  --line:   rgba(255,255,255,.14);
 
   /* myth tones */
-  --ink: rgba(0,0,0,.38);
-  --glass: rgba(255,255,255,.06);
-  --glass2: rgba(255,255,255,.10);
-  --line: rgba(255,255,255,.14);
-
   --hiero: rgba(230,201,107,.22);
   --sand:  rgba(230,201,107,.16);
 
@@ -27,24 +40,24 @@
   /* JS updates */
   --vh: 1vh;
 
-  /* layout tokens */
+  /* layout */
   --hudH: 92px;
-  --btnH: 74px; /* STOP/RESUME増やすので少し余裕 */
+  --btnH: 74px;
+
+  /* stage safe spacing */
   --stageTopPad: 10px;
   --stageBottomPad: 10px;
 
-  /* Tarot card tokens */
-  --tarotW: 92px;      /* 1枚の幅（縦長） */
-  --tarotH: 132px;     /* 1枚の高さ */
-  --tarotGap: 10px;    /* 3枚の間隔 */
-  --tarotLift: 10px;   /* 下から浮かせる */
+  /* target position (shared token) */
+  --hitY: 78%;
 
-  /* God pack */
-  --godA: rgba(255,255,255,.18);
-  --godB: rgba(255,210,110,.22);
-  --godC: rgba(0,240,255,.18);
-  --godD: rgba(156,60,255,.14);
+  /* tarot */
+  --tarotW: 92px;
+  --tarotH: 132px;
+  --tarotGap: 10px;
+  --tarotLift: 10px;
 
+  /* fx */
   --shake: 0px;
 }
 
@@ -66,29 +79,27 @@ body{
   overflow:hidden;
   overscroll-behavior: none;
 
-  /* 選択/長押しメニュー抑制 */
+  /* iOS: selection / callout */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
   -webkit-text-size-adjust: 100%;
+
+  /* Important: we only accept taps on canvas/buttons */
   touch-action: none;
 }
 
-/* テキストを選択させたくない（青枠の原因を減らす） */
-.app, .stage, .overlay, .underlay, .hud, .bottom, .centerBanner{
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
-
-/* ボタンだけは押しやすく */
 button{
-  -webkit-appearance: none;
-  appearance: none;
-  border: none;
-  background: none;
-  color: inherit;
-  font: inherit;
+  -webkit-appearance:none;
+  appearance:none;
+  border:none;
+  background:none;
+  color:inherit;
+  font:inherit;
+
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
 }
 
 /* =========================
@@ -103,7 +114,6 @@ button{
   padding-bottom: var(--safeB);
   overflow:hidden;
 
-  /* iOSのジェスチャ干渉を抑える */
   touch-action: none;
 }
 
@@ -116,21 +126,24 @@ button{
   width:100%;
   height:100%;
   object-fit:cover;
+
   opacity:.30;
   filter: saturate(1.25) contrast(1.06);
   transform: translateZ(0);
   z-index: 1;
+
+  pointer-events:none;
 }
 
 /* =========================
-   FX / MYTH
+   MYTH / FX (TAP-THROUGH)
    ========================= */
 .fxLayer{
   position:absolute;
   inset:0;
+  z-index: 9;
   pointer-events:none;
   overflow:hidden;
-  z-index: 9;
 }
 
 .mythLayer{
@@ -153,7 +166,7 @@ button{
 }
 
 /* -------------------------
-   1) Hiero Ring (THOTH)
+   1) Hiero Ring
 ------------------------- */
 .hieroRing{
   position:absolute;
@@ -335,7 +348,7 @@ button{
 }
 
 /* =========================
-   HUD (TOP FIXED)
+   HUD (TOP)
    ========================= */
 .hud{
   position: fixed;
@@ -350,10 +363,14 @@ button{
   padding: 0 14px;
 
   align-items:start;
-  pointer-events: none; /* HUDはタップ阻害しない */
+  pointer-events: none; /* tap-through */
 }
 
-.hudLeft, .hudRight{ display:flex; flex-direction:column; gap:4px; }
+.hudLeft, .hudRight{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
 .hudMid{
   display:flex;
   flex-direction:column;
@@ -371,7 +388,11 @@ button{
   font-weight:900;
   text-shadow: 0 0 18px rgba(0,240,255,.25);
 }
-.combo{ display:flex; gap:10px; align-items:baseline; }
+.combo{
+  display:flex;
+  gap:10px;
+  align-items:baseline;
+}
 .combo .value{ font-size:26px; }
 
 .fever{
@@ -403,7 +424,7 @@ button{
 }
 
 /* =========================
-   STAGE (FIXED PLAYFIELD)
+   STAGE (PLAYFIELD)
    ========================= */
 .stage{
   position: fixed;
@@ -415,39 +436,43 @@ button{
   overflow:hidden;
 }
 
-/* レイヤ分離：カードは下、ゲームは上 */
+/* ---- underlay: tarot, banners (tap-through) ---- */
 .underlay{
   position:absolute;
   inset:0;
-  z-index: 21; /* カードはゲームより下だが、stage内では持たせる */
+  z-index: 21;
   pointer-events:none;
 }
+
+/* ---- overlay: visual container only (tap-through) ----
+   IMPORTANT: overlay itself does NOT capture taps.
+   We capture taps on #noteCanvas only.
+*/
 .overlay{
   position:absolute;
   inset:0;
-  z-index: 25; /* 常にゲームが最前面 */
-  pointer-events:auto;
-
-  /* “ゲーム層”はここだけタップを許可 */
-  touch-action: manipulation;
+  z-index: 25;
+  pointer-events:none;
 }
 
-/* canvas */
+/* canvas is the ONLY play tap layer */
 .noteCanvas{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
   z-index: 26;
+
+  pointer-events:auto;
   touch-action: manipulation;
 }
 
-/* 判定ライン */
+/* judgement line (visual only) */
 .stage::after{
   content:"";
   position:absolute;
   left:50%;
-  top: 78%;
+  top: var(--hitY);
   width:min(520px, 86vw);
   height:2px;
   transform: translate(-50%, -50%);
@@ -458,16 +483,17 @@ button{
 }
 
 /* =========================
-   TARGET
+   TARGET (visual only)
    ========================= */
 .targetRoot{
   position:absolute;
   left:50%;
-  top: 78%;
+  top: var(--hitY);
   width:min(260px, 56vw);
   aspect-ratio: 1/1;
   transform: translate(-50%,-50%);
   z-index: 28;
+
   pointer-events:none;
   opacity:.96;
   filter: drop-shadow(0 0 18px rgba(0,240,255,.12));
@@ -526,10 +552,8 @@ button{
 }
 @keyframes scanSpin{ to{ transform: rotate(360deg); } }
 
-/* hold ring */
 .holdRing{
   inset: -6%;
-  border-radius:999px;
   border: 2px solid rgba(0,240,255,.0);
   box-shadow: 0 0 0 rgba(0,240,255,0);
   opacity:0;
@@ -545,7 +569,6 @@ button{
   50%{ transform: scale(1.03); opacity:1; }
 }
 
-/* tier */
 .targetRoot[data-tier="0"]{ filter: drop-shadow(0 0 16px rgba(0,240,255,.14)); }
 .targetRoot[data-tier="1"]{ filter: drop-shadow(0 0 18px rgba(230,201,107,.16)); }
 .targetRoot[data-tier="2"]{ filter: drop-shadow(0 0 20px rgba(156,60,255,.18)); }
@@ -559,7 +582,7 @@ button{
 }
 
 /* =========================
-   JUDGE
+   JUDGE (visual only)
    ========================= */
 .judgeText{
   position:absolute;
@@ -595,22 +618,62 @@ button{
 }
 
 /* =========================
+   BUFF TEXT (1s, non-central)
+   - 中央を避けてターゲット上に1秒だけ
+   ========================= */
+.buffText{
+  position:absolute;
+  left:50%;
+  top: calc(var(--hitY) - 84px);
+  transform: translateX(-50%);
+  z-index: 29;
+
+  padding: 10px 14px;
+  border-radius: 14px;
+
+  background: rgba(10, 14, 22, 0.55);
+  border: 1px solid rgba(255,255,255,0.12);
+
+  color: rgba(245,245,242,0.92);
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  font-size: 14px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.buffText.show{
+  animation: buffPop 1.0s ease forwards;
+}
+@keyframes buffPop{
+  0%   { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.98); }
+  15%  { opacity: 1; transform: translateX(-50%) translateY(0)  scale(1.00); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(1.00); }
+}
+
+/* =========================
    TAROT TRIAD (UNDERLAY)
-   - 縦長カード
-   - ゲームを邪魔しない：小さめ、透過、下寄せ
+   - ルール: 説明しない / 邪魔しない
    ========================= */
 .arcanaTriad{
   position:absolute;
   left:50%;
   bottom: calc(var(--tarotLift) + var(--stageBottomPad));
   transform: translateX(-50%);
+
   display:flex;
   gap: var(--tarotGap);
+
   z-index: 22;
   opacity:0;
+
   pointer-events:none;
 }
-
 .arcanaTriad[data-visible="1"]{
   opacity:1;
   animation: triadIn .24s ease-out both;
@@ -620,29 +683,30 @@ button{
   100%{ transform: translateX(-50%) translateY(0) scale(1); opacity:1; }
 }
 
-/* tarot card base */
 .tarotCard{
   width: var(--tarotW);
   height: var(--tarotH);
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.18);
+
   background:
     radial-gradient(circle at 30% 20%, rgba(0,240,255,.14), transparent 55%),
     radial-gradient(circle at 70% 80%, rgba(230,201,107,.12), transparent 58%),
     linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+
   box-shadow:
     0 0 20px rgba(0,240,255,.10),
     0 0 34px rgba(156,60,255,.08);
+
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+
   position:relative;
   overflow:hidden;
 
-  /* 少しだけ透けて邪魔しない */
-  opacity: .86;
+  opacity: .80; /* さらに邪魔しない */
 }
 
-/* 内枠 */
 .tarotCard::before{
   content:"";
   position:absolute;
@@ -652,8 +716,6 @@ button{
   box-shadow: inset 0 0 22px rgba(0,240,255,.10);
   opacity:.9;
 }
-
-/* 上品な縁のきらめき */
 .tarotCard::after{
   content:"";
   position:absolute;
@@ -670,7 +732,6 @@ button{
   pointer-events:none;
 }
 
-/* 中身 */
 .tarotInner{
   position:relative;
   z-index:1;
@@ -680,7 +741,6 @@ button{
   flex-direction:column;
   justify-content:space-between;
 }
-
 .tarotTop{
   display:flex;
   align-items:center;
@@ -698,7 +758,6 @@ button{
   color: rgba(230,201,107,.86);
   text-shadow: 0 0 16px rgba(230,201,107,.12);
 }
-
 .tarotTitle{
   margin-top:10px;
   font-size:14px;
@@ -717,7 +776,6 @@ button{
   opacity:.92;
 }
 
-/* slot flavor */
 .tarotCard[data-slot="compass"]{
   box-shadow: 0 0 22px rgba(0,240,255,.12), 0 0 34px rgba(156,60,255,.06);
 }
@@ -728,7 +786,7 @@ button{
   box-shadow: 0 0 22px rgba(156,60,255,.10), 0 0 34px rgba(0,240,255,.06);
 }
 
-/* absorb seal */
+/* absorb fx */
 .absorbSeal{
   position:absolute;
   inset:0;
@@ -754,8 +812,8 @@ button{
   animation: cardAbsorb .55s ease-in both;
 }
 @keyframes cardAbsorb{
-  0%{ opacity:.86; transform: translateY(0) scale(1); }
-  55%{ opacity:.86; transform: translateY(2px) scale(.98); }
+  0%{ opacity:.80; transform: translateY(0) scale(1); }
+  55%{ opacity:.80; transform: translateY(2px) scale(.98); }
   100%{ opacity:0; transform: translateY(10px) scale(.94); }
 }
 .tarotCard.absorb::after{
@@ -784,7 +842,7 @@ button{
 }
 
 /* =========================
-   GOD FLASH / GOD MODE
+   GOD FLASH / GOD MODE (tap-through)
    ========================= */
 .godFlash{
   position:absolute;
@@ -823,65 +881,7 @@ button{
   100%{ opacity:1; transform: scale(1); }
 }
 
-.godMode::before{
-  content:"";
-  position:absolute;
-  inset:-18%;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,210,110,.18), transparent 55%),
-    repeating-conic-gradient(from 0deg,
-      rgba(255,210,110,.0) 0 8deg,
-      rgba(255,210,110,.12) 8deg 9deg,
-      rgba(255,210,110,.0) 9deg 16deg),
-    radial-gradient(circle at 50% 50%, rgba(0,240,255,.10), transparent 62%);
-  mask: radial-gradient(circle, transparent 34%, #000 35%);
-  mix-blend-mode: screen;
-  opacity:0;
-  transform: scale(.94);
-  filter: blur(.4px);
-  pointer-events:none;
-}
-.godMode[data-on="1"]::before{
-  opacity:.92;
-  animation: sigilBloom .48s ease-out both, sigilSpin 7s linear infinite;
-}
-@keyframes sigilBloom{
-  0%{ opacity:0; transform: scale(.84); }
-  65%{ opacity:1; transform: scale(1.02); }
-  100%{ opacity:.92; transform: scale(.98); }
-}
-@keyframes sigilSpin{
-  to{ transform: scale(.98) rotate(360deg); }
-}
-
-.godMode::after{
-  content:"";
-  position:absolute;
-  left:-10%;
-  right:-10%;
-  top:-20%;
-  height:38%;
-  background:
-    linear-gradient(180deg,
-      rgba(255,255,255,.00),
-      rgba(255,210,110,.10),
-      rgba(0,240,255,.08),
-      rgba(255,255,255,.00));
-  opacity:0;
-  mix-blend-mode: screen;
-  transform: translateY(-40%);
-  pointer-events:none;
-}
-.godMode[data-on="1"]::after{
-  opacity:.8;
-  animation: scanDrop .95s ease-out infinite;
-}
-@keyframes scanDrop{
-  0%{ transform: translateY(-65%); }
-  75%{ opacity:.85; }
-  100%{ transform: translateY(220%); opacity:0; }
-}
-
+/* frame */
 .godFrame{
   width:min(560px, 90vw);
   padding:18px 18px;
@@ -900,60 +900,6 @@ button{
   position:relative;
   overflow:hidden;
 }
-.godFrame::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  border-radius:20px;
-  padding:2px;
-  background:
-    conic-gradient(from 180deg,
-      rgba(255,210,110,.0),
-      rgba(255,210,110,.55),
-      rgba(0,240,255,.40),
-      rgba(156,60,255,.28),
-      rgba(255,210,110,.55),
-      rgba(255,210,110,.0));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity:0;
-  pointer-events:none;
-  filter: blur(.3px);
-}
-.godFrame::after{
-  content:"";
-  position:absolute;
-  inset:-30%;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255,255,255,.06), transparent 55%),
-    radial-gradient(circle at 70% 80%, rgba(0,240,255,.07), transparent 58%),
-    radial-gradient(circle at 50% 50%, rgba(255,210,110,.08), transparent 60%),
-    repeating-linear-gradient(120deg,
-      rgba(255,210,110,.00) 0 12px,
-      rgba(255,210,110,.06) 12px 13px,
-      rgba(255,210,110,.00) 13px 24px);
-  mix-blend-mode: screen;
-  opacity:0;
-  transform: rotate(6deg);
-  pointer-events:none;
-}
-.godMode[data-on="1"] .godFrame::before{
-  opacity:1;
-  animation: rimSpin 2.8s linear infinite;
-}
-.godMode[data-on="1"] .godFrame::after{
-  opacity:.9;
-  animation: sandFloat 1.6s ease-in-out infinite;
-}
-@keyframes rimSpin{ to{ transform: rotate(360deg); } }
-@keyframes sandFloat{
-  0%,100%{ transform: translate3d(0,0,0) rotate(6deg); filter: blur(.0px); }
-  50%{ transform: translate3d(0,-6px,0) rotate(8deg); filter: blur(.3px); }
-}
-
 .godTitle{
   font-size:12px;
   font-weight:1000;
@@ -967,13 +913,6 @@ button{
   letter-spacing:.10em;
   text-shadow: 0 0 24px rgba(255,210,110,.14);
 }
-.godMode[data-on="1"] .godName{
-  animation: godTextGlow 1.1s ease-in-out infinite;
-}
-@keyframes godTextGlow{
-  0%,100%{ text-shadow: 0 0 24px rgba(255,210,110,.14), 0 0 14px rgba(0,240,255,.12); }
-  50%{ text-shadow: 0 0 34px rgba(255,210,110,.20), 0 0 22px rgba(156,60,255,.12); }
-}
 .godLine{
   margin-top:8px;
   font-size:13px;
@@ -983,7 +922,7 @@ button{
 }
 
 /* =========================
-   PAUSE OVERLAY
+   PAUSE OVERLAY (tap-through)
    ========================= */
 .pauseOverlay{
   position:absolute;
@@ -997,9 +936,8 @@ button{
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
-.pauseOverlay[data-on="1"]{
-  opacity:1;
-}
+.pauseOverlay[data-on="1"]{ opacity:1; }
+
 .pauseBox{
   width:min(360px, 86vw);
   padding:18px 16px;
@@ -1023,14 +961,14 @@ button{
 }
 
 /* =========================
-   BOTTOM CONTROLS
+   BOTTOM CONTROLS (always tappable)
    ========================= */
 .bottom{
   position: fixed;
   left:0;
   right:0;
   bottom:0;
-  z-index: 40;
+  z-index: 9999;
 
   display:flex;
   gap:10px;
@@ -1049,64 +987,84 @@ button{
   border-radius: 14px;
   font-weight:900;
   letter-spacing:.06em;
-
-  /* 長押し抑制 */
-  -webkit-user-select:none;
-  user-select:none;
-  -webkit-touch-callout:none;
 }
-
 .btn.primary{
   border-color: rgba(0,240,255,.62);
   background: rgba(0,240,255,.20);
   box-shadow: 0 0 24px rgba(0,240,255,.32), inset 0 0 20px rgba(0,240,255,.10);
 }
-
 .btn:focus-visible{
   outline: 3px solid rgba(255,255,255,.95);
   outline-offset: 3px;
 }
-
 .btn:active{
   transform: translateY(1px) scale(.99);
 }
 
-
+/* START: idle時だけ超目立たせる */
 @keyframes pulseStartGlow{
-  0%,100%{ transform: scale(1); box-shadow: 0 0 24px rgba(0,240,255,.30), 0 0 42px rgba(0,240,255,.20); }
-  50%{ transform: scale(1.03); box-shadow: 0 0 34px rgba(0,240,255,.48), 0 0 56px rgba(156,60,255,.24); }
+  0%,100%{
+    transform: scale(1);
+    box-shadow: 0 0 24px rgba(0,240,255,.30), 0 0 42px rgba(0,240,255,.20);
+  }
+  50%{
+    transform: scale(1.03);
+    box-shadow: 0 0 34px rgba(0,240,255,.48), 0 0 56px rgba(156,60,255,.24);
+  }
 }
 
+/* ==========================================================
+  STATE VISIBILITY (IMPORTANT)
+  app[data-state]
+  - idle: STARTだけ
+  - running: STOP / RESTARTだけ
+  - paused: STOP / RESTART（＋PAUSE overlayはJSがon）
+========================================================== */
+
+/* default: hide all control buttons (JSが状態で出す) */
+.bottom .btn{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+/* idle */
+#app[data-state="idle"] .bottom{
+  justify-content:center;
+}
 #app[data-state="idle"] #startBtn{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+
   min-height: 84px;
   min-width: min(520px, 86vw);
   font-size: clamp(24px, 5.6vw, 34px);
   letter-spacing: .22em;
   border-width: 2px;
+
   animation: pulseStartGlow 1.9s ease-in-out infinite;
 }
 
-#app[data-state="idle"] .bottom{
-  justify-content: center;
-}
-
-#app[data-state="idle"] .bottom .btn,
-#app[data-state="running"] .bottom .btn{
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-#app[data-state="idle"] #startBtn,
+/* running: STOP / RESTARTだけ（※HTMLでrestartBtnがある想定） */
 #app[data-state="running"] #stopBtn,
 #app[data-state="running"] #restartBtn{
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+
+/* paused: 同じく STOP / RESTARTだけ（PAUSEボタンは基本出さない設計） */
+#app[data-state="paused"] #stopBtn,
+#app[data-state="paused"] #restartBtn{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
 }
 
 /* =========================
-   CENTER BANNER
+   CENTER BANNER (tap-through)
+   ※中央は極力使わない方針だが、出すなら短時間で
    ========================= */
 .centerBanner{
   position: fixed;
@@ -1136,35 +1094,6 @@ button{
   position:relative;
   overflow:hidden;
 }
-.bannerInner::before{
-  content:"";
-  position:absolute;
-  inset:-40%;
-  background:
-    repeating-linear-gradient(120deg,
-      rgba(230,201,107,.0) 0 12px,
-      rgba(230,201,107,.08) 12px 13px,
-      rgba(230,201,107,.0) 13px 24px),
-    radial-gradient(circle at 30% 20%, rgba(255,210,110,.14), transparent 55%),
-    radial-gradient(circle at 70% 80%, rgba(0,240,255,.12), transparent 55%);
-  opacity:.75;
-  filter: blur(.2px);
-  transform: rotate(6deg);
-  mix-blend-mode: screen;
-}
-.bannerSmall{
-  color: rgba(245,245,245,.74);
-  font-weight:800;
-  letter-spacing:.18em;
-  font-size:12px;
-}
-.bannerTiny{
-  margin-top:6px;
-  color: rgba(245,245,245,.58);
-  font-weight:900;
-  letter-spacing:.20em;
-  font-size:11px;
-}
 .bannerBig{
   margin:10px 0 4px;
   font-size:34px;
@@ -1180,6 +1109,19 @@ button{
   letter-spacing:.22em;
   color: rgba(230,201,107,.82);
   text-shadow: 0 0 18px rgba(230,201,107,.10);
+}
+.bannerSmall{
+  color: rgba(245,245,245,.74);
+  font-weight:800;
+  letter-spacing:.18em;
+  font-size:12px;
+}
+.bannerTiny{
+  margin-top:6px;
+  color: rgba(245,245,245,.58);
+  font-weight:900;
+  letter-spacing:.20em;
+  font-size:11px;
 }
 
 /* =========================
@@ -1197,7 +1139,7 @@ body.feverOn .app{
   50%     { filter: drop-shadow(0 0 22px rgba(0,240,255,.18)); }
 }
 
-/* fever aura layer (mythより上・stageより下に) */
+/* aura layers (tap-through) */
 body.feverOn::before,
 body.feverOn::after{
   content:"";
@@ -1320,49 +1262,17 @@ body.feverOn .scanLine{
   clip-path: inset(50%);
 }
 
-
-/* 下の操作パネルは絶対最前面＆タップ可能 */
-.bottom{
-  position: fixed;
-  left: 0; right: 0;
-  bottom: 0;
-  z-index: 9999;
-  pointer-events: auto;
-}
-
-/* overlayが下まで覆ってるとボタンが死ぬので保険 */
-.overlay{
-  pointer-events: none;
-}
-#noteCanvas{
-  pointer-events: auto; /* ゲーム操作はキャンバスだけ受ける */
-}
-
-/* 演出レイヤは全部タップ貫通 */
-.fxLayer, .mythLayer, .underlay, .centerBanner,
-.godMode, .godFlash, .pauseOverlay{
-  pointer-events: none;
-}
-
-/* ボタン自体も保険 */
-.bottom button{
-  pointer-events: auto;
-}
-
 /* =========================
    REDUCED MOTION
    ========================= */
 @media (prefers-reduced-motion: reduce){
   body.feverOn::before,
   body.feverOn::after,
-  .godMode::before,
-  .godMode::after,
-  .godFrame::before,
-  .godFrame::after,
   body.feverOn .targetOuter,
   body.feverOn .scanLine,
   .hieroRing.on,
-  .solarDisc.on{
+  .solarDisc.on,
+  .targetCore{
     animation: none !important;
   }
 }
