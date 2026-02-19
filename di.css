@@ -496,3 +496,34 @@ button{
   0%,100%{ filter: drop-shadow(0 0 16px rgba(230,201,107,.10)); }
   50%{ filter: drop-shadow(0 0 28px rgba(0,240,255,.14)); }
 }
+/* =========================
+   GREAT FX: exposure up
+   ========================= */
+.app.exposureUp .bgVideo{
+  opacity: .44; /* いつもより明るく */
+  filter: saturate(1.45) contrast(1.12) brightness(1.06);
+}
+
+.app.exposureUp .mythLayer::before{
+  opacity: 1;
+  filter: blur(.2px) brightness(1.08);
+}
+
+/* 画面全体の一瞬フラッシュ（目に優しい薄め） */
+.app.exposureUp::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 55%, rgba(255,210,110,.18), transparent 60%),
+    radial-gradient(circle at 50% 55%, rgba(0,240,255,.14), transparent 55%);
+  mix-blend-mode: screen;
+  opacity: 1;
+  animation: exposurePop .22s ease-out both;
+}
+@keyframes exposurePop{
+  0%{ opacity: 0; }
+  35%{ opacity: 1; }
+  100%{ opacity: 0; }
+}
