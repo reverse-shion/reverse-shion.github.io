@@ -4,6 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport"
         content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#05060b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
   <title>DiCo ARU – Solar Protocol</title>
   <link rel="stylesheet" href="di.css" />
 </head>
@@ -20,12 +24,13 @@
          src="di_dance.mp4"
          playsinline
          muted
-         loop></video>
+         loop
+         preload="metadata"></video>
 
-  <!-- FX -->
+  <!-- FX（最前面の光粒・フラッシュ等） -->
   <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
 
-  <!-- 神話レイヤ -->
+  <!-- 神話レイヤ（演出） -->
   <section class="mythLayer" aria-hidden="true">
     <div class="hieroRing" id="hieroRing"></div>
 
@@ -43,127 +48,164 @@
     <div class="particleField" id="particleField"></div>
   </section>
 
-  <!-- HUD -->
-  <header class="hud">
-    <div>
+  <!-- HUD（上固定） -->
+  <header class="hud" aria-label="HUD">
+    <div class="hudLeft">
       <div class="label">SCORE</div>
       <div class="value" id="score">0</div>
     </div>
 
     <div class="hudMid">
-      <div class="combo">
+      <div class="combo" id="comboWrap">
         <span class="label">COMBO</span>
         <span class="value" id="combo">0</span>
       </div>
 
-      <div class="fever">
+      <div class="fever" aria-label="Fever">
         <div class="feverTop">
           <span class="label">FEVER</span>
           <span class="value" id="feverText">0%</span>
         </div>
-        <div class="feverBar">
+        <div class="feverBar" role="progressbar"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div class="feverFill" id="feverFill"></div>
         </div>
       </div>
     </div>
 
-    <div>
+    <div class="hudRight">
       <div class="label">TIME</div>
       <div class="value" id="time">--</div>
     </div>
   </header>
 
   <!-- STAGE -->
-  <section class="stage">
+  <section class="stage" id="stage" aria-label="Game Stage">
 
-    <canvas id="noteCanvas" class="noteCanvas"></canvas>
+    <!-- =========================
+         UNDERLAY（カード：ゲームの下）
+         ※ここは「ゲームの邪魔をしない層」
+    ========================== -->
+    <div class="underlay" id="underlay" aria-hidden="true">
 
-    <!-- TARGET -->
-    <div class="targetRoot"
-         id="targetRoot"
-         data-form="eye"
-         data-tier="0">
+      <!-- TRIAD（普通のタロットカード風はCSS側で作る） -->
+      <div class="arcanaTriad" id="arcanaTriad" data-visible="0">
 
-      <div class="targetOuter"></div>
-      <div class="targetCore"></div>
-      <div class="targetHitRing"></div>
-      <div class="scanLine"></div>
-
-      <!-- 追加：ホールドリング -->
-      <div class="holdRing" id="holdRing"></div>
-    </div>
-
-    <!-- JUDGE -->
-    <div class="judgeText" id="judgeText">
-      <span class="judgeMain" id="judgeMain">SYNC</span>
-      <span class="judgeSub" id="judgeSub">ARCANA</span>
-    </div>
-
-    <!-- TRIAD -->
-    <div class="arcanaTriad" id="arcanaTriad" data-visible="0">
-
-      <!-- COMPASS -->
-      <div class="cardSlot" id="slotCompass">
-        <div class="cardGlow compass"></div>
-        <div class="cardFace">
-          <div class="cardHead">
-            <span class="cardRole">COMPASS</span>
-            <span class="cardSigil">✦</span>
+        <!-- COMPASS -->
+        <div class="tarotCard" id="slotCompass" data-slot="compass" aria-label="Compass card">
+          <div class="tarotInner">
+            <div class="tarotTop">
+              <span class="tarotRole">COMPASS</span>
+              <span class="tarotMark">✦</span>
+            </div>
+            <div class="tarotTitle">星の方向</div>
+            <div class="tarotSub">NILE FLOW / ORIENT</div>
           </div>
-          <div class="cardName">星の方向</div>
+          <div class="absorbSeal" aria-hidden="true"></div>
         </div>
-        <div class="absorbSeal"></div>
-      </div>
 
-      <!-- TRIGGER -->
-      <div class="cardSlot" id="slotTrigger">
-        <div class="cardGlow trigger"></div>
-        <div class="cardFace">
-          <div class="cardHead">
-            <span class="cardRole">TRIGGER</span>
-            <span class="cardSigil">⚡</span>
+        <!-- TRIGGER -->
+        <div class="tarotCard" id="slotTrigger" data-slot="trigger" aria-label="Trigger card">
+          <div class="tarotInner">
+            <div class="tarotTop">
+              <span class="tarotRole">TRIGGER</span>
+              <span class="tarotMark">⚡</span>
+            </div>
+            <div class="tarotTitle">門の起動</div>
+            <div class="tarotSub">ANUBIS GATE / IGNITE</div>
           </div>
-          <div class="cardName">門の起動</div>
+          <div class="absorbSeal" aria-hidden="true"></div>
         </div>
-        <div class="absorbSeal"></div>
-      </div>
 
-      <!-- ROUTE -->
-      <div class="cardSlot" id="slotRoute">
-        <div class="cardGlow route"></div>
-        <div class="cardFace">
-          <div class="cardHead">
-            <span class="cardRole">ROUTE</span>
-            <span class="cardSigil">➤</span>
+        <!-- ROUTE -->
+        <div class="tarotCard" id="slotRoute" data-slot="route" aria-label="Route card">
+          <div class="tarotInner">
+            <div class="tarotTop">
+              <span class="tarotRole">ROUTE</span>
+              <span class="tarotMark">➤</span>
+            </div>
+            <div class="tarotTitle">航路の線</div>
+            <div class="tarotSub">SOLAR BARGE / PATH</div>
           </div>
-          <div class="cardName">航路の線</div>
+          <div class="absorbSeal" aria-hidden="true"></div>
         </div>
-        <div class="absorbSeal"></div>
-      </div>
 
-    </div>
-
-    <!-- GOD FLASH -->
-    <div class="godFlash" id="godFlash"></div>
-
-    <!-- GOD MODE -->
-    <div class="godMode" id="godMode" data-on="0">
-      <div class="godFrame">
-        <div class="godTitle">SOLAR SCRIBE MODE</div>
-        <div class="godName">D•code</div>
-        <div class="godLine" id="godLine">
-          計測完了。だが選ぶのは、あなた。
-        </div>
       </div>
     </div>
 
+    <!-- =========================
+         OVERLAY（ゲーム：常に最前面）
+         ※ここが「1番上に見える」層
+    ========================== -->
+    <div class="overlay" id="overlay" aria-label="Play Layer">
+
+      <!-- ノーツ描画 -->
+      <canvas id="noteCanvas" class="noteCanvas"></canvas>
+
+      <!-- TARGET -->
+      <div class="targetRoot"
+           id="targetRoot"
+           data-form="eye"
+           data-tier="0"
+           aria-hidden="true">
+
+        <div class="targetOuter"></div>
+        <div class="targetCore"></div>
+        <div class="targetHitRing"></div>
+        <div class="scanLine"></div>
+
+        <!-- ホールドリング -->
+        <div class="holdRing" id="holdRing" aria-hidden="true"></div>
+      </div>
+
+      <!-- JUDGE -->
+      <div class="judgeText" id="judgeText" aria-hidden="true">
+        <span class="judgeMain" id="judgeMain">SYNC</span>
+        <span class="judgeSub" id="judgeSub">ARCANA</span>
+      </div>
+
+      <!-- GOD FLASH -->
+      <div class="godFlash" id="godFlash" aria-hidden="true"></div>
+
+      <!-- GOD MODE -->
+      <div class="godMode" id="godMode" aria-hidden="true" data-on="0">
+        <div class="godFrame">
+          <div class="godTitle">SOLAR SCRIBE MODE</div>
+          <div class="godName">D•code</div>
+          <div class="godLine" id="godLine">計測完了。だが選ぶのは、あなた。</div>
+        </div>
+      </div>
+
+      <!-- PAUSE OVERLAY（停止中の表示：CSS/JSでon/off） -->
+      <div class="pauseOverlay" id="pauseOverlay" aria-hidden="true" data-on="0">
+        <div class="pauseBox">
+          <div class="pauseTitle">PAUSED</div>
+          <div class="pauseSub">RESUMEで再開</div>
+        </div>
+      </div>
+
+    </div>
   </section>
 
-  <!-- CONTROLS -->
-  <footer class="bottom">
-    <button id="startBtn" class="btn primary">START</button>
-    <button id="calibBtn" class="btn">CALIB</button>
-    <button id="muteBtn" class="btn">MUTE</button>
+  <!-- CONTROLS（下固定） -->
+  <footer class="bottom" aria-label="Controls">
+    <button id="startBtn" class="btn primary" type="button">START</button>
+
+    <!-- 一時停止 -->
+    <button id="pauseBtn" class="btn" type="button">PAUSE</button>
+
+    <!-- 再開（必要ならJSで表示切替） -->
+    <button id="resumeBtn" class="btn" type="button" aria-label="Resume">RESUME</button>
+
+    <!-- 中断（リセット/終了） -->
+    <button id="stopBtn" class="btn" type="button" aria-label="Stop">STOP</button>
+
+    <!-- タイミング補正（旧CALIB） -->
+    <button id="calibBtn" class="btn" type="button"
+            aria-label="Offset / Timing Calibration"
+            title="音ズレ・判定ズレ補正（OFFSET）">OFFSET</button>
+
+    <button id="muteBtn" class="btn" type="button">MUTE</button>
   </footer>
 
   <!-- BGM -->
@@ -176,7 +218,7 @@
   <audio id="seGod" src="audio/se_god.wav" preload="auto"></audio>
 
   <!-- BANNER -->
-  <div class="centerBanner" id="centerBanner">
+  <div class="centerBanner" id="centerBanner" aria-hidden="true" data-step="0">
     <div class="bannerInner">
       <div class="bannerBig" id="bannerBig">⚡ TAROT EXPANSION ⚡</div>
       <div class="bannerSub" id="bannerSub"></div>
@@ -185,7 +227,8 @@
     </div>
   </div>
 
-  <div class="srOnly" id="ariaLive" aria-live="polite"></div>
+  <!-- SR -->
+  <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
 
 </main>
 
