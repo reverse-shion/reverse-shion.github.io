@@ -6,12 +6,13 @@
    - 画面崩れ対策：HUD/Bottom固定、演出DOMは pointer-events:none 前提
    - iOS対策：primeMedia / pointer統一 / ダブルタップズーム抑止 / safeRAF
 */
-(() => {
+function initDiGame() {
   "use strict";
 
   // =========================
   // DOM
   // =========================
+  const app = document.getElementById("app");
   const music  = document.getElementById("music");
   const video  = document.getElementById("bgVideo");
   const canvas = document.getElementById("noteCanvas");
@@ -25,6 +26,8 @@
   const feverText = document.getElementById("feverText");
 
   const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const restartBtn = document.getElementById("restartBtn");
   const muteBtn  = document.getElementById("muteBtn");
   const calibBtn = document.getElementById("calibBtn");
 
@@ -62,8 +65,10 @@
 
   const ariaLive = document.getElementById("ariaLive");
 
-  if (!music || !video || !canvas || !ctx) {
-    console.warn("[di.js] Required elements missing.");
+  const required = { app, music, video, canvas, ctx, startBtn, stopBtn, restartBtn };
+  const missing = Object.entries(required).filter(([, el]) => !el).map(([id]) => id);
+  if (missing.length) {
+    console.error(`[di.js] Missing required elements: ${missing.join(", ")}`);
     return;
   }
 
@@ -229,6 +234,15 @@
   // =========================
   // UI: Banner / Judge / Target
   // =========================
+  function setUIState(state) {
+    if (!app) return;
+    app.dataset.state = state;
+    const isIdle = state === "idle";
+    startBtn.disabled = !isIdle;
+    stopBtn.disabled = isIdle;
+    restartBtn.disabled = isIdle;
+  }
+
   function announce(msg) {
     if (ariaLive) ariaLive.textContent = msg;
   }
@@ -869,15 +883,7 @@
   // =========================
   // Game Start/End
   // =========================
-  async function startGame() {
-    if (S.starting) return;
-    S.starting = true;
-
-    await primeMedia();
-
-    S.duration = (Number.isFinite(music.duration) && music.duration > 5) ? music.duration : 60;
-
-    // reset
+  function resetRunState() {
     S.score = 0;
     S.combo = 0;
     S.maxCombo = 0;
@@ -898,17 +904,37 @@
     if (arcanaTriad) arcanaTriad.dataset.visible = "0";
     setFever(0);
 
+    if (timeEl) timeEl.textContent = "--";
+    if (scoreEl) scoreEl.textContent = "0";
+    if (comboEl) comboEl.textContent = "0";
+  }
+
+  async function startGame() {
+    if (S.starting) return;
+    S.starting = true;
+
+    await primeMedia();
+    S.duration = (Number.isFinite(music.duration) && music.duration > 5) ? music.duration : 60;
+
+    resetRunState();
     createNotes();
 
-    // sync
     music.currentTime = 0;
     video.currentTime = 0;
 
-    // allow sound if user wants (mute button toggles)
-    await safePlay(video);
-    await safePlay(music);
+    const videoOk = await safePlay(video);
+    const musicOk = await safePlay(music);
+    if (!videoOk || !musicOk) {
+      showBanner("READY", "TAP START", "Playback blocked until user gesture", "", 1400);
+      announce("Ready. Tap START.");
+      setUIState("idle");
+      S.running = false;
+      S.starting = false;
+      return;
+    }
 
     S.running = true;
+    setUIState("running");
     showBanner("DiCo", "ARU SYNC", "TAP / HOLD / RELEASE", "145 BPM", 900);
     announce("Game started.");
 
@@ -918,27 +944,31 @@
     S.starting = false;
   }
 
-  function endGame() {
+  function stopGameToIdle() {
     S.running = false;
     cancelAnimationFrame(S.raf);
 
     try { music.pause(); } catch {}
     try { video.pause(); } catch {}
 
-    setProtocolUI(0);
-    if (arcanaTriad) arcanaTriad.dataset.visible = "0";
     targetRoot?.classList.remove("holding");
-    document.body.classList.remove("feverOn");
+    resetRunState();
+    setUIState("idle");
+    showBanner("READY", "TAP START", "", "", 1200);
+    announce("Ready. Tap START.");
+  }
 
-    announce("Game ended.");
+  async function restartGame() {
+    stopGameToIdle();
+    await startGame();
+  }
 
-    // “神ゲー”結果表示：アラートでも見栄えよく
-    alert(
-      `RESULT\n` +
-      `Score: ${S.score}\n` +
-      `Max Combo: ${S.maxCombo}\n` +
-      `Offset: ${S.offsetMs}ms`
-    );
+  function endGame() {
+    const resultScore = S.score;
+    const resultMaxCombo = S.maxCombo;
+    stopGameToIdle();
+    showBanner("RESULT", `Score ${resultScore}`, `Max Combo ${resultMaxCombo}`, "", 1600);
+    announce("Run complete.");
   }
 
   // =========================
@@ -974,68 +1004,25 @@
     if (S.running) e.preventDefault();
   }, { passive: false });
 
-// =========================
-// Buttons (God-Game Boot Fix)
-// =========================
-const startBtn  = document.getElementById("startBtn");
-const pauseBtn  = document.getElementById("pauseBtn");
-const resumeBtn = document.getElementById("resumeBtn");
-const stopBtn   = document.getElementById("stopBtn");
-const calibBtn  = document.getElementById("calibBtn");
-const muteBtn   = document.getElementById("muteBtn");
+  // =========================
+  // Buttons
+  // =========================
+  startBtn?.addEventListener("click", startGame);
+  stopBtn?.addEventListener("click", stopGameToIdle);
+  restartBtn?.addEventListener("click", restartGame);
 
-// ① START
-startBtn?.addEventListener("click", startGame);
+  calibBtn?.addEventListener("click", () => {
+    const seq = [-40, -30, -20, -10, 0, 10, 20, 30, 40];
+    const idx = seq.indexOf(S.offsetMs);
+    S.offsetMs = seq[(idx + 1) % seq.length];
+    showBanner(`OFFSET ${S.offsetMs}ms`, "", "Adjust timing", "", 700);
+  });
 
-// ② RESUME（初回はSTARTとして起動）
-resumeBtn?.addEventListener("click", async () => {
-  if (!running) {
-    await startGame();
-    return;
-  }
-  // pause解除（最低限）
-  try { await safePlay(video); } catch {}
-  try { await safePlay(music); } catch {}
-  running = true;
-  showBanner("RESUME", "—", "SYNC RESTART", "DiCo / ARU", 650);
-  loop();
-});
+  muteBtn?.addEventListener("click", () => {
+    music.muted = !music.muted;
+    muteBtn.textContent = music.muted ? "UNMUTE" : "MUTE";
+  });
 
-// ③ PAUSE（止める）
-pauseBtn?.addEventListener("click", () => {
-  if (!running) return;
-  running = false;
-  try { music.pause(); } catch {}
-  try { video.pause(); } catch {}
-  showBanner("PAUSE", "—", "SYNC FREEZE", "DiCo / ARU", 650);
-});
-
-// ④ STOP（リセット兼 終了）
-stopBtn?.addEventListener("click", () => {
-  endGame();
-});
-
-// ⑤ OFFSET（既存のまま）
-calibBtn?.addEventListener("click", () => {
-  const seq = [-40, -30, -20, -10, 0, 10, 20, 30, 40];
-  const idx = seq.indexOf(offsetMs);
-  offsetMs = seq[(idx + 1) % seq.length];
-  showBanner(`CALIB ${offsetMs}ms`, "—", "体感が合う所に合わせてOK", "", 700);
-});
-
-// ⑥ MUTE（既存のまま）
-muteBtn?.addEventListener("click", () => {
-  music.muted = !music.muted;
-  muteBtn.textContent = music.muted ? "UNMUTE" : "MUTE";
-});
-
-// ⑦ 画面タップでも開始（iOS対策の決定版）
-// ※「何も押せない」系の事故を全部回避できる
-canvas.addEventListener("pointerdown", async () => {
-  if (!running && music.currentTime === 0) {
-    await startGame();
-  }
-}, { passive: true });
   // =========================
   // Metadata
   // =========================
@@ -1044,29 +1031,16 @@ canvas.addEventListener("pointerdown", async () => {
   });
 
   // =========================
-  // Triad trigger hook (score threshold)
-  // =========================
-  function maybeTriad() {
-    if (!S.triadVisible && S.score >= CFG.TRIAD_SCORE_THRESHOLD) triadShow();
-  }
-
-  // =========================
-  // Extra: Success hook upgrades
-  // =========================
-  // “神ゲー”の気持ちよさ：成功時のちょい演出＆TRIAD起動判定
-  const _onAnySuccess = onAnySuccess;
-  function onAnySuccess(kind, noteType) {
-    _onAnySuccess(kind, noteType);
-    maybeTriad();
-  }
-
-  // =========================
   // Init UI
   // =========================
-  if (timeEl) timeEl.textContent = "--";
-  if (scoreEl) scoreEl.textContent = "0";
-  if (comboEl) comboEl.textContent = "0";
-  setFever(0);
-  setProtocolUI(0);
-  if (arcanaTriad) arcanaTriad.dataset.visible = "0";
-})();
+  resetRunState();
+  setUIState("idle");
+  announce("Ready. Tap START.");
+  showBanner("READY", "TAP START", "", "", 1200);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initDiGame, { once: true });
+} else {
+  initDiGame();
+}
