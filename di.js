@@ -974,26 +974,68 @@
     if (S.running) e.preventDefault();
   }, { passive: false });
 
-  // =========================
-  // Buttons
-  // =========================
-  startBtn?.addEventListener("click", startGame);
+// =========================
+// Buttons (God-Game Boot Fix)
+// =========================
+const startBtn  = document.getElementById("startBtn");
+const pauseBtn  = document.getElementById("pauseBtn");
+const resumeBtn = document.getElementById("resumeBtn");
+const stopBtn   = document.getElementById("stopBtn");
+const calibBtn  = document.getElementById("calibBtn");
+const muteBtn   = document.getElementById("muteBtn");
 
-  muteBtn?.addEventListener("click", async () => {
-    await primeMedia();
-    music.muted = !music.muted;
-    // videoは雰囲気なので常時muteでOK（必要ならここで切替も可）
-    muteBtn.textContent = music.muted ? "UNMUTE" : "MUTE";
-    showBanner(music.muted ? "MUTED" : "SOUND ON", "—", "DiCo / ARU", "", 650);
-  });
+// ① START
+startBtn?.addEventListener("click", startGame);
 
-  calibBtn?.addEventListener("click", () => {
-    const seq = [-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50];
-    const idx = seq.indexOf(S.offsetMs);
-    S.offsetMs = seq[(idx + 1) % seq.length];
-    showBanner(`CALIB ${S.offsetMs}ms`, "—", "体感が合う所に合わせてOK", "", 720);
-  });
+// ② RESUME（初回はSTARTとして起動）
+resumeBtn?.addEventListener("click", async () => {
+  if (!running) {
+    await startGame();
+    return;
+  }
+  // pause解除（最低限）
+  try { await safePlay(video); } catch {}
+  try { await safePlay(music); } catch {}
+  running = true;
+  showBanner("RESUME", "—", "SYNC RESTART", "DiCo / ARU", 650);
+  loop();
+});
 
+// ③ PAUSE（止める）
+pauseBtn?.addEventListener("click", () => {
+  if (!running) return;
+  running = false;
+  try { music.pause(); } catch {}
+  try { video.pause(); } catch {}
+  showBanner("PAUSE", "—", "SYNC FREEZE", "DiCo / ARU", 650);
+});
+
+// ④ STOP（リセット兼 終了）
+stopBtn?.addEventListener("click", () => {
+  endGame();
+});
+
+// ⑤ OFFSET（既存のまま）
+calibBtn?.addEventListener("click", () => {
+  const seq = [-40, -30, -20, -10, 0, 10, 20, 30, 40];
+  const idx = seq.indexOf(offsetMs);
+  offsetMs = seq[(idx + 1) % seq.length];
+  showBanner(`CALIB ${offsetMs}ms`, "—", "体感が合う所に合わせてOK", "", 700);
+});
+
+// ⑥ MUTE（既存のまま）
+muteBtn?.addEventListener("click", () => {
+  music.muted = !music.muted;
+  muteBtn.textContent = music.muted ? "UNMUTE" : "MUTE";
+});
+
+// ⑦ 画面タップでも開始（iOS対策の決定版）
+// ※「何も押せない」系の事故を全部回避できる
+canvas.addEventListener("pointerdown", async () => {
+  if (!running && music.currentTime === 0) {
+    await startGame();
+  }
+}, { passive: true });
   // =========================
   // Metadata
   // =========================
