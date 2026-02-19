@@ -1,9 +1,7 @@
-/* di.js — DiCo ARU Phase1 (Base)
-   - 中央神域：意味UIを置かない（判定はターゲット上に一瞬）
-   - 1 lane / GREAT & GOOD / 光＋SEで中毒性
-   - requestAnimationFrame only
-   - iOS: prime media on user gesture, tap is canvas only
-   - ARU energy: 抽象→可視化（結果画面のみリング表示）
+/* di.js — DiCo ARU Phase1 (Taiko-ish)
+   - 判定は ms ではなく px（見た目どおり：円の中=GOOD / 中心=GREAT）
+   - 譜面にメリハリ：8分/16分連打/3連/間
+   - 大ノーツ=HOLD（長押し）
 */
 (function(){
   "use strict";
@@ -28,7 +26,6 @@
   const judgeMain = document.getElementById("judgeMain");
   const judgeSub  = document.getElementById("judgeSub");
 
-  const result = document.getElementById("result");
   const resultScore = document.getElementById("resultScore");
   const resultMaxCombo = document.getElementById("resultMaxCombo");
   const aruProg = document.getElementById("aruProg");
@@ -40,43 +37,36 @@
   const restartBtn = document.getElementById("restartBtn");
   const ariaLive = document.getElementById("ariaLive");
 
-  if(!app || !canvas || !ctx || !music || !startBtn || !stopBtn || !restartBtn){
-    console.error("[di.js] Missing required elements.");
-    return;
-  }
+  if(!app || !canvas || !ctx || !music) return;
 
-  // ===== Config (feel-good) =====
+  // ===== Config =====
   const CFG = Object.freeze({
     BPM: 145,
     BEAT: 60 / 145,
 
     HIT_Y_RATIO: 0.78,
 
-    NOTE_SPEED: 610,   // px per sec (爽快)
-    NOTE_RADIUS: 12,
+    NOTE_SPEED: 640,     // px/sec（少し速く、気持ちよく）
+    TAP_R: 12,
+    HOLD_R: 18,
 
-    // judgement windows (sec)
-    GREAT: 0.060,  // ±60ms
-    GOOD:  0.120,  // ±120ms
+    // 判定は「円の中=GOOD」「中心=GREAT」を“px”で保証する
+    GREAT_PX: 14,         // 中心判定
+    GOOD_PX: 42,          // 円の中判定（＝外円）
+    TAP_ACCEPT_R: 160,    // ターゲット円の中タップのみ受け付け（誤タップ抑制）
 
-    // scoring
     SCORE_GREAT: 100,
     SCORE_GOOD:  60,
-    COMBO_BONUS_GREAT: 6,
-    COMBO_BONUS_GOOD:  3,
 
-    // run
-    FALL_LEAD: 1.2,      // spawn lead (sec)
-    DURATION_FALLBACK: 60,
-
-    // ARU (hidden during play; shown only on result)
     ARU_MAX: 100,
     ARU_ADD_GREAT: 3,
     ARU_ADD_GOOD:  1,
 
-    // canvas
+    FALL_LEAD: 1.4,
+    DURATION_FALLBACK: 70,
+
     DPR_MAX: 2,
-    DRAW_PAD: 120
+    DRAW_PAD: 140,
   });
 
   // ===== State =====
@@ -88,18 +78,22 @@
 
     w:0,h:0,dpr:1,
 
+    // notes: {t, type:'tap'|'hold', dur, hit, holdState}
     notes:[],
-    nextBeatTime: 0,
-    startTime: 0,
+    startTime:0,
+    duration:CFG.DURATION_FALLBACK,
 
     score:0,
     combo:0,
     maxCombo:0,
-
     aru:0,
 
-    // input
+    // hold input
+    holding:false,
+    holdNote:null,
     pointerDown:false,
+    pointerX:0,
+    pointerY:0,
   };
 
   // ===== Utils =====
@@ -115,8 +109,6 @@
     S.dpr = Math.min(CFG.DPR_MAX, window.devicePixelRatio || 1);
     S.w = window.innerWidth;
     S.h = window.innerHeight;
-
-    const stageTop = 0; // canvas is stage-only; we just use full stage area via CSS size
     canvas.width  = Math.floor(S.w * S.dpr);
     canvas.height = Math.floor(S.h * S.dpr);
     canvas.style.width = `${S.w}px`;
@@ -134,7 +126,6 @@
     if(ariaLive) ariaLive.textContent = msg;
   }
 
-  // iOS prime
   async function safePlay(el){
     try{
       const p = el.play();
@@ -147,7 +138,6 @@
     if(S.primed) return true;
     S.primed = true;
 
-    // video prime (muted)
     if(bgVideo){
       bgVideo.playsInline = true;
       bgVideo.muted = true;
@@ -155,41 +145,22 @@
       bgVideo.pause();
       bgVideo.currentTime = 0;
     }
-    // audio prime
     await safePlay(music);
     music.pause();
     music.currentTime = 0;
 
-    // se prime (optional)
     try{
-      seTap && (seTap.volume = 0.9);
-      seGreat && (seGreat.volume = 0.9);
+      if(seTap) seTap.volume = 0.9;
+      if(seGreat) seGreat.volume = 0.95;
     }catch{}
 
     return true;
-  }
-
-  // ===== Notes =====
-  function spawnNote(atTime){
-    // one lane center
-    S.notes.push({
-      t: atTime,
-      hit:false
-    });
-  }
-
-  function buildNotes(){
-    S.notes.length = 0;
-    // beat grid start after a short intro
-    S.nextBeatTime = 1.0;
-    // generate ahead in render loop
   }
 
   // ===== FX =====
   function flashTarget(kind){
     if(!targetRoot) return;
     targetRoot.classList.remove("good","great");
-    // reflow
     void targetRoot.offsetWidth;
     targetRoot.classList.add(kind === "GREAT" ? "great" : "good");
   }
@@ -201,99 +172,252 @@
     judgeMain.textContent = kind;
     judgeSub.textContent = sub || "SYNC";
     void judge.offsetWidth;
-    judge.classList.add("show", kind === "GREAT" ? "great" : "good");
+    if(kind === "GOOD") judge.classList.add("show","good");
+    else if(kind === "GREAT") judge.classList.add("show","great");
+    else judge.classList.add("show");
     clearTimeout(judgeTimer);
     judgeTimer = setTimeout(()=> judge.classList.remove("show","good","great"), 460);
   }
 
   function playSe(kind){
-    // tap always
     if(seTap){
-      try{
-        seTap.currentTime = 0;
-        seTap.play().catch(()=>{});
-      }catch{}
+      try{ seTap.currentTime = 0; seTap.play().catch(()=>{}); }catch{}
     }
-    // great overlay
     if(kind === "GREAT" && seGreat){
-      try{
-        seGreat.currentTime = 0;
-        seGreat.play().catch(()=>{});
-      }catch{}
+      try{ seGreat.currentTime = 0; seGreat.play().catch(()=>{}); }catch{}
     }
   }
 
   // ===== Scoring =====
   function applyHit(kind){
-    // score
     if(kind === "GREAT"){
-      S.score += CFG.SCORE_GREAT + (S.combo * CFG.COMBO_BONUS_GREAT);
+      S.score += CFG.SCORE_GREAT;
       S.aru = clamp(S.aru + CFG.ARU_ADD_GREAT, 0, CFG.ARU_MAX);
     }else{
-      S.score += CFG.SCORE_GOOD + (S.combo * CFG.COMBO_BONUS_GOOD);
+      S.score += CFG.SCORE_GOOD;
       S.aru = clamp(S.aru + CFG.ARU_ADD_GOOD, 0, CFG.ARU_MAX);
     }
 
-    // combo
     S.combo++;
     if(S.combo > S.maxCombo) S.maxCombo = S.combo;
 
-    // UI
-    scoreEl && (scoreEl.textContent = String(S.score));
-    comboEl && (comboEl.textContent = String(S.combo));
-    maxComboEl && (maxComboEl.textContent = String(S.maxCombo));
+    if(scoreEl) scoreEl.textContent = String(S.score);
+    if(comboEl) comboEl.textContent = String(S.combo);
+    if(maxComboEl) maxComboEl.textContent = String(S.maxCombo);
 
     flashTarget(kind);
     showJudge(kind, "SYNC");
     playSe(kind);
 
-    // tiny time-slice “feel” without stalling logic: micro vibration (optional)
-    if("vibrate" in navigator){
-      navigator.vibrate(kind === "GREAT" ? 12 : 8);
-    }
+    if("vibrate" in navigator) navigator.vibrate(kind === "GREAT" ? 12 : 8);
   }
 
   function applyMiss(){
     S.combo = 0;
-    comboEl && (comboEl.textContent = "0");
+    if(comboEl) comboEl.textContent = "0";
     showJudge("MISS", "NO SYNC");
     if("vibrate" in navigator) navigator.vibrate(10);
   }
 
-  // ===== Judge press =====
-  function tryHit(){
-    if(!S.running) return;
-    const t = music.currentTime;
+  // ===== Chart (Taiko-ish patterns) =====
+  function buildNotes(){
+    S.notes.length = 0;
 
-    // find closest active note
-    let best = null;
-    let bestD = 999;
+    // 例：70秒の中に “譜面ブロック” を並べる（Phase1）
+    // t: 秒
+    // - 8分: 1/2 beat
+    // - 16分: 1/4 beat（連打）
+    let t = 1.0;
 
-    // small scan window around t (performance fine for Phase1)
+    const beat = CFG.BEAT;
+
+    function addTap(beats=1){
+      S.notes.push({ t, type:"tap", dur:0, hit:false });
+      t += beat * beats;
+    }
+
+    function addBurst16(count){
+      for(let i=0;i<count;i++){
+        S.notes.push({ t, type:"tap", dur:0, hit:false });
+        t += beat * 0.5; // 16分相当（BPM145で気持ちよい連打）
+      }
+    }
+
+    function addTriplet(){
+      // 3連：1拍を3等分
+      const step = beat / 3;
+      for(let i=0;i<3;i++){
+        S.notes.push({ t, type:"tap", dur:0, hit:false });
+        t += step;
+      }
+    }
+
+    function addHold(beats=2){
+      // HOLD: 開始ノーツ + 持続（beats拍ぶん）
+      S.notes.push({ t, type:"hold", dur: beat * beats, hit:false, holdState:"idle" });
+      t += beat * beats; // 次は終点後に続く
+    }
+
+    // --- Intro: 8分で慣らし ---
+    for(let i=0;i<8;i++) addTap(0.5);
+
+    // --- 間（呼吸） ---
+    t += beat * 1.0;
+
+    // --- 16分連打（太鼓っぽさ） ---
+    addBurst16(12);
+
+    // --- 3連＋間 ---
+    t += beat * 0.5;
+    addTriplet();
+    t += beat * 0.5;
+    addTriplet();
+
+    // --- HOLD（大ノーツ） ---
+    t += beat * 0.5;
+    addHold(2);   // 2拍長押し
+    t += beat * 0.5;
+
+    // --- 8分→16分→8分でメリハリ ---
+    for(let i=0;i<6;i++) addTap(0.5);
+    addBurst16(8);
+    for(let i=0;i<6;i++) addTap(0.5);
+
+    // 足りない分は8分で埋める（単調回避で時々3連・HOLDを差す）
+    while(t < (S.duration - 1.0)){
+      addTap(0.5);
+      if(Math.random() < 0.12) addTriplet();
+      if(Math.random() < 0.10) addHold(1.5);
+      if(Math.random() < 0.10) addBurst16(6);
+    }
+
+    // 時間でソート
+    S.notes.sort((a,b)=>a.t-b.t);
+  }
+
+  // ===== Position-based judgement core =====
+  function getHitY(){ return S.h * CFG.HIT_Y_RATIO; }
+
+  function noteY(note, now){
+    const hitY = getHitY();
+    const diff = note.t - now;          // note is scheduled at t
+    return hitY - diff * CFG.NOTE_SPEED;
+  }
+
+  function findClosestActiveNote(now){
+    let best=null;
+    let bestAbs=1e9;
+
     for(const n of S.notes){
       if(n.hit) continue;
-      const d = Math.abs(n.t - t);
-      if(d < bestD){
-        bestD = d;
+
+      // HOLDの終点管理：終点を過ぎたらミス（保持してなければ）
+      if(n.type==="hold" && n.holdState!=="done"){
+        // start window: note.t around hit
+        const y = noteY(n, now);
+        const dy = Math.abs(y - getHitY());
+        if(dy < bestAbs){
+          bestAbs = dy;
+          best = n;
+        }
+        continue;
+      }
+
+      // TAP
+      const y = noteY(n, now);
+      const dy = Math.abs(y - getHitY());
+      if(dy < bestAbs){
+        bestAbs = dy;
         best = n;
       }
-      // early break if notes are in time order and far ahead (optional)
     }
 
-    if(!best) return applyMiss();
+    return { note: best, dy: bestAbs };
+  }
 
-    if(bestD <= CFG.GREAT){
-      best.hit = true;
-      applyHit("GREAT");
-      return;
-    }
-    if(bestD <= CFG.GOOD){
-      best.hit = true;
-      applyHit("GOOD");
-      return;
-    }
+  function isTapInsideTarget(px, py){
+    const cx = S.w / 2;
+    const cy = getHitY();
+    const dx = px - cx;
+    const dy = py - cy;
+    return (dx*dx + dy*dy) <= (CFG.TAP_ACCEPT_R * CFG.TAP_ACCEPT_R);
+  }
 
+  function judgeByDy(dy){
+    if(dy <= CFG.GREAT_PX) return "GREAT";
+    if(dy <= CFG.GOOD_PX)  return "GOOD";
+    return "MISS";
+  }
+
+  function startHolding(note){
+    S.holding = true;
+    S.holdNote = note;
+    note.holdState = "holding";
+    if(targetRoot) targetRoot.classList.add("holding");
+    showJudge("HOLD", "KEEP");
+  }
+
+  function finishHolding(successKind){
+    const n = S.holdNote;
+    if(!n) return;
+
+    n.hit = true;
+    n.holdState = "done";
+
+    S.holding = false;
+    S.holdNote = null;
+
+    if(targetRoot) targetRoot.classList.remove("holding");
+    applyHit(successKind);
+  }
+
+  function failHolding(){
+    const n = S.holdNote;
+    if(n){
+      n.hit = true;
+      n.holdState = "done";
+    }
+    S.holding = false;
+    S.holdNote = null;
+    if(targetRoot) targetRoot.classList.remove("holding");
     applyMiss();
+  }
+
+  function tryHit(px, py){
+    if(!S.running) return;
+
+    // ターゲット円の中以外は無視（誤タップ減）
+    if(!isTapInsideTarget(px, py)){
+      // 外を叩いたらMISS出したくないならreturn;（太鼓っぽくするなら無視が気持ちいい）
+      return;
+    }
+
+    const now = music.currentTime;
+    const { note, dy } = findClosestActiveNote(now);
+    if(!note) return;
+
+    // HOLDの開始判定
+    if(note.type === "hold"){
+      const kind = judgeByDy(dy);
+      if(kind === "MISS") return; // 中に入ってない
+
+      // HOLD開始
+      startHolding(note);
+      // ここは“開始”なのでSE軽め
+      playSe("GOOD");
+      return;
+    }
+
+    // TAP
+    const kind = judgeByDy(dy);
+    if(kind === "MISS"){
+      // 太鼓っぽく「空打ち=無反応」にしたいなら applyMiss() を消す
+      applyMiss();
+      return;
+    }
+
+    note.hit = true;
+    applyHit(kind);
   }
 
   // ===== Render =====
@@ -302,53 +426,82 @@
 
     ctx.clearRect(0,0,S.w,S.h);
 
-    const t = music.currentTime;
-    const hitY = S.h * CFG.HIT_Y_RATIO;
+    const now = music.currentTime;
+    const hitY = getHitY();
     const cx = S.w / 2;
 
-    // time
-    const remain = Math.max(0, S.duration - t);
-    timeEl && (timeEl.textContent = remain.toFixed(1));
+    const remain = Math.max(0, S.duration - now);
+    if(timeEl) timeEl.textContent = remain.toFixed(1);
 
-    // generate notes ahead
-    while(S.nextBeatTime < t + CFG.FALL_LEAD){
-      spawnNote(S.nextBeatTime);
-      S.nextBeatTime += CFG.BEAT;
-    }
-
-    // draw notes
-    const missLine = CFG.GOOD; // auto-miss when past this window
+    // ノーツ描画 & 自動MISS（画面を過ぎた）
     for(const n of S.notes){
       if(n.hit) continue;
 
-      const diff = n.t - t;
-      const y = hitY - diff * CFG.NOTE_SPEED;
-
+      const y = noteY(n, now);
       if(y < -CFG.DRAW_PAD || y > S.h + CFG.DRAW_PAD) continue;
 
-      // auto miss (passed)
-      if(diff < -missLine){
-        n.hit = true;
-        applyMiss();
-        continue;
+      // TAP: GOOD判定を過ぎたらMISS扱い（ただし、太鼓っぽく“MISS表示しない”ならここを静かに処理）
+      if(n.type==="tap"){
+        if((now - n.t) * CFG.NOTE_SPEED > CFG.GOOD_PX + 18){
+          n.hit = true;
+          applyMiss();
+          continue;
+        }
+
+        ctx.beginPath();
+        ctx.arc(cx, y, CFG.TAP_R, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(0,240,255,0.88)";
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx, y, CFG.TAP_R + 10, 0, Math.PI*2);
+        ctx.strokeStyle = "rgba(0,240,255,0.18)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
       }
 
-      // body
-      ctx.beginPath();
-      ctx.arc(cx, y, CFG.NOTE_RADIUS, 0, Math.PI*2);
-      ctx.fillStyle = "rgba(0,240,255,0.88)";
-      ctx.fill();
+      // HOLD: 大きいノーツ
+      if(n.type==="hold"){
+        // HOLD中は中心に吸い寄せるように見えるリングを描く
+        ctx.beginPath();
+        ctx.arc(cx, y, CFG.HOLD_R, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(230,201,107,0.30)";
+        ctx.fill();
 
-      // halo
-      ctx.beginPath();
-      ctx.arc(cx, y, CFG.NOTE_RADIUS + 8, 0, Math.PI*2);
-      ctx.strokeStyle = "rgba(0,240,255,0.18)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, y, CFG.HOLD_R + 14, 0, Math.PI*2);
+        ctx.strokeStyle = "rgba(230,201,107,0.22)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // HOLDが開始されているなら、終点まで維持チェック
+        if(n.holdState==="holding"){
+          const endT = n.t + n.dur;
+          // 離したら失敗（pointerDown false で failHolding）
+          if(!S.pointerDown){
+            failHolding();
+            continue;
+          }
+          // 終点到達で成功（終点時の位置も中心ならGREAT寄りにする）
+          if(now >= endT){
+            // 終点の“見た目”に合わせて GREAT/GOOD を決める（ほぼGREATになる）
+            finishHolding("GREAT");
+            continue;
+          }
+        }
+
+        // HOLDが開始できずに通過したらMISS
+        if(n.holdState==="idle"){
+          if((now - n.t) * CFG.NOTE_SPEED > CFG.GOOD_PX + 18){
+            n.hit = true;
+            applyMiss();
+            continue;
+          }
+        }
+      }
     }
 
-    // end
-    if(t >= S.duration - 0.02){
+    if(now >= S.duration - 0.02){
       endGame();
       return;
     }
@@ -358,17 +511,11 @@
 
   // ===== Run control =====
   function resetRun(){
-    S.score = 0;
-    S.combo = 0;
-    S.maxCombo = 0;
-    S.aru = 0;
-
-    scoreEl && (scoreEl.textContent = "0");
-    comboEl && (comboEl.textContent = "0");
-    maxComboEl && (maxComboEl.textContent = "0");
-    timeEl && (timeEl.textContent = "--");
-
-    if(result) result.setAttribute("aria-hidden","true");
+    S.score=0; S.combo=0; S.maxCombo=0; S.aru=0;
+    if(scoreEl) scoreEl.textContent="0";
+    if(comboEl) comboEl.textContent="0";
+    if(maxComboEl) maxComboEl.textContent="0";
+    if(timeEl) timeEl.textContent="--";
   }
 
   async function startGame(){
@@ -377,7 +524,6 @@
 
     await primeMedia();
 
-    // duration
     S.duration = (Number.isFinite(music.duration) && music.duration > 5)
       ? music.duration
       : CFG.DURATION_FALLBACK;
@@ -385,7 +531,6 @@
     resetRun();
     buildNotes();
 
-    // start media (must be user gesture)
     if(bgVideo){
       bgVideo.currentTime = 0;
       await safePlay(bgVideo);
@@ -410,10 +555,11 @@
   }
 
   function stopGame(){
-    S.running = false;
+    S.running=false;
     cancelAnimationFrame(S.raf);
     try{ music.pause(); }catch{}
     try{ bgVideo && bgVideo.pause(); }catch{}
+    if(targetRoot) targetRoot.classList.remove("holding","good","great");
     setState("idle");
     announce("Ready. Tap START.");
   }
@@ -424,31 +570,24 @@
   }
 
   function endGame(){
-    S.running = false;
+    S.running=false;
     cancelAnimationFrame(S.raf);
     try{ music.pause(); }catch{}
     try{ bgVideo && bgVideo.pause(); }catch{}
 
-    // result view
     setState("result");
 
     if(resultScore) resultScore.textContent = String(S.score);
     if(resultMaxCombo) resultMaxCombo.textContent = String(S.maxCombo);
 
-    // ARU ring (result only)
-    const pct = clamp(S.aru, 0, 100);
+    const pct = clamp(S.aru,0,100);
     if(aruValue) aruValue.textContent = `${pct.toFixed(0)}%`;
-
-    // stroke progress
-    // circumference ~ 276.46 (r=44)
     if(aruProg){
       const C = 276.46;
       const offset = C * (1 - pct/100);
       aruProg.style.strokeDasharray = String(C);
       aruProg.style.strokeDashoffset = String(offset);
     }
-
-    // positive lines only
     if(dicoLine){
       const lines = [
         "しーちゃんに、君の想いは届いたよ。",
@@ -456,7 +595,6 @@
         "今日の共鳴、ちゃんと残ったよ。",
         "大丈夫。次はもっと光る。"
       ];
-      // choose by score tier
       const pick = (S.score >= 3500) ? 1 : (S.score >= 1800) ? 0 : (S.score >= 800) ? 2 : 3;
       dicoLine.textContent = lines[pick];
     }
@@ -465,22 +603,39 @@
   }
 
   // ===== Input (canvas only) =====
+  function pointerPos(e){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left),
+      y: (e.clientY - rect.top)
+    };
+  }
+
   function onPointerDown(e){
     if(!S.primed) primeMedia();
     if(S.running) e.preventDefault();
+
     S.pointerDown = true;
-    tryHit();
+    const p = pointerPos(e);
+    S.pointerX = p.x;
+    S.pointerY = p.y;
+
+    tryHit(p.x, p.y);
   }
+
   function onPointerUp(e){
     if(S.running) e.preventDefault();
     S.pointerDown = false;
+
+    // HOLD中に離したら失敗（太鼓っぽい）
+    if(S.holding){
+      failHolding();
+    }
   }
 
   canvas.addEventListener("pointerdown", onPointerDown, { passive:false });
   canvas.addEventListener("pointerup", onPointerUp, { passive:false });
-  canvas.addEventListener("pointercancel", ()=>{ S.pointerDown=false; }, { passive:true });
-
-  // iOS insurance: prevent zoom/scroll
+  canvas.addEventListener("pointercancel", ()=>{ S.pointerDown=false; if(S.holding) failHolding(); }, { passive:true });
   canvas.addEventListener("touchstart", (e)=>{ if(S.running) e.preventDefault(); }, { passive:false });
 
   // ===== Buttons =====
@@ -494,8 +649,6 @@
     setState("idle");
     resetRun();
     announce("Ready. Tap START.");
-
-    // try load metadata
     music.addEventListener("loadedmetadata", ()=>{
       if(Number.isFinite(music.duration) && music.duration > 5) S.duration = music.duration;
     });
