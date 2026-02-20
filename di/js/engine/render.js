@@ -9,48 +9,61 @@
       this.chart = chart;
       this.timing = timing;
 
-      this.notes = (chart?.notes || []).slice().sort((a, b) => (a.t || 0) - (b.t || 0));
+      this.notes = (chart?.notes || [])
+        .slice()
+        .sort((a, b) => (Number(a?.t) || 0) - (Number(b?.t) || 0));
+
       this.approach = chart?.scroll?.approach ?? 1.25; // seconds
       this.dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
       this.resize();
 
-      // Pre-made gradients cache key'd by radius (you can use in skins too)
+      // stops cache (radius only) - safe for current usage
       this._gradCache = new Map();
     }
 
     resize() {
       const r = this.canvas.getBoundingClientRect();
-      this.canvas.width = Math.floor(r.width * this.dpr);
-      this.canvas.height = Math.floor(r.height * this.dpr);
+      const w = Math.max(1, Math.floor(r.width * this.dpr));
+      const h = Math.max(1, Math.floor(r.height * this.dpr));
 
-      // 1 unit in code == 1 CSS pixel
+      this.canvas.width = w;
+      this.canvas.height = h;
+
+      // 1 unit == 1 CSS pixel
       this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
 
-      // mobile friendliness
+      // Safari-safe (存在しない場合もあるのでガード)
       this.ctx.imageSmoothingEnabled = true;
-      this.ctx.imageSmoothingQuality = "high";
+      if ("imageSmoothingQuality" in this.ctx) {
+        this.ctx.imageSmoothingQuality = "high";
+      }
     }
 
     draw(songTime) {
       const ctx = this.ctx;
-      const w = this.canvas.getBoundingClientRect().width;
-      const h = this.canvas.getBoundingClientRect().height;
 
-      // Clear: keep video visible (no opaque fill)
+      // songTime が NaN の瞬間があると全滅するのでガード
+      if (!Number.isFinite(songTime)) return;
+
+      const rect = this.canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      // 初期レイアウト中の 0 サイズ対策
+      if (w < 2 || h < 2) return;
+
       ctx.clearRect(0, 0, w, h);
 
-      // lane center + target position
       const cx = w / 2;
       const targetY = h * 0.62;
 
-      // subtle lane guides (match thin lane)
+      // guides
       ctx.save();
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 0.18;
       ctx.lineWidth = 1;
 
-      // edge hints
       ctx.strokeStyle = "rgba(0,240,255,0.22)";
       ctx.beginPath();
       ctx.moveTo(cx - 70, 0);
@@ -63,7 +76,6 @@
       ctx.lineTo(cx + 70, h);
       ctx.stroke();
 
-      // target line (bright)
       ctx.globalAlpha = 0.22;
       ctx.strokeStyle = "rgba(255,255,255,0.30)";
       ctx.beginPath();
@@ -71,7 +83,6 @@
       ctx.lineTo(cx + 115, targetY);
       ctx.stroke();
 
-      // thin neon under-line
       ctx.globalAlpha = 0.22;
       ctx.strokeStyle = "rgba(0,240,255,0.32)";
       ctx.beginPath();
@@ -81,50 +92,51 @@
 
       ctx.restore();
 
-      // draw notes in window
       const spawnT = songTime + this.approach;
       const minT = songTime - 0.45;
 
-      // ✅ IMPORTANT: notes are drawn after guides, so they appear on top within the canvas
       for (let i = 0; i < this.notes.length; i++) {
         const n = this.notes[i];
-        if (n.t < minT) continue;
-        if (n.t > spawnT) break;
+        const t = Number(n?.t);
 
-        const dt = n.t - songTime;
-        const p = 1 - (dt / this.approach);      // 0..1
+        // ✅ ここが超重要：変なノーツは弾く
+        if (!Number.isFinite(t)) continue;
+
+        if (t < minT) continue;
+        if (t > spawnT) break;
+
+        const dt = t - songTime;
+        const p = 1 - (dt / this.approach);
         const y = targetY * p;
 
         const alpha = this._clamp(0.20 + p * 1.05, 0, 1);
-        this._drawNote(cx, y, alpha, p, n);      // ★ n も渡す
+        this._drawNote(cx, y, alpha, p, n);
       }
     }
 
-    // ✅ Skin-call style note draw
     _drawNote(x, y, alpha, p, note) {
       const ctx = this.ctx;
 
-      // Notes should feel "always on top":
-      // Keep Renderer in a stable base mode; skins can opt-in to lighter/screen inside.
       ctx.save();
       ctx.globalCompositeOperation = "source-over";
 
       const skin = (window.DI_ENGINE && window.DI_ENGINE.noteSkin) || null;
 
       if (skin && typeof skin.drawNote === "function") {
-        // skin draws everything (card/heart/star/etc)
-        skin.drawNote(ctx, x, y, alpha, p, note, this);
+        // ✅ スキン例外でゲームが死ぬのを防ぐ
+        try {
+          skin.drawNote(ctx, x, y, alpha, p, note, this);
+        } catch (e) {
+          console.warn("[noteSkin.drawNote] failed -> fallback", e);
+          this._drawFallbackOrb(ctx, x, y, alpha, p);
+        }
       } else {
-        // fallback (your current neon orb style)
         this._drawFallbackOrb(ctx, x, y, alpha, p);
       }
 
       ctx.restore();
     }
 
-    /* -----------------------------------------
-       Fallback: your current DiCo orb note
-       ----------------------------------------- */
     _drawFallbackOrb(ctx, x, y, alpha, p) {
       const C_CYAN   = "rgba(0,240,255,";
       const C_VIOLET = "rgba(156,60,255,";
@@ -140,7 +152,6 @@
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
 
-      // AURA
       ctx.globalAlpha = alpha * 0.55 * pulse;
       ctx.shadowBlur = 26 + near * 24;
       ctx.shadowColor = `${C_CYAN}${0.55})`;
@@ -155,7 +166,6 @@
       ctx.arc(x, y, rAura, 0, Math.PI * 2);
       ctx.fill();
 
-      // RING
       ctx.globalAlpha = alpha * (0.75 + near * 0.30);
       ctx.shadowBlur = 18 + near * 18;
       ctx.shadowColor = `${C_CYAN}${0.65})`;
@@ -171,7 +181,6 @@
       ctx.arc(x, y, rRing, 0, Math.PI * 2);
       ctx.stroke();
 
-      // CORE bloom
       ctx.globalAlpha = alpha;
       ctx.shadowBlur = 10 + near * 12;
       ctx.shadowColor = "rgba(255,255,255,0.65)";
@@ -185,7 +194,6 @@
       ctx.arc(x, y, rCore + 8, 0, Math.PI * 2);
       ctx.fill();
 
-      // inner bead
       ctx.shadowBlur = 0;
       ctx.globalAlpha = alpha * (0.9 + near * 0.1);
       ctx.fillStyle = `rgba(255,255,255,0.78)`;
@@ -193,7 +201,6 @@
       ctx.arc(x, y, rCore, 0, Math.PI * 2);
       ctx.fill();
 
-      // TRAIL
       const trailLen = 64 - near * 20;
       const trailW = 10 + near * 8;
 
@@ -214,7 +221,6 @@
       ctx.closePath();
       ctx.fill();
 
-      // SPARK TICKS
       ctx.globalAlpha = alpha * (0.18 + near * 0.22);
       ctx.shadowBlur = 16;
       ctx.shadowColor = `${C_CYAN}${0.40})`;
@@ -229,25 +235,18 @@
       ctx.stroke();
 
       ctx.restore();
-
-      // restore defaults
-      ctx.globalCompositeOperation = "source-over";
-      ctx.shadowBlur = 0;
     }
 
-    /* -----------------------------------------
-       helpers
-       ----------------------------------------- */
     _radial(ctx, x, y, r, stops) {
-      // cache stop lists by rounded radius (lightweight)
+      // radius-only cache (OK for current fallback). If skins reuse radii with different stops, remove cache.
       const key = Math.round(r * 2) / 2;
+
       let cached = this._gradCache.get(key);
       if (!cached) {
         cached = stops;
         this._gradCache.set(key, stops);
       }
 
-      // gradient depends on x/y so create each call (cheap enough)
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
       for (const [o, c] of cached) g.addColorStop(o, c);
       return g;
