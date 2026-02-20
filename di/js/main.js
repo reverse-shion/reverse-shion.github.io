@@ -2,7 +2,6 @@
    - Loads engine scripts (non-module) and boots the game.
    - Keeps existing DOM ids (#score/#combo/#maxCombo/#time etc.) and syncs to side HUD.
 */
-
 (() => {
   const ENGINE_FILES = [
     "./js/engine/audio.js",
@@ -12,11 +11,10 @@
     "./js/engine/render.js",
     "./js/engine/fx.js",
     "./js/engine/ui.js",
-  
-      // ★ note skins (swap freely)
-  "./js/notes/skin-tarot-pinkgold.js",
 
-   ];
+    // ★ note skins (swap freely)
+    "./js/notes/skin-tarot-pinkgold.js",
+  ];
 
   function $(id) { return document.getElementById(id); }
 
@@ -25,7 +23,9 @@
       return p.then(() => new Promise((resolve, reject) => {
         const s = document.createElement("script");
         s.src = src;
-        s.defer = true;
+
+        // defer は “HTMLに最初から書かれた script” 向け挙動が強いので、
+        // 動的追加では外して順次ロードの確実性を上げる
         s.onload = () => resolve();
         s.onerror = () => reject(new Error("Failed to load: " + src));
         document.head.appendChild(s);
@@ -39,24 +39,20 @@
     return await r.json();
   }
 
-  // Fallback chart if json missing
   function fallbackChart() {
-    // 60 seconds, simple 4th rhythm
     const notes = [];
     const bpm = 145;
-    const beat = 60 / bpm;          // seconds per beat
+    const beat = 60 / bpm;
     const start = 1.2;
     const total = 60.0;
     for (let t = start, i = 0; t < total; t += beat, i++) {
-      // every 2 beats place a tap note
       if (i % 2 === 0) notes.push({ t: +t.toFixed(3), type: "tap" });
-      // occasional doubles
       if (i % 16 === 8) notes.push({ t: +(t + beat * 0.5).toFixed(3), type: "tap" });
     }
     return {
       meta: { title: "DiCo ARU Phase1 (fallback)", bpm },
       offset: 0.0,
-      scroll: { approach: 1.25 }, // seconds from spawn to hit
+      scroll: { approach: 1.25 },
       notes
     };
   }
@@ -66,35 +62,37 @@
     const canvas = $("noteCanvas");
     const bgVideo = $("bgVideo");
 
-    // Buttons
     const startBtn = $("startBtn");
     const stopBtn = $("stopBtn");
     const restartBtn = $("restartBtn");
 
-    // Audio elements (from HTML)
     const music = $("music");
     const seTap = $("seTap");
     const seGreat = $("seGreat");
 
-    // Optional: try autoplay muted bg video (iOS policy ok if muted)
+    // ---- DOM sanity (超大事)
+    if (!app || !canvas || !startBtn || !stopBtn || !restartBtn || !music) {
+      throw new Error("Missing required DOM elements (check ids).");
+    }
+
+    // Optional: autoplay muted bg video
     try {
-      bgVideo.muted = true;
-      bgVideo.playsInline = true;
-      bgVideo.loop = true;
-      bgVideo.play().catch(() => {});
+      if (bgVideo) {
+        bgVideo.muted = true;
+        bgVideo.playsInline = true;
+        bgVideo.loop = true;
+        bgVideo.play().catch(() => {});
+      }
     } catch {}
 
-    // Load chart(s)
     let chart = null;
     try {
-      // prioritize chart_001.json if present
       chart = await fetchJSON("./js/charts/chart_001.json");
     } catch (e) {
       chart = fallbackChart();
       console.warn("[DiCo] chart json not found. Using fallback.", e);
     }
 
-    // Engine must exist after scripts loaded
     const E = window.DI_ENGINE;
     if (!E) throw new Error("DI_ENGINE not found. engine scripts failed to load.");
 
@@ -105,13 +103,9 @@
     const fx = new E.FX({ fxLayer: $("fxLayer") });
     const ui = new E.UI({
       app,
-      // legacy HUD (compat)
       score: $("score"), combo: $("combo"), maxCombo: $("maxCombo"), timeDup: $("time_dup"),
-      // side HUD
       sideScore: $("sideScore"), sideCombo: $("sideCombo"), sideMaxCombo: $("sideMaxCombo"), time: $("time"),
-      // resonance
       resValue: $("resValue"), resFill: $("resFill"), avatarRing: $("avatarRing"),
-      // judge/result
       judge: $("judge"), judgeMain: $("judgeMain"), judgeSub: $("judgeSub"),
       result: $("result"),
       resultScore: $("resultScore"), resultMaxCombo: $("resultMaxCombo"),
@@ -119,27 +113,26 @@
       ariaLive: $("ariaLive"),
       hitFlash: $("hitFlash"),
     });
+
     const render = new E.Renderer({ canvas, chart, timing });
 
-    // Input
     const input = new E.Input({
       element: canvas,
       onTap: (x, y) => {
-        // tap SE (light), then judge
         audio.playTap();
         fx.burstAt(x, y);
 
         const res = judge.hit(timing.getSongTime());
         ui.onJudge(res);
+
         if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
           audio.playGreat();
           ui.flashHit();
-          fx.sparkLine(); // small HUD sparkle
+          fx.sparkLine();
         }
       }
     });
 
-    // Game loop
     let raf = 0;
     let running = false;
 
@@ -147,13 +140,9 @@
       raf = requestAnimationFrame(tick);
       if (!running) return;
 
-      // song time drives everything
       const t = timing.getSongTime();
-
-      // update renderer
       render.draw(t);
 
-      // update UI (time, resonance etc.)
       ui.update({
         t,
         score: judge.state.score,
@@ -163,27 +152,28 @@
         state: app.dataset.state
       });
 
-      // auto-finish at end
-      if (timing.isEnded(t)) {
-        endGame();
-      }
+      if (timing.isEnded(t)) endGame();
     }
 
     async function startGame() {
       if (running) return;
 
-      // Must be inside user gesture (button click) for iOS audio
+      // must be in user gesture
       await audio.unlock();
 
-      // Start bg video if stopped
-      try { bgVideo.play().catch(() => {}); } catch {}
+      try { bgVideo?.play().catch(() => {}); } catch {}
 
       judge.reset();
       timing.start(audio);
+
       app.dataset.state = "playing";
       running = true;
+
       ui.hideResult();
       ui.toast("START");
+
+      // tick 多重起動防止
+      cancelAnimationFrame(raf);
       tick();
     }
 
@@ -212,12 +202,10 @@
       await startGame();
     }
 
-    // Wire buttons
     startBtn.addEventListener("click", () => startGame());
     stopBtn.addEventListener("click", () => stopGame());
     restartBtn.addEventListener("click", () => restartGame());
 
-    // Keyboard (dev)
     window.addEventListener("keydown", (e) => {
       if (e.code === "Space") {
         e.preventDefault();
@@ -229,18 +217,10 @@
       }
     }, { passive: false });
 
-    // Initial UI state
     app.dataset.state = "idle";
-    ui.update({
-      t: 0,
-      score: 0,
-      combo: 0,
-      maxCombo: 0,
-      resonance: 0,
-      state: "idle"
-    });
-    render.resize();
+    ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
 
+    render.resize();
     window.addEventListener("resize", () => {
       render.resize();
       input.recalc();
