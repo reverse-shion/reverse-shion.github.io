@@ -1,21 +1,26 @@
 /* /di/css/lane.css */
 /* =========================================================
-   DiCo LANE – “Single Lane Master” (FINAL)
-   - ONE lane only (no double lane)
-   - ::before + ::after same width (glow stays inside)
-   - No transform wobble (stable on iOS Safari)
-   - Notes(canvas) always on top
+   DiCo LANE – “Cute Neon Pulse” (FINAL)
+   - NOTES(canvas) always on top
+   - LANE behind canvas (no more notes-under-lane)
+   - Visible breathing (strong amplitude)
+   - Shimmer + melt fade top/bottom
+   - Target synchronized pulse
+   - Hit boost (Safari-safe fallback)
+   - Bright judge + light result
    ========================================================= */
 
 /* =========================================================
    0) LAYER FIX (MOST IMPORTANT)
    ========================================================= */
 
+/* notes canvas -> front */
 .noteCanvas{
   position: relative;
-  z-index: 8;
+  z-index: 8;          /* ✅ notes are always above the lane */
 }
 
+/* tap/hit FX layer -> above notes */
 .hitZone{
   position:absolute;
   inset:0;
@@ -23,52 +28,38 @@
   pointer-events:none;
 }
 
-.targetRoot{ position:absolute; z-index: 10; pointer-events:none; }
-.judge{ position:absolute; z-index: 11; pointer-events:none; }
-.result{ position:absolute; z-index: 20; }
+/* target/judge/result -> top */
+.targetRoot{ z-index: 10; }
+.judge{ z-index: 11; }
+.result{ z-index: 20; }
 
 /* =========================================================
-   1) STAGE BASE (must be stable)
+   1) CENTER LANE (behind canvas)
    ========================================================= */
-
-/* stage should be the positioning context */
-.stage{
-  position: relative;
-  overflow: hidden;           /* keeps lane effects clean */
-  transform: translateZ(0);   /* stable compositor layer */
-  will-change: auto;
-}
-
-/* =========================================================
-   2) SINGLE CENTER LANE (ONE WIDTH ONLY)
-   ========================================================= */
-
-:root{
-  /* ✅ HERE: the “real lane width” (match notes feel) */
-  --laneW: min(190px, 50vw);
-  --laneR: 30px;
-}
 
 /* Lane body (glass) */
 .stage::before{
   content:"";
   position:absolute;
   left:50%;
-  top:-14vh;
+  top:-14vh;                 /* extend beyond screen */
   bottom:-16vh;
-  transform: translateX(-50%);     /* only centering (no animation transform!) */
+  transform: translateX(-50%) translateZ(0);
 
-  width: var(--laneW);
-  border-radius: var(--laneR);
+  /* ✅ lane width: adjust here */
+  width: min(190px, 50vw);
 
+  /* ✅ LANE BEHIND CANVAS */
   z-index: 2;
   pointer-events:none;
+
+  border-radius: 30px;
 
   background:
     linear-gradient(180deg,
       rgba(255,255,255,.10),
-      rgba(255,255,255,.035) 44%,
-      rgba(255,255,255,.020) 100%
+      rgba(255,255,255,.03) 42%,
+      rgba(255,255,255,.02) 100%
     );
 
   outline: 1px solid rgba(255,255,255,.11);
@@ -81,72 +72,72 @@
     0 18px 70px rgba(0,0,0,.12),
     0 0 40px rgba(0,240,255,.10);
 
-  /* iOS Safari: heavy blur can shimmer; keep moderate */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
 
-  opacity: .78;
+  opacity: .74;
 
   will-change: opacity, filter, box-shadow;
-  animation: laneBreatheStable 2.4s ease-in-out infinite;
+  animation: laneBreatheStrong 2.4s ease-in-out infinite;
 }
 
-/* Shimmer film (SAME width = no double lane) */
+/* Shimmer layer (cute disco gloss) */
 .stage::after{
   content:"";
   position:absolute;
   left:50%;
   top:-14vh;
   bottom:-16vh;
-  transform: translateX(-50%);     /* no wobble */
+  transform: translateX(-50%) translateZ(0);
 
-  /* ✅ SAME WIDTH as ::before (IMPORTANT) */
-  width: var(--laneW);
-  border-radius: var(--laneR);
+  width: min(230px, 56vw);
 
+  /* ✅ behind canvas too */
   z-index: 2;
   pointer-events:none;
 
+  border-radius: 30px;
+
   background:
     linear-gradient(115deg,
-      rgba(0,0,0,0) 0%,
-      rgba(0,240,255,.18) 18%,
-      rgba(156,60,255,.14) 46%,
-      rgba(230,201,107,.10) 62%,
-      rgba(0,0,0,0) 82%
+      transparent 0%,
+      rgba(0,240,255,.20) 18%,
+      rgba(156,60,255,.16) 46%,
+      rgba(230,201,107,.12) 62%,
+      transparent 82%
     );
 
   background-size: 520px 100%;
-  background-position: -320px 0;
+  background-position: 0 0;
 
-  /* Safari can “flicker” with strong blend; keep screen but lighter */
   mix-blend-mode: screen;
-  opacity: .40;
+
+  opacity: .46;
   filter: blur(.25px);
 
   will-change: opacity, filter, background-position;
+
   animation:
     laneShimmer 2.2s linear infinite,
-    laneBreatheStable 2.4s ease-in-out infinite;
+    laneBreatheStrong 2.4s ease-in-out infinite;
 }
 
-/* Fade top/bottom so lane melts into screen */
+/* Smooth top/bottom fade (melt into screen) */
 .stage::before,
 .stage::after{
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
 }
 
-/* shimmer slide */
 @keyframes laneShimmer{
   0%   { background-position: -320px 0; }
   100% { background-position:  320px 0; }
 }
 
-/* ✅ stable breathing (NO transform scale) */
-@keyframes laneBreatheStable{
+/* ✅ Strong visible breathing (what you asked for) */
+@keyframes laneBreatheStrong{
   0%,100%{
-    opacity: .74;
+    opacity: .70;
     filter: brightness(1.00) saturate(1.08);
     box-shadow:
       inset 2px 0 0 rgba(0,240,255,.55),
@@ -157,31 +148,33 @@
       0 0 28px rgba(0,240,255,.10);
   }
   50%{
-    opacity: .92;
-    filter: brightness(1.14) saturate(1.20);
+    opacity: .92; /* ✅ peak is obvious */
+    filter: brightness(1.20) saturate(1.28);
     box-shadow:
-      inset 2px 0 0 rgba(0,240,255,.82),
-      inset -2px 0 0 rgba(156,60,255,.70),
-      inset 0 0 56px rgba(0,240,255,.10),
-      inset 0 0 92px rgba(156,60,255,.09),
+      inset 2px 0 0 rgba(0,240,255,.86),
+      inset -2px 0 0 rgba(156,60,255,.76),
+      inset 0 0 62px rgba(0,240,255,.12),
+      inset 0 0 100px rgba(156,60,255,.10),
       0 20px 84px rgba(0,0,0,.08),
-      0 0 52px rgba(0,240,255,.18);
+      0 0 58px rgba(0,240,255,.20);
   }
 }
 
 /* =========================================================
-   3) TARGET (synchronized pulse — stable)
+   2) TARGET (synchronized pulse)
    ========================================================= */
 
 .targetRoot{
+  position:absolute;
   left:50%;
   top:50%;
-  transform: translate(-50%, -50%); /* fixed centering only */
+  transform: translate(-50%, -50%) translateZ(0);
   width: 178px;
   height: 178px;
+  pointer-events:none;
 
-  will-change: filter, opacity;
-  animation: targetPulseStable 2.4s ease-in-out infinite;
+  will-change: transform, filter;
+  animation: targetBreathe 2.4s ease-in-out infinite;
 }
 
 .targetOuter, .targetCore, .targetRing{
@@ -203,7 +196,8 @@
     0 12px 46px rgba(0,0,0,.18),
     0 0 34px rgba(0,240,255,.10);
 
-  opacity: .94;
+  will-change: opacity, box-shadow, background;
+  animation: outerPulse 2.4s ease-in-out infinite;
 }
 
 .targetCore{
@@ -213,29 +207,27 @@
       rgba(255,255,255,.32),
       rgba(255,255,255,.12) 40%,
       rgba(0,0,0,.08) 78%);
+
   border: 1px solid rgba(255,255,255,.18);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  opacity: .96;
+
+  will-change: opacity, background, box-shadow;
+  animation: corePulse 2.4s ease-in-out infinite;
 }
 
 .targetRing{
   inset: 12px;
   border: 2px solid rgba(0,240,255,.34);
+
   box-shadow:
     0 0 0 1px rgba(156,60,255,.16),
     0 0 24px rgba(0,240,255,.22),
     0 0 34px rgba(156,60,255,.18),
     0 0 26px rgba(230,201,107,.12);
-}
 
-@keyframes targetPulseStable{
-  0%,100%{
-    filter: brightness(1.00) saturate(1.06);
-  }
-  50%{
-    filter: brightness(1.08) saturate(1.14);
-  }
+  will-change: border-color, box-shadow, filter, opacity;
+  animation: ringPulse 2.4s ease-in-out infinite;
 }
 
 /* scan line */
@@ -246,27 +238,44 @@
   top: 50%;
   height: 2px;
   transform: translateY(-50%);
-
   background: linear-gradient(90deg,
     transparent,
     rgba(0,240,255,.95),
     rgba(156,60,255,.70),
     transparent);
-
   opacity:0;
   filter: blur(.2px);
+  will-change: opacity, transform, filter;
   animation: scanMove 1.05s ease-in-out infinite;
 }
 @keyframes scanMove{
   0%,100%{ transform: translateY(-50%) scaleX(.92); }
   50%    { transform: translateY(-50%) scaleX(1.10); }
 }
-.app[data-state="playing"] .scanLine{ opacity:.92; }
+.app[data-state="playing"] .scanLine{
+  opacity:.92;
+}
 
-/* Hit boost */
+/* hit flash */
+.hitFlash{
+  position:absolute;
+  inset:-12px;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(0,240,255,.48),
+      rgba(156,60,255,.24) 46%,
+      transparent 70%);
+  opacity:0;
+  transform: scale(.98);
+  transition: opacity .11s ease, transform .11s ease, filter .11s ease;
+  filter: blur(.1px);
+}
+
+/* ✅ Hit boost (works if JS adds .hitActive on .app) */
 .app.hitActive .stage::before{
   opacity: .98;
-  filter: brightness(1.18) saturate(1.24);
+  filter: brightness(1.22) saturate(1.35);
 }
 .app.hitActive .targetRing{
   border-color: rgba(0,240,255,.62);
@@ -277,14 +286,90 @@
     0 0 38px rgba(230,201,107,.18);
 }
 
+/* Optional :has() (nice-to-have, not required) */
+.targetRoot:has(#hitFlash[style*="opacity: 1"]),
+.targetRoot:has(#hitFlash[style*="opacity:1"]){
+  filter: brightness(1.10) saturate(1.25);
+}
+
+/* sync keyframes */
+@keyframes targetBreathe{
+  0%,100%{
+    transform: translate(-50%, -50%) scale(1);
+    filter: saturate(1.06) brightness(1.00);
+  }
+  50%{
+    transform: translate(-50%, -50%) scale(1.03);
+    filter: saturate(1.18) brightness(1.08);
+  }
+}
+@keyframes ringPulse{
+  0%,100%{
+    border-color: rgba(0,240,255,.30);
+    opacity:.92;
+    filter: brightness(1.0);
+    box-shadow:
+      0 0 0 1px rgba(156,60,255,.14),
+      0 0 22px rgba(0,240,255,.18),
+      0 0 30px rgba(156,60,255,.14),
+      0 0 22px rgba(230,201,107,.10);
+  }
+  50%{
+    border-color: rgba(0,240,255,.50);
+    opacity:1;
+    filter: brightness(1.12);
+    box-shadow:
+      0 0 0 1px rgba(156,60,255,.22),
+      0 0 34px rgba(0,240,255,.28),
+      0 0 44px rgba(156,60,255,.20),
+      0 0 30px rgba(230,201,107,.14);
+  }
+}
+@keyframes corePulse{
+  0%,100%{
+    opacity:.94;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 10px 30px rgba(0,0,0,.18);
+    background:
+      radial-gradient(circle at 45% 40%,
+        rgba(255,255,255,.30),
+        rgba(255,255,255,.12) 42%,
+        rgba(0,0,0,.08) 78%);
+  }
+  50%{
+    opacity:1;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 12px 34px rgba(0,0,0,.14);
+    background:
+      radial-gradient(circle at 45% 40%,
+        rgba(255,255,255,.38),
+        rgba(0,240,255,.12) 38%,
+        rgba(0,0,0,.06) 78%);
+  }
+}
+@keyframes outerPulse{
+  0%,100%{
+    opacity:.88;
+    box-shadow:
+      0 12px 46px rgba(0,0,0,.18),
+      0 0 34px rgba(0,240,255,.10);
+  }
+  50%{
+    opacity:.98;
+    box-shadow:
+      0 14px 52px rgba(0,0,0,.14),
+      0 0 44px rgba(0,240,255,.14);
+  }
+}
+
 /* =========================================================
-   4) JUDGE / RESULT (keep as you had, stable)
+   3) JUDGE
    ========================================================= */
 
 .judge{
+  position:absolute;
   left:50%;
   top: calc(50% - 150px);
   transform: translateX(-50%);
+  pointer-events:none;
   text-align:center;
 
   padding: 10px 16px;
@@ -300,10 +385,30 @@
     0 0 30px rgba(0,240,255,.16);
 
   opacity:0;
+  will-change: opacity, transform;
+}
+.judgeMain{
+  font-size: 20px;
+  font-weight: 1000;
+  letter-spacing: .10em;
+  text-shadow:
+    0 0 24px rgba(0,240,255,.24),
+    0 0 16px rgba(156,60,255,.18);
+}
+.judgeSub{
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: rgba(245,245,242,.84);
 }
 #judge[aria-hidden="false"]{ opacity:1; }
 
+/* =========================================================
+   4) RESULT (light)
+   ========================================================= */
+
 .result{
+  position:absolute;
   inset:0;
   display:flex;
   align-items:center;
@@ -317,7 +422,106 @@
   opacity:0;
   pointer-events:none;
 }
+.resultCard{
+  width: min(520px, 92vw);
+  border-radius: var(--r2);
+  border: 1px solid rgba(255,255,255,.18);
+
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.14),
+      rgba(255,255,255,.08)
+    );
+
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.20),
+    0 0 40px rgba(0,240,255,.10);
+
+  padding: 18px 18px 16px;
+  animation: pop .18s ease both;
+}
+@keyframes pop{
+  from{ transform: translateY(8px) scale(.98); opacity:.0; }
+  to  { transform: translateY(0)  scale(1);   opacity:1; }
+}
+.resultTitle{
+  font-weight: 1000;
+  letter-spacing: .22em;
+  font-size: 14px;
+  color: rgba(245,245,242,.78);
+}
+.resultRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  padding: 10px 0 0;
+}
+.resultKey{
+  color: rgba(245,245,242,.68);
+  letter-spacing:.14em;
+  font-size: 12px;
+}
+.resultVal{
+  font-weight: 1000;
+  font-size: 18px;
+}
+.resultDivider{
+  height:1px;
+  background: rgba(255,255,255,.14);
+  margin: 14px 0;
+}
+
+/* ARU ring */
+.aruWrap{ display:flex; flex-direction:column; gap: 10px; align-items:center; }
+.aruRing{
+  width: 220px;
+  height: 220px;
+  position:relative;
+  display:grid;
+  place-items:center;
+}
+.aruSvg{
+  width: 220px;
+  height: 220px;
+  filter:
+    drop-shadow(0 14px 40px rgba(0,0,0,.20))
+    drop-shadow(0 0 22px rgba(0,240,255,.12));
+}
+.aruTrack{
+  fill:none;
+  stroke: rgba(255,255,255,.14);
+  stroke-width: 10;
+}
+.aruProg{
+  fill:none;
+  stroke: url(#aruGrad);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 276.46;
+  stroke-dashoffset: 276.46;
+  transition: stroke-dashoffset .18s ease;
+}
+.aruText{ position:absolute; text-align:center; }
+.aruLabel{
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: rgba(245,245,242,.72);
+}
+.aruValue{
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 1000;
+  text-shadow: 0 0 20px rgba(0,240,255,.14);
+}
+.dicoLine{
+  text-align:center;
+  max-width: 460px;
+  font-size: 13px;
+  color: rgba(245,245,242,.92);
+}
+
 .app[data-state="result"] #result{ opacity:1; pointer-events:auto; }
+.app[data-state="result"] .judge{ opacity:0 !important; }
 #result[aria-hidden="false"]{ opacity:1; pointer-events:auto; }
 
 /* =========================================================
@@ -327,20 +531,24 @@
 @media (max-width: 720px){
   .targetRoot{ width: 160px; height: 160px; }
   .judge{ top: calc(50% - 132px); }
+  .aruRing, .aruSvg{ width: 200px; height: 200px; }
 }
-
 @media (max-width: 560px){
-  :root{ --laneW: min(180px, 56vw); --laneR: 28px; }
+  .stage::before{ width: min(180px, 56vw); border-radius: 28px; }
+  .stage::after { width: min(220px, 62vw); border-radius: 28px; }
 }
 
 /* =========================================================
-   6) Reduced motion
+   6) Accessibility
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce){
   .stage::before,
   .stage::after,
   .targetRoot,
+  .targetOuter,
+  .targetCore,
+  .targetRing,
   .scanLine{
     animation: none !important;
   }
