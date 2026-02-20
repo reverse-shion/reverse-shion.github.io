@@ -22,7 +22,70 @@
   <!-- FX（タップ貫通） -->
   <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
 
-  <!-- HUD（上固定・タップ貫通） -->
+  <!-- =========================
+       SIDE HUD (LEFT / RIGHT)
+       ========================= -->
+
+  <!-- 左バー：スコア/コンボ（スクショの左UI寄せ） -->
+  <aside class="sideHud sideHudLeft" aria-label="Left HUD">
+    <div class="sideCard sideScore" role="group" aria-label="Score">
+      <div class="sideScoreValue" id="sideScore">012450</div>
+    </div>
+
+    <div class="sideCard sideCombo" role="group" aria-label="Combo">
+      <div class="sideComboValue" id="sideCombo">38</div>
+      <div class="sideComboLabel">COMBO</div>
+    </div>
+  </aside>
+
+  <!-- 右バー：DiCo / Resonance / Avatar -->
+  <aside class="sideHud sideHudRight" aria-label="Right HUD">
+    <div class="sideTop" role="group" aria-label="Player and avatar">
+      <div class="sideName">
+        <div class="sideNameMain" id="playerName">DiCo</div>
+        <div class="sideNameSub">RESONANCE</div>
+      </div>
+
+      <!-- アバター枠（リング） -->
+      <div class="sideAvatar" aria-label="DiCo avatar">
+        <!-- 表情3段階：画像はあなたが用意して差し替え -->
+        <!-- JSで data-face を見て切替する想定 -->
+        <img
+          id="dicoFace"
+          class="dicoFace"
+          src="assets/dico_face_1.png"
+          data-face="1"
+          alt="DiCo face"
+          draggable="false"
+          decoding="async"
+          loading="eager"
+        />
+      </div>
+    </div>
+
+    <!-- Resonanceゲージ -->
+    <div class="sideGauge" role="group" aria-label="Resonance gauge">
+      <div class="sideGaugeBar" aria-hidden="true">
+        <div class="sideGaugeFill" id="resFill" style="width:73%;"></div>
+      </div>
+      <div class="sideGaugeValue" aria-label="Resonance value">
+        <span id="resValue">73</span><span class="pct">%</span>
+      </div>
+
+      <!-- 表情切替用の素材をHTMLに“置いておく”方式（JSでshow/hide切替も可能） -->
+      <!-- 使わないなら削除OK。後で最適な方式に統一する。 -->
+      <div class="facePool" aria-hidden="true">
+        <img class="faceAsset" id="face1" src="assets/dico_face_1.png" alt="" />
+        <img class="faceAsset" id="face2" src="assets/dico_face_2.png" alt="" />
+        <img class="faceAsset" id="face3" src="assets/dico_face_3.png" alt="" />
+      </div>
+    </div>
+  </aside>
+
+  <!-- =========================
+       TOP HUD（既存：上固定・タップ貫通）
+       ※後で「左右バーと統合」もできるので残す
+       ========================= -->
   <header class="hud" aria-label="HUD">
     <div class="hudBlock">
       <div class="hudLabel">SCORE</div>
@@ -50,6 +113,7 @@
   <section class="stage" id="stage" aria-label="Game Stage">
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
 
+    <div class="hitZone" id="hitZone" aria-hidden="true"></div>
     <!-- TARGET（中央神域：UIは置かない） -->
     <div class="targetRoot" id="targetRoot" aria-hidden="true">
       <div class="targetOuter"></div>
