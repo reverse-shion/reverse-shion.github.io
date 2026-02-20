@@ -472,3 +472,27 @@
 .app[data-state="paused"] #startBtn{ display:inline-flex; }
 .app[data-state="paused"] #stopBtn{ display:none; }
 .app[data-state="paused"] #restartBtn{ display:inline-flex; }
+
+
+/* --- FIX: avatarがカードで切れる問題 --- */
+
+/* 全カードはhiddenでOK。ただしプレイヤーカードだけ例外 */
+.sideCard.sidePlayer{
+  overflow: visible;          /* ✅ 切れ防止 */
+  padding-right: 18px;        /* ✅ 右の余白増やす */
+}
+
+/* 右上のアイコンが端に寄りすぎるのも抑える */
+.sideTop{
+  gap: 12px;
+}
+
+/* リングのはみ出し量を少し抑える（-6 → -4） */
+.avatarRing{
+  inset: -4px;
+}
+
+/* 念のため：丸ごとカード外に出ても見えるように */
+.sideAvatar{
+  overflow: visible;
+}
