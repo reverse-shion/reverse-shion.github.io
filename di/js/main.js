@@ -1,20 +1,18 @@
-/* /di/js/main.js
-   - Loads engine scripts (non-module) and boots the game.
-   - Keeps existing DOM ids (#score/#combo/#maxCombo/#time etc.) and syncs to side HUD.
-*/
+/* /di/js/main.js */
 (() => {
-  const ENGINE_FILES = [
-    "./js/engine/audio.js",
-    "./js/engine/timing.js",
-    "./js/engine/input.js",
-    "./js/engine/judge.js",
-    "./js/engine/render.js",
-    "./js/engine/fx.js",
-    "./js/engine/ui.js",
+  // ✅ main.js の場所を基準にして読み込む（HTML階層に依存しない）
+  const BASE = new URL("./", document.currentScript?.src || location.href);
 
-    // ★ note skins (swap freely)
-    "./js/notes/skin-tarot-pinkgold.js",
-  ];
+  const ENGINE_FILES = [
+    "engine/audio.js",
+    "engine/timing.js",
+    "engine/input.js",
+    "engine/judge.js",
+    "engine/render.js",
+    "engine/fx.js",
+    "engine/ui.js",
+    "notes/skin-tarot-pinkgold.js",
+  ].map(p => new URL(p, BASE).toString());
 
   function $(id) { return document.getElementById(id); }
 
@@ -22,10 +20,12 @@
     return files.reduce((p, src) => {
       return p.then(() => new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = src;
 
-        // defer は “HTMLに最初から書かれた script” 向け挙動が強いので、
-        // 動的追加では外して順次ロードの確実性を上げる
+        // ✅ cache bust（GitHub Pagesの古キャッシュ対策）
+        const u = new URL(src);
+        u.searchParams.set("v", String(Date.now()));
+        s.src = u.toString();
+
         s.onload = () => resolve();
         s.onerror = () => reject(new Error("Failed to load: " + src));
         document.head.appendChild(s);
@@ -34,8 +34,9 @@
   }
 
   async function fetchJSON(url) {
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error(`fetch failed ${url}: ${r.status}`);
+    const u = new URL(url, BASE).toString();
+    const r = await fetch(u, { cache: "no-store" });
+    if (!r.ok) throw new Error(`fetch failed ${u}: ${r.status}`);
     return await r.json();
   }
 
@@ -49,12 +50,7 @@
       if (i % 2 === 0) notes.push({ t: +t.toFixed(3), type: "tap" });
       if (i % 16 === 8) notes.push({ t: +(t + beat * 0.5).toFixed(3), type: "tap" });
     }
-    return {
-      meta: { title: "DiCo ARU Phase1 (fallback)", bpm },
-      offset: 0.0,
-      scroll: { approach: 1.25 },
-      notes
-    };
+    return { meta: { title: "DiCo ARU Phase1 (fallback)", bpm }, offset: 0.0, scroll: { approach: 1.25 }, notes };
   }
 
   async function boot() {
@@ -70,12 +66,10 @@
     const seTap = $("seTap");
     const seGreat = $("seGreat");
 
-    // ---- DOM sanity (超大事)
     if (!app || !canvas || !startBtn || !stopBtn || !restartBtn || !music) {
       throw new Error("Missing required DOM elements (check ids).");
     }
 
-    // Optional: autoplay muted bg video
     try {
       if (bgVideo) {
         bgVideo.muted = true;
@@ -87,7 +81,7 @@
 
     let chart = null;
     try {
-      chart = await fetchJSON("./js/charts/chart_001.json");
+      chart = await fetchJSON("charts/chart_001.json");
     } catch (e) {
       chart = fallbackChart();
       console.warn("[DiCo] chart json not found. Using fallback.", e);
@@ -96,7 +90,9 @@
     const E = window.DI_ENGINE;
     if (!E) throw new Error("DI_ENGINE not found. engine scripts failed to load.");
 
-    // Build engine parts
+    // ✅ スキンが本当に入ってるかログで確定させる
+    console.log("[DiCo] noteSkin =", E.noteSkin?.name || "(none)");
+
     const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
     const timing = new E.Timing({ chart });
     const judge = new E.Judge({ chart, timing });
@@ -157,10 +153,7 @@
 
     async function startGame() {
       if (running) return;
-
-      // must be in user gesture
       await audio.unlock();
-
       try { bgVideo?.play().catch(() => {}); } catch {}
 
       judge.reset();
@@ -172,7 +165,6 @@
       ui.hideResult();
       ui.toast("START");
 
-      // tick 多重起動防止
       cancelAnimationFrame(raf);
       tick();
     }
@@ -206,25 +198,11 @@
     stopBtn.addEventListener("click", () => stopGame());
     restartBtn.addEventListener("click", () => restartGame());
 
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        input.simTapCenter();
-      } else if (e.code === "Enter") {
-        startGame();
-      } else if (e.code === "Escape") {
-        stopGame();
-      }
-    }, { passive: false });
-
     app.dataset.state = "idle";
     ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
 
     render.resize();
-    window.addEventListener("resize", () => {
-      render.resize();
-      input.recalc();
-    });
+    window.addEventListener("resize", () => { render.resize(); input.recalc(); });
 
     console.log("[DiCo] boot OK");
   }
