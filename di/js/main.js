@@ -1,4 +1,4 @@
-/* /di/js/main.js (PAUSE/RESTART STABLE) */
+/* /di/js/main.js (HARD-RECOVERY + PAUSE/RESUME) */
 (() => {
   const BASE = new URL("./", document.currentScript?.src || location.href);
 
@@ -15,7 +15,7 @@
 
   const $ = (id) => document.getElementById(id);
 
-  // iOS向け：当たりづらいなら 0.06→0.08→0.10 と増やす
+  // iOS当たりづらい時：0.06→0.08→0.10で調整
   const INPUT_LAT = 0.06;
 
   function loadScriptsSequentially(files) {
@@ -52,9 +52,10 @@
     return { meta: { title: "DiCo ARU Phase1 (fallback)", bpm }, offset: 0.0, scroll: { approach: 1.25 }, notes };
   }
 
-  function setState(app, s){ app.dataset.state = s; }
+  function setState(app, s) { app.dataset.state = s; }
 
   async function boot() {
+    // ===== DOM =====
     const app = $("app");
     const canvas = $("noteCanvas");
     const hitZone = $("hitZone");
@@ -90,11 +91,12 @@
     const E = window.DI_ENGINE;
     if (!E) throw new Error("DI_ENGINE not found.");
 
+    console.log("[DiCo] noteSkin =", E.noteSkin?.name || "(none)");
+
+    // systems (stable, recreateしない)
     const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
-    const timing = new E.Timing({ chart });
-    const judge  = new E.Judge({ chart, timing });
-    const fx     = new E.FX({ fxLayer: $("fxLayer") });
-    const ui     = new E.UI({
+    const fx = new E.FX({ fxLayer: $("fxLayer") });
+    const ui = new E.UI({
       app,
       score: $("score"), combo: $("combo"), maxCombo: $("maxCombo"), timeDup: $("time_dup"),
       sideScore: $("sideScore"), sideCombo: $("sideCombo"), sideMaxCombo: $("sideMaxCombo"), time: $("time"),
@@ -107,29 +109,49 @@
       hitFlash: $("hitFlash"),
     });
 
-    const render = new E.Renderer({ canvas, chart, timing });
+    // ===== GAME OBJECTS (STOP後に壊れる可能性があるので作り直せるように let) =====
+    let timing = null;
+    let judge = null;
+    let render = null;
 
-    // ====== STATE MACHINE ======
-    // idle -> playing -> paused -> playing -> ... -> result
+    function rebuildGameObjects() {
+      // ✅ ここが最重要：STOP→START/RESTARTで復帰不能になるのを物理的に潰す
+      timing = new E.Timing({ chart });
+      judge  = new E.Judge({ chart, timing });
+      render = new E.Renderer({ canvas, chart, timing });
+      render.resize();
+    }
+
+    rebuildGameObjects();
+
+    // ===== STATE =====
+    // idle -> playing -> paused -> playing ... -> result
     let raf = 0;
     let running = false;
     let starting = false;
 
-    // pause/resume用に保持
-    let pausedSongTime = 0;
+    // pause/resume用
     let pausedMusicTime = 0;
-    let wasPlayingVideo = false;
+    let pausedVideoTime = 0;
+    let videoWasPlaying = false;
 
-    function stopRAF(){
+    function stopRAF() {
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
     }
 
-    function tick(){
+    function tick() {
       if (!running) return;
       raf = requestAnimationFrame(tick);
 
       const t = timing.getSongTime();
+      // timeが壊れたら強制停止して復旧を促す
+      if (!Number.isFinite(t)) {
+        console.warn("[DiCo] songTime is not finite. forcing pause.");
+        pauseGame();
+        return;
+      }
+
       render.draw(t);
 
       ui.update({
@@ -144,27 +166,29 @@
       if (timing.isEnded(t)) endGame();
     }
 
-    async function hardResetToStart(){
-      // メディアを先頭へ
+    async function safePlayMedia() {
+      try { await music.play(); } catch {}
+      try { await bgVideo?.play(); } catch {}
+    }
+
+    function pauseMedia() {
+      try { music.pause(); } catch {}
+      try { bgVideo?.pause(); } catch {}
+    }
+
+    async function resetMediaToStart() {
       try { music.pause(); } catch {}
       try { music.currentTime = 0; } catch {}
 
       try { bgVideo?.pause(); } catch {}
-      // bgVideoは最初からに戻したいなら0に（任意）
+      // 背景も最初に戻したいならON
       // try { bgVideo.currentTime = 0; } catch {}
-
-      // pause情報リセット
-      pausedSongTime = 0;
-      pausedMusicTime = 0;
-      wasPlayingVideo = false;
-
-      judge.reset();
-      // timingを“新規開始”させる
-      // engine側の実装に依存するので start(audio) を必ず呼ぶ
-      timing.start(audio);
     }
 
-    async function startOrResume(){
+    // ===== ACTIONS =====
+
+    // START: idle/resultなら最初から開始、pausedなら再開
+    async function startOrResume() {
       if (starting) return;
       starting = true;
 
@@ -172,36 +196,43 @@
 
       const state = app.dataset.state;
 
-      // 1) pausedなら「再開」
+      // ---- RESUME ----
       if (state === "paused") {
-        // 音を止めた位置から復帰
+        // media restore
         try { music.currentTime = pausedMusicTime || 0; } catch {}
         try { await music.play(); } catch {}
 
         if (bgVideo) {
           try {
-            if (wasPlayingVideo) await bgVideo.play();
+            bgVideo.currentTime = pausedVideoTime || 0;
+            if (videoWasPlaying) await bgVideo.play();
           } catch {}
         }
 
-        // timingは engine 実装次第で再開機能がないので、
-        // “見た目だけ止まってた”場合に備え、startを呼び直しつつ
-        // songTimeが進むことを優先する。
+        // timingは「再開」実装がない可能性があるので、startを呼んで進行を優先
         timing.start(audio);
 
         setState(app, "playing");
         running = true;
+
+        ui.toast("RESUME");
+
         stopRAF();
         tick();
 
-        ui.toast("RESUME");
         starting = false;
         return;
       }
 
-      // 2) idle/resultなら「最初から開始」
+      // ---- START FROM BEGINNING ----
       if (state === "idle" || state === "result") {
-        await hardResetToStart();
+        // ✅ ここも最重要：開始時に必ず fresh な timing/judge/render を作る
+        rebuildGameObjects();
+
+        await resetMediaToStart();
+
+        judge.reset();
+        timing.start(audio);
 
         setState(app, "playing");
         running = true;
@@ -209,8 +240,7 @@
         ui.hideResult();
         ui.toast("START");
 
-        try { await music.play(); } catch {}
-        try { bgVideo?.play().catch(() => {}); } catch {}
+        await safePlayMedia();
 
         stopRAF();
         tick();
@@ -219,44 +249,62 @@
         return;
       }
 
-      // playing中にstart押したら無視
+      // playing中は無視
       starting = false;
     }
 
-    function pauseGame(){
+    // STOP: 一時停止
+    function pauseGame() {
       if (!running) return;
 
-      // いったん停止して位置を保存
-      pausedSongTime = timing.getSongTime();
-      pausedMusicTime = (() => {
-        try { return music.currentTime || 0; } catch { return 0; }
-      })();
-
-      wasPlayingVideo = (() => {
-        try { return !!bgVideo && !bgVideo.paused; } catch { return false; }
-      })();
+      // 保存
+      try { pausedMusicTime = music.currentTime || 0; } catch { pausedMusicTime = 0; }
+      try { pausedVideoTime = bgVideo?.currentTime || 0; } catch { pausedVideoTime = 0; }
+      try { videoWasPlaying = !!bgVideo && !bgVideo.paused; } catch { videoWasPlaying = false; }
 
       running = false;
       stopRAF();
 
-      // timing停止
       timing.stop(audio);
-
-      // メディア停止
-      try { music.pause(); } catch {}
-      try { bgVideo?.pause(); } catch {}
+      pauseMedia();
 
       setState(app, "paused");
       ui.toast("PAUSE");
     }
 
-    function endGame(){
+    // RESTART: いつでも最初から
+    async function restartGame() {
+      running = false;
+      stopRAF();
+
+      try { timing.stop(audio); } catch {}
+      pauseMedia();
+
+      // ✅ ここが最重要：RESTARTで必ず復帰するように timing/judge/render を作り直す
+      rebuildGameObjects();
+
+      await resetMediaToStart();
+
+      judge.reset();
+      timing.start(audio);
+
+      setState(app, "playing");
+      running = true;
+
+      ui.hideResult();
+      ui.toast("RESTART");
+
+      await safePlayMedia();
+
+      stopRAF();
+      tick();
+    }
+
+    function endGame() {
       running = false;
       stopRAF();
       timing.stop(audio);
-
-      try { music.pause(); } catch {}
-      try { bgVideo?.pause(); } catch {}
+      pauseMedia();
 
       setState(app, "result");
       ui.showResult({
@@ -267,29 +315,20 @@
       ui.toast("RESULT");
     }
 
-    async function restartGame(){
-      // いつでも「最初からやり直し」
-      running = false;
-      stopRAF();
-      timing.stop(audio);
-
-      try { music.pause(); } catch {}
-      try { bgVideo?.pause(); } catch {}
-
-      setState(app, "idle");
-      await startOrResume(); // idle扱いで最初から開始
-    }
-
-    // ===== input =====
+    // ===== INPUT (closureは let の timing/judge/render を参照するので、rebuild後も生きる) =====
     const input = new E.Input({
       element: hitZone,
       onTap: (x, y) => {
+        // playing中だけ判定
         if (!running || app.dataset.state !== "playing") return;
 
         audio.playTap();
         fx.burstAt(x, y);
 
-        const res = judge.hit(timing.getSongTime() + INPUT_LAT);
+        const t = timing.getSongTime();
+        if (!Number.isFinite(t)) return;
+
+        const res = judge.hit(t + INPUT_LAT);
         ui.onJudge(res);
 
         if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
@@ -300,19 +339,21 @@
       }
     });
 
-    // ===== buttons =====
+    // ===== BUTTONS =====
     startBtn.addEventListener("click", () => startOrResume());
     stopBtn.addEventListener("click", () => pauseGame());
     restartBtn.addEventListener("click", () => restartGame());
 
-    // ===== init =====
+    // ===== INIT =====
     setState(app, "idle");
     ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
 
-    render.resize();
-    window.addEventListener("resize", () => { render.resize(); input.recalc(); }, { passive: true });
+    window.addEventListener("resize", () => {
+      try { render?.resize(); } catch {}
+      try { input.recalc(); } catch {}
+    }, { passive: true });
 
-    console.log("[DiCo] boot OK (pause/restart stable)");
+    console.log("[DiCo] boot OK (hard-recovery)");
   }
 
   loadScriptsSequentially(ENGINE_FILES)
