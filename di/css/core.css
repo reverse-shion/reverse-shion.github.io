@@ -1,5 +1,5 @@
 /* /di/css/core.css */
-/* CLEAR VERSION – no black overlay */
+/* STABLE VERSION – tap-safe + state control (idle still) */
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
@@ -8,7 +8,7 @@ body{
   margin:0;
   font-family: var(--font);
   color: var(--text);
-  background: #000; /* fallback only */
+  background:#000; /* fallback only */
   overflow:hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -31,7 +31,14 @@ body{
   user-select:none;
   -webkit-user-select:none;
   -webkit-tap-highlight-color: transparent;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
 }
+
+/* オーバーレイ無効（あなたの方針を維持） */
+.app::before{ display:none; }
+.app::after{ display:none; }
 
 /* =========================
    Background Video (pure)
@@ -45,8 +52,6 @@ body{
   object-position:center;
 
   opacity:1;
-
-  /* 明るさ強化 */
   filter: brightness(1.25) contrast(1.1) saturate(1.1);
 
   transform: translateZ(0);
@@ -54,9 +59,24 @@ body{
   pointer-events:none;
 }
 
-/* 完全にオーバーレイ無効 */
-.app::before{ display:none; }
-.app::after{ display:none; }
+/* =========================
+   Idle Background (still image / particles base)
+   ※ HTMLに <div id="idleBg" class="idleBg"> を足す想定
+   ========================= */
+.idleBg{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+
+  /* 「静止画＋軽パーティクル」用のベース。
+     静止画を使うなら background-image を後で差し替え。 */
+  background:
+    radial-gradient(circle at 30% 20%, rgba(156,60,255,.22), transparent 45%),
+    radial-gradient(circle at 75% 35%, rgba(0,240,255,.18), transparent 50%),
+    radial-gradient(circle at 50% 85%, rgba(230,201,107,.10), transparent 55%),
+    linear-gradient(180deg, #04050a 0%, #000 60%, #000 100%);
+}
 
 /* =========================
    FX layer
@@ -64,7 +84,7 @@ body{
 .fxLayer{
   position:absolute;
   inset:0;
-  z-index:5;
+  z-index:6;
   pointer-events:none;
 }
 
@@ -73,7 +93,7 @@ body{
    ========================= */
 .stage{
   position:relative;
-  z-index:3;
+  z-index:4;
 
   width:100%;
   height:100%;
@@ -88,7 +108,8 @@ body{
     10px
     calc(var(--hudW) + var(--hudGap) + env(safe-area-inset-left));
 
-  touch-action: manipulation;
+  /* ここは “manipulation” より、タップの遅延/ズレを減らすため基本 none */
+  touch-action: none;
 }
 
 /* =========================
@@ -101,7 +122,7 @@ body{
 
   border-radius: var(--r2);
 
-  /* 透明寄りに */
+  /* 透明寄り：動画が見える */
   background: rgba(0,0,0,.05);
 
   box-shadow: 0 30px 80px rgba(0,0,0,.35);
@@ -111,7 +132,9 @@ body{
   -webkit-backdrop-filter: blur(3px);
 
   transform: translateZ(0);
-  pointer-events:auto;
+
+  /* ✅重要：canvasは絶対にタップを奪わない（入力は hitZone だけ） */
+  pointer-events:none;
 }
 
 /* =========================
@@ -130,9 +153,7 @@ body{
   align-items:center;
   justify-content:center;
 
-  z-index:10;
-
-  /* 黒グラデ削除 */
+  z-index:20;
   background: transparent;
 }
 
@@ -155,7 +176,6 @@ body{
   cursor:pointer;
   transition: transform .08s ease, background .12s ease, border-color .12s ease;
 }
-
 .btn:active{ transform: translateY(1px) scale(.99); }
 .btn:hover{ border-color: rgba(255,255,255,.32); }
 
@@ -167,6 +187,22 @@ body{
     rgba(156,60,255,.25)
   );
 }
+
+/* =========================
+   State Control
+   ========================= */
+
+/* idle：動画は見せない（静止画＋軽パーティクル側へ） */
+.app[data-state="idle"] .bgVideo{ display:none; }
+.app[data-state="idle"] .idleBg{ display:block; }
+
+/* playing/paused/result：動画を見せる（idleBgは不要） */
+.app[data-state="playing"] .bgVideo,
+.app[data-state="paused"]  .bgVideo,
+.app[data-state="result"]  .bgVideo{ display:block; }
+.app[data-state="playing"] .idleBg,
+.app[data-state="paused"]  .idleBg,
+.app[data-state="result"]  .idleBg{ display:none; }
 
 /* =========================
    Responsive
