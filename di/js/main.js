@@ -1,15 +1,18 @@
 /* /di/js/main.js
-   PHASE1 STABLE (START / STOP / RESTART)
+   PHASE1 STABLE (START / STOP / RESTART) + PRESENTATION LAYER (result.js)
    - STOP = end to RESULT (no pause/resume complexity)
    - Deterministic state machine: idle -> playing -> result
    - iOS safe: unlock on first user gesture, no autoplay before gesture
    - Robust: double-run guards, cleanup, safe media control
+   - Loads: engine scripts -> presentation scripts -> boot()
 */
 (() => {
   "use strict";
 
+  // main.js is /di/js/main.js, so BASE points to /di/js/
   const BASE = new URL("./", document.currentScript?.src || location.href);
 
+  // Engine layer
   const ENGINE_FILES = [
     "engine/audio.js",
     "engine/timing.js",
@@ -21,7 +24,7 @@
     "notes/skin-tarot-pinkgold.js",
   ].map((p) => new URL(p, BASE).toString());
 
-   // Presentation layer (keep separate from engine)
+  // Presentation layer (keep separate from engine)
   // Put result.js at: /di/js/result.js
   const PRESENTATION_FILES = [
     "result.js",
@@ -52,6 +55,7 @@
     return app.dataset.state || STATES.IDLE;
   }
 
+  // -------- script loader (sequential, cache-busted) --------
   function loadScriptsSequentially(files) {
     return files.reduce((p, src) => {
       return p.then(
@@ -59,15 +63,29 @@
           new Promise((resolve, reject) => {
             const s = document.createElement("script");
             const u = new URL(src);
-            // cache-bust (dev friendly)
+            // dev friendly cache-bust (keeps you sane on iOS)
             u.searchParams.set("v", String(Date.now()));
             s.src = u.toString();
+            s.async = false;
             s.onload = () => resolve();
             s.onerror = () => reject(new Error("Failed to load: " + src));
             document.head.appendChild(s);
           })
       );
     }, Promise.resolve());
+  }
+
+  async function loadAllScripts() {
+    // 1) engine
+    await loadScriptsSequentially(ENGINE_FILES);
+
+    // 2) presentation
+    //   - If result.js fails, we still continue with safe fallback (do NOT hard-crash).
+    try {
+      await loadScriptsSequentially(PRESENTATION_FILES);
+    } catch (e) {
+      console.warn("[DiCo] presentation load failed (continue with fallback):", e);
+    }
   }
 
   async function fetchJSON(url) {
@@ -169,6 +187,34 @@
 
       ariaLive: $("ariaLive"),
       hitFlash: $("hitFlash"),
+    });
+
+    // ===== presentation (result.js) safety =====
+    // result.js should set: window.DI_RESULT = { init({ ... }) { return { show(payload), hide() } } }
+    if (!window.DI_RESULT || typeof window.DI_RESULT.init !== "function") {
+      console.warn("[DiCo] DI_RESULT not found. Using safe fallback presenter.");
+      window.DI_RESULT = {
+        init() {
+          return {
+            show(payload) {
+              // keep silent in production, but helpful in dev
+              console.log("[DiCo] RESULT (fallback presenter):", payload);
+            },
+            hide() {},
+          };
+        },
+      };
+    }
+
+    const resultPresenter = window.DI_RESULT.init({
+      app,
+      root: $("result"),
+      dicoLine: $("dicoLine"),
+      aruProg: $("aruProg"),
+      aruValue: $("aruValue"),
+      resultScore: $("resultScore"),
+      resultMaxCombo: $("resultMaxCombo"),
+      ariaLive: $("ariaLive"),
     });
 
     // ===== game objects =====
@@ -283,6 +329,7 @@
 
       // UI cleanup
       ui.hideResult();
+      try { resultPresenter.hide?.(); } catch {}
       ui.toast("START");
 
       // run loop
@@ -330,6 +377,7 @@
 
       // UI
       ui.hideResult();
+      try { resultPresenter.hide?.(); } catch {}
       ui.toast("RESTART");
 
       // loop
@@ -358,11 +406,22 @@
       setState(app, STATES.RESULT);
       setStartLabelForState(STATES.RESULT);
 
-      ui.showResult({
+      const payload = {
         score: judge.state.score,
         maxCombo: judge.state.maxCombo,
         resonance: judge.state.resonance,
-      });
+        reason,
+      };
+
+      // engine UI (existing)
+      ui.showResult(payload);
+
+      // presentation layer (result.js)
+      try {
+        resultPresenter.show(payload);
+      } catch (e) {
+        console.warn("[DiCo] resultPresenter.show failed:", e);
+      }
 
       ui.toast(reason === "ENDED" ? "RESULT" : "STOP");
     }
@@ -433,24 +492,24 @@
     window.addEventListener(
       "resize",
       () => {
-        try {
-          render?.resize?.();
-        } catch {}
-        try {
-          input?.recalc?.();
-        } catch {}
+        try { render?.resize?.(); } catch {}
+        try { input?.recalc?.(); } catch {}
       },
       { passive: true }
     );
 
-    console.log("[DiCo] boot OK (Phase1 stable: START/STOP/RESTART; STOP=endToResult)");
+    console.log("[DiCo] boot OK (Phase1 stable + presentation layer ready)");
   }
 
-  loadScriptsSequentially(ENGINE_FILES)
-    .then(() => boot())
-    .catch((err) => {
+  // ===== ENTRYPOINT (engine -> presentation -> boot) =====
+  (async () => {
+    try {
+      await loadAllScripts();
+      await boot();
+    } catch (err) {
       console.error(err);
       const el = document.getElementById("ariaLive");
-      if (el) el.textContent = "Boot error: " + err.message;
-    });
+      if (el) el.textContent = "Boot error: " + (err?.message || String(err));
+    }
+  })();
 })();
