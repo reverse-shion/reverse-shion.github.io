@@ -14,16 +14,18 @@
       this.dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
       this.resize();
-
-      // Pre-made gradients cache key'd by radius
       this._gradCache = new Map();
     }
 
     resize() {
       const r = this.canvas.getBoundingClientRect();
-      this.canvas.width = Math.floor(r.width * this.dpr);
+      this.canvas.width  = Math.floor(r.width  * this.dpr);
       this.canvas.height = Math.floor(r.height * this.dpr);
       this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+
+      // iOSでの見た目安定
+      this.ctx.imageSmoothingEnabled = true;
+      this.ctx.imageSmoothingQuality = "high";
     }
 
     draw(songTime) {
@@ -31,19 +33,16 @@
       const w = this.canvas.getBoundingClientRect().width;
       const h = this.canvas.getBoundingClientRect().height;
 
-      // Clear: keep video visible (no opaque fill)
       ctx.clearRect(0, 0, w, h);
 
-      // lane center + target position
       const cx = w / 2;
       const targetY = h * 0.62;
 
-      // subtle lane guides (match thin lane)
+      // ---- lane guides (thin) ----
       ctx.save();
       ctx.globalAlpha = 0.18;
       ctx.lineWidth = 1;
 
-      // edge hints
       ctx.strokeStyle = "rgba(0,240,255,0.22)";
       ctx.beginPath();
       ctx.moveTo(cx - 70, 0);
@@ -56,7 +55,6 @@
       ctx.lineTo(cx + 70, h);
       ctx.stroke();
 
-      // target line (bright)
       ctx.globalAlpha = 0.22;
       ctx.strokeStyle = "rgba(255,255,255,0.30)";
       ctx.beginPath();
@@ -64,7 +62,6 @@
       ctx.lineTo(cx + 115, targetY);
       ctx.stroke();
 
-      // thin neon under-line
       ctx.globalAlpha = 0.22;
       ctx.strokeStyle = "rgba(0,240,255,0.32)";
       ctx.beginPath();
@@ -74,50 +71,65 @@
 
       ctx.restore();
 
-      // draw notes in window
+      // ---- notes window ----
       const spawnT = songTime + this.approach;
-      const minT = songTime - 0.45;
+      const minT   = songTime - 0.45;
 
       for (let i = 0; i < this.notes.length; i++) {
         const n = this.notes[i];
         if (n.t < minT) continue;
         if (n.t > spawnT) break;
 
-        const dt = n.t - songTime;            // seconds until hit
-        const p = 1 - (dt / this.approach);   // 0..1
-        const y = targetY * p;
+        const dt = n.t - songTime;
+        const p  = 1 - (dt / this.approach);    // 0..1
+        const y  = targetY * p;
 
-        // Alpha: soft early, strong near hit
         const a = this._clamp(0.20 + p * 1.05, 0, 1);
-        this._drawNote(cx, y, a, p);
+        this._drawNote(cx, y, a, p, n);         // ✅ noteも渡す
       }
     }
 
-    _drawNote(x, y, alpha, p) {
+    // ✅ skin優先 / なければfallback
+    _drawNote(x, y, alpha, p, note) {
       const ctx = this.ctx;
 
-      // DiCo palette
+      // ここが最重要：スキンがあればそっちを呼ぶ
+      const skin = (window.DI_ENGINE && window.DI_ENGINE.noteSkin) || null;
+
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+
+      if (skin && typeof skin.drawNote === "function") {
+        // skin signature: (ctx, x, y, alpha, p, note, renderer)
+        skin.drawNote(ctx, x, y, alpha, p, note, this);
+      } else {
+        this._drawFallbackOrb(ctx, x, y, alpha, p);
+      }
+
+      ctx.restore();
+    }
+
+    // ===== fallback: 旧 _drawNote の中身をここへ移動 =====
+    _drawFallbackOrb(ctx, x, y, alpha, p) {
       const C_CYAN   = "rgba(0,240,255,";
       const C_VIOLET = "rgba(156,60,255,";
       const C_GOLD   = "rgba(230,201,107,";
 
-      // Ease: near hit gets punch
-      const near = this._easeOutCubic(this._clamp(p, 0, 1));
-      const pulse = 0.85 + 0.15 * Math.sin((p * 12.0) + (y * 0.02)); // gentle shimmer
+      const near  = this._easeOutCubic(this._clamp(p, 0, 1));
+      const pulse = 0.85 + 0.15 * Math.sin((p * 12.0) + (y * 0.02));
 
-      // sizes
-      const rCore = 6 + near * 2.2;
+      const rCore = 6  + near * 2.2;
       const rRing = 12 + near * 6.2;
       const rAura = 24 + near * 16;
 
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
 
-      // ========= AURA (soft bloom) =========
-      ctx.globalAlpha = alpha * 0.55 * pulse;
-      ctx.shadowBlur = 26 + near * 24;
-      ctx.shadowColor = `${C_CYAN}${0.55})`;
-      ctx.fillStyle = this._radial(x, y, rAura, [
+      // AURA
+      ctx.globalAlpha  = alpha * 0.55 * pulse;
+      ctx.shadowBlur   = 26 + near * 24;
+      ctx.shadowColor  = `${C_CYAN}${0.55})`;
+      ctx.fillStyle    = this._radial(x, y, rAura, [
         [0.00, `${C_CYAN}${0.00})`],
         [0.22, `${C_CYAN}${0.12})`],
         [0.52, `${C_VIOLET}${0.10})`],
@@ -128,30 +140,26 @@
       ctx.arc(x, y, rAura, 0, Math.PI * 2);
       ctx.fill();
 
-      // ========= RING (neon rim) =========
+      // RING
       ctx.globalAlpha = alpha * (0.75 + near * 0.30);
-      ctx.shadowBlur = 18 + near * 18;
+      ctx.shadowBlur  = 18 + near * 18;
       ctx.shadowColor = `${C_CYAN}${0.65})`;
-      ctx.lineWidth = 2.6 + near * 1.2;
-
-      // outer ring gradient stroke
+      ctx.lineWidth   = 2.6 + near * 1.2;
       ctx.strokeStyle = this._radial(x, y, rRing, [
         [0.00, `${C_CYAN}${0.85})`],
         [0.55, `${C_VIOLET}${0.60})`],
         [0.85, `${C_GOLD}${0.55})`],
         [1.00, `${C_CYAN}${0.70})`],
       ]);
-
       ctx.beginPath();
       ctx.arc(x, y, rRing, 0, Math.PI * 2);
       ctx.stroke();
 
-      // ========= CORE (bright center) =========
+      // CORE bloom
       ctx.globalAlpha = alpha;
-      ctx.shadowBlur = 10 + near * 12;
+      ctx.shadowBlur  = 10 + near * 12;
       ctx.shadowColor = "rgba(255,255,255,0.65)";
-
-      ctx.fillStyle = this._radial(x, y, rCore + 10, [
+      ctx.fillStyle   = this._radial(x, y, rCore + 10, [
         [0.00, `rgba(255,255,255,0.95)`],
         [0.22, `rgba(255,255,255,0.55)`],
         [0.55, `${C_CYAN}${0.25})`],
@@ -162,23 +170,21 @@
       ctx.fill();
 
       // inner bead
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur  = 0;
       ctx.globalAlpha = alpha * (0.9 + near * 0.1);
-      ctx.fillStyle = `rgba(255,255,255,0.78)`;
+      ctx.fillStyle   = `rgba(255,255,255,0.78)`;
       ctx.beginPath();
       ctx.arc(x, y, rCore, 0, Math.PI * 2);
       ctx.fill();
 
-      // ========= TRAIL (short neon ribbon) =========
-      // (closer -> shorter and brighter)
+      // TRAIL
       const trailLen = 64 - near * 20;
-      const trailW = 10 + near * 8;
+      const trailW   = 10 + near * 8;
 
       ctx.globalAlpha = alpha * (0.26 + near * 0.32);
-      ctx.shadowBlur = 22;
+      ctx.shadowBlur  = 22;
       ctx.shadowColor = `${C_VIOLET}${0.45})`;
 
-      // ribbon gradient
       const g = ctx.createLinearGradient(x, y - 6, x, y - trailLen);
       g.addColorStop(0.00, `${C_CYAN}${0.55})`);
       g.addColorStop(0.45, `${C_VIOLET}${0.42})`);
@@ -192,11 +198,11 @@
       ctx.closePath();
       ctx.fill();
 
-      // ========= SPARK TICKS (tiny accents) =========
+      // SPARK TICKS
       ctx.globalAlpha = alpha * (0.18 + near * 0.22);
-      ctx.shadowBlur = 16;
+      ctx.shadowBlur  = 16;
       ctx.shadowColor = `${C_CYAN}${0.40})`;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth   = 1.5;
 
       ctx.strokeStyle = `${C_CYAN}${0.70})`;
       ctx.beginPath();
@@ -207,22 +213,18 @@
       ctx.stroke();
 
       ctx.restore();
-
-      // restore default composite
-      ctx.globalCompositeOperation = "source-over";
-      ctx.shadowBlur = 0;
     }
 
     _radial(x, y, r, stops) {
-      // cache by r rounded (reduces GC on mobile)
+      // cache stop list by rounded radius
       const key = Math.round(r * 2) / 2;
       let cached = this._gradCache.get(key);
-      if (!cached) cached = new Map(), this._gradCache.set(key, cached);
-
-      // but gradients depend on x/y too; keep per-frame creation light:
-      // we cache only the stops definition and create a new gradient each time.
+      if (!cached) {
+        cached = stops;
+        this._gradCache.set(key, stops);
+      }
       const g = this.ctx.createRadialGradient(x, y, 0, x, y, r);
-      for (const [o, c] of stops) g.addColorStop(o, c);
+      for (const [o, c] of cached) g.addColorStop(o, c);
       return g;
     }
 
