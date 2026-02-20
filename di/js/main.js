@@ -12,6 +12,17 @@
     "./js/engine/render.js",
     "./js/engine/fx.js",
     "./js/engine/ui.js",
+     const ENGINE_FILES = [
+  "./js/engine/audio.js",
+  "./js/engine/timing.js",
+  "./js/engine/input.js",
+  "./js/engine/judge.js",
+  "./js/engine/render.js",
+  "./js/engine/fx.js",
+  "./js/engine/ui.js",
+
+  // ★ note skins (swap freely)
+  "./js/notes/skin-tarot-pinkgold.js",
   ];
 
   function $(id) { return document.getElementById(id); }
