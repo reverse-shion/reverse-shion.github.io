@@ -1,4 +1,4 @@
-<!-- /di/di.html -->
+<!-- /di/di.html (RE-DESIGNED / PRO ENGINEER) -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -7,22 +7,53 @@
   <meta name="theme-color" content="#05060b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
   <title>DiCo ARU – Phase1</title>
 
-  <!-- ✅ CSS分割：core / hud / lane / themes -->
+  <!-- CSS split -->
   <link rel="stylesheet" href="./css/themes.css" />
   <link rel="stylesheet" href="./css/core.css" />
   <link rel="stylesheet" href="./css/hud.css" />
   <link rel="stylesheet" href="./css/lane.css" />
 
-  <!-- iOSのタップ遅延＆選択抑制 -->
-  <meta name="format-detection" content="telephone=no" />
+  <!-- Preload (optional but helps iOS) -->
+  <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
+  <link rel="preload" href="./assets/idle/dico_idle.jpg" as="image" />
+  <link rel="preload" href="./audio/music.mp3" as="audio" />
+  <link rel="preload" href="./audio/se_tap.wav" as="audio" />
+  <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
 </head>
 
 <body>
 <main class="app" id="app" data-state="idle" aria-label="DiCo ARU Rhythm">
 
-  <!-- 背景（動画は薄く／暗くしないのはCSS側で） -->
+  <!-- =========================================================
+       BACKGROUND STACK
+       idle: still image + light particles
+       playing: video visible
+       (visibility is controlled via CSS using [data-state])
+       ========================================================= -->
+
+  <!-- Idle still image (use your DiCo key visual) -->
+  <div class="idleBg" id="idleBg" aria-hidden="true">
+    <!-- 画像は差し替えOK：./assets/idle/dico_idle.jpg を置く -->
+    <img
+      class="idleImg"
+      src="./assets/idle/dico_idle.jpg"
+      alt=""
+      draggable="false"
+      decoding="async"
+      loading="eager"
+    />
+
+    <!-- Light particle layer (CSS/JSで軽く動かす想定) -->
+    <canvas id="idleParticles" class="idleParticles" aria-hidden="true"></canvas>
+
+    <!-- Tagline -->
+    <div class="idleLine" aria-hidden="true">キミの想いを、共鳴に変えて。</div>
+  </div>
+
+  <!-- Video background (only meaningful in playing) -->
   <video
     id="bgVideo"
     class="bgVideo"
@@ -31,20 +62,19 @@
     muted
     loop
     preload="metadata"
+    aria-hidden="true"
   ></video>
 
-  <!-- FX（タップ貫通） -->
+  <!-- FX layer (tap-through) -->
   <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
 
-  <!-- ==================================
+  <!-- =========================================================
        SIDE HUD (LEFT / RIGHT)
-       ※見た目はhud.cssで整える
-       ================================== -->
+       ========================================================= -->
 
   <!-- LEFT HUD -->
   <aside class="sideHud sideHudLeft" aria-label="Left HUD">
     <div class="sideCard sideScore" role="group" aria-label="Score">
-      <!-- JSで #score と同期させる想定 -->
       <div class="sideScoreValue" id="sideScore">000000</div>
       <div class="sideScoreSub">SUBJECT: SHION</div>
     </div>
@@ -68,7 +98,6 @@
           <div class="sideNameSub">RESONANCE</div>
         </div>
 
-        <!-- Avatar ring（リング色はthemes.cssで金） -->
         <div class="sideAvatar" aria-label="DiCo avatar">
           <div class="avatarRing" id="avatarRing" aria-hidden="true"></div>
           <img
@@ -84,7 +113,6 @@
         </div>
       </div>
 
-      <!-- Resonance bar -->
       <div class="sideGauge" role="group" aria-label="Resonance gauge">
         <div class="sideGaugeRow">
           <div class="sideGaugeLabel">RESONANCE</div>
@@ -102,7 +130,7 @@
           <div class="sideTimeValue" id="time">--</div>
         </div>
 
-        <!-- 表情素材プール（任意：使わないなら削除OK） -->
+        <!-- Face pool (optional) -->
         <div class="facePool" aria-hidden="true">
           <img class="faceAsset" id="face1" src="./assets/faces/dico_face_1.png" alt="" />
           <img class="faceAsset" id="face2" src="./assets/faces/dico_face_2.png" alt="" />
@@ -112,10 +140,10 @@
     </div>
   </aside>
 
-  <!-- ==================================
-       (互換) 既存HUD：消してもOK
-       ただし今のdi.jsが参照するので残す
-       ================================== -->
+  <!-- =========================================================
+       LEGACY HUD (for compatibility with current UI.js)
+       aria-hidden to avoid duplication for screen readers.
+       ========================================================= -->
   <header class="hud" aria-label="HUD" aria-hidden="true">
     <div class="hudBlock">
       <div class="hudLabel">SCORE</div>
@@ -139,14 +167,16 @@
     </div>
   </header>
 
-  <!-- ==================================
+  <!-- =========================================================
        STAGE
-       ================================== -->
+       ========================================================= -->
   <section class="stage" id="stage" aria-label="Game Stage">
+
+    <!-- NOTE CANVAS (tap-through; rendering only) -->
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
 
-    <!-- “レーン”はlane.cssで細く（動画を見せる） -->
-    <div class="hitZone" id="hitZone" aria-hidden="true"></div>
+    <!-- HIT ZONE (only this receives pointer events) -->
+    <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
 
     <!-- TARGET -->
     <div class="targetRoot" id="targetRoot" aria-hidden="true">
@@ -205,9 +235,11 @@
     </div>
   </section>
 
-  <!-- ==================================
-       CONTROLS（下固定）
-       ================================== -->
+  <!-- =========================================================
+       CONTROLS
+       - We keep three buttons in DOM for compatibility,
+         but CSS should show/hide them by app[data-state].
+       ========================================================= -->
   <footer class="bottom" aria-label="Controls">
     <button id="startBtn" class="btn primary" type="button">START</button>
     <button id="stopBtn" class="btn" type="button">STOP</button>
@@ -219,13 +251,76 @@
   <audio id="seTap"   src="./audio/se_tap.wav" preload="auto"></audio>
   <audio id="seGreat" src="./audio/se_perfect.wav" preload="auto"></audio>
 
-  <!-- SR -->
+  <!-- Screen reader live region -->
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
 
 </main>
 
-<!-- ✅ JS分割：main が engine を読み込む -->
+<!-- Main boot -->
 <script src="./js/main.js" defer></script>
+
+<!-- Idle particles (optional). If you want zero JS, delete this script tag. -->
+<script>
+(() => {
+  // super light idle particles: 30 dots drifting
+  const app = document.getElementById("app");
+  const c = document.getElementById("idleParticles");
+  if (!app || !c) return;
+
+  const ctx = c.getContext("2d");
+  let w = 0, h = 0, dpr = 1;
+  const N = 30;
+  const dots = Array.from({length:N}, () => ({
+    x: Math.random(), y: Math.random(),
+    vx:(Math.random()*2-1)*0.015,
+    vy:(Math.random()*2-1)*0.010,
+    r: 0.6 + Math.random()*1.6,
+    a: 0.10 + Math.random()*0.25
+  }));
+
+  function resize(){
+    const r = c.getBoundingClientRect();
+    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    w = Math.floor(r.width * dpr);
+    h = Math.floor(r.height * dpr);
+    c.width = w; c.height = h;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  window.addEventListener("resize", resize, {passive:true});
+
+  let raf = 0;
+  function tick(){
+    // idle state only
+    if (app.dataset.state !== "idle") { raf = requestAnimationFrame(tick); return; }
+
+    const bw = c.getBoundingClientRect().width;
+    const bh = c.getBoundingClientRect().height;
+
+    ctx.clearRect(0,0,bw,bh);
+    ctx.globalCompositeOperation = "lighter";
+
+    for (const p of dots){
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < -0.05) p.x = 1.05;
+      if (p.x >  1.05) p.x = -0.05;
+      if (p.y < -0.05) p.y = 1.05;
+      if (p.y >  1.05) p.y = -0.05;
+
+      const x = p.x * bw;
+      const y = p.y * bh;
+
+      ctx.globalAlpha = p.a;
+      ctx.beginPath();
+      ctx.arc(x,y,p.r,0,Math.PI*2);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fill();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
 
 </body>
 </html>
