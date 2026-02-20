@@ -1,5 +1,5 @@
 /* /di/css/core.css */
-/* Layout + base rules + background video + stage + buttons */
+/* CLEAR VERSION – no black overlay */
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
@@ -8,27 +8,16 @@ body{
   margin:0;
   font-family: var(--font);
   color: var(--text);
-
-  /* base background (under video) */
-  background:
-    radial-gradient(1200px 700px at 18% 12%, rgba(156,60,255,.22), transparent 55%),
-    radial-gradient(900px 560px at 82% 18%, rgba(0,240,255,.16), transparent 58%),
-    radial-gradient(900px 700px at 56% 86%, rgba(230,201,107,.10), transparent 60%),
-    linear-gradient(180deg, var(--bg0), var(--bg1));
-
+  background: #000; /* fallback only */
   overflow:hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Disable accidental text selection on mobile */
-.app, .app *{
-  -webkit-tap-highlight-color: transparent;
-}
+/* =========================
+   App Container
+   ========================= */
 .app{
-  user-select:none;
-  -webkit-user-select:none;
-
   position:relative;
   width:100%;
   height:100%;
@@ -38,10 +27,14 @@ body{
     env(safe-area-inset-right)
     calc(env(safe-area-inset-bottom) + var(--bottomH))
     env(safe-area-inset-left);
+
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =========================
-   Background Video
+   Background Video (pure)
    ========================= */
 .bgVideo{
   position:absolute;
@@ -51,74 +44,19 @@ body{
   object-fit:cover;
   object-position:center;
 
-  /* keep video visible */
-  opacity:.92;
+  opacity:1;
 
-  /* gentle polish only (no darkening) */
-  filter: saturate(1.06) contrast(1.06);
+  /* 明るさ強化 */
+  filter: brightness(1.25) contrast(1.1) saturate(1.1);
 
   transform: translateZ(0);
   z-index:0;
   pointer-events:none;
 }
 
-/* =========================
-   Cinematic overlays
-   - THIS was the "dark filter"
-   - Now tuned brighter (lighter blacks)
-   ========================= */
-
-/* soft readability veil (lighter than before) */
-.app::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:1;
-
-  /* ↓ reduced darkness:
-     was ~ .22 -> .48 center
-     now ~ .06 -> .18 center
-  */
-  background:
-    radial-gradient(1100px 700px at 50% 50%,
-      rgba(0,0,0,.06),
-      rgba(0,0,0,.18)
-    ),
-    linear-gradient(90deg,
-      rgba(0,0,0,.16) 0%,
-      rgba(0,0,0,.06) 18%,
-      rgba(0,0,0,.02) 50%,
-      rgba(0,0,0,.06) 82%,
-      rgba(0,0,0,.16) 100%
-    );
-
-  pointer-events:none;
-}
-
-/* color glow overlay (kept, slightly toned) */
-.app::after{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  z-index:1;
-
-  background:
-    radial-gradient(600px 300px at 24% 18%, rgba(156,60,255,.18), transparent 62%),
-    radial-gradient(520px 260px at 76% 24%, rgba(0,240,255,.14), transparent 66%),
-    radial-gradient(520px 320px at 56% 84%, rgba(230,201,107,.10), transparent 64%);
-
-  mix-blend-mode: screen;
-  opacity:.56;
-  pointer-events:none;
-  animation: glowPulse 6.5s ease-in-out infinite;
-}
-
-/* subtle pulse */
-@keyframes glowPulse{
-  0%   { opacity:.48; transform: translateZ(0) scale(1); }
-  50%  { opacity:.62; transform: translateZ(0) scale(1.01); }
-  100% { opacity:.48; transform: translateZ(0) scale(1); }
-}
+/* 完全にオーバーレイ無効 */
+.app::before{ display:none; }
+.app::after{ display:none; }
 
 /* =========================
    FX layer
@@ -153,7 +91,9 @@ body{
   touch-action: manipulation;
 }
 
-/* gameplay canvas */
+/* =========================
+   Gameplay Canvas
+   ========================= */
 .noteCanvas{
   width: min(720px, 100%);
   height: min(86vh, 900px);
@@ -161,21 +101,21 @@ body{
 
   border-radius: var(--r2);
 
-  /* lighter glass so video feels brighter */
-  background: rgba(0,0,0,.08);
+  /* 透明寄りに */
+  background: rgba(0,0,0,.05);
 
-  box-shadow: var(--sh1);
-  outline: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  outline: 1px solid rgba(255,255,255,.15);
 
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 
   transform: translateZ(0);
   pointer-events:auto;
 }
 
 /* =========================
-   Bottom controls
+   Bottom Controls
    ========================= */
 .bottom{
   position:absolute;
@@ -192,14 +132,14 @@ body{
 
   z-index:10;
 
-  /* slightly lighter than before */
-  background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.46));
+  /* 黒グラデ削除 */
+  background: transparent;
 }
 
 .btn{
   appearance:none;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
   color: var(--text);
 
   border-radius: 999px;
@@ -209,33 +149,23 @@ body{
   font-weight: 700;
   letter-spacing: .02em;
 
-  box-shadow: var(--sh2);
-
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
   cursor:pointer;
   transition: transform .08s ease, background .12s ease, border-color .12s ease;
 }
 
 .btn:active{ transform: translateY(1px) scale(.99); }
-.btn:hover{ border-color: rgba(255,255,255,.22); }
+.btn:hover{ border-color: rgba(255,255,255,.32); }
 
 .btn.primary{
-  border-color: rgba(0,240,255,.28);
-  background: linear-gradient(180deg, rgba(0,240,255,.22), rgba(156,60,255,.10));
-}
-.btn.primary:hover{
-  border-color: rgba(0,240,255,.42);
-}
-
-/* SR only */
-.srOnly{
-  position:absolute !important;
-  width:1px; height:1px;
-  padding:0; margin:-1px;
-  overflow:hidden; clip:rect(0,0,0,0);
-  white-space:nowrap; border:0;
+  border-color: rgba(0,240,255,.40);
+  background: linear-gradient(
+    180deg,
+    rgba(0,240,255,.35),
+    rgba(156,60,255,.25)
+  );
 }
 
 /* =========================
@@ -250,11 +180,6 @@ body{
 }
 @media (max-width: 720px){
   :root{ --hudW: 170px; }
-  .stage{
-    padding-left: calc(var(--hudW) + 10px + env(safe-area-inset-left));
-    padding-right: calc(var(--hudW) + 10px + env(safe-area-inset-right));
-  }
-  .btn{ min-width: 96px; padding: 11px 14px; }
 }
 @media (max-width: 560px){
   :root{ --hudW: 150px; }
