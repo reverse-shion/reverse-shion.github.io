@@ -20,6 +20,8 @@
   "./js/engine/render.js",
   "./js/engine/fx.js",
   "./js/engine/ui.js",
+      // ★ note skins (swap freely)
+  "./js/notes/skin-tarot-pinkgold.js",
 
    ];
 
