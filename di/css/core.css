@@ -1,5 +1,12 @@
 /* /di/css/core.css */
-/* STABLE VERSION – tap-safe + state control (idle still) */
+/* PRO STABLE CORE – layer order + state control + tap-safe (iOS friendly)
+   Responsibility:
+   - App base / global resets
+   - Background stack (idle still / playing video)
+   - Deterministic layering (z-index)
+   - Stage geometry (safe area + HUD clearance)
+   - Tap safety (only hitZone receives input)
+*/
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
@@ -8,41 +15,44 @@ body{
   margin:0;
   font-family: var(--font);
   color: var(--text);
-  background:#000; /* fallback only */
+  background:#000; /* fallback */
   overflow:hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* =========================
-   App Container
-   ========================= */
+/* ============================================================
+   1) APP ROOT
+   ============================================================ */
 .app{
   position:relative;
   width:100%;
   height:100%;
-
-  padding:
-    env(safe-area-inset-top)
-    env(safe-area-inset-right)
-    calc(env(safe-area-inset-bottom) + var(--bottomH))
-    env(safe-area-inset-left);
-
   user-select:none;
   -webkit-user-select:none;
   -webkit-tap-highlight-color: transparent;
 
   overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
+
+  /* NOTE:
+     app自体に padding を入れると、absolute layer の inset と干渉しやすい。
+     safe-area は各レイヤーで個別に扱う（より事故が少ない）
+  */
 }
 
-/* オーバーレイ無効（あなたの方針を維持） */
+/* オーバーレイ無効（方針維持） */
 .app::before{ display:none; }
 .app::after{ display:none; }
 
-/* =========================
-   Background Video (pure)
-   ========================= */
+/* ============================================================
+   2) LAYER ORDER (deterministic)
+   - 0: video
+   - 1: idle still
+   - 3: stage (lanes/canvas/target/hitzone)
+   - 4: fx
+   - 6+: hud / controls (hud.css側で上げてもOK)
+   ============================================================ */
 .bgVideo{
   position:absolute;
   inset:0;
@@ -50,27 +60,22 @@ body{
   height:100%;
   object-fit:cover;
   object-position:center;
-
-  opacity:1;
-  filter: brightness(1.25) contrast(1.1) saturate(1.1);
-
   transform: translateZ(0);
   z-index:0;
   pointer-events:none;
+
+  /* playing時の見えを良くする */
+  filter: brightness(1.15) contrast(1.08) saturate(1.08);
 }
 
-/* =========================
-   Idle Background (still image / particles base)
-   ※ HTMLに <div id="idleBg" class="idleBg"> を足す想定
-   ========================= */
+/* IDLE STILL STACK */
 .idleBg{
   position:absolute;
   inset:0;
   z-index:1;
   pointer-events:none;
 
-  /* 「静止画＋軽パーティクル」用のベース。
-     静止画を使うなら background-image を後で差し替え。 */
+  /* 余白が出ても成立するベース */
   background:
     radial-gradient(circle at 30% 20%, rgba(156,60,255,.22), transparent 45%),
     radial-gradient(circle at 75% 35%, rgba(0,240,255,.18), transparent 50%),
@@ -78,53 +83,69 @@ body{
     linear-gradient(180deg, #04050a 0%, #000 60%, #000 100%);
 }
 
-/* =========================
-   FX layer
-   ========================= */
-.fxLayer{
+/* idle image (HTMLの <img class="idleImg"> を前提) */
+.idleImg{
   position:absolute;
   inset:0;
-  z-index:6;
+  width:100%;
+  height:100%;
+  /* “切れない”を最優先（全身見せ） */
+  object-fit: contain;
+  object-position: 50% 50%;
+  transform: translateZ(0);
+  filter: saturate(1.04) contrast(1.02);
+}
+
+/* 余白を締めるビネット */
+.idleBg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.28), transparent 26%, transparent 70%, rgba(0,0,0,.48)),
+    radial-gradient(circle at 50% 55%, transparent 45%, rgba(0,0,0,.35) 100%);
   pointer-events:none;
 }
 
-/* =========================
-   Stage
-   ========================= */
-.stage{
-  position:relative;
+/* FX */
+.fxLayer{
+  position:absolute;
+  inset:0;
   z-index:4;
+  pointer-events:none;
+}
 
-  width:100%;
-  height:100%;
+/* ============================================================
+   3) STAGE GEOMETRY (safe-area + HUD clearance)
+   ============================================================ */
+.stage{
+  position:absolute;
+  inset:0;
+  z-index:3;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
+  /* 上下はsafe-areaとボタン高さで確実に空ける */
   padding:
-    10px
-    calc(var(--hudW) + var(--hudGap) + env(safe-area-inset-right))
-    10px
-    calc(var(--hudW) + var(--hudGap) + env(safe-area-inset-left));
+    calc(env(safe-area-inset-top) + 10px)
+    calc(env(safe-area-inset-right) + var(--hudW) + var(--hudGap))
+    calc(env(safe-area-inset-bottom) + var(--bottomH) + 10px)
+    calc(env(safe-area-inset-left) + var(--hudW) + var(--hudGap));
 
-  /* ここは “manipulation” より、タップの遅延/ズレを減らすため基本 none */
+  /* タップ遅延・ズレ軽減（入力は hitZoneへ） */
   touch-action: none;
 }
 
-/* =========================
-   Gameplay Canvas
-   ========================= */
+/* canvasは描画のみ。絶対に入力を奪わない */
 .noteCanvas{
   width: min(720px, 100%);
   height: min(86vh, 900px);
   display:block;
-
   border-radius: var(--r2);
 
-  /* 透明寄り：動画が見える */
   background: rgba(0,0,0,.05);
-
   box-shadow: 0 30px 80px rgba(0,0,0,.35);
   outline: 1px solid rgba(255,255,255,.15);
 
@@ -132,31 +153,39 @@ body{
   -webkit-backdrop-filter: blur(3px);
 
   transform: translateZ(0);
-
-  /* ✅重要：canvasは絶対にタップを奪わない（入力は hitZone だけ） */
   pointer-events:none;
 }
 
-/* =========================
-   Bottom Controls
-   ========================= */
+/* hitZoneが存在する前提（入力はここだけ） */
+.hitZone{
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   4) BOTTOM CONTROLS BASE
+   - 表示/非表示は hud.css 側の state 制御でやるのが理想
+   ============================================================ */
 .bottom{
   position:absolute;
-  left:0; right:0;
-  bottom:0;
+  left:0;
+  right:0;
 
-  height: var(--bottomH);
-  padding: 10px 14px calc(10px + env(safe-area-inset-bottom)) 14px;
+  /* safe-area込みで固定配置 */
+  bottom: calc(env(safe-area-inset-bottom) + 10px);
+  z-index:7;
 
   display:flex;
   gap:10px;
   align-items:center;
   justify-content:center;
 
-  z-index:20;
+  padding: 0 14px;
+  height: var(--bottomH);
   background: transparent;
 }
 
+/* buttons (見た目の最終調整はhud.cssに寄せてOK) */
 .btn{
   appearance:none;
   border:1px solid rgba(255,255,255,.18);
@@ -166,6 +195,13 @@ body{
   border-radius: 999px;
   padding: 12px 16px;
   min-width: 110px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height: 1;
+  white-space: nowrap;
 
   font-weight: 700;
   letter-spacing: .02em;
@@ -188,25 +224,58 @@ body{
   );
 }
 
-/* =========================
-   State Control
-   ========================= */
+/* ============================================================
+   5) STATE CONTROL (iOS stable)
+   - display:none は避ける（動画/レイアウトが不安定になる）
+   - opacity + visibility を使う
+   - idleでは stage を確実に消す（レーンが見える問題の根治）
+   ============================================================ */
 
-/* idle：動画は見せない（静止画＋軽パーティクル側へ） */
-.app[data-state="idle"] .bgVideo{ display:none; }
-.app[data-state="idle"] .idleBg{ display:block; }
+/* defaults */
+.bgVideo{ opacity:1; visibility:visible; }
+.idleBg { opacity:0; visibility:hidden; }
+.stage  { opacity:1; visibility:visible; }
 
-/* playing/paused/result：動画を見せる（idleBgは不要） */
-.app[data-state="playing"] .bgVideo,
-.app[data-state="paused"]  .bgVideo,
-.app[data-state="result"]  .bgVideo{ display:block; }
+/* IDLE: show still, hide stage+video */
+.app[data-state="idle"] .idleBg{
+  opacity:1;
+  visibility:visible;
+}
+.app[data-state="idle"] .bgVideo{
+  opacity:0;
+  visibility:hidden;
+}
+.app[data-state="idle"] .stage{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+/* PLAYING / PAUSED / RESULT: show video+stage, hide still */
 .app[data-state="playing"] .idleBg,
 .app[data-state="paused"]  .idleBg,
-.app[data-state="result"]  .idleBg{ display:none; }
+.app[data-state="result"]  .idleBg{
+  opacity:0;
+  visibility:hidden;
+}
+.app[data-state="playing"] .bgVideo,
+.app[data-state="paused"]  .bgVideo,
+.app[data-state="result"]  .bgVideo{
+  opacity:1;
+  visibility:visible;
+}
+.app[data-state="playing"] .stage,
+.app[data-state="paused"]  .stage,
+.app[data-state="result"]  .stage{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
 
-/* =========================
-   Responsive
-   ========================= */
+/* ============================================================
+   6) RESPONSIVE (HUD width + canvas sizing)
+   - :root 変数をここで上書きしてOK（themes.cssより後なので効く）
+   ============================================================ */
 @media (max-width: 860px){
   :root{ --hudW: 210px; }
   .noteCanvas{
