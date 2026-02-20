@@ -9,13 +9,13 @@
       this.chart = chart;
       this.timing = timing;
 
-      this.notes = (chart?.notes || []).slice().sort((a,b)=> (a.t||0)-(b.t||0));
+      this.notes = (chart?.notes || []).slice().sort((a, b) => (a.t || 0) - (b.t || 0));
       this.approach = chart?.scroll?.approach ?? 1.25; // seconds
       this.dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
       this.resize();
 
-      // Pre-made gradients cache key'd by radius
+      // Pre-made gradients cache key'd by radius (you can use in skins too)
       this._gradCache = new Map();
     }
 
@@ -23,7 +23,13 @@
       const r = this.canvas.getBoundingClientRect();
       this.canvas.width = Math.floor(r.width * this.dpr);
       this.canvas.height = Math.floor(r.height * this.dpr);
+
+      // 1 unit in code == 1 CSS pixel
       this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+
+      // mobile friendliness
+      this.ctx.imageSmoothingEnabled = true;
+      this.ctx.imageSmoothingQuality = "high";
     }
 
     draw(songTime) {
@@ -40,6 +46,7 @@
 
       // subtle lane guides (match thin lane)
       ctx.save();
+      ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 0.18;
       ctx.lineWidth = 1;
 
@@ -78,34 +85,54 @@
       const spawnT = songTime + this.approach;
       const minT = songTime - 0.45;
 
+      // ✅ IMPORTANT: notes are drawn after guides, so they appear on top within the canvas
       for (let i = 0; i < this.notes.length; i++) {
         const n = this.notes[i];
         if (n.t < minT) continue;
         if (n.t > spawnT) break;
 
-        const dt = n.t - songTime;            // seconds until hit
-        const p = 1 - (dt / this.approach);   // 0..1
+        const dt = n.t - songTime;
+        const p = 1 - (dt / this.approach);      // 0..1
         const y = targetY * p;
 
-        // Alpha: soft early, strong near hit
-        const a = this._clamp(0.20 + p * 1.05, 0, 1);
-        this._drawNote(cx, y, a, p);
+        const alpha = this._clamp(0.20 + p * 1.05, 0, 1);
+        this._drawNote(cx, y, alpha, p, n);      // ★ n も渡す
       }
     }
 
-    _drawNote(x, y, alpha, p) {
+    // ✅ Skin-call style note draw
+    _drawNote(x, y, alpha, p, note) {
       const ctx = this.ctx;
 
-      // DiCo palette
+      // Notes should feel "always on top":
+      // Keep Renderer in a stable base mode; skins can opt-in to lighter/screen inside.
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+
+      const skin = (window.DI_ENGINE && window.DI_ENGINE.noteSkin) || null;
+
+      if (skin && typeof skin.drawNote === "function") {
+        // skin draws everything (card/heart/star/etc)
+        skin.drawNote(ctx, x, y, alpha, p, note, this);
+      } else {
+        // fallback (your current neon orb style)
+        this._drawFallbackOrb(ctx, x, y, alpha, p);
+      }
+
+      ctx.restore();
+    }
+
+    /* -----------------------------------------
+       Fallback: your current DiCo orb note
+       ----------------------------------------- */
+    _drawFallbackOrb(ctx, x, y, alpha, p) {
       const C_CYAN   = "rgba(0,240,255,";
       const C_VIOLET = "rgba(156,60,255,";
       const C_GOLD   = "rgba(230,201,107,";
 
-      // Ease: near hit gets punch
       const near = this._easeOutCubic(this._clamp(p, 0, 1));
-      const pulse = 0.85 + 0.15 * Math.sin((p * 12.0) + (y * 0.02)); // gentle shimmer
+      const pulse = 0.85 + 0.15 * Math.sin((p * 12.0) + (y * 0.02));
 
-      // sizes
       const rCore = 6 + near * 2.2;
       const rRing = 12 + near * 6.2;
       const rAura = 24 + near * 16;
@@ -113,11 +140,11 @@
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
 
-      // ========= AURA (soft bloom) =========
+      // AURA
       ctx.globalAlpha = alpha * 0.55 * pulse;
       ctx.shadowBlur = 26 + near * 24;
       ctx.shadowColor = `${C_CYAN}${0.55})`;
-      ctx.fillStyle = this._radial(x, y, rAura, [
+      ctx.fillStyle = this._radial(ctx, x, y, rAura, [
         [0.00, `${C_CYAN}${0.00})`],
         [0.22, `${C_CYAN}${0.12})`],
         [0.52, `${C_VIOLET}${0.10})`],
@@ -128,30 +155,27 @@
       ctx.arc(x, y, rAura, 0, Math.PI * 2);
       ctx.fill();
 
-      // ========= RING (neon rim) =========
+      // RING
       ctx.globalAlpha = alpha * (0.75 + near * 0.30);
       ctx.shadowBlur = 18 + near * 18;
       ctx.shadowColor = `${C_CYAN}${0.65})`;
       ctx.lineWidth = 2.6 + near * 1.2;
 
-      // outer ring gradient stroke
-      ctx.strokeStyle = this._radial(x, y, rRing, [
+      ctx.strokeStyle = this._radial(ctx, x, y, rRing, [
         [0.00, `${C_CYAN}${0.85})`],
         [0.55, `${C_VIOLET}${0.60})`],
         [0.85, `${C_GOLD}${0.55})`],
         [1.00, `${C_CYAN}${0.70})`],
       ]);
-
       ctx.beginPath();
       ctx.arc(x, y, rRing, 0, Math.PI * 2);
       ctx.stroke();
 
-      // ========= CORE (bright center) =========
+      // CORE bloom
       ctx.globalAlpha = alpha;
       ctx.shadowBlur = 10 + near * 12;
       ctx.shadowColor = "rgba(255,255,255,0.65)";
-
-      ctx.fillStyle = this._radial(x, y, rCore + 10, [
+      ctx.fillStyle = this._radial(ctx, x, y, rCore + 10, [
         [0.00, `rgba(255,255,255,0.95)`],
         [0.22, `rgba(255,255,255,0.55)`],
         [0.55, `${C_CYAN}${0.25})`],
@@ -169,8 +193,7 @@
       ctx.arc(x, y, rCore, 0, Math.PI * 2);
       ctx.fill();
 
-      // ========= TRAIL (short neon ribbon) =========
-      // (closer -> shorter and brighter)
+      // TRAIL
       const trailLen = 64 - near * 20;
       const trailW = 10 + near * 8;
 
@@ -178,7 +201,6 @@
       ctx.shadowBlur = 22;
       ctx.shadowColor = `${C_VIOLET}${0.45})`;
 
-      // ribbon gradient
       const g = ctx.createLinearGradient(x, y - 6, x, y - trailLen);
       g.addColorStop(0.00, `${C_CYAN}${0.55})`);
       g.addColorStop(0.45, `${C_VIOLET}${0.42})`);
@@ -192,7 +214,7 @@
       ctx.closePath();
       ctx.fill();
 
-      // ========= SPARK TICKS (tiny accents) =========
+      // SPARK TICKS
       ctx.globalAlpha = alpha * (0.18 + near * 0.22);
       ctx.shadowBlur = 16;
       ctx.shadowColor = `${C_CYAN}${0.40})`;
@@ -208,26 +230,31 @@
 
       ctx.restore();
 
-      // restore default composite
+      // restore defaults
       ctx.globalCompositeOperation = "source-over";
       ctx.shadowBlur = 0;
     }
 
-    _radial(x, y, r, stops) {
-      // cache by r rounded (reduces GC on mobile)
+    /* -----------------------------------------
+       helpers
+       ----------------------------------------- */
+    _radial(ctx, x, y, r, stops) {
+      // cache stop lists by rounded radius (lightweight)
       const key = Math.round(r * 2) / 2;
       let cached = this._gradCache.get(key);
-      if (!cached) cached = new Map(), this._gradCache.set(key, cached);
+      if (!cached) {
+        cached = stops;
+        this._gradCache.set(key, stops);
+      }
 
-      // but gradients depend on x/y too; keep per-frame creation light:
-      // we cache only the stops definition and create a new gradient each time.
-      const g = this.ctx.createRadialGradient(x, y, 0, x, y, r);
-      for (const [o, c] of stops) g.addColorStop(o, c);
+      // gradient depends on x/y so create each call (cheap enough)
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      for (const [o, c] of cached) g.addColorStop(o, c);
       return g;
     }
 
-    _clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-    _easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+    _clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    _easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
   }
 
   NS.Renderer = Renderer;
