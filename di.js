@@ -1,9 +1,9 @@
-/* di.js — DiCo ARU Phase1 (Taiko-ish) + GREAT露出UP＆粒子吸い込み（ARU起動感）
-   ✅ 判定は ms ではなく px（見た目どおり：円の中=GOOD / 中心=GREAT）
-   ✅ ターゲット円の中タップだけ受付（誤タップ抑制）
-   ✅ “円の中で叩いたのにMISS”を潰す：MISSは「譜面を逃した時のみ」表示（空打ちは無反応）
-   ✅ 譜面にメリハリ：8分/16分連打/3連/間 + 大ノーツ=HOLD（長押し）
-   ✅ GREAT演出：露出アップ + 粒子吸い込み（視覚×聴覚でARU起動感）
+/* di.js — DiCo ARU Phase1 (Taiko-ish)
+   + GREAT露出UP＆粒子吸い込み（ARU起動感）
+   + sideHud(左右レゾナンスバー)連動
+   + DiCo表情3段階（data-expression）
+   + 判定帯フラッシュ（ノーツが判定帯に入った瞬間だけclass付与）
+   + レーン両端ガイド光（CSS側の .laneGuide をON/OFFするためのclass付与）
 */
 (function(){
   "use strict";
@@ -13,10 +13,11 @@
   const canvas = document.getElementById("noteCanvas");
   const ctx = canvas?.getContext("2d", { alpha:true });
 
+  const stage = document.querySelector(".stage");
   const bgVideo = document.getElementById("bgVideo");
   const music = document.getElementById("music");
   const seTap = document.getElementById("seTap");
-  // 互換：seGreat が無ければ sePerfect / se_god を拾う
+  // 互換：seGreat が無ければ sePerfect / se_great / seGod を拾う
   const seGreat = document.getElementById("seGreat")
                 || document.getElementById("sePerfect")
                 || document.getElementById("se_great")
@@ -45,6 +46,16 @@
 
   const fxLayer = document.getElementById("fxLayer");
 
+  // sideHud: どれか存在すれば拾う（ID推奨：resBarLeft/resBarRight）
+  const resBarLeft  = document.getElementById("resBarLeft")  || document.querySelector("[data-resbar='left']");
+  const resBarRight = document.getElementById("resBarRight") || document.querySelector("[data-resbar='right']");
+
+  // 判定帯（任意）：.hitBand / #hitBand があれば点灯クラスを付ける
+  const hitBand = document.getElementById("hitBand") || document.querySelector(".hitBand");
+
+  // レーンガイド（任意）：.laneGuide があればON/OFFクラスを付ける
+  const laneGuides = Array.from(document.querySelectorAll(".laneGuide"));
+
   if(!app || !canvas || !ctx || !music) return;
 
   // ===== Config =====
@@ -58,14 +69,15 @@
     TAP_R: 12,
     HOLD_R: 18,
 
-    // 判定は px で保証（中心=GREAT / 円内=GOOD）
-    GREAT_PX: 14,         // 中心判定
-    GOOD_PX: 42,          // 円の中判定
-    // ターゲット内の“受付円”（これより外は完全無視）
+    // 判定は px（中心=GREAT / 円内=GOOD）
+    GREAT_PX: 14,
+    GOOD_PX:  42,
+
+    // ターゲット内“受付円”（これより外は完全無視）
     TAP_ACCEPT_R: 160,
 
-    // 「円内で叩いたのにMISS」対策：ヒット対象にできる最大dy
-    HIT_WINDOW_PX: 64,    // GOOD_PXより少し余裕（取り逃がしを減らす）
+    // 「円内で叩いたのにMISS」対策：候補にできる最大dy
+    HIT_WINDOW_PX: 64, // GOOD_PXより少し余裕
 
     SCORE_GREAT: 100,
     SCORE_GOOD:  60,
@@ -74,7 +86,6 @@
     ARU_ADD_GREAT: 3,
     ARU_ADD_GOOD:  1,
 
-    FALL_LEAD: 1.4,
     DURATION_FALLBACK: 70,
 
     DPR_MAX: 2,
@@ -83,6 +94,18 @@
     // GREAT FX
     EXPOSURE_MS: 140,
     PFX_DPR_MAX: 2,
+
+    // 判定帯フラッシュ（ノーツが帯に入った瞬間だけ点灯）
+    BAND_ENTER_PX: 22,     // 判定帯からこの距離に入った瞬間
+    BAND_FLASH_MS: 80,     // 点灯時間
+
+    // レーンガイド（走行中だけON）
+    LANE_GUIDE_ON_CLASS: "on",
+    HITBAND_ON_CLASS: "active",
+
+    // 表情閾値
+    EXP_FOCUS: 35,
+    EXP_OVERDRIVE: 70,
   });
 
   // ===== State =====
@@ -94,7 +117,7 @@
 
     w:0,h:0,dpr:1,
 
-    // notes: {t, type:'tap'|'hold', dur, hit, holdState}
+    // notes: {t, type:'tap'|'hold', dur, hit, holdState, bandEntered}
     notes:[],
     duration:CFG.DURATION_FALLBACK,
 
@@ -103,16 +126,23 @@
     maxCombo:0,
     aru:0,
 
+    // expression
+    expression:"calm", // calm | focus | overdrive
+
     // hold input
     holding:false,
     holdNote:null,
     pointerDown:false,
     pointerX:0,
     pointerY:0,
+
+    // band flash
+    bandTimer:0,
   };
 
   // ===== Utils =====
   const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+  const nowMs = ()=> (typeof performance !== "undefined" ? performance.now() : Date.now());
 
   function setVhVar(){
     const vh = window.innerHeight * 0.01;
@@ -186,6 +216,43 @@
     return (dx*dx + dy*dy) <= (CFG.TAP_ACCEPT_R * CFG.TAP_ACCEPT_R);
   }
 
+  // ===== UI: expression & resonance bars =====
+  function updateExpression(){
+    const pct = clamp(S.aru, 0, 100);
+
+    let next = "calm";
+    if(pct >= CFG.EXP_OVERDRIVE) next = "overdrive";
+    else if(pct >= CFG.EXP_FOCUS) next = "focus";
+
+    if(S.expression !== next){
+      S.expression = next;
+      app.dataset.expression = next;
+    }
+  }
+
+  function updateResonanceBar(){
+    const pct = clamp(S.aru, 0, 100);
+    if(resBarLeft)  resBarLeft.style.height  = pct + "%";
+    if(resBarRight) resBarRight.style.height = pct + "%";
+  }
+
+  function setLaneGuides(on){
+    if(!laneGuides.length) return;
+    for(const el of laneGuides){
+      el.classList.toggle(CFG.LANE_GUIDE_ON_CLASS, !!on);
+    }
+  }
+
+  function flashHitBand(){
+    const el = hitBand || stage; // 無ければstageに付けてもOK（CSS側で拾う）
+    if(!el) return;
+    el.classList.add(CFG.HITBAND_ON_CLASS);
+    clearTimeout(S.bandTimer);
+    S.bandTimer = setTimeout(()=>{
+      el.classList.remove(CFG.HITBAND_ON_CLASS);
+    }, CFG.BAND_FLASH_MS);
+  }
+
   // ===== FX: target & judge =====
   function flashTarget(kind){
     if(!targetRoot) return;
@@ -209,18 +276,15 @@
   }
 
   function playSe(kind){
-    // タップは常に軽く
     if(seTap){
       try{ seTap.currentTime = 0; seTap.play().catch(()=>{}); }catch{}
     }
-    // GREAT時だけ“上乗せ”
     if(kind === "GREAT" && seGreat){
       try{ seGreat.currentTime = 0; seGreat.play().catch(()=>{}); }catch{}
     }
   }
 
   // ===== GREAT FX: exposure + particle suck =====
-  // ---- FX canvas (tap-through) ----
   let fxCanvas = null;
   let fctx = null;
   let fxDpr = 1;
@@ -231,7 +295,7 @@
     fxCanvas.id = "fxCanvas";
     fxCanvas.style.position = "absolute";
     fxCanvas.style.inset = "0";
-    fxCanvas.style.zIndex = "10";          // HUDより下/上は好み。tapは取らない
+    fxCanvas.style.zIndex = "10";
     fxCanvas.style.pointerEvents = "none";
     fxCanvas.style.width = "100%";
     fxCanvas.style.height = "100%";
@@ -348,6 +412,15 @@
     exposureTimer = setTimeout(()=> app.classList.remove("exposureUp"), CFG.EXPOSURE_MS);
   }
 
+  function stopPfx(){
+    if(PFX.on){
+      cancelAnimationFrame(PFX.raf);
+      PFX.on = false;
+      PFX.list.length = 0;
+      if(fctx) fctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+    }
+  }
+
   // ===== Scoring =====
   function applyHit(kind){
     if(kind === "GREAT"){
@@ -369,7 +442,7 @@
     showJudge(kind, "SYNC");
     playSe(kind);
 
-    // ★ ARU起動感：GREATで露出アップ + 粒子吸い込み（GOODでも弱く）
+    // GREAT: 露出UP + 粒子吸い込み（GOODでも弱く）
     if(kind === "GREAT"){
       exposureUp();
       spawnSuckBurst(1.0);
@@ -378,11 +451,14 @@
     }
 
     if("vibrate" in navigator) navigator.vibrate(kind === "GREAT" ? 12 : 8);
+
+    // UI連動
+    updateExpression();
+    updateResonanceBar();
   }
 
   function applyMiss(show=true){
-    // “円内で叩いたのにMISS”を消すため
-    // MISS表示は「譜面を逃した時のみ」＝ draw側の自動MISSで呼ぶ
+    // MISS表示は「譜面を逃した時のみ」
     S.combo = 0;
     if(comboEl) comboEl.textContent = "0";
     if(show){
@@ -399,62 +475,57 @@
     const beat = CFG.BEAT;
 
     function addTap(beats=1){
-      S.notes.push({ t, type:"tap", dur:0, hit:false });
+      S.notes.push({ t, type:"tap", dur:0, hit:false, bandEntered:false });
       t += beat * beats;
     }
     function addBurst16(count){
       for(let i=0;i<count;i++){
-        S.notes.push({ t, type:"tap", dur:0, hit:false });
+        S.notes.push({ t, type:"tap", dur:0, hit:false, bandEntered:false });
         t += beat * 0.5; // 16分（体感連打）
       }
     }
     function addTriplet(){
       const step = beat / 3;
       for(let i=0;i<3;i++){
-        S.notes.push({ t, type:"tap", dur:0, hit:false });
+        S.notes.push({ t, type:"tap", dur:0, hit:false, bandEntered:false });
         t += step;
       }
     }
     function addHold(beats=2){
-      S.notes.push({ t, type:"hold", dur: beat * beats, hit:false, holdState:"idle" });
+      S.notes.push({ t, type:"hold", dur: beat * beats, hit:false, holdState:"idle", bandEntered:false });
       t += beat * beats;
     }
 
-    // --- Intro: 8分 ---
+    // Intro: 8分
     for(let i=0;i<8;i++) addTap(0.5);
 
-    // --- 間 ---
+    // 間
     t += beat * 1.0;
 
-    // --- 連打（太鼓感） ---
+    // 連打
     addBurst16(12);
 
-    // --- 3連×2 ---
-    t += beat * 0.5;
-    addTriplet();
-    t += beat * 0.5;
-    addTriplet();
+    // 3連×2
+    t += beat * 0.5; addTriplet();
+    t += beat * 0.5; addTriplet();
 
-    // --- HOLD ---
-    t += beat * 0.5;
-    addHold(2);
+    // HOLD
+    t += beat * 0.5; addHold(2);
     t += beat * 0.5;
 
-    // --- メリハリ ---
+    // メリハリ
     for(let i=0;i<6;i++) addTap(0.5);
     addBurst16(8);
     for(let i=0;i<6;i++) addTap(0.5);
 
-    // --- 以降はブロックをランダム混ぜ（単調回避） ---
+    // 以降ランダム
     while(t < (S.duration - 1.0)){
       addTap(0.5);
 
-      // “太鼓の達人っぽい”アクセント頻度
       if(Math.random() < 0.16) addBurst16(6);
       if(Math.random() < 0.14) addTriplet();
       if(Math.random() < 0.12) addHold(1.5);
 
-      // 呼吸（間）も入れる
       if(Math.random() < 0.10) t += beat * 0.5;
     }
 
@@ -468,7 +539,6 @@
     return hitY - diff * CFG.NOTE_SPEED;
   }
 
-  // “叩ける範囲”のノーツだけ候補にする（ズレMISS対策の要）
   function findHittableNote(now){
     let best=null;
     let bestAbs=1e9;
@@ -479,10 +549,7 @@
       const y = noteY(n, now);
       const dy = Math.abs(y - getHitY());
 
-      // ヒット可能窓を超えているノーツは候補にしない
       if(dy > CFG.HIT_WINDOW_PX) continue;
-
-      // HOLDは開始時だけ狙う（holding中は別処理）
       if(n.type==="hold" && n.holdState==="holding") continue;
 
       if(dy < bestAbs){
@@ -537,38 +604,39 @@
   function tryHit(px, py){
     if(!S.running) return;
 
-    // ターゲット円の中以外は完全無視（太鼓っぽい“空打ち無反応”）
+    // ターゲット円の中以外は無視（空打ち無反応）
     if(!isTapInsideTarget(px, py)) return;
 
     const now = music.currentTime;
 
-    // HOLD中：押し続けるだけ（追加判定なし）
-    if(S.holding){
-      // 連打でMISSが出ないよう、ここは無反応
-      return;
-    }
+    // HOLD中：押し続けるだけ（連打でMISS出さない）
+    if(S.holding) return;
 
     const { note, dy } = findHittableNote(now);
-    if(!note) return; // 叩くタイミングにノーツが無い＝無反応が気持ちいい
+    if(!note) return;
 
-    // HOLD開始
     if(note.type === "hold"){
       const kind = judgeByDy(dy);
-      if(kind === "MISS") return; // 中でも、窓外なら無反応
+      if(kind === "MISS") return;
       startHolding(note);
       playSe("GOOD");
       return;
     }
 
-    // TAP
     const kind = judgeByDy(dy);
-    if(kind === "MISS"){
-      // “円内で叩いたのにMISS”を避ける：窓内以外は候補にならないので原則ここに来ない
-      return;
-    }
+    if(kind === "MISS") return;
 
     note.hit = true;
     applyHit(kind);
+  }
+
+  // ===== 判定帯：ノーツが入った瞬間だけ光らせる =====
+  function bandEnterCheck(note, dy){
+    if(note.bandEntered) return;
+    if(dy <= CFG.BAND_ENTER_PX){
+      note.bandEntered = true;
+      flashHitBand();
+    }
   }
 
   // ===== Render =====
@@ -578,23 +646,24 @@
     ctx.clearRect(0,0,S.w,S.h);
 
     const now = music.currentTime;
-
     const remain = Math.max(0, S.duration - now);
     if(timeEl) timeEl.textContent = remain.toFixed(1);
 
     const cx = S.w / 2;
+    const hitY = getHitY();
 
-    // ノーツ描画 & 自動MISS（通過）
     for(const n of S.notes){
       if(n.hit) continue;
 
       const y = noteY(n, now);
-
       if(y < -CFG.DRAW_PAD || y > S.h + CFG.DRAW_PAD) continue;
+
+      const dy = Math.abs(y - hitY);
+      bandEnterCheck(n, dy);
 
       // TAP
       if(n.type==="tap"){
-        // 通過MISS：GOOD窓を超えたらMISS（ここだけは表示）
+        // 通過MISS：GOOD窓を超えたらMISS（ここだけ表示）
         if((now - n.t) * CFG.NOTE_SPEED > CFG.GOOD_PX + 18){
           n.hit = true;
           applyMiss(true);
@@ -629,20 +698,17 @@
         if(n.holdState==="holding"){
           const endT = n.t + n.dur;
 
-          // 押してない＝失敗
           if(!S.pointerDown){
             failHolding();
             continue;
           }
 
-          // 終点到達：成功（Phase1は基本GREATで気持ちよく）
           if(now >= endT){
             finishHolding("GREAT");
             continue;
           }
         }
 
-        // 開始できずに通過：MISS（表示）
         if(n.holdState==="idle"){
           if((now - n.t) * CFG.NOTE_SPEED > CFG.GOOD_PX + 18){
             n.hit = true;
@@ -664,14 +730,20 @@
   // ===== Run control =====
   function resetRun(){
     S.score=0; S.combo=0; S.maxCombo=0; S.aru=0;
+    S.expression="calm";
+    app.dataset.expression="calm";
+
     if(scoreEl) scoreEl.textContent="0";
     if(comboEl) comboEl.textContent="0";
     if(maxComboEl) maxComboEl.textContent="0";
     if(timeEl) timeEl.textContent="--";
+
+    updateResonanceBar();
   }
 
   async function startGame(){
     if(S.starting) return;
+    if(S.running) return;
     S.starting = true;
 
     await primeMedia();
@@ -682,9 +754,9 @@
 
     resetRun();
     buildNotes();
-
-    // FX canvasもここで確実に生成
     ensureFxCanvas();
+
+    setLaneGuides(true);
 
     if(bgVideo){
       bgVideo.currentTime = 0;
@@ -697,6 +769,7 @@
       setState("idle");
       S.running = false;
       S.starting = false;
+      setLaneGuides(false);
       announce("Playback blocked. Tap START.");
       return;
     }
@@ -719,14 +792,16 @@
 
     if(targetRoot) targetRoot.classList.remove("holding","good","great");
     app.classList.remove("exposureUp");
+    if(hitBand) hitBand.classList.remove(CFG.HITBAND_ON_CLASS);
+    if(stage) stage.classList.remove(CFG.HITBAND_ON_CLASS);
 
-    // PFX stop
-    if(PFX.on){
-      cancelAnimationFrame(PFX.raf);
-      PFX.on = false;
-      PFX.list.length = 0;
-      if(fctx) fctx.clearRect(0,0,window.innerWidth,window.innerHeight);
-    }
+    stopPfx();
+    setLaneGuides(false);
+
+    // hold reset
+    S.holding=false;
+    S.holdNote=null;
+    S.pointerDown=false;
 
     setState("idle");
     announce("Ready. Tap START.");
@@ -744,6 +819,9 @@
     try{ music.pause(); }catch{}
     try{ bgVideo && bgVideo.pause(); }catch{}
 
+    setLaneGuides(false);
+    stopPfx();
+
     setState("result");
 
     if(resultScore) resultScore.textContent = String(S.score);
@@ -757,6 +835,7 @@
       aruProg.style.strokeDasharray = String(C);
       aruProg.style.strokeDashoffset = String(offset);
     }
+
     if(dicoLine){
       const lines = [
         "しーちゃんに、君の想いは届いたよ。",
@@ -768,17 +847,16 @@
       dicoLine.textContent = lines[pick];
     }
 
+    updateExpression();
+    updateResonanceBar();
+
     announce("Run complete.");
   }
 
   // ===== Input (canvas only) =====
   function pointerPos(e){
     const rect = canvas.getBoundingClientRect();
-    // client座標→CSSピクセル（判定はCSSピクセルで統一）
-    return {
-      x: (e.clientX - rect.left),
-      y: (e.clientY - rect.top)
-    };
+    return { x: (e.clientX - rect.left), y: (e.clientY - rect.top) };
   }
 
   function onPointerDown(e){
@@ -797,7 +875,7 @@
     if(S.running) e.preventDefault();
     S.pointerDown = false;
 
-    // HOLD中に離したら失敗（太鼓感）
+    // HOLD中に離したら失敗
     if(S.holding){
       failHolding();
     }
@@ -809,6 +887,8 @@
     S.pointerDown=false;
     if(S.holding) failHolding();
   }, { passive:true });
+
+  // iOS対策：スクロール抑止
   canvas.addEventListener("touchstart", (e)=>{
     if(S.running) e.preventDefault();
   }, { passive:false });
@@ -817,6 +897,13 @@
   startBtn?.addEventListener("click", startGame);
   stopBtn?.addEventListener("click", stopGame);
   restartBtn?.addEventListener("click", restartGame);
+
+  // ===== Visibility (タブ離脱で停止) =====
+  document.addEventListener("visibilitychange", ()=>{
+    if(document.hidden && S.running){
+      stopGame();
+    }
+  }, { passive:true });
 
   // ===== Init =====
   function init(){
@@ -829,8 +916,10 @@
       if(Number.isFinite(music.duration) && music.duration > 5) S.duration = music.duration;
     });
 
-    // 初期からFX準備（任意）
     ensureFxCanvas();
+    updateExpression();
+    updateResonanceBar();
+    setLaneGuides(false);
   }
 
   if(document.readyState === "loading"){
