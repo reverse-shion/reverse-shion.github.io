@@ -1,6 +1,5 @@
 /* /di/js/main.js */
 (() => {
-  // ✅ main.js の場所を基準にして読み込む（HTML階層に依存しない）
   const BASE = new URL("./", document.currentScript?.src || location.href);
 
   const ENGINE_FILES = [
@@ -20,12 +19,9 @@
     return files.reduce((p, src) => {
       return p.then(() => new Promise((resolve, reject) => {
         const s = document.createElement("script");
-
-        // ✅ cache bust（GitHub Pagesの古キャッシュ対策）
         const u = new URL(src);
         u.searchParams.set("v", String(Date.now()));
         s.src = u.toString();
-
         s.onload = () => resolve();
         s.onerror = () => reject(new Error("Failed to load: " + src));
         document.head.appendChild(s);
@@ -56,6 +52,7 @@
   async function boot() {
     const app = $("app");
     const canvas = $("noteCanvas");
+    const hitZone = $("hitZone");           // ✅ 追加
     const bgVideo = $("bgVideo");
 
     const startBtn = $("startBtn");
@@ -66,7 +63,7 @@
     const seTap = $("seTap");
     const seGreat = $("seGreat");
 
-    if (!app || !canvas || !startBtn || !stopBtn || !restartBtn || !music) {
+    if (!app || !canvas || !hitZone || !startBtn || !stopBtn || !restartBtn || !music) {
       throw new Error("Missing required DOM elements (check ids).");
     }
 
@@ -90,7 +87,6 @@
     const E = window.DI_ENGINE;
     if (!E) throw new Error("DI_ENGINE not found. engine scripts failed to load.");
 
-    // ✅ スキンが本当に入ってるかログで確定させる
     console.log("[DiCo] noteSkin =", E.noteSkin?.name || "(none)");
 
     const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
@@ -112,12 +108,15 @@
 
     const render = new E.Renderer({ canvas, chart, timing });
 
+    // ✅ Inputは hitZone に付ける（canvasは pointer-events:none でもOKになる）
     const input = new E.Input({
-      element: canvas,
-      onTap: (x, y) => {
+      element: hitZone,
+      onTap: (x, y, t, ev) => {
+        // x,y は hitZone基準。FXは画面演出なのでそのままOK
         audio.playTap();
         fx.burstAt(x, y);
 
+        // 判定は「今の曲時間」でOK（入力時刻tを使いたいなら judge.hit(t) に後で拡張）
         const res = judge.hit(timing.getSongTime());
         ui.onJudge(res);
 
@@ -202,6 +201,8 @@
     ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
 
     render.resize();
+
+    // ✅ resize時にhitZoneのrectも更新（inputはhitZone基準になった）
     window.addEventListener("resize", () => { render.resize(); input.recalc(); });
 
     console.log("[DiCo] boot OK");
