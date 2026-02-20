@@ -1,0 +1,82 @@
+/* /di/css/themes.css */
+/* Theme tokens: colors, glass, gold ring, gradients */
+
+:root{
+  /* base */
+  --bg0:#05060b;
+  --bg1:#070816;
+
+  --text: rgba(245,245,242,.92);
+  --muted: rgba(245,245,242,.64);
+  --dim: rgba(245,245,242,.46);
+
+  --line: rgba(255,255,255,.14);
+  --line2: rgba(255,255,255,.09);
+
+  /* accent */
+  --cyan: rgba(0,240,255,.92);
+  --violet: rgba(156,60,255,.90);
+  --gold: rgba(230,201,107,.92);
+  --goldSoft: rgba(230,201,107,.22);
+  --danger: rgba(255,90,120,.92);
+
+  /* glass */
+  --glass: rgba(255,255,255,.06);
+  --glass2: rgba(255,255,255,.10);
+  --glass3: rgba(255,255,255,.14);
+
+  --blur: 14px;
+  --blur2: 22px;
+
+  /* shadow */
+  --sh1: 0 18px 55px rgba(0,0,0,.42);
+  --sh2: 0 10px 25px rgba(0,0,0,.36);
+  --inset: inset 0 1px 0 rgba(255,255,255,.10);
+
+  /* radius */
+  --r: 16px;
+  --r2: 22px;
+
+  /* sizing */
+  --hudW: 260px;          /* side hud width */
+  --hudGap: 14px;
+  --bottomH: 72px;
+
+  /* typography */
+  --font: ui-sans-serif, system-ui, -apple-system, "SF Pro Display","SF Pro Text",
+          "Hiragino Sans","Noto Sans JP","Segoe UI",sans-serif;
+
+  /* neon gradients */
+  --gradNeon: linear-gradient(135deg,
+    rgba(156,60,255,.85) 0%,
+    rgba(0,240,255,.80) 52%,
+    rgba(230,201,107,.78) 100%
+  );
+  --gradCyan: linear-gradient(180deg, rgba(0,240,255,.85), rgba(0,240,255,.15));
+  --gradViolet: linear-gradient(180deg, rgba(156,60,255,.85), rgba(156,60,255,.15));
+}
+
+/* subtle animated glow background helpers */
+@keyframes glowPulse {
+  0%   { transform: translate3d(0,0,0) scale(1); opacity:.55; }
+  50%  { transform: translate3d(0,0,0) scale(1.06); opacity:.85; }
+  100% { transform: translate3d(0,0,0) scale(1); opacity:.55; }
+}
+
+@keyframes ringSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes scanMove {
+  0%   { transform: translateY(-26px); opacity:.0; }
+  15%  { opacity:.55; }
+  50%  { opacity:.85; }
+  85%  { opacity:.55; }
+  100% { transform: translateY(26px); opacity:.0; }
+}
+
+@keyframes pop {
+  0% { transform: translateY(6px) scale(.98); opacity:0; }
+  100% { transform: translateY(0) scale(1); opacity:1; }
+}
