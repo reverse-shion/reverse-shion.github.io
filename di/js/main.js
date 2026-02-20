@@ -1,5 +1,13 @@
-/* /di/js/main.js (NO-STOP / START+RESTART STABLE / RESULT=もう一回) */
+/* /di/js/main.js
+   PHASE1 STABLE (START / STOP / RESTART)
+   - STOP = end to RESULT (no pause/resume complexity)
+   - Deterministic state machine: idle -> playing -> result
+   - iOS safe: unlock on first user gesture, no autoplay before gesture
+   - Robust: double-run guards, cleanup, safe media control
+*/
 (() => {
+  "use strict";
+
   const BASE = new URL("./", document.currentScript?.src || location.href);
 
   const ENGINE_FILES = [
@@ -11,24 +19,48 @@
     "engine/fx.js",
     "engine/ui.js",
     "notes/skin-tarot-pinkgold.js",
-  ].map(p => new URL(p, BASE).toString());
+  ].map((p) => new URL(p, BASE).toString());
 
   const $ = (id) => document.getElementById(id);
 
   // iOS当たりづらい時：0.06→0.08→0.10で調整
   const INPUT_LAT = 0.06;
 
+  /** Allowed states: idle | playing | result */
+  const STATES = Object.freeze({
+    IDLE: "idle",
+    PLAYING: "playing",
+    RESULT: "result",
+  });
+
+  function assertEl(el, name) {
+    if (!el) throw new Error(`Missing required DOM element: #${name}`);
+    return el;
+  }
+
+  function setState(app, s) {
+    app.dataset.state = s;
+  }
+
+  function getState(app) {
+    return app.dataset.state || STATES.IDLE;
+  }
+
   function loadScriptsSequentially(files) {
     return files.reduce((p, src) => {
-      return p.then(() => new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        const u = new URL(src);
-        u.searchParams.set("v", String(Date.now()));
-        s.src = u.toString();
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load: " + src));
-        document.head.appendChild(s);
-      }));
+      return p.then(
+        () =>
+          new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            const u = new URL(src);
+            // cache-bust (dev friendly)
+            u.searchParams.set("v", String(Date.now()));
+            s.src = u.toString();
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Failed to load: " + src));
+            document.head.appendChild(s);
+          })
+      );
     }, Promise.resolve());
   }
 
@@ -45,6 +77,7 @@
     const beat = 60 / bpm;
     const start = 1.2;
     const total = 60.0;
+
     for (let t = start, i = 0; t < total; t += beat, i++) {
       if (i % 2 === 0) notes.push({ t: +t.toFixed(3), type: "tap" });
       if (i % 16 === 8) notes.push({ t: +(t + beat * 0.5).toFixed(3), type: "tap" });
@@ -53,82 +86,100 @@
       meta: { title: "DiCo ARU Phase1 (fallback)", bpm },
       offset: 0.0,
       scroll: { approach: 1.25 },
-      notes
+      notes,
     };
   }
 
-  function setState(app, s) {
-    app.dataset.state = s;
-  }
-
   async function boot() {
-    const app = $("app");
-    const canvas = $("noteCanvas");
-    const hitZone = $("hitZone");
-    const bgVideo = $("bgVideo");
+    // ===== DOM =====
+    const app = assertEl($("app"), "app");
+    const canvas = assertEl($("noteCanvas"), "noteCanvas");
+    const hitZone = assertEl($("hitZone"), "hitZone");
 
-    const startBtn = $("startBtn");
-    const restartBtn = $("restartBtn");
+    const bgVideo = $("bgVideo"); // optional
 
-    const music = $("music");
+    const startBtn = assertEl($("startBtn"), "startBtn");
+    const stopBtn = $("stopBtn"); // optional but recommended
+    const restartBtn = assertEl($("restartBtn"), "restartBtn");
+
+    const music = assertEl($("music"), "music");
     const seTap = $("seTap");
     const seGreat = $("seGreat");
 
-    if (!app || !canvas || !hitZone || !startBtn || !restartBtn || !music) {
-      throw new Error("Missing required DOM elements (check ids).");
-    }
-
-    // bg video: never autoplay on load; control only after user gesture
-    try {
-      if (bgVideo) {
+    // ===== background video (never autoplay on load; control after gesture) =====
+    if (bgVideo) {
+      try {
         bgVideo.muted = true;
         bgVideo.playsInline = true;
         bgVideo.loop = true;
         bgVideo.preload = "metadata";
-        try { bgVideo.pause(); } catch {}
-      }
-    } catch {}
+        bgVideo.pause();
+      } catch {}
+    }
 
-    // chart
-    let chart = null;
-    try { chart = await fetchJSON("charts/chart_001.json"); }
-    catch (e) { chart = fallbackChart(); console.warn("[DiCo] chart fallback", e); }
+    // ===== chart =====
+    let chart;
+    try {
+      chart = await fetchJSON("charts/chart_001.json");
+    } catch (e) {
+      chart = fallbackChart();
+      console.warn("[DiCo] chart fallback:", e);
+    }
 
+    // ===== engine =====
     const E = window.DI_ENGINE;
     if (!E) throw new Error("DI_ENGINE not found.");
 
     const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
     const fx = new E.FX({ fxLayer: $("fxLayer") });
+
     const ui = new E.UI({
       app,
-      score: $("score"), combo: $("combo"), maxCombo: $("maxCombo"), timeDup: $("time_dup"),
-      sideScore: $("sideScore"), sideCombo: $("sideCombo"), sideMaxCombo: $("sideMaxCombo"), time: $("time"),
-      resValue: $("resValue"), resFill: $("resFill"), avatarRing: $("avatarRing"),
-      judge: $("judge"), judgeMain: $("judgeMain"), judgeSub: $("judgeSub"),
+      score: $("score"),
+      combo: $("combo"),
+      maxCombo: $("maxCombo"),
+      timeDup: $("time_dup"),
+
+      sideScore: $("sideScore"),
+      sideCombo: $("sideCombo"),
+      sideMaxCombo: $("sideMaxCombo"),
+      time: $("time"),
+
+      resValue: $("resValue"),
+      resFill: $("resFill"),
+      avatarRing: $("avatarRing"),
+
+      judge: $("judge"),
+      judgeMain: $("judgeMain"),
+      judgeSub: $("judgeSub"),
+
       result: $("result"),
-      resultScore: $("resultScore"), resultMaxCombo: $("resultMaxCombo"),
-      aruProg: $("aruProg"), aruValue: $("aruValue"), dicoLine: $("dicoLine"),
+      resultScore: $("resultScore"),
+      resultMaxCombo: $("resultMaxCombo"),
+
+      aruProg: $("aruProg"),
+      aruValue: $("aruValue"),
+      dicoLine: $("dicoLine"),
+
       ariaLive: $("ariaLive"),
       hitFlash: $("hitFlash"),
     });
 
-    // ===== GAME OBJECTS =====
-    let timing = null;
-    let judge = null;
-    let render = null;
+    // ===== game objects =====
+    let timing, judge, render;
 
     function rebuildGameObjects() {
       timing = new E.Timing({ chart });
-      judge  = new E.Judge({ chart, timing });
+      judge = new E.Judge({ chart, timing });
       render = new E.Renderer({ canvas, chart, timing });
       render.resize();
     }
     rebuildGameObjects();
 
-    // ===== LOOP =====
+    // ===== loop =====
     let raf = 0;
     let running = false;
-    let starting = false;
+    let transitionLock = false;
 
     function stopRAF() {
       if (raf) cancelAnimationFrame(raf);
@@ -142,9 +193,7 @@
       const t = timing.getSongTime();
       if (!Number.isFinite(t)) return;
 
-      // miss sweep for stability
       judge.sweepMiss(t);
-
       render.draw(t);
 
       ui.update({
@@ -153,131 +202,170 @@
         combo: judge.state.combo,
         maxCombo: judge.state.maxCombo,
         resonance: judge.state.resonance,
-        state: app.dataset.state
+        state: getState(app),
       });
 
-      if (timing.isEnded(t)) endGame();
+      if (timing.isEnded(t)) endToResult("ENDED");
     }
 
-    // ===== MEDIA HELPERS =====
+    // ===== media helpers =====
     async function playBackground() {
-      try { await bgVideo?.play(); } catch {}
+      if (!bgVideo) return;
+      try {
+        await bgVideo.play();
+      } catch {}
     }
+
     function pauseBackground() {
-      try { bgVideo?.pause(); } catch {}
+      if (!bgVideo) return;
+      try {
+        bgVideo.pause();
+      } catch {}
+    }
+
+    async function resetAndPlayMedia() {
+      // music reset + play
+      try {
+        music.pause();
+        music.currentTime = 0;
+      } catch {}
+
+      try {
+        await music.play();
+      } catch {}
+
+      // bg video play (if exists)
+      await playBackground();
+    }
+
+    function stopMediaForResult() {
+      try {
+        music.pause();
+      } catch {}
+      pauseBackground();
     }
 
     function setStartLabelForState(state) {
-      // idle/playing は START、result は もう一回
-      startBtn.textContent = (state === "result") ? "もう一回" : "START";
+      startBtn.textContent = state === STATES.RESULT ? "もう一回" : "START";
     }
 
-    // ===== ACTIONS =====
+    // ===== transitions =====
+    async function startFromIdleOrResult() {
+      if (transitionLock) return;
+      if (getState(app) === STATES.PLAYING) return;
 
-    // START: only from idle/result. (No pause/resume in Phase1)
-    async function startGame() {
-      if (starting) return;
-      const state = app.dataset.state;
-      if (state === "playing") return; // ignore during gameplay
+      transitionLock = true;
 
-      starting = true;
-
+      // user gesture unlock (iOS)
       await audio.unlock();
 
-      // fresh objects
+      // fresh objects for a clean run
       rebuildGameObjects();
-
-      // reset media
-      try { music.pause(); music.currentTime = 0; } catch {}
-      pauseBackground(); // idle keeps cpu low
-
       judge.reset();
 
-      // timing: guarantee start at 0
-      if (typeof timing.restart === "function") timing.restart(audio);
-      else timing.start(audio, { reset: true });
+      // timing start at 0
+      try {
+        if (typeof timing.restart === "function") timing.restart(audio);
+        else timing.start(audio, { reset: true });
+      } catch (e) {
+        console.warn("[DiCo] timing start error:", e);
+      }
 
-      setState(app, "playing");
-      setStartLabelForState("playing");
-      running = true;
+      // state first (so CSS flips immediately)
+      setState(app, STATES.PLAYING);
+      setStartLabelForState(STATES.PLAYING);
 
+      // UI cleanup
       ui.hideResult();
       ui.toast("START");
 
-      // play media (user gesture already happened)
-      try { await music.play(); } catch {}
-      await playBackground();
-
+      // run loop
+      running = true;
       stopRAF();
       tick();
 
-      starting = false;
+      // media after state (gesture already happened)
+      await resetAndPlayMedia();
+
+      transitionLock = false;
     }
 
-    // RESTART: always from beginning (playing/result/idle all OK)
-    async function restartGame() {
-      if (starting) return;
-      starting = true;
+    async function restartAlways() {
+      if (transitionLock) return;
+      transitionLock = true;
 
+      // stop loop
       running = false;
       stopRAF();
 
-      try { music.pause(); } catch {}
+      // stop media
+      try {
+        music.pause();
+      } catch {}
       pauseBackground();
 
       await audio.unlock();
 
+      // rebuild for clean start
       rebuildGameObjects();
-
-      try { music.currentTime = 0; } catch {}
-      // bgVideo currentTime reset is optional (heavy on iOS). Keep off by default.
-      // try { if (bgVideo) bgVideo.currentTime = 0; } catch {}
-
       judge.reset();
 
-      if (typeof timing.restart === "function") timing.restart(audio);
-      else timing.start(audio, { reset: true });
+      // timing restart
+      try {
+        if (typeof timing.restart === "function") timing.restart(audio);
+        else timing.start(audio, { reset: true });
+      } catch (e) {
+        console.warn("[DiCo] timing restart error:", e);
+      }
 
-      setState(app, "playing");
-      setStartLabelForState("playing");
-      running = true;
+      // state
+      setState(app, STATES.PLAYING);
+      setStartLabelForState(STATES.PLAYING);
 
+      // UI
       ui.hideResult();
       ui.toast("RESTART");
 
-      try { await music.play(); } catch {}
-      await playBackground();
-
+      // loop
+      running = true;
       stopRAF();
       tick();
 
-      starting = false;
+      // media
+      await resetAndPlayMedia();
+
+      transitionLock = false;
     }
 
-    function endGame() {
+    function endToResult(reason = "STOP") {
+      if (getState(app) === STATES.RESULT) return; // double-run guard
+
       running = false;
       stopRAF();
 
-      try { timing.stop(audio); } catch {}
-      try { music.pause(); } catch {}
-      pauseBackground(); // result: pause video to save CPU
+      try {
+        timing?.stop?.(audio);
+      } catch {}
 
-      setState(app, "result");
-      setStartLabelForState("result");
+      stopMediaForResult();
+
+      setState(app, STATES.RESULT);
+      setStartLabelForState(STATES.RESULT);
 
       ui.showResult({
         score: judge.state.score,
         maxCombo: judge.state.maxCombo,
-        resonance: judge.state.resonance
+        resonance: judge.state.resonance,
       });
-      ui.toast("RESULT");
+
+      ui.toast(reason === "ENDED" ? "RESULT" : "STOP");
     }
 
-    // ===== INPUT =====
+    // ===== input =====
     const input = new E.Input({
       element: hitZone,
       onTap: (x, y) => {
-        if (!running || app.dataset.state !== "playing") return;
+        if (!running || getState(app) !== STATES.PLAYING) return;
 
         audio.playTap();
         fx.burstAt(x, y);
@@ -285,9 +373,7 @@
         const t = timing.getSongTime();
         if (!Number.isFinite(t)) return;
 
-        // hit + latency
         const res = judge.hit(t + INPUT_LAT);
-
         ui.onJudge(res);
 
         if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
@@ -295,37 +381,63 @@
           ui.flashHit();
           fx.sparkLine();
         }
-      }
+      },
     });
 
-    // ===== BUTTONS =====
-    // START button doubles as "もう一回" in result state
-    startBtn.addEventListener("click", () => startGame());
-    restartBtn.addEventListener("click", () => restartGame());
+    // ===== buttons =====
+    // START: idle/result -> playing
+    startBtn.addEventListener("click", () => startFromIdleOrResult());
 
-    // Optional: keyboard helpers (desktop)
+    // STOP: playing -> result (NO-PAUSE; deterministic)
+    if (stopBtn) {
+      stopBtn.addEventListener("click", () => {
+        if (!running || getState(app) !== STATES.PLAYING) return;
+        endToResult("STOP");
+      });
+    }
+
+    // RESTART: always -> playing from beginning
+    restartBtn.addEventListener("click", () => restartAlways());
+
+    // Optional: keyboard (desktop)
     window.addEventListener("keydown", (e) => {
       if (e.repeat) return;
-      if (e.code === "Enter" || e.code === "Space") startGame();
-      if (e.key?.toLowerCase?.() === "r") restartGame();
+      if (e.code === "Enter" || e.code === "Space") startFromIdleOrResult();
+      if (e.key?.toLowerCase?.() === "r") restartAlways();
+      if (e.key?.toLowerCase?.() === "s") endToResult("STOP");
     });
 
-    // ===== INIT =====
-    setState(app, "idle");
-    setStartLabelForState("idle");
+    // ===== init =====
+    setState(app, STATES.IDLE);
+    setStartLabelForState(STATES.IDLE);
 
     // ensure background is not running in idle
     pauseBackground();
 
-    ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
+    ui.update({
+      t: 0,
+      score: 0,
+      combo: 0,
+      maxCombo: 0,
+      resonance: 0,
+      state: STATES.IDLE,
+    });
 
     // resize
-    window.addEventListener("resize", () => {
-      try { render?.resize(); } catch {}
-      try { input.recalc(); } catch {}
-    }, { passive: true });
+    window.addEventListener(
+      "resize",
+      () => {
+        try {
+          render?.resize?.();
+        } catch {}
+        try {
+          input?.recalc?.();
+        } catch {}
+      },
+      { passive: true }
+    );
 
-    console.log("[DiCo] boot OK (NO-STOP; start/restart stable; result label ok)");
+    console.log("[DiCo] boot OK (Phase1 stable: START/STOP/RESTART; STOP=endToResult)");
   }
 
   loadScriptsSequentially(ENGINE_FILES)
