@@ -1,42 +1,100 @@
 /* /di/css/lane.css */
-/* Gameplay lane / hit zone / target / judge / result */
+/* DiCo LANE – neon thin lane + bright judge + readable target + result */
 
 .hitZone{
   position:absolute;
-  inset: 0;
+  inset:0;
   z-index:4;
   pointer-events:none;
 }
 
-/* Make the visible lane area thin so the dance video is seen */
+/* =========================
+   CENTER LANE (thin + full height + neon edges)
+   - Always centered
+   - Extends beyond screen a bit
+   - Edge neon lines
+   ========================= */
 .stage::before{
   content:"";
   position:absolute;
-  left: 50%;
-  top: calc(env(safe-area-inset-top) + 22px);
+  left:50%;
+  top:-10vh;              /* extend beyond top */
+  bottom:-12vh;           /* extend beyond bottom */
   transform: translateX(-50%);
-  width: min(420px, 70vw);
-  height: calc(100% - (var(--bottomH) + 34px + env(safe-area-inset-bottom)));
+
+  /* ✅ thin: just enough for notes */
+  width: min(220px, 54vw);
+
   z-index:4;
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  outline: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 0 0 1px rgba(0,240,255,.06), 0 22px 65px rgba(0,0,0,.30);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   pointer-events:none;
-  opacity:.70;
+
+  border-radius: 28px;
+
+  /* glass lane body */
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.10),
+      rgba(255,255,255,.03)
+    );
+
+  outline: 1px solid rgba(255,255,255,.10);
+
+  /* ✅ neon edges + subtle depth */
+  box-shadow:
+    inset 3px 0 0 rgba(0,240,255,.62),     /* left cyan edge */
+    inset -3px 0 0 rgba(156,60,255,.52),   /* right violet edge */
+    inset 0 0 42px rgba(0,240,255,.08),
+    0 0 0 1px rgba(0,240,255,.10),
+    0 22px 70px rgba(0,0,0,.18);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  opacity:.82;
 }
 
-/* TARGET core */
+/* soft moving shimmer inside lane (DiCo vibe) */
+.stage::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:-10vh;
+  bottom:-12vh;
+  transform: translateX(-50%);
+  width: min(220px, 54vw);
+  z-index:4;
+  pointer-events:none;
+  border-radius: 28px;
+
+  background:
+    linear-gradient(115deg,
+      transparent 0%,
+      rgba(0,240,255,.16) 22%,
+      rgba(156,60,255,.12) 48%,
+      rgba(230,201,107,.10) 62%,
+      transparent 80%
+    );
+  mix-blend-mode: screen;
+  opacity:.45;
+  filter: blur(.2px);
+  animation: laneShimmer 2.6s linear infinite;
+}
+
+@keyframes laneShimmer{
+  0%   { background-position: -240px 0; }
+  100% { background-position:  240px 0; }
+}
+
+/* =========================
+   TARGET (brighter + cleaner)
+   ========================= */
 .targetRoot{
   position:absolute;
   left:50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 180px;
-  height: 180px;
+  width: 176px;
+  height: 176px;
   z-index:6;
   pointer-events:none;
 }
@@ -49,54 +107,79 @@
 
 .targetOuter{
   background:
-    radial-gradient(circle at 50% 50%, rgba(0,0,0,.0) 45%, rgba(0,0,0,.40) 78%, rgba(0,0,0,.55) 100%);
-  outline: 1px solid rgba(255,255,255,.10);
-  box-shadow: 0 12px 44px rgba(0,0,0,.42);
-}
-.targetCore{
-  inset: 42px;
-  background:
-    radial-gradient(circle at 45% 40%, rgba(255,255,255,.18), rgba(255,255,255,.06) 40%, rgba(0,0,0,.18) 76%);
-  border: 1px solid rgba(255,255,255,.14);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.targetRing{
-  inset: 14px;
-  border: 2px solid rgba(0,240,255,.22);
+    radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.06) 0%,
+      rgba(255,255,255,.04) 44%,
+      rgba(0,0,0,.16) 78%,
+      rgba(0,0,0,.22) 100%);
+  outline: 1px solid rgba(255,255,255,.14);
   box-shadow:
-    0 0 0 1px rgba(156,60,255,.10),
-    0 0 20px rgba(0,240,255,.16),
-    0 0 26px rgba(230,201,107,.10);
+    0 10px 40px rgba(0,0,0,.22),
+    0 0 32px rgba(0,240,255,.10);
+}
+
+.targetCore{
+  inset: 44px;
+  background:
+    radial-gradient(circle at 45% 40%,
+      rgba(255,255,255,.26),
+      rgba(255,255,255,.10) 40%,
+      rgba(0,0,0,.10) 76%);
+  border: 1px solid rgba(255,255,255,.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.targetRing{
+  inset: 12px;
+  border: 2px solid rgba(0,240,255,.34);
+  box-shadow:
+    0 0 0 1px rgba(156,60,255,.14),
+    0 0 22px rgba(0,240,255,.22),
+    0 0 34px rgba(156,60,255,.18),
+    0 0 26px rgba(230,201,107,.12);
 }
 
 /* scan line */
 .scanLine{
   position:absolute;
-  left: 18px;
-  right: 18px;
+  left: 16px;
+  right: 16px;
   top: 50%;
   height: 2px;
   transform: translateY(-50%);
-  background: linear-gradient(90deg, transparent, rgba(0,240,255,.65), transparent);
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(0,240,255,.88),
+    rgba(156,60,255,.62),
+    transparent);
+  opacity:0;
   filter: blur(.2px);
-  opacity:.0;
-  animation: scanMove 1.25s ease-in-out infinite;
+  animation: scanMove 1.15s ease-in-out infinite;
+}
+@keyframes scanMove{
+  0%,100%{ transform: translateY(-50%) scaleX(.92); }
+  50%    { transform: translateY(-50%) scaleX(1.06); }
 }
 
-/* flash on hit (engine toggles) */
+/* flash on hit (engine toggles opacity) */
 .hitFlash{
   position:absolute;
-  inset:-8px;
+  inset:-10px;
   border-radius:999px;
-  background: radial-gradient(circle at 50% 50%, rgba(0,240,255,.28), transparent 62%);
+  background: radial-gradient(circle at 50% 50%,
+    rgba(0,240,255,.38),
+    rgba(156,60,255,.18) 42%,
+    transparent 68%);
   opacity:0;
   transform: scale(.98);
   transition: opacity .10s ease, transform .10s ease;
 }
-.app[data-state="playing"] .scanLine{ opacity:.9; }
+.app[data-state="playing"] .scanLine{ opacity:.92; }
 
-/* JUDGE */
+/* =========================
+   JUDGE (bright + readable)
+   ========================= */
 .judge{
   position:absolute;
   left:50%;
@@ -105,28 +188,44 @@
   z-index:7;
   pointer-events:none;
   text-align:center;
-  padding: 10px 14px;
+
+  padding: 10px 16px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.20);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.14);  /* ✅ brighter */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow:
+    0 12px 38px rgba(0,0,0,.18),
+    0 0 26px rgba(0,240,255,.14);
+
   opacity:0;
 }
+
 .judgeMain{
   font-size: 20px;
   font-weight: 1000;
   letter-spacing: .10em;
+  text-shadow:
+    0 0 22px rgba(0,240,255,.22),
+    0 0 14px rgba(156,60,255,.16);
 }
+
 .judgeSub{
   margin-top: 2px;
   font-size: 11px;
   letter-spacing: .22em;
-  color: var(--muted);
+  color: rgba(245,245,242,.78);
 }
 
-/* RESULT modal */
+/* show/hide states */
+#judge[aria-hidden="false"]{ opacity:1; }
+
+/* =========================
+   RESULT modal
+   ========================= */
 .result{
   position:absolute;
   inset:0;
@@ -135,50 +234,74 @@
   align-items:center;
   justify-content:center;
   padding: 18px;
-  background: rgba(0,0,0,.48);
+
+  /* slightly lighter than “movie black” */
+  background: rgba(0,0,0,.34);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+
   opacity:0;
   pointer-events:none;
 }
+
 .resultCard{
   width: min(520px, 92vw);
   border-radius: var(--r2);
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.08);
-  box-shadow: var(--sh1);
+  border: 1px solid rgba(255,255,255,.18);
+
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.14),
+      rgba(255,255,255,.08)
+    );
+
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.24),
+    0 0 40px rgba(0,240,255,.10);
+
   padding: 18px 18px 16px;
   animation: pop .18s ease both;
 }
+
+@keyframes pop{
+  from{ transform: translateY(8px) scale(.98); opacity:.0; }
+  to  { transform: translateY(0)  scale(1);   opacity:1; }
+}
+
 .resultTitle{
   font-weight: 1000;
   letter-spacing: .22em;
   font-size: 14px;
-  color: var(--muted);
+  color: rgba(245,245,242,.78);
 }
+
 .resultRow{
   display:flex;
   justify-content:space-between;
   align-items:baseline;
   padding: 10px 0 0;
 }
+
 .resultKey{
-  color: var(--muted);
+  color: rgba(245,245,242,.68);
   letter-spacing:.14em;
   font-size: 12px;
 }
+
 .resultVal{
   font-weight: 1000;
   font-size: 18px;
 }
+
 .resultDivider{
   height:1px;
-  background: rgba(255,255,255,.12);
+  background: rgba(255,255,255,.14);
   margin: 14px 0;
 }
 
 /* ARU ring */
 .aruWrap{ display:flex; flex-direction:column; gap: 10px; align-items:center; }
+
 .aruRing{
   width: 220px;
   height: 220px;
@@ -186,16 +309,21 @@
   display:grid;
   place-items:center;
 }
+
 .aruSvg{
   width: 220px;
   height: 220px;
-  filter: drop-shadow(0 14px 40px rgba(0,0,0,.35));
+  filter:
+    drop-shadow(0 14px 40px rgba(0,0,0,.26))
+    drop-shadow(0 0 22px rgba(0,240,255,.12));
 }
+
 .aruTrack{
   fill:none;
-  stroke: rgba(255,255,255,.12);
+  stroke: rgba(255,255,255,.14);
   stroke-width: 10;
 }
+
 .aruProg{
   fill:none;
   stroke: url(#aruGrad);
@@ -205,29 +333,33 @@
   stroke-dashoffset: 276.46;
   transition: stroke-dashoffset .18s ease;
 }
+
 .aruText{
   position:absolute;
   text-align:center;
 }
+
 .aruLabel{
   font-size: 11px;
   letter-spacing: .22em;
-  color: var(--muted);
+  color: rgba(245,245,242,.72);
 }
+
 .aruValue{
   margin-top: 4px;
   font-size: 22px;
   font-weight: 1000;
+  text-shadow: 0 0 20px rgba(0,240,255,.14);
 }
+
 .dicoLine{
   text-align:center;
   max-width: 460px;
   font-size: 13px;
-  color: var(--text);
-  opacity:.92;
+  color: rgba(245,245,242,.92);
 }
 
-/* show/hide states (main.js can set data-state and aria-hidden) */
+/* state */
 .app[data-state="result"] #result{
   opacity:1;
   pointer-events:auto;
@@ -235,14 +367,21 @@
 .app[data-state="result"] .judge{
   opacity:0 !important;
 }
-
-/* fallback: if you toggle #judge / #result aria-hidden in JS */
-#judge[aria-hidden="false"]{ opacity:1; }
 #result[aria-hidden="false"]{ opacity:1; pointer-events:auto; }
 
-/* mobile tweaks */
+/* =========================
+   Mobile tweaks
+   ========================= */
 @media (max-width: 720px){
   .targetRoot{ width: 160px; height: 160px; }
-  .judge{ top: calc(50% - 130px); }
+  .judge{ top: calc(50% - 132px); }
   .aruRing, .aruSvg{ width: 200px; height: 200px; }
+}
+
+@media (max-width: 560px){
+  .stage::before,
+  .stage::after{
+    width: min(200px, 58vw);
+    border-radius: 26px;
+  }
 }
