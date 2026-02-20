@@ -1,6 +1,129 @@
 /* /di/css/hud.css */
-/* SIDE HUD: left score/combo + right player/resonance + avatar ring */
+/* ============================================================
+   HUD + UI Layer Control (STATE / Z-INDEX / CONTROLS)
+   - Keep lane.css focused on stage visuals only
+   - This file owns:
+     1) Side HUD layout
+     2) Button visibility by app[data-state]
+     3) Global z-index layer order (safe, deterministic)
+     4) Idle tagline visibility priority (text above lanes)
+   ============================================================ */
 
+/* ------------------------------------------------------------
+   0) SAFE GLOBAL LAYER ORDER (deterministic)
+   ------------------------------------------------------------ */
+.app{
+  position: relative;
+  overflow: hidden;
+}
+
+/* Base layers (bg) */
+.bgVideo{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Idle still stack (image + particles + tagline) */
+.idleBg{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Ensure idle line stays readable */
+.idleLine{
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom) + var(--bottomH) + 18px);
+  z-index: 2;
+  pointer-events: none;
+  text-shadow: 0 12px 32px rgba(0,0,0,.55);
+}
+
+/* Stage (lanes/canvas/target) */
+.stage{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+/* FX should sit above stage but never block taps */
+.fxLayer{
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Side HUD above everything interactive */
+.sideHud{
+  z-index: 6;
+  pointer-events: none; /* HUD shouldn't block taps */
+}
+
+/* Bottom controls above stage */
+.bottom{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 10px);
+  z-index: 7;
+}
+
+/* ------------------------------------------------------------
+   1) STATE VISIBILITY (fix: idle should be “one illustration”)
+   - idle: show idleBg + idleLine, hide stage + video
+   - playing: show stage + video, hide idleBg
+   - result: show stage + video (or your preference), hide idleBg
+   ------------------------------------------------------------ */
+.app[data-state="idle"] .stage{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.app[data-state="idle"] .bgVideo{
+  opacity: 0;
+  visibility: hidden;
+}
+
+.app[data-state="playing"] .idleBg,
+.app[data-state="result"] .idleBg{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Optional: keep idle line only in idle (recommended) */
+.app[data-state="playing"] .idleLine,
+.app[data-state="result"] .idleLine{
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ------------------------------------------------------------
+   2) CONTROLS VISIBILITY BY STATE
+   Fixes:
+   - START must not appear during playing
+   - STOP must not appear in idle/result
+   ------------------------------------------------------------ */
+.app[data-state="idle"] #startBtn{ display: inline-flex; }
+.app[data-state="idle"] #stopBtn,
+.app[data-state="idle"] #restartBtn{ display: none; }
+
+.app[data-state="playing"] #startBtn{ display: none; }
+.app[data-state="playing"] #stopBtn,
+.app[data-state="playing"] #restartBtn{ display: inline-flex; }
+
+.app[data-state="result"] #startBtn,
+.app[data-state="result"] #stopBtn{ display: none; }
+.app[data-state="result"] #restartBtn{ display: inline-flex; }
+
+/* ------------------------------------------------------------
+   3) SIDE HUD: left score/combo + right player/resonance + avatar ring
+   ------------------------------------------------------------ */
 .sideHud{
   position:absolute;
   top: calc(env(safe-area-inset-top) + 12px);
@@ -9,8 +132,6 @@
   display:flex;
   flex-direction:column;
   gap: 12px;
-  z-index:9;
-  pointer-events:none; /* HUD shouldn't block taps */
 }
 
 .sideHudLeft{
@@ -48,9 +169,7 @@
   pointer-events:none;
 }
 
-.sideScore{
-  padding-top: 14px;
-}
+.sideScore{ padding-top: 14px; }
 .sideScoreValue{
   position:relative;
   font-size: 32px;
@@ -100,9 +219,7 @@
 }
 
 /* player card */
-.sidePlayer{
-  padding: 12px;
-}
+.sidePlayer{ padding: 12px; }
 .sideTop{
   position:relative;
   display:flex;
@@ -137,7 +254,6 @@
   inset:-6px;
   border-radius:999px;
   background: var(--gradNeon);
-  filter: blur(.0px);
   opacity:.92;
   box-shadow:
     0 0 0 1px rgba(255,255,255,.14),
