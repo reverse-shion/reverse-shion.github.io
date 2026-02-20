@@ -1,4 +1,4 @@
-/* /di/js/main.js */
+/* /di/js/main.js (STABLE FULL) */
 (() => {
   const BASE = new URL("./", document.currentScript?.src || location.href);
 
@@ -13,19 +13,25 @@
     "notes/skin-tarot-pinkgold.js",
   ].map(p => new URL(p, BASE).toString());
 
-  function $(id) { return document.getElementById(id); }
+  const $ = (id) => document.getElementById(id);
+
+  // ★ iOS入力遅延補正（当たりにくい時は 0.06〜0.12 で調整）
+  const INPUT_LAT = 0.06;
 
   function loadScriptsSequentially(files) {
     return files.reduce((p, src) => {
-      return p.then(() => new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        const u = new URL(src);
-        u.searchParams.set("v", String(Date.now()));
-        s.src = u.toString();
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load: " + src));
-        document.head.appendChild(s);
-      }));
+      return p.then(
+        () =>
+          new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            const u = new URL(src);
+            u.searchParams.set("v", String(Date.now())); // cache bust
+            s.src = u.toString();
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Failed to load: " + src));
+            document.head.appendChild(s);
+          })
+      );
     }, Promise.resolve());
   }
 
@@ -49,10 +55,29 @@
     return { meta: { title: "DiCo ARU Phase1 (fallback)", bpm }, offset: 0.0, scroll: { approach: 1.25 }, notes };
   }
 
+  // notes t が ms っぽい時は秒に寄せる（安全策）
+  function normalizeChartTime(chart) {
+    const first = chart?.notes?.[0]?.t;
+    if (typeof first !== "number") return chart;
+
+    // 例: 12000 とかなら ms の可能性が高い
+    const msLike = first > 1000;
+    if (!msLike) return chart;
+
+    const fixed = {
+      ...chart,
+      notes: (chart.notes || []).map(n => ({ ...n, t: (n.t || 0) / 1000 })),
+      offset: (chart.offset || 0) / 1000,
+    };
+    console.warn("[DiCo] chart time looks like ms. normalized to seconds.");
+    return fixed;
+  }
+
   async function boot() {
+    // ===== DOM =====
     const app = $("app");
     const canvas = $("noteCanvas");
-    const hitZone = $("hitZone");           // ✅ 追加
+    const hitZone = $("hitZone");
     const bgVideo = $("bgVideo");
 
     const startBtn = $("startBtn");
@@ -67,15 +92,20 @@
       throw new Error("Missing required DOM elements (check ids).");
     }
 
+    // ===== background video init (idleでも流したいならここをONにする) =====
+    // 「STOPでも流し続けたい」なら true に。
+    const BG_ALWAYS_PLAY = false;
+
     try {
       if (bgVideo) {
         bgVideo.muted = true;
         bgVideo.playsInline = true;
         bgVideo.loop = true;
-        bgVideo.play().catch(() => {});
+        if (BG_ALWAYS_PLAY) bgVideo.play().catch(() => {});
       }
     } catch {}
 
+    // ===== chart =====
     let chart = null;
     try {
       chart = await fetchJSON("charts/chart_001.json");
@@ -83,7 +113,9 @@
       chart = fallbackChart();
       console.warn("[DiCo] chart json not found. Using fallback.", e);
     }
+    chart = normalizeChartTime(chart);
 
+    // ===== engine =====
     const E = window.DI_ENGINE;
     if (!E) throw new Error("DI_ENGINE not found. engine scripts failed to load.");
 
@@ -108,16 +140,55 @@
 
     const render = new E.Renderer({ canvas, chart, timing });
 
-    // ✅ Inputは hitZone に付ける（canvasは pointer-events:none でもOKになる）
+    // ===== state =====
+    let raf = 0;
+    let running = false;
+    let starting = false; // 二重スタート防止
+
+    // ===== helpers =====
+    function stopRAF() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+    }
+
+    async function hardResetMedia({ resetVideo = false } = {}) {
+      // musicを確実に止めて先頭へ
+      try { music.pause(); } catch {}
+      try { music.currentTime = 0; } catch {}
+
+      // bgVideoも止める/戻す（必要時）
+      if (bgVideo) {
+        try { bgVideo.pause(); } catch {}
+        if (resetVideo) {
+          try { bgVideo.currentTime = 0; } catch {}
+        }
+      }
+    }
+
+    async function safePlayMedia() {
+      // iOSはplayが弾かれることがあるので握りつぶす
+      try { await music.play(); } catch (e) { /* blocked OK */ }
+      if (bgVideo) {
+        try { await bgVideo.play(); } catch (e) { /* blocked OK */ }
+      }
+    }
+
+    function setState(state) {
+      app.dataset.state = state;
+    }
+
+    // ===== input =====
     const input = new E.Input({
       element: hitZone,
       onTap: (x, y, t, ev) => {
-        // x,y は hitZone基準。FXは画面演出なのでそのままOK
+        // playing中だけ反応（idle/resultで誤爆防止）
+        if (!running || app.dataset.state !== "playing") return;
+
         audio.playTap();
         fx.burstAt(x, y);
 
-        // 判定は「今の曲時間」でOK（入力時刻tを使いたいなら judge.hit(t) に後で拡張）
-        const res = judge.hit(timing.getSongTime());
+        // ★iOS用: 入力補正を足して判定
+        const res = judge.hit(timing.getSongTime() + INPUT_LAT);
         ui.onJudge(res);
 
         if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
@@ -128,12 +199,10 @@
       }
     });
 
-    let raf = 0;
-    let running = false;
-
+    // ===== loop =====
     function tick() {
+      if (!running) return;           // ✅ running中だけ動作
       raf = requestAnimationFrame(tick);
-      if (!running) return;
 
       const t = timing.getSongTime();
       render.draw(t);
@@ -150,36 +219,63 @@
       if (timing.isEnded(t)) endGame();
     }
 
-    async function startGame() {
-      if (running) return;
+    // ===== actions =====
+    async function startGame({ fromRestart = false } = {}) {
+      if (running || starting) return;
+      starting = true;
+
+      // unlock（ユーザー操作に紐づく開始時に必ず）
       await audio.unlock();
-      try { bgVideo?.play().catch(() => {}); } catch {}
+
+      // 重要：毎回確実に「最初から」始める
+      await hardResetMedia({ resetVideo: false });
 
       judge.reset();
       timing.start(audio);
 
-      app.dataset.state = "playing";
+      setState("playing");
       running = true;
 
       ui.hideResult();
-      ui.toast("START");
+      ui.toast(fromRestart ? "RESTART" : "START");
 
-      cancelAnimationFrame(raf);
+      // media再生（ブロックされてもゲームは進む設計）
+      await safePlayMedia();
+
+      stopRAF();
       tick();
+
+      starting = false;
     }
 
     function stopGame() {
       if (!running) return;
+
       running = false;
+      stopRAF();
       timing.stop(audio);
-      app.dataset.state = "idle";
+
+      // STOPで背景も止める（常に流したいなら BG_ALWAYS_PLAY=true にしてここを外す）
+      if (!BG_ALWAYS_PLAY) {
+        try { bgVideo?.pause(); } catch {}
+      }
+
+      setState("idle");
       ui.toast("STOP");
     }
 
     function endGame() {
+      if (!running && app.dataset.state === "result") return;
+
       running = false;
+      stopRAF();
       timing.stop(audio);
-      app.dataset.state = "result";
+
+      if (!BG_ALWAYS_PLAY) {
+        try { bgVideo?.pause(); } catch {}
+      }
+
+      setState("result");
       ui.showResult({
         score: judge.state.score,
         maxCombo: judge.state.maxCombo,
@@ -190,20 +286,23 @@
 
     async function restartGame() {
       stopGame();
-      await startGame();
+      await startGame({ fromRestart: true });
     }
 
+    // ===== bind buttons =====
     startBtn.addEventListener("click", () => startGame());
     stopBtn.addEventListener("click", () => stopGame());
     restartBtn.addEventListener("click", () => restartGame());
 
-    app.dataset.state = "idle";
+    // ===== init =====
+    setState("idle");
     ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
 
     render.resize();
-
-    // ✅ resize時にhitZoneのrectも更新（inputはhitZone基準になった）
-    window.addEventListener("resize", () => { render.resize(); input.recalc(); });
+    window.addEventListener("resize", () => {
+      render.resize();
+      input.recalc();
+    }, { passive: true });
 
     console.log("[DiCo] boot OK");
   }
