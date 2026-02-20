@@ -1,4 +1,4 @@
-<!-- di.html -->
+<!-- di.html (FINAL for di.css + di.js) -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -14,107 +14,94 @@
 <body>
 <main class="app" id="app" data-state="idle" aria-label="DiCo ARU Rhythm">
 
-  <!-- 背景（Phase1は“青×ネイビー”が主役。動画は薄く） -->
+  <!-- 背景動画（薄め表示はCSS側） -->
   <video id="bgVideo" class="bgVideo"
          src="video/di_dance.mp4"
          playsinline muted loop preload="metadata"></video>
 
-  <!-- FX（タップ貫通） -->
+  <!-- FX（粒子キャンバスがここに生える） -->
   <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
 
   <!-- =========================
-       SIDE HUD (LEFT / RIGHT)
-       ========================= -->
-
-  <!-- 左バー：スコア/コンボ（スクショの左UI寄せ） -->
-  <aside class="sideHud sideHudLeft" aria-label="Left HUD">
-    <div class="sideCard sideScore" role="group" aria-label="Score">
-      <div class="sideScoreValue" id="sideScore">012450</div>
-    </div>
-
-    <div class="sideCard sideCombo" role="group" aria-label="Combo">
-      <div class="sideComboValue" id="sideCombo">38</div>
-      <div class="sideComboLabel">COMBO</div>
-    </div>
-  </aside>
-
-  <!-- 右バー：DiCo / Resonance / Avatar -->
-  <aside class="sideHud sideHudRight" aria-label="Right HUD">
-    <div class="sideTop" role="group" aria-label="Player and avatar">
-      <div class="sideName">
-        <div class="sideNameMain" id="playerName">DiCo</div>
-        <div class="sideNameSub">RESONANCE</div>
-      </div>
-
-      <!-- アバター枠（リング） -->
-      <div class="sideAvatar" aria-label="DiCo avatar">
-        <!-- 表情3段階：画像はあなたが用意して差し替え -->
-        <!-- JSで data-face を見て切替する想定 -->
-        <img
-          id="dicoFace"
-          class="dicoFace"
-          src="assets/dico_face_1.png"
-          data-face="1"
-          alt="DiCo face"
-          draggable="false"
-          decoding="async"
-          loading="eager"
-        />
-      </div>
-    </div>
-
-    <!-- Resonanceゲージ -->
-    <div class="sideGauge" role="group" aria-label="Resonance gauge">
-      <div class="sideGaugeBar" aria-hidden="true">
-        <div class="sideGaugeFill" id="resFill" style="width:73%;"></div>
-      </div>
-      <div class="sideGaugeValue" aria-label="Resonance value">
-        <span id="resValue">73</span><span class="pct">%</span>
-      </div>
-
-      <!-- 表情切替用の素材をHTMLに“置いておく”方式（JSでshow/hide切替も可能） -->
-      <!-- 使わないなら削除OK。後で最適な方式に統一する。 -->
-      <div class="facePool" aria-hidden="true">
-        <img class="faceAsset" id="face1" src="assets/dico_face_1.png" alt="" />
-        <img class="faceAsset" id="face2" src="assets/dico_face_2.png" alt="" />
-        <img class="faceAsset" id="face3" src="assets/dico_face_3.png" alt="" />
-      </div>
-    </div>
-  </aside>
-
-  <!-- =========================
-       TOP HUD（既存：上固定・タップ貫通）
-       ※後で「左右バーと統合」もできるので残す
+       HUD (IRIS-ish / NO OVERLAP)
+       - JS: #score #combo #maxCombo #time を更新
+       - JS: .irisRing .irisFill .irisPct を更新
        ========================= -->
   <header class="hud" aria-label="HUD">
-    <div class="hudBlock">
-      <div class="hudLabel">SCORE</div>
-      <div class="hudValue" id="score">0</div>
+
+    <!-- LEFT (score / combo) -->
+    <div class="hudLeft" aria-label="Left HUD">
+      <!-- SCORE -->
+      <div class="hudCard" role="group" aria-label="Score">
+        <div class="hudCardInner">
+          <div class="hudRow">
+            <div class="hudTitle">SCORE</div>
+            <div class="hudBig" id="score">0</div>
+          </div>
+          <div class="hudSub">SUBJECT: SHION</div>
+        </div>
+      </div>
+
+      <!-- COMBO -->
+      <div class="hudCard" role="group" aria-label="Combo">
+        <div class="hudCardInner">
+          <div class="hudRow">
+            <div class="hudTitle">COMBO</div>
+            <div class="hudBig" id="combo">0</div>
+          </div>
+          <div class="hudRow" style="margin-top:-2px">
+            <div class="hudSub">MAX</div>
+            <div class="hudSub" style="font-variant-numeric:tabular-nums" id="maxCombo">0</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="hudBlock hudCenter">
-      <div class="hudCombo">
-        <span class="hudLabel">COMBO</span>
-        <span class="hudValue" id="combo">0</span>
+    <!-- RIGHT (IRIS HUD) -->
+    <div class="hudCard irisHud" aria-label="IRIS HUD">
+      <div class="irisTop" role="group" aria-label="Player and avatar">
+        <div class="irisName">
+          <div class="n0" id="playerName">DiCo</div>
+          <div class="n1">RESONANCE</div>
+        </div>
+
+        <!-- Ring (JS rotates this via --irisRot, and ticks via .tick) -->
+        <div class="irisRing" aria-label="IRIS Ring">
+          <!-- アバター（画像にしたい場合はCSSを画像に差し替え or ここにimgを入れてもOK）
+               今はCSSのグラス表現で統一。 -->
+          <div class="irisAvatar" aria-hidden="true"></div>
+        </div>
       </div>
-      <div class="hudSmall">
-        <span class="hudLabel">MAX</span>
-        <span class="hudValue" id="maxCombo">0</span>
+
+      <div class="irisBar" role="group" aria-label="Resonance gauge">
+        <div class="irisBarRow">
+          <div class="lbl">RESONANCE</div>
+          <div class="pct irisPct">0%</div>
+        </div>
+
+        <div class="irisTrack" aria-hidden="true">
+          <div class="irisFill" style="width:0%"></div>
+        </div>
+
+        <!-- TIME（右HUDの下に置く：邪魔にならない） -->
+        <div class="irisBarRow" style="margin-top:2px">
+          <div class="lbl">TIME</div>
+          <div class="pct" id="time">--</div>
+        </div>
       </div>
     </div>
 
-    <div class="hudBlock hudRight">
-      <div class="hudLabel">TIME</div>
-      <div class="hudValue" id="time">--</div>
-    </div>
   </header>
 
-  <!-- STAGE -->
+  <!-- =========================
+       STAGE
+       - JS: .laneEdge / .hitBand を自動でappend
+       - CSS: レーン幅を細くして動画を見せる
+       ========================= -->
   <section class="stage" id="stage" aria-label="Game Stage">
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
 
-    <div class="hitZone" id="hitZone" aria-hidden="true"></div>
-    <!-- TARGET（中央神域：UIは置かない） -->
+    <!-- TARGET -->
     <div class="targetRoot" id="targetRoot" aria-hidden="true">
       <div class="targetOuter"></div>
       <div class="targetCore"></div>
@@ -123,62 +110,25 @@
       <div class="hitFlash" id="hitFlash" aria-hidden="true"></div>
     </div>
 
-    <!-- JUDGE（中央に邪魔な文字を置かない：ターゲット“上”で一瞬だけ） -->
+    <!-- JUDGE (短時間表示) -->
     <div class="judge" id="judge" aria-hidden="true">
       <div class="judgeMain" id="judgeMain">GREAT</div>
       <div class="judgeSub"  id="judgeSub">SYNC</div>
     </div>
-
-    <!-- RESULT（終わったらここを出す：ARUリングは“結果画面のみ”） -->
-    <div class="result" id="result" aria-hidden="true">
-      <div class="resultCard">
-        <div class="resultTitle">RESULT</div>
-
-        <div class="resultRow">
-          <div class="resultKey">SCORE</div>
-          <div class="resultVal" id="resultScore">0</div>
-        </div>
-
-        <div class="resultRow">
-          <div class="resultKey">MAX COMBO</div>
-          <div class="resultVal" id="resultMaxCombo">0</div>
-        </div>
-
-        <div class="resultDivider"></div>
-
-        <div class="aruWrap" aria-label="ARU Gauge">
-          <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
-            <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
-              <defs>
-                <linearGradient id="aruGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%"  stop-color="rgba(156,60,255,0.95)"/>
-                  <stop offset="55%" stop-color="rgba(0,240,255,0.95)"/>
-                  <stop offset="100%" stop-color="rgba(230,201,107,0.95)"/>
-                </linearGradient>
-              </defs>
-              <circle cx="60" cy="60" r="44" class="aruTrack"/>
-              <circle cx="60" cy="60" r="44" class="aruProg" id="aruProg"/>
-            </svg>
-            <div class="aruText">
-              <div class="aruLabel">ARU ENERGY</div>
-              <div class="aruValue" id="aruValue">0%</div>
-            </div>
-          </div>
-
-          <div class="dicoLine" id="dicoLine">しーちゃんに、君の想いは届いたよ。</div>
-        </div>
-      </div>
-    </div>
   </section>
 
-  <!-- CONTROLS（下固定） -->
+  <!-- =========================
+       CONTROLS（下固定）
+       ========================= -->
   <footer class="bottom" aria-label="Controls">
     <button id="startBtn" class="btn primary" type="button">START</button>
     <button id="stopBtn" class="btn" type="button">STOP</button>
     <button id="restartBtn" class="btn" type="button">RESTART</button>
   </footer>
 
-  <!-- AUDIO -->
+  <!-- =========================
+       AUDIO
+       ========================= -->
   <audio id="music" src="audio/music.mp3" preload="auto"></audio>
   <audio id="seTap" src="audio/se_tap.wav" preload="auto"></audio>
   <audio id="seGreat" src="audio/se_perfect.wav" preload="auto"></audio>
