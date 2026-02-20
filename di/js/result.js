@@ -1,21 +1,19 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (ARU Eye: COMPLETE)
+   TAROT BREAKER – RESULT PRESENTATION (ARU Eye: COMPLETE) [PROD SAFE]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Integrates getUserName() from /js/common.js (optional; safe)
+   - Does NOT destroy #result inner DOM (coexists with engine UI)
    - Iris expansion triggers ONLY at the moment the name is called
    - 100% => double expansion + "ARU COMPLETE" seal
-   - No dependency on engine/UI internals (presentation-only)
 */
 (function () {
   "use strict";
 
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const isNum = (n) => Number.isFinite(n);
 
   // ---------- Safe name getter ----------
   function safeUserName() {
     try {
-      // common.js exports getUserName()
       if (typeof window.getUserName === "function") {
         const n = window.getUserName();
         if (typeof n === "string" && n.trim()) return n.trim();
@@ -29,13 +27,23 @@
     return percent >= 50;
   }
 
+  // ---------- Normalize resonance (0..1 or 0..100) ----------
+  function normalizePercent(resonance) {
+    let r = Number(resonance);
+    if (!Number.isFinite(r)) r = 0;
+    // if it's likely 0..1, scale to 0..100
+    if (r <= 1.0001) r = r * 100;
+    return clamp(Math.round(r), 0, 100);
+  }
+
   // ---------- Copy lines ----------
   function lineByPercent(percent, nameOrNull) {
     const name = nameOrNull;
+
     if (percent >= 100) {
       return name
-        ? `……ARU、完成。\n${name}──君の想いは、眼に宿った。`
-        : `……ARU、完成。\n君の想いは、眼に宿った。`;
+        ? `……ARU、完成。\n封印解除。\n${name}──君の想いは、眼に宿った。`
+        : `……ARU、完成。\n封印解除。\n君の想いは、眼に宿った。`;
     }
     if (percent >= 80) {
       return name
@@ -50,58 +58,63 @@
     return `共鳴は消えてない。\nDiDiDi…もう一回、試そ？`;
   }
 
-  // ---------- DOM builder ----------
-  function buildDOM(root) {
-    // NOTE: We build inside #result element
-    root.innerHTML = `
-      <div class="tbResultShell" role="dialog" aria-label="Result">
-        <div class="tbResultTop">
-          <div class="tbResultTitle">OBSERVATION LOG</div>
-          <div class="tbResultSub">TAROT BREAKER / ARU</div>
-        </div>
+  // ---------- DOM builder (NON-DESTRUCTIVE) ----------
+  // Build inside #result without wiping existing children.
+  function ensureShell(root) {
+    let shell = root.querySelector(".tbResultShell");
+    if (shell) return shell;
 
-        <div class="tbAruEyeWrap" aria-label="ARU Eye">
-          <div class="tbAruEye" id="tbAruEye" aria-hidden="true">
-            <div class="tbAruHalo"></div>
-            <div class="tbAruStars"></div>
-            <div class="tbAruIrisGlow"></div>
-            <div class="tbAruIris"></div>
-            <div class="tbAruCode"></div>
-            <div class="tbAruPupil"></div>
-            <div class="tbAruSeal" id="tbAruSeal">ARU / IRIS RESONANCE</div>
-            <div class="tbAruComplete" id="tbAruComplete" aria-hidden="true">ARU EYE : COMPLETE</div>
-          </div>
-        </div>
+    shell = document.createElement("div");
+    shell.className = "tbResultShell";
+    shell.setAttribute("role", "dialog");
+    shell.setAttribute("aria-label", "Result");
 
-        <div class="tbResRow" aria-label="Resonance">
-          <div class="tbResValue" id="tbResValue">0%</div>
-          <div class="tbResLabel">RESONANCE</div>
-        </div>
+    shell.innerHTML = `
+      <div class="tbResultTop">
+        <div class="tbResultTitle">OBSERVATION LOG</div>
+        <div class="tbResultSub">TAROT BREAKER / ARU</div>
+      </div>
 
-        <div class="tbDicoLine" id="tbDicoLine"></div>
-
-        <div class="tbResultActions">
-          <button class="tbReplayBtn" id="tbReplayBtn" type="button">RESONATE AGAIN</button>
+      <div class="tbAruEyeWrap" aria-label="ARU Eye">
+        <div class="tbAruEye" id="tbAruEye" aria-hidden="true">
+          <div class="tbAruHalo"></div>
+          <div class="tbAruStars"></div>
+          <div class="tbAruIrisGlow"></div>
+          <div class="tbAruIris"></div>
+          <div class="tbAruCode"></div>
+          <div class="tbAruPupil"></div>
+          <div class="tbAruSeal" id="tbAruSeal">ARU / IRIS RESONANCE</div>
+          <div class="tbAruComplete" id="tbAruComplete" aria-hidden="true">ARU EYE : COMPLETE</div>
         </div>
       </div>
+
+      <div class="tbResRow" aria-label="Resonance">
+        <div class="tbResValue" id="tbResValue">0%</div>
+        <div class="tbResLabel">RESONANCE</div>
+      </div>
+
+      <div class="tbDicoLine" id="tbDicoLine"></div>
+
+      <div class="tbResultActions">
+        <button class="tbReplayBtn" id="tbReplayBtn" type="button">RESONATE AGAIN</button>
+      </div>
     `;
+
+    root.appendChild(shell);
+    return shell;
   }
 
   // ---------- Animation helpers ----------
   function retriggerClass(el, cls) {
     if (!el) return;
     el.classList.remove(cls);
-    // force reflow
-    void el.offsetWidth;
+    void el.offsetWidth; // force reflow
     el.classList.add(cls);
   }
 
   function triggerIrisExpansion(eyeEl, percent) {
     if (!eyeEl) return;
-
     retriggerClass(eyeEl, "tbExpand");
-
-    // 100% => double expansion
     if (percent >= 100) {
       setTimeout(() => retriggerClass(eyeEl, "tbExpand"), 320);
     }
@@ -132,10 +145,12 @@
     // reset states
     setCompleteState(root, false);
     if (eyeEl) {
-      eyeEl.classList.remove("tbExpand");
-      eyeEl.classList.remove("tbFull");
+      eyeEl.classList.remove("tbExpand", "tbFull");
+      // show() 時の覚醒演出
+      retriggerClass(eyeEl, "tbAwake");
     }
     lineEl.textContent = "";
+    valueEl.textContent = "0%";
 
     let cur = 0;
     const totalFrames = 58; // ~1s on 60fps
@@ -157,15 +172,13 @@
       if (willCall) triggerIrisExpansion(eyeEl, target);
 
       // 100% => complete seal
-      if (target >= 100) {
-        setCompleteState(root, true);
-      }
+      if (target >= 100) setCompleteState(root, true);
     }
 
     requestAnimationFrame(tick);
   }
 
-  // ---------- Styling injection (separate CSS file is ideal, but result.js must be standalone-safe) ----------
+  // ---------- Styling injection ----------
   function injectStylesOnce() {
     if (document.getElementById("tbResultStyles")) return;
 
@@ -182,24 +195,18 @@
   gap:14px;
   padding:16px;
 }
+
+/* top */
 #result .tbResultTop{ text-align:center; letter-spacing:.12em; }
-#result .tbResultTitle{
-  font-weight:800; font-size:14px;
-  opacity:.92;
-}
-#result .tbResultSub{
-  font-weight:700; font-size:11px;
-  opacity:.62;
-}
+#result .tbResultTitle{ font-weight:800; font-size:14px; opacity:.92; }
+#result .tbResultSub{ font-weight:700; font-size:11px; opacity:.62; }
 
 /* Eye wrap */
 #result .tbAruEyeWrap{ width:min(320px, 86vw); display:flex; justify-content:center; }
 #result .tbAruEye{
   width:260px; height:260px; border-radius:999px;
-  position:relative;
-  transform:translateZ(0);
+  position:relative; transform:translateZ(0);
   overflow:hidden;
-  /* glassy dark base */
   background:
     radial-gradient(circle at 50% 50%, rgba(0,0,0,0.92) 0%, rgba(6,7,14,0.96) 55%, rgba(2,3,6,0.98) 100%);
   box-shadow:
@@ -372,6 +379,11 @@
   transition: opacity 360ms ease, filter 360ms ease;
 }
 
+/* awaken pulse (0 -> eye awaken) */
+#result .tbAruEye.tbAwake{
+  animation: tbAwake .55s ease-out both;
+}
+
 /* complete mode */
 #result .tbAruEye.tbFull{
   box-shadow:
@@ -406,59 +418,52 @@
   60%{ transform: translateX(-50%) scale(1.06); opacity:1; }
   100%{ transform: translateX(-50%) scale(1.00); opacity:.92; }
 }
+@keyframes tbAwake{
+  0%{ transform: scale(.985); filter: brightness(.9); }
+  60%{ transform: scale(1.02); filter: brightness(1.08); }
+  100%{ transform: scale(1.00); filter: brightness(1.00); }
+}
 `;
     document.head.appendChild(s);
   }
 
   // ---------- Public presenter ----------
-  // main.js expects: window.DI_RESULT.init(...) -> { show(payload), hide() }
   window.DI_RESULT = {
     init(opts) {
       const root = opts?.root || document.getElementById("result");
-      if (!root) {
-        return { show() {}, hide() {} };
-      }
+      if (!root) return { show() {}, hide() {} };
 
       injectStylesOnce();
+      ensureShell(root);
 
-      // Build once when init called
-      buildDOM(root);
-
-      // Wire replay to start/restart path (reliable)
+      // Wire replay to start button (reliable)
       const replayBtn = root.querySelector("#tbReplayBtn");
-      if (replayBtn) {
-        replayBtn.addEventListener(
-          "click",
-          () => {
-            // Hide result overlay first
-            root.classList.remove("active");
+      if (replayBtn && !replayBtn.__tbBound) {
+        replayBtn.__tbBound = true;
+        replayBtn.addEventListener("click", () => {
+          // Hide overlay first
+          root.classList.remove("active");
 
-            // Prefer start button (it becomes "もう一回" in result state)
-            const startBtn = document.getElementById("startBtn");
-            if (startBtn) {
-              startBtn.click();
-              return;
-            }
-
-            // Fallback: restart button
-            const restartBtn = document.getElementById("restartBtn");
-            restartBtn?.click?.();
-          },
-          { passive: true }
-        );
+          const startBtn = document.getElementById("startBtn");
+          if (startBtn) {
+            startBtn.click();
+            return;
+          }
+          const restartBtn = document.getElementById("restartBtn");
+          restartBtn?.click?.();
+        });
       }
 
       return {
         show(payload) {
           // payload: {score, maxCombo, resonance, reason}
-          const resonance = payload?.resonance ?? 0;
-          const percent = clamp(Math.round(resonance), 0, 100);
+          const percent = normalizePercent(payload?.resonance ?? 0);
+
+          // ensure shell exists even if something replaced DOM
+          ensureShell(root);
 
           // Activate overlay
           root.classList.add("active");
-
-          // Make sure DOM exists (in case other code replaced it)
-          if (!root.querySelector("#tbAruEye")) buildDOM(root);
 
           // Animate ARU Eye result
           animateResult(root, percent);
