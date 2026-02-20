@@ -1,5 +1,12 @@
 /* /di/css/lane.css */
-/* DiCo LANE – neon thin lane + bright judge + readable target + result */
+/* =========================================================
+   DiCo LANE – “Cute Neon Pulse”
+   - Thin lane (full height, offscreen extend)
+   - Neon edges + shimmer + breathing
+   - Target ring synchronized breathing
+   - Hit boost (works with #hitFlash toggles)
+   - Bright judge
+   ========================================================= */
 
 .hitZone{
   position:absolute;
@@ -8,101 +15,160 @@
   pointer-events:none;
 }
 
-/* =========================
-   CENTER LANE (thin + full height + neon edges)
-   - Always centered
-   - Extends beyond screen a bit
-   - Edge neon lines
-   ========================= */
+/* -----------------------------------------
+   CENTER LANE (thin + full height)
+   ----------------------------------------- */
+
+/* Lane body (glass) */
 .stage::before{
   content:"";
   position:absolute;
   left:50%;
-  top:-10vh;              /* extend beyond top */
-  bottom:-12vh;           /* extend beyond bottom */
-  transform: translateX(-50%);
+  top:-14vh;                 /* extend beyond screen */
+  bottom:-16vh;
+  transform: translateX(-50%) translateZ(0);
 
-  /* ✅ thin: just enough for notes */
-  width: min(130px, 50vw);
+  /* ✅ lane width: adjust here */
+  width: min(190px, 50vw);
 
   z-index:4;
   pointer-events:none;
+  border-radius: 30px;
 
-  border-radius: 28px;
-
-  /* glass lane body */
+  /* glass body */
   background:
     linear-gradient(180deg,
       rgba(255,255,255,.10),
-      rgba(255,255,255,.03)
+      rgba(255,255,255,.03) 42%,
+      rgba(255,255,255,.02) 100%
     );
 
-  outline: 1px solid rgba(255,255,255,.10);
+  /* crisp frame */
+  outline: 1px solid rgba(255,255,255,.11);
 
-  /* ✅ neon edges + subtle depth */
+  /* neon edges + depth */
   box-shadow:
-    inset 3px 0 0 rgba(0,240,255,.62),     /* left cyan edge */
-    inset -3px 0 0 rgba(156,60,255,.52),   /* right violet edge */
-    inset 0 0 42px rgba(0,240,255,.08),
-    0 0 0 1px rgba(0,240,255,.10),
-    0 22px 70px rgba(0,0,0,.18);
+    inset 2px 0 0 rgba(0,240,255,.62),     /* left cyan */
+    inset -2px 0 0 rgba(156,60,255,.52),   /* right violet */
+    inset 0 0 46px rgba(0,240,255,.06),
+    inset 0 0 70px rgba(156,60,255,.05),
+    0 20px 70px rgba(0,0,0,.18),
+    0 0 42px rgba(0,240,255,.10);
 
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 
-  opacity:.82;
+  opacity:.86;
+  will-change: opacity, filter, box-shadow;
+  animation: laneBreathe 5.2s ease-in-out infinite;
 }
 
-/* soft moving shimmer inside lane (DiCo vibe) */
+/* Shimmer layer (cute disco gloss) */
 .stage::after{
   content:"";
   position:absolute;
   left:50%;
-  top:-10vh;
-  bottom:-12vh;
-  transform: translateX(-50%);
-  width: min(220px, 54vw);
+  top:-14vh;
+  bottom:-16vh;
+  transform: translateX(-50%) translateZ(0);
+
+  /* Keep shimmer slightly wider than lane body */
+  width: min(230px, 56vw);
+
   z-index:4;
   pointer-events:none;
-  border-radius: 28px;
+  border-radius: 30px;
 
   background:
     linear-gradient(115deg,
       transparent 0%,
-      rgba(0,240,255,.16) 22%,
-      rgba(156,60,255,.12) 48%,
+      rgba(0,240,255,.18) 18%,
+      rgba(156,60,255,.14) 46%,
       rgba(230,201,107,.10) 62%,
-      transparent 80%
+      transparent 82%
     );
+
+  background-size: 520px 100%;
   mix-blend-mode: screen;
-  opacity:.45;
-  filter: blur(.2px);
-  animation: laneShimmer 2.6s linear infinite;
+  opacity:.42;
+  filter: blur(.25px);
+  will-change: opacity, filter, background-position;
+
+  animation:
+    laneShimmer 2.6s linear infinite,
+    laneGlow    5.2s ease-in-out infinite;
+}
+
+/* Smooth top/bottom fade (so it melts into screen) */
+.stage::before,
+.stage::after{
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
 }
 
 @keyframes laneShimmer{
-  0%   { background-position: -240px 0; }
-  100% { background-position:  240px 0; }
+  0%   { background-position: -300px 0; }
+  100% { background-position:  300px 0; }
 }
 
-/* =========================
-   TARGET (brighter + cleaner)
-   ========================= */
+@keyframes laneBreathe{
+  0%,100%{
+    opacity: .84;
+    filter: saturate(1.03) brightness(1.00);
+    box-shadow:
+      inset 2px 0 0 rgba(0,240,255,.54),
+      inset -2px 0 0 rgba(156,60,255,.44),
+      inset 0 0 46px rgba(0,240,255,.05),
+      inset 0 0 70px rgba(156,60,255,.04),
+      0 20px 70px rgba(0,0,0,.18),
+      0 0 36px rgba(0,240,255,.09);
+  }
+  50%{
+    opacity: .92;
+    filter: saturate(1.12) brightness(1.06);
+    box-shadow:
+      inset 2px 0 0 rgba(0,240,255,.68),
+      inset -2px 0 0 rgba(156,60,255,.58),
+      inset 0 0 52px rgba(0,240,255,.07),
+      inset 0 0 80px rgba(156,60,255,.06),
+      0 22px 80px rgba(0,0,0,.14),
+      0 0 48px rgba(0,240,255,.14);
+  }
+}
+
+@keyframes laneGlow{
+  0%,100%{
+    opacity:.34;
+    filter: blur(.25px) brightness(1.00) saturate(1.06);
+  }
+  50%{
+    opacity:.56;
+    filter: blur(.35px) brightness(1.12) saturate(1.22);
+  }
+}
+
+/* -----------------------------------------
+   TARGET (synchronized pulse)
+   ----------------------------------------- */
+
 .targetRoot{
   position:absolute;
   left:50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 176px;
-  height: 176px;
+  top:50%;
+  transform: translate(-50%, -50%) translateZ(0);
+  width: 178px;
+  height: 178px;
   z-index:6;
   pointer-events:none;
+
+  will-change: transform, filter;
+  animation: targetBreathe 5.2s ease-in-out infinite;
 }
 
 .targetOuter, .targetCore, .targetRing{
   position:absolute;
   inset:0;
-  border-radius: 999px;
+  border-radius:999px;
 }
 
 .targetOuter{
@@ -110,37 +176,49 @@
     radial-gradient(circle at 50% 50%,
       rgba(255,255,255,.06) 0%,
       rgba(255,255,255,.04) 44%,
-      rgba(0,0,0,.16) 78%,
-      rgba(0,0,0,.22) 100%);
+      rgba(0,0,0,.14) 78%,
+      rgba(0,0,0,.20) 100%);
   outline: 1px solid rgba(255,255,255,.14);
+
   box-shadow:
-    0 10px 40px rgba(0,0,0,.22),
-    0 0 32px rgba(0,240,255,.10);
+    0 12px 46px rgba(0,0,0,.20),
+    0 0 34px rgba(0,240,255,.10);
+
+  will-change: opacity, box-shadow, background;
+  animation: outerPulse 5.2s ease-in-out infinite;
 }
 
 .targetCore{
   inset: 44px;
   background:
     radial-gradient(circle at 45% 40%,
-      rgba(255,255,255,.26),
-      rgba(255,255,255,.10) 40%,
+      rgba(255,255,255,.28),
+      rgba(255,255,255,.12) 40%,
       rgba(0,0,0,.10) 76%);
+
   border: 1px solid rgba(255,255,255,.18);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+
+  will-change: opacity, background, box-shadow;
+  animation: corePulse 5.2s ease-in-out infinite;
 }
 
 .targetRing{
   inset: 12px;
   border: 2px solid rgba(0,240,255,.34);
+
   box-shadow:
-    0 0 0 1px rgba(156,60,255,.14),
-    0 0 22px rgba(0,240,255,.22),
+    0 0 0 1px rgba(156,60,255,.16),
+    0 0 24px rgba(0,240,255,.22),
     0 0 34px rgba(156,60,255,.18),
     0 0 26px rgba(230,201,107,.12);
+
+  will-change: border-color, box-shadow, filter, opacity;
+  animation: ringPulse 5.2s ease-in-out infinite;
 }
 
-/* scan line */
+/* scan line (cute neon) */
 .scanLine{
   position:absolute;
   left: 16px;
@@ -150,36 +228,144 @@
   transform: translateY(-50%);
   background: linear-gradient(90deg,
     transparent,
-    rgba(0,240,255,.88),
-    rgba(156,60,255,.62),
+    rgba(0,240,255,.92),
+    rgba(156,60,255,.66),
     transparent);
   opacity:0;
   filter: blur(.2px);
+  will-change: opacity, transform, filter;
   animation: scanMove 1.15s ease-in-out infinite;
 }
 @keyframes scanMove{
   0%,100%{ transform: translateY(-50%) scaleX(.92); }
-  50%    { transform: translateY(-50%) scaleX(1.06); }
+  50%    { transform: translateY(-50%) scaleX(1.08); }
+}
+.app[data-state="playing"] .scanLine{
+  opacity:.92;
+  animation: scanMove 1.15s ease-in-out infinite, scanPulse 5.2s ease-in-out infinite;
+}
+@keyframes scanPulse{
+  0%,100%{ filter: brightness(1.00); }
+  50%    { filter: brightness(1.18); }
 }
 
-/* flash on hit (engine toggles opacity) */
+/* hit flash: JS toggles opacity/scale -> it becomes “impact boost” */
 .hitFlash{
   position:absolute;
-  inset:-10px;
+  inset:-12px;
   border-radius:999px;
-  background: radial-gradient(circle at 50% 50%,
-    rgba(0,240,255,.38),
-    rgba(156,60,255,.18) 42%,
-    transparent 68%);
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(0,240,255,.44),
+      rgba(156,60,255,.22) 46%,
+      transparent 70%);
   opacity:0;
   transform: scale(.98);
-  transition: opacity .10s ease, transform .10s ease;
+  transition: opacity .11s ease, transform .11s ease, filter .11s ease;
+  filter: blur(.1px);
 }
-.app[data-state="playing"] .scanLine{ opacity:.92; }
 
-/* =========================
-   JUDGE (bright + readable)
-   ========================= */
+/* When engine toggles hitFlash ON, amplify lane + ring for a moment */
+.targetRoot:has(#hitFlash[style*="opacity: 1"]),
+.targetRoot:has(#hitFlash[style*="opacity:1"]){
+  filter: brightness(1.08) saturate(1.20);
+}
+.targetRoot:has(#hitFlash[style*="opacity: 1"]) .targetRing,
+.targetRoot:has(#hitFlash[style*="opacity:1"]) .targetRing{
+  border-color: rgba(0,240,255,.56);
+  box-shadow:
+    0 0 0 1px rgba(156,60,255,.26),
+    0 0 34px rgba(0,240,255,.30),
+    0 0 46px rgba(156,60,255,.22),
+    0 0 34px rgba(230,201,107,.16);
+}
+
+/* Fallback for Safari that doesn’t support :has() well:
+   If JS adds .hitActive on body/app, it boosts. (Optional) */
+.app.hitActive .targetRing{
+  border-color: rgba(0,240,255,.56);
+  box-shadow:
+    0 0 0 1px rgba(156,60,255,.26),
+    0 0 34px rgba(0,240,255,.30),
+    0 0 46px rgba(156,60,255,.22),
+    0 0 34px rgba(230,201,107,.16);
+}
+.app.hitActive .stage::before{
+  filter: saturate(1.20) brightness(1.08);
+  opacity: .96;
+}
+
+/* synchronized keyframes */
+@keyframes targetBreathe{
+  0%,100%{
+    transform: translate(-50%, -50%) scale(1);
+    filter: saturate(1.03) brightness(1.00);
+  }
+  50%{
+    transform: translate(-50%, -50%) scale(1.02);
+    filter: saturate(1.12) brightness(1.06);
+  }
+}
+@keyframes ringPulse{
+  0%,100%{
+    border-color: rgba(0,240,255,.28);
+    opacity:.94;
+    filter: brightness(1.0);
+    box-shadow:
+      0 0 0 1px rgba(156,60,255,.14),
+      0 0 22px rgba(0,240,255,.18),
+      0 0 30px rgba(156,60,255,.14),
+      0 0 22px rgba(230,201,107,.10);
+  }
+  50%{
+    border-color: rgba(0,240,255,.44);
+    opacity:1;
+    filter: brightness(1.08);
+    box-shadow:
+      0 0 0 1px rgba(156,60,255,.22),
+      0 0 28px rgba(0,240,255,.24),
+      0 0 38px rgba(156,60,255,.18),
+      0 0 26px rgba(230,201,107,.12);
+  }
+}
+@keyframes corePulse{
+  0%,100%{
+    opacity:.94;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 10px 30px rgba(0,0,0,.22);
+    background:
+      radial-gradient(circle at 45% 40%,
+        rgba(255,255,255,.28),
+        rgba(255,255,255,.12) 42%,
+        rgba(0,0,0,.10) 78%);
+  }
+  50%{
+    opacity:1;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 12px 34px rgba(0,0,0,.18);
+    background:
+      radial-gradient(circle at 45% 40%,
+        rgba(255,255,255,.36),
+        rgba(0,240,255,.10) 38%,
+        rgba(0,0,0,.08) 78%);
+  }
+}
+@keyframes outerPulse{
+  0%,100%{
+    opacity:.88;
+    box-shadow:
+      0 12px 46px rgba(0,0,0,.20),
+      0 0 34px rgba(0,240,255,.10);
+  }
+  50%{
+    opacity:.98;
+    box-shadow:
+      0 14px 52px rgba(0,0,0,.16),
+      0 0 42px rgba(0,240,255,.14);
+  }
+}
+
+/* -----------------------------------------
+   JUDGE (bright + cute readable)
+   ----------------------------------------- */
 .judge{
   position:absolute;
   left:50%;
@@ -193,15 +379,16 @@
   border-radius: 999px;
 
   border: 1px solid rgba(255,255,255,.18);
-  background: rgba(255,255,255,.14);  /* ✅ brighter */
+  background: rgba(255,255,255,.16); /* brighter */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
   box-shadow:
-    0 12px 38px rgba(0,0,0,.18),
+    0 12px 38px rgba(0,0,0,.16),
     0 0 26px rgba(0,240,255,.14);
 
   opacity:0;
+  will-change: opacity, transform;
 }
 
 .judgeMain{
@@ -212,20 +399,17 @@
     0 0 22px rgba(0,240,255,.22),
     0 0 14px rgba(156,60,255,.16);
 }
-
 .judgeSub{
   margin-top: 2px;
   font-size: 11px;
   letter-spacing: .22em;
-  color: rgba(245,245,242,.78);
+  color: rgba(245,245,242,.82);
 }
-
-/* show/hide states */
 #judge[aria-hidden="false"]{ opacity:1; }
 
-/* =========================
-   RESULT modal
-   ========================= */
+/* -----------------------------------------
+   RESULT modal (kept light)
+   ----------------------------------------- */
 .result{
   position:absolute;
   inset:0;
@@ -235,7 +419,6 @@
   justify-content:center;
   padding: 18px;
 
-  /* slightly lighter than “movie black” */
   background: rgba(0,0,0,.34);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -243,7 +426,6 @@
   opacity:0;
   pointer-events:none;
 }
-
 .resultCard{
   width: min(520px, 92vw);
   border-radius: var(--r2);
@@ -256,43 +438,37 @@
     );
 
   box-shadow:
-    0 22px 70px rgba(0,0,0,.24),
+    0 22px 70px rgba(0,0,0,.22),
     0 0 40px rgba(0,240,255,.10);
 
   padding: 18px 18px 16px;
   animation: pop .18s ease both;
 }
-
 @keyframes pop{
   from{ transform: translateY(8px) scale(.98); opacity:.0; }
   to  { transform: translateY(0)  scale(1);   opacity:1; }
 }
-
 .resultTitle{
   font-weight: 1000;
   letter-spacing: .22em;
   font-size: 14px;
   color: rgba(245,245,242,.78);
 }
-
 .resultRow{
   display:flex;
   justify-content:space-between;
   align-items:baseline;
   padding: 10px 0 0;
 }
-
 .resultKey{
   color: rgba(245,245,242,.68);
   letter-spacing:.14em;
   font-size: 12px;
 }
-
 .resultVal{
   font-weight: 1000;
   font-size: 18px;
 }
-
 .resultDivider{
   height:1px;
   background: rgba(255,255,255,.14);
@@ -301,7 +477,6 @@
 
 /* ARU ring */
 .aruWrap{ display:flex; flex-direction:column; gap: 10px; align-items:center; }
-
 .aruRing{
   width: 220px;
   height: 220px;
@@ -309,49 +484,39 @@
   display:grid;
   place-items:center;
 }
-
 .aruSvg{
   width: 220px;
   height: 220px;
   filter:
-    drop-shadow(0 14px 40px rgba(0,0,0,.26))
+    drop-shadow(0 14px 40px rgba(0,0,0,.22))
     drop-shadow(0 0 22px rgba(0,240,255,.12));
 }
-
 .aruTrack{
   fill:none;
   stroke: rgba(255,255,255,.14);
   stroke-width: 10;
 }
-
 .aruProg{
   fill:none;
   stroke: url(#aruGrad);
   stroke-width: 10;
   stroke-linecap: round;
-  stroke-dasharray: 276.46; /* 2*pi*44 */
+  stroke-dasharray: 276.46;
   stroke-dashoffset: 276.46;
   transition: stroke-dashoffset .18s ease;
 }
-
-.aruText{
-  position:absolute;
-  text-align:center;
-}
-
+.aruText{ position:absolute; text-align:center; }
 .aruLabel{
   font-size: 11px;
   letter-spacing: .22em;
   color: rgba(245,245,242,.72);
 }
-
 .aruValue{
   margin-top: 4px;
   font-size: 22px;
   font-weight: 1000;
   text-shadow: 0 0 20px rgba(0,240,255,.14);
 }
-
 .dicoLine{
   text-align:center;
   max-width: 460px;
@@ -359,29 +524,34 @@
   color: rgba(245,245,242,.92);
 }
 
-/* state */
-.app[data-state="result"] #result{
-  opacity:1;
-  pointer-events:auto;
-}
-.app[data-state="result"] .judge{
-  opacity:0 !important;
-}
+.app[data-state="result"] #result{ opacity:1; pointer-events:auto; }
+.app[data-state="result"] .judge{ opacity:0 !important; }
 #result[aria-hidden="false"]{ opacity:1; pointer-events:auto; }
 
-/* =========================
+/* -----------------------------------------
    Mobile tweaks
-   ========================= */
+   ----------------------------------------- */
 @media (max-width: 720px){
   .targetRoot{ width: 160px; height: 160px; }
   .judge{ top: calc(50% - 132px); }
   .aruRing, .aruSvg{ width: 200px; height: 200px; }
 }
-
 @media (max-width: 560px){
+  .stage::before{ width: min(180px, 56vw); border-radius: 28px; }
+  .stage::after { width: min(220px, 62vw); border-radius: 28px; }
+}
+
+/* -----------------------------------------
+   Accessibility
+   ----------------------------------------- */
+@media (prefers-reduced-motion: reduce){
   .stage::before,
-  .stage::after{
-    width: min(200px, 58vw);
-    border-radius: 26px;
+  .stage::after,
+  .targetRoot,
+  .targetOuter,
+  .targetCore,
+  .targetRing,
+  .scanLine{
+    animation: none !important;
   }
 }
