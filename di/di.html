@@ -1,4 +1,4 @@
-<!-- /di/di.html (RE-DESIGNED / PRO ENGINEER) -->
+<!-- /di/di.html (RE-DESIGNED / PRO ENGINEER FINAL) -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -10,15 +10,15 @@
   <meta name="format-detection" content="telephone=no" />
   <title>DiCo ARU – Phase1</title>
 
-  <!-- CSS split -->
+  <!-- CSS split (order matters) -->
   <link rel="stylesheet" href="./css/themes.css" />
   <link rel="stylesheet" href="./css/core.css" />
   <link rel="stylesheet" href="./css/hud.css" />
   <link rel="stylesheet" href="./css/lane.css" />
 
-  <!-- Preload (optional but helps iOS) -->
-  <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
+  <!-- Preload (helps iOS a bit; safe even if missing files) -->
   <link rel="preload" href="./assets/idle/dico_idle.jpg" as="image" />
+  <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
   <link rel="preload" href="./audio/music.mp3" as="audio" />
   <link rel="preload" href="./audio/se_tap.wav" as="audio" />
   <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
@@ -29,14 +29,13 @@
 
   <!-- =========================================================
        BACKGROUND STACK
-       idle: still image + light particles
-       playing: video visible
-       (visibility is controlled via CSS using [data-state])
+       - idle: still image + light particles + tagline
+       - playing/result: video visible
+       - visibility is controlled by CSS via app[data-state]
        ========================================================= -->
 
-  <!-- Idle still image (use your DiCo key visual) -->
+  <!-- IDLE STILL -->
   <div class="idleBg" id="idleBg" aria-hidden="true">
-    <!-- 画像は差し替えOK：./assets/idle/dico_idle.jpg を置く -->
     <img
       class="idleImg"
       src="./assets/idle/dico_idle.jpg"
@@ -45,27 +44,24 @@
       decoding="async"
       loading="eager"
     />
-
-    <!-- Light particle layer (CSS/JSで軽く動かす想定) -->
     <canvas id="idleParticles" class="idleParticles" aria-hidden="true"></canvas>
-
-    <!-- Tagline -->
     <div class="idleLine" aria-hidden="true">キミの想いを、共鳴に変えて。</div>
   </div>
 
-  <!-- Video background (only meaningful in playing) -->
+  <!-- VIDEO (PLAYING BG) -->
   <video
     id="bgVideo"
     class="bgVideo"
     src="./video/di_dance.mp4"
     playsinline
+    webkit-playsinline
     muted
     loop
     preload="metadata"
     aria-hidden="true"
   ></video>
 
-  <!-- FX layer (tap-through) -->
+  <!-- FX (tap-through) -->
   <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
 
   <!-- =========================================================
@@ -141,8 +137,7 @@
   </aside>
 
   <!-- =========================================================
-       LEGACY HUD (for compatibility with current UI.js)
-       aria-hidden to avoid duplication for screen readers.
+       LEGACY HUD (compat for current UI.js)
        ========================================================= -->
   <header class="hud" aria-label="HUD" aria-hidden="true">
     <div class="hudBlock">
@@ -171,11 +166,10 @@
        STAGE
        ========================================================= -->
   <section class="stage" id="stage" aria-label="Game Stage">
-
-    <!-- NOTE CANVAS (tap-through; rendering only) -->
+    <!-- NOTE CANVAS (render only; no input) -->
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
 
-    <!-- HIT ZONE (only this receives pointer events) -->
+    <!-- HIT ZONE (only this receives pointer events; lane width) -->
     <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
 
     <!-- TARGET -->
@@ -229,7 +223,8 @@
             </div>
           </div>
 
-          <div class="dicoLine" id="dicoLine">しーちゃんに、君の想いは届いたよ。</div>
+          <!-- ✅ セリフはあなたの指定に更新 -->
+          <div class="dicoLine" id="dicoLine">キミの想いを、共鳴に変えて。</div>
         </div>
       </div>
     </div>
@@ -237,8 +232,8 @@
 
   <!-- =========================================================
        CONTROLS
-       - We keep three buttons in DOM for compatibility,
-         but CSS should show/hide them by app[data-state].
+       - DOMは3つ置いとく（互換）
+       - 表示はCSSで state ごとに切替推奨
        ========================================================= -->
   <footer class="bottom" aria-label="Controls">
     <button id="startBtn" class="btn primary" type="button">START</button>
@@ -259,43 +254,42 @@
 <!-- Main boot -->
 <script src="./js/main.js" defer></script>
 
-<!-- Idle particles (optional). If you want zero JS, delete this script tag. -->
+<!-- Idle particles (light; idle only) -->
 <script>
 (() => {
-  // super light idle particles: 30 dots drifting
   const app = document.getElementById("app");
   const c = document.getElementById("idleParticles");
   if (!app || !c) return;
 
-  const ctx = c.getContext("2d");
-  let w = 0, h = 0, dpr = 1;
+  const ctx = c.getContext("2d", { alpha: true });
+  let bw = 0, bh = 0;
+  let dpr = 1;
+
   const N = 30;
   const dots = Array.from({length:N}, () => ({
     x: Math.random(), y: Math.random(),
-    vx:(Math.random()*2-1)*0.015,
-    vy:(Math.random()*2-1)*0.010,
-    r: 0.6 + Math.random()*1.6,
-    a: 0.10 + Math.random()*0.25
+    vx:(Math.random()*2-1)*0.010,
+    vy:(Math.random()*2-1)*0.008,
+    r: 0.7 + Math.random()*1.7,
+    a: 0.10 + Math.random()*0.22
   }));
 
   function resize(){
     const r = c.getBoundingClientRect();
     dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    w = Math.floor(r.width * dpr);
-    h = Math.floor(r.height * dpr);
-    c.width = w; c.height = h;
+    bw = r.width; bh = r.height;
+    c.width  = Math.max(1, Math.floor(bw * dpr));
+    c.height = Math.max(1, Math.floor(bh * dpr));
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
-  resize();
-  window.addEventListener("resize", resize, {passive:true});
 
   let raf = 0;
   function tick(){
-    // idle state only
-    if (app.dataset.state !== "idle") { raf = requestAnimationFrame(tick); return; }
-
-    const bw = c.getBoundingClientRect().width;
-    const bh = c.getBoundingClientRect().height;
+    // draw only in idle (keep loop running but cheap)
+    if (app.dataset.state !== "idle") {
+      raf = requestAnimationFrame(tick);
+      return;
+    }
 
     ctx.clearRect(0,0,bw,bh);
     ctx.globalCompositeOperation = "lighter";
@@ -313,11 +307,16 @@
       ctx.globalAlpha = p.a;
       ctx.beginPath();
       ctx.arc(x,y,p.r,0,Math.PI*2);
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.fill();
     }
+
     raf = requestAnimationFrame(tick);
   }
+
+  // init
+  resize();
+  window.addEventListener("resize", resize, {passive:true});
   tick();
 })();
 </script>
