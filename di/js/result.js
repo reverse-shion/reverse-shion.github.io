@@ -1,8 +1,8 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.2]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
-   - When active: hides ALL game UI under app, shows ONLY #result overlay
+   - When active: HARD-HIDE all game layers under #app, show ONLY #result
    - Black screen -> DiCo eye close-up
    - Pupil color driven by SCORE, glow driven by resonance (+ score)
    - MAX/detail is NOT implemented here (future: redirect page)
@@ -17,7 +17,6 @@
     return Number.isFinite(x) ? x : d;
   };
 
-  // Optional username (safe)
   function safeUserName() {
     try {
       if (typeof window.getUserName === "function") {
@@ -35,39 +34,26 @@
     return clamp(Math.round(r), 0, 100);
   }
 
-  // Score normalization strategy (stable across charts):
-  // - prefer maxCombo proxy: maxCombo * 120 approximates a "perfect chain segment"
-  // - fallback: map by resonance
+  // Score normalization (chart-agnostic)
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
     const proxyMax = mc > 0 ? mc * 120 : 0;
 
-    // If proxyMax exists and not tiny, use it
-    if (proxyMax >= 240) {
-      return clamp(s / proxyMax, 0, 1);
-    }
+    if (proxyMax >= 240) return clamp(s / proxyMax, 0, 1);
 
-    // If score is large anyway, use a soft log curve
     if (s > 0) {
-      // smooth: score 0..6000 -> ~0..1 (soft, chart-agnostic)
       const p = Math.log10(1 + s) / Math.log10(1 + 6000);
       return clamp(p, 0, 1);
     }
 
-    // fallback to resonance
     return clamp((toNum(resonancePercent, 0) / 100), 0, 1);
   }
 
-  // Color palette (pupil is the “truth”; iris is subtle)
-  // Score -> pupil hue:
-  //  0..0.2 Navy, 0.2..0.45 Aqua, 0.45..0.7 Violet, 0.7..0.9 Magenta, 0.9..1 Gold
   function lerp(a, b, t) { return a + (b - a) * t; }
   function hexToRgb(hex) {
     const h = String(hex).replace("#", "").trim();
-    const v = h.length === 3
-      ? h.split("").map((c) => c + c).join("")
-      : h;
+    const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
     const n = parseInt(v, 16);
     return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
   }
@@ -76,11 +62,7 @@
   }
   function mix(hexA, hexB, t) {
     const A = hexToRgb(hexA), B = hexToRgb(hexB);
-    return {
-      r: lerp(A.r, B.r, t),
-      g: lerp(A.g, B.g, t),
-      b: lerp(A.b, B.b, t),
-    };
+    return { r: lerp(A.r, B.r, t), g: lerp(A.g, B.g, t), b: lerp(A.b, B.b, t) };
   }
 
   const COLORS = {
@@ -93,15 +75,13 @@
   };
 
   function pupilColorByScoreP(p) {
-    // piecewise mix
-    if (p < 0.20) return rgbToCss(mix(COLORS.navy, COLORS.aqua, p / 0.20), 0.95);
-    if (p < 0.45) return rgbToCss(mix(COLORS.aqua, COLORS.violet, (p - 0.20) / 0.25), 0.95);
-    if (p < 0.70) return rgbToCss(mix(COLORS.violet, COLORS.magenta, (p - 0.45) / 0.25), 0.95);
-    if (p < 0.90) return rgbToCss(mix(COLORS.magenta, COLORS.gold, (p - 0.70) / 0.20), 0.96);
-    return rgbToCss(mix(COLORS.gold, COLORS.white, (p - 0.90) / 0.10), 0.98);
+    if (p < 0.20) return rgbToCss(mix(COLORS.navy,   COLORS.aqua,   p / 0.20), 0.95);
+    if (p < 0.45) return rgbToCss(mix(COLORS.aqua,   COLORS.violet, (p - 0.20) / 0.25), 0.95);
+    if (p < 0.70) return rgbToCss(mix(COLORS.violet, COLORS.magenta,(p - 0.45) / 0.25), 0.95);
+    if (p < 0.90) return rgbToCss(mix(COLORS.magenta,COLORS.gold,   (p - 0.70) / 0.20), 0.96);
+    return rgbToCss(mix(COLORS.gold,   COLORS.white, (p - 0.90) / 0.10), 0.98);
   }
 
-  // copy (short, “result = ritual”)
   function lineBy(resPercent, nameOrNull) {
     const name = nameOrNull;
     if (resPercent >= 100) {
@@ -122,8 +102,7 @@
     return `共鳴は消えてない。\nDiDiDi…もう一回、いこ？`;
   }
 
-  // ---------- DOM (non-destructive to engine result DOM) ----------
-  // We build our overlay shell as an additional child, and NEVER wipe existing #result content.
+  // ---------- DOM (non-destructive) ----------
   function ensureShell(root) {
     let shell = root.querySelector(".tbResultOverlayShell");
     if (shell) return shell;
@@ -167,14 +146,6 @@
     return shell;
   }
 
-  // Retrigger helper
-  function retrigger(el, cls) {
-    if (!el) return;
-    el.classList.remove(cls);
-    void el.offsetWidth; // force reflow
-    el.classList.add(cls);
-  }
-
   // ---------- CSS injection ----------
   function injectStylesOnce() {
     if (document.getElementById("tbResultOverlayStyles")) return;
@@ -182,32 +153,30 @@
     const s = document.createElement("style");
     s.id = "tbResultOverlayStyles";
     s.textContent = `
-/* ===== TB RESULT OVERLAY v1.2 ===== */
+/* ===== TB RESULT OVERLAY v1.3 (HARD CUT) ===== */
 
-/* Base: #result becomes the fullscreen overlay container */
+/* Base: #result becomes a true fullscreen overlay container */
 #result{
   position: fixed !important;
   inset: 0 !important;
-  z-index: 2147483647 !important; /* max-ish */
+  z-index: 2147483647 !important;
+  display: block !important;
+
+  /* hard isolate: avoid blend/backdrop leakage */
+  isolation: isolate !important;
+  contain: layout paint style !important;
+
   pointer-events: none;
-  display: block;
+  background: #000;
 }
 
-/* Active overlay */
 #result.tb-active{
   pointer-events: auto;
 }
 
-/* Hide everything under app while result is active:
-   - We hide all direct children of #app
-   - Then re-enable #result and its children.
-*/
-#app.tb-result-active > *{
-  visibility: hidden !important;
-}
-#app.tb-result-active #result,
-#app.tb-result-active #result *{
-  visibility: visible !important;
+/* HARD CUT: while result is active, remove everything under #app except #result */
+#app.tb-result-active > *:not(#result){
+  display: none !important;
 }
 
 /* Overlay shell */
@@ -222,7 +191,7 @@
   padding: 16px;
 }
 
-/* Pure black (slight depth) */
+/* Pure black with slight depth */
 #result .tbResultOverlayBlack{
   position: absolute;
   inset: 0;
@@ -239,7 +208,7 @@
   align-items: center;
 }
 
-/* Eye close-up (big) */
+/* Eye close-up */
 #result .tbEye{
   position: relative;
   width: min(92vw, 520px);
@@ -253,7 +222,7 @@
   background: radial-gradient(circle at 50% 50%, rgba(5,6,10,0.90) 0%, rgba(0,0,0,0.98) 72%, rgba(0,0,0,1) 100%);
 }
 
-/* Subtle scan/noise */
+/* Scan/noise */
 #result .tbEyeNoise{
   position:absolute; inset:-30%;
   background:
@@ -268,7 +237,7 @@
   animation: tbNoise 2.8s linear infinite;
 }
 
-/* Vignette for close-up */
+/* Vignette */
 #result .tbEyeVignette{
   position:absolute; inset:-10%;
   background:
@@ -278,7 +247,7 @@
       rgba(0,0,0,0.85) 100%);
 }
 
-/* Iris (kept subtle; pupil is the main actor) */
+/* Iris (subtle) */
 #result .tbIris{
   position:absolute; inset: 18%;
   border-radius: 999px;
@@ -317,10 +286,9 @@
     rgba(0,0,0,0.98) 60%,
     rgba(0,0,0,1) 100%);
   box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
-  transform: scale(1.0);
 }
 
-/* Pupil glow (color set via CSS variable) */
+/* Pupil glow (color via CSS variable) */
 #result .tbPupilGlow{
   position:absolute;
   inset: 30%;
@@ -331,11 +299,10 @@
       rgba(0,0,0,0) 65%);
   filter: blur(18px);
   opacity: var(--tb-glow-power, 0.35);
-  transform: scale(1.0);
   animation: tbBreath 3.6s ease-in-out infinite;
 }
 
-/* Specular star highlight (enabled at high score) */
+/* Specular highlight (only high score) */
 #result .tbSpecular{
   position:absolute;
   inset: 0;
@@ -350,11 +317,7 @@
 }
 
 /* Readout */
-#result .tbResultReadout{
-  position: relative;
-  text-align: center;
-  z-index: 1;
-}
+#result .tbResultReadout{ position: relative; text-align:center; z-index: 1; }
 #result .tbResPercent{
   font-size: 56px;
   font-weight: 900;
@@ -386,11 +349,7 @@
 }
 
 /* Actions */
-#result .tbActions{
-  position: relative;
-  z-index: 1;
-  margin-top: 2px;
-}
+#result .tbActions{ position: relative; z-index: 1; margin-top: 2px; }
 #result .tbBtn{
   border: 0;
   padding: 12px 16px;
@@ -405,7 +364,7 @@
 }
 #result .tbBtn:active{ transform: translateY(1px); }
 
-/* Entry animation: black -> eye */
+/* Entry animation */
 #result.tb-active .tbEye{
   animation: tbEyeIn .65s cubic-bezier(.2,.9,.2,1) both;
 }
@@ -442,16 +401,13 @@
     document.head.appendChild(s);
   }
 
-  // ---------- animation / update ----------
-  // Smooth count-up, but the "eye truth" (color/glow) is set immediately based on score/resonance.
+  // ---------- paint / animate ----------
   function animate(root, payload) {
     const percentEl = root.querySelector("#tbResPercent");
     const lineEl = root.querySelector("#tbLine");
     const pupilEl = root.querySelector("#tbPupil");
-    const glowEl = root.querySelector("#tbPupilGlow");
-    const specEl = root.querySelector("#tbSpecular");
 
-    if (!percentEl || !lineEl || !pupilEl || !glowEl) return;
+    if (!percentEl || !lineEl || !pupilEl) return;
 
     const resPercent = normalizePercent(payload?.resonance ?? 0);
     const score = toNum(payload?.score, 0);
@@ -460,29 +416,25 @@
     const scoreP = normalizeScore01(score, maxCombo, resPercent);
     const pupilColor = pupilColorByScoreP(scoreP);
 
-    // Glow power: base from resonance, boosted by scoreP slightly
+    // Glow power: base from resonance + slight score boost
     const glowPower = clamp(0.20 + (resPercent / 100) * 0.55 + scoreP * 0.25, 0.20, 1.00);
-
-    // Specular: only at high score
     const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
 
-    // Apply dynamic vars (pupil+glow)
     root.style.setProperty("--tb-pupil-glow", pupilColor);
     root.style.setProperty("--tb-glow-power", String(glowPower));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
 
-    // Also tint pupil inner ring subtly by setting box-shadow
-    pupilEl.style.boxShadow = `0 0 0 1px rgba(255,255,255,0.10) inset, 0 0 ${Math.round(22 + glowPower * 34)}px ${pupilColor}`;
+    pupilEl.style.boxShadow =
+      `0 0 0 1px rgba(255,255,255,0.10) inset, 0 0 ${Math.round(22 + glowPower * 34)}px ${pupilColor}`;
 
-    // Copy
     const name = safeUserName();
     lineEl.innerText = lineBy(resPercent, (name && resPercent >= 50) ? name : null);
 
-    // Count up percent (soft)
+    // Count-up
     percentEl.textContent = "0%";
     let cur = 0;
     const target = clamp(resPercent, 0, 100);
-    const frames = 56; // ~1s @60fps
+    const frames = 56;
     const step = Math.max(1, Math.ceil(target / frames));
 
     function tick() {
@@ -498,20 +450,18 @@
     init(opts) {
       const root = opts?.root || document.getElementById("result");
       const app = opts?.app || document.getElementById("app");
-
       if (!root) return { show() {}, hide() {} };
 
       injectStylesOnce();
       ensureShell(root);
 
-      // Replay wiring (reliable: click startBtn; fallback restartBtn)
+      // Wire replay once
       const replayBtn = root.querySelector("#tbReplayBtn");
       if (replayBtn && !replayBtn.__tbBound) {
         replayBtn.__tbBound = true;
         replayBtn.addEventListener("click", () => {
-          // Hide first (clean)
+          // clean hide (remove hard-cut first)
           root.classList.remove("tb-active");
-          root.classList.remove("active");
           if (app) app.classList.remove("tb-result-active");
 
           const startBtn = document.getElementById("startBtn");
@@ -523,28 +473,25 @@
 
       return {
         show(payload) {
-          // 1) Activate top overlay
-          root.classList.add("tb-active");
-          root.classList.add("active"); // backward compat (if any CSS depends on it)
-
-          // 2) Hide all game elements under app, show only #result
+          // 1) hard-cut under #app
           if (app) app.classList.add("tb-result-active");
 
-          // 3) Ensure shell exists (in case engine re-rendered #result)
+          // 2) activate overlay
+          root.classList.add("tb-active");
+
+          // 3) ensure overlay shell exists (in case engine touched #result)
           ensureShell(root);
 
-          // 4) Animate / paint
+          // 4) paint + animate
           animate(root, payload || {});
         },
         hide() {
           root.classList.remove("tb-active");
-          root.classList.remove("active");
           if (app) app.classList.remove("tb-result-active");
         },
       };
     },
   };
 
-  // Optional backwards compat namespace
   window.TB_RESULT = window.TB_RESULT || {};
 })();
