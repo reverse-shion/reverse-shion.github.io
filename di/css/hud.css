@@ -1,0 +1,222 @@
+/* /di/css/hud.css */
+/* SIDE HUD: left score/combo + right player/resonance + avatar ring */
+
+.sideHud{
+  position:absolute;
+  top: calc(env(safe-area-inset-top) + 12px);
+  bottom: calc(env(safe-area-inset-bottom) + var(--bottomH) + 10px);
+  width: var(--hudW);
+  display:flex;
+  flex-direction:column;
+  gap: 12px;
+  z-index:9;
+  pointer-events:none; /* HUD shouldn't block taps */
+}
+
+.sideHudLeft{
+  left: calc(env(safe-area-inset-left) + 12px);
+  align-items:stretch;
+}
+.sideHudRight{
+  right: calc(env(safe-area-inset-right) + 12px);
+  align-items:stretch;
+}
+
+/* cards */
+.sideCard{
+  pointer-events:none;
+  border-radius: var(--r);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: var(--sh2);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  padding: 12px 12px;
+  position:relative;
+  overflow:hidden;
+}
+
+.sideCard::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  background:
+    radial-gradient(420px 160px at 10% 0%, rgba(0,240,255,.14), transparent 55%),
+    radial-gradient(420px 160px at 90% 20%, rgba(156,60,255,.12), transparent 58%),
+    radial-gradient(420px 160px at 60% 100%, rgba(230,201,107,.10), transparent 60%);
+  opacity:.85;
+  pointer-events:none;
+}
+
+.sideScore{
+  padding-top: 14px;
+}
+.sideScoreValue{
+  position:relative;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-shadow: 0 0 18px rgba(0,240,255,.18);
+}
+.sideScoreSub{
+  position:relative;
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: .14em;
+  color: var(--muted);
+}
+
+.sideComboValue{
+  position:relative;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+.sideComboLabel{
+  position:relative;
+  margin-top: 2px;
+  font-size: 12px;
+  letter-spacing: .18em;
+  color: var(--muted);
+}
+.sideComboMeta{
+  position:relative;
+  display:flex;
+  gap:8px;
+  align-items:baseline;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+.metaLabel{
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: var(--dim);
+}
+.metaValue{
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* player card */
+.sidePlayer{
+  padding: 12px;
+}
+.sideTop{
+  position:relative;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 10px;
+}
+
+.sideNameMain{
+  font-weight: 900;
+  letter-spacing: .02em;
+  font-size: 20px;
+  line-height: 1.1;
+}
+.sideNameSub{
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: .20em;
+  color: var(--muted);
+}
+
+/* avatar ring */
+.sideAvatar{
+  width: 60px;
+  height: 60px;
+  position:relative;
+  flex: 0 0 auto;
+}
+.avatarRing{
+  position:absolute;
+  inset:-6px;
+  border-radius:999px;
+  background: var(--gradNeon);
+  filter: blur(.0px);
+  opacity:.92;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.14),
+    0 0 18px rgba(230,201,107,.20),
+    0 0 22px rgba(0,240,255,.16);
+}
+.avatarRing::after{
+  content:"";
+  position:absolute;
+  inset: 2px;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(0,0,0,.0), rgba(0,0,0,.40));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: var(--inset);
+}
+.dicoFace{
+  position:absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  outline: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+}
+
+/* gauge */
+.sideGauge{
+  position:relative;
+  padding-top: 6px;
+}
+.sideGaugeRow, .sideTimeRow{
+  position:relative;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:10px;
+}
+.sideGaugeLabel, .sideTimeLabel{
+  font-size: 11px;
+  letter-spacing: .20em;
+  color: var(--muted);
+}
+.sideGaugeValue, .sideTimeValue{
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+.sideGaugeValue .pct{ opacity:.70; font-weight:800; margin-left:2px; }
+
+.sideGaugeBar{
+  position:relative;
+  height: 10px;
+  border-radius: 999px;
+  margin-top: 8px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  overflow:hidden;
+}
+.sideGaugeFill{
+  position:absolute;
+  inset:0;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(0,240,255,.90), rgba(156,60,255,.75), rgba(230,201,107,.78));
+  box-shadow: 0 0 20px rgba(0,240,255,.18);
+  transition: width .12s ease;
+}
+
+/* duplicate time hidden here; use main.js to sync if needed */
+#time_dup{ display:none; }
+
+/* hidden face pool */
+.facePool{ display:none; }
+
+/* small screens: shrink avatar */
+@media (max-width: 720px){
+  .sideAvatar{ width: 52px; height: 52px; }
+  .sideScoreValue{ font-size: 28px; }
+  .sideComboValue{ font-size: 26px; }
+}
