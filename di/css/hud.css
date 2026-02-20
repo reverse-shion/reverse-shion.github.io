@@ -463,3 +463,12 @@
   .sideScoreValue{ font-size: 28px; }
   .sideComboValue{ font-size: 26px; }
 }
+/* --- FIX: STOPが消えない（paused状態を定義） --- */
+
+/* default: 非表示（保険） */
+#stopBtn, #restartBtn{ display:none; }
+
+/* paused: START + RESTART を出して STOP を消す */
+.app[data-state="paused"] #startBtn{ display:inline-flex; }
+.app[data-state="paused"] #stopBtn{ display:none; }
+.app[data-state="paused"] #restartBtn{ display:inline-flex; }
