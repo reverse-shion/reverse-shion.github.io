@@ -23,6 +23,24 @@
   --hitY: 78%;
 }
 
+:root{
+  /* 既存のまま + 追加 */
+  --laneW: min(520px, 86vw);
+  --laneDark: rgba(0,0,0,.34);
+  --laneDark2: rgba(0,0,0,.56);
+
+  /* レーン両端ガイド光 */
+  --laneEdge: rgba(0,240,255,.22);
+  --laneEdge2: rgba(156,60,255,.12);
+
+  /* 判定帯フラッシュ */
+  --hitGlow: rgba(0,240,255,.22);
+  --hitGlowGold: rgba(230,201,107,.20);
+
+  /* 上HUDを整理して“スクショ寄せ”するので、上HUD分の高さを0に */
+  --hudH: 0px;
+}
+
 /* Reset / iOS safety */
 *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 html,body{ height:100%; }
@@ -59,18 +77,22 @@ button{
     linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.35));
 }
 
-/* background video */
+/* background video — 明るさ維持 */
 .bgVideo{
   position:absolute; inset:0;
   width:100%; height:100%;
   object-fit:cover;
-  opacity:.22;
-  filter: saturate(1.20) contrast(1.05);
+
+  /* 暗さの主因だったので上げる */
+  opacity:.55;
+
+  /* 明るさを保ちつつ、映像が綺麗に出る方向 */
+  filter: saturate(1.18) contrast(1.08) brightness(1.12);
+
   transform: translateZ(0);
   z-index:1;
   pointer-events:none;
 }
-
 /* fx layer (tap-through) */
 .fxLayer{
   position:absolute; inset:0;
@@ -90,6 +112,12 @@ button{
   grid-template-columns: 1fr 1.2fr 1fr;
   gap:12px;
   pointer-events:none;
+}
+/* Top HUDは“保持”しつつ視覚的に隠す（JS参照があっても壊れない） */
+.hud{
+  opacity:0;
+  visibility:hidden;
+  transform: translateY(-6px);
 }
 
 .hudBlock{
@@ -124,6 +152,73 @@ button{
   bottom: calc(var(--safeB) + var(--btnH));
   z-index:20;
   overflow:hidden;
+}
+/* ===== Lane board：中央だけ暗く（よくある音ゲー板） ===== */
+.stage::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  width: var(--laneW);
+  height:100%;
+  transform: translateX(-50%);
+  z-index:22;                 /* videoより上、canvasより下 */
+  pointer-events:none;
+
+  /* レーン板：上は薄く、下は濃い（奥行き） */
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.04),
+      var(--laneDark) 18%,
+      var(--laneDark2) 100%);
+
+  border-left: 1px solid rgba(255,255,255,.10);
+  border-right:1px solid rgba(255,255,255,.10);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.18),
+    0 26px 80px rgba(0,0,0,.22);
+}
+
+/* ===== Lane edge guide：両端の薄いガイド光 ===== */
+.stage::before{
+  /* 上のレーン板に“ガイド光”を重ねる（背景多重） */
+  background:
+    /* 左端ガイド */
+    linear-gradient(90deg,
+      rgba(0,0,0,0),
+      rgba(0,0,0,0) 6px,
+      var(--laneEdge) 10px,
+      rgba(0,0,0,0) 18px,
+      rgba(0,0,0,0) 40px),
+    /* 右端ガイド */
+    linear-gradient(270deg,
+      rgba(0,0,0,0),
+      rgba(0,0,0,0) 6px,
+      var(--laneEdge) 10px,
+      rgba(0,0,0,0) 18px,
+      rgba(0,0,0,0) 40px),
+    /* ほんのりバイオレットの縁光（深み） */
+    linear-gradient(90deg,
+      var(--laneEdge2),
+      rgba(0,0,0,0) 18%,
+      rgba(0,0,0,0) 82%,
+      var(--laneEdge2)),
+    /* レーン板本体 */
+    linear-gradient(180deg,
+      rgba(255,255,255,.04),
+      var(--laneDark) 18%,
+      var(--laneDark2) 100%);
+
+  /* ガイド光の立体感 */
+  box-shadow:
+    inset 0 0 26px rgba(0,240,255,.06),
+    inset 0 0 22px rgba(156,60,255,.05),
+    0 0 0 1px rgba(0,0,0,.18),
+    0 26px 80px rgba(0,0,0,.22);
 }
 
 .noteCanvas{
@@ -526,4 +621,195 @@ button{
   0%{ opacity: 0; }
   35%{ opacity: 1; }
   100%{ opacity: 0; }
+}
+/* 判定帯（帯そのもの） */
+.hitZone{
+  position:absolute;
+  left:50%;
+  top: var(--hitY);
+  width: var(--laneW);
+  height: 96px;
+  transform: translate(-50%, -50%);
+  z-index:23;          /* レーン板より上、canvasより下 */
+  pointer-events:none;
+
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,240,255,.08), transparent 62%),
+    linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+
+  border-top: 1px solid rgba(255,255,255,.10);
+  border-bottom:1px solid rgba(255,255,255,.10);
+  box-shadow: inset 0 0 28px rgba(0,240,255,.06);
+}
+
+/* ノーツが判定帯に入った瞬間：軽く発光（JSで class 付与） */
+.hitZone.flash{
+  animation: hitZoneFlash .14s ease-out both;
+}
+
+.hitZone.flash.good{
+  --zg: var(--hitGlow);
+}
+.hitZone.flash.great{
+  --zg: var(--hitGlowGold);
+}
+
+@keyframes hitZoneFlash{
+  0%{
+    filter: brightness(1);
+    box-shadow:
+      inset 0 0 28px rgba(0,240,255,.06),
+      0 0 0 rgba(0,0,0,0);
+  }
+  35%{
+    filter: brightness(1.08);
+    box-shadow:
+      inset 0 0 42px var(--zg),
+      0 0 22px rgba(0,240,255,.10);
+  }
+  100%{
+    filter: brightness(1);
+    box-shadow:
+      inset 0 0 28px rgba(0,240,255,.06),
+      0 0 0 rgba(0,0,0,0);
+  }
+}
+.stage{ z-index:20; }
+.stage::before{ z-index:22; }   /* レーン板 */
+.hitZone{ z-index:23; }         /* 判定帯 */
+.noteCanvas{ z-index:26; }      /* ノーツ */
+.stage::after{ z-index:27; }    /* 判定線 */
+.targetRoot{ z-index:28; }      /* ターゲット */
+.judge{ z-index:29; }           /* 判定文字 */
+
+/* =========================
+   SIDE HUD (スクショ寄せ)
+   ========================= */
+.sideHud{
+  position: fixed;
+  top: calc(var(--safeT) + 14px);
+  z-index: 60;
+  display: grid;
+  gap: 14px;
+  pointer-events:none;
+  user-select:none;
+  text-shadow: 0 0 18px rgba(0,240,255,.14);
+}
+.sideHudLeft{ left: 16px; width: min(260px, 44vw); }
+.sideHudRight{ right: 16px; width: min(420px, 62vw); }
+
+.sideCard{
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 22px 60px rgba(0,0,0,.35);
+}
+
+/* 左：SCORE/COMBO */
+.sideScoreValue{
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+.sideComboValue{
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 1000;
+}
+.sideComboLabel{
+  margin-top: 6px;
+  font-size: 14px;
+  letter-spacing: .22em;
+  opacity: .78;
+}
+
+/* 右：DiCo + Resonance + Avatar */
+.sideTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.sideNameMain{
+  font-size: 34px;
+  font-weight: 1000;
+  letter-spacing: .10em;
+}
+.sideNameSub{
+  margin-top: 4px;
+  font-size: 12px;
+  letter-spacing: .28em;
+  opacity: .7;
+}
+
+.sideAvatar{
+  width: 74px; height: 74px;
+  border-radius: 999px;
+  padding: 4px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(90,255,240,.55), rgba(0,0,0,0) 55%),
+    linear-gradient(135deg, rgba(230,201,107,.55), rgba(0,240,255,.55));
+  box-shadow: 0 0 22px rgba(0,240,255,.18);
+}
+.dicoFace{
+  width:100%; height:100%;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,.22);
+}
+
+.sideGauge{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  align-items:center;
+  gap: 12px;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.sideGaugeBar{
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+  overflow:hidden;
+}
+.sideGaugeFill{
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(0,240,255,.95), rgba(120,255,235,.95));
+  box-shadow: 0 0 18px rgba(0,240,255,.22);
+  transition: width 180ms ease;
+}
+.sideGaugeValue{
+  font-size: 18px;
+  font-weight: 1000;
+  letter-spacing: .06em;
+}
+.sideGaugeValue .pct{ opacity:.8; margin-left:2px; }
+
+/* facePoolはプリロード用：見えない */
+.facePool{ display:none; }
+
+/* モバイル調整 */
+@media (max-width: 520px){
+  .sideHudLeft{ width: 46vw; }
+  .sideHudRight{ width: 78vw; }
+  .sideNameMain{ font-size: 26px; }
+  .sideComboValue{ font-size: 46px; }
 }
