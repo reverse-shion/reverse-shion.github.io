@@ -21,6 +21,12 @@
     "notes/skin-tarot-pinkgold.js",
   ].map((p) => new URL(p, BASE).toString());
 
+   // Presentation layer (keep separate from engine)
+  // Put result.js at: /di/js/result.js
+  const PRESENTATION_FILES = [
+    "result.js",
+  ].map((p) => new URL(p, BASE).toString());
+
   const $ = (id) => document.getElementById(id);
 
   // iOS当たりづらい時：0.06→0.08→0.10で調整
