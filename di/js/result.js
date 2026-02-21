@@ -29,9 +29,15 @@
     COUNTUP_FRAMES: 56,
     Z_MAX: 2147483647,
 
-    // ARU ring tuning (feel free to tweak)
-    RING_INSET_PCT: 5.5, // ring position
-    RING_THICKNESS_PCT: 10.5, // ring thickness
+    // ARU ring tuning
+    RING_INSET_PCT: 5.5,
+    RING_THICKNESS_PCT: 10.5,
+
+    // Eye image tuning (CENTER iris + star in center)
+    // ここが「虹彩/星を中心に合わせる」基準値
+    EYE_BG_SIZE: 190,          // %
+    EYE_BG_POS_X: 50,          // %
+    EYE_BG_POS_Y: 38,          // %  ※だいたい 34〜44 が当たり帯
   });
 
   // =========================
@@ -53,17 +59,12 @@
     return null;
   }
 
-  // Resonance can be 0..1 or 0..100
   function normalizePercent(resonance) {
     let r = toNum(resonance, 0);
     if (r <= 1.0001) r *= 100;
     return clamp(Math.round(r), 0, 100);
   }
 
-  // Score normalization strategy:
-  // - prefer maxCombo proxy: maxCombo * 120
-  // - fallback: soft log
-  // - fallback: resonance
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
@@ -103,7 +104,6 @@
     white:  "#FFFFFF",
   });
 
-  // Score -> ARU hue
   function aruColorByScoreP(p) {
     if (p < 0.20) return rgbToCss(mix(COLORS.navy,   COLORS.aqua,    p / 0.20), 0.95);
     if (p < 0.45) return rgbToCss(mix(COLORS.aqua,   COLORS.violet, (p - 0.20) / 0.25), 0.95);
@@ -144,7 +144,6 @@
     shell.setAttribute("role", "dialog");
     shell.setAttribute("aria-label", "Result");
 
-    // NOTE: add ARU ring + core (center sphere) layers (CSS-driven)
     shell.innerHTML = `
       <div class="tbResultOverlayBlack" aria-hidden="true"></div>
 
@@ -186,7 +185,7 @@
     const s = document.createElement("style");
     s.id = CFG.STYLE_ID;
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (ARU HERO) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (ARU HERO / CENTERED IRIS) ===== */
 
 #result{
   position: fixed !important;
@@ -196,10 +195,14 @@
   pointer-events: none;
   background: #000 !important;
 
-  /* Stack safety (iOS/Safari) */
+  /* iOS/Safari stack safety */
   isolation: isolate !important;
   contain: layout paint style !important;
   transform: translateZ(0) !important;
+
+  /* Eye image tuning variables (CENTER iris + star) */
+  --tb-eye-size: ${CFG.EYE_BG_SIZE}%;
+  --tb-eye-pos: ${CFG.EYE_BG_POS_X}% ${CFG.EYE_BG_POS_Y}%;
 }
 
 #result.${CFG.ROOT_ACTIVE_CLASS}{
@@ -270,10 +273,9 @@
   border-radius: 999px;
   overflow: hidden;
 
-  /* eye image */
   background-image: url("${CFG.EYE_IMAGE_URL}");
-  background-size: var(--tb-eye-size, 145%);
-  background-position: var(--tb-eye-pos, 70% 120%);
+  background-size: var(--tb-eye-size);
+  background-position: var(--tb-eye-pos);
   background-repeat: no-repeat;
 
   box-shadow:
@@ -319,8 +321,6 @@
 /* =========================
    ARU RING (HERO)
    ========================= */
-
-/* Ring body: color is --tb-aru */
 #result .tbAruRing{
   position:absolute;
   inset: ${CFG.RING_INSET_PCT}%;
@@ -346,12 +346,11 @@
     #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
 
   mix-blend-mode: screen;
-  opacity: 0.92;
+  opacity: calc(0.78 + var(--tb-glow,0.35) * 0.22);
   filter: blur(0.25px);
   animation: tbRingSpin 8.8s linear infinite;
 }
 
-/* Digital ticks: “game UI” feel */
 #result .tbAruRingTicks{
   position:absolute;
   inset: ${CFG.RING_INSET_PCT}%;
@@ -382,7 +381,7 @@
 
 /* =========================
    CORE (CENTER SPHERE)
-   - gray base + ARU rim glow + pulse synced
+   - gray base + ARU rim glow (link) + pulse
    ========================= */
 #result .tbCore{
   position:absolute;
@@ -390,7 +389,6 @@
   border-radius: 999px;
   pointer-events:none;
 
-  /* base sphere */
   background:
     radial-gradient(circle at 36% 32%,
       rgba(255,255,255,0.55) 0%,
@@ -399,12 +397,14 @@
       rgba(40,40,40,0.85) 78%,
       rgba(0,0,0,0.95) 100%);
 
-  /* ARU rim glow (THIS is the “link”) */
+  /* ✅ ARU rim (薄い発光縁) */
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.10) inset,
     0 0 0 2px rgba(255,255,255,0.04) inset,
-    0 0 24px rgba(0,0,0,0.35),
-    0 0 calc(10px + var(--tb-glow,0.35)*38px) var(--tb-aru, rgba(0,240,255,0.45));
+    0 0 20px rgba(0,0,0,0.38),
+    0 0 0 2px rgba(0,0,0,0.25),
+    0 0 calc(12px + var(--tb-glow,0.35)*44px) color-mix(in srgb, var(--tb-aru, rgba(0,240,255,0.55)) 55%, transparent),
+    0 0 calc(26px + var(--tb-glow,0.35)*64px) color-mix(in srgb, var(--tb-aru, rgba(0,240,255,0.55)) 28%, transparent);
 
   animation: tbCorePulse 2.6s ease-in-out infinite;
 }
@@ -424,9 +424,7 @@
   pointer-events:none;
 }
 
-/* =========================
-   Readout / Copy / Button
-   ========================= */
+/* Readout */
 #result .tbResultReadout{ position: relative; text-align:center; z-index: 1; }
 #result .tbResPercent{
   font-size: 56px;
@@ -444,6 +442,7 @@
   color: rgba(245,245,242,0.68);
 }
 
+/* Copy */
 #result .tbLine{
   position: relative;
   z-index: 1;
@@ -457,6 +456,7 @@
   text-shadow: 0 8px 24px rgba(0,0,0,0.65);
 }
 
+/* Button */
 #result .tbActions{ position: relative; z-index: 1; margin-top: 2px; }
 #result .tbBtn{
   border: 0;
@@ -520,7 +520,6 @@
   function paintAndAnimate(root, payload) {
     const percentEl = root.querySelector("#tbResPercent");
     const lineEl = root.querySelector("#tbLine");
-    const eyeEl = root.querySelector("#tbEye");
     if (!percentEl || !lineEl) return;
 
     const resPercent = normalizePercent(payload?.resonance ?? 0);
@@ -529,27 +528,16 @@
 
     const scoreP = normalizeScore01(score, maxCombo, resPercent);
 
-    // ARU color (hero)
     const aruColor = aruColorByScoreP(scoreP);
-
-    // Glow power: resonance base + score push
     const glow = clamp(0.18 + (resPercent / 100) * 0.58 + scoreP * 0.22, 0.18, 1.0);
-
-    // Specular at high score
     const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
 
-    // Sync vars across ring / core / bloom
     root.style.setProperty("--tb-aru", aruColor);
     root.style.setProperty("--tb-glow", String(glow));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
 
-    // Optional: auto nudge eye image for “瞳に寄せる” feel by resonance
-    // (keeps it addictive: higher resonance => slightly closer)
-    if (eyeEl) {
-      const size = 142 + glow * 18; // 142%..160%
-      eyeEl.style.setProperty("--tb-eye-size", `${size}%`);
-      eyeEl.style.setProperty("--tb-eye-pos", `50% ${Math.round(42 - glow * 6)}%`);
-    }
+    // ここは固定（勝手に動かさない）
+    // もし微調整したいなら、CFG.EYE_BG_SIZE / POS_Y を変える運用でOK。
 
     const name = safeUserName();
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
