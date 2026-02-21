@@ -1,9 +1,9 @@
 /* /di/css/aru-gauge.css
    =========================
    ARU GAUGE (TOPMOST RESULT HUD)
-   - shows ONLY on result screen (app[data-state="result"])
+   - shows ONLY when #result is visible (aria-hidden != "true")
    - value is driven by CSS var: --aru-value (0..1)
-   - state is driven by app attr: data-aru-state="low|mid|high|max"
+   - color state is driven by app attr: data-aru-state="low|mid|high|max"
    ========================= */
 
 /* =========================
@@ -39,12 +39,12 @@
 
 /* default hidden */
 .aruLayer{
-  display:none;
+  display: none;
 }
 
-/* show only on result */
-.app[data-state="result"] .aruLayer{
-  display:flex;
+/* ✅ "resultが表示状態" をトリガーにする（DOM構造に強い） */
+.app:has(#result:not([aria-hidden="true"])) .aruLayer{
+  display: flex;
 }
 
 /* =========================
@@ -60,6 +60,7 @@
   align-items: center;
   justify-content: center;
 
+  /* overlay ring should sit above everything */
   isolation: isolate;
 }
 
@@ -105,9 +106,11 @@
   transition: background 240ms ease, filter 240ms ease;
   will-change: background, filter;
 
+  /* ring glow only (NO full-screen tint) */
   filter:
     drop-shadow(0 0 10px rgba(255,255,255,0.10))
-    drop-shadow(0 0 calc(var(--aru-glow) * 26px)
+    drop-shadow(
+      0 0 calc(var(--aru-glow) * 26px)
       color-mix(in srgb, var(--aru-active-color) 85%, transparent)
     );
 }
@@ -161,13 +164,4 @@
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce){
   .aruGauge::before{ transition: none; }
-}
-
-/* TEST: まず本当にレイヤーが生きてるか */
-.aruLayer{
-  display:flex !important;
-  background: rgba(255,0,0,0.10);
-}
-.aruGauge{
-  background: rgba(0,255,255,0.10);
 }
