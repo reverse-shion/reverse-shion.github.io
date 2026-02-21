@@ -67,6 +67,10 @@
             u.searchParams.set("v", String(Date.now()));
             s.src = u.toString();
             s.async = false;
+
+              // ✅ ここが重要：presentationだけ module にする
+          if (type === "module") s.type = "module";
+             
             s.onload = () => resolve();
             s.onerror = () => reject(new Error("Failed to load: " + src));
             document.head.appendChild(s);
