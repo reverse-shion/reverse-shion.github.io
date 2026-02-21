@@ -5,71 +5,62 @@ import { paintAndAnimate } from "./paint.js";
 
 /**
  * リプレイ押下時：
- * - overlay を先に確実に閉じる
+ * - overlay を先に確実に閉じる（display:none + pointer-events:none）
  * - app の cut を解除
- * - そのあと START / RESTART を発火（既存main.jsの流れに乗せる）
+ * - そのあと START/RESTART を発火
  */
-function wireReplayOnce(overlayRoot, app, api) {
+function wireReplayOnce(overlayRoot, api) {
   const replayBtn = overlayRoot.querySelector("#tbReplayBtn");
   if (!replayBtn || replayBtn.__tbBound) return;
 
   replayBtn.__tbBound = true;
-  replayBtn.addEventListener(
-    "click",
-    () => {
-      // ✅ 先に必ず閉じる（ここが“消えない”対策の要）
-      api.hide();
+  replayBtn.addEventListener("click", () => {
+    api.hide(); // ✅ 先に閉じる
 
-      const startBtn = document.getElementById("startBtn");
-      if (startBtn) {
-        startBtn.click();
-        return;
-      }
-      const restartBtn = document.getElementById("restartBtn");
-      restartBtn?.click?.();
-    },
-    { passive: true }
-  );
+    const startBtn = document.getElementById("startBtn");
+    if (startBtn) return startBtn.click();
+
+    const restartBtn = document.getElementById("restartBtn");
+    restartBtn?.click?.();
+  });
 }
 
 export function init(opts = {}) {
   const app = opts.app || document.getElementById("app");
-
-  // ✅ init時点では作らない（＝ページ表示直後に被らない）
   let overlayRoot = null;
 
-  // show/hide を外から使うので api を先に用意
   const api = {
     show(payload = {}) {
-      // ✅ 必要になった瞬間に生成
       overlayRoot ||= ensureOverlayRoot();
-
-      // shell（HTML）も必要になった瞬間だけ
       ensureShell(overlayRoot);
+      wireReplayOnce(overlayRoot, api);
 
-      // ボタン配線（api.hide を使うので api を渡す）
-      wireReplayOnce(overlayRoot, app, api);
-
-      // 下のゲームレイヤーを切る（あなたの既存方針）
-      if (app) app.classList.add(CFG.APP_CUT_CLASS);
-
-      // overlay 表示
-      overlayRoot.classList.add(CFG.ROOT_ACTIVE_CLASS);
+      // ✅ まず「触れる」状態に戻す
+      overlayRoot.style.display = "block";
+      overlayRoot.style.pointerEvents = "auto";
       overlayRoot.removeAttribute("aria-hidden");
 
-      // 描画更新（ゲージ・色・%アニメ）
+      // 下レイヤーを切る
+      if (app) app.classList.add(CFG.APP_CUT_CLASS);
+
+      // active
+      overlayRoot.classList.add(CFG.ROOT_ACTIVE_CLASS);
+
       paintAndAnimate(overlayRoot, payload);
     },
 
     hide() {
+      // ✅ overlayが未生成でも cut は必ず解除（B対策）
+      if (app) app.classList.remove(CFG.APP_CUT_CLASS);
+
       if (!overlayRoot) return;
 
-      // overlay 非表示
       overlayRoot.classList.remove(CFG.ROOT_ACTIVE_CLASS);
       overlayRoot.setAttribute("aria-hidden", "true");
 
-      // 下レイヤー復帰
-      if (app) app.classList.remove(CFG.APP_CUT_CLASS);
+      // ✅ ここが最重要：透明膜を絶対残さない（A対策）
+      overlayRoot.style.pointerEvents = "none";
+      overlayRoot.style.display = "none";
     },
   };
 
