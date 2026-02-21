@@ -1,27 +1,25 @@
 /* /di/css/aru-gauge.css
-   ARU GAUGE (RESULT ONLY) v1.1
-   - shows ONLY on result screen:
-       ✅ .app.tb-result-active  (result.jsが付けるクラス)
-       もしくは .app[data-state="result"] のどっちでもOK
-   - value: --aru-value (0..1)  ← JSがここを更新する
-   - text : .aruScore           ← JSがここも更新する
-   - iOS safe mask: white=visible
-   - center fine-tune: --aru-offset-x / --aru-offset-y
+   ARU GAUGE (ANCHOR TO ORB CENTER) v2.0
+   - Anchor = .resultOrbWrap center (NOT viewport center)
+   - Show only on result:
+       .app.tb-result-active .aruLayer
+       OR .app[data-state="result"] .aruLayer
+   - value: --aru-value (0..1)
+   - state: app[data-aru-state="low|mid|high|max"]
 */
 
+/* =========================
+   Tokens (app-scoped)
+========================= */
 .app{
-  --aru-value: 0; /* 0..1 */
+  --aru-value: 0; /* 0..1 (JS updates) */
 
-  /* ✅ サイズ：ひと回り大きく（太さは維持） */
-  --aru-size: 270px;       /* ←ここで大きさ調整 */
-  --aru-thickness: 12px;   /* 太さは維持 */
+  /* Gauge size scales with orb + viewport */
+  --aru-size: clamp(220px, 62vmin, 320px);
+  --aru-thickness: 12px;
 
-  /* ✅ 中心合わせ微調整（pxでOK） */
-  --aru-offset-x: 0px;
-  --aru-offset-y: -22px;   /* ←鼓動の円が“少し上”ならマイナスが効く */
-
+  /* ring colors */
   --aru-gray: rgba(255,255,255,0.22);
-
   --aru-color-low:  rgba(76,201,240,0.96);
   --aru-color-mid:  rgba(168,85,247,0.96);
   --aru-color-high: rgba(255,47,208,0.96);
@@ -30,51 +28,70 @@
   --aru-active-color: var(--aru-color-low);
 }
 
+/* Slightly smaller on very small phones */
 @media (max-width: 390px){
-  .app{ --aru-size: 250px; --aru-thickness: 12px; }
+  .app{ --aru-size: clamp(200px, 64vmin, 280px); }
 }
 
-/* hidden by default */
-.aruLayer{ display:none; }
+/* =========================
+   Result-only visibility
+========================= */
+.aruLayer{ display: none; }
 
-/* ✅ result only（どっちでも起動できるように両対応） */
 .app.tb-result-active .aruLayer,
 .app[data-state="result"] .aruLayer{
-  display:flex;
+  display: grid;
 }
 
+/* =========================
+   Anchor wrapper (IMPORTANT)
+   → This must wrap the background orb
+========================= */
+.resultOrbWrap{
+  position: relative;
+  display: grid;
+  place-items: center;
+  isolation: isolate; /* keep layering clean */
+}
+
+/* Background orb visuals live here */
+.resultOrbVisual{
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   ARU overlay layer
+   → centered INSIDE orb wrapper
+========================= */
 .aruLayer{
-  position: fixed;
+  position: absolute;
   inset: 0;
-
-  /* #result(2147483647)の“直下”に置く */
-  z-index: 2147483646;
-
+  z-index: 2;
   pointer-events: none;
-  align-items: center;
-  justify-content: center;
-  isolation: isolate;
-
-  /* ✅ ここで中心点をズラせる */
-  transform: translate(var(--aru-offset-x), var(--aru-offset-y));
+  place-items: center;
 }
 
+/* The gauge itself */
 .aruGauge{
   width: var(--aru-size);
   height: var(--aru-size);
   position: relative;
   border-radius: 999px;
+
+  /* keep it crisp on iOS */
+  transform: translate3d(0,0,0);
   filter: drop-shadow(0 18px 36px rgba(0,0,0,0.38));
 }
 
-/* ✅ リング描画 */
+/* Ring paint */
 .aruGauge::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:50%;
 
-  /* ✅ 12時(上)開始にするため from -90deg */
+  /* start at 12 o'clock */
   background:
     conic-gradient(
       from -90deg,
@@ -82,7 +99,7 @@
       var(--aru-gray)        0turn 1turn
     );
 
-  /* ✅ iOS safe mask（白=表示 / 透明=非表示） */
+  /* iOS-safe mask (white = visible) */
   -webkit-mask: radial-gradient(
     circle at center,
     rgba(255,255,255,0) calc(50% - var(--aru-thickness)),
@@ -94,8 +111,8 @@
     rgba(255,255,255,1) calc(50% - var(--aru-thickness) + 1px)
   );
 
-  transition: background 240ms ease, filter 240ms ease;
-  will-change: background, filter;
+  transition: filter 240ms ease;
+  will-change: filter;
 
   filter:
     drop-shadow(0 0 10px rgba(255,255,255,0.10))
@@ -104,7 +121,7 @@
     );
 }
 
-/* inner rim */
+/* Inner rim */
 .aruGauge::after{
   content:"";
   position:absolute;
@@ -115,25 +132,29 @@
   opacity: 0.9;
 }
 
-/* center text */
+/* Center text */
 .aruScore{
   position:absolute;
   inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:grid;
+  place-items:center;
+
   font-size: clamp(24px, 4.6vw, 38px);
   font-weight: 900;
   letter-spacing: 0.5px;
   color: rgba(255,255,255,0.92);
+
   text-shadow:
     0 2px 18px rgba(0,0,0,0.55),
     0 0 20px rgba(255,255,255,0.08);
+
   -webkit-font-smoothing: antialiased;
-  transform: translateZ(0);
+  transform: translate3d(0,0,0);
 }
 
-/* state colors */
+/* =========================
+   State colors
+========================= */
 .app[data-aru-state="low"]  { --aru-active-color: var(--aru-color-low);  --aru-glow: 0; }
 .app[data-aru-state="mid"]  { --aru-active-color: var(--aru-color-mid);  --aru-glow: 0.25; }
 .app[data-aru-state="high"] { --aru-active-color: var(--aru-color-high); --aru-glow: 0.45; }
