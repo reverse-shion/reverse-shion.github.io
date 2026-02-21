@@ -1,41 +1,97 @@
 /* /di/js/main.js
-   - Loads engine scripts (non-module) and boots the game.
-   - Keeps existing DOM ids (#score/#combo/#maxCombo/#time etc.) and syncs to side HUD.
+   PHASE1 STABLE (START / STOP / RESTART) + PRESENTATION LAYER (result.js)
+   - STOP = end to RESULT (no pause/resume complexity)
+   - Deterministic state machine: idle -> playing -> result
+   - iOS safe: unlock on first user gesture, no autoplay before gesture
+   - Robust: double-run guards, cleanup, safe media control
+   - Loads: engine scripts -> presentation scripts -> boot()
 */
 (() => {
+  "use strict";
+
+  // main.js is /di/js/main.js, so BASE points to /di/js/
+  const BASE = new URL("./", document.currentScript?.src || location.href);
+
+  // Engine layer
   const ENGINE_FILES = [
-    "./js/engine/audio.js",
-    "./js/engine/timing.js",
-    "./js/engine/input.js",
-    "./js/engine/judge.js",
-    "./js/engine/render.js",
-    "./js/engine/fx.js",
-    "./js/engine/ui.js",
+    "engine/audio.js",
+    "engine/timing.js",
+    "engine/input.js",
+    "engine/judge.js",
+    "engine/render.js",
+    "engine/fx.js",
+    "engine/ui.js",
+    "notes/skin-tarot-pinkgold.js",
+  ].map((p) => new URL(p, BASE).toString());
 
-    // ★ note skins (swap freely)
-    "./js/notes/skin-tarot-pinkgold.js",
-  ];
+  // Presentation layer (keep separate from engine)
+  // Put result.js at: /di/js/result.js
+  const PRESENTATION_FILES = [
+    "result.js",
+  ].map((p) => new URL(p, BASE).toString());
 
-  function $(id) { return document.getElementById(id); }
+  const $ = (id) => document.getElementById(id);
 
+  // iOS当たりづらい時：0.06→0.08→0.10で調整
+  const INPUT_LAT = 0.06;
+
+  /** Allowed states: idle | playing | result */
+  const STATES = Object.freeze({
+    IDLE: "idle",
+    PLAYING: "playing",
+    RESULT: "result",
+  });
+
+  function assertEl(el, name) {
+    if (!el) throw new Error(`Missing required DOM element: #${name}`);
+    return el;
+  }
+
+  function setState(app, s) {
+    app.dataset.state = s;
+  }
+
+  function getState(app) {
+    return app.dataset.state || STATES.IDLE;
+  }
+
+  // -------- script loader (sequential, cache-busted) --------
   function loadScriptsSequentially(files) {
     return files.reduce((p, src) => {
-      return p.then(() => new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        s.src = src;
-
-        // defer は “HTMLに最初から書かれた script” 向け挙動が強いので、
-        // 動的追加では外して順次ロードの確実性を上げる
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load: " + src));
-        document.head.appendChild(s);
-      }));
+      return p.then(
+        () =>
+          new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            const u = new URL(src);
+            // dev friendly cache-bust (keeps you sane on iOS)
+            u.searchParams.set("v", String(Date.now()));
+            s.src = u.toString();
+            s.async = false;
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Failed to load: " + src));
+            document.head.appendChild(s);
+          })
+      );
     }, Promise.resolve());
   }
 
+  async function loadAllScripts() {
+    // 1) engine
+    await loadScriptsSequentially(ENGINE_FILES);
+
+    // 2) presentation
+    //   - If result.js fails, we still continue with safe fallback (do NOT hard-crash).
+    try {
+      await loadScriptsSequentially(PRESENTATION_FILES);
+    } catch (e) {
+      console.warn("[DiCo] presentation load failed (continue with fallback):", e);
+    }
+  }
+
   async function fetchJSON(url) {
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error(`fetch failed ${url}: ${r.status}`);
+    const u = new URL(url, BASE).toString();
+    const r = await fetch(u, { cache: "no-store" });
+    if (!r.ok) throw new Error(`fetch failed ${u}: ${r.status}`);
     return await r.json();
   }
 
@@ -45,6 +101,7 @@
     const beat = 60 / bpm;
     const start = 1.2;
     const total = 60.0;
+
     for (let t = start, i = 0; t < total; t += beat, i++) {
       if (i % 2 === 0) notes.push({ t: +t.toFixed(3), type: "tap" });
       if (i % 16 === 8) notes.push({ t: +(t + beat * 0.5).toFixed(3), type: "tap" });
@@ -53,94 +110,142 @@
       meta: { title: "DiCo ARU Phase1 (fallback)", bpm },
       offset: 0.0,
       scroll: { approach: 1.25 },
-      notes
+      notes,
     };
   }
 
   async function boot() {
-    const app = $("app");
-    const canvas = $("noteCanvas");
-    const bgVideo = $("bgVideo");
+    // ===== DOM =====
+    const app = assertEl($("app"), "app");
+    const canvas = assertEl($("noteCanvas"), "noteCanvas");
+    const hitZone = assertEl($("hitZone"), "hitZone");
 
-    const startBtn = $("startBtn");
-    const stopBtn = $("stopBtn");
-    const restartBtn = $("restartBtn");
+    const bgVideo = $("bgVideo"); // optional
 
-    const music = $("music");
+    const startBtn = assertEl($("startBtn"), "startBtn");
+    const stopBtn = $("stopBtn"); // optional but recommended
+    const restartBtn = assertEl($("restartBtn"), "restartBtn");
+
+    const music = assertEl($("music"), "music");
     const seTap = $("seTap");
     const seGreat = $("seGreat");
 
-    // ---- DOM sanity (超大事)
-    if (!app || !canvas || !startBtn || !stopBtn || !restartBtn || !music) {
-      throw new Error("Missing required DOM elements (check ids).");
-    }
-
-    // Optional: autoplay muted bg video
-    try {
-      if (bgVideo) {
+    // ===== background video (never autoplay on load; control after gesture) =====
+    if (bgVideo) {
+      try {
         bgVideo.muted = true;
         bgVideo.playsInline = true;
         bgVideo.loop = true;
-        bgVideo.play().catch(() => {});
-      }
-    } catch {}
-
-    let chart = null;
-    try {
-      chart = await fetchJSON("./js/charts/chart_001.json");
-    } catch (e) {
-      chart = fallbackChart();
-      console.warn("[DiCo] chart json not found. Using fallback.", e);
+        bgVideo.preload = "metadata";
+        bgVideo.pause();
+      } catch {}
     }
 
-    const E = window.DI_ENGINE;
-    if (!E) throw new Error("DI_ENGINE not found. engine scripts failed to load.");
+    // ===== chart =====
+    let chart;
+    try {
+      chart = await fetchJSON("charts/chart_001.json");
+    } catch (e) {
+      chart = fallbackChart();
+      console.warn("[DiCo] chart fallback:", e);
+    }
 
-    // Build engine parts
+    // ===== engine =====
+    const E = window.DI_ENGINE;
+    if (!E) throw new Error("DI_ENGINE not found.");
+
     const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
-    const timing = new E.Timing({ chart });
-    const judge = new E.Judge({ chart, timing });
     const fx = new E.FX({ fxLayer: $("fxLayer") });
+
     const ui = new E.UI({
       app,
-      score: $("score"), combo: $("combo"), maxCombo: $("maxCombo"), timeDup: $("time_dup"),
-      sideScore: $("sideScore"), sideCombo: $("sideCombo"), sideMaxCombo: $("sideMaxCombo"), time: $("time"),
-      resValue: $("resValue"), resFill: $("resFill"), avatarRing: $("avatarRing"),
-      judge: $("judge"), judgeMain: $("judgeMain"), judgeSub: $("judgeSub"),
+      score: $("score"),
+      combo: $("combo"),
+      maxCombo: $("maxCombo"),
+      timeDup: $("time_dup"),
+
+      sideScore: $("sideScore"),
+      sideCombo: $("sideCombo"),
+      sideMaxCombo: $("sideMaxCombo"),
+      time: $("time"),
+
+      resValue: $("resValue"),
+      resFill: $("resFill"),
+      avatarRing: $("avatarRing"),
+
+      judge: $("judge"),
+      judgeMain: $("judgeMain"),
+      judgeSub: $("judgeSub"),
+
       result: $("result"),
-      resultScore: $("resultScore"), resultMaxCombo: $("resultMaxCombo"),
-      aruProg: $("aruProg"), aruValue: $("aruValue"), dicoLine: $("dicoLine"),
+      resultScore: $("resultScore"),
+      resultMaxCombo: $("resultMaxCombo"),
+
+      aruProg: $("aruProg"),
+      aruValue: $("aruValue"),
+      dicoLine: $("dicoLine"),
+
       ariaLive: $("ariaLive"),
       hitFlash: $("hitFlash"),
     });
 
-    const render = new E.Renderer({ canvas, chart, timing });
+    // ===== presentation (result.js) safety =====
+    // result.js should set: window.DI_RESULT = { init({ ... }) { return { show(payload), hide() } } }
+    if (!window.DI_RESULT || typeof window.DI_RESULT.init !== "function") {
+      console.warn("[DiCo] DI_RESULT not found. Using safe fallback presenter.");
+      window.DI_RESULT = {
+        init() {
+          return {
+            show(payload) {
+              // keep silent in production, but helpful in dev
+              console.log("[DiCo] RESULT (fallback presenter):", payload);
+            },
+            hide() {},
+          };
+        },
+      };
+    }
 
-    const input = new E.Input({
-      element: canvas,
-      onTap: (x, y) => {
-        audio.playTap();
-        fx.burstAt(x, y);
-
-        const res = judge.hit(timing.getSongTime());
-        ui.onJudge(res);
-
-        if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
-          audio.playGreat();
-          ui.flashHit();
-          fx.sparkLine();
-        }
-      }
+    const resultPresenter = window.DI_RESULT.init({
+      app,
+      root: $("result"),
+      dicoLine: $("dicoLine"),
+      aruProg: $("aruProg"),
+      aruValue: $("aruValue"),
+      resultScore: $("resultScore"),
+      resultMaxCombo: $("resultMaxCombo"),
+      ariaLive: $("ariaLive"),
     });
 
+    // ===== game objects =====
+    let timing, judge, render;
+
+    function rebuildGameObjects() {
+      timing = new E.Timing({ chart });
+      judge = new E.Judge({ chart, timing });
+      render = new E.Renderer({ canvas, chart, timing });
+      render.resize();
+    }
+    rebuildGameObjects();
+
+    // ===== loop =====
     let raf = 0;
     let running = false;
+    let transitionLock = false;
+
+    function stopRAF() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+    }
 
     function tick() {
-      raf = requestAnimationFrame(tick);
       if (!running) return;
+      raf = requestAnimationFrame(tick);
 
       const t = timing.getSongTime();
+      if (!Number.isFinite(t)) return;
+
+      judge.sweepMiss(t);
       render.draw(t);
 
       ui.update({
@@ -149,91 +254,262 @@
         combo: judge.state.combo,
         maxCombo: judge.state.maxCombo,
         resonance: judge.state.resonance,
-        state: app.dataset.state
+        state: getState(app),
       });
 
-      if (timing.isEnded(t)) endGame();
+      if (timing.isEnded(t)) endToResult("ENDED");
     }
 
-    async function startGame() {
-      if (running) return;
+    // ===== media helpers =====
+    async function playBackground() {
+      if (!bgVideo) return;
+      try {
+        await bgVideo.play();
+      } catch {}
+    }
 
-      // must be in user gesture
+    function pauseBackground() {
+      if (!bgVideo) return;
+      try {
+        bgVideo.pause();
+      } catch {}
+    }
+
+    async function resetAndPlayMedia() {
+      // music reset + play
+      try {
+        music.pause();
+        music.currentTime = 0;
+      } catch {}
+
+      try {
+        await music.play();
+      } catch {}
+
+      // bg video play (if exists)
+      await playBackground();
+    }
+
+    function stopMediaForResult() {
+      try {
+        music.pause();
+      } catch {}
+      pauseBackground();
+    }
+
+    function setStartLabelForState(state) {
+      startBtn.textContent = state === STATES.RESULT ? "もう一回" : "START";
+    }
+
+    // ===== transitions =====
+    async function startFromIdleOrResult() {
+      if (transitionLock) return;
+      if (getState(app) === STATES.PLAYING) return;
+
+      transitionLock = true;
+
+      // user gesture unlock (iOS)
       await audio.unlock();
 
-      try { bgVideo?.play().catch(() => {}); } catch {}
-
+      // fresh objects for a clean run
+      rebuildGameObjects();
       judge.reset();
-      timing.start(audio);
 
-      app.dataset.state = "playing";
-      running = true;
+      // timing start at 0
+      try {
+        if (typeof timing.restart === "function") timing.restart(audio);
+        else timing.start(audio, { reset: true });
+      } catch (e) {
+        console.warn("[DiCo] timing start error:", e);
+      }
 
+      // state first (so CSS flips immediately)
+      setState(app, STATES.PLAYING);
+      setStartLabelForState(STATES.PLAYING);
+
+      // UI cleanup
       ui.hideResult();
+      try { resultPresenter.hide?.(); } catch {}
       ui.toast("START");
 
-      // tick 多重起動防止
-      cancelAnimationFrame(raf);
+      // run loop
+      running = true;
+      stopRAF();
       tick();
+
+      // media after state (gesture already happened)
+      await resetAndPlayMedia();
+
+      transitionLock = false;
     }
 
-    function stopGame() {
-      if (!running) return;
+    async function restartAlways() {
+      if (transitionLock) return;
+      transitionLock = true;
+
+      // stop loop
       running = false;
-      timing.stop(audio);
-      app.dataset.state = "idle";
-      ui.toast("STOP");
+      stopRAF();
+
+      // stop media
+      try {
+        music.pause();
+      } catch {}
+      pauseBackground();
+
+      await audio.unlock();
+
+      // rebuild for clean start
+      rebuildGameObjects();
+      judge.reset();
+
+      // timing restart
+      try {
+        if (typeof timing.restart === "function") timing.restart(audio);
+        else timing.start(audio, { reset: true });
+      } catch (e) {
+        console.warn("[DiCo] timing restart error:", e);
+      }
+
+      // state
+      setState(app, STATES.PLAYING);
+      setStartLabelForState(STATES.PLAYING);
+
+      // UI
+      ui.hideResult();
+      try { resultPresenter.hide?.(); } catch {}
+      ui.toast("RESTART");
+
+      // loop
+      running = true;
+      stopRAF();
+      tick();
+
+      // media
+      await resetAndPlayMedia();
+
+      transitionLock = false;
     }
 
-    function endGame() {
+    function endToResult(reason = "STOP") {
+      if (getState(app) === STATES.RESULT) return; // double-run guard
+
       running = false;
-      timing.stop(audio);
-      app.dataset.state = "result";
-      ui.showResult({
+      stopRAF();
+
+      try {
+        timing?.stop?.(audio);
+      } catch {}
+
+      stopMediaForResult();
+
+      setState(app, STATES.RESULT);
+      setStartLabelForState(STATES.RESULT);
+
+      const payload = {
         score: judge.state.score,
         maxCombo: judge.state.maxCombo,
-        resonance: judge.state.resonance
-      });
-      ui.toast("RESULT");
-    }
+        resonance: judge.state.resonance,
+        reason,
+      };
 
-    async function restartGame() {
-      stopGame();
-      await startGame();
-    }
+      // engine UI (existing)
+      ui.showResult(payload);
 
-    startBtn.addEventListener("click", () => startGame());
-    stopBtn.addEventListener("click", () => stopGame());
-    restartBtn.addEventListener("click", () => restartGame());
-
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        input.simTapCenter();
-      } else if (e.code === "Enter") {
-        startGame();
-      } else if (e.code === "Escape") {
-        stopGame();
+      // presentation layer (result.js)
+      try {
+        resultPresenter.show(payload);
+      } catch (e) {
+        console.warn("[DiCo] resultPresenter.show failed:", e);
       }
-    }, { passive: false });
 
-    app.dataset.state = "idle";
-    ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
+      ui.toast(reason === "ENDED" ? "RESULT" : "STOP");
+    }
 
-    render.resize();
-    window.addEventListener("resize", () => {
-      render.resize();
-      input.recalc();
+    // ===== input =====
+    const input = new E.Input({
+      element: hitZone,
+      onTap: (x, y) => {
+        if (!running || getState(app) !== STATES.PLAYING) return;
+
+        audio.playTap();
+        fx.burstAt(x, y);
+
+        const t = timing.getSongTime();
+        if (!Number.isFinite(t)) return;
+
+        const res = judge.hit(t + INPUT_LAT);
+        ui.onJudge(res);
+
+        if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
+          audio.playGreat();
+          ui.flashHit();
+          fx.sparkLine();
+        }
+      },
     });
 
-    console.log("[DiCo] boot OK");
+    // ===== buttons =====
+    // START: idle/result -> playing
+    startBtn.addEventListener("click", () => startFromIdleOrResult());
+
+    // STOP: playing -> result (NO-PAUSE; deterministic)
+    if (stopBtn) {
+      stopBtn.addEventListener("click", () => {
+        if (!running || getState(app) !== STATES.PLAYING) return;
+        endToResult("STOP");
+      });
+    }
+
+    // RESTART: always -> playing from beginning
+    restartBtn.addEventListener("click", () => restartAlways());
+
+    // Optional: keyboard (desktop)
+    window.addEventListener("keydown", (e) => {
+      if (e.repeat) return;
+      if (e.code === "Enter" || e.code === "Space") startFromIdleOrResult();
+      if (e.key?.toLowerCase?.() === "r") restartAlways();
+      if (e.key?.toLowerCase?.() === "s") endToResult("STOP");
+    });
+
+    // ===== init =====
+    setState(app, STATES.IDLE);
+    setStartLabelForState(STATES.IDLE);
+
+    // ensure background is not running in idle
+    pauseBackground();
+
+    ui.update({
+      t: 0,
+      score: 0,
+      combo: 0,
+      maxCombo: 0,
+      resonance: 0,
+      state: STATES.IDLE,
+    });
+
+    // resize
+    window.addEventListener(
+      "resize",
+      () => {
+        try { render?.resize?.(); } catch {}
+        try { input?.recalc?.(); } catch {}
+      },
+      { passive: true }
+    );
+
+    console.log("[DiCo] boot OK (Phase1 stable + presentation layer ready)");
   }
 
-  loadScriptsSequentially(ENGINE_FILES)
-    .then(() => boot())
-    .catch((err) => {
+  // ===== ENTRYPOINT (engine -> presentation -> boot) =====
+  (async () => {
+    try {
+      await loadAllScripts();
+      await boot();
+    } catch (err) {
       console.error(err);
       const el = document.getElementById("ariaLive");
-      if (el) el.textContent = "Boot error: " + err.message;
-    });
+      if (el) el.textContent = "Boot error: " + (err?.message || String(err));
+    }
+  })();
 })();
