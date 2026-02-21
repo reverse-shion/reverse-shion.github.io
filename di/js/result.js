@@ -1,11 +1,11 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.6]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.7]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
    - HARD-HIDE all game layers under #app using VISIBILITY (robust)
    - Eye image is inside circle (.tbEye) to avoid square artifacts
-   - ARU is the hero: Digital ring + center core rim synced to ARU color
-   - ARU tint layer makes ARU color always readable without killing the illustration
+   - ARU is the hero: Ring + iris-tint + core-rim all synced to ARU color
+   - ARU glow is made “obviously visible”: double halo + pulse + drop-shadow
    - iOS/Safari safe stacking & masking
    - Non-destructive to #result (adds overlay shell only)
 */
@@ -16,8 +16,8 @@
   // Config
   // =========================
   const CFG = Object.freeze({
-    VERSION: "1.3.6",
-    STYLE_ID: "tbResultOverlayStyles_v136",
+    VERSION: "1.3.7",
+    STYLE_ID: "tbResultOverlayStyles_v137",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
@@ -35,19 +35,36 @@
 
     // Eye image tuning (CENTER iris + star in center)
     // ここで「虹彩/星の中心」を合わせる。JSは触らない（固定運用）
-    EYE_BG_SIZE: 190,     // %
-    // ★要望：もう少し右・下
-    // まずはこの値で。さらに動かしたい時は +2 ずつ増減すると迷わない。
-    EYE_BG_POS_X: 37,     // % 右へ
-    EYE_BG_POS_Y: 33,     // % 下へ（※見た目は“Yが増えるほど下”）
+    EYE_BG_SIZE: 190, // %
+    // ★要望：もう少し右・下（値は「%」で管理、+2ずつ動かすのが迷わない）
+    EYE_BG_POS_X: 37, // %
+    EYE_BG_POS_Y: 33, // %
 
-    // ARU tint (iris-only) visibility guarantee
-    // 目の絵を殺さない範囲で「最低でもARU色が読める」
-    // === ARU COLOR VISIBILITY CONTROL ===
-// 0 = ほぼ見えない
-// 1 = かなり強い（絵が死ぬ一歩手前）
-ARU_COLOR_STRENGTH: 0.60,  // ← 基本強度（まずここだけ触る）
-ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
+    // =========================
+    // ARU VISIBILITY CONTROLS
+    // =========================
+    // 目的：目の絵に負けず「ARUの発光が必ず見える」
+    // 触る場所はここだけでOK（まずは TINT / RING を調整）
+    ARU: Object.freeze({
+      // --- iris tint (色が読める保証) ---
+      TINT_MIN: 0.20, // 0..1 (最低でも色が見える)
+      TINT_MAX: 0.60, // 0..1 (上げ過ぎると絵が死ぬ)
+      TINT_GLOW_WEIGHT: 0.38, // glow連動（0.25〜0.55推奨）
+
+      // --- ring visibility (輪が“発光体”になる) ---
+      RING_ALPHA_BASE: 0.92, // 輪の基本濃度
+      RING_GLOW_BASE_PX: 10, // 外側ハロの最小
+      RING_GLOW_MAX_PX: 28, // 外側ハロの最大（glowで増える）
+      RING_INNER_GLOW_PX: 7, // 内側ハロ
+
+      // --- bloom behind everything (背景発光) ---
+      BLOOM_ALPHA_BASE: 0.10,
+      BLOOM_ALPHA_WEIGHT: 0.65, // glowで増える
+
+      // --- pulse (発光が“生きてる”感じ) ---
+      PULSE_MIN: 0.92,
+      PULSE_MAX: 1.08,
+    }),
   });
 
   // =========================
@@ -95,7 +112,9 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
     return clamp(toNum(resonancePercent, 0) / 100, 0, 1);
   }
 
-  function lerp(a, b, t) { return a + (b - a) * t; }
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
   function hexToRgb(hex) {
     const h = String(hex).replace("#", "").trim();
     const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
@@ -106,44 +125,39 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
     return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`;
   }
   function mix(hexA, hexB, t) {
-    const A = hexToRgb(hexA), B = hexToRgb(hexB);
+    const A = hexToRgb(hexA),
+      B = hexToRgb(hexB);
     return { r: lerp(A.r, B.r, t), g: lerp(A.g, B.g, t), b: lerp(A.b, B.b, t) };
   }
 
   const COLORS = Object.freeze({
-    navy:   "#0b1020",
-    aqua:   "#00F0FF",
+    navy: "#0b1020",
+    aqua: "#00F0FF",
     violet: "#8A2BE2",
-    magenta:"#FF2FB2",
-    gold:   "#FFD46A",
-    white:  "#FFFFFF",
+    magenta: "#FF2FB2",
+    gold: "#FFD46A",
+    white: "#FFFFFF",
   });
 
   // Score -> ARU hue
   function aruColorByScoreP(p) {
-    if (p < 0.20) return rgbToCss(mix(COLORS.navy,   COLORS.aqua,    p / 0.20), 0.95);
-    if (p < 0.45) return rgbToCss(mix(COLORS.aqua,   COLORS.violet, (p - 0.20) / 0.25), 0.95);
-    if (p < 0.70) return rgbToCss(mix(COLORS.violet, COLORS.magenta,(p - 0.45) / 0.25), 0.95);
-    if (p < 0.90) return rgbToCss(mix(COLORS.magenta,COLORS.gold,   (p - 0.70) / 0.20), 0.96);
-    return rgbToCss(mix(COLORS.gold,   COLORS.white, (p - 0.90) / 0.10), 0.98);
+    if (p < 0.20) return rgbToCss(mix(COLORS.navy, COLORS.aqua, p / 0.20), 0.95);
+    if (p < 0.45) return rgbToCss(mix(COLORS.aqua, COLORS.violet, (p - 0.20) / 0.25), 0.95);
+    if (p < 0.70) return rgbToCss(mix(COLORS.violet, COLORS.magenta, (p - 0.45) / 0.25), 0.95);
+    if (p < 0.90) return rgbToCss(mix(COLORS.magenta, COLORS.gold, (p - 0.70) / 0.20), 0.96);
+    return rgbToCss(mix(COLORS.gold, COLORS.white, (p - 0.90) / 0.10), 0.98);
   }
 
   function lineBy(resPercent, nameOrNull) {
     const name = nameOrNull;
     if (resPercent >= 100) {
-      return name
-        ? `……ARU、完成。\n${name}──君の想いは、瞳に宿った。`
-        : `……ARU、完成。\n君の想いは、瞳に宿った。`;
+      return name ? `……ARU、完成。\n${name}──君の想いは、瞳に宿った。` : `……ARU、完成。\n君の想いは、瞳に宿った。`;
     }
     if (resPercent >= 80) {
-      return name
-        ? `${name}。\n波形が綺麗。あと少しで“完成域”。`
-        : `波形が綺麗。\nあと少しで“完成域”。`;
+      return name ? `${name}。\n波形が綺麗。あと少しで“完成域”。` : `波形が綺麗。\nあと少しで“完成域”。`;
     }
     if (resPercent >= 50) {
-      return name
-        ? `${name}。\n揺らぎはある。だから、伸びる。`
-        : `揺らぎはある。\nだから、伸びる。`;
+      return name ? `${name}。\n揺らぎはある。だから、伸びる。` : `揺らぎはある。\nだから、伸びる。`;
     }
     return `共鳴は消えてない。\nDiDiDi…もう一回、いこ？`;
   }
@@ -167,7 +181,7 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
         <div class="tbEye" id="tbEye" aria-hidden="true">
           <div class="tbEyeNoise"></div>
 
-          <!-- ★ ARU tint overlay (iris-only). Always readable, art-safe -->
+          <!-- ARU tint overlay (iris-only). Always readable, art-safe -->
           <div class="tbAruTint" aria-hidden="true"></div>
 
           <div class="tbAruRing" aria-hidden="true"></div>
@@ -203,8 +217,10 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
 
     const s = document.createElement("style");
     s.id = CFG.STYLE_ID;
+
+    // note: CFG values baked into CSS for iOS/Safari stability
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (ARU HERO / CENTERED IRIS) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (ARU HERO / OBVIOUS GLOW) ===== */
 
 #result{
   position: fixed !important;
@@ -219,27 +235,30 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
   contain: layout paint style !important;
   transform: translateZ(0) !important;
 
-  /* Eye image tuning variables (CENTER iris + star) */
+  /* Eye image tuning variables */
   --tb-eye-size: ${CFG.EYE_BG_SIZE}%;
   --tb-eye-pos: ${CFG.EYE_BG_POS_X}% ${CFG.EYE_BG_POS_Y}%;
+
+  /* runtime vars */
   --tb-aru: rgba(0,240,255,0.95);
   --tb-glow: 0.35;
   --tb-specular: 0;
-  --tb-aru-tint: ${CFG.ARU_TINT_MIN};
+
+  /* visibility knobs */
+  --tb-aru-tint: ${CFG.ARU.TINT_MIN};
+  --tb-ring-a: ${CFG.ARU.RING_ALPHA_BASE};
+  --tb-ring-glow: ${CFG.ARU.RING_GLOW_BASE_PX}px;
+  --tb-ring-glow2: ${CFG.ARU.RING_GLOW_MAX_PX}px;
+  --tb-ring-inner: ${CFG.ARU.RING_INNER_GLOW_PX}px;
+  --tb-bloom-a: ${CFG.ARU.BLOOM_ALPHA_BASE};
 }
 
-#result.${CFG.ROOT_ACTIVE_CLASS}{
-  pointer-events: auto;
-}
+#result.${CFG.ROOT_ACTIVE_CLASS}{ pointer-events: auto; }
 
 /* HARD CUT: hide everything under #app by visibility */
-#app.${CFG.APP_CUT_CLASS} *{
-  visibility: hidden !important;
-}
+#app.${CFG.APP_CUT_CLASS} *{ visibility: hidden !important; }
 #app.${CFG.APP_CUT_CLASS} #result,
-#app.${CFG.APP_CUT_CLASS} #result *{
-  visibility: visible !important;
-}
+#app.${CFG.APP_CUT_CLASS} #result *{ visibility: visible !important; }
 
 /* Shell */
 #result .${CFG.SHELL_CLASS}{
@@ -253,7 +272,7 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
   padding: 16px;
 }
 
-/* Background depth + ARU bloom sync */
+/* Background depth + ARU bloom */
 #result .tbResultOverlayBlack{
   position:absolute;
   inset:0;
@@ -267,14 +286,14 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
 #result .tbResultOverlayBlack::after{
   content:"";
   position:absolute;
-  inset:0;
+  inset:-6%;
   background:
     radial-gradient(circle at 50% 44%,
-      var(--tb-aru) 0%,
-      rgba(0,0,0,0) 62%);
+      color-mix(in srgb, var(--tb-aru) 42%, transparent) 0%,
+      rgba(0,0,0,0) 66%);
   mix-blend-mode: screen;
-  opacity: calc(var(--tb-glow) * 0.85);
-  filter: blur(1px);
+  opacity: var(--tb-bloom-a);
+  filter: blur(10px);
   pointer-events:none;
 }
 
@@ -311,7 +330,7 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
   transform: translateZ(0);
 }
 
-/* Darken edges to lock ARU into the eye */
+/* Vignette to lock focus */
 #result .tbEye::before{
   content:"";
   position:absolute;
@@ -343,36 +362,36 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
 
 /* =========================
    ARU TINT (IRIS-ONLY)
-   - Always readable ARU color without killing the art
    ========================= */
 #result .tbAruTint{
   position:absolute;
   inset:0;
   pointer-events:none;
 
-  /* center-focused tint */
   background:
-    radial-gradient(circle at 50% 50%,
-      color-mix(in srgb, var(--tb-aru) 72%, transparent) 0%,
-      rgba(0,0,0,0) 58%);
+    radial-gradient(circle at 50% 52%,
+      color-mix(in srgb, var(--tb-aru) 82%, transparent) 0%,
+      color-mix(in srgb, var(--tb-aru) 40%, transparent) 40%,
+      rgba(0,0,0,0) 62%);
 
   /* restrict to iris area */
-  -webkit-mask: radial-gradient(circle at 50% 50%,
+  -webkit-mask: radial-gradient(circle at 50% 52%,
     #000 0%,
-    #000 46%,
-    rgba(0,0,0,0) 64%);
-          mask: radial-gradient(circle at 50% 50%,
+    #000 48%,
+    rgba(0,0,0,0) 66%);
+          mask: radial-gradient(circle at 50% 52%,
     #000 0%,
-    #000 46%,
-    rgba(0,0,0,0) 64%);
+    #000 48%,
+    rgba(0,0,0,0) 66%);
 
   mix-blend-mode: color;
   opacity: var(--tb-aru-tint);
-  filter: saturate(1.25) brightness(1.05);
+  filter: saturate(1.30) brightness(1.06);
 }
 
 /* =========================
-   ARU RING (HERO)
+   ARU RING (HERO / OBVIOUS GLOW)
+   - “見える”ために、drop-shadowで二重ハロ
    ========================= */
 #result .tbAruRing{
   position:absolute;
@@ -398,8 +417,15 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
     #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
 
   mix-blend-mode: screen;
-  opacity: calc(0.78 + var(--tb-glow) * 0.22);
-  filter: blur(0.25px);
+  opacity: var(--tb-ring-a);
+
+  /* ✅ 二重ハロ（外・内）で“発光体”にする */
+  filter:
+    blur(0.18px)
+    drop-shadow(0 0 var(--tb-ring-inner) color-mix(in srgb, var(--tb-aru) 55%, transparent))
+    drop-shadow(0 0 var(--tb-ring-glow)  color-mix(in srgb, var(--tb-aru) 50%, transparent))
+    drop-shadow(0 0 var(--tb-ring-glow2) color-mix(in srgb, var(--tb-aru) 28%, transparent));
+
   animation: tbRingSpin 8.8s linear infinite;
 }
 
@@ -426,13 +452,13 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
     #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
 
   mix-blend-mode: overlay;
-  opacity: 0.55;
-  filter: blur(0.15px);
+  opacity: 0.62;
+  filter: blur(0.12px);
   animation: tbTicksFlicker 1.9s ease-in-out infinite;
 }
 
 /* =========================
-   CORE (CENTER SPHERE)
+   CORE (CENTER SPHERE) + ARU rim glow
    ========================= */
 #result .tbCore{
   position:absolute;
@@ -452,8 +478,10 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
     0 0 0 1px rgba(255,255,255,0.10) inset,
     0 0 0 2px rgba(255,255,255,0.04) inset,
     0 0 20px rgba(0,0,0,0.38),
-    0 0 calc(12px + var(--tb-glow)*44px) color-mix(in srgb, var(--tb-aru) 55%, transparent),
-    0 0 calc(26px + var(--tb-glow)*64px) color-mix(in srgb, var(--tb-aru) 28%, transparent);
+
+    /* ✅ ARU rim */
+    0 0 calc(10px + var(--tb-glow)*34px) color-mix(in srgb, var(--tb-aru) 55%, transparent),
+    0 0 calc(20px + var(--tb-glow)*52px) color-mix(in srgb, var(--tb-aru) 28%, transparent);
 
   animation: tbCorePulse 2.6s ease-in-out infinite;
 }
@@ -552,12 +580,18 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
   100%{ transform: rotate(360deg); }
 }
 @keyframes tbTicksFlicker{
-  0%,100%{ opacity: 0.45; }
-  50%{ opacity: 0.62; }
+  0%,100%{ opacity: 0.48; }
+  50%{ opacity: 0.70; }
 }
 @keyframes tbCorePulse{
-  0%,100%{ transform: scale(1.00); filter: brightness(1.00); }
-  50%{ transform: scale(1.04); filter: brightness(1.08); }
+  0%,100%{
+    transform: scale(${CFG.ARU.PULSE_MIN});
+    filter: brightness(1.00);
+  }
+  50%{
+    transform: scale(${CFG.ARU.PULSE_MAX});
+    filter: brightness(1.08);
+  }
 }
 `;
     document.head.appendChild(s);
@@ -586,22 +620,31 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
     // Specular at high score
     const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
 
-    // ★ARU tint: guarantee visibility, but cap to keep art alive
+    // --- ARU tint: guarantee readability ---
     const tint = clamp(
-      CFG.ARU_TINT_MIN + glow * CFG.ARU_TINT_GLOW_WEIGHT,
-      CFG.ARU_TINT_MIN,
-      CFG.ARU_TINT_MAX
+      CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT,
+      CFG.ARU.TINT_MIN,
+      CFG.ARU.TINT_MAX
     );
+
+    // --- ring: glow px grows with glow ---
+    const ringGlow = Math.round(lerp(CFG.ARU.RING_GLOW_BASE_PX, CFG.ARU.RING_GLOW_MAX_PX, glow));
+    const ringGlow2 = Math.round(ringGlow * 1.65);
+
+    // --- background bloom alpha grows with glow ---
+    const bloomA = clamp(CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT, 0, 0.85);
 
     // Sync vars across ring / core / bloom / tint
     root.style.setProperty("--tb-aru", aruColor);
     root.style.setProperty("--tb-glow", String(glow));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
     root.style.setProperty("--tb-aru-tint", String(tint));
+    root.style.setProperty("--tb-ring-a", String(CFG.ARU.RING_ALPHA_BASE));
+    root.style.setProperty("--tb-ring-glow", `${ringGlow}px`);
+    root.style.setProperty("--tb-ring-glow2", `${ringGlow2}px`);
+    root.style.setProperty("--tb-bloom-a", String(bloomA));
 
     // 画像位置は固定（CFGのみで調整する）
-    // -> ここでは触らない
-
     const name = safeUserName();
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
     lineEl.innerText = lineBy(resPercent, callName ? name : null);
@@ -625,15 +668,22 @@ ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
     if (!replayBtn || replayBtn.__tbBound) return;
 
     replayBtn.__tbBound = true;
-    replayBtn.addEventListener("click", () => {
-      root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
-      if (app) app.classList.remove(CFG.APP_CUT_CLASS);
+    replayBtn.addEventListener(
+      "click",
+      () => {
+        root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
+        if (app) app.classList.remove(CFG.APP_CUT_CLASS);
 
-      const startBtn = document.getElementById("startBtn");
-      if (startBtn) { startBtn.click(); return; }
-      const restartBtn = document.getElementById("restartBtn");
-      restartBtn?.click?.();
-    }, { passive: true });
+        const startBtn = document.getElementById("startBtn");
+        if (startBtn) {
+          startBtn.click();
+          return;
+        }
+        const restartBtn = document.getElementById("restartBtn");
+        restartBtn?.click?.();
+      },
+      { passive: true }
+    );
   }
 
   // =========================
