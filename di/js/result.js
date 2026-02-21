@@ -1,46 +1,55 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (GAUGE CSS OUTSOURCED TO aru-gauge.css) [v1.4.2]
-   - ✅ ARUリングゲージのCSSは /di/css/aru-gauge.css に統合
-   - ✅ result.js は「値(変数)更新」と「result表示/カット」だけ担当
+   TAROT BREAKER – RESULT PRESENTATION (GAUGE CSS OUTSOURCED TO aru-gauge.css) [v1.4.2-PRO]
+   ✅ ARUリングゲージのCSSは /di/css/aru-gauge.css に統合
+   ✅ result.js は「値(変数)更新」「result表示/カット」「ARUレイヤー例外可視化」だけ担当
+   ✅ iOS/Safari含む：visibility hard-cut 下でも .aruLayer / .aruFX を確実に生かす
+   ✅ ARUゲージ(aru-gauge.css)と RESONANCE(結果%表示)が必ず一致する
 */
 (function () {
   "use strict";
 
   const CFG = Object.freeze({
-    VERSION: "1.4.2",
-    STYLE_ID: "tbResultOverlayStyles_v142_min",
+    VERSION: "1.4.2-PRO",
+    STYLE_ID: "tbResultOverlayStyles_v142_min_pro",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
 
+    // GitHub Pages-safe absolute path
     EYE_IMAGE_URL: "/di/dico_eye_result.png",
 
     NAME_CALL_THRESHOLD: 50,
     COUNTUP_FRAMES: 56,
     Z_MAX: 2147483647,
 
-    EYE_BG_SIZE: 190,
-    EYE_BG_POS_X: 37,
-    EYE_BG_POS_Y: 33,
+    // Eye image tuning
+    EYE_BG_SIZE: 190, // %
+    EYE_BG_POS_X: 37, // %
+    EYE_BG_POS_Y: 33, // %
+
+    // ARU gauge bridge targets (aru-gauge.css)
+    ARU_LAYER_SELECTOR: ".aruLayer",
+    ARU_SCORE_SELECTOR: ".aruScore",
 
     ARU: Object.freeze({
+      // iris tint
       TINT_MIN: 0.24,
       TINT_MAX: 0.72,
       TINT_GLOW_WEIGHT: 0.46,
 
-      GAUGE_ALPHA_BASE: 0.98,
-      GAUGE_INNER_GLOW_PX: 8,
-      GAUGE_GLOW_BASE_PX: 14,
-      GAUGE_GLOW_MAX_PX: 36,
-
+      // bloom behind everything
       BLOOM_ALPHA_BASE: 0.14,
       BLOOM_ALPHA_WEIGHT: 0.72,
 
+      // pulse
       PULSE_MIN: 0.94,
       PULSE_MAX: 1.10,
     }),
   });
 
+  // =========================
+  // Utils
+  // =========================
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const toNum = (v, d = 0) => {
     const x = Number(v);
@@ -57,12 +66,17 @@
     return null;
   }
 
+  // Resonance can be 0..1 or 0..100
   function normalizePercent(resonance) {
     let r = toNum(resonance, 0);
     if (r <= 1.0001) r *= 100;
     return clamp(Math.round(r), 0, 100);
   }
 
+  // Score normalization strategy:
+  // - prefer maxCombo proxy: maxCombo * 120
+  // - fallback: soft log
+  // - fallback: resonance
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
@@ -78,7 +92,9 @@
     return clamp(toNum(resonancePercent, 0) / 100, 0, 1);
   }
 
-  function lerp(a, b, t) { return a + (b - a) * t; }
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
 
   function hexToRgb(hex) {
     const h = String(hex).replace("#", "").trim();
@@ -90,10 +106,12 @@
     return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`;
   }
   function mix(hexA, hexB, t) {
-    const A = hexToRgb(hexA), B = hexToRgb(hexB);
+    const A = hexToRgb(hexA),
+      B = hexToRgb(hexB);
     return { r: lerp(A.r, B.r, t), g: lerp(A.g, B.g, t), b: lerp(A.b, B.b, t) };
   }
 
+  // ✅ 蛍光色寄せ（とにかく“見える”）
   const COLORS = Object.freeze({
     neonCyan: "#00F6FF",
     neonViolet: "#A855FF",
@@ -103,6 +121,7 @@
     white: "#FFFFFF",
   });
 
+  // Score -> ARU hue (蛍光帯域)
   function aruColorByScoreP(p) {
     if (p < 0.22) return rgbToCss(mix(COLORS.neonCyan, COLORS.neonViolet, p / 0.22), 0.995);
     if (p < 0.48) return rgbToCss(mix(COLORS.neonViolet, COLORS.neonPink, (p - 0.22) / 0.26), 0.995);
@@ -114,7 +133,9 @@
   function lineBy(resPercent, nameOrNull) {
     const name = nameOrNull;
     if (resPercent >= 100) {
-      return name ? `……ARU、完成。\n${name}──君の想いは、瞳に宿った。` : `……ARU、完成。\n君の想いは、瞳に宿った。`;
+      return name
+        ? `……ARU、完成。\n${name}──君の想いは、瞳に宿った。`
+        : `……ARU、完成。\n君の想いは、瞳に宿った。`;
     }
     if (resPercent >= 80) {
       return name ? `${name}。\n波形が綺麗。あと少しで“完成域”。` : `波形が綺麗。\nあと少しで“完成域”。`;
@@ -125,6 +146,9 @@
     return `共鳴は消えてない。\nDiDiDi…もう一回、いこ？`;
   }
 
+  // =========================
+  // DOM (non-destructive)
+  // =========================
   function ensureShell(root) {
     let shell = root.querySelector("." + CFG.SHELL_CLASS);
     if (shell) return shell;
@@ -134,6 +158,7 @@
     shell.setAttribute("role", "dialog");
     shell.setAttribute("aria-label", "Result");
 
+    // 注意: ARUリングゲージは aru-gauge.css の .aruLayer / .aruGauge で管理
     shell.innerHTML = `
       <div class="tbResultOverlayBlack" aria-hidden="true"></div>
 
@@ -141,13 +166,6 @@
         <div class="tbEye" id="tbEye" aria-hidden="true">
           <div class="tbEyeNoise"></div>
           <div class="tbAruTint" aria-hidden="true"></div>
-
-          <!-- ✅ Ring gauge DOMは残す（CSSは aru-gauge.css が担当） -->
-          <div class="tbResGauge" aria-hidden="true">
-            <div class="tbResGaugeBase"></div>
-            <div class="tbResGaugeFill"></div>
-          </div>
-
           <div class="tbCore" id="tbCore" aria-hidden="true"></div>
           <div class="tbSpecular" id="tbSpecular"></div>
         </div>
@@ -169,6 +187,9 @@
     return shell;
   }
 
+  // =========================
+  // CSS injection (once)
+  // =========================
   function injectStylesOnce() {
     if (document.getElementById(CFG.STYLE_ID)) return;
 
@@ -176,7 +197,7 @@
     s.id = CFG.STYLE_ID;
 
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (MIN) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (MIN + ARU BRIDGE) ===== */
 
 #result{
   position: fixed !important;
@@ -193,29 +214,23 @@
   --tb-eye-size: ${CFG.EYE_BG_SIZE}%;
   --tb-eye-pos: ${CFG.EYE_BG_POS_X}% ${CFG.EYE_BG_POS_Y}%;
 
-  /* runtime vars (aru-gauge.cssも読む) */
+  /* runtime vars */
   --tb-aru: rgba(0,246,255,0.995);
   --tb-glow: 0.35;
   --tb-specular: 0;
+
   --tb-aru-tint: ${CFG.ARU.TINT_MIN};
-  --tb-res-angle: 0deg;
-
-  --tb-gauge-a: ${CFG.ARU.GAUGE_ALPHA_BASE};
-  --tb-gauge-inner: ${CFG.ARU.GAUGE_INNER_GLOW_PX}px;
-  --tb-gauge-glow: ${CFG.ARU.GAUGE_GLOW_BASE_PX}px;
-  --tb-gauge-glow2: ${CFG.ARU.GAUGE_GLOW_MAX_PX}px;
-
   --tb-bloom-a: ${CFG.ARU.BLOOM_ALPHA_BASE};
 }
 
 #result.${CFG.ROOT_ACTIVE_CLASS}{ pointer-events: auto; }
 
-/* HARD CUT */
+/* HARD CUT (visibility) */
 #app.${CFG.APP_CUT_CLASS} *{ visibility: hidden !important; }
 #app.${CFG.APP_CUT_CLASS} #result,
 #app.${CFG.APP_CUT_CLASS} #result *{ visibility: visible !important; }
 
-/* ✅ keep external ARU layers alive */
+/* ✅ keep external ARU layers alive (aru-gauge / aru-fx) */
 #app.${CFG.APP_CUT_CLASS} .aruFX,
 #app.${CFG.APP_CUT_CLASS} .aruFX *,
 #app.${CFG.APP_CUT_CLASS} .aruLayer,
@@ -235,6 +250,7 @@
   padding: 16px;
 }
 
+/* Background + bloom */
 #result .tbResultOverlayBlack{
   position:absolute;
   inset:0;
@@ -259,6 +275,7 @@
   pointer-events:none;
 }
 
+/* Stage */
 #result .tbEyeStage{
   position: relative;
   z-index: 1;
@@ -268,6 +285,7 @@
   align-items:center;
 }
 
+/* Eye = image inside circle */
 #result .tbEye{
   position: relative;
   width: min(92vw, 540px);
@@ -288,6 +306,7 @@
   transform: translateZ(0);
 }
 
+/* Vignette */
 #result .tbEye::before{
   content:"";
   position:absolute;
@@ -301,13 +320,13 @@
   z-index: 0;
 }
 
-/* layer order */
+/* Layer order */
 #result .tbEyeNoise{ z-index: 1; }
 #result .tbAruTint{  z-index: 2; }
-#result .tbResGauge{ z-index: 3; } /* CSSは aru-gauge.css 側 */
 #result .tbCore{     z-index: 4; }
 #result .tbSpecular{ z-index: 5; }
 
+/* Noise scan */
 #result .tbEyeNoise{
   position:absolute;
   inset:-30%;
@@ -324,6 +343,7 @@
   pointer-events:none;
 }
 
+/* Iris tint */
 #result .tbAruTint{
   position:absolute;
   inset:0;
@@ -349,6 +369,7 @@
   filter: saturate(1.38) brightness(1.08);
 }
 
+/* Core */
 #result .tbCore{
   position:absolute;
   inset: 40%;
@@ -373,6 +394,7 @@
   animation: tbCorePulse 2.6s ease-in-out infinite;
 }
 
+/* Specular */
 #result .tbSpecular{
   position:absolute;
   inset: 0;
@@ -387,6 +409,7 @@
   pointer-events:none;
 }
 
+/* Readout */
 #result .tbResultReadout{ position: relative; text-align:center; z-index: 1; }
 #result .tbResPercent{
   font-size: 56px;
@@ -416,6 +439,7 @@
   text-shadow: 0 8px 24px rgba(0,0,0,0.65);
 }
 
+/* Button */
 #result .tbActions{ position: relative; z-index: 1; margin-top: 2px; }
 #result .tbBtn{
   border: 0;
@@ -431,6 +455,7 @@
 }
 #result .tbBtn:active{ transform: translateY(1px); }
 
+/* Entry */
 #result.${CFG.ROOT_ACTIVE_CLASS} .tbEye{
   animation: tbEyeIn .65s cubic-bezier(.2,.9,.2,1) both;
 }
@@ -440,6 +465,7 @@
   #result .tbCore{ animation: none !important; }
 }
 
+/* Keyframes */
 @keyframes tbEyeIn{
   0%{ transform: scale(0.985); filter: brightness(0.75); opacity: 0; }
   60%{ transform: scale(1.02);  filter: brightness(1.02); opacity: 1; }
@@ -458,7 +484,35 @@
     document.head.appendChild(s);
   }
 
-  function paintAndAnimate(root, payload) {
+  // =========================
+  // ARU gauge bridge (aru-gauge.css)
+  // =========================
+  function setAruState(app, resPercent) {
+    // data-aru-state is used by aru-gauge.css / aru-fx.css
+    if (resPercent >= 100) app.dataset.aruState = "max";
+    else if (resPercent >= 80) app.dataset.aruState = "high";
+    else if (resPercent >= 50) app.dataset.aruState = "mid";
+    else app.dataset.aruState = "low";
+  }
+
+  function syncAruGauge(app, resPercent) {
+    // 0..1
+    const v = clamp(resPercent / 100, 0, 1);
+    app.style.setProperty("--aru-value", String(v));
+
+    // Optional: force result-only triggers for CSS that relies on them
+    app.dataset.state = "result";
+    setAruState(app, resPercent);
+
+    // Update center text inside aru-gauge layer (if present)
+    const scoreEl = document.querySelector(CFG.ARU_SCORE_SELECTOR);
+    if (scoreEl) scoreEl.textContent = `${resPercent}%`;
+  }
+
+  // =========================
+  // Paint / Animate
+  // =========================
+  function paintAndAnimate(root, app, payload) {
     const percentEl = root.querySelector("#tbResPercent");
     const lineEl = root.querySelector("#tbLine");
     if (!percentEl || !lineEl) return;
@@ -473,26 +527,22 @@
     const glow = clamp(0.18 + (resPercent / 100) * 0.58 + scoreP * 0.22, 0.18, 1.0);
     const specular = scoreP >= 0.9 ? clamp((scoreP - 0.9) / 0.1, 0, 1) : 0;
     const tint = clamp(CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT, CFG.ARU.TINT_MIN, CFG.ARU.TINT_MAX);
-
-    const gaugeGlow = Math.round(lerp(CFG.ARU.GAUGE_GLOW_BASE_PX, CFG.ARU.GAUGE_GLOW_MAX_PX, glow));
-    const gaugeGlow2 = Math.round(gaugeGlow * 1.65);
-
     const bloomA = clamp(CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT, 0, 0.9);
-    const angle = (clamp(resPercent, 0, 100) / 100) * 360;
 
     root.style.setProperty("--tb-aru", aruColor);
     root.style.setProperty("--tb-glow", String(glow));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
     root.style.setProperty("--tb-aru-tint", String(tint));
-    root.style.setProperty("--tb-gauge-glow", `${gaugeGlow}px`);
-    root.style.setProperty("--tb-gauge-glow2", `${gaugeGlow2}px`);
     root.style.setProperty("--tb-bloom-a", String(bloomA));
-    root.style.setProperty("--tb-res-angle", `${angle}deg`);
+
+    // ✅ aru-gauge.css と完全同期（82%なら0.82）
+    if (app) syncAruGauge(app, resPercent);
 
     const name = safeUserName();
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
     lineEl.innerText = lineBy(resPercent, callName ? name : null);
 
+    // Count-up display (result readout)
     percentEl.textContent = "0%";
     let cur = 0;
     const target = clamp(resPercent, 0, 100);
@@ -501,6 +551,15 @@
     function tick() {
       cur = clamp(cur + step, 0, target);
       percentEl.textContent = `${cur}%`;
+
+      // ✅ 中央の aruScore も同じカウントで追従させたい場合（任意）
+      if (app) {
+        const scoreEl = document.querySelector(CFG.ARU_SCORE_SELECTOR);
+        if (scoreEl) scoreEl.textContent = `${cur}%`;
+        app.style.setProperty("--aru-value", String(clamp(cur / 100, 0, 1)));
+        setAruState(app, cur);
+      }
+
       if (cur < target) requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
@@ -515,10 +574,18 @@
       "click",
       () => {
         root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
-        if (app) app.classList.remove(CFG.APP_CUT_CLASS);
+        if (app) {
+          app.classList.remove(CFG.APP_CUT_CLASS);
+          // result-state cleanup (optional)
+          // app.dataset.state = "";
+          // delete app.dataset.aruState;
+        }
 
         const startBtn = document.getElementById("startBtn");
-        if (startBtn) { startBtn.click(); return; }
+        if (startBtn) {
+          startBtn.click();
+          return;
+        }
         const restartBtn = document.getElementById("restartBtn");
         restartBtn?.click?.();
       },
@@ -526,6 +593,9 @@
     );
   }
 
+  // =========================
+  // Public API
+  // =========================
   window.DI_RESULT = {
     init(opts) {
       const root = opts?.root || document.getElementById("result");
@@ -540,10 +610,17 @@
         show(payload) {
           ensureShell(root);
           wireReplayOnce(root, app);
-          if (app) app.classList.add(CFG.APP_CUT_CLASS);
+
+          if (app) {
+            // ✅ hard cut on (and used by aru-fx.css)
+            app.classList.add(CFG.APP_CUT_CLASS);
+          }
+
           root.classList.add(CFG.ROOT_ACTIVE_CLASS);
-          paintAndAnimate(root, payload || {});
+
+          paintAndAnimate(root, app, payload || {});
         },
+
         hide() {
           root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
           if (app) app.classList.remove(CFG.APP_CUT_CLASS);
