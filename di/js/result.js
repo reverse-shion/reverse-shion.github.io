@@ -38,8 +38,8 @@
     EYE_BG_SIZE: 190,     // %
     // ★要望：もう少し右・下
     // まずはこの値で。さらに動かしたい時は +2 ずつ増減すると迷わない。
-    EYE_BG_POS_X: 40,     // % 右へ
-    EYE_BG_POS_Y: 35,     // % 下へ（※見た目は“Yが増えるほど下”）
+    EYE_BG_POS_X: 35,     // % 右へ
+    EYE_BG_POS_Y: 30,     // % 下へ（※見た目は“Yが増えるほど下”）
 
     // ARU tint (iris-only) visibility guarantee
     // 目の絵を殺さない範囲で「最低でもARU色が読める」
