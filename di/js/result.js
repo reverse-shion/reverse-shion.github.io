@@ -1,70 +1,46 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.4.1]
-   ✅ 追記済み完成版：リングゲージが「必ず出る」(iOS/Safari含む)
-   PATCH v1.4.1:
-   - ✅ iOS/WebKitでリングが消える主因になりがちな mask の“黒(#000)問題”を修正
-     → mask は「白=表示 / 透明=非表示」で統一（rgba(255,255,255,1)）
-   - ✅ レイヤー順を固定（z-indexを各パーツに明示）
-   - ✅ 0%でもグレー土台リングは常時表示（ゲージUIとして確定）
+   TAROT BREAKER – RESULT PRESENTATION (GAUGE CSS OUTSOURCED TO aru-gauge.css) [v1.4.2]
+   - ✅ ARUリングゲージのCSSは /di/css/aru-gauge.css に統合
+   - ✅ result.js は「値(変数)更新」と「result表示/カット」だけ担当
 */
 (function () {
   "use strict";
 
-  // =========================
-  // Config (触るのは基本ここだけでOK)
-  // =========================
   const CFG = Object.freeze({
-    VERSION: "1.4.1",
-    STYLE_ID: "tbResultOverlayStyles_v141",
+    VERSION: "1.4.2",
+    STYLE_ID: "tbResultOverlayStyles_v142_min",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
 
-    // GitHub Pages-safe absolute path
     EYE_IMAGE_URL: "/di/dico_eye_result.png",
 
     NAME_CALL_THRESHOLD: 50,
     COUNTUP_FRAMES: 56,
     Z_MAX: 2147483647,
 
-    // Eye image tuning (CENTER iris + star in center)
-    EYE_BG_SIZE: 190, // %
-    EYE_BG_POS_X: 37, // %
-    EYE_BG_POS_Y: 33, // %
+    EYE_BG_SIZE: 190,
+    EYE_BG_POS_X: 37,
+    EYE_BG_POS_Y: 33,
 
-    // =========================
-    // ARU / RESONANCE VISIBILITY CONTROLS
-    // =========================
     ARU: Object.freeze({
-      // --- iris tint (色が“読める”保証) ---
       TINT_MIN: 0.24,
       TINT_MAX: 0.72,
       TINT_GLOW_WEIGHT: 0.46,
 
-      // --- gauge ring geometry ---
-      GAUGE_INSET_PCT: 12.5,
-      GAUGE_THICKNESS_PCT: 3.6,
-      GAUGE_BG_ALPHA: 0.34,
-
-      // --- gauge glow (蛍光として“確実に光る”) ---
       GAUGE_ALPHA_BASE: 0.98,
       GAUGE_INNER_GLOW_PX: 8,
       GAUGE_GLOW_BASE_PX: 14,
       GAUGE_GLOW_MAX_PX: 36,
 
-      // --- bloom behind everything ---
       BLOOM_ALPHA_BASE: 0.14,
       BLOOM_ALPHA_WEIGHT: 0.72,
 
-      // --- pulse ---
       PULSE_MIN: 0.94,
       PULSE_MAX: 1.10,
     }),
   });
 
-  // =========================
-  // Utils
-  // =========================
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const toNum = (v, d = 0) => {
     const x = Number(v);
@@ -81,17 +57,12 @@
     return null;
   }
 
-  // Resonance can be 0..1 or 0..100
   function normalizePercent(resonance) {
     let r = toNum(resonance, 0);
     if (r <= 1.0001) r *= 100;
     return clamp(Math.round(r), 0, 100);
   }
 
-  // Score normalization strategy:
-  // - prefer maxCombo proxy: maxCombo * 120
-  // - fallback: soft log
-  // - fallback: resonance
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
@@ -107,9 +78,7 @@
     return clamp(toNum(resonancePercent, 0) / 100, 0, 1);
   }
 
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
-  }
+  function lerp(a, b, t) { return a + (b - a) * t; }
 
   function hexToRgb(hex) {
     const h = String(hex).replace("#", "").trim();
@@ -121,12 +90,10 @@
     return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`;
   }
   function mix(hexA, hexB, t) {
-    const A = hexToRgb(hexA),
-      B = hexToRgb(hexB);
+    const A = hexToRgb(hexA), B = hexToRgb(hexB);
     return { r: lerp(A.r, B.r, t), g: lerp(A.g, B.g, t), b: lerp(A.b, B.b, t) };
   }
 
-  // ✅ 蛍光色寄せ（とにかく“見える”）
   const COLORS = Object.freeze({
     neonCyan: "#00F6FF",
     neonViolet: "#A855FF",
@@ -136,7 +103,6 @@
     white: "#FFFFFF",
   });
 
-  // Score -> ARU hue (蛍光帯域)
   function aruColorByScoreP(p) {
     if (p < 0.22) return rgbToCss(mix(COLORS.neonCyan, COLORS.neonViolet, p / 0.22), 0.995);
     if (p < 0.48) return rgbToCss(mix(COLORS.neonViolet, COLORS.neonPink, (p - 0.22) / 0.26), 0.995);
@@ -159,9 +125,6 @@
     return `共鳴は消えてない。\nDiDiDi…もう一回、いこ？`;
   }
 
-  // =========================
-  // DOM (non-destructive)
-  // =========================
   function ensureShell(root) {
     let shell = root.querySelector("." + CFG.SHELL_CLASS);
     if (shell) return shell;
@@ -177,19 +140,15 @@
       <div class="tbEyeStage" aria-label="ARU Eye">
         <div class="tbEye" id="tbEye" aria-hidden="true">
           <div class="tbEyeNoise"></div>
-
-          <!-- ✅ Iris tint (iris-only) -->
           <div class="tbAruTint" aria-hidden="true"></div>
 
-          <!-- ✅ Resonance gauge ring (progress) -->
+          <!-- ✅ Ring gauge DOMは残す（CSSは aru-gauge.css が担当） -->
           <div class="tbResGauge" aria-hidden="true">
             <div class="tbResGaugeBase"></div>
             <div class="tbResGaugeFill"></div>
           </div>
 
-          <!-- Center core -->
           <div class="tbCore" id="tbCore" aria-hidden="true"></div>
-
           <div class="tbSpecular" id="tbSpecular"></div>
         </div>
       </div>
@@ -210,9 +169,6 @@
     return shell;
   }
 
-  // =========================
-  // CSS injection (once)
-  // =========================
   function injectStylesOnce() {
     if (document.getElementById(CFG.STYLE_ID)) return;
 
@@ -220,7 +176,7 @@
     s.id = CFG.STYLE_ID;
 
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (NEON RESONANCE GAUGE) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (MIN) ===== */
 
 #result{
   position: fixed !important;
@@ -234,37 +190,38 @@
   contain: layout paint style !important;
   transform: translateZ(0) !important;
 
-  /* Eye image tuning variables */
   --tb-eye-size: ${CFG.EYE_BG_SIZE}%;
   --tb-eye-pos: ${CFG.EYE_BG_POS_X}% ${CFG.EYE_BG_POS_Y}%;
 
-  /* runtime vars */
+  /* runtime vars (aru-gauge.cssも読む) */
   --tb-aru: rgba(0,246,255,0.995);
   --tb-glow: 0.35;
   --tb-specular: 0;
-
-  /* iris tint */
   --tb-aru-tint: ${CFG.ARU.TINT_MIN};
-
-  /* gauge (progress angle) */
   --tb-res-angle: 0deg;
 
-  /* gauge glow */
   --tb-gauge-a: ${CFG.ARU.GAUGE_ALPHA_BASE};
+  --tb-gauge-inner: ${CFG.ARU.GAUGE_INNER_GLOW_PX}px;
   --tb-gauge-glow: ${CFG.ARU.GAUGE_GLOW_BASE_PX}px;
   --tb-gauge-glow2: ${CFG.ARU.GAUGE_GLOW_MAX_PX}px;
-  --tb-gauge-inner: ${CFG.ARU.GAUGE_INNER_GLOW_PX}px;
 
-  /* bloom */
   --tb-bloom-a: ${CFG.ARU.BLOOM_ALPHA_BASE};
 }
 
 #result.${CFG.ROOT_ACTIVE_CLASS}{ pointer-events: auto; }
 
-/* HARD CUT: hide everything under #app by visibility */
+/* HARD CUT */
 #app.${CFG.APP_CUT_CLASS} *{ visibility: hidden !important; }
 #app.${CFG.APP_CUT_CLASS} #result,
 #app.${CFG.APP_CUT_CLASS} #result *{ visibility: visible !important; }
+
+/* ✅ keep external ARU layers alive */
+#app.${CFG.APP_CUT_CLASS} .aruFX,
+#app.${CFG.APP_CUT_CLASS} .aruFX *,
+#app.${CFG.APP_CUT_CLASS} .aruLayer,
+#app.${CFG.APP_CUT_CLASS} .aruLayer *{
+  visibility: visible !important;
+}
 
 /* Shell */
 #result .${CFG.SHELL_CLASS}{
@@ -278,7 +235,6 @@
   padding: 16px;
 }
 
-/* Background + bloom */
 #result .tbResultOverlayBlack{
   position:absolute;
   inset:0;
@@ -303,7 +259,6 @@
   pointer-events:none;
 }
 
-/* Stage */
 #result .tbEyeStage{
   position: relative;
   z-index: 1;
@@ -313,7 +268,6 @@
   align-items:center;
 }
 
-/* Eye = image inside circle */
 #result .tbEye{
   position: relative;
   width: min(92vw, 540px);
@@ -330,12 +284,10 @@
     0 28px 90px rgba(0,0,0,0.72),
     0 0 0 1px rgba(255,255,255,0.14) inset;
 
-  /* iOS round fix */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
   transform: translateZ(0);
 }
 
-/* Vignette */
 #result .tbEye::before{
   content:"";
   position:absolute;
@@ -349,14 +301,13 @@
   z-index: 0;
 }
 
-/* ✅ Layer order fix (explicit) */
+/* layer order */
 #result .tbEyeNoise{ z-index: 1; }
 #result .tbAruTint{  z-index: 2; }
-#result .tbResGauge{ z-index: 3; }
+#result .tbResGauge{ z-index: 3; } /* CSSは aru-gauge.css 側 */
 #result .tbCore{     z-index: 4; }
 #result .tbSpecular{ z-index: 5; }
 
-/* Noise scan */
 #result .tbEyeNoise{
   position:absolute;
   inset:-30%;
@@ -373,10 +324,6 @@
   pointer-events:none;
 }
 
-/* =========================
-   IRIS TINT (readability)
-   ✅ PATCH: maskは白=表示で統一
-   ========================= */
 #result .tbAruTint{
   position:absolute;
   inset:0;
@@ -402,65 +349,6 @@
   filter: saturate(1.38) brightness(1.08);
 }
 
-/* =========================
-   RESONANCE GAUGE (progress)
-   - 未到達=グレー土台（常時表示）
-   - 到達=蛍光ARU（進捗）
-   ✅ PATCH: ring maskは白=表示で統一
-   ========================= */
-#result .tbResGauge{
-  position:absolute;
-  inset: ${CFG.ARU.GAUGE_INSET_PCT}%;
-  border-radius: 999px;
-  pointer-events:none;
-}
-
-/* 共通マスク：細めリング */
-#result .tbResGaugeBase,
-#result .tbResGaugeFill{
-  position:absolute;
-  inset:0;
-  border-radius:999px;
-
-  -webkit-mask: radial-gradient(circle,
-    rgba(255,255,255,0) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}%),
-    rgba(255,255,255,1) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}% + 0.8%));
-          mask: radial-gradient(circle,
-    rgba(255,255,255,0) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}%),
-    rgba(255,255,255,1) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}% + 0.8%));
-}
-
-/* 未到達（グレー）: 0%でも常時見せる */
-#result .tbResGaugeBase{
-  background: rgba(190,190,190,${CFG.ARU.GAUGE_BG_ALPHA});
-  opacity: 0.95;
-  filter: blur(0.10px);
-}
-
-/* 到達（ARU蛍光） */
-#result .tbResGaugeFill{
-  background: conic-gradient(
-    from -90deg,
-    var(--tb-aru) 0deg,
-    var(--tb-aru) var(--tb-res-angle),
-    rgba(0,0,0,0) var(--tb-res-angle)
-  );
-
-  opacity: var(--tb-gauge-a);
-  mix-blend-mode: screen;
-
-  filter:
-    blur(0.12px)
-    drop-shadow(0 0 var(--tb-gauge-inner) color-mix(in srgb, var(--tb-aru) 70%, transparent))
-    drop-shadow(0 0 var(--tb-gauge-glow)  color-mix(in srgb, var(--tb-aru) 62%, transparent))
-    drop-shadow(0 0 var(--tb-gauge-glow2) color-mix(in srgb, var(--tb-aru) 36%, transparent));
-
-  animation: tbGaugePulse 2.2s ease-in-out infinite;
-}
-
-/* =========================
-   CORE (CENTER SPHERE) + ARU rim
-   ========================= */
 #result .tbCore{
   position:absolute;
   inset: 40%;
@@ -485,7 +373,6 @@
   animation: tbCorePulse 2.6s ease-in-out infinite;
 }
 
-/* Specular sparkle */
 #result .tbSpecular{
   position:absolute;
   inset: 0;
@@ -500,7 +387,6 @@
   pointer-events:none;
 }
 
-/* Readout */
 #result .tbResultReadout{ position: relative; text-align:center; z-index: 1; }
 #result .tbResPercent{
   font-size: 56px;
@@ -517,8 +403,6 @@
   letter-spacing: .18em;
   color: rgba(245,245,242,0.68);
 }
-
-/* Copy */
 #result .tbLine{
   position: relative;
   z-index: 1;
@@ -532,7 +416,6 @@
   text-shadow: 0 8px 24px rgba(0,0,0,0.65);
 }
 
-/* Button */
 #result .tbActions{ position: relative; z-index: 1; margin-top: 2px; }
 #result .tbBtn{
   border: 0;
@@ -548,21 +431,15 @@
 }
 #result .tbBtn:active{ transform: translateY(1px); }
 
-/* Entry */
 #result.${CFG.ROOT_ACTIVE_CLASS} .tbEye{
   animation: tbEyeIn .65s cubic-bezier(.2,.9,.2,1) both;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   #result .tbEyeNoise,
-  #result .tbResGaugeFill,
-  #result .tbCore{
-    animation: none !important;
-  }
+  #result .tbCore{ animation: none !important; }
 }
 
-/* Keyframes */
 @keyframes tbEyeIn{
   0%{ transform: scale(0.985); filter: brightness(0.75); opacity: 0; }
   60%{ transform: scale(1.02);  filter: brightness(1.02); opacity: 1; }
@@ -574,26 +451,13 @@
   100%{ transform: translateX(18%); opacity: .07; }
 }
 @keyframes tbCorePulse{
-  0%,100%{
-    transform: scale(${CFG.ARU.PULSE_MIN});
-    filter: brightness(1.00);
-  }
-  50%{
-    transform: scale(${CFG.ARU.PULSE_MAX});
-    filter: brightness(1.10);
-  }
-}
-@keyframes tbGaugePulse{
-  0%,100%{ transform: scale(1.00); opacity: var(--tb-gauge-a); }
-  50%{ transform: scale(1.01); opacity: 1; }
+  0%,100%{ transform: scale(${CFG.ARU.PULSE_MIN}); filter: brightness(1.00); }
+  50%{ transform: scale(${CFG.ARU.PULSE_MAX}); filter: brightness(1.10); }
 }
 `;
     document.head.appendChild(s);
   }
 
-  // =========================
-  // Paint / Animate
-  // =========================
   function paintAndAnimate(root, payload) {
     const percentEl = root.querySelector("#tbResPercent");
     const lineEl = root.querySelector("#tbLine");
@@ -604,30 +468,18 @@
     const maxCombo = toNum(payload?.maxCombo, 0);
 
     const scoreP = normalizeScore01(score, maxCombo, resPercent);
-
-    // ✅ 蛍光ARU色（スコアで変化）
     const aruColor = aruColorByScoreP(scoreP);
 
-    // Glow power
     const glow = clamp(0.18 + (resPercent / 100) * 0.58 + scoreP * 0.22, 0.18, 1.0);
-
-    // Specular at high score
     const specular = scoreP >= 0.9 ? clamp((scoreP - 0.9) / 0.1, 0, 1) : 0;
-
-    // Iris tint
     const tint = clamp(CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT, CFG.ARU.TINT_MIN, CFG.ARU.TINT_MAX);
 
-    // Gauge glow grows with glow
     const gaugeGlow = Math.round(lerp(CFG.ARU.GAUGE_GLOW_BASE_PX, CFG.ARU.GAUGE_GLOW_MAX_PX, glow));
     const gaugeGlow2 = Math.round(gaugeGlow * 1.65);
 
-    // Background bloom grows with glow
     const bloomA = clamp(CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT, 0, 0.9);
-
-    // ✅ Resonance -> angle (100%=360deg)
     const angle = (clamp(resPercent, 0, 100) / 100) * 360;
 
-    // Sync vars
     root.style.setProperty("--tb-aru", aruColor);
     root.style.setProperty("--tb-glow", String(glow));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
@@ -641,7 +493,6 @@
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
     lineEl.innerText = lineBy(resPercent, callName ? name : null);
 
-    // Count-up
     percentEl.textContent = "0%";
     let cur = 0;
     const target = clamp(resPercent, 0, 100);
@@ -667,10 +518,7 @@
         if (app) app.classList.remove(CFG.APP_CUT_CLASS);
 
         const startBtn = document.getElementById("startBtn");
-        if (startBtn) {
-          startBtn.click();
-          return;
-        }
+        if (startBtn) { startBtn.click(); return; }
         const restartBtn = document.getElementById("restartBtn");
         restartBtn?.click?.();
       },
@@ -678,9 +526,6 @@
     );
   }
 
-  // =========================
-  // Public API
-  // =========================
   window.DI_RESULT = {
     init(opts) {
       const root = opts?.root || document.getElementById("result");
@@ -695,10 +540,8 @@
         show(payload) {
           ensureShell(root);
           wireReplayOnce(root, app);
-
           if (app) app.classList.add(CFG.APP_CUT_CLASS);
           root.classList.add(CFG.ROOT_ACTIVE_CLASS);
-
           paintAndAnimate(root, payload || {});
         },
         hide() {
