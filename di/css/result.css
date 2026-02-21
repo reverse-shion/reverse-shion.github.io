@@ -1,202 +1,133 @@
 /* /di/css/result.css
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.4.1]
-   - ES Modules split / CSS external
-   - Overlay root is appended to body (#tbResultOverlayRoot) for iOS fixed stability
+   TAROT BREAKER – RESULT OVERLAY (PRO STABLE v1.4.1)
+   - iOS safe
+   - No CSS nesting errors
+   - No invisible click blockers
+   - Overlay outside #app
 */
 
-/* root */
+/* =====================================================
+   ROOT (body直下に生成される #tbResultOverlayRoot)
+   ===================================================== */
+
 #tbResultOverlayRoot{
   position: fixed;
   inset: 0;
   z-index: 2147483647;
-  display: block;
-  pointer-events: none;
+
   background: transparent;
   isolation: isolate;
   contain: layout paint style;
   transform: translateZ(0);
 
-   #tbResultOverlayRoot{
-  /* 追加：初期状態は完全に消す */
+  /* 初期状態：完全非表示＆タップ無効 */
   opacity: 0;
   visibility: hidden;
-  transform: translateZ(0) scale(0.985);
-  transition: opacity .18s ease, visibility 0s linear .18s, transform .22s ease;
+  pointer-events: none;
+
+  transition:
+    opacity .18s ease,
+    visibility 0s linear .18s;
 }
+
+/* 表示状態 */
 #tbResultOverlayRoot.tb-active{
   opacity: 1;
   visibility: visible;
-  transform: translateZ(0) scale(1);
-  transition: opacity .18s ease, visibility 0s linear 0s, transform .22s ease;
+  pointer-events: auto;
+
+  transition:
+    opacity .18s ease,
+    visibility 0s linear 0s;
 }
 
-  /* Eye image tuning vars (JSは直接いじらない。必要ならここで固定もできる) */
-  --tb-eye-size: 190%;
-  --tb-eye-pos: 37% 33%;
 
-  /* runtime vars (JSで更新) */
-  --tb-aru: rgba(0,246,255,0.995);
-  --tb-glow: 0.35;
-  --tb-specular: 0;
-  --tb-aru-tint: 0.24;
+/* =====================================================
+   APP CUT（ゲーム画面を隠す）
+   ===================================================== */
 
-  --tb-res-angle: 0deg;
-
-  --tb-gauge-a: 0.98;
-  --tb-gauge-glow: 14px;
-  --tb-gauge-glow2: 36px;
-  --tb-gauge-inner: 8px;
-
-  --tb-bloom-a: 0.14;
+#app.tb-result-active *{
+  visibility: hidden !important;
 }
 
-#tbResultOverlayRoot.tb-active{ pointer-events: auto; }
 
-/* HARD CUT: hide everything under #app by visibility */
-#app.tb-result-active *{ visibility: hidden !important; }
+/* =====================================================
+   SHELL
+   ===================================================== */
 
-/* overlay is outside #app, so it stays visible */
-
-/* Shell */
 #tbResultOverlayRoot .tbResultOverlayShell{
-  position: absolute;
-  inset: 0;
+  position:absolute;
+  inset:0;
+
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
+
   gap:14px;
   padding:16px;
 }
 
-/* Background + bloom */
+
+/* =====================================================
+   BACKGROUND
+   ===================================================== */
+
 #tbResultOverlayRoot .tbResultOverlayBlack{
   position:absolute;
   inset:0;
   z-index:0;
+
   background:
     radial-gradient(circle at 50% 44%,
       rgba(18,20,28,0.18) 0%,
       rgba(0,0,0,0.88) 56%,
       rgba(0,0,0,0.98) 100%);
 }
-#tbResultOverlayRoot .tbResultOverlayBlack::after{
-  content:"";
-  position:absolute;
-  inset:-8%;
-  background:
-    radial-gradient(circle at 50% 44%,
-      color-mix(in srgb, var(--tb-aru) 46%, transparent) 0%,
-      rgba(0,0,0,0) 68%);
-  mix-blend-mode: screen;
-  opacity: var(--tb-bloom-a);
-  filter: blur(12px);
-  pointer-events:none;
-}
 
-/* Stage */
+
+/* =====================================================
+   EYE
+   ===================================================== */
+
 #tbResultOverlayRoot .tbEyeStage{
-  position: relative;
-  z-index: 1;
-  width: min(92vw, 540px);
+  position:relative;
+  z-index:1;
+  width:min(92vw,540px);
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* Eye = image inside circle */
 #tbResultOverlayRoot .tbEye{
-  position: relative;
-  width: min(92vw, 540px);
-  aspect-ratio: 1 / 1;
-  border-radius: 999px;
-  overflow: hidden;
+  position:relative;
+  width:min(92vw,540px);
+  aspect-ratio:1/1;
+  border-radius:999px;
+  overflow:hidden;
 
-  background-image: url("/di/dico_eye_result.png");
-  background-size: var(--tb-eye-size);
-  background-position: var(--tb-eye-pos);
-  background-repeat: no-repeat;
+  background-image:url("/di/dico_eye_result.png");
+  background-size:190%;
+  background-position:37% 33%;
+  background-repeat:no-repeat;
 
   box-shadow:
     0 28px 90px rgba(0,0,0,0.72),
     0 0 0 1px rgba(255,255,255,0.14) inset;
-
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
-  transform: translateZ(0);
 }
 
-/* Entry */
-#tbResultOverlayRoot.tb-active .tbEye{
-  animation: tbEyeIn .65s cubic-bezier(.2,.9,.2,1) both;
-}
 
-/* Vignette */
-#tbResultOverlayRoot .tbEye::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(0,0,0,0.00) 44%,
-      rgba(0,0,0,0.55) 74%,
-      rgba(0,0,0,0.88) 100%);
-  pointer-events:none;
-}
+/* =====================================================
+   RESONANCE GAUGE
+   ===================================================== */
 
-/* Noise scan */
-#tbResultOverlayRoot .tbEyeNoise{
-  position:absolute;
-  inset:-30%;
-  background:
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,0.00) 0px,
-      rgba(255,255,255,0.00) 9px,
-      rgba(255,255,255,0.05) 10px,
-      rgba(255,255,255,0.00) 12px);
-  opacity: .09;
-  mix-blend-mode: overlay;
-  transform: translateX(-18%);
-  animation: tbNoise 2.8s linear infinite;
-  pointer-events:none;
-}
-
-/* IRIS TINT */
-#tbResultOverlayRoot .tbAruTint{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-
-  background:
-    radial-gradient(circle at 50% 52%,
-      color-mix(in srgb, var(--tb-aru) 86%, transparent) 0%,
-      color-mix(in srgb, var(--tb-aru) 42%, transparent) 42%,
-      rgba(0,0,0,0) 64%);
-
-  -webkit-mask: radial-gradient(circle at 50% 52%,
-    #fff 0%,
-    #fff 48%,
-    rgba(255,255,255,0) 66%);
-          mask: radial-gradient(circle at 50% 52%,
-    #fff 0%,
-    #fff 48%,
-    rgba(255,255,255,0) 66%);
-
-  mix-blend-mode: color;
-  opacity: var(--tb-aru-tint);
-  filter: saturate(1.38) brightness(1.08);
-}
-
-/* RESONANCE GAUGE */
 #tbResultOverlayRoot .tbResGauge{
   position:absolute;
-  inset: 12.5%;
-  border-radius: 999px;
+  inset:12.5%;
+  border-radius:999px;
   pointer-events:none;
 }
 
-/* ✅ v1.4.1 FIX:
-   maskは「白=見える」なので #fff を使う（#000だと全部消える）
-*/
 #tbResultOverlayRoot .tbResGaugeBase,
 #tbResultOverlayRoot .tbResGaugeFill{
   position:absolute;
@@ -206,44 +137,42 @@
   -webkit-mask: radial-gradient(circle,
     transparent calc(100% - 3.6%),
     #fff calc(100% - 3.6% + 0.8%));
-          mask: radial-gradient(circle,
+  mask: radial-gradient(circle,
     transparent calc(100% - 3.6%),
     #fff calc(100% - 3.6% + 0.8%));
 }
 
-/* Base (0%でも常に見えるグレーリング) */
+/* グレー基礎リング（0%でも表示） */
 #tbResultOverlayRoot .tbResGaugeBase{
-  background: rgba(190,190,190,0.34);
-  opacity: 0.95;
-  filter: blur(0.10px);
+  background:rgba(190,190,190,0.34);
+  opacity:.95;
 }
 
-/* Fill (ARU蛍光) */
+/* ARU進捗リング */
 #tbResultOverlayRoot .tbResGaugeFill{
-  background: conic-gradient(
+  background:conic-gradient(
     from -90deg,
     var(--tb-aru) 0deg,
     var(--tb-aru) var(--tb-res-angle),
-    rgba(0,0,0,0) var(--tb-res-angle)
+    transparent var(--tb-res-angle)
   );
 
-  opacity: var(--tb-gauge-a);
+  opacity:0.98;
 
   filter:
-    blur(0.12px)
-    drop-shadow(0 0 var(--tb-gauge-inner) color-mix(in srgb, var(--tb-aru) 70%, transparent))
-    drop-shadow(0 0 var(--tb-gauge-glow)  color-mix(in srgb, var(--tb-aru) 62%, transparent))
-    drop-shadow(0 0 var(--tb-gauge-glow2) color-mix(in srgb, var(--tb-aru) 36%, transparent));
-
-  animation: tbGaugePulse 2.2s ease-in-out infinite;
+    drop-shadow(0 0 8px var(--tb-aru))
+    drop-shadow(0 0 24px var(--tb-aru));
 }
 
-/* CORE */
+
+/* =====================================================
+   CORE
+   ===================================================== */
+
 #tbResultOverlayRoot .tbCore{
   position:absolute;
-  inset: 40%;
-  border-radius: 999px;
-  pointer-events:none;
+  inset:40%;
+  border-radius:999px;
 
   background:
     radial-gradient(circle at 36% 32%,
@@ -252,105 +181,40 @@
       rgba(120,120,120,0.30) 44%,
       rgba(40,40,40,0.85) 78%,
       rgba(0,0,0,0.95) 100%);
-
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.10) inset,
-    0 0 0 2px rgba(255,255,255,0.04) inset,
-    0 0 20px rgba(0,0,0,0.38),
-    0 0 calc(12px + var(--tb-glow)*36px) color-mix(in srgb, var(--tb-aru) 60%, transparent),
-    0 0 calc(24px + var(--tb-glow)*54px) color-mix(in srgb, var(--tb-aru) 34%, transparent);
-
-  animation: tbCorePulse 2.6s ease-in-out infinite;
 }
 
-/* Specular */
-#tbResultOverlayRoot .tbSpecular{
-  position:absolute;
-  inset: 0;
-  opacity: var(--tb-specular);
-  background:
-    radial-gradient(circle at 35% 32%,
-      rgba(255,255,255,0.62) 0%,
-      rgba(255,255,255,0.18) 16%,
-      rgba(0,0,0,0) 34%);
-  mix-blend-mode: screen;
-  filter: blur(0.5px);
-  pointer-events:none;
-}
 
-/* Readout */
-#tbResultOverlayRoot .tbResultReadout{ position: relative; text-align:center; z-index: 1; }
+/* =====================================================
+   TEXT
+   ===================================================== */
+
 #tbResultOverlayRoot .tbResPercent{
-  font-size: 56px;
-  font-weight: 900;
-  letter-spacing: .01em;
-  color: rgba(245,245,242,0.92);
-  text-shadow: 0 10px 30px rgba(0,0,0,0.65);
-  line-height: 1;
+  font-size:56px;
+  font-weight:900;
+  color:rgba(245,245,242,0.92);
 }
+
 #tbResultOverlayRoot .tbResLabel{
-  margin-top: 8px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .18em;
-  color: rgba(245,245,242,0.68);
+  font-size:11px;
+  letter-spacing:.18em;
+  color:rgba(245,245,242,0.68);
 }
 
-/* Copy */
-#tbResultOverlayRoot .tbLine{
-  position: relative;
-  z-index: 1;
-  width: min(560px, 92vw);
-  text-align: center;
-  white-space: pre-line;
-  font-size: 15px;
-  font-weight: 900;
-  letter-spacing: .03em;
-  color: rgba(245,245,242,0.92);
-  text-shadow: 0 8px 24px rgba(0,0,0,0.65);
-}
 
-/* Button */
-#tbResultOverlayRoot .tbActions{ position: relative; z-index: 1; margin-top: 2px; }
+/* =====================================================
+   BUTTON
+   ===================================================== */
+
 #tbResultOverlayRoot .tbBtn{
-  border: 0;
-  padding: 12px 16px;
-  border-radius: 14px;
-  font-weight: 900;
-  letter-spacing: .14em;
-  background: rgba(255,255,255,0.12);
-  color: rgba(245,245,242,0.92);
-  box-shadow: 0 18px 52px rgba(0,0,0,0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-#tbResultOverlayRoot .tbBtn:active{ transform: translateY(1px); }
+  border:0;
+  padding:12px 16px;
+  border-radius:14px;
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce){
-  #tbResultOverlayRoot .tbEyeNoise,
-  #tbResultOverlayRoot .tbResGaugeFill,
-  #tbResultOverlayRoot .tbCore{
-    animation: none !important;
-  }
-}
+  font-weight:900;
+  letter-spacing:.14em;
 
-/* Keyframes */
-@keyframes tbEyeIn{
-  0%{ transform: scale(0.985); filter: brightness(0.75); opacity: 0; }
-  60%{ transform: scale(1.02);  filter: brightness(1.02); opacity: 1; }
-  100%{ transform: scale(1.00); filter: brightness(1.00); opacity: 1; }
-}
-@keyframes tbNoise{
-  0%{ transform: translateX(-18%); opacity: .07; }
-  50%{ opacity: .11; }
-  100%{ transform: translateX(18%); opacity: .07; }
-}
-@keyframes tbCorePulse{
-  0%,100%{ transform: scale(0.94); filter: brightness(1.00); }
-  50%{ transform: scale(1.10); filter: brightness(1.10); }
-}
-@keyframes tbGaugePulse{
-  0%,100%{ transform: scale(1.00); opacity: var(--tb-gauge-a); }
-  50%{ transform: scale(1.01); opacity: 1; }
+  background:rgba(255,255,255,0.12);
+  color:rgba(245,245,242,0.92);
+
+  box-shadow:0 18px 52px rgba(0,0,0,0.45);
 }
