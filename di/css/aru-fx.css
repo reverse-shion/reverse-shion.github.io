@@ -1,0 +1,75 @@
+/* =========================
+   ARU FX LAYER
+   ========================= */
+
+:root{
+  --aru-value: 0.17;
+}
+
+/* 星パーティクル背景 */
+.aruFX{
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+/* 星 */
+.aruFX::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.8) 1px, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.6) 1px, transparent 2px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.7) 1px, transparent 2px);
+  background-size: 200px 200px;
+  opacity: calc(var(--aru-value) * 0.6);
+  animation: starDrift 20s linear infinite;
+}
+
+/* 高ARUでオーラ追加 */
+[data-aru-state="high"] .aruFX::after,
+[data-aru-state="max"] .aruFX::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: radial-gradient(circle at center,
+    rgba(255,255,255,0.08),
+    transparent 60%
+  );
+  animation: pulseAura 3s ease-in-out infinite;
+}
+
+/* MAX時 強い閃光 */
+[data-aru-state="max"] .aruFX{
+  animation: maxFlash 2s infinite alternate;
+}
+
+/* =========================
+   アニメーション
+   ========================= */
+
+@keyframes starDrift{
+  from{ background-position:0 0; }
+  to{ background-position:400px 400px; }
+}
+
+@keyframes pulseAura{
+  0%,100%{ opacity:0.2; }
+  50%{ opacity:0.5; }
+}
+
+@keyframes maxFlash{
+  0%{ filter:brightness(1); }
+  100%{ filter:brightness(1.3); }
+}
+
+/* 軽量モード対応 */
+@media (prefers-reduced-motion: reduce){
+  .aruFX::before,
+  .aruFX::after{
+    animation:none;
+  }
+}
