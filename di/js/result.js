@@ -1,37 +1,16 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.1 FIXED]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
-   - When active: HARD-HIDE all game layers, show ONLY #result
-   - Optional: background image /di/dico_eye_result.png (non-blocking)
+   - When active: HARD-HIDE all game layers under #app, show ONLY #result
+   - Black screen -> DiCo eye close-up
    - Pupil color driven by SCORE, glow driven by resonance (+ score)
-   - Non-destructive to #result (adds overlay shell only)
+   - MAX/detail is NOT implemented here (future: redirect page)
 */
 (function () {
   "use strict";
 
-  // =========================
-  // Config
-  // =========================
-  const CFG = Object.freeze({
-    STYLE_ID: "tbResultOverlayStyles_v131",
-    SHELL_CLASS: "tbResultOverlayShell",
-    ROOT_ACTIVE_CLASS: "tb-active",
-    APP_CUT_CLASS: "tb-result-active", // applied to #app AND body (fallback)
-
-    // IMPORTANT: url() is resolved relative to *HTML*, not this JS file.
-    // Your asset lives at /di/dico_eye_result.png and di.html is /di/di.html
-    // => correct relative path from HTML: "dico_eye_result.png"
-    BG_IMAGE_FILE: "dico_eye_result.png",
-
-    NAME_CALL_THRESHOLD: 50,
-    COUNTUP_FRAMES: 56,
-    Z_MAX: 2147483647,
-  });
-
-  // =========================
-  // Utils
-  // =========================
+  // ---------- utils ----------
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const toNum = (v, d = 0) => {
     const x = Number(v);
@@ -48,12 +27,14 @@
     return null;
   }
 
+  // Resonance can be 0..1 or 0..100
   function normalizePercent(resonance) {
     let r = toNum(resonance, 0);
     if (r <= 1.0001) r *= 100;
     return clamp(Math.round(r), 0, 100);
   }
 
+  // Score normalization (chart-agnostic)
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
@@ -84,17 +65,17 @@
     return { r: lerp(A.r, B.r, t), g: lerp(A.g, B.g, t), b: lerp(A.b, B.b, t) };
   }
 
-  const COLORS = Object.freeze({
+  const COLORS = {
     navy:   "#0b1020",
     aqua:   "#00F0FF",
     violet: "#8A2BE2",
     magenta:"#FF2FB2",
     gold:   "#FFD46A",
     white:  "#FFFFFF",
-  });
+  };
 
   function pupilColorByScoreP(p) {
-    if (p < 0.20) return rgbToCss(mix(COLORS.navy,   COLORS.aqua,    p / 0.20), 0.95);
+    if (p < 0.20) return rgbToCss(mix(COLORS.navy,   COLORS.aqua,   p / 0.20), 0.95);
     if (p < 0.45) return rgbToCss(mix(COLORS.aqua,   COLORS.violet, (p - 0.20) / 0.25), 0.95);
     if (p < 0.70) return rgbToCss(mix(COLORS.violet, COLORS.magenta,(p - 0.45) / 0.25), 0.95);
     if (p < 0.90) return rgbToCss(mix(COLORS.magenta,COLORS.gold,   (p - 0.70) / 0.20), 0.96);
@@ -121,15 +102,13 @@
     return `共鳴は消えてない。\nDiDiDi…もう一回、いこ？`;
   }
 
-  // =========================
-  // DOM
-  // =========================
+  // ---------- DOM (non-destructive) ----------
   function ensureShell(root) {
-    let shell = root.querySelector("." + CFG.SHELL_CLASS);
+    let shell = root.querySelector(".tbResultOverlayShell");
     if (shell) return shell;
 
     shell = document.createElement("div");
-    shell.className = CFG.SHELL_CLASS;
+    shell.className = "tbResultOverlayShell";
     shell.setAttribute("role", "dialog");
     shell.setAttribute("aria-label", "Result");
 
@@ -167,52 +146,41 @@
     return shell;
   }
 
-  // =========================
-  // CSS injection
-  // =========================
+  // ---------- CSS injection ----------
   function injectStylesOnce() {
-    if (document.getElementById(CFG.STYLE_ID)) return;
+    if (document.getElementById("tbResultOverlayStyles")) return;
 
     const s = document.createElement("style");
-    s.id = CFG.STYLE_ID;
+    s.id = "tbResultOverlayStyles";
     s.textContent = `
-/* ===== TB RESULT OVERLAY v1.3.1 FIXED ===== */
+/* ===== TB RESULT OVERLAY v1.3 (HARD CUT) ===== */
 
+/* Base: #result becomes a true fullscreen overlay container */
 #result{
   position: fixed !important;
   inset: 0 !important;
-  z-index: ${CFG.Z_MAX} !important;
+  z-index: 2147483647 !important;
   display: block !important;
-  pointer-events: none;
 
-  background: #000 !important;
-
+  /* hard isolate: avoid blend/backdrop leakage */
   isolation: isolate !important;
   contain: layout paint style !important;
 
-  transform: translateZ(0) !important;
+  pointer-events: none;
+  background: #000;
 }
 
-#result.${CFG.ROOT_ACTIVE_CLASS}{
+#result.tb-active{
   pointer-events: auto;
 }
 
-/* HARD CUT (primary): if #result is inside #app */
-#app.${CFG.APP_CUT_CLASS} > *:not(#result){
+/* HARD CUT: while result is active, remove everything under #app except #result */
+#app.tb-result-active > *:not(#result){
   display: none !important;
-}
-
-/* HARD CUT (fallback): even if #result is NOT a direct child of #app */
-body.${CFG.APP_CUT_CLASS} #app *{
-  display: none !important;
-}
-body.${CFG.APP_CUT_CLASS} #result,
-body.${CFG.APP_CUT_CLASS} #result *{
-  display: block !important;
 }
 
 /* Overlay shell */
-#result .${CFG.SHELL_CLASS}{
+#result .tbResultOverlayShell{
   position: absolute;
   inset: 0;
   display: flex;
@@ -223,37 +191,12 @@ body.${CFG.APP_CUT_CLASS} #result *{
   padding: 16px;
 }
 
-/* Background layer:
-   NOTE: uses --tb-bg-img injected by JS (absolute URL, resilient)
-*/
+/* Pure black with slight depth */
 #result .tbResultOverlayBlack{
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 45%,
-      rgba(18,20,28,0.20) 0%,
-      rgba(0,0,0,0.92) 55%,
-      rgba(0,0,0,0.98) 100%),
-
-    var(--tb-bg-img, none) center / cover no-repeat,
-
-    #000;
-
-  filter: saturate(1.05) contrast(1.05);
-}
-
-/* Bloom over artwork */
-#result .tbResultOverlayBlack::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 50% 44%,
-      var(--tb-pupil-glow, rgba(0,240,255,0.18)) 0%,
-      rgba(0,0,0,0) 55%);
-  mix-blend-mode: screen;
-  opacity: calc(var(--tb-glow-power, 0.35) * 0.90);
-  pointer-events:none;
+    radial-gradient(circle at 50% 45%, rgba(18,20,28,0.20) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,0.98) 100%);
 }
 
 /* Eye stage */
@@ -265,7 +208,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   align-items: center;
 }
 
-/* Eye */
+/* Eye close-up */
 #result .tbEye{
   position: relative;
   width: min(92vw, 520px);
@@ -276,12 +219,10 @@ body.${CFG.APP_CUT_CLASS} #result *{
   box-shadow:
     0 28px 80px rgba(0,0,0,0.70),
     0 0 0 1px rgba(255,255,255,0.12) inset;
-  background: radial-gradient(circle at 50% 50%,
-    rgba(5,6,10,0.90) 0%,
-    rgba(0,0,0,0.98) 72%,
-    rgba(0,0,0,1) 100%);
+  background: radial-gradient(circle at 50% 50%, rgba(5,6,10,0.90) 0%, rgba(0,0,0,0.98) 72%, rgba(0,0,0,1) 100%);
 }
 
+/* Scan/noise */
 #result .tbEyeNoise{
   position:absolute; inset:-30%;
   background:
@@ -296,6 +237,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   animation: tbNoise 2.8s linear infinite;
 }
 
+/* Vignette */
 #result .tbEyeVignette{
   position:absolute; inset:-10%;
   background:
@@ -305,6 +247,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
       rgba(0,0,0,0.85) 100%);
 }
 
+/* Iris (subtle) */
 #result .tbIris{
   position:absolute; inset: 18%;
   border-radius: 999px;
@@ -319,6 +262,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   animation: tbIris 5.8s linear infinite;
 }
 
+/* Iris threads */
 #result .tbIrisThreads{
   position:absolute; inset: 18%;
   border-radius: 999px;
@@ -332,6 +276,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   mix-blend-mode: overlay;
 }
 
+/* Pupil */
 #result .tbPupil{
   position:absolute;
   inset: 40%;
@@ -343,6 +288,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
 }
 
+/* Pupil glow (color via CSS variable) */
 #result .tbPupilGlow{
   position:absolute;
   inset: 30%;
@@ -356,6 +302,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   animation: tbBreath 3.6s ease-in-out infinite;
 }
 
+/* Specular highlight (only high score) */
 #result .tbSpecular{
   position:absolute;
   inset: 0;
@@ -369,6 +316,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   filter: blur(0.5px);
 }
 
+/* Readout */
 #result .tbResultReadout{ position: relative; text-align:center; z-index: 1; }
 #result .tbResPercent{
   font-size: 56px;
@@ -386,6 +334,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   color: rgba(245,245,242,0.68);
 }
 
+/* Line */
 #result .tbLine{
   position: relative;
   z-index: 1;
@@ -399,6 +348,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   text-shadow: 0 8px 24px rgba(0,0,0,0.65);
 }
 
+/* Actions */
 #result .tbActions{ position: relative; z-index: 1; margin-top: 2px; }
 #result .tbBtn{
   border: 0;
@@ -414,10 +364,12 @@ body.${CFG.APP_CUT_CLASS} #result *{
 }
 #result .tbBtn:active{ transform: translateY(1px); }
 
-#result.${CFG.ROOT_ACTIVE_CLASS} .tbEye{
+/* Entry animation */
+#result.tb-active .tbEye{
   animation: tbEyeIn .65s cubic-bezier(.2,.9,.2,1) both;
 }
 
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   #result .tbEyeNoise,
   #result .tbIris,
@@ -426,6 +378,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
   }
 }
 
+/* Keyframes */
 @keyframes tbEyeIn{
   0%{ transform: scale(0.985); filter: brightness(0.75); opacity: 0; }
   60%{ transform: scale(1.02);  filter: brightness(1.05); opacity: 1; }
@@ -448,10 +401,8 @@ body.${CFG.APP_CUT_CLASS} #result *{
     document.head.appendChild(s);
   }
 
-  // =========================
-  // Paint / Animate
-  // =========================
-  function paintAndAnimate(root, payload) {
+  // ---------- paint / animate ----------
+  function animate(root, payload) {
     const percentEl = root.querySelector("#tbResPercent");
     const lineEl = root.querySelector("#tbLine");
     const pupilEl = root.querySelector("#tbPupil");
@@ -465,6 +416,7 @@ body.${CFG.APP_CUT_CLASS} #result *{
     const scoreP = normalizeScore01(score, maxCombo, resPercent);
     const pupilColor = pupilColorByScoreP(scoreP);
 
+    // Glow power: base from resonance + slight score boost
     const glowPower = clamp(0.20 + (resPercent / 100) * 0.55 + scoreP * 0.25, 0.20, 1.00);
     const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
 
@@ -476,13 +428,13 @@ body.${CFG.APP_CUT_CLASS} #result *{
       `0 0 0 1px rgba(255,255,255,0.10) inset, 0 0 ${Math.round(22 + glowPower * 34)}px ${pupilColor}`;
 
     const name = safeUserName();
-    const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
-    lineEl.innerText = lineBy(resPercent, callName ? name : null);
+    lineEl.innerText = lineBy(resPercent, (name && resPercent >= 50) ? name : null);
 
+    // Count-up
     percentEl.textContent = "0%";
     let cur = 0;
     const target = clamp(resPercent, 0, 100);
-    const frames = CFG.COUNTUP_FRAMES;
+    const frames = 56;
     const step = Math.max(1, Math.ceil(target / frames));
 
     function tick() {
@@ -493,64 +445,49 @@ body.${CFG.APP_CUT_CLASS} #result *{
     requestAnimationFrame(tick);
   }
 
-  // =========================
-  // Presenter API
-  // =========================
-  function wireReplayOnce(root, app) {
-    const replayBtn = root.querySelector("#tbReplayBtn");
-    if (!replayBtn || replayBtn.__tbBound) return;
-
-    replayBtn.__tbBound = true;
-    replayBtn.addEventListener("click", () => {
-      root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
-      if (app) app.classList.remove(CFG.APP_CUT_CLASS);
-      document.body.classList.remove(CFG.APP_CUT_CLASS);
-
-      const startBtn = document.getElementById("startBtn");
-      if (startBtn) { startBtn.click(); return; }
-      const restartBtn = document.getElementById("restartBtn");
-      restartBtn?.click?.();
-    }, { passive: true });
-  }
-
+  // ---------- public presenter ----------
   window.DI_RESULT = {
     init(opts) {
       const root = opts?.root || document.getElementById("result");
       const app = opts?.app || document.getElementById("app");
       if (!root) return { show() {}, hide() {} };
 
-      // ✅ resilient background URL (absolute, never breaks)
-      // /di/di.html -> dico_eye_result.png -> /di/dico_eye_result.png
-      try {
-        const abs = new URL(CFG.BG_IMAGE_FILE, location.href).toString();
-        root.style.setProperty("--tb-bg-img", `url("${abs}")`);
-      } catch {
-        // non-blocking
-        root.style.setProperty("--tb-bg-img", "none");
-      }
-
       injectStylesOnce();
       ensureShell(root);
-      wireReplayOnce(root, app);
+
+      // Wire replay once
+      const replayBtn = root.querySelector("#tbReplayBtn");
+      if (replayBtn && !replayBtn.__tbBound) {
+        replayBtn.__tbBound = true;
+        replayBtn.addEventListener("click", () => {
+          // clean hide (remove hard-cut first)
+          root.classList.remove("tb-active");
+          if (app) app.classList.remove("tb-result-active");
+
+          const startBtn = document.getElementById("startBtn");
+          if (startBtn) { startBtn.click(); return; }
+          const restartBtn = document.getElementById("restartBtn");
+          restartBtn?.click?.();
+        });
+      }
 
       return {
         show(payload) {
+          // 1) hard-cut under #app
+          if (app) app.classList.add("tb-result-active");
+
+          // 2) activate overlay
+          root.classList.add("tb-active");
+
+          // 3) ensure overlay shell exists (in case engine touched #result)
           ensureShell(root);
-          wireReplayOnce(root, app);
 
-          // hard cut
-          if (app) app.classList.add(CFG.APP_CUT_CLASS);
-          document.body.classList.add(CFG.APP_CUT_CLASS);
-
-          // overlay on
-          root.classList.add(CFG.ROOT_ACTIVE_CLASS);
-
-          paintAndAnimate(root, payload || {});
+          // 4) paint + animate
+          animate(root, payload || {});
         },
         hide() {
-          root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
-          if (app) app.classList.remove(CFG.APP_CUT_CLASS);
-          document.body.classList.remove(CFG.APP_CUT_CLASS);
+          root.classList.remove("tb-active");
+          if (app) app.classList.remove("tb-result-active");
         },
       };
     },
