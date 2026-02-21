@@ -1,10 +1,9 @@
 /* /di/js/main.js
-   PHASE1 STABLE (START / STOP / RESTART) + PRESENTATION LAYER (result.js)
-   - STOP = end to RESULT (no pause/resume complexity)
-   - Deterministic state machine: idle -> playing -> result
-   - iOS safe: unlock on first user gesture, no autoplay before gesture
-   - Robust: double-run guards, cleanup, safe media control
-   - Loads: engine scripts -> presentation scripts -> boot()
+   PHASE1 PRO — STABLE ENGINE BOOT (START / STOP / RESTART) + UI/RESULT wiring
+   - Deterministic: idle -> playing -> result
+   - iOS-safe: unlock on first gesture, no autoplay before gesture
+   - Robust: double-run guards, media cleanup, safe fallbacks
+   - UI refs are centralized here (single source of truth)
 */
 (() => {
   "use strict";
@@ -12,7 +11,7 @@
   // main.js is /di/js/main.js, so BASE points to /di/js/
   const BASE = new URL("./", document.currentScript?.src || location.href);
 
-  // Engine layer
+  // Engine layer (loaded sequentially, cache-busted)
   const ENGINE_FILES = [
     "engine/audio.js",
     "engine/timing.js",
@@ -24,15 +23,12 @@
     "notes/skin-tarot-pinkgold.js",
   ].map((p) => new URL(p, BASE).toString());
 
-  // Presentation layer (keep separate from engine)
-  // Put result.js at: /di/js/result.js
-  const PRESENTATION_FILES = [
-    "result.js",
-  ].map((p) => new URL(p, BASE).toString());
+  // Presentation layer (optional; safe fallback)
+  const PRESENTATION_FILES = ["result.js"].map((p) => new URL(p, BASE).toString());
 
   const $ = (id) => document.getElementById(id);
 
-  // iOS当たりづらい時：0.06→0.08→0.10で調整
+  // iOS tap latency tuning: 0.06 → 0.08 → 0.10
   const INPUT_LAT = 0.06;
 
   /** Allowed states: idle | playing | result */
@@ -55,7 +51,9 @@
     return app.dataset.state || STATES.IDLE;
   }
 
-  // -------- script loader (sequential, cache-busted) --------
+  // ---------------------------
+  // Sequential loader (cache-busted)
+  // ---------------------------
   function loadScriptsSequentially(files) {
     return files.reduce((p, src) => {
       return p.then(
@@ -63,8 +61,7 @@
           new Promise((resolve, reject) => {
             const s = document.createElement("script");
             const u = new URL(src);
-            // dev friendly cache-bust (keeps you sane on iOS)
-            u.searchParams.set("v", String(Date.now()));
+            u.searchParams.set("v", String(Date.now())); // iOS sanity
             s.src = u.toString();
             s.async = false;
             s.onload = () => resolve();
@@ -76,11 +73,7 @@
   }
 
   async function loadAllScripts() {
-    // 1) engine
     await loadScriptsSequentially(ENGINE_FILES);
-
-    // 2) presentation
-    //   - If result.js fails, we still continue with safe fallback (do NOT hard-crash).
     try {
       await loadScriptsSequentially(PRESENTATION_FILES);
     } catch (e) {
@@ -114,23 +107,27 @@
     };
   }
 
+  // ---------------------------
+  // Boot
+  // ---------------------------
   async function boot() {
-    // ===== DOM =====
+    // ===== DOM (required) =====
     const app = assertEl($("app"), "app");
     const canvas = assertEl($("noteCanvas"), "noteCanvas");
     const hitZone = assertEl($("hitZone"), "hitZone");
 
-    const bgVideo = $("bgVideo"); // optional
-
     const startBtn = assertEl($("startBtn"), "startBtn");
-    const stopBtn = $("stopBtn"); // optional but recommended
     const restartBtn = assertEl($("restartBtn"), "restartBtn");
 
     const music = assertEl($("music"), "music");
+
+    // ===== DOM (optional but recommended) =====
+    const bgVideo = $("bgVideo");
+    const stopBtn = $("stopBtn");
     const seTap = $("seTap");
     const seGreat = $("seGreat");
 
-    // ===== background video (never autoplay on load; control after gesture) =====
+    // ===== background video: never autoplay on load =====
     if (bgVideo) {
       try {
         bgVideo.muted = true;
@@ -154,51 +151,76 @@
     const E = window.DI_ENGINE;
     if (!E) throw new Error("DI_ENGINE not found.");
 
-    const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
-    const fx = new E.FX({ fxLayer: $("fxLayer") });
-
-    const ui = new E.UI({
+    // ---- Build refs ONCE (UI’s single source of truth) ----
+    // NOTE: dicoFace is REQUIRED for face swap system.
+    const refs = {
+      // root/state
       app,
+
+      // legacy HUD
       score: $("score"),
       combo: $("combo"),
       maxCombo: $("maxCombo"),
       timeDup: $("time_dup"),
 
+      // side HUD
       sideScore: $("sideScore"),
       sideCombo: $("sideCombo"),
       sideMaxCombo: $("sideMaxCombo"),
       time: $("time"),
 
+      // resonance HUD
       resValue: $("resValue"),
       resFill: $("resFill"),
-      avatarRing: $("avatarRing"),
 
+      // avatar
+      avatarRing: $("avatarRing"),
+      dicoFace: $("dicoFace"), // ✅ IMPORTANT: face swap target
+
+      // judge
       judge: $("judge"),
       judgeMain: $("judgeMain"),
       judgeSub: $("judgeSub"),
 
+      // result overlay
       result: $("result"),
       resultScore: $("resultScore"),
       resultMaxCombo: $("resultMaxCombo"),
 
+      // ARU
       aruProg: $("aruProg"),
       aruValue: $("aruValue"),
-      dicoLine: $("dicoLine"),
 
+      // line / aria / fx
+      dicoLine: $("dicoLine"),
       ariaLive: $("ariaLive"),
       hitFlash: $("hitFlash"),
-    });
 
-    // ===== presentation (result.js) safety =====
-    // result.js should set: window.DI_RESULT = { init({ ... }) { return { show(payload), hide() } } }
+      // optional preload pool (if present in HTML; harmless if null)
+      face1: $("face1"),
+      face2: $("face2"),
+      face3: $("face3"),
+      face4: $("face4"),
+      face5: $("face5"),
+    };
+
+    // Hard assert: if you want face changes, dicoFace must exist.
+    // (fail fast: better than “why doesn’t it change?”)
+    assertEl(refs.dicoFace, "dicoFace");
+
+    const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
+    const fx = new E.FX({ fxLayer: $("fxLayer") });
+    const ui = new E.UI(refs);
+
+    // ===== presentation (result.js) safe fallback =====
+    // result.js should expose: window.DI_RESULT = { init({ ... }) { return { show(payload), hide() } } }
     if (!window.DI_RESULT || typeof window.DI_RESULT.init !== "function") {
       console.warn("[DiCo] DI_RESULT not found. Using safe fallback presenter.");
       window.DI_RESULT = {
         init() {
           return {
             show(payload) {
-              // keep silent in production, but helpful in dev
-              console.log("[DiCo] RESULT (fallback presenter):", payload);
+              console.log("[DiCo] RESULT (fallback):", payload);
             },
             hide() {},
           };
@@ -208,13 +230,13 @@
 
     const resultPresenter = window.DI_RESULT.init({
       app,
-      root: $("result"),
-      dicoLine: $("dicoLine"),
-      aruProg: $("aruProg"),
-      aruValue: $("aruValue"),
-      resultScore: $("resultScore"),
-      resultMaxCombo: $("resultMaxCombo"),
-      ariaLive: $("ariaLive"),
+      root: refs.result,
+      dicoLine: refs.dicoLine,
+      aruProg: refs.aruProg,
+      aruValue: refs.aruValue,
+      resultScore: refs.resultScore,
+      resultMaxCombo: refs.resultMaxCombo,
+      ariaLive: refs.ariaLive,
     });
 
     // ===== game objects =====
@@ -245,9 +267,11 @@
       const t = timing.getSongTime();
       if (!Number.isFinite(t)) return;
 
+      // judge + render
       judge.sweepMiss(t);
       render.draw(t);
 
+      // ui update
       ui.update({
         t,
         score: judge.state.score,
@@ -257,6 +281,7 @@
         state: getState(app),
       });
 
+      // natural end
       if (timing.isEnded(t)) endToResult("ENDED");
     }
 
@@ -276,17 +301,13 @@
     }
 
     async function resetAndPlayMedia() {
-      // music reset + play
       try {
         music.pause();
         music.currentTime = 0;
       } catch {}
-
       try {
         await music.play();
       } catch {}
-
-      // bg video play (if exists)
       await playBackground();
     }
 
@@ -305,15 +326,14 @@
     async function startFromIdleOrResult() {
       if (transitionLock) return;
       if (getState(app) === STATES.PLAYING) return;
-
       transitionLock = true;
 
-      // user gesture unlock (iOS)
+      // iOS unlock on gesture
       await audio.unlock();
 
-      // fresh objects for a clean run
+      // rebuild clean run
       rebuildGameObjects();
-      judge.reset();
+      judge.reset?.();
 
       // timing start at 0
       try {
@@ -323,7 +343,7 @@
         console.warn("[DiCo] timing start error:", e);
       }
 
-      // state first (so CSS flips immediately)
+      // state first (CSS flips immediately)
       setState(app, STATES.PLAYING);
       setStartLabelForState(STATES.PLAYING);
 
@@ -337,7 +357,7 @@
       stopRAF();
       tick();
 
-      // media after state (gesture already happened)
+      // media after state
       await resetAndPlayMedia();
 
       transitionLock = false;
@@ -352,16 +372,14 @@
       stopRAF();
 
       // stop media
-      try {
-        music.pause();
-      } catch {}
+      try { music.pause(); } catch {}
       pauseBackground();
 
       await audio.unlock();
 
-      // rebuild for clean start
+      // rebuild clean start
       rebuildGameObjects();
-      judge.reset();
+      judge.reset?.();
 
       // timing restart
       try {
@@ -397,10 +415,7 @@
       running = false;
       stopRAF();
 
-      try {
-        timing?.stop?.(audio);
-      } catch {}
-
+      try { timing?.stop?.(audio); } catch {}
       stopMediaForResult();
 
       setState(app, STATES.RESULT);
@@ -413,13 +428,11 @@
         reason,
       };
 
-      // engine UI (existing)
+      // engine UI
       ui.showResult(payload);
 
-      // presentation layer (result.js)
-      try {
-        resultPresenter.show(payload);
-      } catch (e) {
+      // presentation layer
+      try { resultPresenter.show(payload); } catch (e) {
         console.warn("[DiCo] resultPresenter.show failed:", e);
       }
 
@@ -439,8 +452,11 @@
         if (!Number.isFinite(t)) return;
 
         const res = judge.hit(t + INPUT_LAT);
+
+        // UI reaction (faces + lines + streak bonuses)
         ui.onJudge(res);
 
+        // audio/fx for good hits
         if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
           audio.playGreat();
           ui.flashHit();
@@ -450,10 +466,8 @@
     });
 
     // ===== buttons =====
-    // START: idle/result -> playing
     startBtn.addEventListener("click", () => startFromIdleOrResult());
 
-    // STOP: playing -> result (NO-PAUSE; deterministic)
     if (stopBtn) {
       stopBtn.addEventListener("click", () => {
         if (!running || getState(app) !== STATES.PLAYING) return;
@@ -461,7 +475,6 @@
       });
     }
 
-    // RESTART: always -> playing from beginning
     restartBtn.addEventListener("click", () => restartAlways());
 
     // Optional: keyboard (desktop)
@@ -475,8 +488,6 @@
     // ===== init =====
     setState(app, STATES.IDLE);
     setStartLabelForState(STATES.IDLE);
-
-    // ensure background is not running in idle
     pauseBackground();
 
     ui.update({
@@ -498,10 +509,10 @@
       { passive: true }
     );
 
-    console.log("[DiCo] boot OK (Phase1 stable + presentation layer ready)");
+    console.log("[DiCo] boot OK (Phase1 PRO + UI face system wired)");
   }
 
-  // ===== ENTRYPOINT (engine -> presentation -> boot) =====
+  // ===== ENTRYPOINT =====
   (async () => {
     try {
       await loadAllScripts();
