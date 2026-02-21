@@ -38,14 +38,16 @@
     EYE_BG_SIZE: 190,     // %
     // ★要望：もう少し右・下
     // まずはこの値で。さらに動かしたい時は +2 ずつ増減すると迷わない。
-    EYE_BG_POS_X: 54,     // % 右へ
-    EYE_BG_POS_Y: 41,     // % 下へ（※見た目は“Yが増えるほど下”）
+    EYE_BG_POS_X: 66,     // % 右へ
+    EYE_BG_POS_Y: 60,     // % 下へ（※見た目は“Yが増えるほど下”）
 
     // ARU tint (iris-only) visibility guarantee
     // 目の絵を殺さない範囲で「最低でもARU色が読める」
-    ARU_TINT_MIN: 0.18,
-    ARU_TINT_MAX: 0.55,
-    ARU_TINT_GLOW_WEIGHT: 0.34, // glow連動
+    // === ARU COLOR VISIBILITY CONTROL ===
+// 0 = ほぼ見えない
+// 1 = かなり強い（絵が死ぬ一歩手前）
+ARU_COLOR_STRENGTH: 0.60,  // ← 基本強度（まずここだけ触る）
+ARU_COLOR_RESONANCE_BOOST: 0.28, // 共鳴による増幅
   });
 
   // =========================
