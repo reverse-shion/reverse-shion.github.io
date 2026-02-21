@@ -1,9 +1,9 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.3]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.4]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
    - When active: HARD-HIDE all game layers under #app using VISIBILITY (robust)
-   - Optional background image: /di/dico_eye_result.png (non-blocking)
+   - Eye image is INSIDE the circle (.tbEye) to avoid square artifacts
    - Pupil color driven by SCORE, glow driven by resonance (+ score)
    - Non-destructive to #result (adds overlay shell only)
 */
@@ -14,14 +14,14 @@
   // Config
   // =========================
   const CFG = Object.freeze({
-    VERSION: "1.3.3",
-    STYLE_ID: "tbResultOverlayStyles_v133",
+    VERSION: "1.3.4",
+    STYLE_ID: "tbResultOverlayStyles_v134",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
 
-    // /di/js/result.js -> /di/dico_eye_result.png
-    BG_IMAGE_URL: "../dico_eye_result.png",
+    // Use ABSOLUTE path (GitHub Pages-safe)
+    EYE_IMAGE_URL: "/di/dico_eye_result.png",
 
     NAME_CALL_THRESHOLD: 50,
     COUNTUP_FRAMES: 56,
@@ -175,7 +175,7 @@
     const s = document.createElement("style");
     s.id = CFG.STYLE_ID;
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (VISIBILITY HARD CUT) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (VISIBILITY HARD CUT + EYE IN CIRCLE) ===== */
 
 #result{
   position: fixed !important;
@@ -185,7 +185,6 @@
   pointer-events: none;
   background: #000 !important;
 
-  /* iOS blend/stack safety */
   isolation: isolate !important;
   contain: layout paint style !important;
   transform: translateZ(0) !important;
@@ -217,21 +216,20 @@
   padding: 16px;
 }
 
-/* Background: depth + optional image */
+/* Background = ONLY depth (NO image here) */
 #result .tbResultOverlayBlack{
   position: absolute;
   inset: 0;
+  z-index: 0;
   background:
-    url("/di/dico_eye_result.png") center / cover no-repeat,
     radial-gradient(circle at 50% 45%,
-      rgba(18,20,28,0.12) 0%,
-      rgba(0,0,0,0.55) 55%,
-      rgba(0,0,0,0.85) 100%),
+      rgba(18,20,28,0.18) 0%,
+      rgba(0,0,0,0.86) 55%,
+      rgba(0,0,0,0.98) 100%),
     #000;
-  filter: saturate(1.05) contrast(1.05);
 }
 
-/* Bloom (non-blocking even if image fails) */
+/* Bloom overlay (safe) */
 #result .tbResultOverlayBlack::after{
   content:"";
   position:absolute;
@@ -239,35 +237,53 @@
   background:
     radial-gradient(circle at 50% 44%,
       var(--tb-pupil-glow, rgba(0,240,255,0.18)) 0%,
-      rgba(0,0,0,0) 60%);
+      rgba(0,0,0,0) 62%);
   mix-blend-mode: screen;
-  opacity: calc(var(--tb-glow-power, 0.35) * 0.90);
+  opacity: calc(var(--tb-glow-power, 0.35) * 0.80);
   pointer-events:none;
 }
+
 /* Eye stage */
 #result .tbEyeStage{
   position: relative;
+  z-index: 1;
   width: min(92vw, 520px);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Eye close-up */
+/* Eye close-up = IMAGE INSIDE THE CIRCLE */
 #result .tbEye{
   position: relative;
   width: min(92vw, 520px);
   aspect-ratio: 1 / 1;
   border-radius: 999px;
   overflow: hidden;
-  transform: translateZ(0);
+
+  background: url("${CFG.EYE_IMAGE_URL}") center / cover no-repeat;
+
   box-shadow:
     0 28px 80px rgba(0,0,0,0.70),
     0 0 0 1px rgba(255,255,255,0.12) inset;
-  background: radial-gradient(circle at 50% 50%,
-    rgba(5,6,10,0.90) 0%,
-    rgba(0,0,0,0.98) 72%,
-    rgba(0,0,0,1) 100%);
+
+  /* iOS Safari “round but looks square” fix */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+
+  transform: translateZ(0);
+}
+
+/* Tighten / vignette on top of the image so ARU feels integrated */
+#result .tbEye::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(0,0,0,0) 46%,
+      rgba(0,0,0,0.52) 74%,
+      rgba(0,0,0,0.82) 100%);
+  pointer-events:none;
 }
 
 /* Scan/noise */
@@ -285,14 +301,14 @@
   animation: tbNoise 2.8s linear infinite;
 }
 
-/* Vignette */
+/* Vignette (extra) */
 #result .tbEyeVignette{
   position:absolute; inset:-10%;
   background:
     radial-gradient(circle at 50% 50%,
       rgba(0,0,0,0) 48%,
-      rgba(0,0,0,0.55) 72%,
-      rgba(0,0,0,0.85) 100%);
+      rgba(0,0,0,0.40) 70%,
+      rgba(0,0,0,0.70) 100%);
 }
 
 /* Iris */
@@ -301,12 +317,12 @@
   border-radius: 999px;
   background:
     conic-gradient(from 120deg,
-      rgba(0,240,255,0.26),
-      rgba(138,43,226,0.22),
-      rgba(255,47,178,0.22),
-      rgba(0,240,255,0.26));
+      rgba(0,240,255,0.22),
+      rgba(138,43,226,0.18),
+      rgba(255,47,178,0.18),
+      rgba(0,240,255,0.22));
   filter: saturate(1.05);
-  opacity: .65;
+  opacity: .58;
   animation: tbIris 5.8s linear infinite;
 }
 
@@ -320,7 +336,7 @@
       rgba(255,255,255,0.06) 1px,
       rgba(0,0,0,0) 3px,
       rgba(0,0,0,0) 6px);
-  opacity: .18;
+  opacity: .16;
   mix-blend-mode: overlay;
 }
 
@@ -427,7 +443,7 @@
 
 @keyframes tbEyeIn{
   0%{ transform: scale(0.985); filter: brightness(0.75); opacity: 0; }
-  60%{ transform: scale(1.02);  filter: brightness(1.05); opacity: 1; }
+  60%{ transform: scale(1.02);  filter: brightness(1.02); opacity: 1; }
   100%{ transform: scale(1.00); filter: brightness(1.00); opacity: 1; }
 }
 @keyframes tbBreath{
@@ -524,7 +540,6 @@
           ensureShell(root);
           wireReplayOnce(root, app);
 
-          // Order matters: cut first, then activate overlay
           if (app) app.classList.add(CFG.APP_CUT_CLASS);
           root.classList.add(CFG.ROOT_ACTIVE_CLASS);
 
