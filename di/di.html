@@ -1,4 +1,4 @@
-<!-- /di/di.html (RE-DESIGNED / PRO ENGINEER FINAL) -->
+<!-- /di/di.html (RE-DESIGNED / PRO ENGINEER FINAL — polished) -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -16,7 +16,10 @@
   <link rel="stylesheet" href="./css/hud.css" />
   <link rel="stylesheet" href="./css/lane.css" />
   <link rel="stylesheet" href="./css/result.css" />
-  
+  <!-- ARU split -->
+  <link rel="stylesheet" href="./css/aru-fx.css" />
+  <link rel="stylesheet" href="./css/aru-gauge.css" />
+
   <!-- Preload (helps iOS a bit; safe even if missing files) -->
   <link rel="preload" href="./idle/dico_idle.jpg" as="image" />
   <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
@@ -26,7 +29,14 @@
 </head>
 
 <body>
-<main class="app" id="app" data-state="idle" aria-label="DiCo ARU Rhythm">
+<main
+  class="app"
+  id="app"
+  data-state="idle"
+  data-aru-state="low"
+  style="--aru-value:0.17"
+  aria-label="DiCo ARU Rhythm"
+>
 
   <!-- =========================================================
        BACKGROUND STACK
@@ -129,9 +139,9 @@
 
         <!-- Face pool (optional) -->
         <div class="facePool" aria-hidden="true">
-          <img class="faceAsset" id="face1" src="./assets/faces/dico_face_1.png" alt="" />
-          <img class="faceAsset" id="face2" src="./assets/faces/dico_face_2.png" alt="" />
-          <img class="faceAsset" id="face3" src="./assets/faces/dico_face_3.png" alt="" />
+          <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
+          <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
+          <img class="faceAsset" id="face3" src="./faces/dico_face_3.png" alt="" />
         </div>
       </div>
     </div>
@@ -224,7 +234,6 @@
             </div>
           </div>
 
-          <!-- ✅ セリフはあなたの指定に更新 -->
           <div class="dicoLine" id="dicoLine">キミの想いを、共鳴に変えて。</div>
         </div>
       </div>
@@ -250,12 +259,25 @@
   <!-- Screen reader live region -->
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
 
+  <!-- =========================================================
+       ARU OVERLAY (TOPMOST)
+       - CSSで app[data-state="result"] の時だけ表示するのがおすすめ
+       - --aru-value / data-aru-state は result.js から更新
+       ========================================================= -->
+  <div class="aruFX" aria-hidden="true"></div>
+
+  <div class="aruLayer" aria-hidden="true">
+    <div class="aruGauge">
+      <div class="aruScore" id="aruOverlayScore">0%</div>
+    </div>
+  </div>
+
 </main>
 
 <!-- Main boot -->
 <script src="./js/main.js" defer></script>
 <script src="./js/common.js" defer></script>
-  <script type="module" src="./js/result.js"></script>
+<script type="module" src="./js/result.js"></script>
 
 <!-- Idle particles (light; idle only) -->
 <script>
