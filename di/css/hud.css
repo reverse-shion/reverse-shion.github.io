@@ -1,103 +1,118 @@
-/* /di/css/hud.css
-   ============================================================
-   HUD — PRO FINAL (deterministic layering + state hard-guards)
-   - Single source of truth for:
-     1) UI layer order (iOS-safe)
-     2) State visibility: idle / playing / result / paused
-     3) Controls visibility: START / STOP / RESTART (hard guarantee)
-     4) Idle tagline (neon glass)
-     5) Side HUD cards + DiCo avatar tuning (size/brightness/ring pink-gold)
-   ============================================================ */
+/* ============================================================
+   HUD + FX FINAL GOD EDITION
+   - Deterministic layering
+   - Viewport-fixed FX layer
+   - Resonance color sync via --res-color
+   - Heartbeat safe animation
+   - MAX divine flash
+   - Ring absorption aura
+   - iOS safe transforms
+============================================================ */
 
 :root{
-  /* If themes.css already defines these, this will simply reuse them. */
   --pinkGold: rgba(236,191,152,.95);
-  --pinkGoldSoft: rgba(236,191,152,.26);
-  --pinkGoldGlow: rgba(236,191,152,.38);
+  --pinkGoldSoft: rgba(236,191,152,.28);
+  --pinkGoldGlow: rgba(236,191,152,.45);
 
-  /* HUD sizing */
-  --hudW: 168px;        /* right/left HUD width */
+  --res-color: rgba(0,240,255,.9);
+
+  --hudW: 168px;
   --hudGap: 12px;
   --hudPad: 12px;
   --r: 16px;
   --blur: 14px;
 
-  /* bottom controls height hint (used by layout) */
   --bottomH: 76px;
 }
 
-/* ------------------------------------------------------------
-   0) ROOT LAYERING (deterministic)
-   ------------------------------------------------------------ */
+/* ============================================================
+   ROOT
+============================================================ */
 
 .app{
   position: relative;
   overflow: hidden;
-  isolation: isolate; /* ensures z-index stacking is deterministic */
+  isolation: isolate;
 }
 
-/* Base video */
+/* ============================================================
+   BACKGROUND
+============================================================ */
+
 .bgVideo{
   position:absolute;
   inset:0;
-  z-index: 0;
+  z-index:0;
   pointer-events:none;
 }
 
-/* IDLE STACK */
-.idleBg{
-  position:absolute;
-  inset:0;
-  z-index: 1;
-  pointer-events:none;
-}
-
-/* Explicit layering inside idle */
-.idleBg .idleImg{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit: cover;
-  z-index: 1;
-  pointer-events:none;
-}
-
-#idleParticles.idleParticles{
-  position:absolute;
-  inset:0;
-  z-index: 2;
-  pointer-events:none;
-  mix-blend-mode: screen;
-  opacity: .85;
-}
-
-/* idle tagline (above particles) */
-.idleLine{
-  position:absolute;
-  left: 16px;
-  right: 16px;
-  bottom: calc(env(safe-area-inset-bottom) + var(--bottomH) + 16px);
-  z-index: 3;
-  pointer-events:none;
-}
-
-/* Stage */
 .stage{
   position:absolute;
   inset:0;
-  z-index: 4;
+  z-index:4;
 }
 
-/* FX above stage */
+/* ============================================================
+   FX LAYER (CRITICAL FIX)
+   FIXED → viewport coordinate safe
+============================================================ */
+
 .fxLayer{
+  position: fixed;       /* ★重要：absolute禁止 */
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ============================================================
+   PARTICLE BASE (used by fx.js)
+============================================================ */
+
+.fxParticle{
+  position:absolute;
+  transform: translate(-50%,-50%) scale(.6);
+  border-radius:999px;
+  pointer-events:none;
+  opacity:0;
+  will-change: transform, opacity;
+  backface-visibility:hidden;
+}
+
+/* Burst */
+.fxParticle.burstGo{
+  opacity:1;
+  transform: translate(-50%,-50%) scale(2.4);
+  transition: transform .45s ease, opacity .45s ease;
+  opacity:0;
+}
+
+/* ============================================================
+   DIVINE FULL FLASH (MAX)
+============================================================ */
+
+.fxFullFlash{
   position:absolute;
   inset:0;
-  z-index: 5;
   pointer-events:none;
+  opacity:0;
+  mix-blend-mode:screen;
 }
 
-/* Side HUD */
+.fxFullFlash.go{
+  animation: divineFlash .6s ease forwards;
+}
+
+@keyframes divineFlash{
+  0%{ opacity:0; }
+  25%{ opacity:.35; }
+  100%{ opacity:0; }
+}
+
+/* ============================================================
+   SIDE HUD
+============================================================ */
+
 .sideHud{
   position:absolute;
   top: calc(env(safe-area-inset-top) + 12px);
@@ -112,439 +127,157 @@
 
 .sideHudLeft{
   left: calc(env(safe-area-inset-left) + 12px);
-  align-items:stretch;
 }
 .sideHudRight{
   right: calc(env(safe-area-inset-right) + 12px);
-  align-items:stretch;
 }
 
-/* Bottom controls */
-.bottom{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom: calc(env(safe-area-inset-bottom) + 10px);
-  z-index: 7;
-
-  display:flex;
-  gap: 12px;
-  justify-content:center;
-  align-items:center;
-  padding: 0 14px;
-}
-
-/* ------------------------------------------------------------
-   1) STATE VISIBILITY (HARD GUARANTEE)
-   - We only control what must never be wrong.
-   ------------------------------------------------------------ */
-
-/* IDLE: hide stage + bg video */
-.app[data-state="idle"] .stage{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-}
-.app[data-state="idle"] .bgVideo{
-  opacity:0;
-  visibility:hidden;
-}
-
-/* PLAYING / RESULT / PAUSED: hide idleBg + idleLine */
-.app[data-state="playing"] .idleBg,
-.app[data-state="result"]  .idleBg,
-.app[data-state="paused"]  .idleBg{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-}
-
-.app[data-state="playing"] .idleLine,
-.app[data-state="result"]  .idleLine,
-.app[data-state="paused"]  .idleLine{
-  opacity:0;
-  visibility:hidden;
-}
-
-/* In paused, keep stage visible but input is handled by JS.
-   (HUD stays visible, of course) */
-.app[data-state="paused"] .stage{
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
-}
-
-/* ------------------------------------------------------------
-   2) CONTROLS VISIBILITY (HARD GUARANTEE)
-   - Default hidden for STOP/RESTART prevents “ghost buttons”.
-   ------------------------------------------------------------ */
-
-#stopBtn,
-#restartBtn{ display:none; }
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  line-height: 1;
-  white-space:nowrap;
-  user-select:none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* idle */
-.app[data-state="idle"] #startBtn{ display:inline-flex; }
-.app[data-state="idle"] #stopBtn,
-.app[data-state="idle"] #restartBtn{ display:none; }
-
-/* playing */
-.app[data-state="playing"] #startBtn{ display:none; }
-.app[data-state="playing"] #stopBtn,
-.app[data-state="playing"] #restartBtn{ display:inline-flex; }
-
-/* result */
-.app[data-state="result"] #startBtn,
-.app[data-state="result"] #stopBtn{ display:none; }
-.app[data-state="result"] #restartBtn{ display:inline-flex; }
-
-/* paused (safety) */
-.app[data-state="paused"] #startBtn{ display:inline-flex; }
-.app[data-state="paused"] #stopBtn{ display:none; }
-.app[data-state="paused"] #restartBtn{ display:inline-flex; }
-
-/* ------------------------------------------------------------
-   3) START BUTTON (idle emphasis)
-   ------------------------------------------------------------ */
-
-.app[data-state="idle"] #startBtn{
-  min-width: 210px;
-  height: 58px;
-  padding: 0 22px;
-  border-radius: 999px;
-
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: .12em;
-
-  border: 1px solid rgba(0,240,255,.38);
-  background:
-    radial-gradient(120% 160% at 30% 10%, rgba(0,240,255,.35), transparent 52%),
-    linear-gradient(180deg, rgba(0,240,255,.24), rgba(156,60,255,.20));
-  box-shadow:
-    0 18px 50px rgba(0,0,0,.45),
-    0 0 0 1px rgba(255,255,255,.10),
-    0 0 26px rgba(0,240,255,.14);
-}
-
-@media (max-width: 420px){
-  .app[data-state="idle"] #startBtn{
-    min-width: 224px;
-    height: 60px;
-  }
-}
-
-/* ------------------------------------------------------------
-   4) IDLE TAGLINE — neon glass
-   ------------------------------------------------------------ */
-
-.idleLine{
-  padding: 12px 14px 12px 20px;
-  border-radius: 14px;
-
-  font-weight: 900;
-  letter-spacing: .06em;
-  line-height: 1.25;
-
-  color: rgba(245,245,242,.92);
-  background: rgba(10,14,22,.38);
-  border: 1px solid rgba(255,255,255,.16);
-
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-
-  box-shadow:
-    0 16px 42px rgba(0,0,0,.40),
-    0 0 0 1px rgba(0,240,255,.10),
-    0 0 28px rgba(0,240,255,.12);
-
-  text-shadow:
-    0 10px 30px rgba(0,0,0,.55),
-    0 0 18px rgba(0,240,255,.16);
-}
-
-.idleLine::before{
-  content:"";
-  position:absolute;
-  left: 10px;
-  top: 10px;
-  bottom: 10px;
-  width: 3px;
-  border-radius: 99px;
-  background: linear-gradient(180deg,
-    rgba(0,240,255,.95),
-    rgba(156,60,255,.75),
-    rgba(230,201,107,.70)
-  );
-  box-shadow: 0 0 18px rgba(0,240,255,.20);
-}
-
-/* ------------------------------------------------------------
-   5) SIDE HUD CARDS (stable glass)
-   ------------------------------------------------------------ */
-
-.sideCard{
-  pointer-events:none;
-  border-radius: var(--r);
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: 0 16px 42px rgba(0,0,0,.35);
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
-  padding: var(--hudPad);
-  position:relative;
-  overflow:hidden;
-}
-
-.sideCard::before{
-  content:"";
-  position:absolute;
-  inset:-1px;
-  background:
-    radial-gradient(420px 160px at 10% 0%, rgba(0,240,255,.14), transparent 55%),
-    radial-gradient(420px 160px at 90% 20%, rgba(156,60,255,.12), transparent 58%),
-    radial-gradient(420px 160px at 60% 100%, rgba(230,201,107,.10), transparent 60%);
-  opacity:.85;
-  pointer-events:none;
-}
-
-/* Score card */
-.sideScore{ padding-top: 14px; }
-.sideScoreValue{
-  position:relative;
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: .06em;
-  text-shadow: 0 0 18px rgba(0,240,255,.18);
-}
-.sideScoreSub{
-  position:relative;
-  margin-top: 6px;
-  font-size: 12px;
-  letter-spacing: .14em;
-  color: rgba(245,245,242,.68);
-}
-
-/* Combo card */
-.sideComboValue{
-  position:relative;
-  font-size: 30px;
-  font-weight: 900;
-  letter-spacing: .04em;
-}
-.sideComboLabel{
-  position:relative;
-  margin-top: 2px;
-  font-size: 12px;
-  letter-spacing: .18em;
-  color: rgba(245,245,242,.68);
-}
-.sideComboMeta{
-  position:relative;
-  display:flex;
-  gap:8px;
-  align-items:baseline;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255,255,255,.10);
-}
-.metaLabel{
-  font-size: 11px;
-  letter-spacing: .18em;
-  color: rgba(245,245,242,.52);
-}
-.metaValue{
-  font-size: 14px;
-  font-weight: 800;
-  color: rgba(245,245,242,.92);
-}
-
-/* ------------------------------------------------------------
-   6) PLAYER CARD + DiCo AVATAR (the requested tuning)
-   ------------------------------------------------------------ */
+/* ============================================================
+   PLAYER CARD
+============================================================ */
 
 .sidePlayer{
   padding: 12px;
-  overflow: visible;          /* allow ring to breathe */
-  padding-right: 18px;        /* keep distance from right edge */
+  overflow: visible;
+  padding-right: 18px;
 }
 
-.sideTop{
-  position:relative;
-  display:flex;
-  gap: 12px;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom: 10px;
-}
+/* ============================================================
+   AVATAR
+============================================================ */
 
-.sideNameMain{
-  font-weight: 900;
-  letter-spacing: .02em;
-  font-size: 20px;
-  line-height: 1.1;
-}
-.sideNameSub{
-  margin-top: 2px;
-  font-size: 11px;
-  letter-spacing: .20em;
-  color: rgba(245,245,242,.68);
-}
-
-/* Avatar container: larger but never overflow screen.
-   We keep it inside the card; the ring glow is outside via avatarRing inset. */
 .sideAvatar{
-  width: 68px;      /* ✅ bigger face */
-  height: 68px;
+  width: 72px;
+  height: 72px;
   position:relative;
-  flex: 0 0 auto;
-
-  border-radius: 999px;
-  overflow: visible; /* ✅ prevent face image overflow */
+  flex:0 0 auto;
+  border-radius:999px;
+  overflow: visible;
 }
 
-/* Ring: pink-gold with classy glow (and still rotate-able by JS) */
+/* ============================================================
+   RING (GOD VERSION)
+============================================================ */
+
 .avatarRing{
   position:absolute;
-  inset:-5px;               /* ring breathing margin */
+  inset:-6px;
   border-radius:999px;
   pointer-events:none;
 
   background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%),
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.18), transparent 55%),
     conic-gradient(from 0deg,
-      rgba(236,191,152,.10),
-      rgba(236,191,152,.62),
-      rgba(255,255,255,.18),
-      rgba(236,191,152,.62),
-      rgba(236,191,152,.10)
+      transparent,
+      var(--res-color),
+      rgba(255,255,255,.25),
+      var(--res-color),
+      transparent
     );
 
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.14),
-    0 0 0 2px var(--pinkGoldSoft) inset,
-    0 0 24px var(--pinkGoldGlow),
-    0 12px 26px rgba(0,0,0,.28);
+    0 0 0 1px rgba(255,255,255,.15),
+    0 0 28px var(--res-color),
+    0 0 60px var(--res-color);
 
   mix-blend-mode: screen;
   opacity: .98;
+  will-change: transform, box-shadow;
 }
 
 /* Inner lens */
 .avatarRing::after{
   content:"";
   position:absolute;
-  inset: 2px;
+  inset:2px;
   border-radius:999px;
   background:
-    radial-gradient(circle at 50% 35%, rgba(0,0,0,0), rgba(0,0,0,.42));
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow:
-    inset 0 0 22px rgba(0,0,0,.28);
+    radial-gradient(circle at 50% 35%, rgba(0,0,0,0), rgba(0,0,0,.45));
+  border:1px solid rgba(255,255,255,.16);
 }
 
-/* Face: slightly zoomed, brighter, but controlled */
+/* ============================================================
+   RING ABSORPTION AURA (神吸収演出)
+============================================================ */
+
+.avatarRing.absorbPulse{
+  animation: absorbGlow .6s ease-out forwards;
+}
+
+@keyframes absorbGlow{
+  0%{
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.15),
+      0 0 28px var(--res-color);
+  }
+  40%{
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.15),
+      0 0 60px var(--res-color),
+      0 0 120px var(--res-color);
+  }
+  100%{
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.15),
+      0 0 28px var(--res-color);
+  }
+}
+
+/* ============================================================
+   HEARTBEAT (SAFE VERSION)
+============================================================ */
+
+.isHeartbeat .avatarRing{
+  animation: heartbeat .65s ease-in-out infinite;
+}
+
+@keyframes heartbeat{
+  0%{ transform: scale(1); }
+  50%{ transform: scale(1.045); }
+  100%{ transform: scale(1); }
+}
+
+/* ============================================================
+   FACE
+============================================================ */
+
 .dicoFace{
   position:absolute;
   left:50%;
   top:50%;
-  width: 78px;      /* ✅ larger than container to feel “closer” */
-  height: 78px;
+  width:82px;
+  height:82px;
   transform: translate(-50%,-50%);
-  object-fit: cover;
-  border-radius: 999px;
+  object-fit:cover;
+  border-radius:999px;
 
-  /* ✅ brightness */
   filter: brightness(1.10) contrast(1.05) saturate(1.06);
 
-  outline: 1px solid rgba(255,255,255,.18);
-  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  outline:1px solid rgba(255,255,255,.20);
+  box-shadow:0 10px 22px rgba(0,0,0,.35);
 
   backface-visibility:hidden;
 }
 
-/* Optional micro pop on swap (ui.js adds .isSwap) */
 .dicoFace.isSwap{
-  transform: translate(-50%,-50%) scale(1.03);
+  transform: translate(-50%,-50%) scale(1.04);
   transition: transform .12s ease;
 }
 
-/* ------------------------------------------------------------
-   7) Resonance gauge (right card)
-   ------------------------------------------------------------ */
+/* ============================================================
+   RES TIER COLOR SYNC
+============================================================ */
 
-.sideGauge{
-  position:relative;
-  padding-top: 6px;
-}
+.app[data-res-tier="0"]{ --res-color: rgba(0,240,255,.9); }
+.app[data-res-tier="1"]{ --res-color: rgba(156,60,255,.9); }
+.app[data-res-tier="2"]{ --res-color: rgba(236,191,152,.95); }
 
-.sideGaugeRow, .sideTimeRow{
-  position:relative;
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.sideGaugeLabel, .sideTimeLabel{
-  font-size: 11px;
-  letter-spacing: .20em;
-  color: rgba(245,245,242,.68);
-}
-.sideGaugeValue, .sideTimeValue{
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: .02em;
-}
-.sideGaugeValue .pct{ opacity:.70; font-weight:800; margin-left:2px; }
-
-.sideGaugeBar{
-  position:relative;
-  height: 10px;
-  border-radius: 999px;
-  margin-top: 8px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.10);
-  overflow:hidden;
-}
-.sideGaugeFill{
-  position:absolute;
-  inset:0;
-  width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg,
-    rgba(0,240,255,.90),
-    rgba(156,60,255,.75),
-    rgba(236,191,152,.82) /* pink-gold end */
-  );
-  box-shadow: 0 0 20px rgba(0,240,255,.18);
-  transition: width .12s ease;
-}
-
-/* legacy dup hidden */
-#time_dup{ display:none; }
-.facePool{ display:none; }
-
-/* ------------------------------------------------------------
-   8) Responsive tuning
-   ------------------------------------------------------------ */
+/* ============================================================
+   RESPONSIVE
+============================================================ */
 
 @media (max-width: 720px){
-  :root{ --hudW: 162px; }
-
-  .sideScoreValue{ font-size: 28px; }
-  .sideComboValue{ font-size: 26px; }
-
-  .sideAvatar{ width: 64px; height: 64px; }
-  .dicoFace{ width: 74px; height: 74px; }
+  :root{ --hudW: 160px; }
+  .sideAvatar{ width: 66px; height:66px; }
+  .dicoFace{ width: 76px; height:76px; }
 }
