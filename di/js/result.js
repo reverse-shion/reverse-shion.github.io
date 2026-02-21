@@ -237,9 +237,13 @@
   position:absolute;
   inset:0;
   background:
-    radial-gradient(circle at 50% 44%,
-      var(--tb-pupil-glow, rgba(0,240,255,0.18)) 0%,
-      rgba(0,0,0,0) 55%);
+    background:
+  url("${CFG.BG_IMAGE_URL}") center / cover no-repeat,
+  radial-gradient(circle at 50% 45%,
+    rgba(18,20,28,0.12) 0%,
+    rgba(0,0,0,0.55) 55%,
+    rgba(0,0,0,0.85) 100%),
+  #000;
   mix-blend-mode: screen;
   opacity: calc(var(--tb-glow-power, 0.35) * 0.90);
   pointer-events:none;
