@@ -3,147 +3,64 @@
   const NS = (window.DI_ENGINE ||= {});
 
   class FX {
-    constructor({ fxLayer, appRoot }) {
+    constructor({ fxLayer }) {
       this.layer = fxLayer;
-      this.app = appRoot;
-      this._pool = [];
     }
-
-    /* =========================
-       Utility
-    ========================== */
-
-    _getResColor() {
-      if (!this.app) return "rgba(0,240,255,.9)";
-      return getComputedStyle(this.app)
-        .getPropertyValue("--res-color")
-        .trim() || "rgba(0,240,255,.9)";
-    }
-
-    _createParticle(size = 14) {
-      const el = document.createElement("div");
-      el.className = "fxParticle";
-      el.style.width = size + "px";
-      el.style.height = size + "px";
-      return el;
-    }
-
-    /* =========================
-       Burst (判定爆発)
-    ========================== */
 
     burstAt(x, y) {
-      if (!this.layer) return;
-
-      const el = this._createParticle(16);
+      // create a small burst ring in fxLayer coordinate space
+      const el = document.createElement("div");
+      el.className = "fxBurst";
       el.style.left = `${x}px`;
       el.style.top = `${y}px`;
-      el.style.border = `2px solid ${this._getResColor()}`;
-      el.style.boxShadow = `0 0 22px ${this._getResColor()}`;
-
-      this.layer.appendChild(el);
-
-      requestAnimationFrame(() => {
-        el.classList.add("burstGo");
-      });
-
-      setTimeout(() => el.remove(), 520);
-    }
-
-    /* =========================
-       吸収ストリーム（共鳴演出）
-    ========================== */
-
-    streamToAvatar(fromX, fromY, avatarEl) {
-      if (!this.layer || !avatarEl) return;
-
-      const rect = avatarEl.getBoundingClientRect();
-      const toX = rect.left + rect.width / 2;
-      const toY = rect.top + rect.height / 2;
-
-      const el = this._createParticle(10);
-      el.style.left = `${fromX}px`;
-      el.style.top = `${fromY}px`;
-      el.style.background = this._getResColor();
-      el.style.boxShadow = `0 0 14px ${this._getResColor()}`;
-
-      this.layer.appendChild(el);
-
-      requestAnimationFrame(() => {
-        el.style.transition =
-          "all .55s cubic-bezier(.2,.8,.2,1)";
-        el.style.left = `${toX}px`;
-        el.style.top = `${toY}px`;
-        el.style.opacity = "0";
-        el.style.transform = "translate(-50%,-50%) scale(.6)";
-      });
-
-      setTimeout(() => el.remove(), 600);
-    }
-
-    /* =========================
-       MAXカットインフラッシュ
-    ========================== */
-
-    fullFlash() {
-      if (!this.layer) return;
-
-      const el = document.createElement("div");
-      el.className = "fxFullFlash";
-      el.style.background = this._getResColor();
-
       this.layer.appendChild(el);
 
       requestAnimationFrame(() => el.classList.add("go"));
-      setTimeout(() => el.remove(), 600);
+      setTimeout(() => el.remove(), 520);
     }
 
-    /* =========================
-       鼓動トリガー
-    ========================== */
-
-    triggerHeartbeat() {
-      if (!this.app) return;
-
-      this.app.classList.add("isHeartbeat");
-      setTimeout(() => {
-        this.app.classList.remove("isHeartbeat");
-      }, 650);
+    sparkLine() {
+      // tiny sparkle somewhere random
+      const el = document.createElement("div");
+      el.className = "fxSpark";
+      el.style.left = `${30 + Math.random() * 40}%`;
+      el.style.top = `${20 + Math.random() * 50}%`;
+      this.layer.appendChild(el);
+      requestAnimationFrame(() => el.classList.add("go"));
+      setTimeout(() => el.remove(), 520);
     }
   }
 
-  /* =========================
-     CSS Injection (Engine Level)
-  ========================== */
-
+  // inject minimal css for fx elements (kept in JS so you don't need extra file)
   const style = document.createElement("style");
   style.textContent = `
-    .fxParticle{
+    .fxBurst, .fxSpark{
       position:absolute;
+      width:14px; height:14px;
       transform: translate(-50%,-50%) scale(.6);
       border-radius:999px;
       pointer-events:none;
       opacity:0;
     }
-
-    .fxParticle.burstGo{
+    .fxBurst{
+      border: 2px solid rgba(0,240,255,.55);
+      box-shadow: 0 0 18px rgba(0,240,255,.20), 0 0 20px rgba(156,60,255,.14);
+    }
+    .fxBurst.go{
       opacity:1;
-      transform: translate(-50%,-50%) scale(2.4);
+      transform: translate(-50%,-50%) scale(2.3);
       transition: transform .48s ease, opacity .48s ease;
       opacity:0;
     }
-
-    .fxFullFlash{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      opacity:0;
-      mix-blend-mode:screen;
+    .fxSpark{
+      width:10px; height:10px;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.65), rgba(0,240,255,.18) 55%, transparent 70%);
+      filter: drop-shadow(0 0 10px rgba(0,240,255,.18));
     }
-
-    .fxFullFlash.go{
-      opacity:.25;
-      transition: opacity .45s ease;
+    .fxSpark.go{
+      opacity:1;
+      transform: translate(-50%,-50%) scale(2.0);
+      transition: transform .48s ease, opacity .48s ease;
       opacity:0;
     }
   `;
