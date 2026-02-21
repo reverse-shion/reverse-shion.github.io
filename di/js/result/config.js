@@ -8,7 +8,7 @@ export const CFG = Object.freeze({
   SHELL_CLASS: "tbResultOverlayShell",
 
   // Overlay root (body直下に作る)
-  OVERLAY_ID: "tbResultOverlayRoot",
+   OVERLAY_ID: "result",
 
   // Assets
   EYE_IMAGE_URL: "/di/dico_eye_result.png",
