@@ -1,11 +1,12 @@
 /* /di/css/aru-gauge.css
-   ARU GAUGE (ANCHOR TO ORB CENTER) v2.0
-   - Anchor = .resultOrbWrap center (NOT viewport center)
+   ARU GAUGE (ANCHOR TO #aruRing) v2.1 — PRO SAFE
+   - Anchor = #aruRing center (NOT viewport)
    - Show only on result:
-       .app.tb-result-active .aruLayer
-       OR .app[data-state="result"] .aruLayer
+       .app.tb-result-active #aruRing .aruLayer
+       OR .app[data-state="result"] #aruRing .aruLayer
    - value: --aru-value (0..1)
-   - state: app[data-aru-state="low|mid|high|max"]
+   - state: .app[data-aru-state="low|mid|high|max"]
+   - Scope is strictly limited under #aruRing to prevent side effects.
 */
 
 /* =========================
@@ -14,12 +15,12 @@
 .app{
   --aru-value: 0; /* 0..1 (JS updates) */
 
-  /* Gauge size scales with orb + viewport */
+  /* Gauge size scales with viewport but stays sane */
   --aru-size: clamp(220px, 62vmin, 320px);
   --aru-thickness: 12px;
 
-  /* ring colors */
   --aru-gray: rgba(255,255,255,0.22);
+
   --aru-color-low:  rgba(76,201,240,0.96);
   --aru-color-mid:  rgba(168,85,247,0.96);
   --aru-color-high: rgba(255,47,208,0.96);
@@ -34,58 +35,50 @@
 }
 
 /* =========================
-   Result-only visibility
+   Anchor: #aruRing
+   - This is the orb container in your HTML.
+   - Must be a positioning context.
 ========================= */
-.aruLayer{ display: none; }
+#aruRing{
+  position: relative;
+  isolation: isolate; /* keep stacking local */
+}
 
-.app.tb-result-active .aruLayer,
-.app[data-state="result"] .aruLayer{
+/* =========================
+   Result-only visibility (scoped)
+========================= */
+#aruRing .aruLayer{ display: none; }
+
+.app.tb-result-active #aruRing .aruLayer,
+.app[data-state="result"] #aruRing .aruLayer{
   display: grid;
 }
 
 /* =========================
-   Anchor wrapper (IMPORTANT)
-   → This must wrap the background orb
+   ARU overlay layer (scoped)
+   → centered INSIDE #aruRing
 ========================= */
-.resultOrbWrap{
-  position: relative;
-  display: grid;
-  place-items: center;
-  isolation: isolate; /* keep layering clean */
-}
-
-/* Background orb visuals live here */
-.resultOrbVisual{
-  position: relative;
-  z-index: 1;
-}
-
-/* =========================
-   ARU overlay layer
-   → centered INSIDE orb wrapper
-========================= */
-.aruLayer{
+#aruRing .aruLayer{
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;          /* above svg/text if needed */
   pointer-events: none;
   place-items: center;
 }
 
 /* The gauge itself */
-.aruGauge{
+#aruRing .aruGauge{
   width: var(--aru-size);
   height: var(--aru-size);
   position: relative;
   border-radius: 999px;
 
-  /* keep it crisp on iOS */
   transform: translate3d(0,0,0);
   filter: drop-shadow(0 18px 36px rgba(0,0,0,0.38));
 }
 
 /* Ring paint */
-.aruGauge::before{
+#aruRing .aruGauge::before{
   content:"";
   position:absolute;
   inset:0;
@@ -122,7 +115,7 @@
 }
 
 /* Inner rim */
-.aruGauge::after{
+#aruRing .aruGauge::after{
   content:"";
   position:absolute;
   inset: calc(var(--aru-thickness) + 2px);
@@ -133,7 +126,7 @@
 }
 
 /* Center text */
-.aruScore{
+#aruRing .aruScore{
   position:absolute;
   inset:0;
   display:grid;
@@ -153,7 +146,7 @@
 }
 
 /* =========================
-   State colors
+   State colors (app-scoped)
 ========================= */
 .app[data-aru-state="low"]  { --aru-active-color: var(--aru-color-low);  --aru-glow: 0; }
 .app[data-aru-state="mid"]  { --aru-active-color: var(--aru-color-mid);  --aru-glow: 0.25; }
@@ -161,5 +154,5 @@
 .app[data-aru-state="max"]  { --aru-active-color: rgba(255,255,255,0.96); --aru-glow: 1; }
 
 @media (prefers-reduced-motion: reduce){
-  .aruGauge::before{ transition:none; }
+  #aruRing .aruGauge::before{ transition:none; }
 }
