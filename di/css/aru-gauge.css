@@ -1,19 +1,13 @@
 /* /di/css/aru-gauge.css
-   =========================
-   ARU GAUGE (TOPMOST RESULT HUD)
-   - shows ONLY when #result is visible (aria-hidden != "true")
-   - value is driven by CSS var: --aru-value (0..1)
-   - color state is driven by app attr: data-aru-state="low|mid|high|max"
-   ========================= */
+   ARU GAUGE (RESULT ONLY)
+   - shows ONLY on result screen: .app[data-state="result"]
+   - value: --aru-value (0..1)
+   - state: data-aru-state="low|mid|high|max" on .app
+*/
 
-/* =========================
-   Tokens (scoped defaults)
-   ========================= */
-
-/* デフォルト値は app に寄せる（:root だと他ページへ漏れる） */
 .app{
-  --aru-value: 0;              /* 0..1  (result.js で更新) */
-  --aru-size: 220px;           /* iPhoneでも大きすぎない */
+  --aru-value: 0;
+  --aru-size: 220px;
   --aru-thickness: 12px;
 
   --aru-gray: rgba(255,255,255,0.22);
@@ -21,52 +15,31 @@
   --aru-color-mid:  rgba(168,85,247,0.96);
   --aru-color-high: rgba(255,47,208,0.96);
 
-  --aru-glow: 0;               /* 0..1 */
+  --aru-glow: 0;
   --aru-active-color: var(--aru-color-low);
 }
 
-/* iPhone小さめ最適化 */
 @media (max-width: 390px){
-  .app{
-    --aru-size: 200px;
-    --aru-thickness: 11px;
-  }
+  .app{ --aru-size: 200px; --aru-thickness: 11px; }
 }
 
-/* =========================
-   Visibility (RESULT ONLY)
-   ========================= */
+/* hidden by default */
+.aruLayer{ display:none; }
 
-/* default hidden */
-.aruLayer{
-  display: none;
+/* result only */
+.app[data-state="result"] .aruLayer{
+  display:flex;
 }
-
-/* ✅ "resultが表示状態" をトリガーにする（DOM構造に強い） */
-.app:has(#result:not([aria-hidden="true"])) .aruLayer{
-  display: flex;
-}
-
-/* =========================
-   Topmost overlay container
-   ========================= */
 
 .aruLayer{
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 2147483646; /* #result(2147483647)の“すぐ下”にするのが安全 */
   pointer-events: none;
-
   align-items: center;
   justify-content: center;
-
-  /* overlay ring should sit above everything */
   isolation: isolate;
 }
-
-/* =========================
-   Gauge box
-   ========================= */
 
 .aruGauge{
   width: var(--aru-size);
@@ -76,16 +49,11 @@
   filter: drop-shadow(0 18px 36px rgba(0,0,0,0.38));
 }
 
-/* =========================
-   Ring (conic gradient + mask)
-   ========================= */
-
 .aruGauge::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:50%;
-
   background:
     conic-gradient(
       var(--aru-active-color) calc(var(--aru-value) * 1turn),
@@ -106,11 +74,9 @@
   transition: background 240ms ease, filter 240ms ease;
   will-change: background, filter;
 
-  /* ring glow only (NO full-screen tint) */
   filter:
     drop-shadow(0 0 10px rgba(255,255,255,0.10))
-    drop-shadow(
-      0 0 calc(var(--aru-glow) * 26px)
+    drop-shadow(0 0 calc(var(--aru-glow) * 26px)
       color-mix(in srgb, var(--aru-active-color) 85%, transparent)
     );
 }
@@ -125,17 +91,12 @@
   opacity: 0.9;
 }
 
-/* =========================
-   Center text
-   ========================= */
-
 .aruScore{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-
   font-size: clamp(28px, 5.4vw, 44px);
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -143,25 +104,15 @@
   text-shadow:
     0 2px 18px rgba(0,0,0,0.55),
     0 0 20px rgba(255,255,255,0.08);
-
   -webkit-font-smoothing: antialiased;
   transform: translateZ(0);
 }
 
-/* =========================
-   State -> Color mapping
-   ========================= */
-
 .app[data-aru-state="low"]  { --aru-active-color: var(--aru-color-low);  --aru-glow: 0; }
 .app[data-aru-state="mid"]  { --aru-active-color: var(--aru-color-mid);  --aru-glow: 0.25; }
 .app[data-aru-state="high"] { --aru-active-color: var(--aru-color-high); --aru-glow: 0.45; }
+.app[data-aru-state="max"]  { --aru-active-color: rgba(255,255,255,0.96); --aru-glow: 1; }
 
-.app[data-aru-state="max"]{
-  --aru-active-color: rgba(255,255,255,0.96);
-  --aru-glow: 1;
-}
-
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce){
-  .aruGauge::before{ transition: none; }
+  .aruGauge::before{ transition:none; }
 }
