@@ -1,4 +1,4 @@
-<!-- /di/di.html (PRO ENGINEER CLEAN — legacy result removed / result.js overlay only / mobile-safe) -->
+<!-- /di/di.html (PRO ENGINEER FINAL — ARU gauge anchored to orb / mobile-safe) -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="./css/aru-fx.css" />
   <link rel="stylesheet" href="./css/aru-gauge.css" />
 
-  <!-- Preload (iOS/Safari friendly; safe even if a file is missing) -->
+  <!-- Preload (helps iOS a bit; safe even if missing files) -->
   <link rel="preload" href="./idle/dico_idle.jpg" as="image" />
   <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
   <link rel="preload" href="./audio/music.mp3" as="audio" />
@@ -134,7 +134,7 @@
           <div class="sideTimeValue" id="time">--</div>
         </div>
 
-        <!-- Face pool (optional preload) -->
+        <!-- Face pool (optional) -->
         <div class="facePool" aria-hidden="true">
           <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
           <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
@@ -146,7 +146,6 @@
 
   <!-- =========================================================
        LEGACY HUD (compat for current UI.js)
-       - Keep until UI.js stops using it (safe to remove later)
        ========================================================= -->
   <header class="hud" aria-label="HUD" aria-hidden="true">
     <div class="hudBlock">
@@ -196,8 +195,59 @@
       <div class="judgeSub"  id="judgeSub">SYNC</div>
     </div>
 
-    <!-- RESULT ROOT (overlay-only; result.js injects its shell here) -->
-    <div class="result" id="result" aria-hidden="true"></div>
+    <!-- RESULT -->
+    <div class="result" id="result" aria-hidden="true">
+      <div class="resultCard">
+        <div class="resultTitle">RESULT</div>
+
+        <div class="resultRow">
+          <div class="resultKey">SCORE</div>
+          <div class="resultVal" id="resultScore">0</div>
+        </div>
+
+        <div class="resultRow">
+          <div class="resultKey">MAX COMBO</div>
+          <div class="resultVal" id="resultMaxCombo">0</div>
+        </div>
+
+        <div class="resultDivider"></div>
+
+        <!-- =====================================================
+             ARU SECTION (ANCHOR ROOT)
+             - The overlay gauge is now INSIDE #aruRing (orb),
+               so it will NOT drift on mobile.
+             ===================================================== -->
+        <div class="aruWrap" aria-label="ARU Gauge">
+          <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
+            <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
+              <defs>
+                <linearGradient id="aruGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"  stop-color="rgba(156,60,255,0.95)"/>
+                  <stop offset="55%" stop-color="rgba(0,240,255,0.95)"/>
+                  <stop offset="100%" stop-color="rgba(230,201,107,0.95)"/>
+                </linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="44" class="aruTrack"/>
+              <circle cx="60" cy="60" r="44" class="aruProg" id="aruProg"/>
+            </svg>
+
+            <div class="aruText">
+              <div class="aruLabel">ARU ENERGY</div>
+              <div class="aruValue" id="aruValue">0%</div>
+            </div>
+
+            <!-- ✅ ARU GAUGE OVERLAY (ANCHOR TO ORB CENTER) -->
+            <div class="aruLayer" aria-hidden="true">
+              <div class="aruGauge">
+                <div class="aruScore" id="aruOverlayScore">0%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dicoLine" id="dicoLine">キミの想いを、共鳴に変えて。</div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================
@@ -217,7 +267,11 @@
   <!-- Screen reader live region -->
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- ARU FX (TOPMOST) -->
+  <!-- =========================================================
+       ARU FX (TOPMOST)
+       - Keep FX layer global if you want full-screen bloom.
+       - The GAUGE itself is now anchored in #aruRing above.
+       ========================================================= -->
   <div class="aruFX" aria-hidden="true"></div>
 
 </main>
@@ -287,6 +341,7 @@
     raf = requestAnimationFrame(tick);
   }
 
+  // init
   resize();
   window.addEventListener("resize", resize, {passive:true});
   tick();
