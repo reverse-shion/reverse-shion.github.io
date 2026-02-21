@@ -1,130 +1,146 @@
 /* /di/js/main.js
-   DiCo ARU – PRO STABLE FINAL
-   - GitHub Pages safe
-   - iOS safe audio
-   - Classic + ESM mixed loader
-   - Deterministic state machine
+   - Loads engine scripts (non-module) and boots the game.
+   - Keeps existing DOM ids (#score/#combo/#maxCombo/#time etc.) and syncs to side HUD.
 */
-
 (() => {
-  "use strict";
-
-  const BASE = new URL("./", document.currentScript?.src || location.href);
-
   const ENGINE_FILES = [
-    "engine/audio.js",
-    "engine/timing.js",
-    "engine/input.js",
-    "engine/judge.js",
-    "engine/render.js",
-    "engine/fx.js",
-    "engine/ui.js",
-    "notes/skin-tarot-pinkgold.js",
-  ].map(p => new URL(p, BASE).toString());
+    "./js/engine/audio.js",
+    "./js/engine/timing.js",
+    "./js/engine/input.js",
+    "./js/engine/judge.js",
+    "./js/engine/render.js",
+    "./js/engine/fx.js",
+    "./js/engine/ui.js",
 
-  const PRESENTATION_FILES = [
-    "result.js",
-  ].map(p => new URL(p, BASE).toString());
+    // ★ note skins (swap freely)
+    "./js/notes/skin-tarot-pinkgold.js",
+  ];
 
-  const $ = id => document.getElementById(id);
+  function $(id) { return document.getElementById(id); }
 
-  const STATES = Object.freeze({
-    IDLE: "idle",
-    PLAYING: "playing",
-    RESULT: "result",
-  });
-
-  /* ===============================
-     SCRIPT LOADER
-  =============================== */
-
-  function loadScriptsSequentially(files, { module = false } = {}) {
+  function loadScriptsSequentially(files) {
     return files.reduce((p, src) => {
       return p.then(() => new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = src + "?v=" + Date.now();
-        s.async = false;
-        if (module) s.type = "module";
-        s.onload = resolve;
+        s.src = src;
+
+        // defer は “HTMLに最初から書かれた script” 向け挙動が強いので、
+        // 動的追加では外して順次ロードの確実性を上げる
+        s.onload = () => resolve();
         s.onerror = () => reject(new Error("Failed to load: " + src));
         document.head.appendChild(s);
       }));
     }, Promise.resolve());
   }
 
-  async function loadAll() {
-    await loadScriptsSequentially(ENGINE_FILES, { module: false });
-    await loadScriptsSequentially(PRESENTATION_FILES, { module: true });
+  async function fetchJSON(url) {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(`fetch failed ${url}: ${r.status}`);
+    return await r.json();
   }
 
-  /* ===============================
-     BOOT
-  =============================== */
+  function fallbackChart() {
+    const notes = [];
+    const bpm = 145;
+    const beat = 60 / bpm;
+    const start = 1.2;
+    const total = 60.0;
+    for (let t = start, i = 0; t < total; t += beat, i++) {
+      if (i % 2 === 0) notes.push({ t: +t.toFixed(3), type: "tap" });
+      if (i % 16 === 8) notes.push({ t: +(t + beat * 0.5).toFixed(3), type: "tap" });
+    }
+    return {
+      meta: { title: "DiCo ARU Phase1 (fallback)", bpm },
+      offset: 0.0,
+      scroll: { approach: 1.25 },
+      notes
+    };
+  }
 
   async function boot() {
     const app = $("app");
     const canvas = $("noteCanvas");
-    const hitZone = $("hitZone");
-
-    const startBtn = $("startBtn");
-    const restartBtn = $("restartBtn");
-    const stopBtn = $("stopBtn");
-
-    const music = $("music");
     const bgVideo = $("bgVideo");
 
-    const E = window.DI_ENGINE;
-    if (!E) throw new Error("DI_ENGINE missing");
+    const startBtn = $("startBtn");
+    const stopBtn = $("stopBtn");
+    const restartBtn = $("restartBtn");
 
-    const audio = new E.AudioManager({ music, bgVideo });
+    const music = $("music");
+    const seTap = $("seTap");
+    const seGreat = $("seGreat");
+
+    // ---- DOM sanity (超大事)
+    if (!app || !canvas || !startBtn || !stopBtn || !restartBtn || !music) {
+      throw new Error("Missing required DOM elements (check ids).");
+    }
+
+    // Optional: autoplay muted bg video
+    try {
+      if (bgVideo) {
+        bgVideo.muted = true;
+        bgVideo.playsInline = true;
+        bgVideo.loop = true;
+        bgVideo.play().catch(() => {});
+      }
+    } catch {}
+
+    let chart = null;
+    try {
+      chart = await fetchJSON("./js/charts/chart_001.json");
+    } catch (e) {
+      chart = fallbackChart();
+      console.warn("[DiCo] chart json not found. Using fallback.", e);
+    }
+
+    const E = window.DI_ENGINE;
+    if (!E) throw new Error("DI_ENGINE not found. engine scripts failed to load.");
+
+    // Build engine parts
+    const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
+    const timing = new E.Timing({ chart });
+    const judge = new E.Judge({ chart, timing });
+    const fx = new E.FX({ fxLayer: $("fxLayer") });
     const ui = new E.UI({
       app,
-      score: $("score"),
-      combo: $("combo"),
-      maxCombo: $("maxCombo"),
-      timeDup: $("time_dup"),
-      resValue: $("resValue"),
-      resFill: $("resFill"),
+      score: $("score"), combo: $("combo"), maxCombo: $("maxCombo"), timeDup: $("time_dup"),
+      sideScore: $("sideScore"), sideCombo: $("sideCombo"), sideMaxCombo: $("sideMaxCombo"), time: $("time"),
+      resValue: $("resValue"), resFill: $("resFill"), avatarRing: $("avatarRing"),
+      judge: $("judge"), judgeMain: $("judgeMain"), judgeSub: $("judgeSub"),
       result: $("result"),
-      resultScore: $("resultScore"),
-      resultMaxCombo: $("resultMaxCombo"),
-      aruProg: $("aruProg"),
-      aruValue: $("aruValue"),
+      resultScore: $("resultScore"), resultMaxCombo: $("resultMaxCombo"),
+      aruProg: $("aruProg"), aruValue: $("aruValue"), dicoLine: $("dicoLine"),
+      ariaLive: $("ariaLive"),
+      hitFlash: $("hitFlash"),
     });
 
-    const resultPresenter = window.DI_RESULT?.init({
-      app,
-      root: $("result"),
-    }) || { show() {}, hide() {} };
+    const render = new E.Renderer({ canvas, chart, timing });
 
-    let timing, judge, render;
-    let running = false;
+    const input = new E.Input({
+      element: canvas,
+      onTap: (x, y) => {
+        audio.playTap();
+        fx.burstAt(x, y);
+
+        const res = judge.hit(timing.getSongTime());
+        ui.onJudge(res);
+
+        if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
+          audio.playGreat();
+          ui.flashHit();
+          fx.sparkLine();
+        }
+      }
+    });
+
     let raf = 0;
-    let locked = false;
+    let running = false;
 
-    function rebuild(chart) {
-      timing = new E.Timing({ chart });
-      judge = new E.Judge({ chart, timing });
-      render = new E.Renderer({ canvas, chart, timing });
-      render.resize();
-    }
-
-    const chart = await fetch("./js/charts/chart_001.json")
-      .then(r => r.json())
-      .catch(() => ({ notes: [] }));
-
-    rebuild(chart);
-
-    function setState(s) {
-      app.dataset.state = s;
-    }
-
-    function loop() {
+    function tick() {
+      raf = requestAnimationFrame(tick);
       if (!running) return;
-      raf = requestAnimationFrame(loop);
 
       const t = timing.getSongTime();
-      judge.sweepMiss(t);
       render.draw(t);
 
       ui.update({
@@ -133,103 +149,91 @@
         combo: judge.state.combo,
         maxCombo: judge.state.maxCombo,
         resonance: judge.state.resonance,
-        state: app.dataset.state,
+        state: app.dataset.state
       });
 
-      if (timing.isEnded(t)) endGame("ENDED");
-    }
-
-    function stopLoop() {
-      running = false;
-      cancelAnimationFrame(raf);
-    }
-
-    /* ===============================
-       AUDIO SAFE START
-    =============================== */
-
-    async function safePlay() {
-      try {
-        const p = music.play();
-        if (p?.then) {
-          await p;
-        }
-      } catch (e) {
-        console.error("Audio blocked:", e);
-      }
+      if (timing.isEnded(t)) endGame();
     }
 
     async function startGame() {
-      if (locked || running) return;
-      locked = true;
+      if (running) return;
 
-      // iOS gesture unlock
-      await safePlay();
-      music.pause();
-      music.currentTime = 0;
+      // must be in user gesture
+      await audio.unlock();
 
-      rebuild(chart);
+      try { bgVideo?.play().catch(() => {}); } catch {}
+
       judge.reset();
+      timing.start(audio);
 
-      timing.start(audio, { reset: true });
-
-      setState(STATES.PLAYING);
-      resultPresenter.hide();
-      ui.hideResult();
-
+      app.dataset.state = "playing";
       running = true;
-      loop();
 
-      await safePlay();
+      ui.hideResult();
+      ui.toast("START");
 
-      locked = false;
+      // tick 多重起動防止
+      cancelAnimationFrame(raf);
+      tick();
     }
 
-    function endGame(reason) {
+    function stopGame() {
       if (!running) return;
+      running = false;
+      timing.stop(audio);
+      app.dataset.state = "idle";
+      ui.toast("STOP");
+    }
 
-      stopLoop();
-      music.pause();
-
-      setState(STATES.RESULT);
-
-      const payload = {
+    function endGame() {
+      running = false;
+      timing.stop(audio);
+      app.dataset.state = "result";
+      ui.showResult({
         score: judge.state.score,
         maxCombo: judge.state.maxCombo,
-        resonance: judge.state.resonance,
-        reason,
-      };
-
-      ui.showResult(payload);
-      resultPresenter.show(payload);
+        resonance: judge.state.resonance
+      });
+      ui.toast("RESULT");
     }
 
-    /* ===============================
-       BUTTONS
-    =============================== */
+    async function restartGame() {
+      stopGame();
+      await startGame();
+    }
 
-    startBtn.addEventListener("click", startGame);
-    restartBtn?.addEventListener("click", startGame);
-    stopBtn?.addEventListener("click", () => endGame("STOP"));
+    startBtn.addEventListener("click", () => startGame());
+    stopBtn.addEventListener("click", () => stopGame());
+    restartBtn.addEventListener("click", () => restartGame());
 
-    // expose for result overlay
-    window.__DICO_START = startGame;
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        input.simTapCenter();
+      } else if (e.code === "Enter") {
+        startGame();
+      } else if (e.code === "Escape") {
+        stopGame();
+      }
+    }, { passive: false });
 
-    setState(STATES.IDLE);
+    app.dataset.state = "idle";
+    ui.update({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: "idle" });
+
+    render.resize();
+    window.addEventListener("resize", () => {
+      render.resize();
+      input.recalc();
+    });
+
+    console.log("[DiCo] boot OK");
   }
 
-  /* ===============================
-     ENTRY
-  =============================== */
-
-  (async () => {
-    try {
-      await loadAll();
-      await boot();
-      console.log("[DiCo] PRO STABLE boot OK");
-    } catch (e) {
-      console.error("BOOT FAILED:", e);
-    }
-  })();
-
+  loadScriptsSequentially(ENGINE_FILES)
+    .then(() => boot())
+    .catch((err) => {
+      console.error(err);
+      const el = document.getElementById("ariaLive");
+      if (el) el.textContent = "Boot error: " + err.message;
+    });
 })();
