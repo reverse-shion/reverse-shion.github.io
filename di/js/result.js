@@ -1,16 +1,11 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.4.0]
-   ✅ 完成版：ARU視認性を“ゲージUIとして確定”させる
-   - Works with /di/js/main.js (expects window.DI_RESULT.init)
-   - Fullscreen top-layer overlay (fixed, z-index max)
-   - HARD-HIDE all game layers under #app using VISIBILITY (robust)
-   - Eye image is inside circle (.tbEye) to avoid square artifacts
-   - ✅ NEW: Resonance Gauge Ring (progress) between outer eye & core
-       - 100% = full circle / 50% = half circle / 未到達 = gray
-       - 蛍光色＋二重ハロ＋パルスで「必ず見える」
-   - ✅ ARU is the hero: Gauge + iris-tint + core-rim all synced to ARU color
-   - iOS/Safari safe stacking & masking
-   - Non-destructive to #result (adds overlay shell only)
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.4.1]
+   ✅ 追記済み完成版：リングゲージが「必ず出る」(iOS/Safari含む)
+   PATCH v1.4.1:
+   - ✅ iOS/WebKitでリングが消える主因になりがちな mask の“黒(#000)問題”を修正
+     → mask は「白=表示 / 透明=非表示」で統一（rgba(255,255,255,1)）
+   - ✅ レイヤー順を固定（z-indexを各パーツに明示）
+   - ✅ 0%でもグレー土台リングは常時表示（ゲージUIとして確定）
 */
 (function () {
   "use strict";
@@ -19,8 +14,8 @@
   // Config (触るのは基本ここだけでOK)
   // =========================
   const CFG = Object.freeze({
-    VERSION: "1.4.0",
-    STYLE_ID: "tbResultOverlayStyles_v140",
+    VERSION: "1.4.1",
+    STYLE_ID: "tbResultOverlayStyles_v141",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
@@ -44,12 +39,12 @@
       // --- iris tint (色が“読める”保証) ---
       TINT_MIN: 0.24,
       TINT_MAX: 0.72,
-      TINT_GLOW_WEIGHT: 0.46, // glow連動（見えないならまずここを上げる）
+      TINT_GLOW_WEIGHT: 0.46,
 
       // --- gauge ring geometry ---
-      GAUGE_INSET_PCT: 12.5,      // 外円と中央コアの間に来る位置（小さいほど外側）
-      GAUGE_THICKNESS_PCT: 3.6,   // 太さ（大きいほど太い）
-      GAUGE_BG_ALPHA: 0.34,       // 未到達グレー濃度
+      GAUGE_INSET_PCT: 12.5,
+      GAUGE_THICKNESS_PCT: 3.6,
+      GAUGE_BG_ALPHA: 0.34,
 
       // --- gauge glow (蛍光として“確実に光る”) ---
       GAUGE_ALPHA_BASE: 0.98,
@@ -61,7 +56,7 @@
       BLOOM_ALPHA_BASE: 0.14,
       BLOOM_ALPHA_WEIGHT: 0.72,
 
-      // --- pulse (生きてる発光) ---
+      // --- pulse ---
       PULSE_MIN: 0.94,
       PULSE_MAX: 1.10,
     }),
@@ -112,7 +107,9 @@
     return clamp(toNum(resonancePercent, 0) / 100, 0, 1);
   }
 
-  function lerp(a, b, t) { return a + (b - a) * t; }
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
 
   function hexToRgb(hex) {
     const h = String(hex).replace("#", "").trim();
@@ -124,46 +121,40 @@
     return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`;
   }
   function mix(hexA, hexB, t) {
-    const A = hexToRgb(hexA), B = hexToRgb(hexB);
+    const A = hexToRgb(hexA),
+      B = hexToRgb(hexB);
     return { r: lerp(A.r, B.r, t), g: lerp(A.g, B.g, t), b: lerp(A.b, B.b, t) };
   }
 
   // ✅ 蛍光色寄せ（とにかく“見える”）
-  // スコアで色相は変えつつ、全部ネオン強度が高い帯域に寄せる
   const COLORS = Object.freeze({
-    neonCyan:   "#00F6FF",
+    neonCyan: "#00F6FF",
     neonViolet: "#A855FF",
-    neonPink:   "#FF2FEA",
-    neonLime:   "#B8FF3D",
-    neonGold:   "#FFE85A",
-    white:      "#FFFFFF",
+    neonPink: "#FF2FEA",
+    neonLime: "#B8FF3D",
+    neonGold: "#FFE85A",
+    white: "#FFFFFF",
   });
 
   // Score -> ARU hue (蛍光帯域)
   function aruColorByScoreP(p) {
-    if (p < 0.22) return rgbToCss(mix(COLORS.neonCyan,   COLORS.neonViolet, p / 0.22), 0.995);
-    if (p < 0.48) return rgbToCss(mix(COLORS.neonViolet, COLORS.neonPink,  (p - 0.22) / 0.26), 0.995);
-    if (p < 0.72) return rgbToCss(mix(COLORS.neonPink,   COLORS.neonGold,  (p - 0.48) / 0.24), 0.995);
-    if (p < 0.90) return rgbToCss(mix(COLORS.neonGold,   COLORS.neonLime,  (p - 0.72) / 0.18), 0.995);
-    return rgbToCss(mix(COLORS.neonLime, COLORS.white, (p - 0.90) / 0.10), 0.999);
+    if (p < 0.22) return rgbToCss(mix(COLORS.neonCyan, COLORS.neonViolet, p / 0.22), 0.995);
+    if (p < 0.48) return rgbToCss(mix(COLORS.neonViolet, COLORS.neonPink, (p - 0.22) / 0.26), 0.995);
+    if (p < 0.72) return rgbToCss(mix(COLORS.neonPink, COLORS.neonGold, (p - 0.48) / 0.24), 0.995);
+    if (p < 0.9) return rgbToCss(mix(COLORS.neonGold, COLORS.neonLime, (p - 0.72) / 0.18), 0.995);
+    return rgbToCss(mix(COLORS.neonLime, COLORS.white, (p - 0.9) / 0.1), 0.999);
   }
 
   function lineBy(resPercent, nameOrNull) {
     const name = nameOrNull;
     if (resPercent >= 100) {
-      return name
-        ? `……ARU、完成。\n${name}──君の想いは、瞳に宿った。`
-        : `……ARU、完成。\n君の想いは、瞳に宿った。`;
+      return name ? `……ARU、完成。\n${name}──君の想いは、瞳に宿った。` : `……ARU、完成。\n君の想いは、瞳に宿った。`;
     }
     if (resPercent >= 80) {
-      return name
-        ? `${name}。\n波形が綺麗。あと少しで“完成域”。`
-        : `波形が綺麗。\nあと少しで“完成域”。`;
+      return name ? `${name}。\n波形が綺麗。あと少しで“完成域”。` : `波形が綺麗。\nあと少しで“完成域”。`;
     }
     if (resPercent >= 50) {
-      return name
-        ? `${name}。\n揺らぎはある。だから、伸びる。`
-        : `揺らぎはある。\nだから、伸びる。`;
+      return name ? `${name}。\n揺らぎはある。だから、伸びる。` : `揺らぎはある。\nだから、伸びる。`;
     }
     return `共鳴は消えてない。\nDiDiDi…もう一回、いこ？`;
   }
@@ -339,6 +330,7 @@
     0 28px 90px rgba(0,0,0,0.72),
     0 0 0 1px rgba(255,255,255,0.14) inset;
 
+  /* iOS round fix */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
   transform: translateZ(0);
 }
@@ -354,7 +346,15 @@
       rgba(0,0,0,0.55) 74%,
       rgba(0,0,0,0.88) 100%);
   pointer-events:none;
+  z-index: 0;
 }
+
+/* ✅ Layer order fix (explicit) */
+#result .tbEyeNoise{ z-index: 1; }
+#result .tbAruTint{  z-index: 2; }
+#result .tbResGauge{ z-index: 3; }
+#result .tbCore{     z-index: 4; }
+#result .tbSpecular{ z-index: 5; }
 
 /* Noise scan */
 #result .tbEyeNoise{
@@ -375,6 +375,7 @@
 
 /* =========================
    IRIS TINT (readability)
+   ✅ PATCH: maskは白=表示で統一
    ========================= */
 #result .tbAruTint{
   position:absolute;
@@ -388,13 +389,13 @@
       rgba(0,0,0,0) 64%);
 
   -webkit-mask: radial-gradient(circle at 50% 52%,
-    #000 0%,
-    #000 48%,
-    rgba(0,0,0,0) 66%);
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,1) 48%,
+    rgba(255,255,255,0) 66%);
           mask: radial-gradient(circle at 50% 52%,
-    #000 0%,
-    #000 48%,
-    rgba(0,0,0,0) 66%);
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,1) 48%,
+    rgba(255,255,255,0) 66%);
 
   mix-blend-mode: color;
   opacity: var(--tb-aru-tint);
@@ -403,8 +404,9 @@
 
 /* =========================
    RESONANCE GAUGE (progress)
-   - 外円と中心コアの間
-   - 未到達=グレー / 到達=蛍光ARU
+   - 未到達=グレー土台（常時表示）
+   - 到達=蛍光ARU（進捗）
+   ✅ PATCH: ring maskは白=表示で統一
    ========================= */
 #result .tbResGauge{
   position:absolute;
@@ -421,14 +423,14 @@
   border-radius:999px;
 
   -webkit-mask: radial-gradient(circle,
-    transparent calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}%),
-    #000 calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}% + 0.8%));
+    rgba(255,255,255,0) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}%),
+    rgba(255,255,255,1) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}% + 0.8%));
           mask: radial-gradient(circle,
-    transparent calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}%),
-    #000 calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}% + 0.8%));
+    rgba(255,255,255,0) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}%),
+    rgba(255,255,255,1) calc(100% - ${CFG.ARU.GAUGE_THICKNESS_PCT}% + 0.8%));
 }
 
-/* 未到達（グレー） */
+/* 未到達（グレー）: 0%でも常時見せる */
 #result .tbResGaugeBase{
   background: rgba(190,190,190,${CFG.ARU.GAUGE_BG_ALPHA});
   opacity: 0.95;
@@ -445,8 +447,8 @@
   );
 
   opacity: var(--tb-gauge-a);
+  mix-blend-mode: screen;
 
-  /* ✅ “絶対見える” 二重ハロ＋ネオン */
   filter:
     blur(0.12px)
     drop-shadow(0 0 var(--tb-gauge-inner) color-mix(in srgb, var(--tb-aru) 70%, transparent))
@@ -606,25 +608,21 @@
     // ✅ 蛍光ARU色（スコアで変化）
     const aruColor = aruColorByScoreP(scoreP);
 
-    // Glow power: resonance base + score push
+    // Glow power
     const glow = clamp(0.18 + (resPercent / 100) * 0.58 + scoreP * 0.22, 0.18, 1.0);
 
     // Specular at high score
-    const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
+    const specular = scoreP >= 0.9 ? clamp((scoreP - 0.9) / 0.1, 0, 1) : 0;
 
-    // Iris tint: guarantee readability
-    const tint = clamp(
-      CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT,
-      CFG.ARU.TINT_MIN,
-      CFG.ARU.TINT_MAX
-    );
+    // Iris tint
+    const tint = clamp(CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT, CFG.ARU.TINT_MIN, CFG.ARU.TINT_MAX);
 
     // Gauge glow grows with glow
     const gaugeGlow = Math.round(lerp(CFG.ARU.GAUGE_GLOW_BASE_PX, CFG.ARU.GAUGE_GLOW_MAX_PX, glow));
     const gaugeGlow2 = Math.round(gaugeGlow * 1.65);
 
     // Background bloom grows with glow
-    const bloomA = clamp(CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT, 0, 0.90);
+    const bloomA = clamp(CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT, 0, 0.9);
 
     // ✅ Resonance -> angle (100%=360deg)
     const angle = (clamp(resPercent, 0, 100) / 100) * 360;
@@ -669,7 +667,10 @@
         if (app) app.classList.remove(CFG.APP_CUT_CLASS);
 
         const startBtn = document.getElementById("startBtn");
-        if (startBtn) { startBtn.click(); return; }
+        if (startBtn) {
+          startBtn.click();
+          return;
+        }
         const restartBtn = document.getElementById("restartBtn");
         restartBtn?.click?.();
       },
