@@ -1,11 +1,11 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.5]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.6]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
    - HARD-HIDE all game layers under #app using VISIBILITY (robust)
    - Eye image is inside circle (.tbEye) to avoid square artifacts
    - ARU is the hero: Digital ring + center core rim synced to ARU color
-   - Pupil/ARU color driven by SCORE, glow intensity driven by resonance (+ score)
+   - ARU tint layer makes ARU color always readable without killing the illustration
    - iOS/Safari safe stacking & masking
    - Non-destructive to #result (adds overlay shell only)
 */
@@ -16,8 +16,8 @@
   // Config
   // =========================
   const CFG = Object.freeze({
-    VERSION: "1.3.5",
-    STYLE_ID: "tbResultOverlayStyles_v135",
+    VERSION: "1.3.6",
+    STYLE_ID: "tbResultOverlayStyles_v136",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
@@ -34,10 +34,18 @@
     RING_THICKNESS_PCT: 10.5,
 
     // Eye image tuning (CENTER iris + star in center)
-    // ここが「虹彩/星を中心に合わせる」基準値
-    EYE_BG_SIZE: 190,          // %
-    EYE_BG_POS_X: 50,          // %
-    EYE_BG_POS_Y: 38,          // %  ※だいたい 34〜44 が当たり帯
+    // ここで「虹彩/星の中心」を合わせる。JSは触らない（固定運用）
+    EYE_BG_SIZE: 190,     // %
+    // ★要望：もう少し右・下
+    // まずはこの値で。さらに動かしたい時は +2 ずつ増減すると迷わない。
+    EYE_BG_POS_X: 54,     // % 右へ
+    EYE_BG_POS_Y: 41,     // % 下へ（※見た目は“Yが増えるほど下”）
+
+    // ARU tint (iris-only) visibility guarantee
+    // 目の絵を殺さない範囲で「最低でもARU色が読める」
+    ARU_TINT_MIN: 0.18,
+    ARU_TINT_MAX: 0.55,
+    ARU_TINT_GLOW_WEIGHT: 0.34, // glow連動
   });
 
   // =========================
@@ -59,12 +67,17 @@
     return null;
   }
 
+  // Resonance can be 0..1 or 0..100
   function normalizePercent(resonance) {
     let r = toNum(resonance, 0);
     if (r <= 1.0001) r *= 100;
     return clamp(Math.round(r), 0, 100);
   }
 
+  // Score normalization strategy:
+  // - prefer maxCombo proxy: maxCombo * 120
+  // - fallback: soft log
+  // - fallback: resonance
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
@@ -104,6 +117,7 @@
     white:  "#FFFFFF",
   });
 
+  // Score -> ARU hue
   function aruColorByScoreP(p) {
     if (p < 0.20) return rgbToCss(mix(COLORS.navy,   COLORS.aqua,    p / 0.20), 0.95);
     if (p < 0.45) return rgbToCss(mix(COLORS.aqua,   COLORS.violet, (p - 0.20) / 0.25), 0.95);
@@ -150,6 +164,9 @@
       <div class="tbEyeStage" aria-label="ARU Eye">
         <div class="tbEye" id="tbEye" aria-hidden="true">
           <div class="tbEyeNoise"></div>
+
+          <!-- ★ ARU tint overlay (iris-only). Always readable, art-safe -->
+          <div class="tbAruTint" aria-hidden="true"></div>
 
           <div class="tbAruRing" aria-hidden="true"></div>
           <div class="tbAruRingTicks" aria-hidden="true"></div>
@@ -203,6 +220,10 @@
   /* Eye image tuning variables (CENTER iris + star) */
   --tb-eye-size: ${CFG.EYE_BG_SIZE}%;
   --tb-eye-pos: ${CFG.EYE_BG_POS_X}% ${CFG.EYE_BG_POS_Y}%;
+  --tb-aru: rgba(0,240,255,0.95);
+  --tb-glow: 0.35;
+  --tb-specular: 0;
+  --tb-aru-tint: ${CFG.ARU_TINT_MIN};
 }
 
 #result.${CFG.ROOT_ACTIVE_CLASS}{
@@ -247,10 +268,10 @@
   inset:0;
   background:
     radial-gradient(circle at 50% 44%,
-      var(--tb-aru, rgba(0,240,255,0.24)) 0%,
+      var(--tb-aru) 0%,
       rgba(0,0,0,0) 62%);
   mix-blend-mode: screen;
-  opacity: calc(var(--tb-glow, 0.35) * 0.85);
+  opacity: calc(var(--tb-glow) * 0.85);
   filter: blur(1px);
   pointer-events:none;
 }
@@ -319,6 +340,36 @@
 }
 
 /* =========================
+   ARU TINT (IRIS-ONLY)
+   - Always readable ARU color without killing the art
+   ========================= */
+#result .tbAruTint{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+
+  /* center-focused tint */
+  background:
+    radial-gradient(circle at 50% 50%,
+      color-mix(in srgb, var(--tb-aru) 72%, transparent) 0%,
+      rgba(0,0,0,0) 58%);
+
+  /* restrict to iris area */
+  -webkit-mask: radial-gradient(circle at 50% 50%,
+    #000 0%,
+    #000 46%,
+    rgba(0,0,0,0) 64%);
+          mask: radial-gradient(circle at 50% 50%,
+    #000 0%,
+    #000 46%,
+    rgba(0,0,0,0) 64%);
+
+  mix-blend-mode: color;
+  opacity: var(--tb-aru-tint);
+  filter: saturate(1.25) brightness(1.05);
+}
+
+/* =========================
    ARU RING (HERO)
    ========================= */
 #result .tbAruRing{
@@ -331,13 +382,12 @@
     conic-gradient(
       from 180deg,
       rgba(0,0,0,0) 0deg,
-      var(--tb-aru, rgba(0,240,255,0.92)) 60deg,
+      var(--tb-aru) 60deg,
       rgba(255,47,178,0.78) 130deg,
-      var(--tb-aru, rgba(0,240,255,0.92)) 220deg,
+      var(--tb-aru) 220deg,
       rgba(0,0,0,0) 360deg
     );
 
-  /* cut center => ring */
   -webkit-mask: radial-gradient(circle,
     transparent calc(100% - ${CFG.RING_THICKNESS_PCT}%),
     #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
@@ -346,7 +396,7 @@
     #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
 
   mix-blend-mode: screen;
-  opacity: calc(0.78 + var(--tb-glow,0.35) * 0.22);
+  opacity: calc(0.78 + var(--tb-glow) * 0.22);
   filter: blur(0.25px);
   animation: tbRingSpin 8.8s linear infinite;
 }
@@ -381,7 +431,6 @@
 
 /* =========================
    CORE (CENTER SPHERE)
-   - gray base + ARU rim glow (link) + pulse
    ========================= */
 #result .tbCore{
   position:absolute;
@@ -397,14 +446,12 @@
       rgba(40,40,40,0.85) 78%,
       rgba(0,0,0,0.95) 100%);
 
-  /* ✅ ARU rim (薄い発光縁) */
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.10) inset,
     0 0 0 2px rgba(255,255,255,0.04) inset,
     0 0 20px rgba(0,0,0,0.38),
-    0 0 0 2px rgba(0,0,0,0.25),
-    0 0 calc(12px + var(--tb-glow,0.35)*44px) color-mix(in srgb, var(--tb-aru, rgba(0,240,255,0.55)) 55%, transparent),
-    0 0 calc(26px + var(--tb-glow,0.35)*64px) color-mix(in srgb, var(--tb-aru, rgba(0,240,255,0.55)) 28%, transparent);
+    0 0 calc(12px + var(--tb-glow)*44px) color-mix(in srgb, var(--tb-aru) 55%, transparent),
+    0 0 calc(26px + var(--tb-glow)*64px) color-mix(in srgb, var(--tb-aru) 28%, transparent);
 
   animation: tbCorePulse 2.6s ease-in-out infinite;
 }
@@ -413,7 +460,7 @@
 #result .tbSpecular{
   position:absolute;
   inset: 0;
-  opacity: var(--tb-specular, 0);
+  opacity: var(--tb-specular);
   background:
     radial-gradient(circle at 35% 32%,
       rgba(255,255,255,0.62) 0%,
@@ -528,16 +575,30 @@
 
     const scoreP = normalizeScore01(score, maxCombo, resPercent);
 
+    // ARU color (hero)
     const aruColor = aruColorByScoreP(scoreP);
+
+    // Glow power: resonance base + score push
     const glow = clamp(0.18 + (resPercent / 100) * 0.58 + scoreP * 0.22, 0.18, 1.0);
+
+    // Specular at high score
     const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
 
+    // ★ARU tint: guarantee visibility, but cap to keep art alive
+    const tint = clamp(
+      CFG.ARU_TINT_MIN + glow * CFG.ARU_TINT_GLOW_WEIGHT,
+      CFG.ARU_TINT_MIN,
+      CFG.ARU_TINT_MAX
+    );
+
+    // Sync vars across ring / core / bloom / tint
     root.style.setProperty("--tb-aru", aruColor);
     root.style.setProperty("--tb-glow", String(glow));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
+    root.style.setProperty("--tb-aru-tint", String(tint));
 
-    // ここは固定（勝手に動かさない）
-    // もし微調整したいなら、CFG.EYE_BG_SIZE / POS_Y を変える運用でOK。
+    // 画像位置は固定（CFGのみで調整する）
+    // -> ここでは触らない
 
     const name = safeUserName();
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
