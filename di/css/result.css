@@ -340,3 +340,18 @@
   0%,100%{ transform: scale(1.00); opacity: var(--tb-gauge-a); }
   50%{ transform: scale(1.01); opacity: 1; }
 }
+/* =========================================================
+   Keep % text, remove card ring only
+   ========================================================= */
+
+/* SVGリング部分だけ消す */
+.app[data-state="result"] .aruRing svg{
+  display:none !important;
+}
+
+/* 背景に色が乗る可能性を排除 */
+.app[data-state="result"] .aruRing,
+.app[data-state="result"] .aruRing *{
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
