@@ -16,6 +16,20 @@
   contain: layout paint style;
   transform: translateZ(0);
 
+   #tbResultOverlayRoot{
+  /* 追加：初期状態は完全に消す */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateZ(0) scale(0.985);
+  transition: opacity .18s ease, visibility 0s linear .18s, transform .22s ease;
+}
+#tbResultOverlayRoot.tb-active{
+  opacity: 1;
+  visibility: visible;
+  transform: translateZ(0) scale(1);
+  transition: opacity .18s ease, visibility 0s linear 0s, transform .22s ease;
+}
+
   /* Eye image tuning vars (JSは直接いじらない。必要ならここで固定もできる) */
   --tb-eye-size: 190%;
   --tb-eye-pos: 37% 33%;
