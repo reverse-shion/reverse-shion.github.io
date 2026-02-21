@@ -16,7 +16,7 @@
   --aru-size: 220px;           /* iPhoneでも大きすぎない */
   --aru-thickness: 12px;
 
-  --aru-gray: rgba(255,255,255,0.22); /* “灰”だけど世界観に馴染む */
+  --aru-gray: rgba(255,255,255,0.22);
   --aru-color-low:  rgba(76,201,240,0.96);
   --aru-color-mid:  rgba(168,85,247,0.96);
   --aru-color-high: rgba(255,47,208,0.96);
@@ -37,12 +37,14 @@
    Visibility (RESULT ONLY)
    ========================= */
 
+/* default hidden */
 .aruLayer{
-  display:none; /* default hidden */
+  display:none;
 }
 
+/* show only on result */
 .app[data-state="result"] .aruLayer{
-  display:flex; /* show only on result */
+  display:flex;
 }
 
 /* =========================
@@ -58,7 +60,6 @@
   align-items: center;
   justify-content: center;
 
-  /* overlay ring should sit “on top of the image” */
   isolation: isolate;
 }
 
@@ -70,8 +71,6 @@
   width: var(--aru-size);
   height: var(--aru-size);
   position: relative;
-
-  /* subtle glass backdrop so ring is readable on any bg */
   border-radius: 999px;
   filter: drop-shadow(0 18px 36px rgba(0,0,0,0.38));
 }
@@ -86,14 +85,12 @@
   inset:0;
   border-radius:50%;
 
-  /* progress + remaining */
   background:
     conic-gradient(
       var(--aru-active-color) calc(var(--aru-value) * 1turn),
       var(--aru-gray) 0turn
     );
 
-  /* ring cutout */
   -webkit-mask: radial-gradient(
     circle at center,
     transparent calc(50% - var(--aru-thickness)),
@@ -105,17 +102,16 @@
     #000 calc(50% - var(--aru-thickness) + 1px)
   );
 
-  /* smoother */
   transition: background 240ms ease, filter 240ms ease;
   will-change: background, filter;
 
-  /* base shine */
   filter:
     drop-shadow(0 0 10px rgba(255,255,255,0.10))
-    drop-shadow(0 0 calc(var(--aru-glow) * 26px) color-mix(in srgb, var(--aru-active-color) 85%, transparent));
+    drop-shadow(0 0 calc(var(--aru-glow) * 26px)
+      color-mix(in srgb, var(--aru-active-color) 85%, transparent)
+    );
 }
 
-/* inner thin highlight ring */
 .aruGauge::after{
   content:"";
   position:absolute;
@@ -145,42 +141,24 @@
     0 2px 18px rgba(0,0,0,0.55),
     0 0 20px rgba(255,255,255,0.08);
 
-  /* keep crisp on iOS */
   -webkit-font-smoothing: antialiased;
   transform: translateZ(0);
 }
 
-/* optional: show small label under % if you want later */
-.aruScore::after{
-  content:"";
-}
-
 /* =========================
    State -> Color mapping
-   (apply to app, not global)
    ========================= */
 
 .app[data-aru-state="low"]  { --aru-active-color: var(--aru-color-low);  --aru-glow: 0; }
 .app[data-aru-state="mid"]  { --aru-active-color: var(--aru-color-mid);  --aru-glow: 0.25; }
 .app[data-aru-state="high"] { --aru-active-color: var(--aru-color-high); --aru-glow: 0.45; }
 
-/* MAX: brilliant */
 .app[data-aru-state="max"]{
   --aru-active-color: rgba(255,255,255,0.96);
   --aru-glow: 1;
 }
-/* ===== DEBUG (temporary) ===== */
-.aruLayer{
-  display:flex !important;
-  outline: 2px solid rgba(0,255,255,0.7);
-}
-.aruGauge{
-  outline: 2px solid rgba(255,0,255,0.5);
-}
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce){
-  .aruGauge::before{
-    transition: none;
-  }
+  .aruGauge::before{ transition: none; }
 }
