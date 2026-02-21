@@ -1,10 +1,12 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.4]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.5]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
-   - When active: HARD-HIDE all game layers under #app using VISIBILITY (robust)
-   - Eye image is INSIDE the circle (.tbEye) to avoid square artifacts
-   - Pupil color driven by SCORE, glow driven by resonance (+ score)
+   - HARD-HIDE all game layers under #app using VISIBILITY (robust)
+   - Eye image is inside circle (.tbEye) to avoid square artifacts
+   - ARU is the hero: Digital ring + center core rim synced to ARU color
+   - Pupil/ARU color driven by SCORE, glow intensity driven by resonance (+ score)
+   - iOS/Safari safe stacking & masking
    - Non-destructive to #result (adds overlay shell only)
 */
 (function () {
@@ -14,18 +16,22 @@
   // Config
   // =========================
   const CFG = Object.freeze({
-    VERSION: "1.3.4",
-    STYLE_ID: "tbResultOverlayStyles_v134",
+    VERSION: "1.3.5",
+    STYLE_ID: "tbResultOverlayStyles_v135",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
 
-    // Use ABSOLUTE path (GitHub Pages-safe)
+    // GitHub Pages-safe absolute path
     EYE_IMAGE_URL: "/di/dico_eye_result.png",
 
     NAME_CALL_THRESHOLD: 50,
     COUNTUP_FRAMES: 56,
     Z_MAX: 2147483647,
+
+    // ARU ring tuning (feel free to tweak)
+    RING_INSET_PCT: 5.5, // ring position
+    RING_THICKNESS_PCT: 10.5, // ring thickness
   });
 
   // =========================
@@ -47,12 +53,17 @@
     return null;
   }
 
+  // Resonance can be 0..1 or 0..100
   function normalizePercent(resonance) {
     let r = toNum(resonance, 0);
     if (r <= 1.0001) r *= 100;
     return clamp(Math.round(r), 0, 100);
   }
 
+  // Score normalization strategy:
+  // - prefer maxCombo proxy: maxCombo * 120
+  // - fallback: soft log
+  // - fallback: resonance
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
@@ -92,7 +103,8 @@
     white:  "#FFFFFF",
   });
 
-  function pupilColorByScoreP(p) {
+  // Score -> ARU hue
+  function aruColorByScoreP(p) {
     if (p < 0.20) return rgbToCss(mix(COLORS.navy,   COLORS.aqua,    p / 0.20), 0.95);
     if (p < 0.45) return rgbToCss(mix(COLORS.aqua,   COLORS.violet, (p - 0.20) / 0.25), 0.95);
     if (p < 0.70) return rgbToCss(mix(COLORS.violet, COLORS.magenta,(p - 0.45) / 0.25), 0.95);
@@ -132,19 +144,18 @@
     shell.setAttribute("role", "dialog");
     shell.setAttribute("aria-label", "Result");
 
+    // NOTE: add ARU ring + core (center sphere) layers (CSS-driven)
     shell.innerHTML = `
       <div class="tbResultOverlayBlack" aria-hidden="true"></div>
 
       <div class="tbEyeStage" aria-label="ARU Eye">
         <div class="tbEye" id="tbEye" aria-hidden="true">
           <div class="tbEyeNoise"></div>
-          <div class="tbEyeVignette"></div>
 
-          <div class="tbIris" id="tbIris"></div>
-          <div class="tbIrisThreads"></div>
+          <div class="tbAruRing" aria-hidden="true"></div>
+          <div class="tbAruRingTicks" aria-hidden="true"></div>
 
-          <div class="tbPupil" id="tbPupil"></div>
-          <div class="tbPupilGlow" id="tbPupilGlow"></div>
+          <div class="tbCore" id="tbCore" aria-hidden="true"></div>
 
           <div class="tbSpecular" id="tbSpecular"></div>
         </div>
@@ -175,7 +186,7 @@
     const s = document.createElement("style");
     s.id = CFG.STYLE_ID;
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (VISIBILITY HARD CUT + EYE IN CIRCLE) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (ARU HERO) ===== */
 
 #result{
   position: fixed !important;
@@ -185,6 +196,7 @@
   pointer-events: none;
   background: #000 !important;
 
+  /* Stack safety (iOS/Safari) */
   isolation: isolate !important;
   contain: layout paint style !important;
   transform: translateZ(0) !important;
@@ -194,8 +206,7 @@
   pointer-events: auto;
 }
 
-/* HARD CUT (robust): hide EVERYTHING under #app by visibility,
-   then explicitly show #result + its descendants. */
+/* HARD CUT: hide everything under #app by visibility */
 #app.${CFG.APP_CUT_CLASS} *{
   visibility: hidden !important;
 }
@@ -204,7 +215,7 @@
   visibility: visible !important;
 }
 
-/* Overlay shell */
+/* Shell */
 #result .${CFG.SHELL_CLASS}{
   position: absolute;
   inset: 0;
@@ -216,157 +227,189 @@
   padding: 16px;
 }
 
-/* Background = ONLY depth (NO image here) */
+/* Background depth + ARU bloom sync */
 #result .tbResultOverlayBlack{
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  position:absolute;
+  inset:0;
+  z-index:0;
   background:
-    radial-gradient(circle at 50% 45%,
+    radial-gradient(circle at 50% 44%,
       rgba(18,20,28,0.18) 0%,
-      rgba(0,0,0,0.86) 55%,
-      rgba(0,0,0,0.98) 100%),
-    #000;
+      rgba(0,0,0,0.88) 56%,
+      rgba(0,0,0,0.98) 100%);
 }
-
-/* Bloom overlay (safe) */
 #result .tbResultOverlayBlack::after{
   content:"";
   position:absolute;
   inset:0;
   background:
     radial-gradient(circle at 50% 44%,
-      var(--tb-pupil-glow, rgba(0,240,255,0.18)) 0%,
+      var(--tb-aru, rgba(0,240,255,0.24)) 0%,
       rgba(0,0,0,0) 62%);
   mix-blend-mode: screen;
-  opacity: calc(var(--tb-glow-power, 0.35) * 0.80);
+  opacity: calc(var(--tb-glow, 0.35) * 0.85);
+  filter: blur(1px);
   pointer-events:none;
 }
 
-/* Eye stage */
+/* Stage */
 #result .tbEyeStage{
   position: relative;
   z-index: 1;
-  width: min(92vw, 520px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: min(92vw, 540px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* Eye close-up = IMAGE INSIDE THE CIRCLE */
+/* Eye = image inside circle */
 #result .tbEye{
   position: relative;
-  width: min(92vw, 520px);
+  width: min(92vw, 540px);
   aspect-ratio: 1 / 1;
   border-radius: 999px;
   overflow: hidden;
 
-  background: url("${CFG.EYE_IMAGE_URL}") center / cover no-repeat;
+  /* eye image */
+  background-image: url("${CFG.EYE_IMAGE_URL}");
+  background-size: var(--tb-eye-size, 145%);
+  background-position: var(--tb-eye-pos, 50% 40%);
+  background-repeat: no-repeat;
 
   box-shadow:
-    0 28px 80px rgba(0,0,0,0.70),
-    0 0 0 1px rgba(255,255,255,0.12) inset;
+    0 28px 90px rgba(0,0,0,0.72),
+    0 0 0 1px rgba(255,255,255,0.14) inset;
 
-  /* iOS Safari “round but looks square” fix */
+  /* iOS “round but looks square” fix */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
 
   transform: translateZ(0);
 }
 
-/* Tighten / vignette on top of the image so ARU feels integrated */
+/* Darken edges to lock ARU into the eye */
 #result .tbEye::before{
   content:"";
   position:absolute;
   inset:0;
   background:
     radial-gradient(circle at 50% 50%,
-      rgba(0,0,0,0) 46%,
-      rgba(0,0,0,0.52) 74%,
-      rgba(0,0,0,0.82) 100%);
+      rgba(0,0,0,0.00) 44%,
+      rgba(0,0,0,0.55) 74%,
+      rgba(0,0,0,0.88) 100%);
   pointer-events:none;
 }
 
-/* Scan/noise */
+/* Noise scan (subtle) */
 #result .tbEyeNoise{
-  position:absolute; inset:-30%;
+  position:absolute;
+  inset:-30%;
   background:
     repeating-linear-gradient(90deg,
       rgba(255,255,255,0.00) 0px,
       rgba(255,255,255,0.00) 9px,
       rgba(255,255,255,0.05) 10px,
       rgba(255,255,255,0.00) 12px);
-  opacity: .10;
+  opacity: .09;
   mix-blend-mode: overlay;
   transform: translateX(-18%);
   animation: tbNoise 2.8s linear infinite;
+  pointer-events:none;
 }
 
-/* Vignette (extra) */
-#result .tbEyeVignette{
-  position:absolute; inset:-10%;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(0,0,0,0) 48%,
-      rgba(0,0,0,0.40) 70%,
-      rgba(0,0,0,0.70) 100%);
-}
+/* =========================
+   ARU RING (HERO)
+   ========================= */
 
-/* Iris */
-#result .tbIris{
-  position:absolute; inset: 18%;
+/* Ring body: color is --tb-aru */
+#result .tbAruRing{
+  position:absolute;
+  inset: ${CFG.RING_INSET_PCT}%;
   border-radius: 999px;
+  pointer-events:none;
+
   background:
-    conic-gradient(from 120deg,
-      rgba(0,240,255,0.22),
-      rgba(138,43,226,0.18),
-      rgba(255,47,178,0.18),
-      rgba(0,240,255,0.22));
-  filter: saturate(1.05);
-  opacity: .58;
-  animation: tbIris 5.8s linear infinite;
+    conic-gradient(
+      from 180deg,
+      rgba(0,0,0,0) 0deg,
+      var(--tb-aru, rgba(0,240,255,0.92)) 60deg,
+      rgba(255,47,178,0.78) 130deg,
+      var(--tb-aru, rgba(0,240,255,0.92)) 220deg,
+      rgba(0,0,0,0) 360deg
+    );
+
+  /* cut center => ring */
+  -webkit-mask: radial-gradient(circle,
+    transparent calc(100% - ${CFG.RING_THICKNESS_PCT}%),
+    #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
+          mask: radial-gradient(circle,
+    transparent calc(100% - ${CFG.RING_THICKNESS_PCT}%),
+    #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
+
+  mix-blend-mode: screen;
+  opacity: 0.92;
+  filter: blur(0.25px);
+  animation: tbRingSpin 8.8s linear infinite;
 }
 
-/* Iris threads */
-#result .tbIrisThreads{
-  position:absolute; inset: 18%;
+/* Digital ticks: “game UI” feel */
+#result .tbAruRingTicks{
+  position:absolute;
+  inset: ${CFG.RING_INSET_PCT}%;
   border-radius: 999px;
+  pointer-events:none;
+
   background:
-    repeating-radial-gradient(circle,
-      rgba(255,255,255,0.06) 0px,
-      rgba(255,255,255,0.06) 1px,
-      rgba(0,0,0,0) 3px,
-      rgba(0,0,0,0) 6px);
-  opacity: .16;
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255,255,255,0.00) 0deg,
+      rgba(255,255,255,0.00) 6deg,
+      rgba(255,255,255,0.14) 6.5deg,
+      rgba(255,255,255,0.00) 7deg
+    );
+
+  -webkit-mask: radial-gradient(circle,
+    transparent calc(100% - ${CFG.RING_THICKNESS_PCT}%),
+    #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
+          mask: radial-gradient(circle,
+    transparent calc(100% - ${CFG.RING_THICKNESS_PCT}%),
+    #000 calc(100% - ${CFG.RING_THICKNESS_PCT}% + 1%));
+
   mix-blend-mode: overlay;
+  opacity: 0.55;
+  filter: blur(0.15px);
+  animation: tbTicksFlicker 1.9s ease-in-out infinite;
 }
 
-/* Pupil */
-#result .tbPupil{
+/* =========================
+   CORE (CENTER SPHERE)
+   - gray base + ARU rim glow + pulse synced
+   ========================= */
+#result .tbCore{
   position:absolute;
   inset: 40%;
   border-radius: 999px;
-  background: radial-gradient(circle at 50% 50%,
-    rgba(0,0,0,0.92) 0%,
-    rgba(0,0,0,0.98) 60%,
-    rgba(0,0,0,1) 100%);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
-}
+  pointer-events:none;
 
-/* Pupil glow */
-#result .tbPupilGlow{
-  position:absolute;
-  inset: 30%;
-  border-radius: 999px;
+  /* base sphere */
   background:
-    radial-gradient(circle at 50% 50%,
-      var(--tb-pupil-glow, rgba(0,240,255,0.18)) 0%,
-      rgba(0,0,0,0) 65%);
-  filter: blur(18px);
-  opacity: var(--tb-glow-power, 0.35);
-  animation: tbBreath 3.6s ease-in-out infinite;
+    radial-gradient(circle at 36% 32%,
+      rgba(255,255,255,0.55) 0%,
+      rgba(235,235,235,0.22) 18%,
+      rgba(120,120,120,0.30) 44%,
+      rgba(40,40,40,0.85) 78%,
+      rgba(0,0,0,0.95) 100%);
+
+  /* ARU rim glow (THIS is the “link”) */
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.10) inset,
+    0 0 0 2px rgba(255,255,255,0.04) inset,
+    0 0 24px rgba(0,0,0,0.35),
+    0 0 calc(10px + var(--tb-glow,0.35)*38px) var(--tb-aru, rgba(0,240,255,0.45));
+
+  animation: tbCorePulse 2.6s ease-in-out infinite;
 }
 
-/* Specular */
+/* Specular sparkle at high score */
 #result .tbSpecular{
   position:absolute;
   inset: 0;
@@ -378,9 +421,12 @@
       rgba(0,0,0,0) 34%);
   mix-blend-mode: screen;
   filter: blur(0.5px);
+  pointer-events:none;
 }
 
-/* Readout */
+/* =========================
+   Readout / Copy / Button
+   ========================= */
 #result .tbResultReadout{ position: relative; text-align:center; z-index: 1; }
 #result .tbResPercent{
   font-size: 56px;
@@ -398,7 +444,6 @@
   color: rgba(245,245,242,0.68);
 }
 
-/* Line */
 #result .tbLine{
   position: relative;
   z-index: 1;
@@ -412,7 +457,6 @@
   text-shadow: 0 8px 24px rgba(0,0,0,0.65);
 }
 
-/* Actions */
 #result .tbActions{ position: relative; z-index: 1; margin-top: 2px; }
 #result .tbBtn{
   border: 0;
@@ -428,36 +472,43 @@
 }
 #result .tbBtn:active{ transform: translateY(1px); }
 
-/* Entry animation */
+/* Entry */
 #result.${CFG.ROOT_ACTIVE_CLASS} .tbEye{
   animation: tbEyeIn .65s cubic-bezier(.2,.9,.2,1) both;
 }
 
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   #result .tbEyeNoise,
-  #result .tbIris,
-  #result .tbPupilGlow{
+  #result .tbAruRing,
+  #result .tbAruRingTicks,
+  #result .tbCore{
     animation: none !important;
   }
 }
 
+/* Keyframes */
 @keyframes tbEyeIn{
   0%{ transform: scale(0.985); filter: brightness(0.75); opacity: 0; }
   60%{ transform: scale(1.02);  filter: brightness(1.02); opacity: 1; }
   100%{ transform: scale(1.00); filter: brightness(1.00); opacity: 1; }
 }
-@keyframes tbBreath{
-  0%,100%{ transform: scale(1.00); }
-  50%{ transform: scale(1.05); }
+@keyframes tbNoise{
+  0%{ transform: translateX(-18%); opacity: .07; }
+  50%{ opacity: .11; }
+  100%{ transform: translateX(18%); opacity: .07; }
 }
-@keyframes tbIris{
+@keyframes tbRingSpin{
   0%{ transform: rotate(0deg); }
   100%{ transform: rotate(360deg); }
 }
-@keyframes tbNoise{
-  0%{ transform: translateX(-18%); opacity: .08; }
-  50%{ opacity: .12; }
-  100%{ transform: translateX(18%); opacity: .08; }
+@keyframes tbTicksFlicker{
+  0%,100%{ opacity: 0.45; }
+  50%{ opacity: 0.62; }
+}
+@keyframes tbCorePulse{
+  0%,100%{ transform: scale(1.00); filter: brightness(1.00); }
+  50%{ transform: scale(1.04); filter: brightness(1.08); }
 }
 `;
     document.head.appendChild(s);
@@ -469,30 +520,42 @@
   function paintAndAnimate(root, payload) {
     const percentEl = root.querySelector("#tbResPercent");
     const lineEl = root.querySelector("#tbLine");
-    const pupilEl = root.querySelector("#tbPupil");
-    if (!percentEl || !lineEl || !pupilEl) return;
+    const eyeEl = root.querySelector("#tbEye");
+    if (!percentEl || !lineEl) return;
 
     const resPercent = normalizePercent(payload?.resonance ?? 0);
     const score = toNum(payload?.score, 0);
     const maxCombo = toNum(payload?.maxCombo, 0);
 
     const scoreP = normalizeScore01(score, maxCombo, resPercent);
-    const pupilColor = pupilColorByScoreP(scoreP);
 
-    const glowPower = clamp(0.20 + (resPercent / 100) * 0.55 + scoreP * 0.25, 0.20, 1.00);
+    // ARU color (hero)
+    const aruColor = aruColorByScoreP(scoreP);
+
+    // Glow power: resonance base + score push
+    const glow = clamp(0.18 + (resPercent / 100) * 0.58 + scoreP * 0.22, 0.18, 1.0);
+
+    // Specular at high score
     const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
 
-    root.style.setProperty("--tb-pupil-glow", pupilColor);
-    root.style.setProperty("--tb-glow-power", String(glowPower));
+    // Sync vars across ring / core / bloom
+    root.style.setProperty("--tb-aru", aruColor);
+    root.style.setProperty("--tb-glow", String(glow));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
 
-    pupilEl.style.boxShadow =
-      `0 0 0 1px rgba(255,255,255,0.10) inset, 0 0 ${Math.round(22 + glowPower * 34)}px ${pupilColor}`;
+    // Optional: auto nudge eye image for “瞳に寄せる” feel by resonance
+    // (keeps it addictive: higher resonance => slightly closer)
+    if (eyeEl) {
+      const size = 142 + glow * 18; // 142%..160%
+      eyeEl.style.setProperty("--tb-eye-size", `${size}%`);
+      eyeEl.style.setProperty("--tb-eye-pos", `50% ${Math.round(42 - glow * 6)}%`);
+    }
 
     const name = safeUserName();
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
     lineEl.innerText = lineBy(resPercent, callName ? name : null);
 
+    // Count-up
     percentEl.textContent = "0%";
     let cur = 0;
     const target = clamp(resPercent, 0, 100);
