@@ -480,16 +480,19 @@
       this._pulseUntil = Math.max(this._pulseUntil, now + (ms | 0));
     }
 
-    _applyPulse(img, now) {
-      const active = now < this._pulseUntil;
-      if (active) {
-        img.style.transform = "scale(1.02)";
-        img.style.filter = "brightness(1.05) saturate(1.03)";
-      } else {
-        if (img.style.transform) img.style.transform = "";
-        if (img.style.filter) img.style.filter = "";
-      }
-    }
+   _applyPulse(img, now) {
+  const active = now < this._pulseUntil;
+
+  // Keep base transform (translate(-50%,-50%)) intact.
+  // We apply pulse via a CSS variable + filter only.
+  if (active) {
+    img.style.setProperty("--pulseScale", "1.02");
+    img.style.filter = "brightness(1.05) saturate(1.03)";
+  } else {
+    img.style.removeProperty("--pulseScale");
+    if (img.style.filter) img.style.filter = "";
+  }
+}
 
     _ringBoost(ms) {
       const r = this.r;
