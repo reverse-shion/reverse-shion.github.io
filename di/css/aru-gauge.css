@@ -1,12 +1,12 @@
 /* /di/css/aru-gauge.css
-   ARU GAUGE (ANCHOR TO #aruRing) v2.1 — PRO SAFE
-   - Anchor = #aruRing center (NOT viewport)
+   ARU GAUGE (ANCHOR TO #targetRoot) v2.2 — PRO SAFE
+   - Anchor = #targetRoot center (the pulsing circle)
    - Show only on result:
-       .app.tb-result-active #aruRing .aruLayer
-       OR .app[data-state="result"] #aruRing .aruLayer
+       .app.tb-result-active #targetRoot .aruLayer
+       OR .app[data-state="result"] #targetRoot .aruLayer
    - value: --aru-value (0..1)
    - state: .app[data-aru-state="low|mid|high|max"]
-   - Scope is strictly limited under #aruRing to prevent side effects.
+   - Scope is strictly limited under #targetRoot to prevent side effects.
 */
 
 /* =========================
@@ -35,39 +35,40 @@
 }
 
 /* =========================
-   Anchor: #aruRing
-   - This is the orb container in your HTML.
+   Anchor: #targetRoot
    - Must be a positioning context.
 ========================= */
-#aruRing{
+#targetRoot{
   position: relative;
   isolation: isolate; /* keep stacking local */
 }
 
 /* =========================
    Result-only visibility (scoped)
+   - default hidden ALWAYS
 ========================= */
-#aruRing .aruLayer{ display: none; }
+#targetRoot .aruLayer{ display: none; }
 
-.app.tb-result-active #aruRing .aruLayer,
-.app[data-state="result"] #aruRing .aruLayer{
+/* show on result state only */
+.app.tb-result-active #targetRoot .aruLayer,
+.app[data-state="result"] #targetRoot .aruLayer{
   display: grid;
 }
 
 /* =========================
    ARU overlay layer (scoped)
-   → centered INSIDE #aruRing
+   → centered INSIDE #targetRoot
 ========================= */
-#aruRing .aruLayer{
+#targetRoot .aruLayer{
   position: absolute;
   inset: 0;
-  z-index: 3;          /* above svg/text if needed */
+  z-index: 50;         /* above target visuals */
   pointer-events: none;
   place-items: center;
 }
 
 /* The gauge itself */
-#aruRing .aruGauge{
+#targetRoot .aruGauge{
   width: var(--aru-size);
   height: var(--aru-size);
   position: relative;
@@ -78,7 +79,7 @@
 }
 
 /* Ring paint */
-#aruRing .aruGauge::before{
+#targetRoot .aruGauge::before{
   content:"";
   position:absolute;
   inset:0;
@@ -115,7 +116,7 @@
 }
 
 /* Inner rim */
-#aruRing .aruGauge::after{
+#targetRoot .aruGauge::after{
   content:"";
   position:absolute;
   inset: calc(var(--aru-thickness) + 2px);
@@ -126,7 +127,7 @@
 }
 
 /* Center text */
-#aruRing .aruScore{
+#targetRoot .aruScore{
   position:absolute;
   inset:0;
   display:grid;
@@ -154,5 +155,5 @@
 .app[data-aru-state="max"]  { --aru-active-color: rgba(255,255,255,0.96); --aru-glow: 1; }
 
 @media (prefers-reduced-motion: reduce){
-  #aruRing .aruGauge::before{ transition:none; }
+  #targetRoot .aruGauge::before{ transition:none; }
 }
