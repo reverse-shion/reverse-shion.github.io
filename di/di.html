@@ -1,4 +1,4 @@
-<!-- /di/di.html (RE-DESIGNED / PRO ENGINEER FINAL — polished) -->
+<!-- /di/di.html (PRO ENGINEER FINAL — release-ready / ARU overlay integrated) -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -20,9 +20,10 @@
   <link rel="stylesheet" href="./css/aru-fx.css" />
   <link rel="stylesheet" href="./css/aru-gauge.css" />
 
-  <!-- Preload (helps iOS a bit; safe even if missing files) -->
-  <link rel="preload" href="./idle/dico_idle.jpg" as="image" />
+  <!-- Preload (iOS friendly) -->
+  <link rel="preload" href="./idle/dico_idle.jpg" as="image" fetchpriority="high" />
   <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
+  <link rel="preload" href="./faces/dico_face_1.png" as="image" />
   <link rel="preload" href="./audio/music.mp3" as="audio" />
   <link rel="preload" href="./audio/se_tap.wav" as="audio" />
   <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
@@ -40,9 +41,6 @@
 
   <!-- =========================================================
        BACKGROUND STACK
-       - idle: still image + light particles + tagline
-       - playing/result: video visible
-       - visibility is controlled by CSS via app[data-state]
        ========================================================= -->
 
   <!-- IDLE STILL -->
@@ -65,7 +63,6 @@
     class="bgVideo"
     src="./video/di_dance.mp4"
     playsinline
-    webkit-playsinline
     muted
     loop
     preload="metadata"
@@ -137,7 +134,7 @@
           <div class="sideTimeValue" id="time">--</div>
         </div>
 
-        <!-- Face pool (optional) -->
+        <!-- Face pool (optional / preloaded to avoid flash) -->
         <div class="facePool" aria-hidden="true">
           <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
           <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
@@ -178,7 +175,7 @@
        ========================================================= -->
   <section class="stage" id="stage" aria-label="Game Stage">
     <!-- NOTE CANVAS (render only; no input) -->
-    <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
+    <canvas id="noteCanvas" class="noteCanvas" aria-hidden="true"></canvas>
 
     <!-- HIT ZONE (only this receives pointer events; lane width) -->
     <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
@@ -215,6 +212,7 @@
 
         <div class="resultDivider"></div>
 
+        <!-- Result card ARU (inside card) -->
         <div class="aruWrap" aria-label="ARU Gauge">
           <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
             <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
@@ -241,9 +239,7 @@
   </section>
 
   <!-- =========================================================
-       CONTROLS
-       - DOMは3つ置いとく（互換）
-       - 表示はCSSで state ごとに切替推奨
+       CONTROLS (compat)
        ========================================================= -->
   <footer class="bottom" aria-label="Controls">
     <button id="startBtn" class="btn primary" type="button">START</button>
@@ -260,9 +256,9 @@
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
 
   <!-- =========================================================
-       ARU OVERLAY (TOPMOST)
-       - CSSで app[data-state="result"] の時だけ表示するのがおすすめ
-       - --aru-value / data-aru-state は result.js から更新
+       ARU TOPMOST OVERLAY (RESULT ONLY)
+       - shown/hidden by CSS via .app[data-state="result"]
+       - values updated by result.js
        ========================================================= -->
   <div class="aruFX" aria-hidden="true"></div>
 
@@ -271,6 +267,12 @@
       <div class="aruScore" id="aruOverlayScore">0%</div>
     </div>
   </div>
+
+  <noscript>
+    <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#05060b;color:#fff;z-index:99999;">
+      JavaScript を有効にしてください。
+    </div>
+  </noscript>
 
 </main>
 
@@ -303,6 +305,7 @@
     const r = c.getBoundingClientRect();
     dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     bw = r.width; bh = r.height;
+
     c.width  = Math.max(1, Math.floor(bw * dpr));
     c.height = Math.max(1, Math.floor(bh * dpr));
     ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -310,7 +313,6 @@
 
   let raf = 0;
   function tick(){
-    // draw only in idle (keep loop running but cheap)
     if (app.dataset.state !== "idle") {
       raf = requestAnimationFrame(tick);
       return;
@@ -339,7 +341,6 @@
     raf = requestAnimationFrame(tick);
   }
 
-  // init
   resize();
   window.addEventListener("resize", resize, {passive:true});
   tick();
