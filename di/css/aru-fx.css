@@ -1,31 +1,33 @@
 /* /di/css/aru-fx.css
-   ARU FX (RESULT ONLY, iOS safe)
-   - shows ONLY when result overlay is active (.app.tb-result-active)
+   ARU FX (RESULT ONLY, iOS safe) v1.2
+   - shows ONLY when result is active:
+       .app.tb-result-active  OR  .app[data-state="result"]
    - intensity driven by --aru-value (0..1) on .app
    - state driven by .app[data-aru-state="low|mid|high|max"]
+   - Z-layer: above everything (including #result)
 */
 
-.aruFX{
-  display:none; /* default hidden */
-}
+/* default hidden */
+.aruFX{ display:none; }
 
-.app.tb-result-active .aruFX{
+/* ✅ result only (both flags) */
+.app.tb-result-active .aruFX,
+.app[data-state="result"] .aruFX{
   display:block;
 }
 
 .aruFX{
   position: fixed;
   inset: 0;
-
-  /* result.jsが #result を Z_MAX で最前面にするので、
-     FXは「その中」か「同階層でZを合わせる」必要がある。
-     まずは同階層運用：Zを上げる */
-  z-index: 2147483646; /* #result(2147483647)の直下 */
-
   pointer-events: none;
   overflow: hidden;
   isolation: isolate;
+
+  /* ✅ 確実に見せる：#resultより上にする */
+  z-index: 2147483647;
+
   opacity: 1;
+  transform: translateZ(0);
 }
 
 /* Stars */
@@ -44,7 +46,7 @@
 
   opacity: clamp(0, calc(var(--aru-value) * 0.55), 0.55);
   animation: aruStarDrift 18s linear infinite;
-  transform: translateZ(0);
+  transform: translate3d(0,0,0);
 }
 
 /* Aura (high/max only) */
@@ -61,7 +63,7 @@
   opacity: 0.0;
   animation: aruAuraPulse 3.2s ease-in-out infinite;
   mix-blend-mode: screen;
-  transform: translateZ(0);
+  transform: translate3d(0,0,0);
 }
 
 /* Max flash */
