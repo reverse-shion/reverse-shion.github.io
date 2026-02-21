@@ -1,16 +1,27 @@
 /* /di/css/aru-gauge.css
-   ARU GAUGE (RESULT ONLY)
-   - shows ONLY on result screen: .app[data-state="result"]
-   - value: --aru-value (0..1)
-   - state: data-aru-state="low|mid|high|max" on .app
+   ARU GAUGE (RESULT ONLY) v1.1
+   - shows ONLY on result screen:
+       ✅ .app.tb-result-active  (result.jsが付けるクラス)
+       もしくは .app[data-state="result"] のどっちでもOK
+   - value: --aru-value (0..1)  ← JSがここを更新する
+   - text : .aruScore           ← JSがここも更新する
+   - iOS safe mask: white=visible
+   - center fine-tune: --aru-offset-x / --aru-offset-y
 */
 
 .app{
-  --aru-value: 0;
-  --aru-size: 220px;
-  --aru-thickness: 12px;
+  --aru-value: 0; /* 0..1 */
+
+  /* ✅ サイズ：ひと回り大きく（太さは維持） */
+  --aru-size: 270px;       /* ←ここで大きさ調整 */
+  --aru-thickness: 12px;   /* 太さは維持 */
+
+  /* ✅ 中心合わせ微調整（pxでOK） */
+  --aru-offset-x: 0px;
+  --aru-offset-y: -22px;   /* ←鼓動の円が“少し上”ならマイナスが効く */
 
   --aru-gray: rgba(255,255,255,0.22);
+
   --aru-color-low:  rgba(76,201,240,0.96);
   --aru-color-mid:  rgba(168,85,247,0.96);
   --aru-color-high: rgba(255,47,208,0.96);
@@ -20,13 +31,14 @@
 }
 
 @media (max-width: 390px){
-  .app{ --aru-size: 200px; --aru-thickness: 11px; }
+  .app{ --aru-size: 250px; --aru-thickness: 12px; }
 }
 
 /* hidden by default */
 .aruLayer{ display:none; }
 
-/* result only */
+/* ✅ result only（どっちでも起動できるように両対応） */
+.app.tb-result-active .aruLayer,
 .app[data-state="result"] .aruLayer{
   display:flex;
 }
@@ -34,11 +46,17 @@
 .aruLayer{
   position: fixed;
   inset: 0;
-  z-index: 2147483646; /* #result(2147483647)の“すぐ下”にするのが安全 */
+
+  /* #result(2147483647)の“直下”に置く */
+  z-index: 2147483646;
+
   pointer-events: none;
   align-items: center;
   justify-content: center;
   isolation: isolate;
+
+  /* ✅ ここで中心点をズラせる */
+  transform: translate(var(--aru-offset-x), var(--aru-offset-y));
 }
 
 .aruGauge{
@@ -49,26 +67,31 @@
   filter: drop-shadow(0 18px 36px rgba(0,0,0,0.38));
 }
 
+/* ✅ リング描画 */
 .aruGauge::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:50%;
+
+  /* ✅ 12時(上)開始にするため from -90deg */
   background:
     conic-gradient(
-      var(--aru-active-color) calc(var(--aru-value) * 1turn),
-      var(--aru-gray) 0turn
+      from -90deg,
+      var(--aru-active-color) 0turn calc(var(--aru-value) * 1turn),
+      var(--aru-gray)        0turn 1turn
     );
 
+  /* ✅ iOS safe mask（白=表示 / 透明=非表示） */
   -webkit-mask: radial-gradient(
     circle at center,
-    transparent calc(50% - var(--aru-thickness)),
-    #000 calc(50% - var(--aru-thickness) + 1px)
+    rgba(255,255,255,0) calc(50% - var(--aru-thickness)),
+    rgba(255,255,255,1) calc(50% - var(--aru-thickness) + 1px)
   );
   mask: radial-gradient(
     circle at center,
-    transparent calc(50% - var(--aru-thickness)),
-    #000 calc(50% - var(--aru-thickness) + 1px)
+    rgba(255,255,255,0) calc(50% - var(--aru-thickness)),
+    rgba(255,255,255,1) calc(50% - var(--aru-thickness) + 1px)
   );
 
   transition: background 240ms ease, filter 240ms ease;
@@ -81,6 +104,7 @@
     );
 }
 
+/* inner rim */
 .aruGauge::after{
   content:"";
   position:absolute;
@@ -91,16 +115,17 @@
   opacity: 0.9;
 }
 
+/* center text */
 .aruScore{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size: clamp(28px, 5.4vw, 44px);
-  font-weight: 800;
+  font-size: clamp(24px, 4.6vw, 38px);
+  font-weight: 900;
   letter-spacing: 0.5px;
-  color: rgba(255,255,255,0.94);
+  color: rgba(255,255,255,0.92);
   text-shadow:
     0 2px 18px rgba(0,0,0,0.55),
     0 0 20px rgba(255,255,255,0.08);
@@ -108,6 +133,7 @@
   transform: translateZ(0);
 }
 
+/* state colors */
 .app[data-aru-state="low"]  { --aru-active-color: var(--aru-color-low);  --aru-glow: 0; }
 .app[data-aru-state="mid"]  { --aru-active-color: var(--aru-color-mid);  --aru-glow: 0.25; }
 .app[data-aru-state="high"] { --aru-active-color: var(--aru-color-high); --aru-glow: 0.45; }
