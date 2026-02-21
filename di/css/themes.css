@@ -1,66 +1,157 @@
-/* /di/css/themes.css */
-/* Theme tokens: colors, glass, gold ring, gradients */
+/* /di/css/themes.css
+   ============================================================
+   THEME TOKENS — PRO FINAL
+   - Single source of truth for colors / glass / radii / shadows / sizing
+   - Designed for iOS Safari (P3-ish vividness, readable contrast)
+   - Adds Pink-Gold system (avatar ring + premium UI)
+   - Keeps compatibility with existing variables (no breaking rename)
+   ============================================================ */
 
 :root{
-  /* base */
-  --bg0:#05060b;
-  --bg1:#070816;
+  /* ------------------------------------------------------------
+     0) Typography
+     ------------------------------------------------------------ */
+  --font: ui-sans-serif, system-ui, -apple-system,
+          "SF Pro Display","SF Pro Text",
+          "Hiragino Sans","Noto Sans JP","Segoe UI", sans-serif;
 
-  --text: rgba(245,245,242,.92);
+  /* ------------------------------------------------------------
+     1) Base background
+     ------------------------------------------------------------ */
+  --bg0: #05060b;
+  --bg1: #070816;
+
+  /* surface tint helpers (used in gradients / panels) */
+  --ink:  rgba(10,12,18,.92);
+  --ink2: rgba(12,16,26,.74);
+
+  /* ------------------------------------------------------------
+     2) Text
+     ------------------------------------------------------------ */
+  --text:  rgba(245,245,242,.92);
   --muted: rgba(245,245,242,.64);
-  --dim: rgba(245,245,242,.46);
+  --dim:   rgba(245,245,242,.46);
 
-  --line: rgba(255,255,255,.14);
+  /* ------------------------------------------------------------
+     3) Lines / borders
+     ------------------------------------------------------------ */
+  --line:  rgba(255,255,255,.14);
   --line2: rgba(255,255,255,.09);
 
-  /* accent */
-  --cyan: rgba(0,240,255,.92);
+  /* ------------------------------------------------------------
+     4) Accent palette (existing + refined)
+     ------------------------------------------------------------ */
+  --cyan:   rgba(0,240,255,.92);
   --violet: rgba(156,60,255,.90);
-  --gold: rgba(230,201,107,.92);
-  --goldSoft: rgba(230,201,107,.22);
-  --danger: rgba(255,90,120,.92);
 
-  /* glass */
-  --glass: rgba(255,255,255,.06);
+  /* legacy gold (kept for compatibility) */
+  --gold:     rgba(230,201,107,.92);
+  --goldSoft: rgba(230,201,107,.22);
+
+  /* ✅ Pink-Gold (premium ring / highlight) */
+  --pinkGold:      rgba(236,191,152,.95);
+  --pinkGoldSoft:  rgba(236,191,152,.26);
+  --pinkGoldGlow:  rgba(236,191,152,.38);
+
+  /* semantic */
+  --danger:  rgba(255, 90,120,.92);
+  --success: rgba( 90,255,190,.88);
+
+  /* ------------------------------------------------------------
+     5) Glass surfaces
+     ------------------------------------------------------------ */
+  --glass:  rgba(255,255,255,.06);
   --glass2: rgba(255,255,255,.10);
   --glass3: rgba(255,255,255,.14);
 
-  --blur: 14px;
+  --blur:  14px;
   --blur2: 22px;
 
-  /* shadow */
+  /* ------------------------------------------------------------
+     6) Shadows (stackable)
+     ------------------------------------------------------------ */
   --sh1: 0 18px 55px rgba(0,0,0,.42);
   --sh2: 0 10px 25px rgba(0,0,0,.36);
+  --sh3: 0 16px 42px rgba(0,0,0,.35);
+
   --inset: inset 0 1px 0 rgba(255,255,255,.10);
 
-  /* radius */
-  --r: 16px;
+  /* ------------------------------------------------------------
+     7) Radius
+     ------------------------------------------------------------ */
+  --r:  16px;
   --r2: 22px;
+  --rPill: 999px;
 
-  /* sizing */
-  --hudW: 260px;          /* side hud width */
-  --hudGap: 14px;
-  --bottomH: 72px;
+  /* ------------------------------------------------------------
+     8) Layout sizing (make “intent” explicit)
+     ------------------------------------------------------------ */
+  --hudW: 168px;     /* ✅ mobile first */
+  --hudGap: 12px;
+  --bottomH: 76px;
 
-  /* typography */
-  --font: ui-sans-serif, system-ui, -apple-system, "SF Pro Display","SF Pro Text",
-          "Hiragino Sans","Noto Sans JP","Segoe UI",sans-serif;
+  /* ------------------------------------------------------------
+     9) Gradients (neon + premium)
+     ------------------------------------------------------------ */
 
-  /* neon gradients */
+  /* main neon (legacy-compatible name) */
   --gradNeon: linear-gradient(135deg,
     rgba(156,60,255,.85) 0%,
     rgba(0,240,255,.80) 52%,
     rgba(230,201,107,.78) 100%
   );
-  --gradCyan: linear-gradient(180deg, rgba(0,240,255,.85), rgba(0,240,255,.15));
+
+  /* ✅ premium neon uses pink-gold at end (for ring / highlights) */
+  --gradNeonPremium: linear-gradient(135deg,
+    rgba(156,60,255,.86) 0%,
+    rgba(0,240,255,.82) 50%,
+    rgba(236,191,152,.86) 100%
+  );
+
+  --gradCyan:   linear-gradient(180deg, rgba(0,240,255,.85), rgba(0,240,255,.15));
   --gradViolet: linear-gradient(180deg, rgba(156,60,255,.85), rgba(156,60,255,.15));
+
+  /* subtle panel sheen (for glass cards) */
+  --sheen: radial-gradient(420px 160px at 10% 0%,
+      rgba(0,240,255,.14), transparent 55%),
+    radial-gradient(420px 160px at 90% 20%,
+      rgba(156,60,255,.12), transparent 58%),
+    radial-gradient(420px 160px at 60% 100%,
+      rgba(236,191,152,.10), transparent 60%);
+
+  /* ------------------------------------------------------------
+     10) Motion tuning
+     ------------------------------------------------------------ */
+  --easeOut: cubic-bezier(.16,1,.3,1);
+  --easeIn:  cubic-bezier(.7,0,.84,0);
+  --easeIO:  cubic-bezier(.65,0,.35,1);
+
+  --durXS: 120ms;
+  --durS:  180ms;
+  --durM:  260ms;
+  --durL:  420ms;
 }
 
-/* subtle animated glow background helpers */
+/* ------------------------------------------------------------
+   Accessibility / device tuning
+   - Reduce motion = kill heavy loops
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce){
+  :root{
+    --durXS: 1ms;
+    --durS:  1ms;
+    --durM:  1ms;
+    --durL:  1ms;
+  }
+}
+
+/* ------------------------------------------------------------
+   Keyframes (kept light)
+   ------------------------------------------------------------ */
 @keyframes glowPulse {
-  0%   { transform: translate3d(0,0,0) scale(1); opacity:.55; }
+  0%   { transform: translate3d(0,0,0) scale(1);    opacity:.55; }
   50%  { transform: translate3d(0,0,0) scale(1.06); opacity:.85; }
-  100% { transform: translate3d(0,0,0) scale(1); opacity:.55; }
+  100% { transform: translate3d(0,0,0) scale(1);    opacity:.55; }
 }
 
 @keyframes ringSpin {
@@ -69,14 +160,14 @@
 }
 
 @keyframes scanMove {
-  0%   { transform: translateY(-26px); opacity:.0; }
+  0%   { transform: translateY(-26px); opacity:0; }
   15%  { opacity:.55; }
   50%  { opacity:.85; }
   85%  { opacity:.55; }
-  100% { transform: translateY(26px); opacity:.0; }
+  100% { transform: translateY(26px); opacity:0; }
 }
 
 @keyframes pop {
-  0% { transform: translateY(6px) scale(.98); opacity:0; }
-  100% { transform: translateY(0) scale(1); opacity:1; }
+  0%   { transform: translateY(6px) scale(.98); opacity:0; }
+  100% { transform: translateY(0)  scale(1);    opacity:1; }
 }
