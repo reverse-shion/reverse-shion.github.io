@@ -1,8 +1,8 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.2]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.3]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
-   - When active: HARD-HIDE all game layers under #app (DOM-structure independent)
+   - When active: HARD-HIDE all game layers under #app using VISIBILITY (robust)
    - Optional background image: /di/dico_eye_result.png (non-blocking)
    - Pupil color driven by SCORE, glow driven by resonance (+ score)
    - Non-destructive to #result (adds overlay shell only)
@@ -14,20 +14,16 @@
   // Config
   // =========================
   const CFG = Object.freeze({
-    VERSION: "1.3.2",
-    STYLE_ID: "tbResultOverlayStyles_v132",
+    VERSION: "1.3.3",
+    STYLE_ID: "tbResultOverlayStyles_v133",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
 
-    // Your file: /di/dico_eye_result.png
-    // This JS is /di/js/result.js, so ../dico_eye_result.png resolves to /di/dico_eye_result.png
+    // /di/js/result.js -> /di/dico_eye_result.png
     BG_IMAGE_URL: "../dico_eye_result.png",
 
-    // Copy policy
     NAME_CALL_THRESHOLD: 50,
-
-    // Rendering knobs
     COUNTUP_FRAMES: 56,
     Z_MAX: 2147483647,
   });
@@ -51,33 +47,27 @@
     return null;
   }
 
-  // Resonance can be 0..1 or 0..100
   function normalizePercent(resonance) {
     let r = toNum(resonance, 0);
     if (r <= 1.0001) r *= 100;
     return clamp(Math.round(r), 0, 100);
   }
 
-  // Score normalization (chart-agnostic)
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
     const proxyMax = mc > 0 ? mc * 120 : 0;
 
-    // Prefer proxyMax if it’s meaningful
     if (proxyMax >= 240) return clamp(s / proxyMax, 0, 1);
 
-    // Soft log curve if score exists
     if (s > 0) {
       const p = Math.log10(1 + s) / Math.log10(1 + 6000);
       return clamp(p, 0, 1);
     }
 
-    // Fallback to resonance
     return clamp(toNum(resonancePercent, 0) / 100, 0, 1);
   }
 
-  // Color helpers
   function lerp(a, b, t) { return a + (b - a) * t; }
   function hexToRgb(hex) {
     const h = String(hex).replace("#", "").trim();
@@ -184,15 +174,9 @@
 
     const s = document.createElement("style");
     s.id = CFG.STYLE_ID;
-
-    // HARD CUT: DOM構造に依存しない方式
-    // - #app配下の“全部”を display:none
-    // - その後、#result と overlay shell だけ復活
-    //   → #result がネストされていても確実に表示される
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (HARD CUT, DOM-INDEPENDENT) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (VISIBILITY HARD CUT) ===== */
 
-/* Fullscreen overlay root */
 #result{
   position: fixed !important;
   inset: 0 !important;
@@ -201,11 +185,9 @@
   pointer-events: none;
   background: #000 !important;
 
-  /* prevent blend/backdrop leakage */
+  /* iOS blend/stack safety */
   isolation: isolate !important;
   contain: layout paint style !important;
-
-  /* iOS stacking safety */
   transform: translateZ(0) !important;
 }
 
@@ -213,33 +195,21 @@
   pointer-events: auto;
 }
 
-/* ---------- HARD CUT (DOM independent) ----------
-   Hide everything under #app (any depth),
-   then explicitly re-enable #result + overlay shell.
-   This avoids the classic bug:
-   #app > *:not(#result) hides a wrapper, and #result is inside it.
-*/
+/* HARD CUT (robust): hide EVERYTHING under #app by visibility,
+   then explicitly show #result + its descendants. */
 #app.${CFG.APP_CUT_CLASS} *{
-  display: none !important;
+  visibility: hidden !important;
+}
+#app.${CFG.APP_CUT_CLASS} #result,
+#app.${CFG.APP_CUT_CLASS} #result *{
+  visibility: visible !important;
 }
 
-/* Re-enable #result itself */
-#app.${CFG.APP_CUT_CLASS} #result{
-  display: block !important;
-}
-
-/* Re-enable ONLY our overlay shell and its descendants */
-#app.${CFG.APP_CUT_CLASS} #result .${CFG.SHELL_CLASS}{
-  display: flex !important;
-}
-#app.${CFG.APP_CUT_CLASS} #result .${CFG.SHELL_CLASS} *{
-  display: block !important;
-}
-
-/* Overlay shell layout */
+/* Overlay shell */
 #result .${CFG.SHELL_CLASS}{
   position: absolute;
   inset: 0;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -247,11 +217,7 @@
   padding: 16px;
 }
 
-/* Background layer:
-   - base black depth
-   - optional eye artwork
-   - bloom overlay via ::after vars
-*/
+/* Background: depth + optional image */
 #result .tbResultOverlayBlack{
   position: absolute;
   inset: 0;
@@ -262,10 +228,10 @@
       rgba(0,0,0,0.98) 100%),
     url("${CFG.BG_IMAGE_URL}") center / cover no-repeat,
     #000;
-
   filter: saturate(1.05) contrast(1.05);
 }
 
+/* Bloom (non-blocking even if image fails) */
 #result .tbResultOverlayBlack::after{
   content:"";
   position:absolute;
@@ -283,7 +249,7 @@
 #result .tbEyeStage{
   position: relative;
   width: min(92vw, 520px);
-  display: flex !important; /* ensure flex even under hardened rules */
+  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -452,7 +418,6 @@
   animation: tbEyeIn .65s cubic-bezier(.2,.9,.2,1) both;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   #result .tbEyeNoise,
   #result .tbIris,
@@ -461,7 +426,6 @@
   }
 }
 
-/* Keyframes */
 @keyframes tbEyeIn{
   0%{ transform: scale(0.985); filter: brightness(0.75); opacity: 0; }
   60%{ transform: scale(1.02);  filter: brightness(1.05); opacity: 1; }
@@ -514,7 +478,6 @@
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
     lineEl.innerText = lineBy(resPercent, callName ? name : null);
 
-    // Count-up
     percentEl.textContent = "0%";
     let cur = 0;
     const target = clamp(resPercent, 0, 100);
@@ -528,20 +491,15 @@
     requestAnimationFrame(tick);
   }
 
-  // =========================
-  // Replay wiring
-  // =========================
   function wireReplayOnce(root, app) {
     const replayBtn = root.querySelector("#tbReplayBtn");
     if (!replayBtn || replayBtn.__tbBound) return;
 
     replayBtn.__tbBound = true;
     replayBtn.addEventListener("click", () => {
-      // remove overlay + cut first
       root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
       if (app) app.classList.remove(CFG.APP_CUT_CLASS);
 
-      // restart
       const startBtn = document.getElementById("startBtn");
       if (startBtn) { startBtn.click(); return; }
       const restartBtn = document.getElementById("restartBtn");
@@ -564,17 +522,13 @@
 
       return {
         show(payload) {
-          // ensure overlay exists even if engine re-rendered #result
           ensureShell(root);
           wireReplayOnce(root, app);
 
-          // HARD CUT
+          // Order matters: cut first, then activate overlay
           if (app) app.classList.add(CFG.APP_CUT_CLASS);
-
-          // activate overlay
           root.classList.add(CFG.ROOT_ACTIVE_CLASS);
 
-          // paint
           paintAndAnimate(root, payload || {});
         },
         hide() {
@@ -585,6 +539,5 @@
     },
   };
 
-  // Optional backward compat namespace
   window.TB_RESULT = window.TB_RESULT || {};
 })();
