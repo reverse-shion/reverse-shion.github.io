@@ -273,7 +273,7 @@
   /* eye image */
   background-image: url("${CFG.EYE_IMAGE_URL}");
   background-size: var(--tb-eye-size, 145%);
-  background-position: var(--tb-eye-pos, 50% 40%);
+  background-position: var(--tb-eye-pos, 60% 60%);
   background-repeat: no-repeat;
 
   box-shadow:
