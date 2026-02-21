@@ -1,197 +1,139 @@
-/* /di/css/hud.css
-   ============================================================
-   HUD — PRO FINAL (deterministic layering + state hard-guards)
-   - Single source of truth for:
-     1) UI layer order (iOS-safe)
-     2) State visibility: idle / playing / result / paused
-     3) Controls visibility: START / STOP / RESTART (hard guarantee)
-     4) Idle tagline (neon glass)
-     5) Side HUD cards + DiCo avatar tuning (size/brightness/ring pink-gold)
+/* /di/css/hud.css */
+/* ============================================================
+   HUD FINAL – state control + controls + idle tagline + layering
+   Notes:
+   - This file is the "UI authority".
+   - It intentionally wins over lane.css by specificity (and safe z-index).
+   - Fixes:
+     1) START/STOP/RESTART state visibility (hard guarantee)
+     2) Start button size + true center
+     3) Idle tagline redesign (neon glass)
+     4) Idle particles layer above still image
    ============================================================ */
 
-:root{
-  /* If themes.css already defines these, this will simply reuse them. */
-  --pinkGold: rgba(236,191,152,.95);
-  --pinkGoldSoft: rgba(236,191,152,.26);
-  --pinkGoldGlow: rgba(236,191,152,.38);
-
-  /* HUD sizing */
-  --hudW: 168px;        /* right/left HUD width */
-  --hudGap: 12px;
-  --hudPad: 12px;
-  --r: 16px;
-  --blur: 14px;
-
-  /* bottom controls height hint (used by layout) */
-  --bottomH: 76px;
-}
-
 /* ------------------------------------------------------------
-   0) ROOT LAYERING (deterministic)
+   0) GLOBAL LAYER ORDER (deterministic)
    ------------------------------------------------------------ */
-
 .app{
   position: relative;
   overflow: hidden;
-  isolation: isolate; /* ensures z-index stacking is deterministic */
 }
 
 /* Base video */
 .bgVideo{
-  position:absolute;
-  inset:0;
+  position: absolute;
+  inset: 0;
   z-index: 0;
-  pointer-events:none;
+  pointer-events: none;
 }
 
 /* IDLE STACK */
 .idleBg{
-  position:absolute;
-  inset:0;
+  position: absolute;
+  inset: 0;
   z-index: 1;
-  pointer-events:none;
+  pointer-events: none;
 }
 
-/* Explicit layering inside idle */
+/* ✅ FIX: explicit layer order inside idleBg */
 .idleBg .idleImg{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit: cover;
-  z-index: 1;
+  z-index: 1;              /* image base */
   pointer-events:none;
 }
 
 #idleParticles.idleParticles{
   position:absolute;
   inset:0;
-  z-index: 2;
+  z-index: 2;              /* ✅ particles ABOVE image */
   pointer-events:none;
-  mix-blend-mode: screen;
+  mix-blend-mode: screen;  /* 星が“光として”乗る */
   opacity: .85;
 }
 
 /* idle tagline (above particles) */
 .idleLine{
-  position:absolute;
+  position: absolute;
   left: 16px;
   right: 16px;
   bottom: calc(env(safe-area-inset-bottom) + var(--bottomH) + 16px);
   z-index: 3;
-  pointer-events:none;
+  pointer-events: none;
 }
 
 /* Stage */
 .stage{
-  position:absolute;
-  inset:0;
+  position: absolute;
+  inset: 0;
   z-index: 4;
 }
 
 /* FX above stage */
 .fxLayer{
-  position:absolute;
-  inset:0;
+  position: absolute;
+  inset: 0;
   z-index: 5;
-  pointer-events:none;
+  pointer-events: none;
 }
 
 /* Side HUD */
 .sideHud{
-  position:absolute;
-  top: calc(env(safe-area-inset-top) + 12px);
-  bottom: calc(env(safe-area-inset-bottom) + var(--bottomH) + 10px);
-  width: var(--hudW);
-  display:flex;
-  flex-direction:column;
-  gap: var(--hudGap);
   z-index: 6;
-  pointer-events:none;
-}
-
-.sideHudLeft{
-  left: calc(env(safe-area-inset-left) + 12px);
-  align-items:stretch;
-}
-.sideHudRight{
-  right: calc(env(safe-area-inset-right) + 12px);
-  align-items:stretch;
+  pointer-events: none;
 }
 
 /* Bottom controls */
 .bottom{
-  position:absolute;
-  left:0;
-  right:0;
+  position: absolute;
+  left: 0;
+  right: 0;
   bottom: calc(env(safe-area-inset-bottom) + 10px);
   z-index: 7;
-
-  display:flex;
-  gap: 12px;
-  justify-content:center;
-  align-items:center;
-  padding: 0 14px;
 }
 
 /* ------------------------------------------------------------
-   1) STATE VISIBILITY (HARD GUARANTEE)
-   - We only control what must never be wrong.
+   1) STATE VISIBILITY (UI-side)
+   - core.css が state の本体制御
+   - hud.css は “UIの見え方” を補強（事故防止）
    ------------------------------------------------------------ */
 
-/* IDLE: hide stage + bg video */
+/* idle: hide stage overlay UI elements that would pollute still */
 .app[data-state="idle"] .stage{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-}
-.app[data-state="idle"] .bgVideo{
-  opacity:0;
-  visibility:hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
-/* PLAYING / RESULT / PAUSED: hide idleBg + idleLine */
+.app[data-state="idle"] .bgVideo{
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* playing/result: hide idle */
 .app[data-state="playing"] .idleBg,
-.app[data-state="result"]  .idleBg,
-.app[data-state="paused"]  .idleBg{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
+.app[data-state="result"]  .idleBg{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .app[data-state="playing"] .idleLine,
-.app[data-state="result"]  .idleLine,
-.app[data-state="paused"]  .idleLine{
-  opacity:0;
-  visibility:hidden;
-}
-
-/* In paused, keep stage visible but input is handled by JS.
-   (HUD stays visible, of course) */
-.app[data-state="paused"] .stage{
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
+.app[data-state="result"]  .idleLine{
+  opacity: 0;
+  visibility: hidden;
 }
 
 /* ------------------------------------------------------------
    2) CONTROLS VISIBILITY (HARD GUARANTEE)
-   - Default hidden for STOP/RESTART prevents “ghost buttons”.
+   Fix:
+   - STOPが残る事故は「デフォルト非表示」→playingのみ表示で潰す
    ------------------------------------------------------------ */
 
-#stopBtn,
-#restartBtn{ display:none; }
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  line-height: 1;
-  white-space:nowrap;
-  user-select:none;
-  -webkit-tap-highlight-color: transparent;
-}
+/* default: hide stop/restart */
+#stopBtn, #restartBtn{ display:none; }
 
 /* idle */
 .app[data-state="idle"] #startBtn{ display:inline-flex; }
@@ -208,15 +150,31 @@
 .app[data-state="result"] #stopBtn{ display:none; }
 .app[data-state="result"] #restartBtn{ display:inline-flex; }
 
-/* paused (safety) */
-.app[data-state="paused"] #startBtn{ display:inline-flex; }
-.app[data-state="paused"] #stopBtn{ display:none; }
-.app[data-state="paused"] #restartBtn{ display:inline-flex; }
-
 /* ------------------------------------------------------------
-   3) START BUTTON (idle emphasis)
+   3) START BUTTON – bigger + true center
+   Fix:
+   - “文字がセンターになってない” → inline-flex centering
+   - “もう少し大きく” → min-width/height/letter-spacing
    ------------------------------------------------------------ */
 
+.bottom{
+  display:flex;
+  gap: 12px;
+  justify-content:center;
+  align-items:center;
+  padding: 0 14px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* idle start emphasis */
 .app[data-state="idle"] #startBtn{
   min-width: 210px;
   height: 58px;
@@ -227,6 +185,7 @@
   font-weight: 900;
   letter-spacing: .12em;
 
+  /* “押したくなる”ネオン */
   border: 1px solid rgba(0,240,255,.38);
   background:
     radial-gradient(120% 160% at 30% 10%, rgba(0,240,255,.35), transparent 52%),
@@ -237,6 +196,7 @@
     0 0 26px rgba(0,240,255,.14);
 }
 
+/* Small screens fine-tune */
 @media (max-width: 420px){
   .app[data-state="idle"] #startBtn{
     min-width: 224px;
@@ -245,11 +205,12 @@
 }
 
 /* ------------------------------------------------------------
-   4) IDLE TAGLINE — neon glass
+   4) IDLE TAGLINE – neon glass (less “plain”)
    ------------------------------------------------------------ */
 
 .idleLine{
-  padding: 12px 14px 12px 20px;
+  padding: 12px 14px;
+  padding-left: 20px;
   border-radius: 14px;
 
   font-weight: 900;
@@ -273,6 +234,7 @@
     0 0 18px rgba(0,240,255,.16);
 }
 
+/* left neon bar */
 .idleLine::before{
   content:"";
   position:absolute;
@@ -290,18 +252,38 @@
 }
 
 /* ------------------------------------------------------------
-   5) SIDE HUD CARDS (stable glass)
+   5) SIDE HUD (unchanged styling, only safe tweaks)
+   - 修正点: z-index/pointer-eventsは上で統一済み
    ------------------------------------------------------------ */
+
+.sideHud{
+  position:absolute;
+  top: calc(env(safe-area-inset-top) + 12px);
+  bottom: calc(env(safe-area-inset-bottom) + var(--bottomH) + 10px);
+  width: var(--hudW);
+  display:flex;
+  flex-direction:column;
+  gap: 12px;
+}
+
+.sideHudLeft{
+  left: calc(env(safe-area-inset-left) + 12px);
+  align-items:stretch;
+}
+.sideHudRight{
+  right: calc(env(safe-area-inset-right) + 12px);
+  align-items:stretch;
+}
 
 .sideCard{
   pointer-events:none;
   border-radius: var(--r);
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.14);
-  box-shadow: 0 16px 42px rgba(0,0,0,.35);
+  box-shadow: var(--sh2);
   backdrop-filter: blur(var(--blur));
   -webkit-backdrop-filter: blur(var(--blur));
-  padding: var(--hudPad);
+  padding: 12px 12px;
   position:relative;
   overflow:hidden;
 }
@@ -318,7 +300,6 @@
   pointer-events:none;
 }
 
-/* Score card */
 .sideScore{ padding-top: 14px; }
 .sideScoreValue{
   position:relative;
@@ -332,10 +313,9 @@
   margin-top: 6px;
   font-size: 12px;
   letter-spacing: .14em;
-  color: rgba(245,245,242,.68);
+  color: var(--muted);
 }
 
-/* Combo card */
 .sideComboValue{
   position:relative;
   font-size: 30px;
@@ -347,7 +327,7 @@
   margin-top: 2px;
   font-size: 12px;
   letter-spacing: .18em;
-  color: rgba(245,245,242,.68);
+  color: var(--muted);
 }
 .sideComboMeta{
   position:relative;
@@ -361,28 +341,20 @@
 .metaLabel{
   font-size: 11px;
   letter-spacing: .18em;
-  color: rgba(245,245,242,.52);
+  color: var(--dim);
 }
 .metaValue{
   font-size: 14px;
   font-weight: 800;
-  color: rgba(245,245,242,.92);
+  color: var(--text);
 }
 
-/* ------------------------------------------------------------
-   6) PLAYER CARD + DiCo AVATAR (the requested tuning)
-   ------------------------------------------------------------ */
-
-.sidePlayer{
-  padding: 12px;
-  overflow: visible;          /* allow ring to breathe */
-  padding-right: 18px;        /* keep distance from right edge */
-}
-
+/* player card */
+.sidePlayer{ padding: 12px; }
 .sideTop{
   position:relative;
   display:flex;
-  gap: 12px;
+  gap:10px;
   align-items:center;
   justify-content:space-between;
   margin-bottom: 10px;
@@ -398,96 +370,53 @@
   margin-top: 2px;
   font-size: 11px;
   letter-spacing: .20em;
-  color: rgba(245,245,242,.68);
+  color: var(--muted);
 }
 
-/* Avatar container: larger but never overflow screen.
-   We keep it inside the card; the ring glow is outside via avatarRing inset. */
+/* avatar ring */
 .sideAvatar{
-  width: 68px;      /* ✅ bigger face */
-  height: 68px;
+  width: 60px;
+  height: 60px;
   position:relative;
   flex: 0 0 auto;
-
-  border-radius: 999px;
-  overflow: hidden; /* ✅ prevent face image overflow */
 }
-
-/* Ring: pink-gold with classy glow (and still rotate-able by JS) */
 .avatarRing{
   position:absolute;
-  inset:-5px;               /* ring breathing margin */
+  inset:-6px;
   border-radius:999px;
-  pointer-events:none;
-
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%),
-    conic-gradient(from 0deg,
-      rgba(236,191,152,.10),
-      rgba(236,191,152,.62),
-      rgba(255,255,255,.18),
-      rgba(236,191,152,.62),
-      rgba(236,191,152,.10)
-    );
-
+  background: var(--gradNeon);
+  opacity:.92;
   box-shadow:
     0 0 0 1px rgba(255,255,255,.14),
-    0 0 0 2px var(--pinkGoldSoft) inset,
-    0 0 24px var(--pinkGoldGlow),
-    0 12px 26px rgba(0,0,0,.28);
-
-  mix-blend-mode: screen;
-  opacity: .98;
+    0 0 18px rgba(230,201,107,.20),
+    0 0 22px rgba(0,240,255,.16);
 }
-
-/* Inner lens */
 .avatarRing::after{
   content:"";
   position:absolute;
   inset: 2px;
   border-radius:999px;
   background:
-    radial-gradient(circle at 50% 35%, rgba(0,0,0,0), rgba(0,0,0,.42));
+    radial-gradient(circle at 50% 40%, rgba(0,0,0,.0), rgba(0,0,0,.40));
   border: 1px solid rgba(255,255,255,.14);
-  box-shadow:
-    inset 0 0 22px rgba(0,0,0,.28);
+  box-shadow: var(--inset);
 }
-
-/* Face: slightly zoomed, brighter, but controlled */
 .dicoFace{
   position:absolute;
-  left:50%;
-  top:50%;
-  width: 78px;      /* ✅ larger than container to feel “closer” */
-  height: 78px;
-  transform: translate(-50%,-50%);
-  object-fit: cover;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 999px;
-
-  /* ✅ brightness */
-  filter: brightness(1.10) contrast(1.05) saturate(1.06);
-
+  object-fit: cover;
   outline: 1px solid rgba(255,255,255,.18);
   box-shadow: 0 10px 22px rgba(0,0,0,.35);
-
-  backface-visibility:hidden;
 }
 
-/* Optional micro pop on swap (ui.js adds .isSwap) */
-.dicoFace.isSwap{
-  transform: translate(-50%,-50%) scale(1.03);
-  transition: transform .12s ease;
-}
-
-/* ------------------------------------------------------------
-   7) Resonance gauge (right card)
-   ------------------------------------------------------------ */
-
+/* gauge */
 .sideGauge{
   position:relative;
   padding-top: 6px;
 }
-
 .sideGaugeRow, .sideTimeRow{
   position:relative;
   display:flex;
@@ -495,11 +424,10 @@
   justify-content:space-between;
   gap:10px;
 }
-
 .sideGaugeLabel, .sideTimeLabel{
   font-size: 11px;
   letter-spacing: .20em;
-  color: rgba(245,245,242,.68);
+  color: var(--muted);
 }
 .sideGaugeValue, .sideTimeValue{
   font-size: 14px;
@@ -522,29 +450,49 @@
   inset:0;
   width: 0%;
   border-radius: 999px;
-  background: linear-gradient(90deg,
-    rgba(0,240,255,.90),
-    rgba(156,60,255,.75),
-    rgba(236,191,152,.82) /* pink-gold end */
-  );
+  background: linear-gradient(90deg, rgba(0,240,255,.90), rgba(156,60,255,.75), rgba(230,201,107,.78));
   box-shadow: 0 0 20px rgba(0,240,255,.18);
   transition: width .12s ease;
 }
 
-/* legacy dup hidden */
 #time_dup{ display:none; }
 .facePool{ display:none; }
 
-/* ------------------------------------------------------------
-   8) Responsive tuning
-   ------------------------------------------------------------ */
-
 @media (max-width: 720px){
-  :root{ --hudW: 162px; }
-
+  .sideAvatar{ width: 52px; height: 52px; }
   .sideScoreValue{ font-size: 28px; }
   .sideComboValue{ font-size: 26px; }
+}
+/* --- FIX: STOPが消えない（paused状態を定義） --- */
 
-  .sideAvatar{ width: 64px; height: 64px; }
-  .dicoFace{ width: 74px; height: 74px; }
+/* default: 非表示（保険） */
+#stopBtn, #restartBtn{ display:none; }
+
+/* paused: START + RESTART を出して STOP を消す */
+.app[data-state="paused"] #startBtn{ display:inline-flex; }
+.app[data-state="paused"] #stopBtn{ display:none; }
+.app[data-state="paused"] #restartBtn{ display:inline-flex; }
+
+
+/* --- FIX: avatarがカードで切れる問題 --- */
+
+/* 全カードはhiddenでOK。ただしプレイヤーカードだけ例外 */
+.sideCard.sidePlayer{
+  overflow: visible;          /* ✅ 切れ防止 */
+  padding-right: 18px;        /* ✅ 右の余白増やす */
+}
+
+/* 右上のアイコンが端に寄りすぎるのも抑える */
+.sideTop{
+  gap: 12px;
+}
+
+/* リングのはみ出し量を少し抑える（-6 → -4） */
+.avatarRing{
+  inset: -4px;
+}
+
+/* 念のため：丸ごとカード外に出ても見えるように */
+.sideAvatar{
+  overflow: visible;
 }
