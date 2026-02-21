@@ -222,11 +222,11 @@
   position: absolute;
   inset: 0;
   background:
+    url("/di/dico_eye_result.png") center / cover no-repeat,
     radial-gradient(circle at 50% 45%,
-      rgba(18,20,28,0.20) 0%,
-      rgba(0,0,0,0.92) 55%,
-      rgba(0,0,0,0.98) 100%),
-    url("${CFG.BG_IMAGE_URL}") center / cover no-repeat,
+      rgba(18,20,28,0.12) 0%,
+      rgba(0,0,0,0.55) 55%,
+      rgba(0,0,0,0.85) 100%),
     #000;
   filter: saturate(1.05) contrast(1.05);
 }
@@ -237,18 +237,13 @@
   position:absolute;
   inset:0;
   background:
-    background:
-  url("${CFG.BG_IMAGE_URL}") center / cover no-repeat,
-  radial-gradient(circle at 50% 45%,
-    rgba(18,20,28,0.12) 0%,
-    rgba(0,0,0,0.55) 55%,
-    rgba(0,0,0,0.85) 100%),
-  #000;
+    radial-gradient(circle at 50% 44%,
+      var(--tb-pupil-glow, rgba(0,240,255,0.18)) 0%,
+      rgba(0,0,0,0) 60%);
   mix-blend-mode: screen;
   opacity: calc(var(--tb-glow-power, 0.35) * 0.90);
   pointer-events:none;
 }
-
 /* Eye stage */
 #result .tbEyeStage{
   position: relative;
