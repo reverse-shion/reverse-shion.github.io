@@ -1,13 +1,10 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.7]
+   TAROT BREAKER – RESULT PRESENTATION (FULLSCREEN ARU EYE OVERLAY) [PROD SAFE v1.3.8]
    - Works with /di/js/main.js (expects window.DI_RESULT.init)
    - Fullscreen top-layer overlay (fixed, z-index max)
    - HARD-HIDE all game layers under #app using VISIBILITY (robust)
-   - Eye image is inside circle (.tbEye) to avoid square artifacts
-   - ARU is the hero: Ring + iris-tint + core-rim all synced to ARU color
-   - ARU glow is made “obviously visible”: double halo + pulse + drop-shadow
-   - iOS/Safari safe stacking & masking
-   - Non-destructive to #result (adds overlay shell only)
+   - Keeps ARU overlay (.aruLayer / .aruFX) visible during result even if outside #result
+   - Sets app[data-state="result"] + --aru-value + data-aru-state for aru-gauge.css / aru-fx.css
 */
 (function () {
   "use strict";
@@ -16,8 +13,8 @@
   // Config
   // =========================
   const CFG = Object.freeze({
-    VERSION: "1.3.7",
-    STYLE_ID: "tbResultOverlayStyles_v137",
+    VERSION: "1.3.8",
+    STYLE_ID: "tbResultOverlayStyles_v138",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
@@ -34,36 +31,42 @@
     RING_THICKNESS_PCT: 10.5,
 
     // Eye image tuning (CENTER iris + star in center)
-    // ここで「虹彩/星の中心」を合わせる。JSは触らない（固定運用）
     EYE_BG_SIZE: 190, // %
-    // ★要望：もう少し右・下（値は「%」で管理、+2ずつ動かすのが迷わない）
     EYE_BG_POS_X: 37, // %
     EYE_BG_POS_Y: 33, // %
 
     // =========================
     // ARU VISIBILITY CONTROLS
     // =========================
-    // 目的：目の絵に負けず「ARUの発光が必ず見える」
-    // 触る場所はここだけでOK（まずは TINT / RING を調整）
     ARU: Object.freeze({
       // --- iris tint (色が読める保証) ---
-      TINT_MIN: 0.20, // 0..1 (最低でも色が見える)
-      TINT_MAX: 0.60, // 0..1 (上げ過ぎると絵が死ぬ)
-      TINT_GLOW_WEIGHT: 0.38, // glow連動（0.25〜0.55推奨）
+      TINT_MIN: 0.20,
+      TINT_MAX: 0.60,
+      TINT_GLOW_WEIGHT: 0.38,
 
       // --- ring visibility (輪が“発光体”になる) ---
-      RING_ALPHA_BASE: 0.92, // 輪の基本濃度
-      RING_GLOW_BASE_PX: 10, // 外側ハロの最小
-      RING_GLOW_MAX_PX: 28, // 外側ハロの最大（glowで増える）
-      RING_INNER_GLOW_PX: 7, // 内側ハロ
+      RING_ALPHA_BASE: 0.92,
+      RING_GLOW_BASE_PX: 10,
+      RING_GLOW_MAX_PX: 28,
+      RING_INNER_GLOW_PX: 7,
 
       // --- bloom behind everything (背景発光) ---
       BLOOM_ALPHA_BASE: 0.10,
-      BLOOM_ALPHA_WEIGHT: 0.65, // glowで増える
+      BLOOM_ALPHA_WEIGHT: 0.65,
 
-      // --- pulse (発光が“生きてる”感じ) ---
+      // --- pulse ---
       PULSE_MIN: 0.92,
       PULSE_MAX: 1.08,
+    }),
+
+    // =========================
+    // ARU overlay thresholds (for aru-gauge.css / aru-fx.css)
+    // =========================
+    // 好みで調整OK
+    ARU_STATE: Object.freeze({
+      MID: 40,
+      HIGH: 70,
+      MAX: 100,
     }),
   });
 
@@ -162,6 +165,13 @@
     return `共鳴は消えてない。\nDiDiDi…もう一回、いこ？`;
   }
 
+  function aruStateByPercent(resPercent) {
+    if (resPercent >= CFG.ARU_STATE.MAX) return "max";
+    if (resPercent >= CFG.ARU_STATE.HIGH) return "high";
+    if (resPercent >= CFG.ARU_STATE.MID) return "mid";
+    return "low";
+  }
+
   // =========================
   // DOM (non-destructive)
   // =========================
@@ -218,9 +228,8 @@
     const s = document.createElement("style");
     s.id = CFG.STYLE_ID;
 
-    // note: CFG values baked into CSS for iOS/Safari stability
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (ARU HERO / OBVIOUS GLOW) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} ===== */
 
 #result{
   position: fixed !important;
@@ -230,21 +239,17 @@
   pointer-events: none;
   background: #000 !important;
 
-  /* iOS/Safari stack safety */
   isolation: isolate !important;
   contain: layout paint style !important;
   transform: translateZ(0) !important;
 
-  /* Eye image tuning variables */
   --tb-eye-size: ${CFG.EYE_BG_SIZE}%;
   --tb-eye-pos: ${CFG.EYE_BG_POS_X}% ${CFG.EYE_BG_POS_Y}%;
 
-  /* runtime vars */
   --tb-aru: rgba(0,240,255,0.95);
   --tb-glow: 0.35;
   --tb-specular: 0;
 
-  /* visibility knobs */
   --tb-aru-tint: ${CFG.ARU.TINT_MIN};
   --tb-ring-a: ${CFG.ARU.RING_ALPHA_BASE};
   --tb-ring-glow: ${CFG.ARU.RING_GLOW_BASE_PX}px;
@@ -259,6 +264,12 @@
 #app.${CFG.APP_CUT_CLASS} *{ visibility: hidden !important; }
 #app.${CFG.APP_CUT_CLASS} #result,
 #app.${CFG.APP_CUT_CLASS} #result *{ visibility: visible !important; }
+
+/* ✅ IMPORTANT: keep ARU overlay visible even if it's outside #result */
+#app.${CFG.APP_CUT_CLASS} .aruLayer,
+#app.${CFG.APP_CUT_CLASS} .aruFX{
+  visibility: visible !important;
+}
 
 /* Shell */
 #result .${CFG.SHELL_CLASS}{
@@ -307,7 +318,7 @@
   align-items:center;
 }
 
-/* Eye = image inside circle */
+/* Eye */
 #result .tbEye{
   position: relative;
   width: min(92vw, 540px);
@@ -324,13 +335,10 @@
     0 28px 90px rgba(0,0,0,0.72),
     0 0 0 1px rgba(255,255,255,0.14) inset;
 
-  /* iOS “round but looks square” fix */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
-
   transform: translateZ(0);
 }
 
-/* Vignette to lock focus */
 #result .tbEye::before{
   content:"";
   position:absolute;
@@ -343,7 +351,7 @@
   pointer-events:none;
 }
 
-/* Noise scan (subtle) */
+/* Noise */
 #result .tbEyeNoise{
   position:absolute;
   inset:-30%;
@@ -360,9 +368,7 @@
   pointer-events:none;
 }
 
-/* =========================
-   ARU TINT (IRIS-ONLY)
-   ========================= */
+/* ARU Tint */
 #result .tbAruTint{
   position:absolute;
   inset:0;
@@ -374,7 +380,6 @@
       color-mix(in srgb, var(--tb-aru) 40%, transparent) 40%,
       rgba(0,0,0,0) 62%);
 
-  /* restrict to iris area */
   -webkit-mask: radial-gradient(circle at 50% 52%,
     #000 0%,
     #000 48%,
@@ -389,10 +394,7 @@
   filter: saturate(1.30) brightness(1.06);
 }
 
-/* =========================
-   ARU RING (HERO / OBVIOUS GLOW)
-   - “見える”ために、drop-shadowで二重ハロ
-   ========================= */
+/* ARU Ring */
 #result .tbAruRing{
   position:absolute;
   inset: ${CFG.RING_INSET_PCT}%;
@@ -419,7 +421,6 @@
   mix-blend-mode: screen;
   opacity: var(--tb-ring-a);
 
-  /* ✅ 二重ハロ（外・内）で“発光体”にする */
   filter:
     blur(0.18px)
     drop-shadow(0 0 var(--tb-ring-inner) color-mix(in srgb, var(--tb-aru) 55%, transparent))
@@ -457,9 +458,7 @@
   animation: tbTicksFlicker 1.9s ease-in-out infinite;
 }
 
-/* =========================
-   CORE (CENTER SPHERE) + ARU rim glow
-   ========================= */
+/* Core */
 #result .tbCore{
   position:absolute;
   inset: 40%;
@@ -478,15 +477,13 @@
     0 0 0 1px rgba(255,255,255,0.10) inset,
     0 0 0 2px rgba(255,255,255,0.04) inset,
     0 0 20px rgba(0,0,0,0.38),
-
-    /* ✅ ARU rim */
     0 0 calc(10px + var(--tb-glow)*34px) color-mix(in srgb, var(--tb-aru) 55%, transparent),
     0 0 calc(20px + var(--tb-glow)*52px) color-mix(in srgb, var(--tb-aru) 28%, transparent);
 
   animation: tbCorePulse 2.6s ease-in-out infinite;
 }
 
-/* Specular sparkle at high score */
+/* Specular */
 #result .tbSpecular{
   position:absolute;
   inset: 0;
@@ -620,21 +617,21 @@
     // Specular at high score
     const specular = scoreP >= 0.90 ? clamp((scoreP - 0.90) / 0.10, 0, 1) : 0;
 
-    // --- ARU tint: guarantee readability ---
+    // Tint
     const tint = clamp(
       CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT,
       CFG.ARU.TINT_MIN,
       CFG.ARU.TINT_MAX
     );
 
-    // --- ring: glow px grows with glow ---
+    // Ring glow px grows with glow
     const ringGlow = Math.round(lerp(CFG.ARU.RING_GLOW_BASE_PX, CFG.ARU.RING_GLOW_MAX_PX, glow));
     const ringGlow2 = Math.round(ringGlow * 1.65);
 
-    // --- background bloom alpha grows with glow ---
+    // Background bloom alpha grows with glow
     const bloomA = clamp(CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT, 0, 0.85);
 
-    // Sync vars across ring / core / bloom / tint
+    // Sync vars
     root.style.setProperty("--tb-aru", aruColor);
     root.style.setProperty("--tb-glow", String(glow));
     root.style.setProperty("--tb-specular", String(specular * 0.9));
@@ -644,7 +641,6 @@
     root.style.setProperty("--tb-ring-glow2", `${ringGlow2}px`);
     root.style.setProperty("--tb-bloom-a", String(bloomA));
 
-    // 画像位置は固定（CFGのみで調整する）
     const name = safeUserName();
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
     lineEl.innerText = lineBy(resPercent, callName ? name : null);
@@ -673,6 +669,9 @@
       () => {
         root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
         if (app) app.classList.remove(CFG.APP_CUT_CLASS);
+
+        // Reset overlay state back to idle
+        if (app) app.dataset.state = "idle";
 
         const startBtn = document.getElementById("startBtn");
         if (startBtn) {
@@ -704,14 +703,32 @@
           ensureShell(root);
           wireReplayOnce(root, app);
 
-          if (app) app.classList.add(CFG.APP_CUT_CLASS);
-          root.classList.add(CFG.ROOT_ACTIVE_CLASS);
+          if (app) {
+            // HARD CUT underlay
+            app.classList.add(CFG.APP_CUT_CLASS);
 
+            // ✅ ARU overlay trigger (aru-gauge.css / aru-fx.css)
+            app.dataset.state = "result";
+
+            const resPercent = normalizePercent(payload?.resonance ?? 0);
+            app.style.setProperty("--aru-value", String(resPercent / 100));
+            app.dataset.aruState = aruStateByPercent(resPercent);
+
+            // Optional: keep overlay score text synced if exists
+            const overlayScore = document.getElementById("aruOverlayScore");
+            if (overlayScore) overlayScore.textContent = `${resPercent}%`;
+          }
+
+          root.classList.add(CFG.ROOT_ACTIVE_CLASS);
           paintAndAnimate(root, payload || {});
         },
+
         hide() {
           root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
-          if (app) app.classList.remove(CFG.APP_CUT_CLASS);
+          if (app) {
+            app.classList.remove(CFG.APP_CUT_CLASS);
+            app.dataset.state = "idle";
+          }
         },
       };
     },
