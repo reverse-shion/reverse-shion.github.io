@@ -1,0 +1,99 @@
+/* =========================
+   ARU GAUGE COMPONENT
+   ========================= */
+
+:root{
+  --aru-value: 0.17;          /* 0〜1 */
+  --aru-size: 220px;
+  --aru-thickness: 12px;
+
+  --aru-gray: #3a3a3a;
+  --aru-color-low: #4cc9f0;
+  --aru-color-mid: #a855f7;
+  --aru-color-high: #ff2fd0;
+
+  --aru-glow: 0;
+}
+
+/* 最上位レイヤー */
+.aruLayer{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ゲージ本体 */
+.aruGauge{
+  width: var(--aru-size);
+  height: var(--aru-size);
+  position: relative;
+}
+
+/* リング */
+.aruGauge::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:
+    conic-gradient(
+      var(--aru-active-color) calc(var(--aru-value) * 360deg),
+      var(--aru-gray) 0deg
+    );
+  mask:
+    radial-gradient(
+      circle at center,
+      transparent calc(50% - var(--aru-thickness)),
+      black calc(50% - var(--aru-thickness) + 1px)
+    );
+  -webkit-mask:
+    radial-gradient(
+      circle at center,
+      transparent calc(50% - var(--aru-thickness)),
+      black calc(50% - var(--aru-thickness) + 1px)
+    );
+  transition: background 0.4s ease;
+  filter: drop-shadow(0 0 calc(var(--aru-glow) * 20px) var(--aru-active-color));
+}
+
+/* 中央スコア表示 */
+.aruScore{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2rem;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:1px;
+}
+
+/* =========================
+   状態別カラー制御
+   ========================= */
+
+/* 低 */
+[data-aru-state="low"]{
+  --aru-active-color: var(--aru-color-low);
+}
+
+/* 中 */
+[data-aru-state="mid"]{
+  --aru-active-color: var(--aru-color-mid);
+}
+
+/* 高 */
+[data-aru-state="high"]{
+  --aru-active-color: var(--aru-color-high);
+}
+
+/* MAX */
+[data-aru-state="max"]{
+  --aru-active-color: #ffffff;
+  --aru-glow: 1;
+}
