@@ -10,25 +10,27 @@
 */
 
 .app{
-  --aru-value: 0; /* 0..1 */
-
-  /* ✅ サイズ：ひと回り大きく（太さは維持） */
-  --aru-size: 270px;       /* ←ここで大きさ調整 */
-  --aru-thickness: 12px;   /* 太さは維持 */
-
-  /* ✅ 中心合わせ微調整（pxでOK） */
-  --aru-offset-x: 0px;
-  --aru-offset-y: -22px;   /* ←鼓動の円が“少し上”ならマイナスが効く */
+  --aru-value: 0;
+  --aru-size: 220px;
+  --aru-thickness: 12px;
 
   --aru-gray: rgba(255,255,255,0.22);
-
   --aru-color-low:  rgba(76,201,240,0.96);
   --aru-color-mid:  rgba(168,85,247,0.96);
   --aru-color-high: rgba(255,47,208,0.96);
 
   --aru-glow: 0;
   --aru-active-color: var(--aru-color-low);
+
+  /* ✅ NEW: ここが「瞳の中心に吸い付く」アンカー座標 */
+  --aru-anchor-x: 50vw;
+  --aru-anchor-y: 50vh;
+
+  /* ✅ 微調整したい時だけ触る（最初は0でOK） */
+  --aru-offset-x: 0px;
+  --aru-offset-y: 0px;
 }
+
 
 @media (max-width: 390px){
   .app{ --aru-size: 250px; --aru-thickness: 12px; }
