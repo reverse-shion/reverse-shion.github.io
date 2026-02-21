@@ -1,23 +1,24 @@
 /* /di/css/aru-gauge.css
-   ARU GAUGE (ANCHOR TO #targetRoot) v2.2 — PRO SAFE
-   - Anchor = #targetRoot center (the pulsing circle)
-   - Show only on result:
-       .app.tb-result-active #targetRoot .aruLayer
-       OR .app[data-state="result"] #targetRoot .aruLayer
-   - value: --aru-value (0..1)
-   - state: .app[data-aru-state="low|mid|high|max"]
-   - Scope is strictly limited under #targetRoot to prevent side effects.
+   ARU GAUGE (RESULT ONLY) v1.1
+   - shows ONLY on result screen:
+       ✅ .app.tb-result-active  (result.jsが付けるクラス)
+       もしくは .app[data-state="result"] のどっちでもOK
+   - value: --aru-value (0..1)  ← JSがここを更新する
+   - text : .aruScore           ← JSがここも更新する
+   - iOS safe mask: white=visible
+   - center fine-tune: --aru-offset-x / --aru-offset-y
 */
 
-/* =========================
-   Tokens (app-scoped)
-========================= */
 .app{
-  --aru-value: 0; /* 0..1 (JS updates) */
+  --aru-value: 0; /* 0..1 */
 
-  /* Gauge size scales with viewport but stays sane */
-  --aru-size: clamp(220px, 62vmin, 320px);
-  --aru-thickness: 12px;
+  /* ✅ サイズ：ひと回り大きく（太さは維持） */
+  --aru-size: 270px;       /* ←ここで大きさ調整 */
+  --aru-thickness: 12px;   /* 太さは維持 */
+
+  /* ✅ 中心合わせ微調整（pxでOK） */
+  --aru-offset-x: 0px;
+  --aru-offset-y: -22px;   /* ←鼓動の円が“少し上”ならマイナスが効く */
 
   --aru-gray: rgba(255,255,255,0.22);
 
@@ -29,63 +30,51 @@
   --aru-active-color: var(--aru-color-low);
 }
 
-/* Slightly smaller on very small phones */
 @media (max-width: 390px){
-  .app{ --aru-size: clamp(200px, 64vmin, 280px); }
+  .app{ --aru-size: 250px; --aru-thickness: 12px; }
 }
 
-/* =========================
-   Anchor: #targetRoot
-   - Must be a positioning context.
-========================= */
-#targetRoot{
-  position: relative;
-  isolation: isolate; /* keep stacking local */
+/* hidden by default */
+.aruLayer{ display:none; }
+
+/* ✅ result only（どっちでも起動できるように両対応） */
+.app.tb-result-active .aruLayer,
+.app[data-state="result"] .aruLayer{
+  display:flex;
 }
 
-/* =========================
-   Result-only visibility (scoped)
-   - default hidden ALWAYS
-========================= */
-#targetRoot .aruLayer{ display: none; }
-
-/* show on result state only */
-.app.tb-result-active #targetRoot .aruLayer,
-.app[data-state="result"] #targetRoot .aruLayer{
-  display: grid;
-}
-
-/* =========================
-   ARU overlay layer (scoped)
-   → centered INSIDE #targetRoot
-========================= */
-#targetRoot .aruLayer{
-  position: absolute;
+.aruLayer{
+  position: fixed;
   inset: 0;
-  z-index: 50;         /* above target visuals */
+
+  /* #result(2147483647)の“直下”に置く */
+  z-index: 2147483646;
+
   pointer-events: none;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+
+  /* ✅ ここで中心点をズラせる */
+  transform: translate(var(--aru-offset-x), var(--aru-offset-y));
 }
 
-/* The gauge itself */
-#targetRoot .aruGauge{
+.aruGauge{
   width: var(--aru-size);
   height: var(--aru-size);
   position: relative;
   border-radius: 999px;
-
-  transform: translate3d(0,0,0);
   filter: drop-shadow(0 18px 36px rgba(0,0,0,0.38));
 }
 
-/* Ring paint */
-#targetRoot .aruGauge::before{
+/* ✅ リング描画 */
+.aruGauge::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:50%;
 
-  /* start at 12 o'clock */
+  /* ✅ 12時(上)開始にするため from -90deg */
   background:
     conic-gradient(
       from -90deg,
@@ -93,7 +82,7 @@
       var(--aru-gray)        0turn 1turn
     );
 
-  /* iOS-safe mask (white = visible) */
+  /* ✅ iOS safe mask（白=表示 / 透明=非表示） */
   -webkit-mask: radial-gradient(
     circle at center,
     rgba(255,255,255,0) calc(50% - var(--aru-thickness)),
@@ -105,8 +94,8 @@
     rgba(255,255,255,1) calc(50% - var(--aru-thickness) + 1px)
   );
 
-  transition: filter 240ms ease;
-  will-change: filter;
+  transition: background 240ms ease, filter 240ms ease;
+  will-change: background, filter;
 
   filter:
     drop-shadow(0 0 10px rgba(255,255,255,0.10))
@@ -115,8 +104,8 @@
     );
 }
 
-/* Inner rim */
-#targetRoot .aruGauge::after{
+/* inner rim */
+.aruGauge::after{
   content:"";
   position:absolute;
   inset: calc(var(--aru-thickness) + 2px);
@@ -126,34 +115,30 @@
   opacity: 0.9;
 }
 
-/* Center text */
-#targetRoot .aruScore{
+/* center text */
+.aruScore{
   position:absolute;
   inset:0;
-  display:grid;
-  place-items:center;
-
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-size: clamp(24px, 4.6vw, 38px);
   font-weight: 900;
   letter-spacing: 0.5px;
   color: rgba(255,255,255,0.92);
-
   text-shadow:
     0 2px 18px rgba(0,0,0,0.55),
     0 0 20px rgba(255,255,255,0.08);
-
   -webkit-font-smoothing: antialiased;
-  transform: translate3d(0,0,0);
+  transform: translateZ(0);
 }
 
-/* =========================
-   State colors (app-scoped)
-========================= */
+/* state colors */
 .app[data-aru-state="low"]  { --aru-active-color: var(--aru-color-low);  --aru-glow: 0; }
 .app[data-aru-state="mid"]  { --aru-active-color: var(--aru-color-mid);  --aru-glow: 0.25; }
 .app[data-aru-state="high"] { --aru-active-color: var(--aru-color-high); --aru-glow: 0.45; }
 .app[data-aru-state="max"]  { --aru-active-color: rgba(255,255,255,0.96); --aru-glow: 1; }
 
 @media (prefers-reduced-motion: reduce){
-  #targetRoot .aruGauge::before{ transition:none; }
+  .aruGauge::before{ transition:none; }
 }
