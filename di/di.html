@@ -1,65 +1,31 @@
-<!-- /di/di.html
-  PRO FINAL — SINGLE ENTRYPOINT / NO-CONFLICT / iOS SAFE
-  - Entry is ONLY: ./js/main.js (type=module)
-  - No duplicate loaders (old main.js / result.js tag removed)
-  - Keeps existing IDs for legacy engine/ui.js compatibility
-  - FX layer stays #fxLayer (single source of truth)
-  - Idle particles inline (cheap) and only draws in idle
--->
+<!-- /di/di.html (PRO ENGINEER FINAL — ARU gauge anchored to orb / mobile-safe) -->
 <!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#05060b" />
-  <meta name="format-detection" content="telephone=no" />
-
-  <!-- iOS PWA (optional) -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
+  <meta name="format-detection" content="telephone=no" />
   <title>DiCo ARU – Phase1</title>
 
-  <!-- =========================================================
-       CSS (order matters)
-       ========================================================= -->
+  <!-- CSS split (order matters) -->
   <link rel="stylesheet" href="./css/themes.css" />
   <link rel="stylesheet" href="./css/core.css" />
   <link rel="stylesheet" href="./css/hud.css" />
   <link rel="stylesheet" href="./css/lane.css" />
   <link rel="stylesheet" href="./css/result.css" />
+  <!-- ARU split -->
   <link rel="stylesheet" href="./css/aru-fx.css" />
   <link rel="stylesheet" href="./css/aru-gauge.css" />
 
-  <!-- ✅ NEW FX CSS (separated, safe add-on; does not break existing UI) -->
-  <link rel="stylesheet" href="./css/fx/fx-layer.css" />
-  <link rel="stylesheet" href="./css/fx/fx-particles.css" />
-  <link rel="stylesheet" href="./css/fx/fx-ring.css" />
-  <link rel="stylesheet" href="./css/fx/fx-max.css" />
-
-  <!-- =========================================================
-       Preload (iOS help)
-       ========================================================= -->
-  <link rel="preload" href="./idle/dico_idle.jpg" as="image" fetchpriority="high" />
+  <!-- Preload (helps iOS a bit; safe even if missing files) -->
+  <link rel="preload" href="./idle/dico_idle.jpg" as="image" />
   <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
   <link rel="preload" href="./audio/music.mp3" as="audio" />
   <link rel="preload" href="./audio/se_tap.wav" as="audio" />
   <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
-
-  <!-- Face preloads (instant swap) -->
-  <link rel="preload" href="./faces/dico_face_1.png" as="image" />
-  <link rel="preload" href="./faces/dico_face_2.png" as="image" />
-  <link rel="preload" href="./faces/dico_face_3.png" as="image" />
-  <link rel="preload" href="./faces/dico_face_4.png" as="image" />
-  <link rel="preload" href="./faces/dico_face_5.png" as="image" />
-
-  <noscript>
-    <style>
-      body{margin:0;background:#05060b;color:#f5f5f2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-      .nojs{padding:18px;line-height:1.6}
-      .nojs strong{display:block;font-size:18px;margin-bottom:8px}
-    </style>
-  </noscript>
 </head>
 
 <body>
@@ -71,13 +37,6 @@
   style="--aru-value:0.17"
   aria-label="DiCo ARU Rhythm"
 >
-  <!-- no-js fallback -->
-  <noscript>
-    <div class="nojs" role="note" aria-label="JavaScript required">
-      <strong>JavaScript が必要です</strong>
-      このページはゲーム演出のために JavaScript を使用します。ブラウザ設定で JavaScript を有効にしてください。
-    </div>
-  </noscript>
 
   <!-- =========================================================
        BACKGROUND STACK
@@ -110,11 +69,8 @@
     aria-hidden="true"
   ></video>
 
-  <!-- =========================================================
-       FX (single source of truth)
-       - New FX modules will attach particles here
-       ========================================================= -->
-  <div class="fxLayer fx-layer" id="fxLayer" aria-hidden="true"></div>
+  <!-- FX (tap-through) -->
+  <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
 
   <!-- =========================================================
        SIDE HUD (LEFT / RIGHT)
@@ -146,11 +102,8 @@
           <div class="sideNameSub">RESONANCE</div>
         </div>
 
-        <!-- Avatar -->
         <div class="sideAvatar" aria-label="DiCo avatar">
-          <!-- ✅ Ring element (target for absorption + rotation sync) -->
-          <div class="avatarRing res-ring" id="avatarRing" aria-hidden="true"></div>
-
+          <div class="avatarRing" id="avatarRing" aria-hidden="true"></div>
           <img
             id="dicoFace"
             class="dicoFace"
@@ -181,20 +134,18 @@
           <div class="sideTimeValue" id="time">--</div>
         </div>
 
-        <!-- Face pool (preload guarantee; hidden) -->
+        <!-- Face pool (optional) -->
         <div class="facePool" aria-hidden="true">
           <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
           <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
           <img class="faceAsset" id="face3" src="./faces/dico_face_3.png" alt="" />
-          <img class="faceAsset" id="face4" src="./faces/dico_face_4.png" alt="" />
-          <img class="faceAsset" id="face5" src="./faces/dico_face_5.png" alt="" />
         </div>
       </div>
     </div>
   </aside>
 
   <!-- =========================================================
-       LEGACY HUD (compat for engine/ui.js)
+       LEGACY HUD (compat for current UI.js)
        ========================================================= -->
   <header class="hud" aria-label="HUD" aria-hidden="true">
     <div class="hudBlock">
@@ -223,10 +174,10 @@
        STAGE
        ========================================================= -->
   <section class="stage" id="stage" aria-label="Game Stage">
-    <!-- NOTE CANVAS -->
+    <!-- NOTE CANVAS (render only; no input) -->
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
 
-    <!-- HIT ZONE -->
+    <!-- HIT ZONE (only this receives pointer events; lane width) -->
     <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
 
     <!-- TARGET -->
@@ -261,7 +212,11 @@
 
         <div class="resultDivider"></div>
 
-        <!-- ARU SECTION -->
+        <!-- =====================================================
+             ARU SECTION (ANCHOR ROOT)
+             - The overlay gauge is now INSIDE #aruRing (orb),
+               so it will NOT drift on mobile.
+             ===================================================== -->
         <div class="aruWrap" aria-label="ARU Gauge">
           <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
             <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
@@ -281,6 +236,7 @@
               <div class="aruValue" id="aruValue">0%</div>
             </div>
 
+            <!-- ✅ ARU GAUGE OVERLAY (ANCHOR TO ORB CENTER) -->
             <div class="aruLayer" aria-hidden="true">
               <div class="aruGauge">
                 <div class="aruScore" id="aruOverlayScore">0%</div>
@@ -311,25 +267,21 @@
   <!-- Screen reader live region -->
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- ARU FX (TOPMOST) -->
+  <!-- =========================================================
+       ARU FX (TOPMOST)
+       - Keep FX layer global if you want full-screen bloom.
+       - The GAUGE itself is now anchored in #aruRing above.
+       ========================================================= -->
   <div class="aruFX" aria-hidden="true"></div>
 
 </main>
 
-<!-- =========================================================
-     SCRIPTS (NO DUPLICATES)
-     - common.js: classic defer (globals / helpers)
-     - di/js/main.js: ONLY entrypoint, module
-       (main.js will import FX + try import result presenter safely)
-     ========================================================= -->
-
+<!-- Main boot -->
+<script src="./js/main.js" defer></script>
 <script src="./js/common.js" defer></script>
-<script type="module" src="./js/main.js"></script>
+<script type="module" src="./js/result.js"></script>
 
-<!-- =========================================================
-     Idle particles (idle only, light + iOS safe)
-     - Only draws when data-state="idle"
-     ========================================================= -->
+<!-- Idle particles (light; idle only) -->
 <script>
 (() => {
   const app = document.getElementById("app");
@@ -341,59 +293,57 @@
   let dpr = 1;
 
   const N = 30;
-  const dots = Array.from({ length: N }, () => ({
-    x: Math.random(),
-    y: Math.random(),
-    vx: (Math.random() * 2 - 1) * 0.010,
-    vy: (Math.random() * 2 - 1) * 0.008,
-    r: 0.7 + Math.random() * 1.7,
-    a: 0.10 + Math.random() * 0.22,
+  const dots = Array.from({length:N}, () => ({
+    x: Math.random(), y: Math.random(),
+    vx:(Math.random()*2-1)*0.010,
+    vy:(Math.random()*2-1)*0.008,
+    r: 0.7 + Math.random()*1.7,
+    a: 0.10 + Math.random()*0.22
   }));
 
-  function resize() {
-    const rect = c.getBoundingClientRect();
+  function resize(){
+    const r = c.getBoundingClientRect();
     dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    bw = rect.width;
-    bh = rect.height;
-
-    c.width = Math.max(1, Math.floor(bw * dpr));
+    bw = r.width; bh = r.height;
+    c.width  = Math.max(1, Math.floor(bw * dpr));
     c.height = Math.max(1, Math.floor(bh * dpr));
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
   }
 
-  function tick() {
+  let raf = 0;
+  function tick(){
+    // draw only in idle (keep loop running but cheap)
     if (app.dataset.state !== "idle") {
-      requestAnimationFrame(tick);
+      raf = requestAnimationFrame(tick);
       return;
     }
 
-    ctx.clearRect(0, 0, bw, bh);
+    ctx.clearRect(0,0,bw,bh);
     ctx.globalCompositeOperation = "lighter";
 
-    for (const p of dots) {
-      p.x += p.vx;
-      p.y += p.vy;
-
+    for (const p of dots){
+      p.x += p.vx; p.y += p.vy;
       if (p.x < -0.05) p.x = 1.05;
-      if (p.x > 1.05) p.x = -0.05;
+      if (p.x >  1.05) p.x = -0.05;
       if (p.y < -0.05) p.y = 1.05;
-      if (p.y > 1.05) p.y = -0.05;
+      if (p.y >  1.05) p.y = -0.05;
 
       const x = p.x * bw;
       const y = p.y * bh;
 
       ctx.globalAlpha = p.a;
       ctx.beginPath();
-      ctx.arc(x, y, p.r, 0, Math.PI * 2);
+      ctx.arc(x,y,p.r,0,Math.PI*2);
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.fill();
     }
 
-    requestAnimationFrame(tick);
+    raf = requestAnimationFrame(tick);
   }
 
+  // init
   resize();
-  window.addEventListener("resize", resize, { passive: true });
+  window.addEventListener("resize", resize, {passive:true});
   tick();
 })();
 </script>
