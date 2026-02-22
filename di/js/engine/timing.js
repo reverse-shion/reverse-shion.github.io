@@ -1,125 +1,146 @@
-/* /di/js/engine/timing.js
-   Timing — PRO FINAL (single gameplay clock sourced from AudioManager.getMusicTime())
-   ✅ Deterministic start/restart/stop
-   ✅ Always clamps non-finite time
-   ✅ End time computed from chart + tail padding
-*/
+/* /di/js/engine/timing.js */
 (() => {
-  "use strict";
   const NS = (window.DI_ENGINE ||= {});
 
   class Timing {
     constructor({ chart }) {
-      this.chart = chart || {};
-      this._audio = null;
+      this.chart = chart;
 
       this._running = false;
-      this._paused = false;
 
       // chart offset (seconds)
-      this._songOffset = Number(this.chart.offset || 0);
-      if (!Number.isFinite(this._songOffset)) this._songOffset = 0;
+      this._songOffset = Number(chart?.offset || 0);
 
-      this._lastSongTime = 0;
+      this._durationGuess = this._guessDuration(chart);
 
-      // Tail padding (seconds) so last note can resolve
-      this._tailPadding = 1.5;
+      this._audio = null;
 
-      this._endTime = this._computeEndTime();
+      // pause/resume support
+      this._paused = false;
+      this._lastSongTime = 0; // keep last computed time for UI
     }
 
-    _computeEndTime() {
-      const notes = this.chart?.notes || [];
-      let last = 0;
-      for (const n of notes) {
-        const t = Number(n?.t || 0);
-        if (Number.isFinite(t) && t > last) last = t;
-      }
-      return last + this._tailPadding;
+    _guessDuration(chart) {
+      const notes = chart?.notes || [];
+      if (!notes.length) return 60;
+      const last = notes.reduce((m, n) => Math.max(m, Number(n.t || 0)), 0);
+      return Math.max(20, last + 4.0);
     }
 
+    // --- Core helpers ---
     _ensureAudio(audio) {
-      if (audio) this._audio = audio;
+      this._audio = audio || this._audio;
       return this._audio;
     }
 
-    _readSongTimeFromAudio() {
+    _calcSongTimeFromAudio() {
       const a = this._audio;
-      if (!a || typeof a.getMusicTime !== "function") {
-        return this._lastSongTime || 0;
+      if (a && a.music) {
+        const raw = a.getMusicTime(); // seconds
+        const t = raw - this._songOffset;
+        return Math.max(0, t);
+      }
+      return this._lastSongTime || 0;
+    }
+
+    // --- API ---
+    /**
+     * Start gameplay timing.
+     * @param {AudioManager} audio
+     * @param {{ reset?: boolean }} opt
+     */
+    start(audio, opt = {}) {
+      const a = this._ensureAudio(audio);
+      const reset = !!opt.reset;
+
+      this._paused = false;
+      this._running = true;
+
+      // ✅ reset=true の時は必ず曲を先頭へ
+      if (a && a.music && reset) {
+        try {
+          a.music.pause();
+          a.music.currentTime = 0;
+        } catch {}
       }
 
-      const musicTime = Number(a.getMusicTime() || 0);
-      if (!Number.isFinite(musicTime)) return this._lastSongTime || 0;
+      // start/resume music
+      a?.playMusic?.();
 
-      const t = musicTime - this._songOffset;
-      if (!Number.isFinite(t)) return this._lastSongTime || 0;
-
-      return Math.max(0, t);
+      // refresh cached time
+      this._lastSongTime = this._calcSongTimeFromAudio();
     }
 
-    start(audio, { reset = false } = {}) {
+    /**
+     * Pause (STOP) gameplay timing (keeps position).
+     */
+    pause(audio) {
       const a = this._ensureAudio(audio);
-
-      this._running = true;
-      this._paused = false;
-
-      if (reset) this._lastSongTime = 0;
-
-      // Music is the truth source. Keep it deterministic.
-      a?.playMusic?.({ reset: !!reset });
-
-      this._lastSongTime = this._readSongTimeFromAudio();
-      return this._lastSongTime;
-    }
-
-    restart(audio) {
-      const a = this._ensureAudio(audio);
-
+      this._paused = true;
       this._running = false;
-      this._paused = false;
-      this._lastSongTime = 0;
 
-      // Hard reset music then start clean
-      a?.stopMusic?.({ reset: true });
-      return this.start(a, { reset: true });
+      // keep last time snapshot
+      this._lastSongTime = this._calcSongTimeFromAudio();
+
+      a?.stopMusic?.(); // pause music
     }
 
+    /**
+     * Resume from pause without resetting.
+     */
+    resume(audio) {
+      const a = this._ensureAudio(audio);
+      this._paused = false;
+      this._running = true;
+
+      a?.playMusic?.();
+      this._lastSongTime = this._calcSongTimeFromAudio();
+    }
+
+    /**
+     * Stop completely (used at result/end). Keeps last time.
+     */
     stop(audio) {
       const a = this._ensureAudio(audio);
-
-      // capture current before stopping
-      this._lastSongTime = this._readSongTimeFromAudio();
-
       this._running = false;
       this._paused = false;
 
-      a?.stopMusic?.({ reset: true });
-      return this._lastSongTime;
+      this._lastSongTime = this._calcSongTimeFromAudio();
+
+      a?.stopMusic?.();
     }
 
-    isRunning() {
-      return this._running;
+    /**
+     * Convenience for restart.
+     */
+    restart(audio) {
+      this.start(audio, { reset: true });
     }
 
-    isPaused() {
-      return this._paused;
-    }
+    isRunning() { return this._running; }
+    isPaused() { return this._paused; }
 
     getSongTime() {
-      if (!this._running) return this._lastSongTime || 0;
+      // If running, follow audio clock.
+      if (this._running) {
+        const t = this._calcSongTimeFromAudio();
+        this._lastSongTime = t;
+        return t;
+      }
 
-      const t = this._readSongTimeFromAudio();
-      if (!Number.isFinite(t)) return this._lastSongTime || 0;
-
-      this._lastSongTime = t;
-      return this._lastSongTime;
+      // If paused/stopped, return last known time (not 0)
+      return this._lastSongTime || 0;
     }
 
     isEnded(songTime) {
-      const t = Number(songTime);
-      if (!Number.isFinite(t)) return false;
-      return t >= this._endTime;
+      return songTime >= this._durationGuess;
+    }
+
+    formatTime(songTime) {
+      const s = Math.max(0, Math.floor(songTime));
+      const mm = String(Math.floor(s / 60)).padStart(2, "0");
+      const ss = String(s % 60).padStart(2, "0");
+      return `${mm}:${ss}`;
     }
   }
 
