@@ -5,6 +5,7 @@
    - idempotent loader (safe if called twice)
    - single-run guard + abortable listeners
    - deterministic lifecycle: boot -> idle -> playing -> result
+   - ✅ integrates CSS var: --res-color (lightweight + smooth)
 */
 
 "use strict";
@@ -28,8 +29,7 @@ const ENGINE_FILES = [
   "notes/skin-tarot-pinkgold.js",
 ].map((p) => new URL(p, BASE).toString());
 
-// ✅ result.js は “legacy script” として読む運用もできるが、
-// ここでは「存在すれば使う / 無ければfallback」方式にして衝突をゼロにする。
+// Optional presenter (legacy script load; DI_RESULT if exists)
 const PRESENTATION_FILES = ["result.js"].map((p) => new URL(p, BASE).toString());
 
 /* ===============================
@@ -64,8 +64,6 @@ function getState(app) {
 
 /* ===============================
    IDempotent Script Loader
-   - same src will never be loaded twice
-   - promise cached per src
 ================================= */
 const __scriptCache = (globalThis[APP_KEY] ||= {}).scriptCache || new Map();
 (globalThis[APP_KEY] ||= {}).scriptCache = __scriptCache;
@@ -74,13 +72,13 @@ function loadScriptOnce(src) {
   if (__scriptCache.has(src)) return __scriptCache.get(src);
 
   const p = new Promise((resolve, reject) => {
-    // already present?
+    // already present? (base URL match)
     const found = [...document.scripts].some((s) => s.src === src);
     if (found) return resolve();
 
     const s = document.createElement("script");
     const u = new URL(src);
-    u.searchParams.set("v", String(Date.now())); // iOS sanity; still ok because cache map is by base src
+    u.searchParams.set("v", String(Date.now())); // iOS sanity
     s.src = u.toString();
     s.async = false;
     s.onload = () => resolve();
@@ -100,8 +98,6 @@ async function loadScriptsSequentially(files) {
 
 async function ensureLegacyLoaded() {
   await loadScriptsSequentially(ENGINE_FILES);
-
-  // presentation is optional
   try {
     await loadScriptsSequentially(PRESENTATION_FILES);
   } catch (e) {
@@ -139,8 +135,6 @@ function fallbackChart() {
 
 /* ===============================
    RESULT PRESENTER SAFE WRAP
-   - Use DI_RESULT if it exists
-   - Else fallback (no throw)
 ================================= */
 function getResultPresenterSafe({ app, refs }) {
   const impl = globalThis.DI_RESULT;
@@ -162,10 +156,8 @@ function getResultPresenterSafe({ app, refs }) {
     }
   }
 
-  // fallback
   return {
     show(payload) {
-      // minimal, never breaks
       console.log("[DiCo] RESULT (fallback)", payload);
     },
     hide() {},
@@ -174,31 +166,72 @@ function getResultPresenterSafe({ app, refs }) {
 
 /* ===============================
    LIFECYCLE (no collision)
-   - dispose old instance on re-run
 ================================= */
 function disposePreviousIfAny() {
   const prev = globalThis[APP_KEY];
-  if (prev && prev.dispose && typeof prev.dispose === "function") {
+  if (prev && typeof prev.dispose === "function") {
     try { prev.dispose(); } catch {}
   }
+}
+
+/* ===============================
+   ✅ RES COLOR SYNC (LIGHT + SMOOTH)
+   - updates CSS var --res-color only when needed
+   - resonance is treated as 0..100 (percent)
+================================= */
+function makeResColorSync() {
+  const root = document.documentElement;
+  let lastHue = NaN;
+
+  // You can tune these:
+  const HUE_MIN = 190; // cyan-ish
+  const HUE_MAX = 55;  // gold-ish (wrap style looks good)
+  const UPDATE_STEP_DEG = 2.0; // only update if hue changes enough
+
+  const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+  function resonanceToHue01(rPct) {
+    // rPct can be 0..100 or 0..1; normalize safely
+    let v = Number(rPct);
+    if (!Number.isFinite(v)) v = 0;
+    if (v > 1.5) v = v / 100;     // assume percent
+    const x = clamp01(v);
+
+    // smooth curve: early subtle, later more dramatic
+    const eased = x * x * (3 - 2 * x); // smoothstep
+    // We want hue drift cyan->purple->gold feeling:
+    // simplest: interpolate between HUE_MIN and HUE_MAX
+    const hue = HUE_MIN + (HUE_MAX - HUE_MIN) * eased;
+    return hue;
+  }
+
+  function setResColorByResonance(rPct) {
+    const hue = resonanceToHue01(rPct);
+    if (Number.isFinite(lastHue) && Math.abs(hue - lastHue) < UPDATE_STEP_DEG) return;
+    lastHue = hue;
+
+    // Core color (you can also set companion vars if needed)
+    root.style.setProperty("--res-hue", String(hue.toFixed(2)));
+    root.style.setProperty("--res-color", `hsl(${hue.toFixed(2)}, 92%, 62%)`);
+    root.style.setProperty("--res-color-soft", `hsla(${hue.toFixed(2)}, 92%, 62%, .35)`);
+    root.style.setProperty("--res-color-glow", `hsla(${hue.toFixed(2)}, 92%, 62%, .18)`);
+  }
+
+  return { setResColorByResonance };
 }
 
 /* ===============================
    BOOT
 ================================= */
 async function boot() {
-  // Prevent double boot collisions
   disposePreviousIfAny();
 
-  // Mark running instance container
   const instance = (globalThis[APP_KEY] ||= {});
   instance.running = true;
 
-  // AbortController: all listeners are registered with {signal}
   const ac = new AbortController();
   instance._ac = ac;
 
-  // RAF tracking
   let raf = 0;
   const stopRAF = () => {
     if (raf) cancelAnimationFrame(raf);
@@ -220,7 +253,6 @@ async function boot() {
   const seTap = $("seTap");
   const seGreat = $("seGreat");
 
-  // background video: never autoplay on load
   if (bgVideo) {
     try {
       bgVideo.muted = true;
@@ -244,22 +276,16 @@ async function boot() {
   const E = globalThis.DI_ENGINE;
   if (!E) throw new Error("DI_ENGINE not loaded");
 
-  // Keep existing IDs (compat)
   const refs = {
-    // root
     app,
-
-    // avatar + ring
     avatarRing: $("avatarRing"),
     dicoFace: $("dicoFace"),
 
-    // judge UI (optional)
     judge: $("judge"),
     judgeMain: $("judgeMain"),
     judgeSub: $("judgeSub"),
     hitFlash: $("hitFlash"),
 
-    // result overlay
     result: $("result"),
     resultScore: $("resultScore"),
     resultMaxCombo: $("resultMaxCombo"),
@@ -271,24 +297,21 @@ async function boot() {
 
   assertEl(refs.dicoFace, "dicoFace");
 
-  // ===== instantiate engine components =====
+  // ✅ initialize CSS var sync (safe even if CSS doesn't use it yet)
+  const resColor = makeResColorSync();
+  resColor.setResColorByResonance(0);
+
   const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
-
-  // legacy FX (you can later replace with new FX core)
   const fxLegacy = new E.FX({ fxLayer: $("fxLayer") });
-
   const ui = new E.UI(refs);
 
-  // game objects
   let timing = new E.Timing({ chart });
   let judge = new E.Judge({ chart, timing });
   let render = new E.Renderer({ canvas, chart, timing });
   render.resize?.();
 
-  // result presenter
   const presenter = getResultPresenterSafe({ app, refs });
 
-  // runtime flags
   let running = false;
   let lock = false;
 
@@ -309,6 +332,10 @@ async function boot() {
     judge.sweepMiss(t);
     render.draw(t);
 
+    // ✅ update color sync BEFORE/AFTER ui.update both ok.
+    // Here: after judge state is updated; before ui uses it next paint.
+    resColor.setResColorByResonance(judge.state.resonance);
+
     ui.update({
       t,
       score: judge.state.score,
@@ -322,16 +349,9 @@ async function boot() {
   }
 
   async function playMedia() {
-    try {
-      music.pause();
-      music.currentTime = 0;
-    } catch {}
-    try {
-      await music.play();
-    } catch {}
-    try {
-      await bgVideo?.play?.();
-    } catch {}
+    try { music.pause(); music.currentTime = 0; } catch {}
+    try { await music.play(); } catch {}
+    try { await bgVideo?.play?.(); } catch {}
   }
 
   function stopMedia() {
@@ -340,7 +360,6 @@ async function boot() {
   }
 
   async function startGame() {
-    // hard guards
     if (lock) return;
     if (running) return;
     if (getState(app) === STATES.PLAYING) return;
@@ -349,11 +368,9 @@ async function boot() {
 
     await audio.unlock();
 
-    // clean rebuild (prevents residual state)
     rebuild();
     judge.reset?.();
 
-    // deterministic timing start
     try {
       if (typeof timing.restart === "function") timing.restart(audio);
       else timing.start(audio, { reset: true });
@@ -384,7 +401,6 @@ async function boot() {
 
     await audio.unlock();
 
-    // rebuild + start
     rebuild();
     judge.reset?.();
 
@@ -452,16 +468,20 @@ async function boot() {
         audio.playGreat?.();
         ui.flashHit?.();
         fxLegacy.sparkLine?.();
+
+        // ✅ optional: micro boost on successful hit (feels addictive)
+        // (tick() will naturally pull it back within a frame or two)
+        // If you want stronger boost, uncomment:
+        // document.documentElement.style.setProperty("--res-color", "hsla(50, 100%, 65%, 1)");
       }
     },
   });
 
-  // buttons (AbortController to prevent duplicate registrations)
+  // listeners (AbortController prevents duplicates on re-run)
   startBtn.addEventListener("click", startGame, { signal: ac.signal });
   restartBtn.addEventListener("click", restartGame, { signal: ac.signal });
   stopBtn?.addEventListener("click", () => endToResult("STOP"), { signal: ac.signal });
 
-  // resize safety
   window.addEventListener(
     "resize",
     () => {
@@ -484,7 +504,6 @@ async function boot() {
     state: STATES.IDLE,
   });
 
-  // expose dispose (no collision guarantee)
   instance.dispose = () => {
     try { ac.abort(); } catch {}
     try { input?.destroy?.(); } catch {}
@@ -494,15 +513,13 @@ async function boot() {
     instance.running = false;
   };
 
-  console.log("[DiCo] HYBRID MODULE SAFE BOOT OK (no collision)");
+  console.log("[DiCo] HYBRID MODULE SAFE BOOT OK (+ --res-color sync)");
 }
 
 /* ===============================
    ENTRYPOINT (single run)
 ================================= */
 (async () => {
-  // If this module is evaluated again, dispose previous safely.
-  // (e.g., hot reload / double script include / SPA navigation)
   try {
     await ensureLegacyLoaded();
     await boot();
