@@ -1,9 +1,7 @@
 /* /di/js/engine/audio.js
-   AudioManager — PRO (iOS gesture-safe + truthful unlock + stable clock)
-   - primeUnlock(): sync, call inside click handler (NO await)
-   - unlock(): async, but returns "true only if actually unlocked"
-   - playMusic({reset}): does not always force currentTime=0
-   - getMusicTime(): currentTime + perf fallback if stalled
+   AudioManager — PRO FIX (iOS-safe + truthful clock)
+   ✅ perf fallback runs ONLY when music is truly playing
+   ✅ if play() fails, clock does NOT advance (prevents silent-run)
 */
 (() => {
   const NS = (window.DI_ENGINE ||= {});
@@ -17,17 +15,19 @@
 
       this._unlocked = false;
 
-      // perf clock fallback
+      // clock base
       this._clockBasePerf = 0;
       this._clockBaseMusic = 0;
       this._lastMusicTime = 0;
       this._stallCount = 0;
 
-      // iOS: safe defaults
+      // ✅ NEW: truth flags
+      this._musicPlaying = false;   // “play() resolved and not paused”
+      this._musicPlayFailed = false;
+
       if (this.music) {
         this.music.volume = 0.9;
         this.music.preload = this.music.preload || "auto";
-        // playsInline は video用だが、環境によっては audioタグでも持つ
         try { this.music.playsInline = true; } catch {}
       }
       if (this.seTap) this.seTap.volume = 0.6;
@@ -41,21 +41,14 @@
       }
     }
 
-    /* ------------------------------------------------------------
-       1) SYNC PRIME (call inside user gesture)
-       - do NOT await
-       - just attempts play() and immediately pauses in then()
-    ------------------------------------------------------------ */
+    // call inside gesture, no await
     primeUnlock() {
       const prime = (el) => {
         if (!el || typeof el.play !== "function") return false;
         try {
-          // Some browsers need muted to allow play; for SFX keep as-is.
           const p = el.play();
           if (p && typeof p.then === "function") {
-            p.then(() => {
-              try { el.pause(); } catch {}
-            }).catch(() => {});
+            p.then(() => { try { el.pause(); } catch {} }).catch(() => {});
           } else {
             try { el.pause(); } catch {}
           }
@@ -64,121 +57,127 @@
           return false;
         }
       };
-
-      // prime SFX first (fast), then music, then bg video (muted)
-      const ok1 = prime(this.seTap);
-      const ok2 = prime(this.seGreat);
-      const ok3 = prime(this.music);
-      const ok4 = prime(this.bgVideo);
-
-      // don't mark unlocked here (because we didn't verify)
-      return ok1 || ok2 || ok3 || ok4;
+      return (
+        prime(this.seTap) ||
+        prime(this.seGreat) ||
+        prime(this.music) ||
+        prime(this.bgVideo)
+      );
     }
 
-    /* ------------------------------------------------------------
-       2) ASYNC UNLOCK (truthful)
-       - returns true only if at least one play actually succeeded
-    ------------------------------------------------------------ */
     async unlock() {
       if (this._unlocked) return true;
 
       const tryEl = async (el, { resetTo0 = false } = {}) => {
         if (!el || typeof el.play !== "function") return false;
         const prev = Number(el.currentTime || 0);
-
         try {
-          if (resetTo0) {
-            try { el.currentTime = 0; } catch {}
-          }
+          if (resetTo0) { try { el.currentTime = 0; } catch {} }
           const p = el.play();
           if (p && typeof p.then === "function") await p;
-          // If play succeeded, pause immediately (we only want "permission")
           try { el.pause(); } catch {}
-          // restore time
           try { el.currentTime = prev; } catch {}
           return true;
         } catch {
-          // restore time
           try { el.currentTime = prev; } catch {}
           return false;
         }
       };
 
-      // Attempt unlock; count successes
       let ok = false;
       ok = (await tryEl(this.seTap)) || ok;
       ok = (await tryEl(this.seGreat)) || ok;
-
-      // music: reset to start when unlocking
       ok = (await tryEl(this.music, { resetTo0: true })) || ok;
 
-      // bg video is muted; try but don't require
+      // bg video best-effort
       try { this.bgVideo?.play?.().catch(() => {}); } catch {}
 
       this._unlocked = ok;
       return ok;
     }
 
-    /* ------------------------------------------------------------
-       music controls
-    ------------------------------------------------------------ */
+    // ✅ returns a promise-like result (but can be ignored by caller)
     playMusic(opt = {}) {
       const m = this.music;
       if (!m) return;
 
       const reset = !!opt.reset;
-      try {
-        if (reset) m.currentTime = 0;
-      } catch {}
 
-      const p = m.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
-      this._syncClockBase();
+      this._musicPlayFailed = false;
+      this._musicPlaying = false;
+      this._stallCount = 0;
+
+      try { if (reset) m.currentTime = 0; } catch {}
+
+      let p;
+      try {
+        p = m.play();
+      } catch (e) {
+        this._musicPlayFailed = true;
+        this._musicPlaying = false;
+        console.warn("[Audio] music.play threw", e);
+        return;
+      }
+
+      if (p && typeof p.then === "function") {
+        p.then(() => {
+          // play promise resolved
+          this._musicPlaying = !m.paused;
+          this._syncClockBase();
+        }).catch((e) => {
+          this._musicPlayFailed = true;
+          this._musicPlaying = false;
+          console.warn("[Audio] music.play rejected", e);
+        });
+      } else {
+        // older behavior
+        this._musicPlaying = !m.paused;
+        this._syncClockBase();
+      }
     }
 
     stopMusic(opt = {}) {
       const m = this.music;
       if (!m) return;
 
+      const reset = opt.reset !== false; // default true
       try { m.pause(); } catch {}
-      if (opt.reset) {
-        try { m.currentTime = 0; } catch {}
-      }
-      // keep clock base for UI (Timing stops anyway)
+      if (reset) { try { m.currentTime = 0; } catch {} }
+
+      this._musicPlaying = false;
+      this._musicPlayFailed = false;
+      this._stallCount = 0;
       this._syncClockBase();
     }
 
-    /* ------------------------------------------------------------
-       stable time read
-       - prefer currentTime
-       - if it stalls repeatedly (iOS), use perf fallback
-    ------------------------------------------------------------ */
+    // ✅ key fix: NO perf-advance unless music truly playing
     getMusicTime() {
       const m = this.music;
       if (!m) return 0;
 
+      // If not playing, do not advance.
+      if (!this._musicPlaying || m.paused) {
+        const ct0 = Number(m.currentTime || 0);
+        if (Number.isFinite(ct0)) this._lastMusicTime = ct0;
+        return this._lastMusicTime || 0;
+      }
+
       const ct = Number(m.currentTime || 0);
       if (!Number.isFinite(ct)) return this._lastMusicTime || 0;
 
-      // detect stall (ct not increasing while should be playing)
-      if (ct <= this._lastMusicTime + 1e-6) {
-        this._stallCount++;
-      } else {
-        this._stallCount = 0;
-      }
+      if (ct <= this._lastMusicTime + 1e-6) this._stallCount++;
+      else this._stallCount = 0;
 
-      // if not stalled, accept currentTime and resync base
+      // Allow small stalls
       if (this._stallCount < 6) {
         this._lastMusicTime = ct;
         this._syncClockBase(ct);
         return ct;
       }
 
-      // fallback: perf-based clock
+      // Perf fallback ONLY while playing
       const now = performance.now();
       const t = this._clockBaseMusic + (now - this._clockBasePerf) / 1000;
-
-      // keep monotonic
       const out = Math.max(this._lastMusicTime || 0, t);
       this._lastMusicTime = out;
       return out;
@@ -193,9 +192,6 @@
       this._clockBaseMusic = ct;
     }
 
-    /* ------------------------------------------------------------
-       SFX
-    ------------------------------------------------------------ */
     playTap() {
       const s = this.seTap;
       if (!s) return;
@@ -216,9 +212,9 @@
       } catch {}
     }
 
-    isUnlocked() {
-      return !!this._unlocked;
-    }
+    isUnlocked() { return !!this._unlocked; }
+    isMusicPlaying() { return !!this._musicPlaying && !this.music?.paused; }
+    didMusicFail() { return !!this._musicPlayFailed; }
   }
 
   NS.AudioManager = AudioManager;
