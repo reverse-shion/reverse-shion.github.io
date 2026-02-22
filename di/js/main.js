@@ -1,10 +1,5 @@
 /* /di/js/main.js
-   PHASE1 PRO — STRICT DIAG + SINGLE AUDIO ROUTE (NO FREEZE)
-   - Music control: ONLY via AudioManager (no direct <audio>.play/pause here)
-   - Tick is guarded (try/catch) and emits ariaLive logs
-   - Buttons emit logs so "click not firing" is provable
-   - Drives FX: --aru-value + data-aru-state
-   - Fixes HUD wiring: time_dup etc
+   PHASE1 PRO — iOS PRIME UNLOCK + SINGLE CLOCK (NO AUDIO DRIFT)
 */
 "use strict";
 
@@ -42,9 +37,9 @@ const STATES = Object.freeze({
 function setState(app, s) { app.dataset.state = s; }
 function getState(app) { return app.dataset.state || STATES.IDLE; }
 
-/* ===============================
+/* -------------------------------
    Idempotent legacy loader
-================================= */
+-------------------------------- */
 const __scriptCache = (globalThis[APP_KEY] ||= {}).scriptCache || new Map();
 (globalThis[APP_KEY] ||= {}).scriptCache = __scriptCache;
 
@@ -52,12 +47,9 @@ function loadScriptOnce(src) {
   if (__scriptCache.has(src)) return __scriptCache.get(src);
 
   const p = new Promise((resolve, reject) => {
-    const found = [...document.scripts].some((s) => s.src === src);
-    if (found) return resolve();
-
     const s = document.createElement("script");
     const u = new URL(src);
-    u.searchParams.set("v", String(Date.now())); // iOS sanity
+    u.searchParams.set("v", String(Date.now()));
     s.src = u.toString();
     s.async = false;
     s.onload = resolve;
@@ -76,12 +68,12 @@ async function loadScriptsSequentially(files) {
 async function ensureLegacyLoaded() {
   await loadScriptsSequentially(ENGINE_FILES);
   try { await loadScriptsSequentially(PRESENTATION_FILES); }
-  catch (e) { console.warn("[DiCo] presentation load failed (fallback continues):", e); }
+  catch (e) { console.warn("[DiCo] presentation load failed:", e); }
 }
 
-/* ===============================
+/* -------------------------------
    fetch chart
-================================= */
+-------------------------------- */
 async function fetchJSON(url) {
   const u = new URL(url, BASE).toString();
   const r = await fetch(u, { cache: "no-store" });
@@ -98,15 +90,15 @@ function fallbackChart() {
   return { meta: { title: "fallback", bpm }, offset: 0, scroll: { approach: 1.25 }, notes };
 }
 
-/* ===============================
+/* -------------------------------
    presenter (optional)
-================================= */
-function getResultPresenterSafe({ app, refs }) {
+-------------------------------- */
+function getResultPresenterSafe({ refs }) {
   const impl = globalThis.DI_RESULT;
   if (impl && typeof impl.init === "function") {
     try {
       return impl.init({
-        app,
+        app: refs.app,
         root: refs.result,
         dicoLine: refs.dicoLine,
         aruProg: refs.aruProg,
@@ -119,12 +111,12 @@ function getResultPresenterSafe({ app, refs }) {
       console.warn("[DiCo] DI_RESULT.init failed -> fallback", e);
     }
   }
-  return { show: (p) => console.log("[DiCo] RESULT (fallback)", p), hide() {} };
+  return { show: () => {}, hide() {} };
 }
 
-/* ===============================
-   --res-color sync
-================================= */
+/* -------------------------------
+   --res-color sync (unchanged)
+-------------------------------- */
 function makeResColorSync() {
   const root = document.documentElement;
   let lastHue = NaN;
@@ -159,9 +151,9 @@ function makeResColorSync() {
   return { setByResonance };
 }
 
-/* ===============================
-   ARU FX driver
-================================= */
+/* -------------------------------
+   ARU FX driver (unchanged)
+-------------------------------- */
 function applyAruState(app, resonancePct) {
   const r = Math.max(0, Math.min(100, Number(resonancePct) || 0));
   const v01 = r / 100;
@@ -174,9 +166,9 @@ function applyAruState(app, resonancePct) {
   app.dataset.aruState = s;
 }
 
-/* ===============================
+/* -------------------------------
    lifecycle
-================================= */
+-------------------------------- */
 function disposePreviousIfAny() {
   const prev = globalThis[APP_KEY];
   if (prev && typeof prev.dispose === "function") {
@@ -229,10 +221,9 @@ async function boot() {
   const E = globalThis.DI_ENGINE;
   if (!E) throw new Error("DI_ENGINE not loaded");
 
-  // refs (match di.html exactly)
+  // refs
   const refs = {
     app,
-
     avatarRing: $("avatarRing"),
     dicoFace: $("dicoFace"),
     face1: $("face1"),
@@ -256,7 +247,7 @@ async function boot() {
     score: $("score"),
     combo: $("combo"),
     maxCombo: $("maxCombo"),
-    timeDup: $("time_dup"), // ✅ underscore
+    timeDup: $("time_dup"),
 
     result: $("result"),
     resultScore: $("resultScore"),
@@ -283,7 +274,7 @@ async function boot() {
   let render = new E.Renderer({ canvas, chart, timing });
   render.resize?.();
 
-  const presenter = getResultPresenterSafe({ app, refs });
+  const presenter = getResultPresenterSafe({ refs });
 
   let running = false;
   let lock = false;
@@ -301,10 +292,7 @@ async function boot() {
 
     try {
       const t = timing.getSongTime();
-      if (!Number.isFinite(t)) {
-        log("tick: time NaN (timing)");
-        return;
-      }
+      if (!Number.isFinite(t)) return;
 
       judge.sweepMiss(t);
       render.draw(t);
@@ -322,14 +310,9 @@ async function boot() {
         state: getState(app),
       });
 
-      // (optional) live proof that loop runs
-      // log(`t=${t.toFixed(2)} score=${judge.state.score}`);
-
       if (timing.isEnded(t)) endToResult("ENDED");
     } catch (e) {
       console.error(e);
-      log("tick error: " + (e?.message || String(e)));
-      // keep running but stop to avoid infinite crash spam:
       endToResult("ERROR");
     }
   }
@@ -341,24 +324,26 @@ async function boot() {
     try { bgVideo?.pause?.(); } catch {}
   }
 
-  async function startGame() {
-    log("START clicked");
-    if (lock || running || getState(app) === STATES.PLAYING) return;
+  // ✅ important: primeUnlock must be called synchronously in click handler
+  function primeInGesture() {
+    try { audio.primeUnlock?.(); } catch {}
+  }
 
+  async function startGame() {
+    if (lock || running || getState(app) === STATES.PLAYING) return;
     lock = true;
-    await audio.unlock();
+
+    // ✅ sync prime (gesture)
+    primeInGesture();
+
+    // truthful unlock (async) — if false, continue anyway, but clock will fallback
+    try { await audio.unlock?.(); } catch {}
 
     rebuild();
     judge.reset?.();
 
-    // ✅ timing drives audio via AudioManager
-    try {
-      if (typeof timing.restart === "function") timing.restart(audio);
-      else timing.start(audio, { reset: true });
-    } catch (e) {
-      console.warn("[DiCo] timing start error:", e);
-      log("timing start error");
-    }
+    // ✅ single clock route: timing controls audio via AudioManager
+    timing.restart?.(audio);
 
     setState(app, STATES.PLAYING);
     presenter.hide?.();
@@ -373,30 +358,27 @@ async function boot() {
   }
 
   async function restartGame() {
-    log("RESTART clicked");
     if (lock) return;
     lock = true;
+
+    // ✅ sync prime (gesture)
+    primeInGesture();
 
     // stop loop first
     running = false;
     stopRAF();
 
-    // ✅ stop music ONLY via AudioManager
-    try { audio.stopMusic?.(); } catch {}
+    // ✅ HARD reset now (sync) to prevent “music runs but chart frozen”
+    try { audio.stopMusic?.({ reset: true }); } catch {}
     stopBGVideo();
 
-    await audio.unlock();
+    try { await audio.unlock?.(); } catch {}
 
     rebuild();
     judge.reset?.();
 
-    try {
-      if (typeof timing.restart === "function") timing.restart(audio);
-      else timing.start(audio, { reset: true });
-    } catch (e) {
-      console.warn("[DiCo] timing restart error:", e);
-      log("timing restart error");
-    }
+    // ✅ restart timing+audio in one route
+    timing.restart?.(audio);
 
     setState(app, STATES.PLAYING);
     presenter.hide?.();
@@ -413,13 +395,10 @@ async function boot() {
   function endToResult(reason = "STOP") {
     if (getState(app) === STATES.RESULT) return;
 
-    log("RESULT: " + reason);
-
     running = false;
     stopRAF();
 
     try { timing.stop?.(audio); } catch {}
-    try { audio.stopMusic?.(); } catch {}
     stopBGVideo();
 
     setState(app, STATES.RESULT);
@@ -432,9 +411,8 @@ async function boot() {
     };
 
     ui.showResult?.(payload);
-    try { presenter.show?.(payload); } catch (e) {
-      console.warn("[DiCo] presenter.show failed:", e);
-    }
+    try { presenter.show?.(payload); } catch {}
+    log("RESULT: " + reason);
   }
 
   // input
@@ -453,7 +431,6 @@ async function boot() {
       ui.onJudge?.(res);
 
       if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-        // GOODでもスコア増えるので、ここで鳴らしてもOK
         audio.playGreat?.();
         ui.flashHit?.();
         fxLegacy.sparkLine?.();
@@ -477,7 +454,7 @@ async function boot() {
 
   // init
   setState(app, STATES.IDLE);
-  try { audio.stopMusic?.(); } catch {}
+  try { audio.stopMusic?.({ reset: true }); } catch {}
   stopBGVideo();
 
   applyAruState(app, 0);
@@ -490,7 +467,7 @@ async function boot() {
     try { input?.destroy?.(); } catch {}
     try { running = false; } catch {}
     try { stopRAF(); } catch {}
-    try { audio.stopMusic?.(); } catch {}
+    try { audio.stopMusic?.({ reset: true }); } catch {}
     try { stopBGVideo(); } catch {}
     instance.running = false;
   };
