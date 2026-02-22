@@ -1,4 +1,15 @@
-/* /di/js/engine/timing.js */
+/* /di/js/engine/timing.js
+   Timing — PRO (Hybrid Clock for iOS / buffering safe)
+   ------------------------------------------------------------
+   Problem solved:
+   - After restart, music may play but audio.currentTime can stay 0 (or stall)
+     for a short while (iOS / buffering / autoplay quirks).
+   - If timing relies ONLY on currentTime, t stays 0 -> notes appear frozen.
+   Fix:
+   - Use AUDIO clock when it moves
+   - Fallback to PERF clock while audio clock is stalled right after start/resume
+*/
+
 (() => {
   const NS = (window.DI_ENGINE ||= {});
 
@@ -7,17 +18,22 @@
       this.chart = chart;
 
       this._running = false;
+      this._paused = false;
 
       // chart offset (seconds)
       this._songOffset = Number(chart?.offset || 0);
-
       this._durationGuess = this._guessDuration(chart);
 
       this._audio = null;
 
-      // pause/resume support
-      this._paused = false;
-      this._lastSongTime = 0; // keep last computed time for UI
+      // last known song time (seconds)
+      this._lastSongTime = 0;
+
+      // --- hybrid clock state ---
+      this._perfStartMs = 0;     // performance.now at start/resume
+      this._baseSongTime = 0;    // songTime at perfStartMs (seconds)
+      this._lastAudioRaw = -1;   // last raw audio time (seconds)
+      this._stallFrames = 0;     // how long audio clock is stalled
     }
 
     _guessDuration(chart) {
@@ -27,28 +43,32 @@
       return Math.max(20, last + 4.0);
     }
 
-    // --- Core helpers ---
     _ensureAudio(audio) {
       this._audio = audio || this._audio;
       return this._audio;
     }
 
-    _calcSongTimeFromAudio() {
+    _getAudioRaw() {
       const a = this._audio;
       if (a && a.music) {
         const raw = a.getMusicTime(); // seconds
-        const t = raw - this._songOffset;
-        return Math.max(0, t);
+        return Number.isFinite(raw) ? raw : 0;
       }
-      return this._lastSongTime || 0;
+      return 0;
+    }
+
+    _toSongTimeFromRaw(raw) {
+      const t = raw - this._songOffset;
+      return Math.max(0, t);
+    }
+
+    _markPerfBase(songTime) {
+      this._perfStartMs = performance.now();
+      this._baseSongTime = songTime;
+      this._stallFrames = 0;
     }
 
     // --- API ---
-    /**
-     * Start gameplay timing.
-     * @param {AudioManager} audio
-     * @param {{ reset?: boolean }} opt
-     */
     start(audio, opt = {}) {
       const a = this._ensureAudio(audio);
       const reset = !!opt.reset;
@@ -56,7 +76,7 @@
       this._paused = false;
       this._running = true;
 
-      // ✅ reset=true の時は必ず曲を先頭へ
+      // reset request: seek to start (best effort)
       if (a && a.music && reset) {
         try {
           a.music.pause();
@@ -64,55 +84,58 @@
         } catch {}
       }
 
-      // start/resume music
-      a?.playMusic?.();
+      // start music (best effort, may still stall currentTime briefly)
+      a?.playMusic?.({ reset });
 
-      // refresh cached time
-      this._lastSongTime = this._calcSongTimeFromAudio();
+      // establish base times
+      const raw = this._getAudioRaw();
+      this._lastAudioRaw = raw;
+
+      const songT = this._toSongTimeFromRaw(raw);
+      this._lastSongTime = songT;
+      this._markPerfBase(songT);
     }
 
-    /**
-     * Pause (STOP) gameplay timing (keeps position).
-     */
     pause(audio) {
       const a = this._ensureAudio(audio);
       this._paused = true;
       this._running = false;
 
-      // keep last time snapshot
-      this._lastSongTime = this._calcSongTimeFromAudio();
+      // snapshot current time
+      const raw = this._getAudioRaw();
+      this._lastAudioRaw = raw;
+      this._lastSongTime = this._toSongTimeFromRaw(raw);
 
-      a?.stopMusic?.(); // pause music
+      a?.stopMusic?.({ reset: false }); // pause music (keep pos)
     }
 
-    /**
-     * Resume from pause without resetting.
-     */
     resume(audio) {
       const a = this._ensureAudio(audio);
       this._paused = false;
       this._running = true;
 
-      a?.playMusic?.();
-      this._lastSongTime = this._calcSongTimeFromAudio();
+      a?.playMusic?.({ reset: false });
+
+      const raw = this._getAudioRaw();
+      this._lastAudioRaw = raw;
+
+      const songT = this._toSongTimeFromRaw(raw);
+      this._lastSongTime = songT;
+      this._markPerfBase(songT);
     }
 
-    /**
-     * Stop completely (used at result/end). Keeps last time.
-     */
     stop(audio) {
       const a = this._ensureAudio(audio);
       this._running = false;
       this._paused = false;
 
-      this._lastSongTime = this._calcSongTimeFromAudio();
+      const raw = this._getAudioRaw();
+      this._lastAudioRaw = raw;
+      this._lastSongTime = this._toSongTimeFromRaw(raw);
 
-      a?.stopMusic?.();
+      a?.stopMusic?.({ reset: true }); // stop + reset to 0
     }
 
-    /**
-     * Convenience for restart.
-     */
     restart(audio) {
       this.start(audio, { reset: true });
     }
@@ -121,15 +144,37 @@
     isPaused() { return this._paused; }
 
     getSongTime() {
-      // If running, follow audio clock.
-      if (this._running) {
-        const t = this._calcSongTimeFromAudio();
-        this._lastSongTime = t;
-        return t;
+      if (!this._running) return this._lastSongTime || 0;
+
+      const raw = this._getAudioRaw();
+      const songFromAudio = this._toSongTimeFromRaw(raw);
+
+      // Detect "audio clock stalled" right after (re)start:
+      // - raw doesn't change (or changes extremely little)
+      // - songFromAudio stays at same value
+      const EPS = 1e-4;
+      const moved = Math.abs(raw - this._lastAudioRaw) > EPS;
+
+      if (moved) {
+        // Audio clock is alive -> trust it
+        this._stallFrames = 0;
+        this._lastAudioRaw = raw;
+        this._lastSongTime = songFromAudio;
+        // re-anchor perf base so fallback stays seamless if it stalls again
+        this._markPerfBase(songFromAudio);
+        return songFromAudio;
       }
 
-      // If paused/stopped, return last known time (not 0)
-      return this._lastSongTime || 0;
+      // Audio clock not moving: use performance clock fallback
+      this._stallFrames++;
+
+      const dt = (performance.now() - this._perfStartMs) / 1000;
+      // Limit drift during long stalls (should not happen; safety cap)
+      const perfSong = this._baseSongTime + Math.max(0, Math.min(dt, 3.0));
+
+      // Keep lastSongTime monotonic
+      this._lastSongTime = Math.max(this._lastSongTime, perfSong);
+      return this._lastSongTime;
     }
 
     isEnded(songTime) {
