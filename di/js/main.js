@@ -1,13 +1,10 @@
 /* /di/js/main.js
-   PHASE1 PRO — HYBRID MODULE SAFE (NO-COLLISION / NO-REGRESSION)
-   - main.js: ESModule only
-   - engine: legacy scripts (window.DI_ENGINE)
-   - idempotent loader (safe if called twice)
-   - single-run guard + abortable listeners
-   - deterministic lifecycle: boot -> idle -> playing -> result
-   - ✅ fixes HUD wiring (time_dup etc)
-   - ✅ drives FX: --aru-value + data-aru-state
-   - ✅ integrates CSS var: --res-color
+   PHASE1 PRO — STRICT DIAG + SINGLE AUDIO ROUTE (NO FREEZE)
+   - Music control: ONLY via AudioManager (no direct <audio>.play/pause here)
+   - Tick is guarded (try/catch) and emits ariaLive logs
+   - Buttons emit logs so "click not firing" is provable
+   - Drives FX: --aru-value + data-aru-state
+   - Fixes HUD wiring: time_dup etc
 */
 "use strict";
 
@@ -55,7 +52,6 @@ function loadScriptOnce(src) {
   if (__scriptCache.has(src)) return __scriptCache.get(src);
 
   const p = new Promise((resolve, reject) => {
-    // If exact base src already exists (rare), accept.
     const found = [...document.scripts].some((s) => s.src === src);
     if (found) return resolve();
 
@@ -133,8 +129,8 @@ function makeResColorSync() {
   const root = document.documentElement;
   let lastHue = NaN;
 
-  const HUE_MIN = 190; // cyan
-  const HUE_MAX = 55;  // gold
+  const HUE_MIN = 190;
+  const HUE_MAX = 55;
   const UPDATE_STEP_DEG = 1.5;
 
   const clamp01 = (v) => Math.max(0, Math.min(1, v));
@@ -144,7 +140,7 @@ function makeResColorSync() {
     if (!Number.isFinite(v)) v = 0;
     if (v > 1.5) v /= 100;
     const x = clamp01(v);
-    const eased = x * x * (3 - 2 * x); // smoothstep
+    const eased = x * x * (3 - 2 * x);
     return HUE_MIN + (HUE_MAX - HUE_MIN) * eased;
   }
 
@@ -164,12 +160,11 @@ function makeResColorSync() {
 }
 
 /* ===============================
-   ARU FX driver (CSS-only FX)
-   - keeps FX stable even if some modules missing
+   ARU FX driver
 ================================= */
 function applyAruState(app, resonancePct) {
   const r = Math.max(0, Math.min(100, Number(resonancePct) || 0));
-  const v01 = (r / 100);
+  const v01 = r / 100;
   app.style.setProperty("--aru-value", v01.toFixed(3));
 
   let s = "low";
@@ -189,9 +184,6 @@ function disposePreviousIfAny() {
   }
 }
 
-/* ===============================
-   boot
-================================= */
 async function boot() {
   disposePreviousIfAny();
 
@@ -211,13 +203,12 @@ async function boot() {
   const hitZone = assertEl($("hitZone"), "hitZone");
   const startBtn = assertEl($("startBtn"), "startBtn");
   const restartBtn = assertEl($("restartBtn"), "restartBtn");
-  const music = assertEl($("music"), "music");
-
-  // optional DOM
-  const bgVideo = $("bgVideo");
   const stopBtn = $("stopBtn");
+
+  const music = assertEl($("music"), "music");
   const seTap = $("seTap");
   const seGreat = $("seGreat");
+  const bgVideo = $("bgVideo");
 
   if (bgVideo) {
     try {
@@ -234,16 +225,14 @@ async function boot() {
   try { chart = await fetchJSON("charts/chart_001.json"); }
   catch (e) { chart = fallbackChart(); console.warn("[DiCo] chart fallback:", e); }
 
-  // legacy engine
+  // engine
   const E = globalThis.DI_ENGINE;
   if (!E) throw new Error("DI_ENGINE not loaded");
 
-  // ✅ IMPORTANT: refs must match di.html IDs exactly
+  // refs (match di.html exactly)
   const refs = {
-    // root
     app,
 
-    // avatar + ring + face pool
     avatarRing: $("avatarRing"),
     dicoFace: $("dicoFace"),
     face1: $("face1"),
@@ -252,13 +241,11 @@ async function boot() {
     face4: $("face4"),
     face5: $("face5"),
 
-    // judge overlay
     judge: $("judge"),
     judgeMain: $("judgeMain"),
     judgeSub: $("judgeSub"),
     hitFlash: $("hitFlash"),
 
-    // ✅ SIDE HUD (exists)
     sideScore: $("sideScore"),
     sideCombo: $("sideCombo"),
     sideMaxCombo: $("sideMaxCombo"),
@@ -266,14 +253,11 @@ async function boot() {
     resFill: $("resFill"),
     time: $("time"),
 
-    // ✅ LEGACY HUD (exists)
     score: $("score"),
     combo: $("combo"),
     maxCombo: $("maxCombo"),
-    // NOTE: di.html uses time_dup (underscore)
-    timeDup: $("time_dup"),
+    timeDup: $("time_dup"), // ✅ underscore
 
-    // result
     result: $("result"),
     resultScore: $("resultScore"),
     resultMaxCombo: $("resultMaxCombo"),
@@ -284,8 +268,8 @@ async function boot() {
   };
 
   assertEl(refs.dicoFace, "dicoFace");
+  const log = (m) => { if (refs.ariaLive) refs.ariaLive.textContent = String(m); };
 
-  // color + aru init (safe)
   const resColor = makeResColorSync();
   resColor.setByResonance(0);
   applyAruState(app, 0);
@@ -315,60 +299,65 @@ async function boot() {
     if (!running) return;
     raf = requestAnimationFrame(tick);
 
-    const t = timing.getSongTime();
-    if (!Number.isFinite(t)) return;
+    try {
+      const t = timing.getSongTime();
+      if (!Number.isFinite(t)) {
+        log("tick: time NaN (timing)");
+        return;
+      }
 
-    judge.sweepMiss(t);
-    render.draw(t);
+      judge.sweepMiss(t);
+      render.draw(t);
 
-    // ✅ drive FX + theme vars from resonance
-    const res = judge.state.resonance;
-    resColor.setByResonance(res);
-    applyAruState(app, res);
+      const res = judge.state.resonance;
+      resColor.setByResonance(res);
+      applyAruState(app, res);
 
-    ui.update({
-      t,
-      score: judge.state.score,
-      combo: judge.state.combo,
-      maxCombo: judge.state.maxCombo,
-      resonance: res,
-      state: getState(app),
-    });
+      ui.update({
+        t,
+        score: judge.state.score,
+        combo: judge.state.combo,
+        maxCombo: judge.state.maxCombo,
+        resonance: res,
+        state: getState(app),
+      });
 
-    if (timing.isEnded(t)) endToResult("ENDED");
+      // (optional) live proof that loop runs
+      // log(`t=${t.toFixed(2)} score=${judge.state.score}`);
+
+      if (timing.isEnded(t)) endToResult("ENDED");
+    } catch (e) {
+      console.error(e);
+      log("tick error: " + (e?.message || String(e)));
+      // keep running but stop to avoid infinite crash spam:
+      endToResult("ERROR");
+    }
   }
 
-  async function playMedia(resetToStart = true) {
-    if (resetToStart) {
-      try { music.pause(); music.currentTime = 0; } catch {}
-    }
-    try { await music.play(); } catch {}
+  async function playBGVideo() {
     try { await bgVideo?.play?.(); } catch {}
   }
-
-  function stopMedia(resetToStart = false) {
-    try { music.pause(); } catch {}
+  function stopBGVideo() {
     try { bgVideo?.pause?.(); } catch {}
-    if (resetToStart) {
-      try { music.currentTime = 0; } catch {}
-    }
   }
 
   async function startGame() {
+    log("START clicked");
     if (lock || running || getState(app) === STATES.PLAYING) return;
-    lock = true;
 
+    lock = true;
     await audio.unlock();
 
     rebuild();
     judge.reset?.();
 
-    // start timing (audio clock is source of truth)
+    // ✅ timing drives audio via AudioManager
     try {
       if (typeof timing.restart === "function") timing.restart(audio);
       else timing.start(audio, { reset: true });
     } catch (e) {
       console.warn("[DiCo] timing start error:", e);
+      log("timing start error");
     }
 
     setState(app, STATES.PLAYING);
@@ -379,17 +368,22 @@ async function boot() {
     stopRAF();
     tick();
 
-    await playMedia(true);
+    await playBGVideo();
     lock = false;
   }
 
   async function restartGame() {
+    log("RESTART clicked");
     if (lock) return;
     lock = true;
 
+    // stop loop first
     running = false;
     stopRAF();
-    stopMedia(true);
+
+    // ✅ stop music ONLY via AudioManager
+    try { audio.stopMusic?.(); } catch {}
+    stopBGVideo();
 
     await audio.unlock();
 
@@ -401,6 +395,7 @@ async function boot() {
       else timing.start(audio, { reset: true });
     } catch (e) {
       console.warn("[DiCo] timing restart error:", e);
+      log("timing restart error");
     }
 
     setState(app, STATES.PLAYING);
@@ -411,18 +406,21 @@ async function boot() {
     stopRAF();
     tick();
 
-    await playMedia(true);
+    await playBGVideo();
     lock = false;
   }
 
   function endToResult(reason = "STOP") {
     if (getState(app) === STATES.RESULT) return;
 
+    log("RESULT: " + reason);
+
     running = false;
     stopRAF();
 
     try { timing.stop?.(audio); } catch {}
-    stopMedia(false);
+    try { audio.stopMusic?.(); } catch {}
+    stopBGVideo();
 
     setState(app, STATES.RESULT);
 
@@ -454,7 +452,8 @@ async function boot() {
       const res = judge.hit(t + INPUT_LAT);
       ui.onJudge?.(res);
 
-      if (res && (res.name === "GREAT" || res.name === "PERFECT")) {
+      if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
+        // GOODでもスコア増えるので、ここで鳴らしてもOK
         audio.playGreat?.();
         ui.flashHit?.();
         fxLegacy.sparkLine?.();
@@ -462,7 +461,7 @@ async function boot() {
     },
   });
 
-  // listeners (AbortController prevents duplicates)
+  // listeners
   startBtn.addEventListener("click", startGame, { signal: ac.signal });
   restartBtn.addEventListener("click", restartGame, { signal: ac.signal });
   stopBtn?.addEventListener("click", () => endToResult("STOP"), { signal: ac.signal });
@@ -476,30 +475,28 @@ async function boot() {
     { passive: true, signal: ac.signal }
   );
 
-  // init state
+  // init
   setState(app, STATES.IDLE);
-  stopMedia(false);
+  try { audio.stopMusic?.(); } catch {}
+  stopBGVideo();
 
-  // initialize UI display (must show zeros immediately)
   applyAruState(app, 0);
   resColor.setByResonance(0);
   ui.update?.({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: STATES.IDLE });
+  log("BOOT OK");
 
   instance.dispose = () => {
     try { ac.abort(); } catch {}
     try { input?.destroy?.(); } catch {}
     try { running = false; } catch {}
     try { stopRAF(); } catch {}
-    try { stopMedia(true); } catch {}
+    try { audio.stopMusic?.(); } catch {}
+    try { stopBGVideo(); } catch {}
     instance.running = false;
   };
-
-  console.log("[DiCo] BOOT OK (HUD wired + FX driven)");
 }
 
-/* ===============================
-   entrypoint
-================================= */
+// entry
 (async () => {
   try {
     await ensureLegacyLoaded();
