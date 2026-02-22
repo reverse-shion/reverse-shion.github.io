@@ -1,10 +1,10 @@
 <!-- /di/di.html
-  PRO FINAL (mobile-safe / iOS-safe / deterministic layering)
-  - Keeps your existing IDs (so engine/ui.js/main.js keep working)
-  - Improves preload strategy (faces + core assets)
-  - Moves idleParticles script to module-safe block at bottom (still inline)
-  - Adds “no-js” fallback message (hidden when JS runs)
-  - Keeps ARU gauge anchored to orb and keeps result overlay semantics
+  PRO FINAL — SINGLE ENTRYPOINT / NO-CONFLICT / iOS SAFE
+  - Entry is ONLY: ./js/main.js (type=module)
+  - No duplicate loaders (old main.js / result.js tag removed)
+  - Keeps existing IDs for legacy engine/ui.js compatibility
+  - FX layer stays #fxLayer (single source of truth)
+  - Idle particles inline (cheap) and only draws in idle
 -->
 <!doctype html>
 <html lang="ja">
@@ -20,7 +20,9 @@
 
   <title>DiCo ARU – Phase1</title>
 
-  <!-- CSS split (order matters) -->
+  <!-- =========================================================
+       CSS (order matters)
+       ========================================================= -->
   <link rel="stylesheet" href="./css/themes.css" />
   <link rel="stylesheet" href="./css/core.css" />
   <link rel="stylesheet" href="./css/hud.css" />
@@ -29,14 +31,22 @@
   <link rel="stylesheet" href="./css/aru-fx.css" />
   <link rel="stylesheet" href="./css/aru-gauge.css" />
 
-  <!-- Preload (iOS help) -->
+  <!-- ✅ NEW FX CSS (separated, safe add-on; does not break existing UI) -->
+  <link rel="stylesheet" href="./css/fx/fx-layer.css" />
+  <link rel="stylesheet" href="./css/fx/fx-particles.css" />
+  <link rel="stylesheet" href="./css/fx/fx-ring.css" />
+  <link rel="stylesheet" href="./css/fx/fx-max.css" />
+
+  <!-- =========================================================
+       Preload (iOS help)
+       ========================================================= -->
   <link rel="preload" href="./idle/dico_idle.jpg" as="image" fetchpriority="high" />
   <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
   <link rel="preload" href="./audio/music.mp3" as="audio" />
   <link rel="preload" href="./audio/se_tap.wav" as="audio" />
   <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
 
-  <!-- ✅ Face preloads (for instant swaps) -->
+  <!-- Face preloads (instant swap) -->
   <link rel="preload" href="./faces/dico_face_1.png" as="image" />
   <link rel="preload" href="./faces/dico_face_2.png" as="image" />
   <link rel="preload" href="./faces/dico_face_3.png" as="image" />
@@ -61,7 +71,7 @@
   style="--aru-value:0.17"
   aria-label="DiCo ARU Rhythm"
 >
-  <!-- no-js fallback (JS can hide by setting display:none if you want later) -->
+  <!-- no-js fallback -->
   <noscript>
     <div class="nojs" role="note" aria-label="JavaScript required">
       <strong>JavaScript が必要です</strong>
@@ -100,8 +110,11 @@
     aria-hidden="true"
   ></video>
 
-  <!-- FX (tap-through) -->
-  <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
+  <!-- =========================================================
+       FX (single source of truth)
+       - New FX modules will attach particles here
+       ========================================================= -->
+  <div class="fxLayer fx-layer" id="fxLayer" aria-hidden="true"></div>
 
   <!-- =========================================================
        SIDE HUD (LEFT / RIGHT)
@@ -135,7 +148,9 @@
 
         <!-- Avatar -->
         <div class="sideAvatar" aria-label="DiCo avatar">
-          <div class="avatarRing" id="avatarRing" aria-hidden="true"></div>
+          <!-- ✅ Ring element (target for absorption + rotation sync) -->
+          <div class="avatarRing res-ring" id="avatarRing" aria-hidden="true"></div>
+
           <img
             id="dicoFace"
             class="dicoFace"
@@ -166,7 +181,7 @@
           <div class="sideTimeValue" id="time">--</div>
         </div>
 
-        <!-- ✅ Face pool (preload guarantee; hidden) -->
+        <!-- Face pool (preload guarantee; hidden) -->
         <div class="facePool" aria-hidden="true">
           <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
           <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
@@ -208,10 +223,10 @@
        STAGE
        ========================================================= -->
   <section class="stage" id="stage" aria-label="Game Stage">
-    <!-- NOTE CANVAS (render only; no input) -->
+    <!-- NOTE CANVAS -->
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
 
-    <!-- HIT ZONE (only this receives pointer events; lane width) -->
+    <!-- HIT ZONE -->
     <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
 
     <!-- TARGET -->
@@ -246,7 +261,7 @@
 
         <div class="resultDivider"></div>
 
-        <!-- ARU SECTION (ANCHOR ROOT) -->
+        <!-- ARU SECTION -->
         <div class="aruWrap" aria-label="ARU Gauge">
           <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
             <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
@@ -266,7 +281,6 @@
               <div class="aruValue" id="aruValue">0%</div>
             </div>
 
-            <!-- ARU GAUGE OVERLAY (ANCHOR TO ORB CENTER) -->
             <div class="aruLayer" aria-hidden="true">
               <div class="aruGauge">
                 <div class="aruScore" id="aruOverlayScore">0%</div>
@@ -303,19 +317,18 @@
 </main>
 
 <!-- =========================================================
-     SCRIPTS (order: main -> common -> result module)
-     - main.js loads engine scripts sequentially.
-     - result.js module can coexist; main.js also tries to load it
-       (safe, because your main.js fallback handles failure).
+     SCRIPTS (NO DUPLICATES)
+     - common.js: classic defer (globals / helpers)
+     - di/js/main.js: ONLY entrypoint, module
+       (main.js will import FX + try import result presenter safely)
      ========================================================= -->
 
-<script src="./js/main.js" defer></script>
 <script src="./js/common.js" defer></script>
-<script type="module" src="./js/result.js"></script>
+<script type="module" src="./js/main.js"></script>
 
 <!-- =========================================================
      Idle particles (idle only, light + iOS safe)
-     - Uses requestAnimationFrame and only draws during data-state="idle"
+     - Only draws when data-state="idle"
      ========================================================= -->
 <script>
 (() => {
@@ -345,17 +358,12 @@
 
     c.width = Math.max(1, Math.floor(bw * dpr));
     c.height = Math.max(1, Math.floor(bh * dpr));
-
-    // draw in CSS pixels
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  let raf = 0;
-
   function tick() {
-    // keep loop running but draw only in idle
     if (app.dataset.state !== "idle") {
-      raf = requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
       return;
     }
 
@@ -381,10 +389,9 @@
       ctx.fill();
     }
 
-    raf = requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
   }
 
-  // init
   resize();
   window.addEventListener("resize", resize, { passive: true });
   tick();
