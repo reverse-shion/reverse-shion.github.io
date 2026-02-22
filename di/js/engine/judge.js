@@ -1,5 +1,5 @@
 /* /di/js/engine/judge.js
-   Judge — PRO (Deterministic, Skip-safe, No double-consume)
+   Judge — deterministic, skip-safe, adjustable input latency support
 */
 (() => {
   const NS = (window.DI_ENGINE ||= {});
@@ -8,29 +8,34 @@
     constructor({ chart, timing }) {
       this.chart = chart;
       this.timing = timing;
+      this.inputLatency = 0;
 
       this.W = {
         PERFECT: 0.055,
-        GREAT:   0.095,
-        GOOD:    0.140,
-        MISS:    0.190,
+        GREAT: 0.095,
+        GOOD: 0.140,
+        MISS: 0.190,
       };
 
       this.state = {
         score: 0,
         combo: 0,
         maxCombo: 0,
-        resonance: 0, // 0..100
+        resonance: 0,
         idx: 0,
         hitCount: 0,
         missCount: 0,
       };
 
-      // ensure numeric note times
       this.notes = (chart?.notes || [])
-        .map(n => ({ ...n, t: Number(n.t || 0) }))
-        .filter(n => Number.isFinite(n.t))
+        .map((n) => ({ ...n, t: Number(n.t || 0) }))
+        .filter((n) => Number.isFinite(n.t))
         .sort((a, b) => a.t - b.t);
+    }
+
+    setInputLatency(sec) {
+      const v = Number(sec);
+      this.inputLatency = Number.isFinite(v) ? v : 0;
     }
 
     reset() {
@@ -44,19 +49,15 @@
       s.missCount = 0;
     }
 
-    _clampRes(v) {
-      return Math.max(0, Math.min(100, v));
-    }
-    _addRes(amount) {
-      this.state.resonance = this._clampRes(this.state.resonance + amount);
-    }
+    _clampRes(v) { return Math.max(0, Math.min(100, v)); }
+    _addRes(amount) { this.state.resonance = this._clampRes(this.state.resonance + amount); }
 
     _scoreFor(name) {
       switch (name) {
         case "PERFECT": return 120;
-        case "GREAT":   return 90;
-        case "GOOD":    return 40;
-        default:        return 0;
+        case "GREAT": return 90;
+        case "GOOD": return 40;
+        default: return 0;
       }
     }
 
@@ -67,14 +68,11 @@
       this._addRes(-2);
     }
 
-    // auto-miss notes that passed too far
     sweepMiss(songTime) {
       const missWindow = this.W.MISS;
       const s = this.state;
-      const notes = this.notes;
-
-      while (s.idx < notes.length) {
-        const nt = notes[s.idx].t;
+      while (s.idx < this.notes.length) {
+        const nt = this.notes[s.idx].t;
         if ((songTime - nt) > missWindow) {
           s.idx++;
           this._applyMiss();
@@ -84,27 +82,21 @@
       }
     }
 
-    // find nearest among idx / idx+1; reject if outside MISS window
     _findNearestIndex(songTime) {
       const s = this.state;
-      const notes = this.notes;
-      if (s.idx >= notes.length) return -1;
-
+      if (s.idx >= this.notes.length) return -1;
       const a = s.idx;
       const b = s.idx + 1;
 
       let best = a;
-      let bestDiff = Math.abs(songTime - notes[a].t);
-
-      if (b < notes.length) {
-        const d2 = Math.abs(songTime - notes[b].t);
+      let bestDiff = Math.abs(songTime - this.notes[a].t);
+      if (b < this.notes.length) {
+        const d2 = Math.abs(songTime - this.notes[b].t);
         if (d2 < bestDiff) { best = b; bestDiff = d2; }
       }
-
-      return (bestDiff <= this.W.MISS) ? best : -1;
+      return bestDiff <= this.W.MISS ? best : -1;
     }
 
-    // consume notes strictly in order, treating skipped ones as MISS
     _consumeTo(targetIndexExclusive) {
       const s = this.state;
       while (s.idx < targetIndexExclusive) {
@@ -113,43 +105,33 @@
       }
     }
 
-    // called on tap
     hit(songTime) {
-      // keep idx aligned with time first
-      this.sweepMiss(songTime);
+      const now = Number(songTime) + this.inputLatency;
+      this.sweepMiss(now);
 
-      const i = this._findNearestIndex(songTime);
+      const i = this._findNearestIndex(now);
       if (i < 0) return { name: "EMPTY", delta: 0, diff: null };
 
       const n = this.notes[i];
-      const diff = Math.abs(songTime - n.t);
-
+      const diff = Math.abs(now - n.t);
       let name = "MISS";
       if (diff <= this.W.PERFECT) name = "PERFECT";
       else if (diff <= this.W.GREAT) name = "GREAT";
       else if (diff <= this.W.GOOD) name = "GOOD";
-      else name = "MISS";
 
       if (name === "MISS") {
         this._applyMiss();
         return { name, diff, noteTime: n.t };
       }
 
-      // If player hit idx+1, treat idx as missed FIRST (strict)
-      // Then consume the hit note.
       this._consumeTo(i);
-
-      // consume hit note itself
       this.state.idx++;
 
-      // apply reward
       const s = this.state;
       s.hitCount++;
       s.combo++;
       s.maxCombo = Math.max(s.maxCombo, s.combo);
-
-      const add = this._scoreFor(name);
-      s.score += add;
+      s.score += this._scoreFor(name);
 
       if (name === "PERFECT") this._addRes(1.8);
       else if (name === "GREAT") this._addRes(1.2);
