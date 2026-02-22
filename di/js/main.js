@@ -1,19 +1,20 @@
 /* /di/js/main.js
-   DiCo ARU Phase1 — PRO STABLE ENTRY v2.2 (VIDEO NEVER STOPS / CHART PATH FIX)
-   ------------------------------------------------------------
-   ✅ iOS Safari safe (gesture unlock, VIDEO PLAY IN-GESTURE on pointerdown)
+   DiCo ARU Phase1 — PRO STABLE ENTRY v2.3 (VIDEO NEVER STOPS / CHART PATH FIX / FX SINGLETON)
+   -----------------------------------------------------------------------------------------
+   ✅ iOS Safari safe (gesture unlock, VIDEO PLAY IN-GESTURE on pointerdown/touchstart)
    ✅ Prevent double-tap zoom / scroll drift (hitZone scoped)
    ✅ Deterministic state machine: idle -> playing -> result
    ✅ Single clock (Timing drives everything)
    ✅ Asset base fixed: charts/audio/video resolve from /di/ (NOT /di/js/)
-   ✅ Video never-stall: keep decoding alive + auto-recover (waiting/stalled/ended)
+   ✅ Video never-stall: keep decoding alive + auto-recover (waiting/stalled/pause/ended + watchdog)
    ✅ Robust restart (no stalled notes / audio desync)
    ✅ Debug probes for bg video stall + visualViewport drift
+   ✅ FX is singleton (prevents multiple FXCore instances / patch duplication)
 */
 
 "use strict";
 
-import { FXCore } from "./engine/fx/index.js";
+import { createFX, resetFX } from "./engine/fx/index.js";
 
 const JS_BASE = new URL("./", import.meta.url);      // /di/js/
 const ASSET_BASE = new URL("../", import.meta.url);  // /di/
@@ -60,11 +61,9 @@ function assertEl(el, name) {
   if (!el) throw new Error(`Missing #${name}`);
   return el;
 }
-
 function now() {
   return performance?.now?.() ?? Date.now();
 }
-
 function clamp(v, a, b) {
   return Math.max(a, Math.min(b, v));
 }
@@ -118,14 +117,44 @@ async function ensureLegacyLoaded() {
 
 // ---------------------------------------------------------------------
 // DATA FETCH (ASSET BASE FIX)
-//  - charts/ は /di/charts/ を見る（moduleのJS_BASEだと /di/js/charts に行って404→fallback）
+//  - charts/ は /di/charts/ を見る（JS_BASEだと /di/js/charts に行って404→fallback）
 // ---------------------------------------------------------------------
 async function fetchJSON(url) {
   const u = new URL(url, ASSET_BASE).toString();
-  if (DEV) console.debug("[CHART] url =", u);
+  if (DEV) console.debug("[ASSET] fetch =", u);
   const r = await fetch(u, { cache: DEV ? "no-store" : "force-cache" });
   if (!r.ok) throw new Error(`fetch failed ${u}: ${r.status}`);
   return r.json();
+}
+
+function normalizeChart(raw) {
+  const c = raw && typeof raw === "object" ? raw : null;
+  if (!c) return null;
+
+  const notes = Array.isArray(c.notes) ? c.notes : null;
+  if (!notes || notes.length === 0) return null;
+
+  // minimal normalize
+  const bpm = Number(c?.meta?.bpm ?? c?.bpm ?? 145);
+  const offset = Number(c?.offset ?? 0);
+  const approach = Number(c?.scroll?.approach ?? 1.25);
+
+  const fixedNotes = notes
+    .map((n) => ({
+      t: Number(n?.t ?? 0),
+      type: n?.type || "tap",
+    }))
+    .filter((n) => Number.isFinite(n.t) && n.t >= 0)
+    .sort((a, b) => a.t - b.t);
+
+  if (!fixedNotes.length) return null;
+
+  return {
+    meta: { ...(c.meta || {}), bpm },
+    offset,
+    scroll: { ...(c.scroll || {}), approach },
+    notes: fixedNotes,
+  };
 }
 
 function fallbackChart() {
@@ -243,7 +272,6 @@ function kickVideoInGesture(bgVideo) {
     bgVideo.playsInline = true;
     bgVideo.setAttribute("playsinline", "");
     bgVideo.setAttribute("webkit-playsinline", "");
-    // iOS個体差：preloadを強めると安定するケースがある（害が少ない）
     if (!bgVideo.getAttribute("preload")) bgVideo.setAttribute("preload", "auto");
 
     const p = bgVideo.play?.();
@@ -260,13 +288,12 @@ function bestEffortPlayVideo(bgVideo) {
   } catch {}
 }
 
-// ✅ stalled/waiting/ended で復帰（iOS保険）
+// ✅ stalled/waiting/ended/pause で復帰（iOS保険）
 function attachVideoAutoRecover(bgVideo, isPlayingFn) {
   if (!bgVideo) return () => {};
   let lastKick = 0;
 
   const recover = (why) => {
-    // playing中だけ復帰（result/idleで無限に叩かない）
     if (typeof isPlayingFn === "function" && !isPlayingFn()) return;
 
     const t = Date.now();
@@ -285,7 +312,7 @@ function attachVideoAutoRecover(bgVideo, isPlayingFn) {
 
   const onStalled = () => recover("stalled");
   const onWaiting = () => recover("waiting");
-  const onPause = () => recover("pause"); // iOSで勝手にpause扱いになる個体
+  const onPause = () => recover("pause");
   const onEnded = () => {
     try {
       bgVideo.currentTime = 0;
@@ -411,10 +438,9 @@ function bindPress(btn, fn, { signal, onGesture } = {}) {
 
   const run = (e) => {
     const t = Date.now();
-    if (t - lastTs < 120) return;
+    if (t - lastTs < 140) return; // 少し広め（touchstart+pointerdown二重を確実に潰す）
     lastTs = t;
 
-    // ✅ gesture同期で叩きたい物がある場合ここが最強
     try {
       onGesture?.(e);
     } catch {}
@@ -473,10 +499,18 @@ async function boot() {
     app.style.webkitTouchCallout = "none";
   } catch {}
 
+  if (DEV) {
+    console.debug("[BASE] JS_BASE =", JS_BASE.toString());
+    console.debug("[BASE] ASSET_BASE =", ASSET_BASE.toString());
+  }
+
   // Chart load (from /di/charts/)
-  let chart;
+  let chart = null;
   try {
-    chart = await fetchJSON("charts/chart_001.json");
+    const raw = await fetchJSON("charts/chart_001.json");
+    chart = normalizeChart(raw);
+    if (!chart) throw new Error("chart invalid (notes missing/empty)");
+    if (DEV) console.debug("[CHART] notes =", chart.notes.length, "offset =", chart.offset);
   } catch (e) {
     chart = fallbackChart();
     console.warn("[DiCo] chart fallback", e);
@@ -534,9 +568,8 @@ async function boot() {
   const ui = new E.UI(refs);
   const presenter = getResultPresenterSafe({ refs });
 
-  // Heavy: FXCore lazy
-  let fx = null;
-  const ensureFX = () => (fx ||= new FXCore({ layer: fxLayer, app }));
+  // FX (singleton)
+  const ensureFX = () => createFX({ layer: fxLayer, app });
 
   // Core systems (rebuildable)
   let timing = new E.Timing({ chart });
@@ -558,7 +591,10 @@ async function boot() {
   };
 
   // ✅ video auto-recover (PLAYING中のみ)
-  const detachVideoRecover = attachVideoAutoRecover(bgVideo, () => running && getState(app) === STATES.PLAYING);
+  const detachVideoRecover = attachVideoAutoRecover(
+    bgVideo,
+    () => running && getState(app) === STATES.PLAYING
+  );
 
   // RAF loop
   function tick() {
@@ -622,7 +658,7 @@ async function boot() {
   }
 
   async function startFromScratch(kind = "START") {
-    // ✅ gesture内で呼ばれている前提（bindPress onGestureでprime）
+    // primeInGesture は bindPress の onGesture で先に走っている想定
     await unlockBestEffort();
 
     // 1) stop
@@ -643,9 +679,8 @@ async function boot() {
     setState(app, STATES.PLAYING);
     presenter.hide?.();
     ui.hideResult?.();
-    log(`STATE: PLAYING (${kind})`);
 
-    // 5) warm FX (optional)
+    // 5) warm FX
     ensureFX();
 
     // 6) run
@@ -724,7 +759,7 @@ async function boot() {
       const lx = clientX - fxRect.left;
       const ly = clientY - fxRect.top;
 
-      // FX (lazy)
+      // FX
       const fxi = ensureFX();
       fxi.burst(lx, ly);
       if (refs.avatarRing) fxi.stream(lx, ly, refs.avatarRing);
@@ -748,7 +783,7 @@ async function boot() {
 
   // ------------------------------------------------------------
   // Controls
-  //  - pointerdown/touchstartの「瞬間」に primeInGesture() を実行
+  //  - pointerdown/touchstart の「瞬間」に primeInGesture() を実行
   // ------------------------------------------------------------
   bindPress(startBtn, startGame, { signal: ac.signal, onGesture: primeInGesture });
   bindPress(restartBtn, restartGame, { signal: ac.signal, onGesture: primeInGesture });
@@ -808,11 +843,16 @@ async function boot() {
     try {
       audio.stopMusic?.({ reset: true });
     } catch {}
-    // videoは止めない（次回のSTARTで即復帰させる）
+
+    // FX singleton reset（次回startで確実にlayer/appを張り直す）
     try {
-      // どうしても止めたいならここを有効化（安定性は下がる可能性あり）
-      // bgVideo?.pause?.();
+      resetFX?.();
     } catch {}
+
+    // videoは止めない（次回のSTARTで即復帰させる）
+    // ※どうしても止めたい場合のみ、ここを有効化（安定性は下がる可能性あり）
+    // try { bgVideo?.pause?.(); } catch {}
+
     instance.running = false;
   };
 }
