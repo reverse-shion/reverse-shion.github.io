@@ -1,0 +1,20 @@
+/* di/css/fx/fx-layer.css */
+
+.fx-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:visible;
+
+  z-index:5;
+
+  contain: layout paint style;
+  transform: translateZ(0);
+}
+
+/* GPU固定 */
+.fx-layer,
+.fx-layer *{
+  backface-visibility:hidden;
+  transform-style:preserve-3d;
+}
