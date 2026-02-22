@@ -1,25 +1,20 @@
 /* /di/js/engine/audio.js
-   AudioManager — PRO FINAL (iOS gesture-safe + truthful unlock + stable clock)
-   ✅ primeUnlock(): sync, call inside user gesture (NO await)
-   ✅ unlock(): async, returns true only if MUSIC is actually unlocked (clock truth)
-   ✅ bgVideo is unlocked properly (no silent best-effort play spam)
-   ✅ getMusicTime(): stable clock with perf fallback on stall
+   AudioManager — PRO (iOS gesture-safe + truthful unlock + stable clock)
+   - primeUnlock(): sync, call inside click handler (NO await)
+   - unlock(): async, but returns "true only if actually unlocked"
+   - playMusic({reset}): does not always force currentTime=0
+   - getMusicTime(): currentTime + perf fallback if stalled
 */
 (() => {
-  "use strict";
   const NS = (window.DI_ENGINE ||= {});
-
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const nowSec = () => performance.now() / 1000;
 
   class AudioManager {
     constructor({ music, seTap, seGreat, bgVideo }) {
-      this.music = music || null;
-      this.seTap = seTap || null;
-      this.seGreat = seGreat || null;
-      this.bgVideo = bgVideo || null;
+      this.music = music;
+      this.seTap = seTap;
+      this.seGreat = seGreat;
+      this.bgVideo = bgVideo;
 
-      // NOTE: gameplay clock depends on MUSIC; so "unlocked" means music is playable.
       this._unlocked = false;
 
       // perf clock fallback
@@ -28,181 +23,116 @@
       this._lastMusicTime = 0;
       this._stallCount = 0;
 
-      // iOS safe defaults
+      // iOS: safe defaults
       if (this.music) {
-        try { this.music.preload = this.music.preload || "auto"; } catch {}
+        this.music.volume = 0.9;
+        this.music.preload = this.music.preload || "auto";
+        // playsInline は video用だが、環境によっては audioタグでも持つ
         try { this.music.playsInline = true; } catch {}
-        try { this.music.volume = 0.9; } catch {}
       }
-      if (this.seTap) {
-        try { this.seTap.volume = 0.6; } catch {}
-        try { this.seTap.preload = this.seTap.preload || "auto"; } catch {}
-      }
-      if (this.seGreat) {
-        try { this.seGreat.volume = 0.7; } catch {}
-        try { this.seGreat.preload = this.seGreat.preload || "auto"; } catch {}
-      }
+      if (this.seTap) this.seTap.volume = 0.6;
+      if (this.seGreat) this.seGreat.volume = 0.7;
 
       if (this.bgVideo) {
         try {
-          this.bgVideo.muted = true;        // iOS autoplay prerequisite
+          this.bgVideo.muted = true;
           this.bgVideo.playsInline = true;
-          this.bgVideo.loop = true;
-          // do not force preload here; HTML decides
         } catch {}
       }
-
-      this._installVideoDebug();
-    }
-
-    /* ------------------------------------------------------------
-       Debug hooks (lightweight)
-    ------------------------------------------------------------ */
-    _installVideoDebug() {
-      const v = this.bgVideo;
-      if (!v) return;
-
-      // Keep it minimal; these logs solve "silent stop" instantly.
-      const log = (e) => {
-        // NOTE: iOS sometimes blocks console, but this helps on desktop too.
-        console.debug(
-          "[DiCo][bgVideo]",
-          e,
-          "readyState=",
-          v.readyState,
-          "paused=",
-          v.paused,
-          "ct=",
-          Number(v.currentTime || 0).toFixed(2)
-        );
-      };
-
-      try {
-        v.addEventListener("error", () => console.warn("[DiCo][bgVideo] error", v.error));
-        v.addEventListener("stalled", () => log("stalled"));
-        v.addEventListener("waiting", () => log("waiting"));
-        v.addEventListener("playing", () => log("playing"));
-        v.addEventListener("pause", () => log("pause"));
-      } catch {}
     }
 
     /* ------------------------------------------------------------
        1) SYNC PRIME (call inside user gesture)
        - do NOT await
-       - attempts play() and immediately pauses in then()
-       - important: do NOT swallow reason completely; warn once
+       - just attempts play() and immediately pauses in then()
     ------------------------------------------------------------ */
     primeUnlock() {
-      const prime = (el, tag) => {
+      const prime = (el) => {
         if (!el || typeof el.play !== "function") return false;
         try {
+          // Some browsers need muted to allow play; for SFX keep as-is.
           const p = el.play();
           if (p && typeof p.then === "function") {
             p.then(() => {
               try { el.pause(); } catch {}
-            }).catch((e) => {
-              // NotAllowedError is common on iOS when not in gesture
-              console.warn(`[DiCo][Audio] prime denied (${tag})`, e?.name || e);
-            });
+            }).catch(() => {});
           } else {
             try { el.pause(); } catch {}
           }
           return true;
-        } catch (e) {
-          console.warn(`[DiCo][Audio] prime exception (${tag})`, e?.name || e);
+        } catch {
           return false;
         }
       };
 
-      // Keep this order: SFX -> MUSIC -> VIDEO
-      const ok1 = prime(this.seTap, "seTap");
-      const ok2 = prime(this.seGreat, "seGreat");
-      const ok3 = prime(this.music, "music");
-      const ok4 = prime(this.bgVideo, "bgVideo");
+      // prime SFX first (fast), then music, then bg video (muted)
+      const ok1 = prime(this.seTap);
+      const ok2 = prime(this.seGreat);
+      const ok3 = prime(this.music);
+      const ok4 = prime(this.bgVideo);
+
+      // don't mark unlocked here (because we didn't verify)
       return ok1 || ok2 || ok3 || ok4;
     }
 
     /* ------------------------------------------------------------
        2) ASYNC UNLOCK (truthful)
-       - returns true only if MUSIC actually unlocked (game clock truth)
-       - bgVideo is also unlocked properly, but does not define _unlocked
+       - returns true only if at least one play actually succeeded
     ------------------------------------------------------------ */
     async unlock() {
       if (this._unlocked) return true;
 
-      const tryEl = async (el, tag, { resetTo0 = false } = {}) => {
+      const tryEl = async (el, { resetTo0 = false } = {}) => {
         if (!el || typeof el.play !== "function") return false;
-
         const prev = Number(el.currentTime || 0);
+
         try {
           if (resetTo0) {
             try { el.currentTime = 0; } catch {}
           }
-
           const p = el.play();
           if (p && typeof p.then === "function") await p;
-
-          // Immediately pause + restore time (unlock pattern)
+          // If play succeeded, pause immediately (we only want "permission")
           try { el.pause(); } catch {}
+          // restore time
           try { el.currentTime = prev; } catch {}
           return true;
-        } catch (e) {
-          console.warn(`[DiCo][Audio] unlock denied (${tag})`, e?.name || e);
+        } catch {
+          // restore time
           try { el.currentTime = prev; } catch {}
           return false;
         }
       };
 
-      // 1) Unlock MUSIC first (clock source)
-      const musicOK = await tryEl(this.music, "music", { resetTo0: true });
+      // Attempt unlock; count successes
+      let ok = false;
+      ok = (await tryEl(this.seTap)) || ok;
+      ok = (await tryEl(this.seGreat)) || ok;
 
-      // 2) SFX can be best-effort; does not affect clock truth
-      const se1 = await tryEl(this.seTap, "seTap");
-      const se2 = await tryEl(this.seGreat, "seGreat");
+      // music: reset to start when unlocking
+      ok = (await tryEl(this.music, { resetTo0: true })) || ok;
 
-      // 3) Unlock bgVideo properly (no silent play spam)
-      //    IMPORTANT: keep it muted=true
-      let videoOK = false;
-      if (this.bgVideo) {
-        try { this.bgVideo.muted = true; } catch {}
-        try { this.bgVideo.playsInline = true; } catch {}
-        videoOK = await tryEl(this.bgVideo, "bgVideo", { resetTo0: true });
-      }
+      // bg video is muted; try but don't require
+      try { this.bgVideo?.play?.().catch(() => {}); } catch {}
 
-      // "unlocked" means we can drive gameplay clock reliably.
-      this._unlocked = !!musicOK;
-
-      console.debug("[DiCo][Audio] unlock result", {
-        musicOK,
-        seTapOK: se1,
-        seGreatOK: se2,
-        videoOK,
-        unlocked: this._unlocked,
-      });
-
-      return this._unlocked;
+      this._unlocked = ok;
+      return ok;
     }
 
     /* ------------------------------------------------------------
-       music controls (API compatible)
+       music controls
     ------------------------------------------------------------ */
     playMusic(opt = {}) {
       const m = this.music;
       if (!m) return;
 
       const reset = !!opt.reset;
-      try { if (reset) m.currentTime = 0; } catch {}
-
       try {
-        const p = m.play();
-        if (p && typeof p.catch === "function") {
-          p.catch((e) => console.warn("[DiCo][Audio] music play denied", e?.name || e));
-        }
-      } catch (e) {
-        console.warn("[DiCo][Audio] music play exception", e?.name || e);
-      }
+        if (reset) m.currentTime = 0;
+      } catch {}
 
-      // reset clock bases immediately (even if play is pending)
+      const p = m.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
       this._syncClockBase();
     }
 
@@ -210,16 +140,18 @@
       const m = this.music;
       if (!m) return;
 
-      const reset = opt.reset !== false; // ✅ default true
       try { m.pause(); } catch {}
-      if (reset) {
+      if (opt.reset) {
         try { m.currentTime = 0; } catch {}
       }
+      // keep clock base for UI (Timing stops anyway)
       this._syncClockBase();
     }
 
     /* ------------------------------------------------------------
-       stable time read (clock truth)
+       stable time read
+       - prefer currentTime
+       - if it stalls repeatedly (iOS), use perf fallback
     ------------------------------------------------------------ */
     getMusicTime() {
       const m = this.music;
@@ -228,19 +160,25 @@
       const ct = Number(m.currentTime || 0);
       if (!Number.isFinite(ct)) return this._lastMusicTime || 0;
 
-      // Detect stall: same currentTime repeatedly
-      if (ct <= this._lastMusicTime + 1e-6) this._stallCount++;
-      else this._stallCount = 0;
+      // detect stall (ct not increasing while should be playing)
+      if (ct <= this._lastMusicTime + 1e-6) {
+        this._stallCount++;
+      } else {
+        this._stallCount = 0;
+      }
 
-      // If not stalled, use audio currentTime
+      // if not stalled, accept currentTime and resync base
       if (this._stallCount < 6) {
         this._lastMusicTime = ct;
         this._syncClockBase(ct);
         return ct;
       }
 
-      // Stall fallback: perf-based extrapolation
-      const t = this._clockBaseMusic + (performance.now() - this._clockBasePerf) / 1000;
+      // fallback: perf-based clock
+      const now = performance.now();
+      const t = this._clockBaseMusic + (now - this._clockBasePerf) / 1000;
+
+      // keep monotonic
       const out = Math.max(this._lastMusicTime || 0, t);
       this._lastMusicTime = out;
       return out;
@@ -249,16 +187,14 @@
     _syncClockBase(forceMusicTime) {
       const m = this.music;
       if (!m) return;
-
       const ct = Number(forceMusicTime != null ? forceMusicTime : (m.currentTime || 0));
       if (!Number.isFinite(ct)) return;
-
       this._clockBasePerf = performance.now();
       this._clockBaseMusic = ct;
     }
 
     /* ------------------------------------------------------------
-       SFX (API compatible)
+       SFX
     ------------------------------------------------------------ */
     playTap() {
       const s = this.seTap;
