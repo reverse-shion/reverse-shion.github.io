@@ -1,14 +1,14 @@
 /* /di/js/main.js
-   DiCo ARU Phase1 — PRO STABLE ENTRY v2.1 (iOS Zoom/Drift FIXED)
+   DiCo ARU Phase1 — PRO STABLE ENTRY v2.1 (FULL INTEGRATED)
    ------------------------------------------------------------
-   ✅ iOS Safari safe (gesture unlock, video play in-gesture)
+   ✅ iOS Safari safe (gesture unlock, VIDEO PLAY IN-GESTURE)
    ✅ Prevent double-tap zoom / scroll drift (hitZone scoped)
    ✅ Deterministic state machine: idle -> playing -> result
    ✅ Single clock (Timing drives everything)
-   ✅ No cache-killing loader (dev only bust)
-   ✅ Heavy init deferred (FXCore lazy)
+   ✅ No cache-killing loader (dev only bust / prod fixed ver)
+   ✅ Heavy init deferred (FXCore lazy, but prewarmed on start)
    ✅ Robust restart (no stalled notes / audio desync)
-   ✅ Debug probes for "bg video stalled", viewport/zoom changes
+   ✅ Debug probes for bg video stall + visualViewport drift
 */
 
 "use strict";
@@ -38,6 +38,7 @@ const DEV =
   location.search.includes("dev=1") ||
   location.search.includes("nocache=1");
 
+// 本番固定バージョン（更新したら文字列を変える）
 const BUILD_VER = "2026-02-22";
 
 // ---------------------------------------------------------------------
@@ -128,6 +129,7 @@ function fallbackChart() {
   const notes = [];
   const bpm = 145;
   const beat = 60 / bpm;
+  // 80秒想定
   for (let t = 1; t < 80; t += beat) notes.push({ t: +t.toFixed(3), type: "tap" });
   return { meta: { title: "fallback", bpm }, offset: 0, scroll: { approach: 1.25 }, notes };
 }
@@ -197,7 +199,7 @@ function applyAruState(app, resonancePct) {
 }
 
 // ---------------------------------------------------------------------
-// VIDEO PROBES
+// VIDEO PROBES + iOS "PLAY IN GESTURE" KICK
 // ---------------------------------------------------------------------
 function attachVideoDebug(bgVideo) {
   if (!bgVideo) return;
@@ -230,13 +232,28 @@ function attachVideoDebug(bgVideo) {
   }
 }
 
-async function safePlayVideo(bgVideo) {
+// ✅ iOS最重要：ユーザー操作の同期区間で play() を叩く（awaitしない）
+function kickVideoInGesture(bgVideo) {
   if (!bgVideo) return;
   try {
-    await bgVideo.play?.();
-  } catch (e) {
-    console.warn("[BGV] play failed (ok on iOS)", e?.message || e);
-  }
+    bgVideo.muted = true;
+    // property + attr 両方（iOSの個体差対策）
+    bgVideo.playsInline = true;
+    bgVideo.setAttribute("playsinline", "");
+    bgVideo.setAttribute("webkit-playsinline", "");
+    // preload は metadata のままでもOK。強めたいなら "auto" に。
+    const p = bgVideo.play?.();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch {}
+}
+
+// “後追い再生” は await しない（gesture外でも最悪害が少ない）
+function bestEffortPlayVideo(bgVideo) {
+  if (!bgVideo) return;
+  try {
+    const p = bgVideo.play?.();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch {}
 }
 
 // ---------------------------------------------------------------------
@@ -244,34 +261,31 @@ async function safePlayVideo(bgVideo) {
 // ---------------------------------------------------------------------
 function preventIOSZoomAndScroll(el, { signal, debugTag = "HIT" } = {}) {
   if (!el) return () => {};
-  // Visual hint for Safari and prevent selection/callout without CSS edits
   try {
     el.style.webkitTapHighlightColor = "transparent";
     el.style.webkitUserSelect = "none";
     el.style.userSelect = "none";
     el.style.webkitTouchCallout = "none";
-    // touch-action works on modern Safari; safe to set
+    // modern safari respects this; harmless otherwise
     el.style.touchAction = "manipulation";
   } catch {}
 
-  // 1) Hard block: prevent default on touchstart/move (passive:false)
   const onTouchStart = (e) => {
-    // Single touch tap area: stop scroll/zoom
+    // allow 1-finger tap but block page scroll/zoom
     if (e.touches && e.touches.length === 1) e.preventDefault();
   };
   const onTouchMove = (e) => {
     e.preventDefault();
   };
 
-  // 2) Classic iOS double-tap zoom guard (touchend interval)
   let lastTouchEnd = 0;
   const onTouchEnd = (e) => {
     const t = Date.now();
+    // classic double-tap zoom window
     if (t - lastTouchEnd <= 250) e.preventDefault();
     lastTouchEnd = t;
   };
 
-  // 3) Prevent gesture events (older iOS pinch)
   const onGesture = (e) => {
     e.preventDefault();
   };
@@ -280,12 +294,11 @@ function preventIOSZoomAndScroll(el, { signal, debugTag = "HIT" } = {}) {
   el.addEventListener("touchmove", onTouchMove, { passive: false, signal });
   el.addEventListener("touchend", onTouchEnd, { passive: false, signal });
 
-  // iOS Safari: gesturestart/gesturechange/gestureend (non-standard)
   window.addEventListener("gesturestart", onGesture, { passive: false, signal });
   window.addEventListener("gesturechange", onGesture, { passive: false, signal });
   window.addEventListener("gestureend", onGesture, { passive: false, signal });
 
-  // 4) Viewport drift detection (debug only)
+  // debug: view/zoom drift
   if (DEV) {
     const vv = window.visualViewport;
     if (vv) {
@@ -306,7 +319,6 @@ function preventIOSZoomAndScroll(el, { signal, debugTag = "HIT" } = {}) {
     }
   }
 
-  // cleanup closure (optional; AbortController handles normally)
   return () => {
     try {
       el.removeEventListener("touchstart", onTouchStart);
@@ -334,6 +346,7 @@ function disposePreviousIfAny() {
 }
 
 function bindPress(btn, fn, signal) {
+  // iOS: click + pointerup both may fire → de-dupe
   let lastTs = -1;
   const wrapped = (e) => {
     const ts = Number(e?.timeStamp || 0);
@@ -381,11 +394,12 @@ async function boot() {
   // ✅ Prevent iOS zoom/drift (hitZone only)
   preventIOSZoomAndScroll(hitZone, { signal: ac.signal, debugTag: "HIT" });
 
-  // Also prevent accidental selection on the overall app (safe, no scroll expected)
+  // Prevent selection/callout globally (no scroll UI)
   try {
     app.style.webkitUserSelect = "none";
     app.style.userSelect = "none";
     app.style.webkitTapHighlightColor = "transparent";
+    app.style.webkitTouchCallout = "none";
   } catch {}
 
   // Chart load
@@ -500,23 +514,16 @@ async function boot() {
     if (timing.isEnded(t)) endToResult("ENDED");
   }
 
-  // iOS gesture unlock (audio + video)
+  // ------------------------------------------------------------
+  // iOS gesture unlock (audio + VIDEO PLAY IN-GESTURE)
+  // ------------------------------------------------------------
   function primeInGesture() {
+    // ✅ 1) video must be kicked synchronously in gesture
+    kickVideoInGesture(bgVideo);
+    // ✅ 2) audio unlock prep
     try {
       audio.primeUnlock?.();
     } catch {}
-
-    // iOS: ensure muted + playsinline before play
-    try {
-      if (bgVideo) {
-        bgVideo.muted = true;
-        bgVideo.setAttribute("playsinline", "");
-        bgVideo.setAttribute("webkit-playsinline", "");
-      }
-    } catch {}
-
-    // fire and forget (must be inside gesture)
-    safePlayVideo(bgVideo);
   }
 
   async function unlockBestEffort() {
@@ -527,7 +534,9 @@ async function boot() {
     }
   }
 
+  // ------------------------------------------------------------
   // transitions
+  // ------------------------------------------------------------
   function hardStopAll() {
     running = false;
     stopRAF();
@@ -539,18 +548,25 @@ async function boot() {
     } catch {}
   }
 
+  // NOTE:
+  // iOSでは「await の後の video.play」が弾かれやすい。
+  // だから start/restart の入口で kickVideoInGesture を最優先で叩き、
+  // 以降は bestEffortPlayVideo( awaitなし ) に留める。
   async function startFromScratch(kind = "START") {
+    // ✅ gesture内で呼ばれている前提（startGame/restartGameから）
     primeInGesture();
+
+    // audio unlock may await; keep it after video kick
     await unlockBestEffort();
 
     // 1) stop
     hardStopAll();
 
-    // 2) rebuild
+    // 2) rebuild core (fresh)
     rebuild();
     judge.reset?.();
 
-    // 3) start timing+audio
+    // 3) start timing+audio together (single clock)
     if (kind === "RESTART" && typeof timing.restart === "function") {
       timing.restart(audio);
     } else {
@@ -563,22 +579,24 @@ async function boot() {
     ui.hideResult?.();
     log(`STATE: PLAYING (${kind})`);
 
-    // 5) init FX now (avoid first-tap hitch)
+    // 5) warm FX (optional but recommended)
     ensureFX();
 
     // 6) run
     running = true;
     tick();
 
-    // 7) video
-    await safePlayVideo(bgVideo);
+    // 7) video best-effort (NO await)
+    bestEffortPlayVideo(bgVideo);
   }
 
-  async function startGame() {
+  async function startGame(e) {
     if (lock) return;
     lock = true;
     log("START: begin");
     try {
+      // ✅ 最優先：gesture同期で video kick
+      kickVideoInGesture(bgVideo);
       await startFromScratch("START");
       log("START: done");
     } finally {
@@ -586,11 +604,13 @@ async function boot() {
     }
   }
 
-  async function restartGame() {
+  async function restartGame(e) {
     if (lock) return;
     lock = true;
     log("RESTART: begin");
     try {
+      // ✅ 最優先：gesture同期で video kick
+      kickVideoInGesture(bgVideo);
       await startFromScratch("RESTART");
       log("RESTART: done");
     } finally {
@@ -608,10 +628,12 @@ async function boot() {
       timing.stop?.(audio);
     } catch {}
 
-    // design choice: pause video on result
-    try {
-      bgVideo?.pause?.();
-    } catch {}
+    // ✅ iOS安定優先：pause すると復帰が不安定になる端末がある
+    // ここは「止めない」方が安定。見た目はCSSで隠す。
+    // ただし電池/負荷が気になるなら pause へ戻してOK。
+    // try { bgVideo?.pause?.(); } catch {}
+    // → 継続再生にする：
+    bestEffortPlayVideo(bgVideo);
 
     setState(app, STATES.RESULT);
     log(`RESULT: ${reason}`);
@@ -627,7 +649,9 @@ async function boot() {
     presenter.show?.(payload);
   }
 
+  // ------------------------------------------------------------
   // Input
+  // ------------------------------------------------------------
   const input = new E.Input({
     element: hitZone,
     onTap: (x, y, _ts, ev) => {
@@ -647,7 +671,7 @@ async function boot() {
       fxi.burst(lx, ly);
       if (refs.avatarRing) fxi.stream(lx, ly, refs.avatarRing);
 
-      // audio
+      // audio feedback
       audio.playTap?.();
 
       // judgement
@@ -664,12 +688,16 @@ async function boot() {
     },
   });
 
+  // ------------------------------------------------------------
   // Controls
+  // ------------------------------------------------------------
   bindPress(startBtn, startGame, ac.signal);
   bindPress(restartBtn, restartGame, ac.signal);
   if (stopBtn) bindPress(stopBtn, () => endToResult("STOP"), ac.signal);
 
+  // ------------------------------------------------------------
   // Resize/orientation/viewport drift: keep canvas/input aligned
+  // ------------------------------------------------------------
   const onResize = () => {
     try {
       render?.resize?.();
@@ -682,18 +710,22 @@ async function boot() {
   window.addEventListener("resize", onResize, { passive: true, signal: ac.signal });
   window.addEventListener("orientationchange", onResize, { passive: true, signal: ac.signal });
 
-  // visualViewport is the real source of drift on iOS
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", onResize, { passive: true, signal: ac.signal });
     window.visualViewport.addEventListener("scroll", onResize, { passive: true, signal: ac.signal });
   }
 
+  // ------------------------------------------------------------
   // Initial state
+  // ------------------------------------------------------------
   setState(app, STATES.IDLE);
 
   try {
     audio.stopMusic?.({ reset: true });
   } catch {}
+
+  // idleでは動画を止めてもOKだが、復帰安定のため一旦playしておきCSSで隠す戦略も可。
+  // ここは電池優先で pause。STARTで確実にkickするのでOK。
   try {
     bgVideo?.pause?.();
   } catch {}
@@ -701,7 +733,9 @@ async function boot() {
   ui.update?.({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: STATES.IDLE });
   log("BOOT OK");
 
+  // ------------------------------------------------------------
   // Dispose
+  // ------------------------------------------------------------
   instance.dispose = () => {
     try {
       ac.abort();
