@@ -1,16 +1,16 @@
 /* /di/js/result.js
-   TAROT BREAKER – RESULT PRESENTATION (iOS gesture-safe REPLAY) [v1.5.0-PRO]
-   ✅ aru-gauge.css と --aru-value を常時同期（%表示も一致）
-   ✅ iOS/Safari: “startBtn.click()依存” を廃止 → window.DI_GAME.restartFromResult() を直呼び
-   ✅ visibility hard-cut 下でも .aruLayer / .aruFX を確実に生かす
-   ✅ show/hide は state と class を確実に管理（RESULT→PLAYING移行が安定）
+   TAROT BREAKER – RESULT PRESENTATION (GAUGE CSS OUTSOURCED TO aru-gauge.css) [v1.4.2-PRO]
+   ✅ ARUリングゲージのCSSは /di/css/aru-gauge.css に統合
+   ✅ result.js は「値(変数)更新」「result表示/カット」「ARUレイヤー例外可視化」だけ担当
+   ✅ iOS/Safari含む：visibility hard-cut 下でも .aruLayer / .aruFX を確実に生かす
+   ✅ ARUゲージ(aru-gauge.css)と RESONANCE(結果%表示)が必ず一致する
 */
 (function () {
   "use strict";
 
   const CFG = Object.freeze({
-    VERSION: "1.5.0-PRO",
-    STYLE_ID: "tbResultOverlayStyles_v150_pro",
+    VERSION: "1.4.2-PRO",
+    STYLE_ID: "tbResultOverlayStyles_v142_min_pro",
     SHELL_CLASS: "tbResultOverlayShell",
     ROOT_ACTIVE_CLASS: "tb-active",
     APP_CUT_CLASS: "tb-result-active",
@@ -32,13 +32,16 @@
     ARU_SCORE_SELECTOR: ".aruScore",
 
     ARU: Object.freeze({
+      // iris tint
       TINT_MIN: 0.24,
       TINT_MAX: 0.72,
       TINT_GLOW_WEIGHT: 0.46,
 
+      // bloom behind everything
       BLOOM_ALPHA_BASE: 0.14,
       BLOOM_ALPHA_WEIGHT: 0.72,
 
+      // pulse
       PULSE_MIN: 0.94,
       PULSE_MAX: 1.10,
     }),
@@ -52,14 +55,6 @@
     const x = Number(v);
     return Number.isFinite(x) ? x : d;
   };
-
-  function logToAria(opts, msg) {
-    try {
-      const aria = opts?.ariaLive || document.getElementById("ariaLive");
-      if (aria) aria.textContent = String(msg);
-    } catch {}
-    console.debug("[TB_RESULT]", msg);
-  }
 
   function safeUserName() {
     try {
@@ -78,6 +73,10 @@
     return clamp(Math.round(r), 0, 100);
   }
 
+  // Score normalization strategy:
+  // - prefer maxCombo proxy: maxCombo * 120
+  // - fallback: soft log
+  // - fallback: resonance
   function normalizeScore01(score, maxCombo, resonancePercent) {
     const s = Math.max(0, toNum(score, 0));
     const mc = Math.max(0, toNum(maxCombo, 0));
@@ -89,6 +88,7 @@
       const p = Math.log10(1 + s) / Math.log10(1 + 6000);
       return clamp(p, 0, 1);
     }
+
     return clamp(toNum(resonancePercent, 0) / 100, 0, 1);
   }
 
@@ -111,6 +111,7 @@
     return { r: lerp(A.r, B.r, t), g: lerp(A.g, B.g, t), b: lerp(A.b, B.b, t) };
   }
 
+  // ✅ 蛍光色寄せ（とにかく“見える”）
   const COLORS = Object.freeze({
     neonCyan: "#00F6FF",
     neonViolet: "#A855FF",
@@ -120,6 +121,7 @@
     white: "#FFFFFF",
   });
 
+  // Score -> ARU hue (蛍光帯域)
   function aruColorByScoreP(p) {
     if (p < 0.22) return rgbToCss(mix(COLORS.neonCyan, COLORS.neonViolet, p / 0.22), 0.995);
     if (p < 0.48) return rgbToCss(mix(COLORS.neonViolet, COLORS.neonPink, (p - 0.22) / 0.26), 0.995);
@@ -156,6 +158,7 @@
     shell.setAttribute("role", "dialog");
     shell.setAttribute("aria-label", "Result");
 
+    // 注意: ARUリングゲージは aru-gauge.css の .aruLayer / .aruGauge で管理
     shell.innerHTML = `
       <div class="tbResultOverlayBlack" aria-hidden="true"></div>
 
@@ -194,7 +197,7 @@
     s.id = CFG.STYLE_ID;
 
     s.textContent = `
-/* ===== TB RESULT OVERLAY v${CFG.VERSION} (PRO + ARU BRIDGE) ===== */
+/* ===== TB RESULT OVERLAY v${CFG.VERSION} (MIN + ARU BRIDGE) ===== */
 
 #result{
   position: fixed !important;
@@ -282,7 +285,7 @@
   align-items:center;
 }
 
-/* Eye */
+/* Eye = image inside circle */
 #result .tbEye{
   position: relative;
   width: min(92vw, 540px);
@@ -449,7 +452,6 @@
   box-shadow: 0 18px 52px rgba(0,0,0,0.45);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  touch-action: manipulation;
 }
 #result .tbBtn:active{ transform: translateY(1px); }
 
@@ -486,7 +488,7 @@
   // ARU gauge bridge (aru-gauge.css)
   // =========================
   function setAruState(app, resPercent) {
-    if (!app) return;
+    // data-aru-state is used by aru-gauge.css / aru-fx.css
     if (resPercent >= 100) app.dataset.aruState = "max";
     else if (resPercent >= 80) app.dataset.aruState = "high";
     else if (resPercent >= 50) app.dataset.aruState = "mid";
@@ -494,16 +496,15 @@
   }
 
   function syncAruGauge(app, resPercent) {
-    if (!app) return;
-
+    // 0..1
     const v = clamp(resPercent / 100, 0, 1);
     app.style.setProperty("--aru-value", String(v));
 
-    // (result-only triggers)
+    // Optional: force result-only triggers for CSS that relies on them
     app.dataset.state = "result";
     setAruState(app, resPercent);
 
-    // center text
+    // Update center text inside aru-gauge layer (if present)
     const scoreEl = document.querySelector(CFG.ARU_SCORE_SELECTOR);
     if (scoreEl) scoreEl.textContent = `${resPercent}%`;
   }
@@ -511,7 +512,7 @@
   // =========================
   // Paint / Animate
   // =========================
-  function paintAndAnimate(opts, root, app, payload) {
+  function paintAndAnimate(root, app, payload) {
     const percentEl = root.querySelector("#tbResPercent");
     const lineEl = root.querySelector("#tbLine");
     if (!percentEl || !lineEl) return;
@@ -525,17 +526,8 @@
 
     const glow = clamp(0.18 + (resPercent / 100) * 0.58 + scoreP * 0.22, 0.18, 1.0);
     const specular = scoreP >= 0.9 ? clamp((scoreP - 0.9) / 0.1, 0, 1) : 0;
-
-    const tint = clamp(
-      CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT,
-      CFG.ARU.TINT_MIN,
-      CFG.ARU.TINT_MAX
-    );
-    const bloomA = clamp(
-      CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT,
-      0,
-      0.9
-    );
+    const tint = clamp(CFG.ARU.TINT_MIN + glow * CFG.ARU.TINT_GLOW_WEIGHT, CFG.ARU.TINT_MIN, CFG.ARU.TINT_MAX);
+    const bloomA = clamp(CFG.ARU.BLOOM_ALPHA_BASE + glow * CFG.ARU.BLOOM_ALPHA_WEIGHT, 0, 0.9);
 
     root.style.setProperty("--tb-aru", aruColor);
     root.style.setProperty("--tb-glow", String(glow));
@@ -543,87 +535,62 @@
     root.style.setProperty("--tb-aru-tint", String(tint));
     root.style.setProperty("--tb-bloom-a", String(bloomA));
 
-    // ✅ aru-gauge.css と完全同期
-    syncAruGauge(app, resPercent);
+    // ✅ aru-gauge.css と完全同期（82%なら0.82）
+    if (app) syncAruGauge(app, resPercent);
 
     const name = safeUserName();
     const callName = !!name && resPercent >= CFG.NAME_CALL_THRESHOLD;
     lineEl.innerText = lineBy(resPercent, callName ? name : null);
 
-    // Count-up
+    // Count-up display (result readout)
     percentEl.textContent = "0%";
     let cur = 0;
     const target = clamp(resPercent, 0, 100);
     const step = Math.max(1, Math.ceil(target / CFG.COUNTUP_FRAMES));
 
-    function stepTick() {
+    function tick() {
       cur = clamp(cur + step, 0, target);
       percentEl.textContent = `${cur}%`;
 
-      // keep aruScore + --aru-value in lockstep during count-up
-      syncAruGauge(app, cur);
+      // ✅ 中央の aruScore も同じカウントで追従させたい場合（任意）
+      if (app) {
+        const scoreEl = document.querySelector(CFG.ARU_SCORE_SELECTOR);
+        if (scoreEl) scoreEl.textContent = `${cur}%`;
+        app.style.setProperty("--aru-value", String(clamp(cur / 100, 0, 1)));
+        setAruState(app, cur);
+      }
 
-      if (cur < target) requestAnimationFrame(stepTick);
+      if (cur < target) requestAnimationFrame(tick);
     }
-    requestAnimationFrame(stepTick);
-
-    logToAria(opts, `RESULT: painted ${target}%`);
+    requestAnimationFrame(tick);
   }
 
-  // =========================
-  // iOS-safe Replay binding (NO DOM click dependency)
-  // =========================
-  function bindPress(btn, fn) {
-    if (!btn || btn.__tbBound) return;
-    btn.__tbBound = true;
-
-    let lastSig = "";
-    const wrapped = (e) => {
-      const ts = Number(e?.timeStamp || 0);
-      const pid = e?.pointerId != null ? String(e.pointerId) : "";
-      const typ = e?.type || "";
-      const sig = `${typ}:${pid}:${Math.round(ts)}`;
-      if (sig === lastSig) return;
-      lastSig = sig;
-
-      try { fn(e); } catch (err) { console.error(err); }
-    };
-
-    btn.addEventListener("click", wrapped, { passive: true });
-    btn.addEventListener("pointerup", wrapped, { passive: true });
-  }
-
-  function replayNow(opts, root, app) {
-    // 1) hide overlay immediately
-    try { root.classList.remove(CFG.ROOT_ACTIVE_CLASS); } catch {}
-    try { if (app) app.classList.remove(CFG.APP_CUT_CLASS); } catch {}
-
-    // 2) Prefer DI_GAME direct call (gesture-safe)
-    const G = window.DI_GAME;
-    if (G && typeof G.restartFromResult === "function") {
-      logToAria(opts, "REPLAY: DI_GAME.restartFromResult()");
-      G.restartFromResult();
-      return;
-    }
-    if (G && typeof G.startFromResult === "function") {
-      logToAria(opts, "REPLAY: DI_GAME.startFromResult()");
-      G.startFromResult();
-      return;
-    }
-
-    // 3) Fallback: click existing buttons (last resort)
-    logToAria(opts, "REPLAY: fallback click");
-    const restartBtn = document.getElementById("restartBtn");
-    const startBtn = document.getElementById("startBtn");
-    if (restartBtn && typeof restartBtn.click === "function") restartBtn.click();
-    else if (startBtn && typeof startBtn.click === "function") startBtn.click();
-  }
-
-  function wireReplay(opts, root, app) {
+  function wireReplayOnce(root, app) {
     const replayBtn = root.querySelector("#tbReplayBtn");
-    if (!replayBtn) return;
+    if (!replayBtn || replayBtn.__tbBound) return;
 
-    bindPress(replayBtn, () => replayNow(opts, root, app));
+    replayBtn.__tbBound = true;
+    replayBtn.addEventListener(
+      "click",
+      () => {
+        root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
+        if (app) {
+          app.classList.remove(CFG.APP_CUT_CLASS);
+          // result-state cleanup (optional)
+          // app.dataset.state = "";
+          // delete app.dataset.aruState;
+        }
+
+        const startBtn = document.getElementById("startBtn");
+        if (startBtn) {
+          startBtn.click();
+          return;
+        }
+        const restartBtn = document.getElementById("restartBtn");
+        restartBtn?.click?.();
+      },
+      { passive: true }
+    );
   }
 
   // =========================
@@ -637,24 +604,26 @@
 
       injectStylesOnce();
       ensureShell(root);
-      wireReplay(opts, root, app);
+      wireReplayOnce(root, app);
 
-      // init visible safety (no-op)
       return {
         show(payload) {
           ensureShell(root);
-          wireReplay(opts, root, app);
+          wireReplayOnce(root, app);
 
-          // ✅ hard cut on (and used by aru-fx.css)
-          if (app) app.classList.add(CFG.APP_CUT_CLASS);
+          if (app) {
+            // ✅ hard cut on (and used by aru-fx.css)
+            app.classList.add(CFG.APP_CUT_CLASS);
+          }
 
           root.classList.add(CFG.ROOT_ACTIVE_CLASS);
-          paintAndAnimate(opts, root, app, payload || {});
+
+          paintAndAnimate(root, app, payload || {});
         },
 
         hide() {
-          try { root.classList.remove(CFG.ROOT_ACTIVE_CLASS); } catch {}
-          try { if (app) app.classList.remove(CFG.APP_CUT_CLASS); } catch {}
+          root.classList.remove(CFG.ROOT_ACTIVE_CLASS);
+          if (app) app.classList.remove(CFG.APP_CUT_CLASS);
         },
       };
     },
