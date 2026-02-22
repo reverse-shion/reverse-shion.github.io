@@ -1,11 +1,14 @@
+☺️
+
 <!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-
-  <!-- iOS: zoom/viewport drift を抑える -->
-  <meta name="viewport"
-        content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <!-- ✅ iOS: double-tap zoom / viewport drift を根本的に抑える -->
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
+  />
   <meta name="theme-color" content="#05060b" />
   <meta name="format-detection" content="telephone=no" />
 
@@ -30,12 +33,12 @@
   <link rel="stylesheet" href="./css/fx/fx-ring.css" />
   <link rel="stylesheet" href="./css/fx/fx-max.css" />
 
-  <!-- Preload (Safari安定のため type を付ける) -->
+  <!-- Preload -->
   <link rel="preload" href="./idle/dico_idle.jpg" as="image" fetchpriority="high" />
-  <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" fetchpriority="high" />
-  <link rel="preload" href="./audio/music.mp3" as="audio" type="audio/mpeg" />
-  <link rel="preload" href="./audio/se_tap.wav" as="audio" type="audio/wav" />
-  <link rel="preload" href="./audio/se_perfect.wav" as="audio" type="audio/wav" />
+  <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
+  <link rel="preload" href="./audio/music.mp3" as="audio" />
+  <link rel="preload" href="./audio/se_tap.wav" as="audio" />
+  <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
 
   <link rel="preload" href="./faces/dico_face_1.png" as="image" />
   <link rel="preload" href="./faces/dico_face_2.png" as="image" />
@@ -58,7 +61,7 @@
   id="app"
   data-state="idle"
   data-aru-state="low"
-  style="--aru-value:0"
+  style="--aru-value:0.17"
   aria-label="DiCo ARU Rhythm"
 >
   <noscript>
@@ -70,17 +73,19 @@
 
   <!-- IDLE STILL -->
   <div class="idleBg" id="idleBg" aria-hidden="true">
-    <img class="idleImg"
-         src="./idle/dico_idle.jpg"
-         alt=""
-         draggable="false"
-         decoding="async"
-         loading="eager" />
+    <img
+      class="idleImg"
+      src="./idle/dico_idle.jpg"
+      alt=""
+      draggable="false"
+      decoding="async"
+      loading="eager"
+    />
     <canvas id="idleParticles" class="idleParticles" aria-hidden="true"></canvas>
     <div class="idleLine" aria-hidden="true">キミの想いを、共鳴に変えて。</div>
   </div>
 
-  <!-- VIDEO (iOS: display:none禁止 / opacity運用前提) -->
+  <!-- ✅ VIDEO: preload auto にして初回再生の“止まり感”を減らす -->
   <video
     id="bgVideo"
     class="bgVideo"
@@ -155,7 +160,6 @@
           <div class="sideTimeValue" id="time">--</div>
         </div>
 
-        <!-- Face pool (prewarm) -->
         <div class="facePool" aria-hidden="true">
           <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
           <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
@@ -167,11 +171,33 @@
     </div>
   </aside>
 
+  <!-- LEGACY HUD -->
+  <header class="hud" aria-label="HUD" aria-hidden="true">
+    <div class="hudBlock">
+      <div class="hudLabel">SCORE</div>
+      <div class="hudValue" id="score">0</div>
+    </div>
+
+    <div class="hudBlock hudCenter">
+      <div class="hudCombo">
+        <span class="hudLabel">COMBO</span>
+        <span class="hudValue" id="combo">0</span>
+      </div>
+      <div class="hudSmall">
+        <span class="hudLabel">MAX</span>
+        <span class="hudValue" id="maxCombo">0</span>
+      </div>
+    </div>
+
+    <div class="hudBlock hudRight">
+      <div class="hudLabel">TIME</div>
+      <div class="hudValue" id="time_dup">--</div>
+    </div>
+  </header>
+
   <!-- STAGE -->
   <section class="stage" id="stage" aria-label="Game Stage">
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
-
-    <!-- Tap area (iOS zoom/scroll対策はJSでここに当てる) -->
     <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
 
     <div class="targetRoot" id="targetRoot" aria-hidden="true">
@@ -187,8 +213,52 @@
       <div class="judgeSub"  id="judgeSub">SYNC</div>
     </div>
 
-    <!-- RESULT (overlay container) -->
-    <div class="result" id="result" aria-hidden="true"></div>
+    <div class="result" id="result" aria-hidden="true">
+      <div class="resultCard">
+        <div class="resultTitle">RESULT</div>
+
+        <div class="resultRow">
+          <div class="resultKey">SCORE</div>
+          <div class="resultVal" id="resultScore">0</div>
+        </div>
+
+        <div class="resultRow">
+          <div class="resultKey">MAX COMBO</div>
+          <div class="resultVal" id="resultMaxCombo">0</div>
+        </div>
+
+        <div class="resultDivider"></div>
+
+        <div class="aruWrap" aria-label="ARU Gauge">
+          <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
+            <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
+              <defs>
+                <linearGradient id="aruGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"  stop-color="rgba(156,60,255,0.95)"/>
+                  <stop offset="55%" stop-color="rgba(0,240,255,0.95)"/>
+                  <stop offset="100%" stop-color="rgba(230,201,107,0.95)"/>
+                </linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="44" class="aruTrack"/>
+              <circle cx="60" cy="60" r="44" class="aruProg" id="aruProg"/>
+            </svg>
+
+            <div class="aruText">
+              <div class="aruLabel">ARU ENERGY</div>
+              <div class="aruValue" id="aruValue">0%</div>
+            </div>
+
+            <div class="aruLayer" aria-hidden="true">
+              <div class="aruGauge">
+                <div class="aruScore" id="aruOverlayScore">0%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dicoLine" id="dicoLine">キミの想いを、共鳴に変えて。</div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- CONTROLS -->
@@ -203,18 +273,14 @@
   <audio id="seTap"   src="./audio/se_tap.wav" preload="auto"></audio>
   <audio id="seGreat" src="./audio/se_perfect.wav" preload="auto"></audio>
 
-  <!-- A11y live region -->
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- Result FX layer (shows on .app.tb-result-active etc) -->
   <div class="aruFX" aria-hidden="true"></div>
+
 </main>
 
-<!-- ✅ common は module より先に -->
 <script src="./js/common.js" defer></script>
 <script type="module" src="./js/main.js"></script>
 
-<!-- Idle particles (IDLE時のみ) -->
 <script>
 (() => {
   const app = document.getElementById("app");
