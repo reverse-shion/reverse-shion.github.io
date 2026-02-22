@@ -192,7 +192,6 @@ async function boot() {
     render.draw(t);
 
     const res = judge.state.resonance;
-    fx.setIntensity?.(res);
     resColor.setByResonance(res);
     applyAruState(app, res);
     ui.update({ t, score: judge.state.score, combo: judge.state.combo, maxCombo: judge.state.maxCombo, resonance: res, state: getState(app) });
