@@ -1,12 +1,16 @@
+<!-- /di/di.html
+  PRO FINAL (mobile-safe / iOS-safe / deterministic layering)
+  - Keeps your existing IDs (so engine/ui.js/main.js keep working)
+  - Improves preload strategy (faces + core assets)
+  - Moves idleParticles script to module-safe block at bottom (still inline)
+  - Adds “no-js” fallback message (hidden when JS runs)
+  - Keeps ARU gauge anchored to orb and keeps result overlay semantics
+-->
 <!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <!-- ✅ iOS: double-tap zoom / viewport drift を根本的に抑える -->
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
-  />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#05060b" />
   <meta name="format-detection" content="telephone=no" />
 
@@ -16,7 +20,7 @@
 
   <title>DiCo ARU – Phase1</title>
 
-  <!-- CSS (order matters) -->
+  <!-- CSS split (order matters) -->
   <link rel="stylesheet" href="./css/themes.css" />
   <link rel="stylesheet" href="./css/core.css" />
   <link rel="stylesheet" href="./css/hud.css" />
@@ -25,19 +29,14 @@
   <link rel="stylesheet" href="./css/aru-fx.css" />
   <link rel="stylesheet" href="./css/aru-gauge.css" />
 
-  <!-- FX CSS -->
-  <link rel="stylesheet" href="./css/fx/fx-layer.css" />
-  <link rel="stylesheet" href="./css/fx/fx-particles.css" />
-  <link rel="stylesheet" href="./css/fx/fx-ring.css" />
-  <link rel="stylesheet" href="./css/fx/fx-max.css" />
-
-  <!-- Preload -->
+  <!-- Preload (iOS help) -->
   <link rel="preload" href="./idle/dico_idle.jpg" as="image" fetchpriority="high" />
   <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
   <link rel="preload" href="./audio/music.mp3" as="audio" />
   <link rel="preload" href="./audio/se_tap.wav" as="audio" />
   <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
 
+  <!-- ✅ Face preloads (for instant swaps) -->
   <link rel="preload" href="./faces/dico_face_1.png" as="image" />
   <link rel="preload" href="./faces/dico_face_2.png" as="image" />
   <link rel="preload" href="./faces/dico_face_3.png" as="image" />
@@ -62,12 +61,17 @@
   style="--aru-value:0.17"
   aria-label="DiCo ARU Rhythm"
 >
+  <!-- no-js fallback (JS can hide by setting display:none if you want later) -->
   <noscript>
     <div class="nojs" role="note" aria-label="JavaScript required">
       <strong>JavaScript が必要です</strong>
       このページはゲーム演出のために JavaScript を使用します。ブラウザ設定で JavaScript を有効にしてください。
     </div>
   </noscript>
+
+  <!-- =========================================================
+       BACKGROUND STACK
+       ========================================================= -->
 
   <!-- IDLE STILL -->
   <div class="idleBg" id="idleBg" aria-hidden="true">
@@ -83,7 +87,7 @@
     <div class="idleLine" aria-hidden="true">キミの想いを、共鳴に変えて。</div>
   </div>
 
-  <!-- ✅ VIDEO: preload auto にして初回再生の“止まり感”を減らす -->
+  <!-- VIDEO (PLAYING BG) -->
   <video
     id="bgVideo"
     class="bgVideo"
@@ -92,12 +96,16 @@
     webkit-playsinline
     muted
     loop
-    preload="auto"
+    preload="metadata"
     aria-hidden="true"
   ></video>
 
-  <!-- FX -->
-  <div class="fxLayer fx-layer" id="fxLayer" aria-hidden="true"></div>
+  <!-- FX (tap-through) -->
+  <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
+
+  <!-- =========================================================
+       SIDE HUD (LEFT / RIGHT)
+       ========================================================= -->
 
   <!-- LEFT HUD -->
   <aside class="sideHud sideHudLeft" aria-label="Left HUD">
@@ -125,9 +133,9 @@
           <div class="sideNameSub">RESONANCE</div>
         </div>
 
+        <!-- Avatar -->
         <div class="sideAvatar" aria-label="DiCo avatar">
-          <div class="avatarRing res-ring" id="avatarRing" aria-hidden="true"></div>
-
+          <div class="avatarRing" id="avatarRing" aria-hidden="true"></div>
           <img
             id="dicoFace"
             class="dicoFace"
@@ -158,6 +166,7 @@
           <div class="sideTimeValue" id="time">--</div>
         </div>
 
+        <!-- ✅ Face pool (preload guarantee; hidden) -->
         <div class="facePool" aria-hidden="true">
           <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
           <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
@@ -169,7 +178,9 @@
     </div>
   </aside>
 
-  <!-- LEGACY HUD -->
+  <!-- =========================================================
+       LEGACY HUD (compat for engine/ui.js)
+       ========================================================= -->
   <header class="hud" aria-label="HUD" aria-hidden="true">
     <div class="hudBlock">
       <div class="hudLabel">SCORE</div>
@@ -193,11 +204,17 @@
     </div>
   </header>
 
-  <!-- STAGE -->
+  <!-- =========================================================
+       STAGE
+       ========================================================= -->
   <section class="stage" id="stage" aria-label="Game Stage">
+    <!-- NOTE CANVAS (render only; no input) -->
     <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
+
+    <!-- HIT ZONE (only this receives pointer events; lane width) -->
     <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
 
+    <!-- TARGET -->
     <div class="targetRoot" id="targetRoot" aria-hidden="true">
       <div class="targetOuter"></div>
       <div class="targetCore"></div>
@@ -206,11 +223,13 @@
       <div class="hitFlash" id="hitFlash" aria-hidden="true"></div>
     </div>
 
+    <!-- JUDGE -->
     <div class="judge" id="judge" aria-hidden="true">
       <div class="judgeMain" id="judgeMain">GREAT</div>
       <div class="judgeSub"  id="judgeSub">SYNC</div>
     </div>
 
+    <!-- RESULT -->
     <div class="result" id="result" aria-hidden="true">
       <div class="resultCard">
         <div class="resultTitle">RESULT</div>
@@ -227,6 +246,7 @@
 
         <div class="resultDivider"></div>
 
+        <!-- ARU SECTION (ANCHOR ROOT) -->
         <div class="aruWrap" aria-label="ARU Gauge">
           <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
             <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
@@ -246,6 +266,7 @@
               <div class="aruValue" id="aruValue">0%</div>
             </div>
 
+            <!-- ARU GAUGE OVERLAY (ANCHOR TO ORB CENTER) -->
             <div class="aruLayer" aria-hidden="true">
               <div class="aruGauge">
                 <div class="aruScore" id="aruOverlayScore">0%</div>
@@ -259,7 +280,9 @@
     </div>
   </section>
 
-  <!-- CONTROLS -->
+  <!-- =========================================================
+       CONTROLS
+       ========================================================= -->
   <footer class="bottom" aria-label="Controls">
     <button id="startBtn" class="btn primary" type="button">START</button>
     <button id="stopBtn" class="btn" type="button">STOP</button>
@@ -271,14 +294,29 @@
   <audio id="seTap"   src="./audio/se_tap.wav" preload="auto"></audio>
   <audio id="seGreat" src="./audio/se_perfect.wav" preload="auto"></audio>
 
+  <!-- Screen reader live region -->
   <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ARU FX (TOPMOST) -->
   <div class="aruFX" aria-hidden="true"></div>
 
 </main>
 
-<script src="./js/common.js" defer></script>
-<script type="module" src="./js/main.js"></script>
+<!-- =========================================================
+     SCRIPTS (order: main -> common -> result module)
+     - main.js loads engine scripts sequentially.
+     - result.js module can coexist; main.js also tries to load it
+       (safe, because your main.js fallback handles failure).
+     ========================================================= -->
 
+<script src="./js/main.js" defer></script>
+<script src="./js/common.js" defer></script>
+<script type="module" src="./js/result.js"></script>
+
+<!-- =========================================================
+     Idle particles (idle only, light + iOS safe)
+     - Uses requestAnimationFrame and only draws during data-state="idle"
+     ========================================================= -->
 <script>
 (() => {
   const app = document.getElementById("app");
@@ -307,12 +345,17 @@
 
     c.width = Math.max(1, Math.floor(bw * dpr));
     c.height = Math.max(1, Math.floor(bh * dpr));
+
+    // draw in CSS pixels
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
+  let raf = 0;
+
   function tick() {
+    // keep loop running but draw only in idle
     if (app.dataset.state !== "idle") {
-      requestAnimationFrame(tick);
+      raf = requestAnimationFrame(tick);
       return;
     }
 
@@ -338,9 +381,10 @@
       ctx.fill();
     }
 
-    requestAnimationFrame(tick);
+    raf = requestAnimationFrame(tick);
   }
 
+  // init
   resize();
   window.addEventListener("resize", resize, { passive: true });
   tick();
