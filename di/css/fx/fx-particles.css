@@ -1,0 +1,39 @@
+/* di/css/fx/fx-particles.css */
+
+.fx-particle{
+  position:absolute;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  pointer-events:none;
+
+  opacity:0.95;
+  will-change:transform, opacity;
+  transform:translate(-50%,-50%) translateZ(0);
+
+  background:
+    radial-gradient(
+      circle at 35% 35%,
+      #ffffff 0%,
+      var(--res-color) 35%,
+      transparent 70%
+    );
+
+  box-shadow:
+    0 0 8px var(--res-color),
+    0 0 20px var(--res-color),
+    0 0 40px rgba(255,255,255,.15);
+
+  mix-blend-mode:screen;
+}
+
+/* 吸収アニメ用 */
+.fx-particle.stream{
+  transition:
+    transform .55s cubic-bezier(.22,.8,.2,1),
+    opacity .55s ease;
+}
+
+.fx-particle.absorbed{
+  opacity:0;
+}
