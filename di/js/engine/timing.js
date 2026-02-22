@@ -1,109 +1,96 @@
 /* /di/js/engine/timing.js
-   Timing — PRO (single clock = AudioManager.getMusicTime)
-   - NEVER reads a.music.currentTime directly
-   - start/restart/stop only call AudioManager methods
+   Timing — single gameplay clock sourced from AudioManager.getMusicTime()
 */
 (() => {
   const NS = (window.DI_ENGINE ||= {});
 
   class Timing {
     constructor({ chart }) {
-      this.chart = chart;
+      this.chart = chart || {};
+      this._audio = null;
       this._running = false;
       this._paused = false;
-
-      this._songOffset = Number(chart?.offset || 0);
-      this._durationGuess = this._guessDuration(chart);
-
-      /** @type {any} AudioManager */
-      this._audio = null;
-
+      this._songOffset = Number(this.chart.offset || 0);
       this._lastSongTime = 0;
+      this._tailPadding = 1.5;
+      this._endTime = this._computeEndTime();
     }
 
-    _guessDuration(chart) {
-      const notes = chart?.notes || [];
-      if (!notes.length) return 60;
-      const last = notes.reduce((m, n) => Math.max(m, Number(n.t || 0)), 0);
-      return Math.max(20, last + 4.0);
+    _computeEndTime() {
+      const notes = this.chart?.notes || [];
+      let last = 0;
+      for (const n of notes) {
+        const t = Number(n?.t || 0);
+        if (Number.isFinite(t) && t > last) last = t;
+      }
+      return last + this._tailPadding;
     }
 
     _ensureAudio(audio) {
-      this._audio = audio || this._audio;
+      if (audio) this._audio = audio;
       return this._audio;
     }
 
-    _calcSongTimeFromAudio() {
+    _readSongTimeFromAudio() {
       const a = this._audio;
-      if (a && typeof a.getMusicTime === "function") {
-        const raw = Number(a.getMusicTime() || 0); // seconds
-        const t = raw - this._songOffset;
-        return Math.max(0, t);
+      if (!a || typeof a.getMusicTime !== "function") {
+        return this._lastSongTime || 0;
       }
-      return this._lastSongTime || 0;
+
+      const musicTime = Number(a.getMusicTime() || 0);
+      const t = musicTime - this._songOffset;
+      if (!Number.isFinite(t)) return this._lastSongTime || 0;
+      return Math.max(0, t);
     }
 
-    start(audio, opt = {}) {
+    start(audio, { reset = false } = {}) {
       const a = this._ensureAudio(audio);
-      const reset = !!opt.reset;
-
-      this._paused = false;
       this._running = true;
+      this._paused = false;
 
-      // ✅ audio is the only controller
-      a?.playMusic?.({ reset });
+      if (reset) this._lastSongTime = 0;
+      a?.playMusic?.({ reset: !!reset });
 
-      this._lastSongTime = this._calcSongTimeFromAudio();
+      this._lastSongTime = this._readSongTimeFromAudio();
+      return this._lastSongTime;
     }
 
-    pause(audio) {
+    restart(audio) {
       const a = this._ensureAudio(audio);
-      this._paused = true;
       this._running = false;
-
-      this._lastSongTime = this._calcSongTimeFromAudio();
-      // pause but keep position (reset=false)
-      a?.stopMusic?.({ reset: false });
-    }
-
-    resume(audio) {
-      const a = this._ensureAudio(audio);
       this._paused = false;
-      this._running = true;
+      this._lastSongTime = 0;
 
-      // resume without reset
-      a?.playMusic?.({ reset: false });
-      this._lastSongTime = this._calcSongTimeFromAudio();
+      // hard reset both audio and internal state
+      a?.stopMusic?.({ reset: true });
+      return this.start(a, { reset: true });
     }
 
     stop(audio) {
       const a = this._ensureAudio(audio);
+      this._lastSongTime = this._readSongTimeFromAudio();
       this._running = false;
       this._paused = false;
-
-      this._lastSongTime = this._calcSongTimeFromAudio();
-      // default reset=true (AudioManager side)
       a?.stopMusic?.({ reset: true });
+      return this._lastSongTime;
     }
 
-    restart(audio) {
-      this.start(audio, { reset: true });
+    isRunning() {
+      return this._running;
     }
 
-    isRunning() { return this._running; }
-    isPaused() { return this._paused; }
+    isPaused() {
+      return this._paused;
+    }
 
     getSongTime() {
-      if (this._running) {
-        const t = this._calcSongTimeFromAudio();
-        this._lastSongTime = t;
-        return t;
-      }
-      return this._lastSongTime || 0;
+      if (!this._running) return this._lastSongTime || 0;
+      this._lastSongTime = this._readSongTimeFromAudio();
+      return this._lastSongTime;
     }
 
     isEnded(songTime) {
-      return songTime >= this._durationGuess;
+      return Number(songTime) >= this._endTime;
     }
   }
 
