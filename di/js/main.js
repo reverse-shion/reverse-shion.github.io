@@ -818,7 +818,9 @@ if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD
 
   fxi.burst(lx, ly, { judge: res.name, combo, milestone });
 
-  const ringEl = refs?.avatarRing || document.getElementById("avatarRing");
+  const ringEl =
+    document.querySelector(".res-ring") ||
+    document.getElementById("avatarRing");
 
   if (res.name === "PERFECT") {
     requestAnimationFrame(() => {
