@@ -1,105 +1,121 @@
-/* di/css/fx/fx-ring.css */
+/* /di/css/fx/fx-ring.css
+   AVATAR RING — STABLE + REACT (NO OFFSCREEN GHOST / NO TARGET DRIFT)
+   ✅ keep your existing look (conic ring + inner shade)
+   ✅ keep always-rotate (ringRotate)
+   ✅ absorbPulse stays (flash + scale)
+   ✅ add PERFECT-only ripple + short boost (absorbPerfect)
+   ✅ safety: ring must not create a “new ring elsewhere”
+      → relies on parent (.sideAvatar) being positioned (see note below)
+*/
 
+/* ------------------------------------------------------------
+   0) (Recommended) anchor: parent should be positioning context
+   If hud.css already sets .sideAvatar{position:relative;} you can delete this.
+------------------------------------------------------------ */
+.sideAvatar{ position:relative; }
+
+/* ------------------------------------------------------------
+   1) Base ring
+------------------------------------------------------------ */
 .res-ring{
   position:absolute;
   inset:-14px;
   border-radius:999px;
   pointer-events:none;
-  transform:translateZ(0);
-  will-change:transform, filter, box-shadow;
+
+  /* keep GPU-friendly but DO NOT move center */
+  transform: translateZ(0);
+  will-change: transform, filter, box-shadow;
 }
 
+/* always rotating conic ring */
 .res-ring::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:inherit;
+
   background: conic-gradient(from 0deg, var(--res-color), #ffffff, var(--res-color));
   opacity:.85;
   mix-blend-mode:screen;
-  animation:ringRotate 6s linear infinite;
+
+  animation: ringRotate 6s linear infinite;
   transition: filter .25s ease, opacity .25s ease;
 }
 
+/* inner shade + frame */
 .res-ring::after{
   content:"";
   position:absolute;
   inset:4px;
   border-radius:inherit;
+
   background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0), rgba(0,0,0,.45));
   border:1px solid rgba(255,255,255,.12);
   box-shadow: inset 0 0 20px rgba(0,0,0,.3);
 }
 
+/* ------------------------------------------------------------
+   2) Receive flash (common: GREAT/GOOD/PERFECT)
+------------------------------------------------------------ */
 .res-ring.absorbPulse::before{
-  filter:brightness(1.5) blur(2px);
-  opacity:1;
+  filter: brightness(1.5) blur(2px);
+  opacity: 1;
 }
 
+/* keep your pulse timing (visual), JS can remove class earlier if desired */
 .res-ring.absorbPulse{
-  animation:ringPulse .6s ease-out;
+  animation: ringPulse .6s ease-out;
 }
 
+/* ------------------------------------------------------------
+   3) PERFECT-only: ripple + “arrival” feel
+   - no extra DOM
+   - uses box-shadow expansion (lightweight)
+------------------------------------------------------------ */
+.res-ring.absorbPerfect::after{
+  /* preserve existing inset shadow + add expanding outer rings */
+  animation: ringRipple 220ms ease-out;
+}
+
+/* ------------------------------------------------------------
+   4) OPTIONAL: PERFECT-only short “boost” impression
+   - do NOT change ringRotate (keeps stable)
+   - just adds tiny brightness kick (cheap)
+------------------------------------------------------------ */
+.res-ring.absorbPerfect::before{
+  filter: brightness(1.65) blur(2px);
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------
+   Animations
+------------------------------------------------------------ */
 @keyframes ringPulse{
-  0%{ transform:scale(1); }
-  40%{ transform:scale(1.12); }
-  100%{ transform:scale(1); }
+  0%   { transform: translateZ(0) scale(1); }
+  40%  { transform: translateZ(0) scale(1.12); }
+  100% { transform: translateZ(0) scale(1); }
 }
 
 @keyframes ringRotate{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
+  from{ transform: rotate(0deg); }
+  to  { transform: rotate(360deg); }
 }
 
-/* di/css/fx/fx-ring.css */
-
-.res-ring{
-  position:absolute;
-  inset:-14px;
-  border-radius:999px;
-  pointer-events:none;
-  transform:translateZ(0);
-  will-change:transform, filter, box-shadow;
-}
-
-.res-ring::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  background: conic-gradient(from 0deg, var(--res-color), #ffffff, var(--res-color));
-  opacity:.85;
-  mix-blend-mode:screen;
-  animation:ringRotate 6s linear infinite;
-  transition: filter .25s ease, opacity .25s ease;
-}
-
-.res-ring::after{
-  content:"";
-  position:absolute;
-  inset:4px;
-  border-radius:inherit;
-  background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0), rgba(0,0,0,.45));
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow: inset 0 0 20px rgba(0,0,0,.3);
-}
-
-.res-ring.absorbPulse::before{
-  filter:brightness(1.5) blur(2px);
-  opacity:1;
-}
-
-.res-ring.absorbPulse{
-  animation:ringPulse .6s ease-out;
-}
-
-@keyframes ringPulse{
-  0%{ transform:scale(1); }
-  40%{ transform:scale(1.12); }
-  100%{ transform:scale(1); }
-}
-
-@keyframes ringRotate{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
+/* expanding ripple (outer rings fade out) */
+@keyframes ringRipple{
+  0%{
+    box-shadow:
+      inset 0 0 20px rgba(0,0,0,.3),
+      0 0 0 0 rgba(0,240,255,.28),
+      0 0 0 0 rgba(156,60,255,.18);
+    opacity: 1;
+  }
+  100%{
+    box-shadow:
+      inset 0 0 20px rgba(0,0,0,.3),
+      0 0 0 12px rgba(0,240,255,0),
+      0 0 0 18px rgba(156,60,255,0);
+    opacity: 1;
+  }
 }
