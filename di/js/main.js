@@ -714,16 +714,15 @@ if (timing.isEnded(t)) {
       const t = timing.getSongTime();
       if (!Number.isFinite(t)) return;
 
-      const res = judge.hit(t);
+ const res = judge.hit(t);
 ui.onJudge?.(res);
 
 if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-
-  // 🔥 Absorb FX 追加
+  // ★ AbsorbFX は "perfect" だけ特別、他は "great" 扱いに寄せる
   AbsorbFX.fire({
     x: clientX,
     y: clientY,
-    judge: res.name.toLowerCase()
+    judge: res.name === "PERFECT" ? "perfect" : "great",
   });
 
   audio.playGreat?.();
