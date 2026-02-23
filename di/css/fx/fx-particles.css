@@ -92,3 +92,33 @@
   opacity:0;
   filter: brightness(1.4) blur(1px);
 }
+/* ------------------------------------------------------------
+   BURST VISIBILITY BOOST (PRO)
+   - Make burst readable on bright/video backgrounds
+------------------------------------------------------------ */
+
+.burstCore,
+.burstDust{
+  opacity: 1 !important;
+  mix-blend-mode: screen !important;     /* 光として合成 */
+  filter: none !important;               /* 既存filterで薄くなるのを防ぐ */
+  will-change: transform, opacity, filter;
+}
+
+/* Core: stronger pop */
+.burstCore{
+  filter: brightness(1.60) saturate(1.85) contrast(1.12) !important;
+}
+
+/* Dust: still vivid */
+.burstDust{
+  filter: brightness(1.35) saturate(1.60) contrast(1.08) !important;
+}
+
+/* If base particle class is dimmed elsewhere, override it */
+.particle,
+.fxParticle,
+.fx-particle{
+  opacity: 1 !important;
+  filter: none !important;
+}
