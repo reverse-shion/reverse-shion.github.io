@@ -1,58 +1,97 @@
 /* /di/css/fx/crit-flash.css
-   PRO LIGHT (tap flash) — geometric AI flash + tarot sigil
-   - Spawn element: <div class="fxTapFlash [is-perfect]"><div class="tarotSigil">...svg...</div></div>
-   - Position via vars: --fx-x, --fx-y
+   PRO LIGHT (tap flash) — geometric AI flash + tarot sigil (PRO FINAL)
+   ----------------------------------------------------------------------------
+   ✅ Spawn DOM (JS):
+     <div class="fxTapFlash [is-perfect]" style="--fx-x:..;--fx-y:..">
+       <div class="tarotSigil">...inline svg...</div>
+     </div>
+
+   ✅ Positioning:
+     - .fxTapFlash is a 1px anchor translated to (x,y)
+     - all visuals are centered at that anchor via translate(-50%,-50%)
+
+   ✅ iOS/Safari safe:
+     - no heavy filters on large surfaces (only drop-shadows)
+     - will-change scoped
+     - no layout thrash (fixed + transform only)
+
+   ✅ Consistent timing:
+     - NORMAL: ~160ms total
+     - PERFECT: ~220ms total (bigger + stronger)
 */
 
+/* -----------------------------
+   Anchor (at tap point)
+------------------------------ */
 .fxTapFlash{
   position: fixed;
   left: 0; top: 0;
-  width: 1px; height: 1px;
+  width: 1px;
+  height: 1px;
+
+  /* anchor -> tap position */
   transform: translate(var(--fx-x, 0px), var(--fx-y, 0px));
+  transform-origin: 0 0;
+
   pointer-events: none;
   z-index: 2147483000;
+
+  /* keep compositing stable */
   opacity: 1;
-  /* iOS/Safari: keep it crisp */
-  transform-origin: 0 0;
-  will-change: transform, opacity, filter;
+  will-change: transform;
+  contain: layout paint style;
+  isolation: isolate;
 }
 
-/* ------------------------------------------------------------------
-   1) tiny core (existing)
------------------------------------------------------------------- */
+/* =============================
+   1) Tiny core spark (white-hot)
+============================= */
 .fxTapFlash::before{
   content:"";
   position:absolute;
-  left: -1px; top: -1px;
+  left: 0; top: 0;
   width: 2px; height: 2px;
-  transform: translate(-50%,-50%);
+
+  transform: translate(-50%,-50%) scale(0.65);
   border-radius: 999px;
 
   background: radial-gradient(circle,
-    rgba(255,255,255,0.95) 0%,
-    rgba(0,240,255,0.55) 35%,
-    rgba(156,60,255,0.0) 75%
+    rgba(255,255,255,0.98) 0%,
+    rgba(0,240,255,0.62) 34%,
+    rgba(156,60,255,0.00) 76%
   );
-  filter: drop-shadow(0 0 8px rgba(0,240,255,0.35))
-          drop-shadow(0 0 10px rgba(156,60,255,0.25));
-  animation: fxTapCore 120ms ease-out both;
+
+  filter:
+    drop-shadow(0 0 8px rgba(0,240,255,0.34))
+    drop-shadow(0 0 10px rgba(156,60,255,0.22));
+
+  opacity: 0;
+  will-change: transform, opacity, filter;
+  animation: fxTapCore 130ms cubic-bezier(.15,.9,.2,1) both;
 }
 
-/* ------------------------------------------------------------------
-   2) geometric ring (existing) + slight upgrade on perfect
------------------------------------------------------------------- */
+.fxTapFlash.is-perfect::before{
+  filter:
+    drop-shadow(0 0 10px rgba(0,240,255,0.38))
+    drop-shadow(0 0 14px rgba(156,60,255,0.26));
+}
+
+/* =============================
+   2) Geometric ring + cross feel
+============================= */
 .fxTapFlash::after{
   content:"";
   position:absolute;
   left: 0; top: 0;
 
-  /* default size */
-  width: 110px; height: 110px;
+  width: 112px;
+  height: 112px;
 
-  transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%) scale(0.78) rotate(0deg);
   border-radius: 999px;
 
   background:
+    /* thin radial ring */
     radial-gradient(circle,
       rgba(0,0,0,0) 54%,
       rgba(0,240,255,0.35) 56%,
@@ -60,91 +99,112 @@
       rgba(156,60,255,0.22) 62%,
       rgba(0,0,0,0) 66%
     ),
+    /* conic ticks */
     conic-gradient(from 0deg,
-      rgba(0,240,255,0.0) 0deg 35deg,
-      rgba(0,240,255,0.25) 35deg 45deg,
-      rgba(156,60,255,0.0) 45deg 125deg,
-      rgba(156,60,255,0.22) 125deg 135deg,
-      rgba(0,240,255,0.0) 135deg 215deg,
-      rgba(0,240,255,0.25) 215deg 225deg,
-      rgba(156,60,255,0.0) 225deg 305deg,
-      rgba(156,60,255,0.22) 305deg 315deg,
-      rgba(0,240,255,0.0) 315deg 360deg
+      rgba(0,240,255,0.0) 0deg 34deg,
+      rgba(0,240,255,0.25) 34deg 46deg,
+      rgba(156,60,255,0.0) 46deg 124deg,
+      rgba(156,60,255,0.22) 124deg 136deg,
+      rgba(0,240,255,0.0) 136deg 214deg,
+      rgba(0,240,255,0.25) 214deg 226deg,
+      rgba(156,60,255,0.0) 226deg 304deg,
+      rgba(156,60,255,0.22) 304deg 316deg,
+      rgba(0,240,255,0.0) 316deg 360deg
     );
 
-  opacity: 0.95;
-  filter: drop-shadow(0 0 10px rgba(0,240,255,0.18))
-          drop-shadow(0 0 12px rgba(156,60,255,0.12));
-  animation: fxTapSigil 120ms ease-out both;
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 10px rgba(0,240,255,0.18))
+    drop-shadow(0 0 12px rgba(156,60,255,0.12));
+
+  will-change: transform, opacity, filter;
+  animation: fxTapRing 160ms cubic-bezier(.2,.9,.2,1) both;
 }
 
-/* Perfect: ring bigger + slightly more punch */
+/* Perfect: bigger + longer + stronger */
 .fxTapFlash.is-perfect::after{
-  width: 132px;
-  height: 132px;
-  opacity: 1;
-  filter: drop-shadow(0 0 14px rgba(0,240,255,0.22))
-          drop-shadow(0 0 18px rgba(156,60,255,0.16));
+  width: 134px;
+  height: 134px;
+
+  filter:
+    drop-shadow(0 0 14px rgba(0,240,255,0.22))
+    drop-shadow(0 0 18px rgba(156,60,255,0.16));
+
+  animation: fxTapRingPerfect 220ms cubic-bezier(.15,1,.25,1) both;
 }
 
-/* ------------------------------------------------------------------
-   3) Tarot Sigil (NEW) — optional child element
------------------------------------------------------------------- */
+/* =============================
+   3) Tarot sigil (child)
+   - if JS doesn't append it, nothing breaks
+============================= */
 .fxTapFlash .tarotSigil{
   position:absolute;
   left: 0; top: 0;
+
   width: 160px;
   height: 160px;
+
   transform: translate(-50%,-50%) scale(0.85) rotate(0deg);
   opacity: 0;
+
   pointer-events:none;
   will-change: transform, opacity, filter;
-  /* makes it visible on bright bg */
-  filter: drop-shadow(0 0 12px rgba(255,255,255,0.14))
-          drop-shadow(0 0 14px rgba(0,240,255,0.18))
-          drop-shadow(0 0 16px rgba(156,60,255,0.12));
+
+  filter:
+    drop-shadow(0 0 12px rgba(255,255,255,0.14))
+    drop-shadow(0 0 14px rgba(0,240,255,0.18))
+    drop-shadow(0 0 16px rgba(156,60,255,0.12));
+
+  animation: tarotIn 160ms cubic-bezier(.2,.9,.2,1) both;
 }
 
 .fxTapFlash .tarotSigil svg{
   width: 100%;
   height: 100%;
-  display:block;
+  display: block;
 }
 
-/* Normal hit */
-.fxTapFlash .tarotSigil{
-  animation: tarotIn 160ms cubic-bezier(.2,.9,.2,1) forwards;
-}
-
-/* Perfect hit */
+/* Perfect: slightly bigger + longer + punchier */
 .fxTapFlash.is-perfect .tarotSigil{
-  animation: tarotPerfect 220ms cubic-bezier(.15,1,.3,1) forwards;
-  filter: drop-shadow(0 0 16px rgba(255,255,255,0.18))
-          drop-shadow(0 0 20px rgba(0,240,255,0.22))
-          drop-shadow(0 0 22px rgba(156,60,255,0.16));
+  filter:
+    drop-shadow(0 0 16px rgba(255,255,255,0.18))
+    drop-shadow(0 0 20px rgba(0,240,255,0.22))
+    drop-shadow(0 0 22px rgba(156,60,255,0.16));
+
+  animation: tarotPerfect 220ms cubic-bezier(.15,1,.3,1) both;
 }
 
-/* ------------------------------------------------------------------
+/* -----------------------------
    Animations
------------------------------------------------------------------- */
+------------------------------ */
 @keyframes fxTapCore{
-  0%   { opacity:0; transform: translate(-50%,-50%) scale(0.65); }
-  35%  { opacity:1; transform: translate(-50%,-50%) scale(1.05); }
-  100% { opacity:0; transform: translate(-50%,-50%) scale(0.95); }
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(0.60); }
+  35%  { opacity:1; transform: translate(-50%,-50%) scale(1.12); }
+  100% { opacity:0; transform: translate(-50%,-50%) scale(0.92); }
 }
 
-@keyframes fxTapSigil{
-  0%   { opacity:0; transform: translate(-50%,-50%) scale(0.70) rotate(0deg); }
-  40%  { opacity:0.95; transform: translate(-50%,-50%) scale(1.02) rotate(18deg); }
+/* ring for NORMAL */
+@keyframes fxTapRing{
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(0.72) rotate(0deg); }
+  40%  { opacity:0.95; transform: translate(-50%,-50%) scale(1.05) rotate(18deg); }
   100% { opacity:0; transform: translate(-50%,-50%) scale(0.92) rotate(30deg); }
 }
 
+/* ring for PERFECT */
+@keyframes fxTapRingPerfect{
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(0.72) rotate(0deg); }
+  35%  { opacity:1; transform: translate(-50%,-50%) scale(1.14) rotate(28deg); }
+  100% { opacity:0; transform: translate(-50%,-50%) scale(1.02) rotate(60deg); }
+}
+
+/* sigil for NORMAL */
 @keyframes tarotIn{
   0%   { opacity:0; transform: translate(-50%,-50%) scale(0.75) rotate(0deg); }
   40%  { opacity:1; transform: translate(-50%,-50%) scale(1.05) rotate(18deg); }
   100% { opacity:0; transform: translate(-50%,-50%) scale(0.95) rotate(30deg); }
 }
 
+/* sigil for PERFECT */
 @keyframes tarotPerfect{
   0%   { opacity:0; transform: translate(-50%,-50%) scale(0.75) rotate(0deg); }
   35%  { opacity:1; transform: translate(-50%,-50%) scale(1.15) rotate(28deg); }
