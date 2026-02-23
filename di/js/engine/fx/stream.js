@@ -1,8 +1,8 @@
 // /di/js/engine/fx/stream.js
-// STREAM — "Ring Resonance Absorb" (PRO)
-// - Accepts target element as 3rd arg: stream(x, y, targetEl)
-// - Flies to the RIM (outer ring) to sell "resonance", not the center
-// - iOS safe: low DOM, transform/opacity/filter only
+// STREAM — Tap -> Fly -> Ring Absorb (RIM) [PRO]
+// ✅ Start position = tap (fxLayer local coords)
+// ✅ End position   = ring rim (fxLayer local coords)
+// ✅ iOS safe: low DOM count, transform/opacity/filter only
 
 export function attachStream(FX) {
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -32,39 +32,41 @@ export function attachStream(FX) {
   FX.prototype.stream = function (x, y, targetEl) {
     ensureRingPulseStyle();
 
+    const layer = this.layer; // #fxLayer
+    if (!layer) return;
+
     const color = this.getResColor();
     const k = clamp(Number(this.intensity) || 0, 0, 1);
 
-    // target: prefer provided element, fallback to #avatarRing
     const el =
       targetEl ||
       document.getElementById("avatarRing") ||
       document.querySelector(".avatarRing") ||
       null;
 
-    // If no target found, do nothing safely
     if (!el) return;
 
+    // --- convert target rect (viewport) -> layer local coords ---
+    const layerRect = layer.getBoundingClientRect();
     const rc = el.getBoundingClientRect();
-    const cx = rc.left + rc.width / 2;
-    const cy = rc.top + rc.height / 2;
+
+    const cx = (rc.left + rc.width / 2) - layerRect.left;
+    const cy = (rc.top + rc.height / 2) - layerRect.top;
     const r = Math.max(10, Math.min(rc.width, rc.height) / 2);
 
-    // iOS safe count (flashiness comes from glow, not huge count)
+    // iOS safe count（派手さは glow で作る）
     const COUNT_MIN = 10;
     const COUNT_MAX = 18;
     const count = Math.round(COUNT_MIN + (COUNT_MAX - COUNT_MIN) * (k * 0.95));
 
-    // local -> viewport conversion:
-    // main.js passes x,y in fxLayer local coords, but rc is viewport coords.
-    // So we must convert start point to viewport coords using fxLayer rect.
-    const layer = this.layer;
-    const layerRect = layer.getBoundingClientRect();
-    const sx0 = layerRect.left + x;
-    const sy0 = layerRect.top + y;
-
     const durBase = 260;
     const durJit = 140;
+
+    // tap周りの「出現の散り」
+    const launch = 8 + k * 14;
+
+    // rim着地点の揺れ
+    const rimJit = 5 + k * 10;
 
     for (let i = 0; i < count; i++) {
       const size = Math.round(6 + k * 6 + this.rand(-2, 6));
@@ -76,25 +78,23 @@ export function attachStream(FX) {
         className: "streamAbsorb",
       });
 
-      // start: small scatter around tap (in viewport coords)
-      const launch = 8 + k * 14;
+      // ✅ START = TAP（layer local）
       const a0 = Math.random() * Math.PI * 2;
       const rr0 = Math.pow(Math.random(), 0.62) * launch;
-      const sx = sx0 + Math.cos(a0) * rr0;
-      const sy = sy0 + Math.sin(a0) * rr0;
+      const sx = x + Math.cos(a0) * rr0;
+      const sy = y + Math.sin(a0) * rr0;
 
-      // end: RIM point (resonance feel)
+      // ✅ END = RING RIM（layer local）
       const a1 = Math.random() * Math.PI * 2;
-      const rimJit = 5 + k * 10;
       const rr1 = r * 0.92 + this.rand(-rimJit, rimJit);
       const ex = cx + Math.cos(a1) * rr1;
       const ey = cy + Math.sin(a1) * rr1;
 
-      // place particle in layer-local coords (because layer is the container)
-      p.style.left = `${sx - layerRect.left}px`;
-      p.style.top = `${sy - layerRect.top}px`;
+      // Place at start
+      p.style.left = `${sx}px`;
+      p.style.top = `${sy}px`;
 
-      // vivid look on video bg
+      // Vivid on video bg
       p.style.background = color;
       p.style.opacity = "1";
       p.style.mixBlendMode = "screen";
@@ -119,12 +119,12 @@ export function attachStream(FX) {
 
       layer.appendChild(p);
 
+      // Animate: move from tap->rim by delta
       requestAnimationFrame(() => {
         const dur = durBase + this.rand(-40, durJit) + k * 80;
 
-        // move by adjusting translate with delta (layer-local)
-        const dx = (ex - layerRect.left) - (sx - layerRect.left);
-        const dy = (ey - layerRect.top) - (sy - layerRect.top);
+        const dx = ex - sx;
+        const dy = ey - sy;
 
         const s1 = 0.20 + this.rand(-0.06, 0.08); // shrink into rim
         const rot1 = rot0 + this.rand(-160, 160);
@@ -147,7 +147,7 @@ export function attachStream(FX) {
       setTimeout(() => p.remove(), 520 + k * 140);
     }
 
-    // ring pulse sells resonance
+    // ring pulse = resonance feedback
     pulse(el);
   };
 }
