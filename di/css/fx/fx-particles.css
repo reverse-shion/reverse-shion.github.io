@@ -108,3 +108,133 @@
   opacity: 1 !important;
   filter: none !important;
 }
+/* =========================================================
+   GOD-PRO: Resonance Core (Hex + Sigil) OVERRIDE
+   - Replaces "star" look with hex crystal + tarot sigil vibe
+   - Affects: .burstCore .burstDust .streamAbsorb
+   - Uses --res-color vars (already set by JS)
+   ========================================================= */
+
+:root{
+  --res-core: var(--res-color, hsl(210 90% 62%));
+  --res-core-soft: var(--res-color-soft, hsla(210 90% 62% / .35));
+  --res-core-glow: var(--res-color-glow, hsla(210 90% 62% / .18));
+}
+
+/* 共通：粒子を“結晶核”に上書き */
+.burstCore,
+.burstDust,
+.streamAbsorb{
+  border-radius: 0 !important;
+  background: none !important;
+
+  /* 六角結晶（フラットじゃなく“核＋縁”を作る） */
+  clip-path: polygon(
+    50% 0%,
+    92% 25%,
+    92% 75%,
+    50% 100%,
+    8% 75%,
+    8% 25%
+  );
+
+  /* “核”の見え方：中心白熱 + 外側共鳴色 */
+  background:
+    radial-gradient(circle at 50% 45%,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.55) 18%,
+      var(--res-core) 44%,
+      rgba(0,0,0,0) 74%
+    ),
+    radial-gradient(circle at 50% 55%,
+      var(--res-core-soft) 0%,
+      rgba(0,0,0,0) 68%
+    ) !important;
+
+  /* “縁取り”の水晶感（内側の薄いリム） */
+  outline: 1px solid rgba(255,255,255,.22);
+  outline-offset: -1px;
+
+  /* 映像背景で埋もれない神秘ブースト */
+  mix-blend-mode: screen;
+  filter: brightness(1.35) saturate(1.35) contrast(1.06);
+
+  /* 影はJSでも付けてるが、形を綺麗に見せる最小補助 */
+  box-shadow:
+    0 0 10px rgba(255,255,255,.35),
+    0 0 22px var(--res-core),
+    0 0 46px var(--res-core-glow);
+}
+
+/* 中の“タロット紋章”っぽい幾何学シジル */
+.burstCore::before,
+.burstDust::before,
+.streamAbsorb::before{
+  content:"";
+  position:absolute;
+  inset: 18%;
+  pointer-events:none;
+
+  /* 幾何学：放射＋リング（タロット機械紋） */
+  background:
+    radial-gradient(circle,
+      rgba(255,255,255,.80) 0%,
+      rgba(255,255,255,.25) 35%,
+      rgba(255,255,255,0) 70%
+    ),
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255,255,255,.55) 0deg 6deg,
+      rgba(255,255,255,0) 6deg 18deg
+    );
+
+  /* “線だけ残す”ための簡易マスク */
+  -webkit-mask:
+    radial-gradient(circle, #000 0 55%, transparent 56% 100%);
+  mask:
+    radial-gradient(circle, #000 0 55%, transparent 56% 100%);
+
+  opacity: .55;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,.25));
+  transform: translateZ(0);
+  animation: sigilSpin 900ms linear infinite;
+}
+
+/* PERFECTっぽい“虹彩”をほんのり（過剰にしない） */
+.burstCore::after,
+.streamAbsorb::after{
+  content:"";
+  position:absolute;
+  inset: -14%;
+  pointer-events:none;
+
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(255,255,255,.00),
+      rgba(255,255,255,.18),
+      var(--res-core-soft),
+      rgba(255,255,255,.10),
+      rgba(255,255,255,.00)
+    );
+
+  clip-path: inherit;
+  opacity: .55;
+  filter: blur(2px) brightness(1.25);
+  transform: translateZ(0);
+}
+
+/* “流星の線”に見えないよう、移動中の粒子を少し丸めて“核”感を優先 */
+.streamAbsorb{
+  outline-color: rgba(255,255,255,.18);
+  box-shadow:
+    0 0 12px rgba(255,255,255,.28),
+    0 0 26px var(--res-core),
+    0 0 54px var(--res-core-glow);
+}
+
+/* 紋章回転：速すぎるとチープなので固定1倍 */
+@keyframes sigilSpin{
+  from{ transform: rotate(0deg); }
+  to  { transform: rotate(360deg); }
+}
