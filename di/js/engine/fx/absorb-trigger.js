@@ -23,18 +23,20 @@ export function createAbsorbFX({
   }
 
   function _fireRingReact(judge) {
-    const ring = $(ringId);
-    if (!ring) return;
+  const ring = document.getElementById("avatarRing");
+  if (!ring) return;
 
-    ring.classList.add("fx-hit");
-    if (judge === "perfect") ring.classList.add("fx-boost");
-
-    // hard remove
-    window.setTimeout(() => {
-      ring.classList.remove("fx-hit", "fx-boost");
-    }, 320);
+  ring.classList.add("fx-hit");
+  if (judge === "perfect") {
+    ring.classList.add("fx-boost","is-perfect");
+  } else {
+    ring.classList.add("fx-boost");
   }
 
+  window.setTimeout(() => {
+    ring.classList.remove("fx-hit","fx-boost","is-perfect");
+  }, 320);
+}
   function _append(node) {
     const layer = $(fxLayerId);
     if (!layer) return false;
