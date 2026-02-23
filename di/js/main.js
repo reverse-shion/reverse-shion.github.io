@@ -115,11 +115,16 @@ async function ensureLegacyLoaded() {
   console.debug("[PERF] legacy(presentation) ms:", (t2 - t1).toFixed(1));
 }
 
-// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------// ---------------------------------------------------------------------
 // DATA FETCH
 // ---------------------------------------------------------------------
+
+// ★追加：/di/ を基準にしたアセット基準（main.js は /di/js/ 配下なので 1つ上）
+const ASSET_BASE = new URL("../", import.meta.url);
+
 async function fetchJSON(url) {
-  const u = new URL(url, BASE).toString();
+  // ★ここを BASE ではなく ASSET_BASE にする
+  const u = new URL(url, ASSET_BASE).toString();
   const r = await fetch(u, { cache: DEV ? "no-store" : "force-cache" });
   if (!r.ok) throw new Error(`fetch failed ${u}: ${r.status}`);
   return r.json();
