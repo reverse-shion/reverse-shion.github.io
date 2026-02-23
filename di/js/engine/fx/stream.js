@@ -62,6 +62,17 @@ export function attachStream(FX) {
   }
 
   FX.prototype.stream = function (x, y, targetEl, meta = null) {
+    (() => {
+  const id="__dbg_stream_called__";
+  let d=document.getElementById(id);
+  if(!d){
+    d=document.createElement("div");
+    d.id=id;
+    d.style.cssText="position:fixed;left:8px;bottom:34px;z-index:2147483647;padding:6px 8px;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font:12px/1.2 system-ui;pointer-events:none";
+    document.body.appendChild(d);
+  }
+  d.textContent="STREAM CALLED: " + (meta?.judge || "");
+})();
     ensureRingPulseStyle();
 
     const layer = this.layer; // #fxLayer
