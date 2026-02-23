@@ -703,9 +703,9 @@ if (timing.isEnded(t)) {
       const ly = clientY - fxRect.top;
 
       // FX (lazy)
-      const fxi = ensureFX();
-      fxi.burst(lx, ly);
-      if (refs.avatarRing) fxi.stream(lx, ly, refs.avatarRing);
+     //   const fxi = ensureFX();
+     //   fxi.burst(lx, ly);
+     //   if (refs.avatarRing) fxi.stream(lx, ly, refs.avatarRing);
 
       // audio feedback
       audio.playTap?.();
