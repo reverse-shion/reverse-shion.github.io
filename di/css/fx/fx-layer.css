@@ -1,39 +1,34 @@
 /* /di/css/fx/fx-layer.css
-   FX LAYER — PRO (lux additive, iOS Safari safe)
-   - Particles look washed-out on video => fix with blend + subtle boosts
-   - Keep it lightweight: no huge blur filters on the whole layer
+   FX LAYER — LEGACY BASE (fix alignment, HUD-safe)
+   - ✅ parent-relative absolute (NOT fixed)
+   - ✅ overflow visible (old behavior)
+   - ✅ keeps crisp on iOS Safari
 */
 
 .fx-layer,
 .fxLayer{
-  position: fixed;
+  position: absolute;         /* ✅ 旧に戻す：親基準 */
   inset: 0;
   pointer-events: none;
-  overflow: hidden;
-  z-index: 1200;
-  isolation: isolate;
-
-  /* ✅ ここが重要：背景動画上でも薄くならない “加算寄り合成” */
-  mix-blend-mode: screen;
-
-  /* ほんの少しだけ底上げ（全体フィルタは弱く） */
-  opacity: 1;
-}
-
-.fx-layer::before,
-.fxLayer::before{
-  content:"";
-  position:absolute;
-  inset:-20px;
-  pointer-events:none;
-
-  /* ✅ うっすらベールで粒子の色を拾わせる（チープ化しない程度） */
-  background:
-    radial-gradient(60% 50% at 50% 65%, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.14) 58%, rgba(0,0,0,0.22) 100%);
-}
-
-/* iOS: keep transforms crisp */
-.fx-layer * ,
-.fxLayer *{
+  overflow: visible;          /* 旧仕様 */
+  z-index: 20;
+  contain: layout paint style;
   transform: translateZ(0);
+}
+
+/* preserve 3d rules */
+.fx-layer,
+.fx-layer * ,
+.fxLayer,
+.fxLayer *{
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* optional: if someone applied blend to whole layer, neutralize */
+.fx-layer,
+.fxLayer{
+  mix-blend-mode: normal;
+  opacity: 1;
+  isolation: isolate;
 }
