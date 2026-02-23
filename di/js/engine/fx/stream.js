@@ -7,6 +7,22 @@
 // ✅ Milestone: BlessPulse (cut-in grade but light)
 
 export function attachStream(FX) {
+
+
+  // DEBUG: show on screen (iPhoneでも確認できる)
+(() => {
+  const id = "__dbg_stream_loaded__";
+  if (document.getElementById(id)) return;
+  const d = document.createElement("div");
+  d.id = id;
+  d.textContent = "STREAM LOADED: " + new Date().toLocaleTimeString();
+  d.style.cssText =
+    "position:fixed;left:8px;bottom:8px;z-index:2147483647;" +
+    "padding:6px 8px;border-radius:10px;" +
+    "background:rgba(0,0,0,.65);color:#fff;font:12px/1.2 system-ui;" +
+    "pointer-events:none";
+  document.body.appendChild(d);
+})();
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function ensureRingPulseStyle() {
