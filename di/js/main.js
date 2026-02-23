@@ -811,11 +811,11 @@ async function boot() {
   const milestone = (combo === 10 || combo === 25 || combo === 50);
 
   // ① 既存：吸収（白い線の正体）
-  AbsorbFX.fire({
-    x: lx,
-    y: ly,
-    judge: res.name === "PERFECT" ? "perfect" : "great",
-  });
+  // AbsorbFX.fire({
+//   x: lx,
+//   y: ly,
+//   judge: res.name === "PERFECT" ? "perfect" : "great",
+// });
 
   // ② ★ここが今まで無かった：FXCore を確実に起動して burst/stream を呼ぶ
   const fxi = ensureFX();
