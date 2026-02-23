@@ -9,12 +9,19 @@
    ✅ Heavy init deferred (FXCore lazy, but prewarmed on start)
    ✅ Robust restart (no stalled notes / audio desync)
    ✅ Debug probes for bg video stall + visualViewport drift
+
+   FIX (THIS PATCH):
+   ------------------------------------------------------------
+   ✅ Tap判定を「判定ライン付近の“中央ノーツが通る円”のみ」に限定（写真の場所）
+      - 円の中心は DOM（#hitFlash / #judge / #noteCanvas / #hitZone）から自動推定
+      - 半径は 円要素（hitFlash/judge）のサイズから推定（無ければhitZoneから推定）
+   ✅ AbsorbFX.fire の座標系を fxLayer ローカル座標 (lx/ly) に統一 → 幾何学FXが確実に見える
+   ✅ fxLayer を JS 側で最前面・クリップ回避設定（CSSを触らずに安定）
 */
 
 "use strict";
 
 import { FXCore } from "./engine/fx/index.js";
-
 import { createAbsorbFX } from "./engine/fx/absorb-trigger.js";
 
 const BASE = new URL("./", import.meta.url);
@@ -117,7 +124,7 @@ async function ensureLegacyLoaded() {
   console.debug("[PERF] legacy(presentation) ms:", (t2 - t1).toFixed(1));
 }
 
-// ---------------------------------------------------------------------// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
 // DATA FETCH
 // ---------------------------------------------------------------------
 
@@ -366,6 +373,77 @@ function bindPress(btn, fn, signal) {
 }
 
 // ---------------------------------------------------------------------
+// FX LAYER SAFETY (NO CSS EDIT)
+// ---------------------------------------------------------------------
+function ensureFxLayerTop(fxLayer) {
+  if (!fxLayer) return;
+  try {
+    // 既存CSSを壊さない範囲で、埋もれ/クリップを確実に回避
+    fxLayer.style.position = "fixed";
+    fxLayer.style.left = "0";
+    fxLayer.style.top = "0";
+    fxLayer.style.right = "0";
+    fxLayer.style.bottom = "0";
+    fxLayer.style.width = "100vw";
+    fxLayer.style.height = "100vh";
+    fxLayer.style.pointerEvents = "none";
+    fxLayer.style.overflow = "visible";
+    fxLayer.style.isolation = "isolate";
+    fxLayer.style.zIndex = "2147483646"; // #result(2147483647)の直下想定
+    fxLayer.style.transform = "translateZ(0)";
+    fxLayer.style.webkitTransform = "translateZ(0)";
+  } catch {}
+}
+
+// ---------------------------------------------------------------------
+// HIT GATE: ONLY "CENTER CIRCLE NEAR JUDGE LINE"
+// ---------------------------------------------------------------------
+function makeCircleGate({ hitZone, refs }) {
+  // 優先順位：写真の「中央円」＝ hitFlash / judge の中心を最優先で採用
+  // 無ければ noteCanvas の中心、最後に hitZone 推定
+  const circleEl =
+    refs?.hitFlash ||
+    refs?.judge ||
+    refs?.noteCanvas ||
+    refs?.canvas ||
+    hitZone;
+
+  function getCircleCenterAndRadius() {
+    const hz = hitZone.getBoundingClientRect();
+    const r0 = circleEl?.getBoundingClientRect?.() || hz;
+
+    // 中心
+    const cx = r0.left + r0.width * 0.5;
+    const cy = r0.top + r0.height * 0.5;
+
+    // 半径：円要素が取れているならその半分弱。
+    // 取れない場合は hitZone 幅から推定（中央ノーツ円はレーン幅に近い）
+    let radius = 0;
+
+    if (circleEl && circleEl !== hitZone && Number.isFinite(r0.width) && r0.width > 0) {
+      radius = Math.min(r0.width, r0.height) * 0.50;
+    } else {
+      radius = Math.min(hz.width, hz.height) * 0.18;
+    }
+
+    // 少しだけ猶予（タップ指のブレ + iOS座標丸め）
+    const slack = radius * 0.10;
+    radius = Math.max(8, radius + slack);
+
+    return { cx, cy, radius };
+  }
+
+  function inCircle(clientX, clientY) {
+    const { cx, cy, radius } = getCircleCenterAndRadius();
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    return dx * dx + dy * dy <= radius * radius;
+  }
+
+  return { inCircle };
+}
+
+// ---------------------------------------------------------------------
 // BOOT
 // ---------------------------------------------------------------------
 async function boot() {
@@ -391,12 +469,9 @@ async function boot() {
   const stopBtn = $("stopBtn");
   const fxLayer = assertEl($("fxLayer"), "fxLayer");
 
-   // 🔥 Absorb FX 初期化
-const AbsorbFX = createAbsorbFX({
-  fxLayerId: "fxLayer",
-  ringId: "avatarRing"
-});
-   
+  // ✅ FX layer safety (no css edit)
+  ensureFxLayerTop(fxLayer);
+
   const music = assertEl($("music"), "music");
   const seTap = $("seTap");
   const seGreat = $("seGreat");
@@ -459,7 +534,20 @@ const AbsorbFX = createAbsorbFX({
     aruProg: $("aruProg"),
     aruValue: $("aruValue"),
     ariaLive: $("ariaLive"),
+
+    // convenience
+    noteCanvas: canvas,
+    canvas,
   };
+
+  // 🔥 Absorb FX 初期化（refsが揃ってから）
+  const AbsorbFX = createAbsorbFX({
+    fxLayerId: "fxLayer",
+    ringId: "avatarRing",
+  });
+
+  // ✅ Gate: “判定ライン付近の中央円のみ”
+  const gate = makeCircleGate({ hitZone, refs });
 
   const log = (m) => {
     if (refs.ariaLive) refs.ariaLive.textContent = String(m);
@@ -525,29 +613,29 @@ const AbsorbFX = createAbsorbFX({
     });
 
     // ------------------------------------------------------------
-// natural end (AUDIO is source of truth)
-// ------------------------------------------------------------
-const a = music;
+    // natural end (AUDIO is source of truth)
+    // ------------------------------------------------------------
+    const a = music;
 
-// iOS: duration が最初 NaN のことがあるので guard
-const dur = Number(a?.duration);
-const hasDur = Number.isFinite(dur) && dur > 0;
+    // iOS: duration が最初 NaN のことがあるので guard
+    const dur = Number(a?.duration);
+    const hasDur = Number.isFinite(dur) && dur > 0;
 
-// 余白（秒）: 終端の誤差吸収
-const EPS = 0.06;
+    // 余白（秒）: 終端の誤差吸収
+    const EPS = 0.06;
 
-// ✅ 1) 音源が ended なら即RESULT
-// ✅ 2) duration が取れていて、t が終端付近に来たらRESULT
-if (a && (a.ended || (hasDur && t >= dur - EPS))) {
-  endToResult("ENDED");
-  return;
-}
+    // ✅ 1) 音源が ended なら即RESULT
+    // ✅ 2) duration が取れていて、t が終端付近に来たらRESULT
+    if (a && (a.ended || (hasDur && t >= dur - EPS))) {
+      endToResult("ENDED");
+      return;
+    }
 
-// 旧ロジックも保険で残す（chart終端で終わるケース）
-if (timing.isEnded(t)) {
-  endToResult("ENDED");
-  return;
-}
+    // 旧ロジックも保険で残す（chart終端で終わるケース）
+    if (timing.isEnded(t)) {
+      endToResult("ENDED");
+      return;
+    }
   }
 
   // ------------------------------------------------------------
@@ -698,14 +786,15 @@ if (timing.isEnded(t)) {
       const clientX = Number(ev?.clientX ?? hitRect.left + x);
       const clientY = Number(ev?.clientY ?? hitRect.top + y);
 
+      // ✅ ここが今回の最重要：判定は「写真の中央円」内だけ
+      if (!gate.inCircle(clientX, clientY)) {
+        if (DEV) console.debug("[HIT] rejected(outside circle)", { clientX, clientY });
+        return;
+      }
+
       const fxRect = fxLayer.getBoundingClientRect();
       const lx = clientX - fxRect.left;
       const ly = clientY - fxRect.top;
-
-      // FX (lazy)
-     //   const fxi = ensureFX();
-     //   fxi.burst(lx, ly);
-     //   if (refs.avatarRing) fxi.stream(lx, ly, refs.avatarRing);
 
       // audio feedback
       audio.playTap?.();
@@ -714,20 +803,21 @@ if (timing.isEnded(t)) {
       const t = timing.getSongTime();
       if (!Number.isFinite(t)) return;
 
- const res = judge.hit(t);
-ui.onJudge?.(res);
+      const res = judge.hit(t);
+      ui.onJudge?.(res);
 
-if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-  // ★ AbsorbFX は "perfect" だけ特別、他は "great" 扱いに寄せる
-  AbsorbFX.fire({
-    x: clientX,
-    y: clientY,
-    judge: res.name === "PERFECT" ? "perfect" : "great",
-  });
+      if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
+        // ★ AbsorbFX は "perfect" だけ特別、他は "great" 扱いに寄せる
+        // ★ 座標は fxLayer ローカル (lx/ly) に統一 → 見えない問題を根絶
+        AbsorbFX.fire({
+          x: lx,
+          y: ly,
+          judge: res.name === "PERFECT" ? "perfect" : "great",
+        });
 
-  audio.playGreat?.();
-  ui.flashHit?.();
-}
+        audio.playGreat?.();
+        ui.flashHit?.();
+      }
     },
   });
 
