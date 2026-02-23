@@ -806,18 +806,42 @@ async function boot() {
       const res = judge.hit(t);
       ui.onJudge?.(res);
 
-      if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-        // ★ AbsorbFX は "perfect" だけ特別、他は "great" 扱いに寄せる
-        // ★ 座標は fxLayer ローカル (lx/ly) に統一 → 見えない問題を根絶
-        AbsorbFX.fire({
-          x: lx,
-          y: ly,
-          judge: res.name === "PERFECT" ? "perfect" : "great",
-        });
+    if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
+  const combo = judge.state.combo || 0;
+  const milestone = (combo === 10 || combo === 25 || combo === 50);
 
-        audio.playGreat?.();
-        ui.flashHit?.();
-      }
+  // ① 既存：吸収（白い線の正体）
+  AbsorbFX.fire({
+    x: lx,
+    y: ly,
+    judge: res.name === "PERFECT" ? "perfect" : "great",
+  });
+
+  // ② ★ここが今まで無かった：FXCore を確実に起動して burst/stream を呼ぶ
+  const fxi = ensureFX();
+
+  // ③ リングの“rim吸収”にしたいターゲット要素
+  //    avatarRing は「右上アイコンのリング」なので、中央リングにしたいなら res-ring を取る
+  const ringEl =
+    document.querySelector(".res-ring") || // 中央のリング（これが欲しいはず）
+    refs?.avatarRing ||                    // 無ければ右上のリング
+    document.getElementById("avatarRing");
+
+  // ④ burst（タップ時の星火花）
+  fxi.burst(lx, ly, { judge: res.name, combo, milestone });
+
+  // ⑤ stream（タップ→弧→リングrimへ吸収）
+  if (res.name === "PERFECT") {
+    requestAnimationFrame(() => {
+      fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
+    });
+  } else {
+    fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
+  }
+
+  audio.playGreat?.();
+  ui.flashHit?.();
+}
     },
   });
 
