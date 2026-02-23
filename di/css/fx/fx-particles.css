@@ -1,124 +1,149 @@
-/* di/css/fx/fx-particles.css */
+/* /di/css/fx/fx-particles.css
+   FX PARTICLES — CYBER RITUAL (Core-first)
+   - Core = white-hot nucleus + res-color halo (premium)
+   - Dust = subtle data shards (secondary)
+   - Stream = core bolt + faint tail (to ring)
+*/
 
-/* 粒子の基礎：星形・強い発光・サイズはCSS変数で */
+:root{
+  /* default safety */
+  --res-color: rgba(0,240,255,.95);
+  --res-color-soft: rgba(0,240,255,.35);
+  --res-color-glow: rgba(0,240,255,.18);
+
+  /* FX tuning knobs */
+  --fx-core-size-mul: 1.0;      /* 1.0..1.4 */
+  --fx-core-glow-mul: 1.0;      /* 1.0..1.6 */
+  --fx-dust-alpha-mul: 1.0;     /* 0.8..1.4 */
+  --fx-stream-alpha-mul: 1.0;   /* 1.0..1.6 */
+}
+
+/* ---------- base particle ---------- */
 .fx-particle{
-  position:absolute;
   width: var(--fx-size, 14px);
   height: var(--fx-size, 14px);
-  border-radius: 0; /* 円やめる */
-  pointer-events:none;
+  opacity: var(--fx-alpha, .92);
 
-  opacity: var(--fx-alpha, .95);
-  will-change: transform, opacity, filter;
-  transform:translate(-50%,-50%) translateZ(0);
+  /* fallback look (overridden per class) */
+  background: var(--res-color);
+  border-radius: 999px;
 
-  /* 星形 */
-  -webkit-clip-path: polygon(
-    50% 0%,
-    61% 35%,
-    98% 35%,
-    68% 57%,
-    79% 92%,
-    50% 72%,
-    21% 92%,
-    32% 57%,
-    2% 35%,
-    39% 35%
-  );
-  clip-path: polygon(
-    50% 0%,
-    61% 35%,
-    98% 35%,
-    68% 57%,
-    79% 92%,
-    50% 72%,
-    21% 92%,
-    32% 57%,
-    2% 35%,
-    39% 35%
-  );
+  /* premium: tiny inner highlight */
+  box-shadow:
+    0 0 12px rgba(255,255,255,0.12),
+    0 0 18px var(--res-color-glow);
 
-  /* “芯”を明るく：中心白→res色 */
+  /* keep cheap blur away; use controlled brightness */
+  filter: saturate(1.12) brightness(1.06);
+
+  will-change: transform, opacity, left, top, filter;
+}
+
+/* ---------- CORE: the “hit confirmation” nucleus ---------- */
+.fx-particle.burstCore{
+  /* core bigger by CSS even if JS size small */
+  width: calc(var(--fx-size, 18px) * var(--fx-core-size-mul));
+  height: calc(var(--fx-size, 18px) * var(--fx-core-size-mul));
+  border-radius: 999px;
+  opacity: 0.98;
+
+  /* ✅ white-hot center + res halo (premium) */
   background:
-    radial-gradient(circle at 40% 35%,
-      rgba(255,255,255,.95) 0%,
-      color-mix(in srgb, var(--res-color) 80%, white) 32%,
-      rgba(255,255,255,0) 70%
+    radial-gradient(circle at 35% 30%,
+      rgba(255,255,255,1.00) 0%,
+      rgba(255,255,255,0.92) 18%,
+      rgba(255,255,255,0.20) 38%,
+      rgba(255,255,255,0.00) 58%
+    ),
+    radial-gradient(circle at 55% 55%,
+      rgba(255,255,255,0.0) 0%,
+      var(--res-color) 44%,
+      rgba(0,0,0,0.00) 72%
     );
 
-  /* 光量アップ（A演出の中毒性はここ） */
   box-shadow:
-    0 0 calc(var(--fx-size,14px) * .8) var(--res-color),
-    0 0 calc(var(--fx-size,14px) * 1.8) var(--res-color),
-    0 0 calc(var(--fx-size,14px) * 3.2) rgba(255,255,255,.22);
+    0 0 calc(18px * var(--fx-core-glow-mul)) rgba(255,255,255,0.30),
+    0 0 calc(30px * var(--fx-core-glow-mul)) var(--res-color-soft),
+    0 0 calc(58px * var(--fx-core-glow-mul)) var(--res-color-glow);
 
-  mix-blend-mode: screen;
-  filter: saturate(1.25) brightness(1.12);
+  filter: saturate(1.35) brightness(1.18);
 }
 
-/* 流星尾：streamだけ尾を出す */
-.fx-particle.stream::after{
+/* ---------- DUST: secondary “data shards” ---------- */
+.fx-particle.burstDust{
+  /* shard-ish: diamond */
+  border-radius: 3px;
+
+  /* diamond look via rotation handled by JS transform; here we make it “holo” */
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,0.65) 0%,
+      rgba(255,255,255,0.08) 28%,
+      rgba(255,255,255,0.00) 45%
+    ),
+    radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,0.00) 0%,
+      var(--res-color) 55%,
+      rgba(0,0,0,0.00) 78%
+    );
+
+  opacity: calc(var(--fx-alpha, .84) * var(--fx-dust-alpha-mul));
+
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.10),
+    0 0 14px var(--res-color-glow);
+
+  filter: saturate(1.28) brightness(1.10);
+}
+
+/* ---------- STREAM: the core bolt to ring ---------- */
+.fx-particle.streamCore{
+  border-radius: 999px;
+  opacity: calc(var(--fx-alpha, .95) * var(--fx-stream-alpha-mul));
+
+  /* bolt is whiter to read on video */
+  background:
+    radial-gradient(circle at 35% 30%,
+      rgba(255,255,255,1.0) 0%,
+      rgba(255,255,255,0.85) 26%,
+      rgba(255,255,255,0.12) 48%,
+      rgba(255,255,255,0.00) 64%
+    ),
+    radial-gradient(circle at 55% 55%,
+      var(--res-color) 0%,
+      rgba(0,0,0,0.00) 70%
+    );
+
+  box-shadow:
+    0 0 20px rgba(255,255,255,0.22),
+    0 0 34px var(--res-color-soft),
+    0 0 70px var(--res-color-glow);
+
+  filter: saturate(1.38) brightness(1.22);
+}
+
+/* optional “tail” (only if JS sets --fx-tail) */
+.fx-particle.streamCore::after{
   content:"";
   position:absolute;
-  left: 50%;
-  top: 50%;
-  width: calc(var(--fx-size,14px) * var(--fx-tail, 2.6));
-  height: calc(var(--fx-size,14px) * .55);
-  transform: translate(-10%, -50%) rotate(var(--fx-tail-rot, -18deg));
-  transform-origin: 0% 50%;
+  inset:-10% -160%;
   pointer-events:none;
+  opacity: 0.75;
 
-  background: linear-gradient(90deg,
-    rgba(255,255,255,.55),
-    color-mix(in srgb, var(--res-color) 85%, transparent),
-    rgba(0,0,0,0)
-  );
+  /* ✅ line tail (not fireworks) */
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0.00) 0%,
+      rgba(255,255,255,0.22) 26%,
+      var(--res-color-soft) 54%,
+      rgba(255,255,255,0.00) 100%
+    );
 
-  filter: blur(0.5px);
-  opacity: .92;
-}
+  transform-origin: 50% 50%;
+  transform:
+    translateZ(0)
+    rotate(var(--fx-tail-rot, 0deg))
+    scaleX(var(--fx-tail, 1.0));
 
-/* 吸収アニメ：位置移動も含めたいならJSで left/top を動かすのでここは維持 */
-.fx-particle.stream{
-  transition:
-    transform .55s cubic-bezier(.22,.8,.2,1),
-    left .55s cubic-bezier(.22,.8,.2,1),
-    top .55s cubic-bezier(.22,.8,.2,1),
-    opacity .55s ease,
-    filter .55s ease;
-}
-
-.fx-particle.absorbed{
-  opacity:0;
-  filter: brightness(1.4) blur(1px);
-}
-/* ------------------------------------------------------------
-   BURST VISIBILITY BOOST (PRO)
-   - Make burst readable on bright/video backgrounds
------------------------------------------------------------- */
-
-.burstCore,
-.burstDust{
-  opacity: 1 !important;
-  mix-blend-mode: screen !important;     /* 光として合成 */
-  filter: none !important;               /* 既存filterで薄くなるのを防ぐ */
-  will-change: transform, opacity, filter;
-}
-
-/* Core: stronger pop */
-.burstCore{
-  filter: brightness(1.60) saturate(1.85) contrast(1.12) !important;
-}
-
-/* Dust: still vivid */
-.burstDust{
-  filter: brightness(1.35) saturate(1.60) contrast(1.08) !important;
-}
-
-/* If base particle class is dimmed elsewhere, override it */
-.particle,
-.fxParticle,
-.fx-particle{
-  opacity: 1 !important;
-  filter: none !important;
+  filter: blur(0.2px) brightness(1.12);
 }
