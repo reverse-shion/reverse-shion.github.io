@@ -516,7 +516,30 @@ async function boot() {
       state: getState(app),
     });
 
-    if (timing.isEnded(t)) endToResult("ENDED");
+    // ------------------------------------------------------------
+// natural end (AUDIO is source of truth)
+// ------------------------------------------------------------
+const a = music;
+
+// iOS: duration が最初 NaN のことがあるので guard
+const dur = Number(a?.duration);
+const hasDur = Number.isFinite(dur) && dur > 0;
+
+// 余白（秒）: 終端の誤差吸収
+const EPS = 0.06;
+
+// ✅ 1) 音源が ended なら即RESULT
+// ✅ 2) duration が取れていて、t が終端付近に来たらRESULT
+if (a && (a.ended || (hasDur && t >= dur - EPS))) {
+  endToResult("ENDED");
+  return;
+}
+
+// 旧ロジックも保険で残す（chart終端で終わるケース）
+if (timing.isEnded(t)) {
+  endToResult("ENDED");
+  return;
+}
   }
 
   // ------------------------------------------------------------
