@@ -806,18 +806,28 @@ async function boot() {
       const res = judge.hit(t);
       ui.onJudge?.(res);
 
-      if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-        // ★ AbsorbFX は "perfect" だけ特別、他は "great" 扱いに寄せる
-        // ★ 座標は fxLayer ローカル (lx/ly) に統一 → 見えない問題を根絶
-        AbsorbFX.fire({
-          x: lx,
-          y: ly,
-          judge: res.name === "PERFECT" ? "perfect" : "great",
-        });
+   if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
+  const combo = judge.state.combo || 0;
+  const milestone = (combo === 10 || combo === 25 || combo === 50);
 
-        audio.playGreat?.();
-        ui.flashHit?.();
-      }
+  // ① 既存：吸収エフェクト（今のまま）
+  AbsorbFX.fire({
+    x: lx,
+    y: ly,
+    judge: res.name === "PERFECT" ? "perfect" : "great",
+  });
+
+  // ② 追加：burst（神演出の流星/星座弧/祝福）
+  //    ※ burst.js 神演出版は第3引数 meta を見て PERFECT/節目を強化する
+  fxi.burst(lx, ly, { judge: res.name, combo, milestone });
+
+  // ③ 追加：stream（タップ→星座弧→リング吸収）
+  //    ※ ring要素を渡せるなら渡す（無ければ null でも stream.js 内が拾う）
+  fxi.stream(lx, ly, refs?.avatarRing || document.getElementById("avatarRing"), { judge: res.name, combo, milestone });
+
+  audio.playGreat?.();
+  ui.flashHit?.();
+}
     },
   });
 
