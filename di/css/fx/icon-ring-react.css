@@ -1,0 +1,73 @@
+/* /di/css/fx/icon-ring-react.css
+   PRO LIGHT (icon ring react) — glow + ripple + spin boost
+   Target: #avatarRing (already exists, class "avatarRing res-ring")
+*/
+
+#avatarRing{
+  position:absolute;
+  /* existing ring css should already center it; keep additive only */
+}
+
+#avatarRing.fx-hit{
+  animation: fxRingGlow 100ms ease-out both;
+}
+
+/* inner ripple */
+#avatarRing.fx-hit::before{
+  content:"";
+  position:absolute;
+  inset: 10px;
+  border-radius: 999px;
+  border: 2px solid rgba(0,240,255,0.35);
+  opacity: 0;
+  transform: scale(0.82);
+  filter: drop-shadow(0 0 10px rgba(0,240,255,0.22));
+  animation: fxInnerRipple 160ms ease-out both;
+}
+
+/* outer secondary ripple */
+#avatarRing.fx-hit::after{
+  content:"";
+  position:absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 2px solid rgba(156,60,255,0.22);
+  opacity: 0;
+  transform: scale(0.92);
+  filter: drop-shadow(0 0 12px rgba(156,60,255,0.14));
+  animation: fxOuterRipple 180ms ease-out both;
+}
+
+/* spin boost: use CSS var multiplier (set by JS for perfect) */
+#avatarRing.fx-boost{
+  --ring-boost-mul: 1.2;
+}
+
+/* If your ring is already rotating via animation in fx-ring.css,
+   this extra animation is a short additive "kick" */
+#avatarRing.fx-boost{
+  animation: fxRingKick 250ms ease-out both;
+}
+
+@keyframes fxRingGlow{
+  0%   { filter: brightness(1); }
+  35%  { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
+
+@keyframes fxInnerRipple{
+  0%   { opacity:0; transform: scale(0.82); }
+  35%  { opacity:0.95; transform: scale(1.02); }
+  100% { opacity:0; transform: scale(1.10); }
+}
+
+@keyframes fxOuterRipple{
+  0%   { opacity:0; transform: scale(0.92); }
+  40%  { opacity:0.65; transform: scale(1.02); }
+  100% { opacity:0; transform: scale(1.14); }
+}
+
+@keyframes fxRingKick{
+  0%   { transform: translate(calc(-50% + var(--avatar-offset-x,0px)), calc(-50% + var(--avatar-offset-y,0px))) rotate(0deg); }
+  100% { transform: translate(calc(-50% + var(--avatar-offset-x,0px)), calc(-50% + var(--avatar-offset-y,0px))) rotate(38deg); }
+}
