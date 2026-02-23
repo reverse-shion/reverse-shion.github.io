@@ -1,5 +1,3 @@
-㊗️
-
 /* /di/js/engine/fx/absorb-trigger.js
    PRO LIGHT — minimal trigger (coords -> CSS vars) for:
    - tap flash (sigil) (0.16s / perfect 0.22s)
