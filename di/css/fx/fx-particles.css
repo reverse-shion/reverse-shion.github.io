@@ -1,119 +1,12 @@
 /* /di/css/fx/fx-particles.css
-   FX PARTICLES — LEGACY STAR (stable)
+   FX PARTICLES — GOD-PRO "ENERGY CORE" (ULTRA LIGHT)
+   --------------------------------------------------
+   Goals:
+   1) タップ時の紋章（sigil）を消す（pseudo廃止）
+   2) 星 → 円形エネルギー粒子（数と大きさが認識できる）
+   3) 中央くっきり＋外周グラデでぼかし（filter/blur無しで表現）
+   4) iOS軽量化：mix-blend/filter/clip-path/repeating-conic を使わない
 */
-
-.fx-particle{
-  position: absolute;
-  width: var(--fx-size, 14px);
-  height: var(--fx-size, 14px);
-  border-radius: 0;
-  pointer-events: none;
-
-  opacity: var(--fx-alpha, .95);
-  will-change: transform, opacity, filter, left, top;
-  transform: translate(-50%,-50%) translateZ(0);
-
-  -webkit-clip-path: polygon(
-    50% 0%,
-    61% 35%,
-    98% 35%,
-    68% 57%,
-    79% 92%,
-    50% 72%,
-    21% 92%,
-    32% 57%,
-    2% 35%,
-    39% 35%
-  );
-  clip-path: polygon(
-    50% 0%,
-    61% 35%,
-    98% 35%,
-    68% 57%,
-    79% 92%,
-    50% 72%,
-    21% 92%,
-    32% 57%,
-    2% 35%,
-    39% 35%
-  );
-
-  background:
-    radial-gradient(circle at 40% 35%,
-      rgba(255,255,255,.95) 0%,
-      color-mix(in srgb, var(--res-color) 80%, white) 32%,
-      rgba(255,255,255,0) 70%
-    );
-
-  box-shadow:
-    0 0 calc(var(--fx-size,14px) * .8) var(--res-color),
-    0 0 calc(var(--fx-size,14px) * 1.8) var(--res-color),
-    0 0 calc(var(--fx-size,14px) * 3.2) rgba(255,255,255,.22);
-
-  mix-blend-mode: screen;
-  filter: saturate(1.25) brightness(1.12);
-}
-
-/* stream tail */
-.fx-particle.stream::after{
-  content:"";
-  position:absolute;
-  left: 50%;
-  top: 50%;
-  width: calc(var(--fx-size,14px) * var(--fx-tail, 2.6));
-  height: calc(var(--fx-size,14px) * .55);
-  transform: translate(-10%, -50%) rotate(var(--fx-tail-rot, -18deg));
-  transform-origin: 0% 50%;
-  pointer-events:none;
-
-  background: linear-gradient(90deg,
-    rgba(255,255,255,.55),
-    color-mix(in srgb, var(--res-color) 85%, transparent),
-    rgba(0,0,0,0)
-  );
-
-  filter: blur(0.5px);
-  opacity: .92;
-}
-
-.fx-particle.stream{
-  transition:
-    transform .55s cubic-bezier(.22,.8,.2,1),
-    left .55s cubic-bezier(.22,.8,.2,1),
-    top .55s cubic-bezier(.22,.8,.2,1),
-    opacity .55s ease,
-    filter .55s ease;
-}
-
-.fx-particle.absorbed{
-  opacity:0;
-  filter: brightness(1.4) blur(1px);
-}
-
-/* burst visibility boost (keep) */
-.burstCore,
-.burstDust{
-  opacity: 1 !important;
-  mix-blend-mode: screen !important;
-  filter: none !important;
-  will-change: transform, opacity, filter;
-}
-.burstCore{ filter: brightness(1.60) saturate(1.85) contrast(1.12) !important; }
-.burstDust{ filter: brightness(1.35) saturate(1.60) contrast(1.08) !important; }
-
-/* stop accidental dimming by other css */
-.particle,
-.fxParticle,
-.fx-particle{
-  opacity: 1 !important;
-  filter: none !important;
-}
-/* =========================================================
-   GOD-PRO: Resonance Core (Hex + Sigil) OVERRIDE
-   - Replaces "star" look with hex crystal + tarot sigil vibe
-   - Affects: .burstCore .burstDust .streamAbsorb
-   - Uses --res-color vars (already set by JS)
-   ========================================================= */
 
 :root{
   --res-core: var(--res-color, hsl(210 90% 62%));
@@ -121,120 +14,157 @@
   --res-core-glow: var(--res-color-glow, hsla(210 90% 62% / .18));
 }
 
-/* 共通：粒子を“結晶核”に上書き */
+/* ------------------------------
+   Base particle (legacy hook)
+   - JS側が left/top/--fx-size を付ける想定
+   - transform/opacity だけで動く（軽い）
+-------------------------------- */
+.fx-particle{
+  position: absolute;
+  width: var(--fx-size, 14px);
+  height: var(--fx-size, 14px);
+  pointer-events: none;
+
+  left: 0;
+  top: 0;
+
+  /* iOS：filterは使わない。描画はradial-gradient+shadowで完結 */
+  opacity: var(--fx-alpha, .95);
+  will-change: transform, opacity, left, top;
+  transform: translate(-50%,-50%) translateZ(0);
+
+  border-radius: 999px;
+
+  /* ✅ 中央くっきり + 外周ぼかし（filter無し） */
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.85) 12%,
+      color-mix(in srgb, var(--res-core) 78%, rgba(255,255,255,.55)) 28%,
+      var(--res-core-soft) 52%,
+      rgba(0,0,0,0) 74%
+    );
+
+  /* ✅ “光量”は影で出す：段数を少なく */
+  box-shadow:
+    0 0 calc(var(--fx-size,14px) * .90) var(--res-core-glow),
+    0 0 calc(var(--fx-size,14px) * 1.60) rgba(255,255,255,.14);
+
+  /* ❌重い要素は禁止 */
+  mix-blend-mode: normal;
+  filter: none;
+}
+
+/* ---------------------------------
+   Stream particle (moving to ring)
+   - “白い線”に見えるのを防ぐため「尾」は薄く短く
+   - blur/filterは使わない
+---------------------------------- */
+.fx-particle.stream{
+  /* JS側がtransitionを付ける場合もあるが、保険で保持 */
+  transition:
+    transform .55s cubic-bezier(.22,.8,.2,1),
+    left .55s cubic-bezier(.22,.8,.2,1),
+    top .55s cubic-bezier(.22,.8,.2,1),
+    opacity .55s ease;
+}
+
+/* 尾（軽量）：細いグラデ帯を1枚だけ。blurなし。 */
+.fx-particle.stream::after{
+  content:"";
+  position:absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--fx-size,14px) * 1.8);
+  height: calc(var(--fx-size,14px) * .42);
+  transform: translate(-12%, -50%) rotate(var(--fx-tail-rot, -16deg));
+  transform-origin: 0% 50%;
+  pointer-events:none;
+  border-radius: 999px;
+
+  background: linear-gradient(90deg,
+    rgba(255,255,255,.26),
+    var(--res-core-soft),
+    rgba(0,0,0,0)
+  );
+
+  opacity: .75;
+}
+
+/* 吸収終端：フェードアウトだけ（blur禁止） */
+.fx-particle.absorbed{
+  opacity:0;
+}
+
+/* ---------------------------------
+   Engine FX classes (burst/stream)
+   - JSが createParticle(...) で付ける className を想定
+   - ここで「星→円形エネルギー核」に統一
+---------------------------------- */
 .burstCore,
 .burstDust,
 .streamAbsorb{
-  border-radius: 0 !important;
-  background: none !important;
-
-  /* 六角結晶（フラットじゃなく“核＋縁”を作る） */
-  clip-path: polygon(
-    50% 0%,
-    92% 25%,
-    92% 75%,
-    50% 100%,
-    8% 75%,
-    8% 25%
-  );
-
-  /* “核”の見え方：中心白熱 + 外側共鳴色 */
+  border-radius: 999px !important;
   background:
-    radial-gradient(circle at 50% 45%,
-      rgba(255,255,255,.95) 0%,
-      rgba(255,255,255,.55) 18%,
-      var(--res-core) 44%,
-      rgba(0,0,0,0) 74%
-    ),
-    radial-gradient(circle at 50% 55%,
-      var(--res-core-soft) 0%,
-      rgba(0,0,0,0) 68%
+    radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.96) 0%,
+      rgba(255,255,255,.82) 13%,
+      color-mix(in srgb, var(--res-core) 78%, rgba(255,255,255,.55)) 30%,
+      var(--res-core-soft) 56%,
+      rgba(0,0,0,0) 78%
     ) !important;
 
-  /* “縁取り”の水晶感（内側の薄いリム） */
-  outline: 1px solid rgba(255,255,255,.22);
+  /* 認識しやすさ：中心が締まって見えるよう“薄い内リム” */
+  outline: 1px solid rgba(255,255,255,.16);
   outline-offset: -1px;
 
-  /* 映像背景で埋もれない神秘ブースト */
-  mix-blend-mode: screen;
-  filter: brightness(1.35) saturate(1.35) contrast(1.06);
-
-  /* 影はJSでも付けてるが、形を綺麗に見せる最小補助 */
+  /* 軽量shadow（段数少なめ） */
   box-shadow:
-    0 0 10px rgba(255,255,255,.35),
-    0 0 22px var(--res-core),
-    0 0 46px var(--res-core-glow);
+    0 0 18px var(--res-core-glow),
+    0 0 28px rgba(255,255,255,.10);
+
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  will-change: transform, opacity;
 }
 
-/* 中の“タロット紋章”っぽい幾何学シジル */
-.burstCore::before,
-.burstDust::before,
-.streamAbsorb::before{
-  content:"";
-  position:absolute;
-  inset: 18%;
-  pointer-events:none;
-
-  /* 幾何学：放射＋リング（タロット機械紋） */
-  background:
-    radial-gradient(circle,
-      rgba(255,255,255,.80) 0%,
-      rgba(255,255,255,.25) 35%,
-      rgba(255,255,255,0) 70%
-    ),
-    repeating-conic-gradient(
-      from 0deg,
-      rgba(255,255,255,.55) 0deg 6deg,
-      rgba(255,255,255,0) 6deg 18deg
-    );
-
-  /* “線だけ残す”ための簡易マスク */
-  -webkit-mask:
-    radial-gradient(circle, #000 0 55%, transparent 56% 100%);
-  mask:
-    radial-gradient(circle, #000 0 55%, transparent 56% 100%);
-
-  opacity: .55;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,.25));
-  transform: translateZ(0);
-  animation: sigilSpin 900ms linear infinite;
+/* burstCore は“核が強い”：外周光量を少しだけ増やす（でも軽い） */
+.burstCore{
+  outline-color: rgba(255,255,255,.22);
+  box-shadow:
+    0 0 22px var(--res-core-glow),
+    0 0 34px rgba(255,255,255,.14);
 }
 
-/* PERFECTっぽい“虹彩”をほんのり（過剰にしない） */
-.burstCore::after,
-.streamAbsorb::after{
-  content:"";
-  position:absolute;
-  inset: -14%;
-  pointer-events:none;
-
-  background:
-    conic-gradient(
-      from 0deg,
-      rgba(255,255,255,.00),
-      rgba(255,255,255,.18),
-      var(--res-core-soft),
-      rgba(255,255,255,.10),
-      rgba(255,255,255,.00)
-    );
-
-  clip-path: inherit;
-  opacity: .55;
-  filter: blur(2px) brightness(1.25);
-  transform: translateZ(0);
+/* burstDust は“数が多い”：さらに軽く（影弱め） */
+.burstDust{
+  outline: none;
+  box-shadow:
+    0 0 14px var(--res-core-glow);
 }
 
-/* “流星の線”に見えないよう、移動中の粒子を少し丸めて“核”感を優先 */
+/* streamAbsorb は“移動粒子”：尾はJS側のtransformで線に見えやすいので影を抑える */
 .streamAbsorb{
-  outline-color: rgba(255,255,255,.18);
+  outline-color: rgba(255,255,255,.14);
   box-shadow:
-    0 0 12px rgba(255,255,255,.28),
-    0 0 26px var(--res-core),
-    0 0 54px var(--res-core-glow);
+    0 0 16px var(--res-core-glow);
 }
 
-/* 紋章回転：速すぎるとチープなので固定1倍 */
-@keyframes sigilSpin{
-  from{ transform: rotate(0deg); }
-  to  { transform: rotate(360deg); }
+/* ✅ 重要：タップ時の紋章（sigil）を完全禁止 */
+.burstCore::before,
+.burstCore::after,
+.burstDust::before,
+.burstDust::after,
+.streamAbsorb::before,
+.streamAbsorb::after{
+  content: none !important;
+}
+
+/* 旧CSSの干渉を止める（ただし重い効果は追加しない） */
+.particle,
+.fxParticle,
+.fx-particle{
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
 }
