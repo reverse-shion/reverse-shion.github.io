@@ -15,6 +15,8 @@
 
 import { FXCore } from "./engine/fx/index.js";
 
+import { createAbsorbFX } from "./engine/fx/absorb-trigger.js";
+
 const BASE = new URL("./", import.meta.url);
 
 const ENGINE_FILES = [
@@ -389,6 +391,12 @@ async function boot() {
   const stopBtn = $("stopBtn");
   const fxLayer = assertEl($("fxLayer"), "fxLayer");
 
+   // 🔥 Absorb FX 初期化
+const AbsorbFX = createAbsorbFX({
+  fxLayerId: "fxLayer",
+  ringId: "avatarRing"
+});
+   
   const music = assertEl($("music"), "music");
   const seTap = $("seTap");
   const seGreat = $("seGreat");
@@ -707,12 +715,20 @@ if (timing.isEnded(t)) {
       if (!Number.isFinite(t)) return;
 
       const res = judge.hit(t);
-      ui.onJudge?.(res);
+ui.onJudge?.(res);
 
-      if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-        audio.playGreat?.();
-        ui.flashHit?.();
-      }
+if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
+
+  // 🔥 Absorb FX 追加
+  AbsorbFX.fire({
+    x: clientX,
+    y: clientY,
+    judge: res.name.toLowerCase()
+  });
+
+  audio.playGreat?.();
+  ui.flashHit?.();
+}
     },
   });
 
