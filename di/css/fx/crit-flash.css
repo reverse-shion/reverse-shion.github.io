@@ -1,0 +1,76 @@
+/* /di/css/fx/crit-flash.css
+   PRO LIGHT (tap flash) — geometric AI flash 0.12s
+*/
+
+.fxTapFlash{
+  position: fixed;
+  left: 0; top: 0;
+  width: 1px; height: 1px;
+  transform: translate(var(--fx-x, 0px), var(--fx-y, 0px));
+  pointer-events: none;
+  z-index: 2147483000;
+  opacity: 1;
+}
+
+.fxTapFlash::before{
+  content:"";
+  position:absolute;
+  left: -1px; top: -1px;
+  width: 2px; height: 2px;
+  transform: translate(-50%,-50%);
+  border-radius: 999px;
+
+  /* tiny core */
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.95) 0%,
+    rgba(0,240,255,0.55) 35%,
+    rgba(156,60,255,0.0) 75%
+  );
+  filter: drop-shadow(0 0 8px rgba(0,240,255,0.35))
+          drop-shadow(0 0 10px rgba(156,60,255,0.25));
+  animation: fxTapCore 120ms ease-out both;
+}
+
+.fxTapFlash::after{
+  content:"";
+  position:absolute;
+  left: 0; top: 0;
+  width: 110px; height: 110px;
+  transform: translate(-50%,-50%);
+  border-radius: 999px;
+
+  /* geometric ring + cross feel (cheap but premium) */
+  background:
+    radial-gradient(circle,
+      rgba(0,0,0,0) 54%,
+      rgba(0,240,255,0.35) 56%,
+      rgba(0,0,0,0) 58%,
+      rgba(156,60,255,0.22) 62%,
+      rgba(0,0,0,0) 66%
+    ),
+    conic-gradient(from 0deg,
+      rgba(0,240,255,0.0) 0deg 35deg,
+      rgba(0,240,255,0.25) 35deg 45deg,
+      rgba(156,60,255,0.0) 45deg 125deg,
+      rgba(156,60,255,0.22) 125deg 135deg,
+      rgba(0,240,255,0.0) 135deg 215deg,
+      rgba(0,240,255,0.25) 215deg 225deg,
+      rgba(156,60,255,0.0) 225deg 305deg,
+      rgba(156,60,255,0.22) 305deg 315deg,
+      rgba(0,240,255,0.0) 315deg 360deg
+    );
+  opacity: 0.95;
+  animation: fxTapSigil 120ms ease-out both;
+}
+
+@keyframes fxTapCore{
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(0.65); }
+  35%  { opacity:1; transform: translate(-50%,-50%) scale(1.05); }
+  100% { opacity:0; transform: translate(-50%,-50%) scale(0.95); }
+}
+
+@keyframes fxTapSigil{
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(0.70); }
+  40%  { opacity:0.95; transform: translate(-50%,-50%) scale(1.02); }
+  100% { opacity:0; transform: translate(-50%,-50%) scale(0.92); }
+}
