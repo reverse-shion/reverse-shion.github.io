@@ -22,20 +22,22 @@ export function createAbsorbFX({
     };
   }
 
-  function _fireRingReact(judge) {
-  const ring = document.getElementById("avatarRing");
+function _fireRingReact(judge) {
+  const ring = $(ringId);
   if (!ring) return;
 
-  ring.classList.add("fx-hit");
+  // 共通：受信フラッシュ
+  ring.classList.add("absorbPulse");
+
+  // Perfectだけ強化
   if (judge === "perfect") {
-    ring.classList.add("fx-boost","is-perfect");
-  } else {
-    ring.classList.add("fx-boost");
+    ring.classList.add("absorbPerfect");
   }
 
+  // 早めに切る（CSSは0.6sでも体感は短く）
   window.setTimeout(() => {
-    ring.classList.remove("fx-hit","fx-boost","is-perfect");
-  }, 320);
+    ring.classList.remove("absorbPulse", "absorbPerfect");
+  }, 260);
 }
   function _append(node) {
     const layer = $(fxLayerId);
