@@ -1,146 +1,78 @@
 /* /di/css/fx/fx-ring.css
-   AVATAR RING — CYBER RITUAL (premium, non-cheap)
-   - Rotating rune-ish layers (CSS only)
-   - Absorb pulse (JS can toggle .ring-hit)
-   - Speed control via CSS var --ring-spin-dur (JS will update later)
+   AVATAR RING — LEGACY BASE (no drift, same-centering rule)
+   - ✅ ring uses 50%/50% + translate(-50%,-50%) (same as face)
+   - ✅ optional offsets for perfect alignment
 */
 
+/* 🔧 調整つまみ（必要なら hud.css か :root に置いてもOK） */
 :root{
-  --ring-size: 96px;
-  --ring-thick: 5px;
-
-  /* base speed (JS can reduce duration to speed up) */
-  --ring-spin-dur: 10s;
-
-  /* absorb pulse intensity (0..1) optional */
-  --ring-pulse: 0;
+  --avatar-offset-x: 0px;   /* +右 / -左 */
+  --avatar-offset-y: 0px;   /* +下 / -上 */
+  --ring-inset: 14px;       /* 旧 inset:-14px 相当の“余白” */
 }
 
-/* Safari smooth var animation (supported in modern iOS) */
-@property --ring-pulse{
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-#avatarRing.res-ring,
-.avatarRing.res-ring{
-  width: var(--ring-size);
-  height: var(--ring-size);
-  border-radius: 999px;
+/* リング本体（旧 res-ring を維持） */
+.res-ring{
   position: absolute;
-  inset: 0;
-  margin: auto;
+  left: 50%;
+  top: 50%;
+
+  /* ✅ 顔画像と同じ中心揃え */
+  transform: translate(calc(-50% + var(--avatar-offset-x)),
+                       calc(-50% + var(--avatar-offset-y))) translateZ(0);
+
+  /* ✅ サイズは「親(アイコン枠)」に追従させる：枠より少し大きく */
+  width: calc(100% + (var(--ring-inset) * 2));
+  height: calc(100% + (var(--ring-inset) * 2));
+
+  border-radius: 999px;
   pointer-events: none;
-
-  /* keep it crisp */
-  transform: translateZ(0);
-
-  /* base aura */
-  box-shadow:
-    0 0 16px rgba(255,255,255,0.10),
-    0 0 26px var(--res-color-glow),
-    0 0 46px var(--res-color-soft);
+  will-change: transform, filter, box-shadow;
 }
 
-/* --- ring body: multi-layer conic + mask --- */
-#avatarRing.res-ring::before,
-.avatarRing.res-ring::before{
+/* 旧の見た目（回転＋合成） */
+.res-ring::before{
   content:"";
   position:absolute;
   inset: 0;
-  border-radius: 999px;
+  border-radius: inherit;
 
-  /* ✅ high-end ring (gold+res interplay) */
-  background:
-    /* faint rune ticks */
-    repeating-conic-gradient(
-      from 0deg,
-      rgba(255,255,255,0.20) 0deg 1.2deg,
-      rgba(255,255,255,0.00) 1.2deg 10deg
-    ),
-    /* primary res band */
-    conic-gradient(
-      from 90deg,
-      rgba(255,255,255,0.00) 0deg,
-      var(--res-color) 70deg,
-      rgba(255,255,255,0.55) 120deg,
-      var(--res-color-soft) 190deg,
-      rgba(255,255,255,0.00) 360deg
-    ),
-    /* subtle gold accent */
-    radial-gradient(circle at 50% 50%,
-      rgba(230,201,107,0.00) 54%,
-      rgba(230,201,107,0.22) 66%,
-      rgba(230,201,107,0.00) 78%
-    );
-
-  /* thickness via mask */
-  -webkit-mask:
-    radial-gradient(circle,
-      transparent calc(50% - var(--ring-thick)),
-      #000 calc(50% - var(--ring-thick) + 1px),
-      #000 50%,
-      transparent 51%
-    );
-  mask:
-    radial-gradient(circle,
-      transparent calc(50% - var(--ring-thick)),
-      #000 calc(50% - var(--ring-thick) + 1px),
-      #000 50%,
-      transparent 51%
-    );
-
-  /* rotation */
-  animation: ringSpin var(--ring-spin-dur) linear infinite;
-
-  /* premium glow control */
-  filter: saturate(1.20) brightness(1.06);
-  opacity: 0.95;
+  background: conic-gradient(from 0deg, var(--res-color), #ffffff, var(--res-color));
+  opacity: .85;
+  mix-blend-mode: screen;
+  animation: ringRotate 6s linear infinite;
+  transition: filter .25s ease, opacity .25s ease;
 }
 
-/* --- inner lens / highlight --- */
-#avatarRing.res-ring::after,
-.avatarRing.res-ring::after{
+.res-ring::after{
   content:"";
   position:absolute;
-  inset: 10px;
-  border-radius: 999px;
-
-  background:
-    radial-gradient(circle at 35% 30%,
-      rgba(255,255,255,0.30) 0%,
-      rgba(255,255,255,0.10) 22%,
-      rgba(255,255,255,0.00) 55%
-    ),
-    radial-gradient(circle at 60% 68%,
-      rgba(255,255,255,0.00) 0%,
-      rgba(0,0,0,0.16) 58%,
-      rgba(0,0,0,0.28) 100%
-    );
-
-  opacity: 0.65;
-  filter: saturate(1.1) brightness(1.0);
+  inset: 4px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0), rgba(0,0,0,.45));
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: inset 0 0 20px rgba(0,0,0,.3);
 }
 
-/* absorb pulse (JS can toggle .ring-hit or increase --ring-pulse) */
-#avatarRing.res-ring.ring-hit,
-.avatarRing.res-ring.ring-hit{
-  box-shadow:
-    0 0 18px rgba(255,255,255,0.14),
-    0 0 34px var(--res-color-soft),
-    0 0 72px var(--res-color-glow);
+/* hit pulse */
+.res-ring.absorbPulse::before{
+  filter: brightness(1.5) blur(2px);
+  opacity: 1;
+}
+.res-ring.absorbPulse{
+  animation: ringPulse .6s ease-out;
 }
 
-#avatarRing.res-ring.ring-hit::before,
-.avatarRing.res-ring.ring-hit::before{
-  filter:
-    saturate(1.35)
-    brightness(calc(1.08 + (var(--ring-pulse) * 0.18)));
+@keyframes ringPulse{
+  0%{ transform: translate(calc(-50% + var(--avatar-offset-x)),
+                           calc(-50% + var(--avatar-offset-y))) scale(1) translateZ(0); }
+  40%{ transform: translate(calc(-50% + var(--avatar-offset-x)),
+                            calc(-50% + var(--avatar-offset-y))) scale(1.12) translateZ(0); }
+  100%{ transform: translate(calc(-50% + var(--avatar-offset-x)),
+                             calc(-50% + var(--avatar-offset-y))) scale(1) translateZ(0); }
 }
 
-/* breathing “ritual” micro motion (not cheap) */
-@keyframes ringSpin{
+@keyframes ringRotate{
   from{ transform: rotate(0deg) translateZ(0); }
   to  { transform: rotate(360deg) translateZ(0); }
 }
