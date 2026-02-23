@@ -1,5 +1,3 @@
-☺️
-
 // /di/js/engine/fx/stream.js
 // STREAM — Tap -> Constellation Arc -> Ring Absorb (GOD-PRO)
 // ✅ Start = tap (fxLayer local coords)
