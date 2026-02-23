@@ -840,7 +840,7 @@ async function boot() {
   }
 
   audio.playGreat?.();
-  ui.flashHit?.();
+  //ui.flashHit?.();
 }
     },
   });
