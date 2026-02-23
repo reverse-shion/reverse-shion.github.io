@@ -1,27 +1,27 @@
 /* /di/css/fx/fx-ring.css
-   AVATAR RING — LEGACY BASE (no drift, same-centering rule)
-   - ✅ ring uses 50%/50% + translate(-50%,-50%) (same as face)
-   - ✅ optional offsets for perfect alignment
+   AVATAR RING — LEGACY BASE (HUD scoped, no drift)
+   - ✅ scoped to HUD avatar only (prevents accidental matches)
+   - ✅ ring center uses same rule as face (50% + translate)
+   - ✅ pulse does NOT kill rotation (pulse on wrapper, rotate on ::before)
 */
 
-/* 🔧 調整つまみ（必要なら hud.css か :root に置いてもOK） */
 :root{
   --avatar-offset-x: 0px;   /* +右 / -左 */
   --avatar-offset-y: 0px;   /* +下 / -上 */
-  --ring-inset: 14px;       /* 旧 inset:-14px 相当の“余白” */
+  --ring-inset: 14px;       /* 旧 inset:-14px 相当の余白 */
 }
 
-/* リング本体（旧 res-ring を維持） */
-.res-ring{
+/* ✅ HUDの右上アイコン内だけに限定（誤爆停止の本丸） */
+.sideAvatar .res-ring{
   position: absolute;
   left: 50%;
   top: 50%;
 
-  /* ✅ 顔画像と同じ中心揃え */
+  /* 顔と同じ中心揃えルール */
   transform: translate(calc(-50% + var(--avatar-offset-x)),
                        calc(-50% + var(--avatar-offset-y))) translateZ(0);
 
-  /* ✅ サイズは「親(アイコン枠)」に追従させる：枠より少し大きく */
+  /* 親（.sideAvatar）に追従して少し大きく */
   width: calc(100% + (var(--ring-inset) * 2));
   height: calc(100% + (var(--ring-inset) * 2));
 
@@ -30,8 +30,8 @@
   will-change: transform, filter, box-shadow;
 }
 
-/* 旧の見た目（回転＋合成） */
-.res-ring::before{
+/* 見た目：回転は ::before に任せる（pulseで止めない） */
+.sideAvatar .res-ring::before{
   content:"";
   position:absolute;
   inset: 0;
@@ -40,36 +40,48 @@
   background: conic-gradient(from 0deg, var(--res-color), #ffffff, var(--res-color));
   opacity: .85;
   mix-blend-mode: screen;
+
+  /* ✅ 回転はここだけ */
   animation: ringRotate 6s linear infinite;
+
   transition: filter .25s ease, opacity .25s ease;
 }
 
-.res-ring::after{
+.sideAvatar .res-ring::after{
   content:"";
   position:absolute;
   inset: 4px;
   border-radius: inherit;
+
   background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0), rgba(0,0,0,.45));
   border: 1px solid rgba(255,255,255,.12);
   box-shadow: inset 0 0 20px rgba(0,0,0,.3);
 }
 
-/* hit pulse */
-.res-ring.absorbPulse::before{
-  filter: brightness(1.5) blur(2px);
-  opacity: 1;
-}
-.res-ring.absorbPulse{
+/* ✅ pulse：本体にscale（回転は ::before なので止まらない） */
+.sideAvatar .res-ring.absorbPulse{
   animation: ringPulse .6s ease-out;
 }
 
+.sideAvatar .res-ring.absorbPulse::before{
+  filter: brightness(1.5) blur(2px);
+  opacity: 1;
+}
+
+/* pulseは “translate+scale” を維持（中心がズレない） */
 @keyframes ringPulse{
-  0%{ transform: translate(calc(-50% + var(--avatar-offset-x)),
-                           calc(-50% + var(--avatar-offset-y))) scale(1) translateZ(0); }
-  40%{ transform: translate(calc(-50% + var(--avatar-offset-x)),
-                            calc(-50% + var(--avatar-offset-y))) scale(1.12) translateZ(0); }
-  100%{ transform: translate(calc(-50% + var(--avatar-offset-x)),
-                             calc(-50% + var(--avatar-offset-y))) scale(1) translateZ(0); }
+  0%{
+    transform: translate(calc(-50% + var(--avatar-offset-x)),
+                         calc(-50% + var(--avatar-offset-y))) scale(1) translateZ(0);
+  }
+  40%{
+    transform: translate(calc(-50% + var(--avatar-offset-x)),
+                         calc(-50% + var(--avatar-offset-y))) scale(1.12) translateZ(0);
+  }
+  100%{
+    transform: translate(calc(-50% + var(--avatar-offset-x)),
+                         calc(-50% + var(--avatar-offset-y))) scale(1) translateZ(0);
+  }
 }
 
 @keyframes ringRotate{
