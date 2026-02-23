@@ -1,3 +1,5 @@
+☺️
+
 // /di/js/engine/fx/stream.js
 // STREAM — Tap -> Constellation Arc -> Ring Absorb (GOD-PRO)
 // ✅ Start = tap (fxLayer local coords)
@@ -7,24 +9,6 @@
 // ✅ Milestone: BlessPulse (cut-in grade but light)
 
 export function attachStream(FX) {
-
-
-  // DEBUG: show on screen (iPhoneでも確認できる)
-(() => {
-  const id = "__dbg_stream_called__";
-  const d = document.getElementById(id) || (() => {
-    const x = document.createElement("div");
-    x.id = id;
-    x.style.cssText =
-      "position:fixed;left:8px;bottom:34px;z-index:2147483647;" +
-      "padding:6px 8px;border-radius:10px;" +
-      "background:rgba(0,0,0,.65);color:#fff;font:12px/1.2 system-ui;" +
-      "pointer-events:none";
-    document.body.appendChild(x);
-    return x;
-  })();
-  d.textContent = "STREAM CALLED";
-})();
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function ensureRingPulseStyle() {
@@ -95,11 +79,8 @@ export function attachStream(FX) {
     // perfect feels stronger but don't explode counts (iOS safe)
     const k = clamp(k0 + (isPerfect ? 0.18 : 0) + (milestone ? 0.10 : 0), 0, 1);
 
-    // ✅ 変更(1): ターゲットはリング本体を優先（rim吸収の確定）
-    // refs が画像を指してても、.res-ring を掴めれば“中心刺さり”が止まる
     const el =
       targetEl ||
-      document.querySelector(".res-ring") ||     // ← 追加：最優先でリング
       document.getElementById("avatarRing") ||
       document.querySelector(".avatarRing") ||
       null;
@@ -116,9 +97,7 @@ export function attachStream(FX) {
     // count: keep low, add quality via glow/path
     const COUNT_MIN = 10;
     const COUNT_MAX = 18;
-    const count = Math.round(
-      COUNT_MIN + (COUNT_MAX - COUNT_MIN) * (k * 0.95) + (isPerfect ? 2 : 0)
-    );
+    const count = Math.round(COUNT_MIN + (COUNT_MAX - COUNT_MIN) * (k * 0.95) + (isPerfect ? 2 : 0));
 
     // duration: perfect = slightly faster suction
     const durBase = isPerfect ? 220 : 260;
@@ -158,33 +137,24 @@ export function attachStream(FX) {
 
       p.style.background = color;
       p.style.opacity = "1";
-
-      // ✅ 変更(2): 白飛びしやすい screen → lighter（色が残る）
-      p.style.mixBlendMode = "lighter";
+      p.style.mixBlendMode = "screen";
 
       // “吸い込み圧”＝rim直前だけ白熱感を足す（perfect強化）
       const g1 = 10 + k * 18 + this.rand(-2, 6);
       const g2 = 26 + k * 34 + this.rand(-4, 12);
-
-      // ✅ 変更(3): 白コアのαを少し下げて「白い線」感を減らす（色が読める）
-      const whiteCoreA = isPerfect ? 0.56 : 0.38;
-      const whiteFarA  = isPerfect ? 0.12 : 0.08;
-
       p.style.boxShadow =
-        `0 0 ${Math.round(g1 * 0.45)}px rgba(255,255,255,${whiteCoreA}), ` +
+        `0 0 ${Math.round(g1 * 0.55)}px rgba(255,255,255,${isPerfect ? "0.78" : "0.60"}), ` +
         `0 0 ${g1.toFixed(0)}px ${color}, ` +
         `0 0 ${g2.toFixed(0)}px ${color}, ` +
-        `0 0 ${Math.round(g2 * 1.2)}px rgba(255,255,255,${whiteFarA})`;
+        `0 0 ${Math.round(g2 * 1.2)}px rgba(255,255,255,${isPerfect ? "0.14" : "0.10"})`;
 
-      // ✅ 変更(4): 神秘寄り（色の深度）— saturate強化＋hueを少しだけ青紫へ
-      p.style.filter =
-        `brightness(${(1.18 + k * 0.42 + (isPerfect ? 0.10 : 0)).toFixed(2)}) ` +
-        `saturate(${(1.95).toFixed(2)}) contrast(1.08) hue-rotate(-8deg)`;
+      p.style.filter = `brightness(${(1.30 + k * 0.45 + (isPerfect ? 0.12 : 0)).toFixed(
+        2
+      )}) saturate(1.65) contrast(1.06)`;
 
       const s0 = 0.55 + this.rand(-0.12, 0.18);
       const rot0 = this.rand(-25, 25);
-      p.style.transform =
-        `translate(-50%,-50%) scale(${s0.toFixed(3)}) rotate(${rot0.toFixed(1)}deg)`;
+      p.style.transform = `translate(-50%,-50%) scale(${s0.toFixed(3)}) rotate(${rot0.toFixed(1)}deg)`;
 
       layer.appendChild(p);
 
@@ -202,17 +172,20 @@ export function attachStream(FX) {
         const dy = ey - sy;
 
         // curve control (single bend)
+        // perpendicular curve amount (bigger = more mystical)
         const bend = (10 + k * 26) * (this.rand(0, 1) < 0.5 ? -1 : 1);
-        const px = -dy;
+        const px = -dy; // perpendicular vector
         const py = dx;
         const pm = Math.max(0.001, Math.hypot(px, py));
         const ux = px / pm;
         const uy = py / pm;
 
+        // mid point: somewhere between start and end + perpendicular offset
         const midT = 0.48 + this.rand(-0.08, 0.10);
         const mx = dx * midT + ux * bend;
         const my = dy * midT + uy * bend;
 
+        // Step1: go to mid (slightly bigger = "gathering")
         const sMid = (0.62 + this.rand(-0.08, 0.10)) * (isPerfect ? 1.05 : 1.0);
         const rotMid = rot0 + this.rand(-120, 120);
 
@@ -224,15 +197,14 @@ export function attachStream(FX) {
           `translate(calc(-50% + ${mx.toFixed(1)}px), calc(-50% + ${my.toFixed(1)}px)) ` +
           `scale(${sMid.toFixed(3)}) rotate(${rotMid.toFixed(1)}deg)`;
 
+        // Step2: go to rim (shrink into rim) — a bit faster at the end
         setTimeout(() => {
           const sEnd = 0.18 + this.rand(-0.05, 0.06);
           const rot1 = rotMid + this.rand(-160, 160);
 
-          // end “white-hot” for perfect (micro reward) — ただし白飛びしない程度に
+          // end “white-hot” for perfect (micro reward)
           if (isPerfect) {
-            p.style.filter =
-              `brightness(${(1.55 + k * 0.25).toFixed(2)}) saturate(1.65) ` +
-              `contrast(1.10) hue-rotate(-8deg)`;
+            p.style.filter = `brightness(${(1.75 + k * 0.30).toFixed(2)}) saturate(1.55) contrast(1.10)`;
           }
 
           p.style.transition =
