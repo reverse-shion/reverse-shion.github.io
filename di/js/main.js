@@ -809,7 +809,7 @@ async function boot() {
       if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
         // ★ AbsorbFX は "perfect" だけ特別、他は "great" 扱いに寄せる
         // ★ 座標は fxLayer ローカル (lx/ly) に統一 → 見えない問題を根絶
-        AbsorbFX.fire({
+     //  AbsorbFX.fire({
           x: lx,
           y: ly,
           judge: res.name === "PERFECT" ? "perfect" : "great",
