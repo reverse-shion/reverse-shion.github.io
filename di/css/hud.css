@@ -548,3 +548,32 @@
   .sideAvatar{ width: 64px; height: 64px; }
   .dicoFace{ width: 74px; height: 74px; }
 }
+
+
+/* ------------------------------------------------------------
+   AVATAR RING LAYERS — PRO STABLE
+   base ring (#avatarRing) + skin ring (#avatarRingSkin)
+------------------------------------------------------------ */
+.sideAvatar{
+  position: relative; /* 基準点 */
+}
+
+/* 顔 */
+.sideAvatar .dicoFace{
+  position: relative;
+  z-index: 2;
+}
+
+/* ①ベースリング（共鳴/吸収） */
+#avatarRing{
+  z-index: 1;
+}
+
+/* ②スキンリング（タロット模様） */
+#avatarRingSkin{
+  position: absolute;
+  inset: -14px;            /* fx-ring.css の inset:-14px と同じ輪郭 */
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 3;              /* 顔より前に見せたいので上 */
+}
