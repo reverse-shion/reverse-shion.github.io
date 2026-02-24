@@ -828,13 +828,13 @@ async function boot() {
     document.getElementById("avatarRing");
 
   // ⑤ stream（タップ→弧→リングrimへ吸収）
-   // if (res.name === "PERFECT") {
-    //  requestAnimationFrame(() => {
-   // fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
- //    });
- //  } else {
-  //   fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
- //  }
+    if (res.name === "PERFECT") {
+    requestAnimationFrame(() => {
+   fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
+    });
+  } else {
+   fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
+   }
 
   audio.playGreat?.();
   ui.flashHit?.();
