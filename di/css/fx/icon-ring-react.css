@@ -1,73 +1,95 @@
-/* /di/css/fx/icon-ring-react.css
-   PRO LIGHT (icon ring react) — glow + ripple + spin boost
-   Target: #avatarRing (already exists, class "avatarRing res-ring")
-*/
+/* =========================================================
+   ICON RING – CONSTANT ROTATION + HIT BOOST (PRO STABLE)
+   Target: #avatarRing
+   ========================================================= */
 
+/* ====== 基本設定 ====== */
 #avatarRing{
   position:absolute;
-  /* existing ring css should already center it; keep additive only */
+
+  /* 中央固定（既存維持） */
+  transform:
+    translate(calc(-50% + var(--avatar-offset-x,0px)),
+              calc(-50% + var(--avatar-offset-y,0px)))
+    rotate(var(--ring-rot, 0deg));
+
+  transform-origin: center;
+  will-change: transform, filter;
+
+  /* 回転速度（秒）→ JSで変更可能 */
+  --ring-speed: 12s;
+
+  animation: ringSpin var(--ring-speed) linear infinite;
 }
 
+/* ====== 常時回転 ====== */
+@keyframes ringSpin{
+  from{
+    transform:
+      translate(calc(-50% + var(--avatar-offset-x,0px)),
+                calc(-50% + var(--avatar-offset-y,0px)))
+      rotate(0deg);
+  }
+  to{
+    transform:
+      translate(calc(-50% + var(--avatar-offset-x,0px)),
+                calc(-50% + var(--avatar-offset-y,0px)))
+      rotate(360deg);
+  }
+}
+
+/* ====== ヒット時グロー ====== */
 #avatarRing.fx-hit{
-  animation: fxRingGlow 100ms ease-out both;
-}
-
-/* inner ripple */
-#avatarRing.fx-hit::before{
-  content:"";
-  position:absolute;
-  inset: 10px;
-  border-radius: 999px;
-  border: 2px solid rgba(0,240,255,0.35);
-  opacity: 0;
-  transform: scale(0.82);
-  filter: drop-shadow(0 0 10px rgba(0,240,255,0.22));
-  animation: fxInnerRipple 160ms ease-out both;
-}
-
-/* outer secondary ripple */
-#avatarRing.fx-hit::after{
-  content:"";
-  position:absolute;
-  inset: -6px;
-  border-radius: 999px;
-  border: 2px solid rgba(156,60,255,0.22);
-  opacity: 0;
-  transform: scale(0.92);
-  filter: drop-shadow(0 0 12px rgba(156,60,255,0.14));
-  animation: fxOuterRipple 180ms ease-out both;
-}
-
-/* spin boost: use CSS var multiplier (set by JS for perfect) */
-#avatarRing.fx-boost{
-  --ring-boost-mul: 1.2;
-}
-
-/* If your ring is already rotating via animation in fx-ring.css,
-   this extra animation is a short additive "kick" */
-#avatarRing.fx-boost{
-  animation: fxRingKick 250ms ease-out both;
+  animation:
+    ringSpin var(--ring-speed) linear infinite,
+    fxRingGlow 120ms ease-out both;
 }
 
 @keyframes fxRingGlow{
   0%   { filter: brightness(1); }
-  35%  { filter: brightness(1.4); }
+  40%  { filter: brightness(1.5); }
   100% { filter: brightness(1); }
 }
 
+/* ====== 内側リップル ====== */
+#avatarRing.fx-hit::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:999px;
+  border:2px solid rgba(0,240,255,0.45);
+  opacity:0;
+  transform:scale(0.8);
+  filter: drop-shadow(0 0 14px rgba(0,240,255,0.4));
+  animation: fxInnerRipple 200ms ease-out both;
+}
+
 @keyframes fxInnerRipple{
-  0%   { opacity:0; transform: scale(0.82); }
-  35%  { opacity:0.95; transform: scale(1.02); }
-  100% { opacity:0; transform: scale(1.10); }
+  0%   { opacity:0; transform:scale(0.8); }
+  40%  { opacity:1; transform:scale(1.05); }
+  100% { opacity:0; transform:scale(1.15); }
+}
+
+/* ====== 外側リップル ====== */
+#avatarRing.fx-hit::after{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:999px;
+  border:2px solid rgba(156,60,255,0.35);
+  opacity:0;
+  transform:scale(0.9);
+  filter: drop-shadow(0 0 16px rgba(156,60,255,0.25));
+  animation: fxOuterRipple 240ms ease-out both;
 }
 
 @keyframes fxOuterRipple{
-  0%   { opacity:0; transform: scale(0.92); }
-  40%  { opacity:0.65; transform: scale(1.02); }
-  100% { opacity:0; transform: scale(1.14); }
+  0%   { opacity:0; transform:scale(0.9); }
+  40%  { opacity:0.8; transform:scale(1.05); }
+  100% { opacity:0; transform:scale(1.2); }
 }
 
-@keyframes fxRingKick{
-  0%   { transform: translate(calc(-50% + var(--avatar-offset-x,0px)), calc(-50% + var(--avatar-offset-y,0px))) rotate(0deg); }
-  100% { transform: translate(calc(-50% + var(--avatar-offset-x,0px)), calc(-50% + var(--avatar-offset-y,0px))) rotate(38deg); }
+/* ====== ブースト（速度上昇） ====== */
+#avatarRing.fx-boost{
+  --ring-speed: 4s; /* 一時的に高速回転 */
 }
