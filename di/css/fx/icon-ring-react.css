@@ -1,56 +1,45 @@
 /* =========================================================
    ICON RING – DUAL SPIN + TAROT MOTIF (CSS ONLY)
-   - Layer A: tick + rune ring (slow)
-   - Layer B: sweep wedge (faster) + micro star dust
-   - Keeps center translate (no drift)
+   ✅ target is #avatarRingSkin (separate layer)
+   ✅ NO translate(-50%) needed because we use inset-based sizing
    ========================================================= */
 
-#avatarRing{
-  position:absolute;
-  transform:
-    translate(calc(-50% + var(--avatar-offset-x,0px)),
-              calc(-50% + var(--avatar-offset-y,0px)))
-    rotate(0deg);
-  transform-origin:center;
+#avatarRingSkin{
+  /* position/inset/z-index は hud.css 側で固定済み想定 */
   will-change: transform, filter;
 
   /* base spin */
   --ring-speed: 12s; /* slow (world-safe) */
-  animation: ringSpin var(--ring-speed) linear infinite;
+  animation: ringSpinSkin var(--ring-speed) linear infinite;
 
   /* palette */
   --tarot-cyan: rgba(0,240,255,0.70);
   --tarot-violet: rgba(156,60,255,0.55);
-  --tarot-gold: rgba(255,210,120,0.55); /* pink-gold寄せ */
+  --tarot-gold: rgba(255,210,120,0.55);
   --tarot-white: rgba(255,255,255,0.18);
 }
 
 /* =========================================================
-   Layer A (slow): ticks + “arcana engraving” feel
-   - This rotates WITH the ring (inherited)
-   ========================================================= */
-#avatarRing::before{
+   Layer A (slow): ticks + engraving feel
+========================================================= */
+#avatarRingSkin::before{
   content:"";
   position:absolute;
   inset:-2px;
   border-radius:999px;
   pointer-events:none;
 
-  /* ①細目盛り＋②太目盛り（12分割）＋③刻印っぽい内周グラデ */
   background:
-    /* 太目盛り：12本（回転認識の基準点） */
     repeating-conic-gradient(
       from -90deg,
       rgba(255,255,255,0.0) 0deg 28deg,
       var(--tarot-gold) 28deg 29.6deg
     ),
-    /* 細目盛り：リズム感（星座の刻み） */
     repeating-conic-gradient(
       from 0deg,
       rgba(255,255,255,0.0) 0deg 8deg,
       var(--tarot-cyan) 8deg 8.5deg
     ),
-    /* 刻印の“縁” */
     radial-gradient(circle at 50% 50%,
       rgba(255,255,255,0.00) 0%,
       rgba(255,255,255,0.00) 56%,
@@ -59,7 +48,6 @@
       rgba(255,255,255,0.00) 72%
     );
 
-  /* リング状に抜く（軽量） */
   -webkit-mask: radial-gradient(circle, transparent 57%, #000 60%);
           mask: radial-gradient(circle, transparent 57%, #000 60%);
 
@@ -71,23 +59,19 @@
 
 /* =========================================================
    Layer B (faster): sweep wedge + star dust
-   - separate rotation (faster) = “装置が生きてる”感
-   ========================================================= */
-#avatarRing::after{
+========================================================= */
+#avatarRingSkin::after{
   content:"";
   position:absolute;
   inset:-6px;
   border-radius:999px;
   pointer-events:none;
 
-  /* スイープ楔 + 微細スター塵（タロットっぽい光粒） */
   background:
-    /* star dust */
     repeating-radial-gradient(circle at 50% 50%,
       rgba(255,255,255,0.00) 0px 6px,
       rgba(255,255,255,0.06) 6px 7px
     ),
-    /* sweep wedge */
     conic-gradient(
       from 0deg,
       rgba(156,60,255,0.00) 0deg 300deg,
@@ -106,66 +90,33 @@
     drop-shadow(0 0 18px rgba(255,210,120,0.15));
   opacity: 0.78;
 
-  /* ✅ 2層回転：ここだけ少し速い */
   --sweep-speed: 7.2s;
   animation: sweepSpin var(--sweep-speed) linear infinite;
 }
 
 /* =========================================================
-   Hit / Boost
-   ========================================================= */
-
-#avatarRing.fx-hit{
+   Hit / Boost (optional): skin ring only
+   ※JSで #avatarRingSkin に class を付けるなら効く
+========================================================= */
+#avatarRingSkin.fx-hit{
   animation:
-    ringSpin var(--ring-speed) linear infinite,
+    ringSpinSkin var(--ring-speed) linear infinite,
     fxRingGlow 120ms ease-out both;
 }
-
-#avatarRing.fx-hit::before{
-  opacity: 1;
-  filter:
-    drop-shadow(0 0 12px rgba(0,240,255,0.26))
-    drop-shadow(0 0 18px rgba(255,210,120,0.18));
-}
-
-#avatarRing.fx-hit::after{
-  opacity: 0.96;
-  filter:
-    drop-shadow(0 0 18px rgba(156,60,255,0.26))
-    drop-shadow(0 0 20px rgba(0,240,255,0.18));
-}
-
-/* PERFECTなど：一時ブースト（速度を上げる） */
-#avatarRing.fx-boost{
-  --ring-speed: 5.0s;     /* base faster */
-}
-#avatarRing.fx-boost::after{
-  --sweep-speed: 3.4s;    /* sweep much faster */
-}
+#avatarRingSkin.fx-boost{ --ring-speed: 5.0s; }
+#avatarRingSkin.fx-boost::after{ --sweep-speed: 3.4s; }
 
 /* =========================================================
-   Keyframes (center-safe: translate is always preserved)
-   ========================================================= */
-@keyframes ringSpin{
-  from{
-    transform:
-      translate(calc(-50% + var(--avatar-offset-x,0px)),
-                calc(-50% + var(--avatar-offset-y,0px)))
-      rotate(0deg);
-  }
-  to{
-    transform:
-      translate(calc(-50% + var(--avatar-offset-x,0px)),
-                calc(-50% + var(--avatar-offset-y,0px)))
-      rotate(360deg);
-  }
+   Keyframes
+========================================================= */
+@keyframes ringSpinSkin{
+  from{ transform: rotate(0deg); }
+  to{   transform: rotate(360deg); }
 }
-
 @keyframes sweepSpin{
   from{ transform: rotate(0deg); }
   to{   transform: rotate(360deg); }
 }
-
 @keyframes fxRingGlow{
   0%   { filter: brightness(1); }
   40%  { filter: brightness(1.55); }
