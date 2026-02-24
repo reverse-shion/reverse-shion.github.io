@@ -1,28 +1,151 @@
 /* =========================================================
-   ICON RING – CONSTANT ROTATION + HIT BOOST (PRO STABLE)
-   Target: #avatarRing
+   ICON RING – DUAL SPIN + TAROT MOTIF (CSS ONLY)
+   - Layer A: tick + rune ring (slow)
+   - Layer B: sweep wedge (faster) + micro star dust
+   - Keeps center translate (no drift)
    ========================================================= */
 
-/* ====== 基本設定 ====== */
 #avatarRing{
   position:absolute;
-
-  /* 中央固定（既存維持） */
   transform:
     translate(calc(-50% + var(--avatar-offset-x,0px)),
               calc(-50% + var(--avatar-offset-y,0px)))
-    rotate(var(--ring-rot, 0deg));
-
-  transform-origin: center;
+    rotate(0deg);
+  transform-origin:center;
   will-change: transform, filter;
 
-  /* 回転速度（秒）→ JSで変更可能 */
-  --ring-speed: 12s;
-
+  /* base spin */
+  --ring-speed: 12s; /* slow (world-safe) */
   animation: ringSpin var(--ring-speed) linear infinite;
+
+  /* palette */
+  --tarot-cyan: rgba(0,240,255,0.70);
+  --tarot-violet: rgba(156,60,255,0.55);
+  --tarot-gold: rgba(255,210,120,0.55); /* pink-gold寄せ */
+  --tarot-white: rgba(255,255,255,0.18);
 }
 
-/* ====== 常時回転 ====== */
+/* =========================================================
+   Layer A (slow): ticks + “arcana engraving” feel
+   - This rotates WITH the ring (inherited)
+   ========================================================= */
+#avatarRing::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:999px;
+  pointer-events:none;
+
+  /* ①細目盛り＋②太目盛り（12分割）＋③刻印っぽい内周グラデ */
+  background:
+    /* 太目盛り：12本（回転認識の基準点） */
+    repeating-conic-gradient(
+      from -90deg,
+      rgba(255,255,255,0.0) 0deg 28deg,
+      var(--tarot-gold) 28deg 29.6deg
+    ),
+    /* 細目盛り：リズム感（星座の刻み） */
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255,255,255,0.0) 0deg 8deg,
+      var(--tarot-cyan) 8deg 8.5deg
+    ),
+    /* 刻印の“縁” */
+    radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,0.00) 0%,
+      rgba(255,255,255,0.00) 56%,
+      rgba(255,210,120,0.10) 60%,
+      rgba(0,240,255,0.08) 67%,
+      rgba(255,255,255,0.00) 72%
+    );
+
+  /* リング状に抜く（軽量） */
+  -webkit-mask: radial-gradient(circle, transparent 57%, #000 60%);
+          mask: radial-gradient(circle, transparent 57%, #000 60%);
+
+  filter:
+    drop-shadow(0 0 10px rgba(0,240,255,0.20))
+    drop-shadow(0 0 14px rgba(255,210,120,0.12));
+  opacity: 0.92;
+}
+
+/* =========================================================
+   Layer B (faster): sweep wedge + star dust
+   - separate rotation (faster) = “装置が生きてる”感
+   ========================================================= */
+#avatarRing::after{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:999px;
+  pointer-events:none;
+
+  /* スイープ楔 + 微細スター塵（タロットっぽい光粒） */
+  background:
+    /* star dust */
+    repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,0.00) 0px 6px,
+      rgba(255,255,255,0.06) 6px 7px
+    ),
+    /* sweep wedge */
+    conic-gradient(
+      from 0deg,
+      rgba(156,60,255,0.00) 0deg 300deg,
+      rgba(156,60,255,0.00) 300deg 334deg,
+      rgba(255,210,120,0.00) 334deg 338deg,
+      rgba(255,210,120,0.55) 338deg 345deg,
+      rgba(0,240,255,0.65) 345deg 352deg,
+      rgba(0,240,255,0.00) 352deg 360deg
+    );
+
+  -webkit-mask: radial-gradient(circle, transparent 66%, #000 69%);
+          mask: radial-gradient(circle, transparent 66%, #000 69%);
+
+  filter:
+    drop-shadow(0 0 16px rgba(156,60,255,0.22))
+    drop-shadow(0 0 18px rgba(255,210,120,0.15));
+  opacity: 0.78;
+
+  /* ✅ 2層回転：ここだけ少し速い */
+  --sweep-speed: 7.2s;
+  animation: sweepSpin var(--sweep-speed) linear infinite;
+}
+
+/* =========================================================
+   Hit / Boost
+   ========================================================= */
+
+#avatarRing.fx-hit{
+  animation:
+    ringSpin var(--ring-speed) linear infinite,
+    fxRingGlow 120ms ease-out both;
+}
+
+#avatarRing.fx-hit::before{
+  opacity: 1;
+  filter:
+    drop-shadow(0 0 12px rgba(0,240,255,0.26))
+    drop-shadow(0 0 18px rgba(255,210,120,0.18));
+}
+
+#avatarRing.fx-hit::after{
+  opacity: 0.96;
+  filter:
+    drop-shadow(0 0 18px rgba(156,60,255,0.26))
+    drop-shadow(0 0 20px rgba(0,240,255,0.18));
+}
+
+/* PERFECTなど：一時ブースト（速度を上げる） */
+#avatarRing.fx-boost{
+  --ring-speed: 5.0s;     /* base faster */
+}
+#avatarRing.fx-boost::after{
+  --sweep-speed: 3.4s;    /* sweep much faster */
+}
+
+/* =========================================================
+   Keyframes (center-safe: translate is always preserved)
+   ========================================================= */
 @keyframes ringSpin{
   from{
     transform:
@@ -38,58 +161,13 @@
   }
 }
 
-/* ====== ヒット時グロー ====== */
-#avatarRing.fx-hit{
-  animation:
-    ringSpin var(--ring-speed) linear infinite,
-    fxRingGlow 120ms ease-out both;
+@keyframes sweepSpin{
+  from{ transform: rotate(0deg); }
+  to{   transform: rotate(360deg); }
 }
 
 @keyframes fxRingGlow{
   0%   { filter: brightness(1); }
-  40%  { filter: brightness(1.5); }
+  40%  { filter: brightness(1.55); }
   100% { filter: brightness(1); }
-}
-
-/* ====== 内側リップル ====== */
-#avatarRing.fx-hit::before{
-  content:"";
-  position:absolute;
-  inset:10px;
-  border-radius:999px;
-  border:2px solid rgba(0,240,255,0.45);
-  opacity:0;
-  transform:scale(0.8);
-  filter: drop-shadow(0 0 14px rgba(0,240,255,0.4));
-  animation: fxInnerRipple 200ms ease-out both;
-}
-
-@keyframes fxInnerRipple{
-  0%   { opacity:0; transform:scale(0.8); }
-  40%  { opacity:1; transform:scale(1.05); }
-  100% { opacity:0; transform:scale(1.15); }
-}
-
-/* ====== 外側リップル ====== */
-#avatarRing.fx-hit::after{
-  content:"";
-  position:absolute;
-  inset:-6px;
-  border-radius:999px;
-  border:2px solid rgba(156,60,255,0.35);
-  opacity:0;
-  transform:scale(0.9);
-  filter: drop-shadow(0 0 16px rgba(156,60,255,0.25));
-  animation: fxOuterRipple 240ms ease-out both;
-}
-
-@keyframes fxOuterRipple{
-  0%   { opacity:0; transform:scale(0.9); }
-  40%  { opacity:0.8; transform:scale(1.05); }
-  100% { opacity:0; transform:scale(1.2); }
-}
-
-/* ====== ブースト（速度上昇） ====== */
-#avatarRing.fx-boost{
-  --ring-speed: 4s; /* 一時的に高速回転 */
 }
