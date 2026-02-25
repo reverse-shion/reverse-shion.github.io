@@ -1,22 +1,14 @@
 /* /di/js/main.js
-   DiCo ARU Phase1 — PRO STABLE ENTRY v2.1 (FULL INTEGRATED)
+   DiCo ARU Phase1 — PRO STABLE ENTRY v2.3 (RINGBEAT HARDENED)
    ------------------------------------------------------------
    ✅ iOS Safari safe (gesture unlock, VIDEO PLAY IN-GESTURE)
-   ✅ Prevent double-tap zoom / scroll drift (hitZone scoped)
+   ✅ Prevent double-tap zoom / viewport drift (hitZone scoped)
    ✅ Deterministic state machine: idle -> playing -> result
    ✅ Single clock (Timing drives everything)
-   ✅ No cache-killing loader (dev only bust / prod fixed ver)
-   ✅ Heavy init deferred (FXCore lazy, but prewarmed on start)
-   ✅ Robust restart (no stalled notes / audio desync)
-   ✅ Debug probes for bg video stall + visualViewport drift
-
-   FIX (THIS PATCH):
-   ------------------------------------------------------------
-   ✅ Tap判定を「判定ライン付近の“中央ノーツが通る円”のみ」に限定（写真の場所）
-      - 円の中心は DOM（#hitFlash / #judge / #noteCanvas / #hitZone）から自動推定
-      - 半径は 円要素（hitFlash/judge）のサイズから推定（無ければhitZoneから推定）
-   ✅ AbsorbFX.fire の座標系を fxLayer ローカル座標 (lx/ly) に統一 → 幾何学FXが確実に見える
-   ✅ fxLayer を JS 側で最前面・クリップ回避設定（CSSを触らずに安定）
+   ✅ Legacy engine loader (DI_ENGINE globals) kept
+   ✅ RingBeat: create after DOM refs, combo notify after judge.hit(t)
+   ✅ RingBeat call is "dual-safe": onCombo / updateCombo both supported
+   ✅ Debug logs to prove: res.name / combo / threshold / gate rejection
 */
 
 "use strict";
@@ -26,18 +18,7 @@ import { createAbsorbFX } from "./engine/fx/absorb-trigger.js";
 import { RingBeat } from "./engine/fx/ringBeat.js";
 
 const BASE = new URL("./", import.meta.url);
-
-const ENGINE_FILES = [
-  "engine/audio.js",
-  "engine/timing.js",
-  "engine/input.js",
-  "engine/judge.js",
-  "engine/render.js",
-  "engine/ui.js",
-  "notes/skin-tarot-pinkgold.js",
-].map((p) => new URL(p, BASE).toString());
-
-const PRESENTATION_FILES = ["result.js"].map((p) => new URL(p, BASE).toString());
+const ASSET_BASE = new URL("../", import.meta.url);
 
 // ---------------------------------------------------------------------
 // ENV / VERSION
@@ -48,8 +29,7 @@ const DEV =
   location.search.includes("dev=1") ||
   location.search.includes("nocache=1");
 
-// 本番固定バージョン（更新したら文字列を変える）
-const BUILD_VER = "2026-02-22";
+const BUILD_VER = "2026-02-26";
 
 // ---------------------------------------------------------------------
 // HELPERS
@@ -69,11 +49,9 @@ function assertEl(el, name) {
   if (!el) throw new Error(`Missing #${name}`);
   return el;
 }
-
 function now() {
   return performance?.now?.() ?? Date.now();
 }
-
 function clamp(v, a, b) {
   return Math.max(a, Math.min(b, v));
 }
@@ -97,7 +75,7 @@ function loadScriptOnce(src) {
   const p = new Promise((resolve, reject) => {
     const s = document.createElement("script");
     s.src = withVersion(src);
-    s.async = false; // keep order deterministic
+    s.async = false;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error("Failed to load: " + src));
     document.head.appendChild(s);
@@ -110,6 +88,18 @@ function loadScriptOnce(src) {
 async function loadScriptsSequentially(files) {
   for (const src of files) await loadScriptOnce(src);
 }
+
+const ENGINE_FILES = [
+  "engine/audio.js",
+  "engine/timing.js",
+  "engine/input.js",
+  "engine/judge.js",
+  "engine/render.js",
+  "engine/ui.js",
+  "notes/skin-tarot-pinkgold.js",
+].map((p) => new URL(p, BASE).toString());
+
+const PRESENTATION_FILES = ["result.js"].map((p) => new URL(p, BASE).toString());
 
 async function ensureLegacyLoaded() {
   const t0 = now();
@@ -126,14 +116,9 @@ async function ensureLegacyLoaded() {
 }
 
 // ---------------------------------------------------------------------
-// DATA FETCH
+// FETCH
 // ---------------------------------------------------------------------
-
-// ★追加：/di/ を基準にしたアセット基準（main.js は /di/js/ 配下なので 1つ上）
-const ASSET_BASE = new URL("../", import.meta.url);
-
 async function fetchJSON(url) {
-  // ★ここを BASE ではなく ASSET_BASE にする
   const u = new URL(url, ASSET_BASE).toString();
   const r = await fetch(u, { cache: DEV ? "no-store" : "force-cache" });
   if (!r.ok) throw new Error(`fetch failed ${u}: ${r.status}`);
@@ -144,8 +129,7 @@ function fallbackChart() {
   const notes = [];
   const bpm = 145;
   const beat = 60 / bpm;
-  // 80秒想定
-  for (let t = 1; t < 80; t += beat) notes.push({ t: +t.toFixed(3), type: "tap" });
+  for (let t = 0.9; t < 10; t += beat) notes.push({ t: +t.toFixed(3), type: "tap" });
   return { meta: { title: "fallback", bpm }, offset: 0, scroll: { approach: 1.25 }, notes };
 }
 
@@ -187,7 +171,7 @@ function makeResColorSync() {
   const resonanceToHue = (rPct) => {
     let v = Number(rPct);
     if (!Number.isFinite(v)) v = 0;
-    if (v > 1.5) v /= 100; // allow 0..100
+    if (v > 1.5) v /= 100;
     const x = clamp01(v);
     const eased = x * x * (3 - 2 * x);
     return HUE_MIN + (HUE_MAX - HUE_MIN) * eased;
@@ -214,55 +198,19 @@ function applyAruState(app, resonancePct) {
 }
 
 // ---------------------------------------------------------------------
-// VIDEO PROBES + iOS "PLAY IN GESTURE" KICK
+// VIDEO (iOS gesture)
 // ---------------------------------------------------------------------
-function attachVideoDebug(bgVideo) {
-  if (!bgVideo) return;
-  const evs = [
-    "loadstart",
-    "loadedmetadata",
-    "loadeddata",
-    "canplay",
-    "canplaythrough",
-    "stalled",
-    "waiting",
-    "playing",
-    "pause",
-    "ended",
-    "error",
-  ];
-  for (const ev of evs) {
-    bgVideo.addEventListener(
-      ev,
-      () => {
-        console.debug("[BGV]", ev, {
-          readyState: bgVideo.readyState,
-          networkState: bgVideo.networkState,
-          paused: bgVideo.paused,
-          t: +bgVideo.currentTime.toFixed(3),
-        });
-      },
-      { passive: true }
-    );
-  }
-}
-
-// ✅ iOS最重要：ユーザー操作の同期区間で play() を叩く（awaitしない）
 function kickVideoInGesture(bgVideo) {
   if (!bgVideo) return;
   try {
     bgVideo.muted = true;
-    // property + attr 両方（iOSの個体差対策）
     bgVideo.playsInline = true;
     bgVideo.setAttribute("playsinline", "");
     bgVideo.setAttribute("webkit-playsinline", "");
-    // preload は metadata のままでもOK。強めたいなら "auto" に。
     const p = bgVideo.play?.();
     if (p && typeof p.catch === "function") p.catch(() => {});
   } catch {}
 }
-
-// “後追い再生” は await しない（gesture外でも最悪害が少ない）
 function bestEffortPlayVideo(bgVideo) {
   if (!bgVideo) return;
   try {
@@ -274,65 +222,36 @@ function bestEffortPlayVideo(bgVideo) {
 // ---------------------------------------------------------------------
 // iOS SAFETY: prevent double-tap zoom / scroll drift (hitZone scoped)
 // ---------------------------------------------------------------------
-function preventIOSZoomAndScroll(el, { signal, debugTag = "HIT" } = {}) {
+function preventIOSZoomAndScroll(el, { signal } = {}) {
   if (!el) return () => {};
   try {
     el.style.webkitTapHighlightColor = "transparent";
     el.style.webkitUserSelect = "none";
     el.style.userSelect = "none";
     el.style.webkitTouchCallout = "none";
-    // modern safari respects this; harmless otherwise
     el.style.touchAction = "manipulation";
   } catch {}
 
   const onTouchStart = (e) => {
-    // allow 1-finger tap but block page scroll/zoom
     if (e.touches && e.touches.length === 1) e.preventDefault();
   };
-  const onTouchMove = (e) => {
-    e.preventDefault();
-  };
+  const onTouchMove = (e) => e.preventDefault();
 
   let lastTouchEnd = 0;
   const onTouchEnd = (e) => {
     const t = Date.now();
-    // classic double-tap zoom window
     if (t - lastTouchEnd <= 250) e.preventDefault();
     lastTouchEnd = t;
   };
 
-  const onGesture = (e) => {
-    e.preventDefault();
-  };
+  const onGesture = (e) => e.preventDefault();
 
   el.addEventListener("touchstart", onTouchStart, { passive: false, signal });
   el.addEventListener("touchmove", onTouchMove, { passive: false, signal });
   el.addEventListener("touchend", onTouchEnd, { passive: false, signal });
-
   window.addEventListener("gesturestart", onGesture, { passive: false, signal });
   window.addEventListener("gesturechange", onGesture, { passive: false, signal });
   window.addEventListener("gestureend", onGesture, { passive: false, signal });
-
-  // debug: view/zoom drift
-  if (DEV) {
-    const vv = window.visualViewport;
-    if (vv) {
-      const logVV = () => {
-        console.debug(`[${debugTag}] visualViewport`, {
-          scale: vv.scale,
-          w: vv.width,
-          h: vv.height,
-          x: vv.offsetLeft,
-          y: vv.offsetTop,
-        });
-      };
-      vv.addEventListener("resize", logVV, { passive: true, signal });
-      vv.addEventListener("scroll", logVV, { passive: true, signal });
-      logVV();
-    } else {
-      console.debug(`[${debugTag}] visualViewport not supported`);
-    }
-  }
 
   return () => {
     try {
@@ -344,6 +263,58 @@ function preventIOSZoomAndScroll(el, { signal, debugTag = "HIT" } = {}) {
       window.removeEventListener("gestureend", onGesture);
     } catch {}
   };
+}
+
+// ---------------------------------------------------------------------
+// FX LAYER SAFETY
+// ---------------------------------------------------------------------
+function ensureFxLayerTop(fxLayer) {
+  if (!fxLayer) return;
+  try {
+    fxLayer.style.position = "fixed";
+    fxLayer.style.left = "0";
+    fxLayer.style.top = "0";
+    fxLayer.style.right = "0";
+    fxLayer.style.bottom = "0";
+    fxLayer.style.width = "100vw";
+    fxLayer.style.height = "100vh";
+    fxLayer.style.pointerEvents = "none";
+    fxLayer.style.overflow = "visible";
+    fxLayer.style.isolation = "isolate";
+    fxLayer.style.zIndex = "2147483646";
+    fxLayer.style.transform = "translateZ(0)";
+    fxLayer.style.webkitTransform = "translateZ(0)";
+  } catch {}
+}
+
+// ---------------------------------------------------------------------
+// HIT GATE: ONLY CENTER CIRCLE
+// ---------------------------------------------------------------------
+function makeCircleGate({ hitZone, refs }) {
+  const circleEl = refs?.hitFlash || refs?.judge || refs?.noteCanvas || hitZone;
+
+  function getCircleCenterAndRadius() {
+    const hz = hitZone.getBoundingClientRect();
+    const r0 = circleEl?.getBoundingClientRect?.() || hz;
+    const cx = r0.left + r0.width * 0.5;
+    const cy = r0.top + r0.height * 0.5;
+
+    let radius = 0;
+    if (circleEl && circleEl !== hitZone && r0.width > 0) radius = Math.min(r0.width, r0.height) * 0.50;
+    else radius = Math.min(hz.width, hz.height) * 0.18;
+
+    radius = Math.max(8, radius + radius * 0.10);
+    return { cx, cy, radius };
+  }
+
+  function inCircle(clientX, clientY) {
+    const { cx, cy, radius } = getCircleCenterAndRadius();
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    return dx * dx + dy * dy <= radius * radius;
+  }
+
+  return { inCircle };
 }
 
 // ---------------------------------------------------------------------
@@ -361,7 +332,6 @@ function disposePreviousIfAny() {
 }
 
 function bindPress(btn, fn, signal) {
-  // iOS: click + pointerup both may fire → de-dupe
   let lastTs = -1;
   const wrapped = (e) => {
     const ts = Number(e?.timeStamp || 0);
@@ -374,76 +344,24 @@ function bindPress(btn, fn, signal) {
 }
 
 // ---------------------------------------------------------------------
-// FX LAYER SAFETY (NO CSS EDIT)
+// RINGBEAT: HARDENED CALL (silent-fail killer)
 // ---------------------------------------------------------------------
-function ensureFxLayerTop(fxLayer) {
-  if (!fxLayer) return;
+function ringBeatNotify(rb, combo) {
+  if (!rb) return false;
   try {
-    // 既存CSSを壊さない範囲で、埋もれ/クリップを確実に回避
-    fxLayer.style.position = "fixed";
-    fxLayer.style.left = "0";
-    fxLayer.style.top = "0";
-    fxLayer.style.right = "0";
-    fxLayer.style.bottom = "0";
-    fxLayer.style.width = "100vw";
-    fxLayer.style.height = "100vh";
-    fxLayer.style.pointerEvents = "none";
-    fxLayer.style.overflow = "visible";
-    fxLayer.style.isolation = "isolate";
-    fxLayer.style.zIndex = "2147483646"; // #result(2147483647)の直下想定
-    fxLayer.style.transform = "translateZ(0)";
-    fxLayer.style.webkitTransform = "translateZ(0)";
-  } catch {}
+    if (typeof rb.onCombo === "function") rb.onCombo(combo);
+    else if (typeof rb.updateCombo === "function") rb.updateCombo(combo);
+    else return false;
+    return true;
+  } catch (e) {
+    console.warn("[RingBeat] notify failed", e);
+    return false;
+  }
 }
 
 // ---------------------------------------------------------------------
-// HIT GATE: ONLY "CENTER CIRCLE NEAR JUDGE LINE"
+// BOOT
 // ---------------------------------------------------------------------
-function makeCircleGate({ hitZone, refs }) {
-  // 優先順位：写真の「中央円」＝ hitFlash / judge の中心を最優先で採用
-  // 無ければ noteCanvas の中心、最後に hitZone 推定
-  const circleEl =
-    refs?.hitFlash ||
-    refs?.judge ||
-    refs?.noteCanvas ||
-    refs?.canvas ||
-    hitZone;
-
-  function getCircleCenterAndRadius() {
-    const hz = hitZone.getBoundingClientRect();
-    const r0 = circleEl?.getBoundingClientRect?.() || hz;
-
-    // 中心
-    const cx = r0.left + r0.width * 0.5;
-    const cy = r0.top + r0.height * 0.5;
-
-    // 半径：円要素が取れているならその半分弱。
-    // 取れない場合は hitZone 幅から推定（中央ノーツ円はレーン幅に近い）
-    let radius = 0;
-
-    if (circleEl && circleEl !== hitZone && Number.isFinite(r0.width) && r0.width > 0) {
-      radius = Math.min(r0.width, r0.height) * 0.50;
-    } else {
-      radius = Math.min(hz.width, hz.height) * 0.18;
-    }
-
-    // 少しだけ猶予（タップ指のブレ + iOS座標丸め）
-    const slack = radius * 0.10;
-    radius = Math.max(8, radius + slack);
-
-    return { cx, cy, radius };
-  }
-
-  function inCircle(clientX, clientY) {
-    const { cx, cy, radius } = getCircleCenterAndRadius();
-    const dx = clientX - cx;
-    const dy = clientY - cy;
-    return dx * dx + dy * dy <= radius * radius;
-  }
-
-  return { inCircle };
-}
-
 async function boot() {
   disposePreviousIfAny();
 
@@ -458,21 +376,7 @@ async function boot() {
     raf = 0;
   };
 
-  // -----------------------------------------------------------------
-  // RingBeat Install
-  // -----------------------------------------------------------------
-  const ringBeat = new RingBeat({
-    app: document.getElementById("app"),
-    avatarRing: document.getElementById("avatarRing"),
-    targetEl: document.querySelector(".targetCore"),
-    fxLayer: document.getElementById("fxLayer"),
-  });
-
-  ringBeat.setThreshold(5);
-  instance.ringBeat = ringBeat;
-
-  
-  // DOM refs
+  // DOM refs (first!)
   const app = assertEl($("app"), "app");
   const canvas = assertEl($("noteCanvas"), "noteCanvas");
   const hitZone = assertEl($("hitZone"), "hitZone");
@@ -481,26 +385,13 @@ async function boot() {
   const stopBtn = $("stopBtn");
   const fxLayer = assertEl($("fxLayer"), "fxLayer");
 
-  // ✅ FX layer safety (no css edit)
-  ensureFxLayerTop(fxLayer);
-
   const music = assertEl($("music"), "music");
   const seTap = $("seTap");
   const seGreat = $("seGreat");
   const bgVideo = $("bgVideo");
 
-  attachVideoDebug(bgVideo);
-
-  // ✅ Prevent iOS zoom/drift (hitZone only)
-  preventIOSZoomAndScroll(hitZone, { signal: ac.signal, debugTag: "HIT" });
-
-  // Prevent selection/callout globally (no scroll UI)
-  try {
-    app.style.webkitUserSelect = "none";
-    app.style.userSelect = "none";
-    app.style.webkitTapHighlightColor = "transparent";
-    app.style.webkitTouchCallout = "none";
-  } catch {}
+  ensureFxLayerTop(fxLayer);
+  preventIOSZoomAndScroll(hitZone, { signal: ac.signal });
 
   // Chart load
   let chart;
@@ -515,7 +406,7 @@ async function boot() {
   const E = globalThis.DI_ENGINE;
   if (!E) throw new Error("DI_ENGINE not loaded (engine scripts missing)");
 
-  // UI refs (IDs unchanged)
+  // UI refs
   const refs = {
     app,
     avatarRing: $("avatarRing"),
@@ -546,24 +437,20 @@ async function boot() {
     aruProg: $("aruProg"),
     aruValue: $("aruValue"),
     ariaLive: $("ariaLive"),
-
-    // convenience
     noteCanvas: canvas,
     canvas,
   };
 
-  // 🔥 Absorb FX 初期化（refsが揃ってから）
-  const AbsorbFX = createAbsorbFX({
-    fxLayerId: "fxLayer",
-    ringId: "avatarRing",
-  });
+  // Absorb FX
+  const AbsorbFX = createAbsorbFX({ fxLayerId: "fxLayer", ringId: "avatarRing" });
 
-  // ✅ Gate: “判定ライン付近の中央円のみ”
+  // Gate
   const gate = makeCircleGate({ hitZone, refs });
 
-  const log = (m) => {
+  const log = (m, obj) => {
     if (refs.ariaLive) refs.ariaLive.textContent = String(m);
-    console.debug("[DiCo]", m);
+    if (obj) console.debug("[DiCo]", m, obj);
+    else console.debug("[DiCo]", m);
   };
 
   // Visual sync
@@ -576,16 +463,15 @@ async function boot() {
   const ui = new E.UI(refs);
   const presenter = getResultPresenterSafe({ refs });
 
-  // Heavy: FXCore lazy
+  // FXCore lazy
   let fx = null;
   const ensureFX = () => (fx ||= new FXCore({ layer: fxLayer, app }));
 
-  // Core systems (rebuildable)
+  // Core systems
   let timing = new E.Timing({ chart });
   let judge = new E.Judge({ chart, timing });
   let render = new E.Renderer({ canvas, chart, timing, judge });
 
-  // input latency
   const INPUT_LAT = 0.06;
   judge.setInputLatency?.(INPUT_LAT);
 
@@ -599,6 +485,27 @@ async function boot() {
     render = new E.Renderer({ canvas, chart, timing, judge });
     render.resize?.();
   };
+
+  // -----------------------------------------------------------------
+  // RingBeat Install (AFTER DOM refs exist)
+  // -----------------------------------------------------------------
+  instance.ringBeat = new RingBeat({
+    app,
+    avatarRing: refs.avatarRing || $("avatarRing"),
+    targetEl: document.querySelector(".targetCore"),
+    fxLayer,
+  });
+
+  // ✅ test threshold (5)
+  try {
+    instance.ringBeat.setThreshold?.(5);
+  } catch {}
+  log("RingBeat installed", {
+    hasRingBeat: !!instance.ringBeat,
+    threshold: 5,
+    avatarRing: !!(refs.avatarRing || $("avatarRing")),
+    targetCore: !!document.querySelector(".targetCore"),
+  });
 
   // RAF loop
   function tick() {
@@ -624,39 +531,23 @@ async function boot() {
       state: getState(app),
     });
 
-    // ------------------------------------------------------------
-    // natural end (AUDIO is source of truth)
-    // ------------------------------------------------------------
     const a = music;
-
-    // iOS: duration が最初 NaN のことがあるので guard
     const dur = Number(a?.duration);
     const hasDur = Number.isFinite(dur) && dur > 0;
-
-    // 余白（秒）: 終端の誤差吸収
     const EPS = 0.06;
 
-    // ✅ 1) 音源が ended なら即RESULT
-    // ✅ 2) duration が取れていて、t が終端付近に来たらRESULT
     if (a && (a.ended || (hasDur && t >= dur - EPS))) {
       endToResult("ENDED");
       return;
     }
-
-    // 旧ロジックも保険で残す（chart終端で終わるケース）
     if (timing.isEnded(t)) {
       endToResult("ENDED");
       return;
     }
   }
 
-  // ------------------------------------------------------------
-  // iOS gesture unlock (audio + VIDEO PLAY IN-GESTURE)
-  // ------------------------------------------------------------
   function primeInGesture() {
-    // ✅ 1) video must be kicked synchronously in gesture
     kickVideoInGesture(bgVideo);
-    // ✅ 2) audio unlock prep
     try {
       audio.primeUnlock?.();
     } catch {}
@@ -666,13 +557,10 @@ async function boot() {
     try {
       await audio.unlock?.();
     } catch (e) {
-      console.warn("[DiCo] audio.unlock failed (may be ok)", e?.message || e);
+      console.warn("[DiCo] audio.unlock failed", e?.message || e);
     }
   }
 
-  // ------------------------------------------------------------
-  // transitions
-  // ------------------------------------------------------------
   function hardStopAll() {
     running = false;
     stopRAF();
@@ -684,54 +572,35 @@ async function boot() {
     } catch {}
   }
 
-  // NOTE:
-  // iOSでは「await の後の video.play」が弾かれやすい。
-  // だから start/restart の入口で kickVideoInGesture を最優先で叩き、
-  // 以降は bestEffortPlayVideo( awaitなし ) に留める。
   async function startFromScratch(kind = "START") {
-    // ✅ gesture内で呼ばれている前提（startGame/restartGameから）
     primeInGesture();
-
-    // audio unlock may await; keep it after video kick
     await unlockBestEffort();
 
-    // 1) stop
     hardStopAll();
 
-    // 2) rebuild core (fresh)
     rebuild();
     judge.reset?.();
 
-    // 3) start timing+audio together (single clock)
-    if (kind === "RESTART" && typeof timing.restart === "function") {
-      timing.restart(audio);
-    } else {
-      timing.start(audio, { reset: true });
-    }
+    if (kind === "RESTART" && typeof timing.restart === "function") timing.restart(audio);
+    else timing.start(audio, { reset: true });
 
-    // 4) show playing
     setState(app, STATES.PLAYING);
     presenter.hide?.();
     ui.hideResult?.();
-    log(`STATE: PLAYING (${kind})`);
 
-    // 5) warm FX (optional but recommended)
     ensureFX();
 
-    // 6) run
     running = true;
     tick();
 
-    // 7) video best-effort (NO await)
     bestEffortPlayVideo(bgVideo);
   }
 
-  async function startGame(e) {
+  async function startGame() {
     if (lock) return;
     lock = true;
     log("START: begin");
     try {
-      // ✅ 最優先：gesture同期で video kick
       kickVideoInGesture(bgVideo);
       await startFromScratch("START");
       log("START: done");
@@ -740,12 +609,11 @@ async function boot() {
     }
   }
 
-  async function restartGame(e) {
+  async function restartGame() {
     if (lock) return;
     lock = true;
     log("RESTART: begin");
     try {
-      // ✅ 最優先：gesture同期で video kick
       kickVideoInGesture(bgVideo);
       await startFromScratch("RESTART");
       log("RESTART: done");
@@ -764,11 +632,6 @@ async function boot() {
       timing.stop?.(audio);
     } catch {}
 
-    // ✅ iOS安定優先：pause すると復帰が不安定になる端末がある
-    // ここは「止めない」方が安定。見た目はCSSで隠す。
-    // ただし電池/負荷が気になるなら pause へ戻してOK。
-    // try { bgVideo?.pause?.(); } catch {}
-    // → 継続再生にする：
     bestEffortPlayVideo(bgVideo);
 
     setState(app, STATES.RESULT);
@@ -785,20 +648,16 @@ async function boot() {
     presenter.show?.(payload);
   }
 
-  // ------------------------------------------------------------
   // Input
-  // ------------------------------------------------------------
   const input = new E.Input({
     element: hitZone,
     onTap: (x, y, _ts, ev) => {
       if (!running || getState(app) !== STATES.PLAYING) return;
 
-      // local coords (FX layer)
       const hitRect = hitZone.getBoundingClientRect();
       const clientX = Number(ev?.clientX ?? hitRect.left + x);
       const clientY = Number(ev?.clientY ?? hitRect.top + y);
 
-      // ✅ ここが今回の最重要：判定は「写真の中央円」内だけ
       if (!gate.inCircle(clientX, clientY)) {
         if (DEV) console.debug("[HIT] rejected(outside circle)", { clientX, clientY });
         return;
@@ -808,66 +667,52 @@ async function boot() {
       const lx = clientX - fxRect.left;
       const ly = clientY - fxRect.top;
 
-      // audio feedback
       audio.playTap?.();
 
-      // judgement
       const t = timing.getSongTime();
       if (!Number.isFinite(t)) return;
 
       const res = judge.hit(t);
       ui.onJudge?.(res);
 
-       // ✅ ここに追加（MISS含め全判定を拾う）
-instance.ringBeat?.onCombo(judge.state.combo || 0);
+      // ✅ ALWAYS notify combo (MISSも含む)
+      const comboNow = judge.state.combo || 0;
+      const ok = ringBeatNotify(instance.ringBeat, comboNow);
 
+      if (DEV) {
+        console.debug("[RingBeat]", {
+          res: res?.name,
+          combo: comboNow,
+          notified: ok,
+          hasRB: !!instance.ringBeat,
+        });
+      }
+
+      // (optional) visual fx on good hits
       if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-  const combo = judge.state.combo || 0;
+        // Absorb FX を使うならここで有効化
+        // AbsorbFX.fire({
+        //   x: lx,
+        //   y: ly,
+        //   judge: res.name === "PERFECT" ? "perfect" : "great",
+        // });
 
-  const milestone = (combo === 10 || combo === 25 || combo === 50);
+        // FXCore burst/stream を使うならここで（必要なら）
+        // const fxi = ensureFX();
+        // fxi.burst(lx, ly);
 
-  // ① 既存：吸収（白い線の正体）
-  // AbsorbFX.fire({
-//   x: lx,
-//   y: ly,
-//   judge: res.name === "PERFECT" ? "perfect" : "great",
-// });
-
-  // ② ★ここが今まで無かった：FXCore を確実に起動して burst/stream を呼ぶ
-  const fxi = ensureFX();
-
-  // ③ リングの“rim吸収”にしたいターゲット要素
-  //    avatarRing は「右上アイコンのリング」なので、中央リングにしたいなら res-ring を取る
-  const ringEl =
-    document.querySelector(".res-ring") || // 中央のリング（これが欲しいはず）
-    refs?.avatarRing ||                    // 無ければ右上のリング
-    document.getElementById("avatarRing");
-
-  // ⑤ stream（タップ→弧→リングrimへ吸収）
-   // if (res.name === "PERFECT") {
-    //  requestAnimationFrame(() => {
-   // fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
- //    });
- //  } else {
-  //   fxi.stream(lx, ly, ringEl, { judge: res.name, combo, milestone });
- //  }
-
-  audio.playGreat?.();
-  ui.flashHit?.();
-}
+        audio.playGreat?.();
+        ui.flashHit?.();
+      }
     },
   });
 
-  // ------------------------------------------------------------
   // Controls
-  // ------------------------------------------------------------
   bindPress(startBtn, startGame, ac.signal);
   bindPress(restartBtn, restartGame, ac.signal);
   if (stopBtn) bindPress(stopBtn, () => endToResult("STOP"), ac.signal);
 
-  // ------------------------------------------------------------
-  // Resize/orientation/viewport drift: keep canvas/input aligned
-  // ------------------------------------------------------------
+  // Resize
   const onResize = () => {
     try {
       render?.resize?.();
@@ -879,23 +724,16 @@ instance.ringBeat?.onCombo(judge.state.combo || 0);
 
   window.addEventListener("resize", onResize, { passive: true, signal: ac.signal });
   window.addEventListener("orientationchange", onResize, { passive: true, signal: ac.signal });
-
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", onResize, { passive: true, signal: ac.signal });
     window.visualViewport.addEventListener("scroll", onResize, { passive: true, signal: ac.signal });
   }
 
-  // ------------------------------------------------------------
   // Initial state
-  // ------------------------------------------------------------
   setState(app, STATES.IDLE);
-
   try {
     audio.stopMusic?.({ reset: true });
   } catch {}
-
-  // idleでは動画を止めてもOKだが、復帰安定のため一旦playしておきCSSで隠す戦略も可。
-  // ここは電池優先で pause。STARTで確実にkickするのでOK。
   try {
     bgVideo?.pause?.();
   } catch {}
@@ -903,9 +741,7 @@ instance.ringBeat?.onCombo(judge.state.combo || 0);
   ui.update?.({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: STATES.IDLE });
   log("BOOT OK");
 
-  // ------------------------------------------------------------
   // Dispose
-  // ------------------------------------------------------------
   instance.dispose = () => {
     try {
       ac.abort();
