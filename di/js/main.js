@@ -23,6 +23,7 @@
 
 import { FXCore } from "./engine/fx/index.js";
 import { createAbsorbFX } from "./engine/fx/absorb-trigger.js";
+import { RingBeat } from "./engine/fx/ringBeat.js";
 
 const BASE = new URL("./", import.meta.url);
 
