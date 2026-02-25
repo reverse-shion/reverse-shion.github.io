@@ -818,11 +818,11 @@ async function boot() {
       const res = judge.hit(t);
       ui.onJudge?.(res);
 
+       // ✅ ここに追加（MISS含め全判定を拾う）
+instance.ringBeat?.onCombo(judge.state.combo || 0);
+
       if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
   const combo = judge.state.combo || 0;
-
-          // 🔥 RingBeatへ通知
-  instance.ringBeat?.onCombo(combo);
 
   const milestone = (combo === 10 || combo === 25 || combo === 50);
 
