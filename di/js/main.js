@@ -682,8 +682,12 @@ log("RingBeat installed", {
       if (!Number.isFinite(t)) return;
 
       const res = judge.hit(t);
-      ui.onJudge?.(res);
+ui.onJudge?.(res);
 
+// ✅ これだけ
+ringBeatNotify(instance.ringBeat, judge.state.combo || 0);
+
+       
       // ✅ ALWAYS notify combo (MISSも含む)
       const comboNow = judge.state.combo || 0;
       const ok = ringBeatNotify(instance.ringBeat, comboNow);
