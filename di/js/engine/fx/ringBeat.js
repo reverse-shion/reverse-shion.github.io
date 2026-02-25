@@ -1,145 +1,126 @@
-/* =========================================================
-   /di/js/engine/fx/ringBeat.js
-   RING BEAT SYSTEM — PRO LIGHTWEIGHT v1.0
-   - combo 15 => transition + absorb-to-center + beat
-   - combo break => back to rotate
-   - minimal DOM: beam is 1 element, removed after animation
-   ========================================================= */
+/* /di/js/engine/fx/ringBeat.js
+   RingBeat — LIGHTWEIGHT THRESHOLD MODE (spin stop + glow + absorb-to-center)
+   - No heavy canvas, only 1 DOM element created on demand
+   - Works with avatarRing (#avatarRing) and targetEl (.targetCore)
+*/
 
 export class RingBeat {
   constructor({ app, avatarRing, targetEl, fxLayer }) {
-    this.app = app || null;
-    this.ring = avatarRing || null;
-    this.targetEl = targetEl || null;     // center target (e.g., .targetCore)
-    this.fxLayer = fxLayer || document.body;
+    this.app = app || document.getElementById("app");
+    this.ring = avatarRing || document.getElementById("avatarRing");
+    this.targetEl = targetEl || document.querySelector(".targetCore");
+    this.fxLayer = fxLayer || document.getElementById("fxLayer");
 
-    this.enabled = !!this.ring;
     this.threshold = 15;
-
-    this._inBeat = false;
+    this._armed = true;          // trigger once per reach
     this._lastCombo = 0;
+    this._absorbEl = null;
 
-    // transition timings (ms)
-    this._transitionMs = 180;
-    this._absorbMs = 220;
-
-    if (this.enabled) {
-      // default mode
-      this._setMode("rotate");
-    }
+    // safety
+    if (!this.ring) console.warn("[RingBeat] avatarRing missing");
+    if (!this.targetEl) console.warn("[RingBeat] targetEl missing (.targetCore)");
+    if (!this.fxLayer) console.warn("[RingBeat] fxLayer missing");
   }
 
   setThreshold(n) {
-    this.threshold = Math.max(1, Number(n || 15));
+    const v = Math.max(1, Number(n) || 1);
+    this.threshold = v;
+    return v;
   }
+
+  // compatibility (some code calls updateCombo)
+  updateCombo(combo) { this.onCombo(combo); }
 
   onCombo(combo) {
-    if (!this.enabled) return;
-    combo = Math.max(0, Number(combo || 0));
+    const c = Math.max(0, Number(combo) || 0);
+    this._lastCombo = c;
 
-    // combo break => exit beat
-    if (combo === 0 && this._inBeat) {
-      this._exitBeat();
+    if (!this.ring) return;
+
+    // beat intensity always reflects combo (your "鼓動=繋がり")
+    this._applyBeat(c);
+
+    // trigger: crossing threshold upward
+    if (this._armed && c >= this.threshold) {
+      this._armed = false;
+      this._onReachThreshold();
+      return;
     }
 
-    // threshold reached exactly (or crossed from below)
-    const crossed = (this._lastCombo < this.threshold && combo >= this.threshold);
-
-    if (crossed && !this._inBeat) {
-      this._enterBeat();
+    // reset arming if combo drops (MISS etc.)
+    if (c < this.threshold) {
+      this._armed = true;
+      // return to spin mode
+      this.ring.classList.remove("rb-stop", "rb-glow");
+      this.app?.classList?.remove("rb-absorb-active");
     }
-
-    // optional: strengthen beat amplitude after threshold (light)
-    if (this._inBeat) {
-      // scale max gently with combo (cap)
-      const k = Math.min(1, (combo - this.threshold) / 120);
-      const beatMax = 1.06 + k * 0.04; // 1.06..1.10
-      this.ring.style.setProperty("--beat-max", beatMax.toFixed(3));
-    }
-
-    this._lastCombo = combo;
   }
 
-  // -------------------------
-  // Mode transitions
-  // -------------------------
-  _setMode(mode) {
-    const el = this.ring;
-    el.classList.remove("ring-rotate", "ring-transition", "ring-beat");
-
-    if (mode === "rotate") el.classList.add("ring-rotate");
-    if (mode === "transition") el.classList.add("ring-transition");
-    if (mode === "beat") el.classList.add("ring-beat");
+  _applyBeat(combo) {
+    // map combo to 0..1 (gentle)
+    const k = Math.min(1, combo / Math.max(10, this.threshold));
+    this.ring.style.setProperty("--rb-beat", k.toFixed(3));
+    this.ring.classList.add("rb-beat");
   }
 
-  _enterBeat() {
-    this._inBeat = true;
+  _onReachThreshold() {
+    // 1) stop spin + glow
+    this.ring.classList.add("rb-stop", "rb-glow");
 
-    // 1) stop rotation + flash
-    this._setMode("transition");
+    // 2) absorb animation (ring center -> target center)
+    this._fireAbsorb();
 
-    // 2) absorb to center (beam)
-    this._emitAbsorbToCenter();
-
-    // 3) slight "pause" then beat
+    // 3) after absorb, switch to pure beat (keep glow slightly, spin stays stopped)
     window.setTimeout(() => {
-      if (!this._inBeat) return;
-      this._setMode("beat");
-    }, this._transitionMs);
+      if (!this.ring) return;
+      this.ring.classList.remove("rb-glow");
+      // keep rb-stop + rb-beat
+    }, 520);
   }
 
-  _exitBeat() {
-    this._inBeat = false;
-    // reset beat strength
-    this.ring.style.removeProperty("--beat-max");
-    this._setMode("rotate");
-  }
+  _fireAbsorb() {
+    if (!this.app || !this.fxLayer || !this.ring || !this.targetEl) return;
 
-  // -------------------------
-  // Absorb effect
-  // -------------------------
-  _emitAbsorbToCenter() {
-    const ring = this.ring;
-    const target = this.targetEl;
+    const r0 = this.ring.getBoundingClientRect();
+    const t0 = this.targetEl.getBoundingClientRect();
+    const fx = this.fxLayer.getBoundingClientRect();
 
-    if (!ring || !target) return;
+    const sx = (r0.left + r0.width / 2) - fx.left;
+    const sy = (r0.top + r0.height / 2) - fx.top;
+    const ex = (t0.left + t0.width / 2) - fx.left;
+    const ey = (t0.top + t0.height / 2) - fx.top;
 
-    const a = ring.getBoundingClientRect();
-    const b = target.getBoundingClientRect();
+    // create element once
+    const el = (this._absorbEl ||= this._createAbsorbEl());
+    if (!el) return;
 
-    const ax = a.left + a.width * 0.5;
-    const ay = a.top + a.height * 0.5;
+    // set CSS vars (local to fxLayer)
+    el.style.setProperty("--sx", `${sx}px`);
+    el.style.setProperty("--sy", `${sy}px`);
+    el.style.setProperty("--ex", `${ex}px`);
+    el.style.setProperty("--ey", `${ey}px`);
 
-    const bx = b.left + b.width * 0.5;
-    const by = b.top + b.height * 0.5;
+    // “arrival” size relates to threshold feel
+    const size = Math.round(18 + Math.min(1, this.threshold / 25) * 10);
+    el.style.setProperty("--rb-dot", `${size}px`);
 
-    const dx = bx - ax;
-    const dy = by - ay;
+    // run
+    this.app.classList.add("rb-absorb-active");
+    el.classList.remove("rb-run");
+    // reflow to restart animation reliably on iOS
+    void el.offsetWidth;
+    el.classList.add("rb-run");
 
-    const len = Math.max(10, Math.hypot(dx, dy));
-    const ang = (Math.atan2(dy, dx) * 180) / Math.PI;
-
-    const wrap = document.createElement("div");
-    wrap.className = "fxRingAbsorb";
-
-    const beam = document.createElement("i");
-    beam.className = "beam";
-
-    // CSS vars
-    wrap.style.setProperty("--ax", `${ax}px`);
-    wrap.style.setProperty("--ay", `${ay}px`);
-    wrap.style.setProperty("--ang", `${ang}deg`);
-    wrap.style.setProperty("--len", `${len.toFixed(1)}`);
-    wrap.style.setProperty("--adur", `${this._absorbMs}ms`);
-
-    wrap.appendChild(beam);
-
-    // mount to fxLayer if possible (keeps it above stage)
-    const mount = this.fxLayer || document.body;
-    mount.appendChild(wrap);
-
+    // cleanup class
     window.setTimeout(() => {
-      wrap.remove();
-    }, this._absorbMs + 60);
+      this.app?.classList?.remove("rb-absorb-active");
+    }, 560);
+  }
+
+  _createAbsorbEl() {
+    const el = document.createElement("div");
+    el.className = "rbAbsorb";
+    this.fxLayer.appendChild(el);
+    return el;
   }
 }
