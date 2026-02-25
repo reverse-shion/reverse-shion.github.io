@@ -468,7 +468,7 @@ async function boot() {
     fxLayer: document.getElementById("fxLayer"),
   });
 
-  ringBeat.setThreshold(15);
+  ringBeat.setThreshold(5);
   instance.ringBeat = ringBeat;
 
   
