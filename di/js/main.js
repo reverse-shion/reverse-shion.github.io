@@ -444,9 +444,6 @@ function makeCircleGate({ hitZone, refs }) {
   return { inCircle };
 }
 
-// ---------------------------------------------------------------------
-// BOOT
-// ---------------------------------------------------------------------
 async function boot() {
   disposePreviousIfAny();
 
@@ -461,6 +458,20 @@ async function boot() {
     raf = 0;
   };
 
+  // -----------------------------------------------------------------
+  // RingBeat Install
+  // -----------------------------------------------------------------
+  const ringBeat = new RingBeat({
+    app: document.getElementById("app"),
+    avatarRing: document.getElementById("avatarRing"),
+    targetEl: document.querySelector(".targetCore"),
+    fxLayer: document.getElementById("fxLayer"),
+  });
+
+  ringBeat.setThreshold(15);
+  instance.ringBeat = ringBeat;
+
+  
   // DOM refs
   const app = assertEl($("app"), "app");
   const canvas = assertEl($("noteCanvas"), "noteCanvas");
