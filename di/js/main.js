@@ -489,24 +489,33 @@ async function boot() {
   // -----------------------------------------------------------------
   // RingBeat Install (AFTER DOM refs exist)
   // -----------------------------------------------------------------
-  instance.ringBeat = new RingBeat({
-    app,
-    avatarRing: refs.avatarRing || $("avatarRing"),
-    targetEl: document.querySelector(".targetCore"),
-    fxLayer,
-  });
+instance.ringBeat = new RingBeat({
+  app,
+  avatarRing: refs.avatarRing || $("avatarRing"),
 
-  // ✅ test threshold (5)
-  try {
-    instance.ringBeat.setThreshold?.(5);
-  } catch {}
-  log("RingBeat installed", {
-    hasRingBeat: !!instance.ringBeat,
-    threshold: 5,
-    avatarRing: !!(refs.avatarRing || $("avatarRing")),
-    targetCore: !!document.querySelector(".targetCore"),
-  });
+  // ✅ 中央の“確実に存在する”要素へフォールバック
+  targetEl:
+    document.querySelector(".targetCore") ||
+    document.getElementById("hitFlash") ||
+    document.querySelector("#targetRoot .targetCore") ||
+    document.getElementById("targetRoot") ||
+    document.getElementById("hitZone"),
 
+  fxLayer,
+});
+
+// ✅ test threshold (5)
+try {
+  instance.ringBeat.setThreshold?.(5);
+} catch {}
+
+log("RingBeat installed", {
+  hasRingBeat: !!instance.ringBeat,
+  threshold: 5,
+  avatarRing: !!(refs.avatarRing || $("avatarRing")),
+  targetCore: !!document.querySelector(".targetCore"),
+  hitFlash: !!document.getElementById("hitFlash"),
+});
   // RAF loop
   function tick() {
     if (!running) return;
