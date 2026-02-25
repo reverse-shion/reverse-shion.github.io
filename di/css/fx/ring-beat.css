@@ -1,165 +1,135 @@
-/* =========================================================
-   RING BEAT SYSTEM — PRO LIGHTWEIGHT v1.0
-   Target: #avatarRing (right-top avatar ring)
-   - Mode switch by class:
-       ring-rotate -> ring-transition -> ring-beat
-   - Combo break => back to ring-rotate
-   - Includes "absorb to center" beam (single DOM, very light)
-   ========================================================= */
+/* /di/css/fx/ring-beat.css
+   RingBeat VISUAL — ultra light
+   - rb-beat: heartbeat pulse (scale + glow)
+   - rb-stop: stop rotation (pause animation)
+   - rb-glow: strong glow at threshold moment
+   - rbAbsorb: 1 DOM element, ring -> center absorb
+*/
 
-:root{
-  --ring-offset: -14px;             /* match your old inset:-14px */
-  --ring-border: 2px;
-  --ring-color: rgba(0,240,255,0.82);
-  --ring-glow:  rgba(0,240,255,0.28);
-
-  /* beat amplitude (base). JS can raise by CSS var later if needed */
-  --beat-min: 1.02;
-  --beat-max: 1.06;
-
-  /* rotate speed (quiet) */
-  --rotate-speed: 7s;
+/* ---------------------------------------
+   1) Beat (always)
+--------------------------------------- */
+#avatarRing.rb-beat{
+  /* beat intensity: 0..1 */
+  --rb-k: var(--rb-beat, 0.0);
+  /* subtle but felt */
+  animation: rbBeat 720ms ease-in-out infinite;
+  will-change: transform, filter;
 }
 
-/* ---- Anchor safety (if already in hud.css, harmless) ---- */
-.sideAvatar{ position: relative; }
-
-/* =========================================================
-   BASE RING (shared)
-   ========================================================= */
-#avatarRing{
-  position:absolute;
-  inset: var(--ring-offset);
-  border-radius: 999px;
-  pointer-events: none;
-
-  /* simple ring */
-  border: var(--ring-border) solid var(--ring-color);
-
-  /* ultra light glow (single) */
-  box-shadow: 0 0 8px var(--ring-glow);
-
-  transform: translateZ(0) scale(1);
-  transform-origin: center;
-
-  will-change: transform, opacity, box-shadow;
-  opacity: 0.92;
-
-  /* default mode should be rotate (JS adds ring-rotate on boot) */
+@keyframes rbBeat{
+  0%   { transform: translate(-50%,-50%) rotate(0deg) scale(1); filter: brightness(1); }
+  35%  { transform: translate(-50%,-50%) rotate(0deg) scale(calc(1 + 0.06 + 0.10*var(--rb-k))); filter: brightness(calc(1.08 + 0.55*var(--rb-k))); }
+  100% { transform: translate(-50%,-50%) rotate(0deg) scale(1); filter: brightness(1); }
 }
 
-/* =========================================================
-   MODE 1 — ROTATE (collecting)
-   ========================================================= */
-#avatarRing.ring-rotate{
-  animation: ringRotate var(--rotate-speed) linear infinite;
+/* ---------------------------------------
+   2) Stop spin at threshold
+   - pause pseudo animations safely
+--------------------------------------- */
+#avatarRing.rb-stop,
+#avatarRing.rb-stop::before,
+#avatarRing.rb-stop::after{
+  animation-play-state: paused !important;
 }
 
-/* small response when you still want "tap feels" in rotate mode */
-#avatarRing.ring-rotate.absorbPulse{
-  /* keep it tiny so it doesn't look busy */
-  transform: translateZ(0) scale(1.04);
-  box-shadow: 0 0 10px rgba(0,240,255,0.34);
-  transition: transform 120ms ease, box-shadow 160ms ease;
+/* ---------------------------------------
+   3) Strong glow (moment)
+--------------------------------------- */
+#avatarRing.rb-glow{
+  filter: brightness(1.85) saturate(1.1);
 }
 
-/* =========================================================
-   MODE 2 — TRANSITION (combo 15 moment)
-   - Stop rotation
-   - Short flash + slight tighten
-   ========================================================= */
-#avatarRing.ring-transition{
-  animation: none;
+#avatarRing.rb-glow::before{
   opacity: 1;
-  transform: translateZ(0) scale(1.08);
-  box-shadow: 0 0 16px rgba(0,240,255,0.52);
+  filter: brightness(2.0) blur(2px);
 }
 
-/* =========================================================
-   MODE 3 — BEAT (connected)
-   - No rotate
-   - Beat only (scale)
-   ========================================================= */
-#avatarRing.ring-beat{
-  animation: ringBeat 1s ease-in-out infinite;
-  opacity: 1;
-  box-shadow: 0 0 12px rgba(0,240,255,0.40);
+#avatarRing.rb-glow::after{
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,.25),
+    0 0 0 10px rgba(0,240,255,.20),
+    0 0 0 16px rgba(156,60,255,.12);
 }
 
-/* =========================================================
-   Keyframes
-   ========================================================= */
-@keyframes ringRotate{
-  from{ transform: translateZ(0) rotate(0deg) scale(1); }
-  to  { transform: translateZ(0) rotate(360deg) scale(1); }
-}
-
-@keyframes ringBeat{
-  0%   { transform: translateZ(0) scale(var(--beat-min)); }
-  50%  { transform: translateZ(0) scale(var(--beat-max)); }
-  100% { transform: translateZ(0) scale(var(--beat-min)); }
-}
-
-/* =========================================================
-   ABSORB TO CENTER (single beam element)
-   - created by JS: <div class="fxRingAbsorb"><i class="beam"></i></div>
-   - uses CSS vars:
-       --ax, --ay  start px (viewport)
-       --bx, --by  end px (viewport)
-       --adur      duration ms
-   ========================================================= */
-.fxRingAbsorb{
-  position: fixed;
+/* ---------------------------------------
+   4) Absorb beam (1 element)
+--------------------------------------- */
+.rbAbsorb{
+  position: absolute;
   left: 0; top: 0;
   width: 1px; height: 1px;
   pointer-events: none;
-  z-index: 2147483005;
-}
+  z-index: 2147483646; /* fxLayer top */
 
-.fxRingAbsorb .beam{
-  position: absolute;
-  left: 0; top: 0;
-  width: 10px;
-  height: 2px;
-  border-radius: 999px;
+  /* start/end (set by JS in fxLayer coords) */
+  --sx: 0px; --sy: 0px;
+  --ex: 0px; --ey: 0px;
+  --rb-dot: 22px;
 
-  /* beam gradient (light) */
-  background: linear-gradient(90deg,
-    rgba(0,240,255,0.00) 0%,
-    rgba(0,240,255,0.55) 30%,
-    rgba(255,255,255,0.78) 50%,
-    rgba(0,240,255,0.35) 70%,
-    rgba(0,240,255,0.00) 100%
-  );
-
-  box-shadow: 0 0 10px rgba(0,240,255,0.25);
-
-  transform-origin: 0 50%;
+  transform: translate(var(--sx), var(--sy));
   opacity: 0;
-
-  animation: ringAbsorb var(--adur, 220ms) ease-out both;
 }
 
-@keyframes ringAbsorb{
-  0%{
-    opacity: 0;
-    transform:
-      translate(var(--ax,0px), var(--ay,0px))
-      rotate(var(--ang,0deg))
-      scaleX(0.15);
-  }
-  15%{
-    opacity: 1;
-    transform:
-      translate(var(--ax,0px), var(--ay,0px))
-      rotate(var(--ang,0deg))
-      scaleX(0.9);
-  }
-  100%{
-    opacity: 0;
-    transform:
-      translate(var(--ax,0px), var(--ay,0px))
-      rotate(var(--ang,0deg))
-      scaleX(var(--len,120));
-  }
+/* the moving “spark + trail” */
+.rbAbsorb::before{
+  content:"";
+  position:absolute;
+  left: calc(var(--rb-dot) * -0.5);
+  top:  calc(var(--rb-dot) * -0.5);
+  width: var(--rb-dot);
+  height: var(--rb-dot);
+  border-radius: 999px;
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.95) 0%,
+    rgba(0,240,255,0.75) 35%,
+    rgba(156,60,255,0.35) 62%,
+    rgba(0,0,0,0) 72%
+  );
+  filter:
+    drop-shadow(0 0 10px rgba(0,240,255,0.25))
+    drop-shadow(0 0 16px rgba(156,60,255,0.18));
+}
+
+/* trail */
+.rbAbsorb::after{
+  content:"";
+  position:absolute;
+  left: 0;
+  top: -1px;
+  height: 2px;
+  width: 180px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.00),
+    rgba(0,240,255,0.32),
+    rgba(156,60,255,0.18),
+    rgba(255,255,255,0.00)
+  );
+  opacity: 0.0;
+  filter: blur(0.2px);
+}
+
+.rbAbsorb.rb-run{
+  opacity: 1;
+  animation: rbAbsorbMove 520ms cubic-bezier(.18,.82,.2,1) both;
+}
+
+.rbAbsorb.rb-run::after{
+  opacity: 0.75;
+  animation: rbTrail 520ms cubic-bezier(.18,.82,.2,1) both;
+}
+
+/* move from ring to center */
+@keyframes rbAbsorbMove{
+  0%   { transform: translate(var(--sx), var(--sy)) scale(1.0); opacity: 1; }
+  70%  { transform: translate(calc((var(--sx)*0.2 + var(--ex)*0.8)), calc((var(--sy)*0.2 + var(--ey)*0.8))) scale(0.85); opacity: 1; }
+  100% { transform: translate(var(--ex), var(--ey)) scale(0.55); opacity: 0; }
+}
+
+/* trail rotates roughly toward the target (cheap approx by stretch only) */
+@keyframes rbTrail{
+  0%   { width: 40px; opacity: 0.0; }
+  25%  { width: 180px; opacity: 0.75; }
+  100% { width: 220px; opacity: 0.0; }
 }
