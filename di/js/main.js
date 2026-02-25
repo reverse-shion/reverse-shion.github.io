@@ -820,6 +820,10 @@ async function boot() {
 
       if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
   const combo = judge.state.combo || 0;
+
+          // 🔥 RingBeatへ通知
+  instance.ringBeat?.onCombo(combo);
+
   const milestone = (combo === 10 || combo === 25 || combo === 50);
 
   // ① 既存：吸収（白い線の正体）
