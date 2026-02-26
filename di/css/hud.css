@@ -370,8 +370,13 @@
 }
 
 /* ------------------------------------------------------------
-   6) PLAYER CARD + DiCo AVATAR (LIGHT, FRONT-SKIN)
-   ------------------------------------------------------------ */
+   6) PLAYER CARD + DiCo AVATAR (LIGHT, FRONT-SKIN) — FIXED
+   ✅ #avatarRing transform 一本化（--ui-rot）
+   ✅ #avatarRing は定義1回のみ（衝突防止）
+   ✅ face は translate を維持しつつ --pulseScale だけ可変
+   ✅ Skin は “前” に出す（z-index:2）
+   ✅ 軽量：大面積blend回避 / filter最小
+------------------------------------------------------------ */
 
 .sidePlayer{
   padding: 12px;
@@ -409,30 +414,32 @@
   flex: 0 0 auto;
   border-radius: 999px;
   overflow: visible;
+
+  /* ✅ anchor（別ファイルで absolute が迷子にならない） */
+  contain: layout paint; /* iOSでも安定しやすい */
 }
 
 /* --- LAYER MAP (deterministic) ---
    0: base ring (#avatarRing)
    1: face (.dicoFace)
-   2: skin overlay (#avatarRingSkin)  ← faceの前に出す
+   2: skin overlay (#avatarRingSkin)  ← faceの前
 */
-#avatarRing{ position:absolute; inset: calc(var(--ring-inset) * -1); border-radius:999px; z-index:0; pointer-events:none; 
-          /* ✅ JSが回転値を渡す。デフォは0 */
---ui-rot: 0deg;
 
-/* ✅ transformはここで一本化（JSでtransform直書きしない） */
-transform: rotate(var(--ui-rot)) translateZ(0);
-
-will-change: transform, filter, opacity;
-           }
-.sideAvatar .dicoFace{ position:absolute; left:50%; top:50%; width: var(--face-size); height: var(--face-size);
-  transform: translate(-50%,-50%) scale(var(--pulseScale, 1)) translateZ(0);
-  border-radius:999px; object-fit:cover; z-index:1; pointer-events:none;
-}
-#avatarRingSkin{ position:absolute; inset: calc(var(--skin-inset) * -1); border-radius:999px; z-index:2; pointer-events:none; }
-
-/* Base ring (pink-gold glass) */
+/* ✅ BASE RING（transformはここだけ） */
 #avatarRing{
+  position:absolute;
+  inset: calc(var(--ring-inset) * -1);
+  border-radius:999px;
+  z-index:0;
+  pointer-events:none;
+
+  /* ✅ JSが回転値を渡す（デフォ0） */
+  --ui-rot: 0deg;
+  transform: rotate(var(--ui-rot)) translateZ(0);
+  transform-origin: 50% 50%;
+  will-change: transform, filter, opacity;
+
+  /* Base ring look (pink-gold glass) */
   background:
     radial-gradient(circle at 30% 25%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%),
     conic-gradient(from 0deg,
@@ -442,18 +449,22 @@ will-change: transform, filter, opacity;
       rgba(236,191,152,.62),
       rgba(236,191,152,.10)
     );
+
   box-shadow:
     0 0 0 1px rgba(255,255,255,.14),
     0 0 0 2px var(--pinkGoldSoft) inset,
     0 0 28px var(--pinkGoldGlow),
     0 12px 26px rgba(0,0,0,.28);
+
   opacity: .98;
 
-  /* 局所だけ blend：大面積にしない */
-  mix-blend-mode: screen;
+  /* ⚠️ blend は重いので “必要なら” だけ（基本OFF推奨）
+     どうしても欲しいなら次の1行をONにする
+     mix-blend-mode: screen;
+  */
 }
 
-/* inner lens (base ring) */
+/* inner lens */
 #avatarRing::after{
   content:"";
   position:absolute;
@@ -464,17 +475,31 @@ will-change: transform, filter, opacity;
   box-shadow: inset 0 0 18px rgba(0,0,0,.26);
 }
 
-/* Face tuning (lightweight “reflection”, avoids floating look) */
+/* ✅ FACE（translate固定 + scaleだけ変化） */
 .sideAvatar .dicoFace{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width: var(--face-size);
+  height: var(--face-size);
+  border-radius:999px;
+  object-fit:cover;
+  z-index:1;
+  pointer-events:none;
+
+  transform: translate(-50%,-50%) scale(var(--pulseScale, 1)) translateZ(0);
+  transform-origin: 50% 50%;
+  will-change: transform, filter;
+
   outline: 1px solid var(--av-outline);
   box-shadow: 0 10px 22px rgba(0,0,0,.35);
   backface-visibility:hidden;
 
-  /* 反射：リングが光ってるほど顔が少しだけ乗る */
+  /* 反射（軽量・局所） */
   filter:
-    brightness(calc(1.08 + 0.10*var(--res-k)))
-    contrast(1.05)
-    saturate(calc(1.06 + 0.06*var(--res-k)));
+    brightness(calc(1.06 + 0.08*var(--res-k)))
+    contrast(1.04)
+    saturate(calc(1.05 + 0.05*var(--res-k)));
 }
 
 /* swap micro-pop (ui.js adds .isSwap) */
@@ -483,13 +508,19 @@ will-change: transform, filter, opacity;
   transition: transform .12s ease;
 }
 
-/* Skin overlay: FRONT of face (cheap) */
+/* ✅ SKIN OVERLAY（前面・transformを触らない） */
 #avatarRingSkin{
-  opacity: .92;
+  position:absolute;
+  inset: calc(var(--skin-inset) * -1);
+  border-radius:999px;
+  z-index:2;
+  pointer-events:none;
 
-  /* “模様が前に乗ってる”感：薄く、軽く、上品 */
-  filter: brightness(1.06) saturate(1.04);
-  /* iOSでも軽い：ここでは影を増やさない */
+  opacity: .92;
+  will-change: filter, opacity;
+
+  /* 模様が前に乗る感じ（軽量） */
+  filter: brightness(1.05) saturate(1.03);
 }
 
 /* ------------------------------------------------------------
