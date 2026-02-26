@@ -1,29 +1,36 @@
 /* /di/css/hud.css
    ============================================================
-   HUD — PRO FINAL (deterministic layering + state hard-guards)
-   - Single source of truth for:
-     1) UI layer order (iOS-safe)
-     2) State visibility: idle / playing / result / paused
-     3) Controls visibility: START / STOP / RESTART (hard guarantee)
-     4) Idle tagline (neon glass)
-     5) Side HUD cards + DiCo avatar tuning (size/brightness/ring pink-gold)
+   HUD — PRO FINAL (LIGHTWEIGHT + DETERMINISTIC)
+   - iOS-safe deterministic stacking (isolation + fixed z map)
+   - HARD state visibility guarantees (idle/playing/result/paused)
+   - Side HUD glass cards
+   - DiCo avatar: base ring + face + skin overlay (skin is FRONT of face)
+   - Lightweight: avoid expensive blend on large areas, keep effects local
    ============================================================ */
 
 :root{
-  /* If themes.css already defines these, this will simply reuse them. */
+  /* (themes.cssがあるなら上書きされない想定でもOK) */
   --pinkGold: rgba(236,191,152,.95);
   --pinkGoldSoft: rgba(236,191,152,.26);
   --pinkGoldGlow: rgba(236,191,152,.38);
 
-  /* HUD sizing */
-  --hudW: 168px;        /* right/left HUD width */
+  --hudW: 168px;
   --hudGap: 12px;
   --hudPad: 12px;
   --r: 16px;
   --blur: 14px;
 
-  /* bottom controls height hint (used by layout) */
   --bottomH: 76px;
+
+  /* Avatar tuning */
+  --av-size: 68px;           /* container size */
+  --face-size: 78px;         /* face image size */
+  --ring-inset: 12px;        /* base ring breathing */
+  --skin-inset: 14px;        /* skin overlay breathing */
+  --av-outline: rgba(255,255,255,.18);
+
+  /* “反射”を入れて浮きを抑える（0..1） */
+  --res-k: 0;
 }
 
 /* ------------------------------------------------------------
@@ -33,7 +40,7 @@
 .app{
   position: relative;
   overflow: hidden;
-  isolation: isolate; /* ensures z-index stacking is deterministic */
+  isolation: isolate;
 }
 
 /* Base video */
@@ -52,7 +59,6 @@
   pointer-events:none;
 }
 
-/* Explicit layering inside idle */
 .idleBg .idleImg{
   position:absolute;
   inset:0;
@@ -72,7 +78,7 @@
   opacity: .85;
 }
 
-/* idle tagline (above particles) */
+/* idle tagline */
 .idleLine{
   position:absolute;
   left: 16px;
@@ -136,10 +142,8 @@
 
 /* ------------------------------------------------------------
    1) STATE VISIBILITY (HARD GUARANTEE)
-   - We only control what must never be wrong.
    ------------------------------------------------------------ */
 
-/* IDLE: hide stage + bg video */
 .app[data-state="idle"] .stage{
   opacity:0;
   visibility:hidden;
@@ -150,7 +154,6 @@
   visibility:hidden;
 }
 
-/* PLAYING / RESULT / PAUSED: hide idleBg + idleLine */
 .app[data-state="playing"] .idleBg,
 .app[data-state="result"]  .idleBg,
 .app[data-state="paused"]  .idleBg{
@@ -166,8 +169,6 @@
   visibility:hidden;
 }
 
-/* In paused, keep stage visible but input is handled by JS.
-   (HUD stays visible, of course) */
 .app[data-state="paused"] .stage{
   opacity:1;
   visibility:visible;
@@ -176,7 +177,6 @@
 
 /* ------------------------------------------------------------
    2) CONTROLS VISIBILITY (HARD GUARANTEE)
-   - Default hidden for STOP/RESTART prevents “ghost buttons”.
    ------------------------------------------------------------ */
 
 #stopBtn,
@@ -208,7 +208,7 @@
 .app[data-state="result"] #stopBtn{ display:none; }
 .app[data-state="result"] #restartBtn{ display:inline-flex; }
 
-/* paused (safety) */
+/* paused */
 .app[data-state="paused"] #startBtn{ display:inline-flex; }
 .app[data-state="paused"] #stopBtn{ display:none; }
 .app[data-state="paused"] #restartBtn{ display:inline-flex; }
@@ -370,13 +370,13 @@
 }
 
 /* ------------------------------------------------------------
-   6) PLAYER CARD + DiCo AVATAR (the requested tuning)
+   6) PLAYER CARD + DiCo AVATAR (LIGHT, FRONT-SKIN)
    ------------------------------------------------------------ */
 
 .sidePlayer{
   padding: 12px;
-  overflow: visible;          /* allow ring to breathe */
-  padding-right: 18px;        /* keep distance from right edge */
+  overflow: visible;
+  padding-right: 18px;
 }
 
 .sideTop{
@@ -401,25 +401,30 @@
   color: rgba(245,245,242,.68);
 }
 
-/* Avatar container: larger but never overflow screen.
-   We keep it inside the card; the ring glow is outside via avatarRing inset. */
+/* Avatar container */
 .sideAvatar{
-  width: 68px;      /* ✅ bigger face */
-  height: 68px;
+  width: var(--av-size);
+  height: var(--av-size);
   position:relative;
   flex: 0 0 auto;
-
   border-radius: 999px;
-  overflow: visible; /* ✅ prevent face image overflow */
+  overflow: visible;
 }
 
-/* Ring: pink-gold with classy glow (and still rotate-able by JS) */
-.avatarRing{
-  position:absolute;
-  inset:-12px;               /* ring breathing margin */
-  border-radius:999px;
-  pointer-events:none;
+/* --- LAYER MAP (deterministic) ---
+   0: base ring (#avatarRing)
+   1: face (.dicoFace)
+   2: skin overlay (#avatarRingSkin)  ← faceの前に出す
+*/
+#avatarRing{ position:absolute; inset: calc(var(--ring-inset) * -1); border-radius:999px; z-index:0; pointer-events:none; }
+.sideAvatar .dicoFace{ position:absolute; left:50%; top:50%; width: var(--face-size); height: var(--face-size);
+  transform: translate(-50%,-50%) scale(var(--pulseScale, 1)) translateZ(0);
+  border-radius:999px; object-fit:cover; z-index:1; pointer-events:none;
+}
+#avatarRingSkin{ position:absolute; inset: calc(var(--skin-inset) * -1); border-radius:999px; z-index:2; pointer-events:none; }
 
+/* Base ring (pink-gold glass) */
+#avatarRing{
   background:
     radial-gradient(circle at 30% 25%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%),
     conic-gradient(from 0deg,
@@ -429,54 +434,54 @@
       rgba(236,191,152,.62),
       rgba(236,191,152,.10)
     );
-
   box-shadow:
     0 0 0 1px rgba(255,255,255,.14),
     0 0 0 2px var(--pinkGoldSoft) inset,
-    0 0 32px var(--pinkGoldGlow),
-    0 16px 32px rgba(0,0,0,.28);
-
-  mix-blend-mode: screen;
+    0 0 28px var(--pinkGoldGlow),
+    0 12px 26px rgba(0,0,0,.28);
   opacity: .98;
+
+  /* 局所だけ blend：大面積にしない */
+  mix-blend-mode: screen;
 }
 
-/* Inner lens */
-.avatarRing::after{
+/* inner lens (base ring) */
+#avatarRing::after{
   content:"";
   position:absolute;
-  inset: 0px;
+  inset: 0;
   border-radius:999px;
-  background:
-    radial-gradient(circle at 50% 35%, rgba(0,0,0,0), rgba(0,0,0,.42));
+  background: radial-gradient(circle at 50% 35%, rgba(0,0,0,0), rgba(0,0,0,.42));
   border: 1px solid rgba(255,255,255,.14);
-  box-shadow:
-    inset 0 0 22px rgba(0,0,0,.28);
+  box-shadow: inset 0 0 18px rgba(0,0,0,.26);
 }
 
-/* Face: slightly zoomed, brighter, but controlled */
-.dicoFace{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width: 78px;      /* ✅ larger than container to feel “closer” */
-  height: 78px;
-  transform: translate(-50%,-50%) scale(var(--pulseScale, 1));
-  object-fit: cover;
-  border-radius: 999px;
-
-  /* ✅ brightness */
-  filter: brightness(1.10) contrast(1.05) saturate(1.06);
-
-  outline: 1px solid rgba(255,255,255,.18);
+/* Face tuning (lightweight “reflection”, avoids floating look) */
+.sideAvatar .dicoFace{
+  outline: 1px solid var(--av-outline);
   box-shadow: 0 10px 22px rgba(0,0,0,.35);
-
   backface-visibility:hidden;
+
+  /* 反射：リングが光ってるほど顔が少しだけ乗る */
+  filter:
+    brightness(calc(1.08 + 0.10*var(--res-k)))
+    contrast(1.05)
+    saturate(calc(1.06 + 0.06*var(--res-k)));
 }
 
-/* Optional micro pop on swap (ui.js adds .isSwap) */
-.dicoFace.isSwap{
-  transform: translate(-50%,-50%) scale(1.03);
+/* swap micro-pop (ui.js adds .isSwap) */
+.sideAvatar .dicoFace.isSwap{
+  transform: translate(-50%,-50%) scale(1.03) translateZ(0);
   transition: transform .12s ease;
+}
+
+/* Skin overlay: FRONT of face (cheap) */
+#avatarRingSkin{
+  opacity: .92;
+
+  /* “模様が前に乗ってる”感：薄く、軽く、上品 */
+  filter: brightness(1.06) saturate(1.04);
+  /* iOSでも軽い：ここでは影を増やさない */
 }
 
 /* ------------------------------------------------------------
@@ -525,7 +530,7 @@
   background: linear-gradient(90deg,
     rgba(0,240,255,.90),
     rgba(156,60,255,.75),
-    rgba(236,191,152,.82) /* pink-gold end */
+    rgba(236,191,152,.82)
   );
   box-shadow: 0 0 20px rgba(0,240,255,.18);
   transition: width .12s ease;
@@ -540,40 +545,11 @@
    ------------------------------------------------------------ */
 
 @media (max-width: 720px){
-  :root{ --hudW: 162px; }
-
+  :root{
+    --hudW: 162px;
+    --av-size: 64px;
+    --face-size: 74px;
+  }
   .sideScoreValue{ font-size: 28px; }
   .sideComboValue{ font-size: 26px; }
-
-  .sideAvatar{ width: 64px; height: 64px; }
-  .dicoFace{ width: 74px; height: 74px; }
-}
-
-
-/* ------------------------------------------------------------
-   AVATAR RING LAYERS — PRO STABLE
-   base ring (#avatarRing) + skin ring (#avatarRingSkin)
------------------------------------------------------------- */
-.sideAvatar{
-  position: relative; /* 基準点 */
-}
-
-/* 顔 */
-.sideAvatar .dicoFace{
-  position: relative;
-  z-index: 2;
-}
-
-/* ①ベースリング（共鳴/吸収） */
-#avatarRing{
-  z-index: 1;
-}
-
-/* ②スキンリング（タロット模様） */
-#avatarRingSkin{
-  position: absolute;
-  inset: -14px;            /* fx-ring.css の inset:-14px と同じ輪郭 */
-  border-radius: 999px;
-  pointer-events: none;
-  z-index: 3;              /* 顔より前に見せたいので上 */
 }
