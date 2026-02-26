@@ -592,4 +592,52 @@
   .sideScoreValue{ font-size: 28px; }
   .sideComboValue{ font-size: 26px; }
 }
+/* ===== AVATAR RING (SINGLE SOURCE OF TRUTH) ===== */
+#avatarRing{
+  position:absolute;
+  inset: calc(var(--ring-inset, 12px) * -1);
+  border-radius: 999px;
+  z-index: 0;
+  pointer-events:none;
 
+  /* ✅ JS rotation input */
+  --ui-rot: 0deg;
+
+  /* ✅ transform is unified here (rb-beat also uses --ui-rot) */
+  transform: rotate(var(--ui-rot)) translateZ(0);
+
+  /* ✅ visible ring body (復活の本体) */
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%),
+    conic-gradient(from 0deg,
+      rgba(236,191,152,.10),
+      rgba(236,191,152,.62),
+      rgba(255,255,255,.18),
+      rgba(236,191,152,.62),
+      rgba(236,191,152,.10)
+    );
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.14),
+    0 0 0 2px rgba(236,191,152,.26) inset,
+    0 0 28px rgba(236,191,152,.38),
+    0 12px 26px rgba(0,0,0,.28);
+
+  opacity: .98;
+
+  /* ⚠️ iOSで消える原因になりやすいので一旦OFF（必要なら後で局所だけON） */
+  mix-blend-mode: normal;
+
+  will-change: transform, filter, opacity;
+}
+
+/* inner lens */
+#avatarRing::after{
+  content:"";
+  position:absolute;
+  inset: 0;
+  border-radius:999px;
+  background: radial-gradient(circle at 50% 35%, rgba(0,0,0,0), rgba(0,0,0,.42));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 0 18px rgba(0,0,0,.26);
+}
