@@ -14,8 +14,8 @@
 "use strict";
 
 import { FXCore } from "./engine/fx/index.js";
-import { createAbsorbFX } from "./engine/fx/absorb-trigger.js";
 import { RingBeat } from "./engine/fx/ringBeat.js";
+import { RingResonance } from "./engine/fx/ring-resonance.js";
 
 const BASE = new URL("./", import.meta.url);
 const ASSET_BASE = new URL("../", import.meta.url);
@@ -441,9 +441,6 @@ async function boot() {
     canvas,
   };
 
-  // Absorb FX
-  const AbsorbFX = createAbsorbFX({ fxLayerId: "fxLayer", ringId: "avatarRing" });
-
   // Gate
   const gate = makeCircleGate({ hitZone, refs });
 
@@ -489,6 +486,14 @@ async function boot() {
   // -----------------------------------------------------------------
   // RingBeat Install (AFTER DOM refs exist)
   // -----------------------------------------------------------------
+instance.ringResonance = new RingResonance({
+  app,
+  ring: refs.avatarRing || $("avatarRing"),
+  fxLayer,
+  icon: refs.dicoFace || $("dicoFace"),
+  maxOrbs: 6,
+});
+
 instance.ringBeat = new RingBeat({
   app,
   avatarRing: refs.avatarRing || $("avatarRing"),
@@ -502,6 +507,7 @@ instance.ringBeat = new RingBeat({
     document.getElementById("hitZone"),
 
   fxLayer,
+  resonanceCtrl: instance.ringResonance,
 });
 
 // ✅ test threshold (5)
@@ -530,6 +536,7 @@ log("RingBeat installed", {
     const res = judge.state.resonance;
     resColor.setByResonance(res);
     applyAruState(app, res);
+    instance.ringResonance?.setResonance?.(res);
 
     ui.update({
       t,
@@ -682,13 +689,9 @@ log("RingBeat installed", {
       if (!Number.isFinite(t)) return;
 
       const res = judge.hit(t);
-ui.onJudge?.(res);
+      ui.onJudge?.(res);
 
-// ✅ これだけ
-ringBeatNotify(instance.ringBeat, judge.state.combo || 0);
-
-       
-      // ✅ ALWAYS notify combo (MISSも含む)
+      // ALWAYS notify combo (MISSも含む)
       const comboNow = judge.state.combo || 0;
       const ok = ringBeatNotify(instance.ringBeat, comboNow);
 
@@ -701,19 +704,8 @@ ringBeatNotify(instance.ringBeat, judge.state.combo || 0);
         });
       }
 
-      // (optional) visual fx on good hits
       if (res && (res.name === "GREAT" || res.name === "PERFECT" || res.name === "GOOD")) {
-        // Absorb FX を使うならここで有効化
-        // AbsorbFX.fire({
-        //   x: lx,
-        //   y: ly,
-        //   judge: res.name === "PERFECT" ? "perfect" : "great",
-        // });
-
-        // FXCore burst/stream を使うならここで（必要なら）
-        // const fxi = ensureFX();
-        // fxi.burst(lx, ly);
-
+        instance.ringBeat?.emitTapAbsorb?.({ x: lx, y: ly, judge: res.name });
         audio.playGreat?.();
         ui.flashHit?.();
       }
@@ -761,6 +753,9 @@ ringBeatNotify(instance.ringBeat, judge.state.combo || 0);
     } catch {}
     try {
       input?.destroy?.();
+    } catch {}
+    try {
+      instance.ringResonance?.dispose?.();
     } catch {}
     running = false;
     stopRAF();
