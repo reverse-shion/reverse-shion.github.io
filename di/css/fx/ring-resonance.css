@@ -1,0 +1,163 @@
+/* /di/css/fx/ring-resonance.css */
+
+#app.rr-enabled{
+  --rr-hue: 188;
+  --rr-speed: 7.2s;
+  --rr-intensity: 0;
+  --rr-impact: 0;
+}
+
+#app.rr-enabled #avatarRing{
+  will-change: transform, filter;
+  filter:
+    hue-rotate(calc((var(--rr-hue) - 188) * 1deg))
+    saturate(calc(1 + var(--rr-intensity) * .6))
+    brightness(calc(1 + var(--rr-intensity) * .32 + var(--rr-impact) * .2));
+  transition: filter .22s ease;
+}
+
+#app.rr-enabled #avatarRing::before{
+  animation-duration: var(--rr-speed);
+}
+
+#app.rr-enabled #avatarRing.rr-rainbow::before{
+  background: conic-gradient(
+    from 0deg,
+    rgba(255,64,129,.95),
+    rgba(255,140,0,.95),
+    rgba(255,225,86,.95),
+    rgba(80,255,164,.95),
+    rgba(0,220,255,.95),
+    rgba(135,110,255,.95),
+    rgba(255,64,129,.95)
+  );
+  opacity: .95;
+}
+
+#app.rr-enabled #avatarRing.rr-pulse{
+  animation: rrPulse 280ms cubic-bezier(.2,.82,.2,1) both;
+}
+
+#app.rr-enabled #avatarRing.rr-shock::after{
+  animation: rrShock 340ms ease-out both;
+}
+
+#app.rr-enabled #dicoFace.rr-icon-boost{
+  filter:
+    brightness(calc(1 + var(--rr-impact) * .45))
+    drop-shadow(0 0 calc(6px + var(--rr-impact) * 16px) rgba(120,235,255,.35));
+  transition: filter .26s ease;
+  will-change: filter;
+}
+
+#fxLayer .rr-orb{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 2147483645;
+  --ox: 0px;
+  --oy: 0px;
+  --tx: 0px;
+  --ty: 0px;
+  --cx: 0px;
+  --cy: 0px;
+  --size: 14px;
+  --flight: 430ms;
+  --rr-orb-alpha: .8;
+  --rr-orb-scale: .9;
+  transform: translate3d(var(--ox), var(--oy), 0);
+  will-change: transform, opacity;
+}
+
+#fxLayer .rr-orb::before,
+#fxLayer .rr-orb::after{
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+}
+
+#fxLayer .rr-orb::before{
+  left: calc(var(--size) * -.5);
+  top: calc(var(--size) * -.5);
+  width: var(--size);
+  height: var(--size);
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.98) 0%,
+    hsla(var(--rr-hue), 98%, 67%, var(--rr-orb-alpha)) 46%,
+    hsla(calc(var(--rr-hue) + 46), 100%, 70%, .2) 70%,
+    rgba(0,0,0,0) 76%
+  );
+  filter: drop-shadow(0 0 8px hsla(var(--rr-hue), 100%, 68%, .33));
+}
+
+#fxLayer .rr-orb::after{
+  left: 0;
+  top: -1px;
+  width: 136px;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0),
+    hsla(var(--rr-hue), 100%, 72%, .38),
+    hsla(calc(var(--rr-hue) + 38), 100%, 73%, .12),
+    rgba(255,255,255,0)
+  );
+  opacity: 0;
+  filter: blur(.3px);
+}
+
+#fxLayer .rr-orb.is-active{
+  opacity: 1;
+  animation: rrOrbFly var(--flight) cubic-bezier(.18,.86,.2,1) both;
+}
+
+#fxLayer .rr-orb.is-active::after{
+  animation: rrOrbTrail var(--flight) cubic-bezier(.18,.86,.2,1) both;
+}
+
+@keyframes rrOrbFly{
+  0%{
+    transform: translate3d(var(--ox), var(--oy), 0) scale(var(--rr-orb-scale));
+    opacity: 0;
+  }
+  14%{ opacity: 1; }
+  62%{
+    transform: translate3d(var(--cx), var(--cy), 0) scale(calc(var(--rr-orb-scale) * .86));
+    opacity: 1;
+  }
+  100%{
+    transform: translate3d(var(--tx), var(--ty), 0) scale(calc(var(--rr-orb-scale) * .58));
+    opacity: 0;
+  }
+}
+
+@keyframes rrOrbTrail{
+  0%{ width: 30px; opacity: 0; }
+  28%{ width: 124px; opacity: .7; }
+  100%{ width: 166px; opacity: 0; }
+}
+
+@keyframes rrPulse{
+  0%{ transform: rotate(var(--ui-rot, 0deg)) scale(1) translateZ(0); }
+  38%{ transform: rotate(var(--ui-rot, 0deg)) scale(calc(1.06 + var(--rr-impact) * .03)) translateZ(0); }
+  100%{ transform: rotate(var(--ui-rot, 0deg)) scale(1) translateZ(0); }
+}
+
+@keyframes rrShock{
+  0%{
+    box-shadow:
+      inset 0 0 20px rgba(0,0,0,.28),
+      0 0 0 0 hsla(var(--rr-hue), 100%, 68%, .32),
+      0 0 0 0 hsla(calc(var(--rr-hue) + 42), 100%, 72%, .2);
+  }
+  100%{
+    box-shadow:
+      inset 0 0 20px rgba(0,0,0,.28),
+      0 0 0 14px hsla(var(--rr-hue), 100%, 68%, 0),
+      0 0 0 20px hsla(calc(var(--rr-hue) + 42), 100%, 72%, 0);
+  }
+}
