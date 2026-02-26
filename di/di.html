@@ -1,184 +1,263 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<meta name="theme-color" content="#05060b" />
-<meta name="format-detection" content="telephone=no" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta charset="utf-8" />
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="theme-color" content="#05060b" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<title>DiCo ARU – Phase1</title>
+  <title>DiCo ARU – Phase1</title>
 
-<!-- ===============================
-     CORE LAYOUT (順序固定)
-================================ -->
-<link rel="stylesheet" href="./css/themes.css" />
-<link rel="stylesheet" href="./css/core.css" />
-<link rel="stylesheet" href="./css/hud.css" />
-<link rel="stylesheet" href="./css/lane.css" />
-<link rel="stylesheet" href="./css/result.css" />
-<link rel="stylesheet" href="./css/aru-gauge.css" />
+  <!-- ===============================
+       CORE CSS（順序固定）
+  ================================ -->
+  <link rel="stylesheet" href="./css/themes.css" />
+  <link rel="stylesheet" href="./css/core.css" />
+  <link rel="stylesheet" href="./css/hud.css" />
+  <link rel="stylesheet" href="./css/lane.css" />
+  <link rel="stylesheet" href="./css/result.css" />
+  <link rel="stylesheet" href="./css/aru-gauge.css" />
+  <link rel="stylesheet" href="./css/aru-fx.css" />
 
-<!-- ===============================
-     FX LAYER (順序厳守)
-================================ -->
-<link rel="stylesheet" href="./css/fx/fx-layer.css" />
-<link rel="stylesheet" href="./css/fx/fx-particles.css" />
-<link rel="stylesheet" href="./css/fx/fx-ring.css" />
-<link rel="stylesheet" href="./css/fx/icon-ring-react.css" />
-<link rel="stylesheet" href="./css/fx/ring-beat.css" />
-<link rel="stylesheet" href="./css/fx/crit-flash.css" />
-<link rel="stylesheet" href="./css/fx/absorb.css" />
-<link rel="stylesheet" href="./css/fx/fx-max.css" />
+  <!-- ===============================
+       FX CSS（重複ゼロ・順序固定）
+  ================================ -->
+  <link rel="stylesheet" href="./css/fx/fx-layer.css" />
+  <link rel="stylesheet" href="./css/fx/fx-particles.css" />
+  <link rel="stylesheet" href="./css/fx/fx-ring.css" />
+  <link rel="stylesheet" href="./css/fx/icon-ring-react.css" />
+  <link rel="stylesheet" href="./css/fx/ring-beat.css" />
+  <link rel="stylesheet" href="./css/fx/crit-flash.css" />
+  <link rel="stylesheet" href="./css/fx/absorb.css" />
+  <link rel="stylesheet" href="./css/fx/fx-max.css" />
 
-<!-- ===============================
-     PRELOAD
-================================ -->
-<link rel="preload" href="./idle/dico_idle.jpg" as="image" fetchpriority="high" />
-<link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
-<link rel="preload" href="./audio/music.mp3" as="audio" />
-<link rel="preload" href="./audio/se_tap.wav" as="audio" />
-<link rel="preload" href="./audio/se_perfect.wav" as="audio" />
+  <!-- Preload -->
+  <link rel="preload" href="./idle/dico_idle.jpg" as="image" fetchpriority="high" />
+  <link rel="preload" href="./video/di_dance.mp4" as="video" type="video/mp4" />
+  <link rel="preload" href="./audio/music.mp3" as="audio" />
+  <link rel="preload" href="./audio/se_tap.wav" as="audio" />
+  <link rel="preload" href="./audio/se_perfect.wav" as="audio" />
 
-<link rel="preload" href="./faces/dico_face_1.png" as="image" />
-<link rel="preload" href="./faces/dico_face_2.png" as="image" />
-<link rel="preload" href="./faces/dico_face_3.png" as="image" />
-<link rel="preload" href="./faces/dico_face_4.png" as="image" />
-<link rel="preload" href="./faces/dico_face_5.png" as="image" />
+  <link rel="preload" href="./faces/dico_face_1.png" as="image" />
+  <link rel="preload" href="./faces/dico_face_2.png" as="image" />
+  <link rel="preload" href="./faces/dico_face_3.png" as="image" />
+  <link rel="preload" href="./faces/dico_face_4.png" as="image" />
+  <link rel="preload" href="./faces/dico_face_5.png" as="image" />
 </head>
 
 <body>
-
-<main id="app"
-      class="app"
-      data-state="idle"
-      data-aru-state="low"
-      style="--aru-value:0.17"
-      aria-label="DiCo ARU Rhythm">
-
-<!-- ===============================
-     IDLE BACKGROUND
-================================ -->
-<div class="idleBg" aria-hidden="true">
-  <img class="idleImg"
-       src="./idle/dico_idle.jpg"
-       alt=""
-       draggable="false"
-       decoding="async"
-       loading="eager" />
-  <canvas id="idleParticles" class="idleParticles"></canvas>
-  <div class="idleLine">キミの想いを、共鳴に変えて。</div>
-</div>
-
-<video id="bgVideo"
-       class="bgVideo"
-       src="./video/di_dance.mp4"
-       playsinline
-       muted
-       loop
-       preload="auto"></video>
-
-<!-- ===============================
-     FX ROOT（最前面管理）
-================================ -->
-<div id="fxLayer" class="fxLayer"></div>
-
-<!-- ===============================
-     LEFT HUD
-================================ -->
-<aside class="sideHud sideHudLeft">
-  <div class="sideCard sideScore">
-    <div class="sideScoreValue" id="sideScore">000000</div>
-    <div class="sideScoreSub">SUBJECT: SHION</div>
+<main
+  class="app"
+  id="app"
+  data-state="idle"
+  data-aru-state="low"
+  style="--aru-value:0.17"
+  aria-label="DiCo ARU Rhythm"
+>
+  <!-- IDLE STILL -->
+  <div class="idleBg" id="idleBg" aria-hidden="true">
+    <img class="idleImg" src="./idle/dico_idle.jpg" alt="" draggable="false" decoding="async" loading="eager" />
+    <canvas id="idleParticles" class="idleParticles" aria-hidden="true"></canvas>
+    <div class="idleLine" aria-hidden="true">キミの想いを、共鳴に変えて。</div>
   </div>
 
-  <div class="sideCard sideCombo">
-    <div class="sideComboValue" id="sideCombo">0</div>
-    <div class="sideComboLabel">COMBO</div>
-    <div class="sideComboMeta">
-      <span class="metaLabel">MAX</span>
-      <span class="metaValue" id="sideMaxCombo">0</span>
-    </div>
-  </div>
-</aside>
+  <!-- VIDEO -->
+  <video
+    id="bgVideo"
+    class="bgVideo"
+    src="./video/di_dance.mp4"
+    playsinline
+    webkit-playsinline
+    muted
+    loop
+    preload="auto"
+    aria-hidden="true"
+  ></video>
 
-<!-- ===============================
-     RIGHT HUD
-================================ -->
-<aside class="sideHud sideHudRight">
-  <div class="sideCard sidePlayer">
+  <!-- FX（class も旧互換に戻す：.fx-layer を拾うCSS対策） -->
+  <div class="fxLayer fx-layer" id="fxLayer" aria-hidden="true"></div>
 
-    <div class="sideTop">
-      <div class="sideName">
-        <div class="sideNameMain" id="playerName">DiCo</div>
-        <div class="sideNameSub">RESONANCE</div>
-      </div>
-
-      <!-- AVATAR -->
-      <div class="sideAvatar">
-        <div id="avatarRing" class="avatarRing res-ring"></div>
-        <img id="dicoFace"
-             class="dicoFace"
-             src="./faces/dico_face_1.png"
-             alt="DiCo"
-             draggable="false"
-             decoding="async"
-             loading="eager" />
-        <div id="avatarRingSkin" class="avatarRingSkin"></div>
-      </div>
+  <!-- LEFT HUD -->
+  <aside class="sideHud sideHudLeft" aria-label="Left HUD">
+    <div class="sideCard sideScore" role="group" aria-label="Score">
+      <div class="sideScoreValue" id="sideScore">000000</div>
+      <div class="sideScoreSub">SUBJECT: SHION</div>
     </div>
 
-    <div class="sideGauge">
-      <div class="sideGaugeRow">
-        <div class="sideGaugeLabel">RESONANCE</div>
-        <div class="sideGaugeValue">
-          <span id="resValue">0</span><span class="pct">%</span>
+    <div class="sideCard sideCombo" role="group" aria-label="Combo">
+      <div class="sideComboValue" id="sideCombo">0</div>
+      <div class="sideComboLabel">COMBO</div>
+      <div class="sideComboMeta">
+        <span class="metaLabel">MAX</span>
+        <span class="metaValue" id="sideMaxCombo">0</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT HUD -->
+  <aside class="sideHud sideHudRight" aria-label="Right HUD">
+    <div class="sideCard sidePlayer" role="group" aria-label="Player">
+      <div class="sideTop">
+        <div class="sideName">
+          <div class="sideNameMain" id="playerName">DiCo</div>
+          <div class="sideNameSub">RESONANCE</div>
+        </div>
+
+        <div class="sideAvatar" aria-label="DiCo avatar">
+          <div class="avatarRing res-ring" id="avatarRing" aria-hidden="true"></div>
+          <div class="avatarRingSkin" id="avatarRingSkin" aria-hidden="true"></div>
+
+          <img
+            id="dicoFace"
+            class="dicoFace"
+            src="./faces/dico_face_1.png"
+            data-face="1"
+            alt="DiCo face"
+            draggable="false"
+            decoding="async"
+            loading="eager"
+          />
         </div>
       </div>
 
-      <div class="sideGaugeBar">
-        <div id="resFill" class="sideGaugeFill"></div>
-      </div>
+      <div class="sideGauge" role="group" aria-label="Resonance gauge">
+        <div class="sideGaugeRow">
+          <div class="sideGaugeLabel">RESONANCE</div>
+          <div class="sideGaugeValue" aria-label="Resonance value">
+            <span id="resValue">0</span><span class="pct">%</span>
+          </div>
+        </div>
 
-      <div class="sideTimeRow">
-        <div class="sideTimeLabel">TIME</div>
-        <div class="sideTimeValue" id="time">--</div>
+        <div class="sideGaugeBar" aria-hidden="true">
+          <div class="sideGaugeFill" id="resFill" style="width:0%;"></div>
+        </div>
+
+        <div class="sideTimeRow">
+          <div class="sideTimeLabel">TIME</div>
+          <div class="sideTimeValue" id="time">--</div>
+        </div>
+
+        <div class="facePool" aria-hidden="true">
+          <img class="faceAsset" id="face1" src="./faces/dico_face_1.png" alt="" />
+          <img class="faceAsset" id="face2" src="./faces/dico_face_2.png" alt="" />
+          <img class="faceAsset" id="face3" src="./faces/dico_face_3.png" alt="" />
+          <img class="faceAsset" id="face4" src="./faces/dico_face_4.png" alt="" />
+          <img class="faceAsset" id="face5" src="./faces/dico_face_5.png" alt="" />
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- LEGACY HUD（JSが参照してる可能性があるので残す／hud.cssで非表示運用でもOK） -->
+  <header class="hud" aria-label="HUD" aria-hidden="true">
+    <div class="hudBlock">
+      <div class="hudLabel">SCORE</div>
+      <div class="hudValue" id="score">0</div>
+    </div>
+
+    <div class="hudBlock hudCenter">
+      <div class="hudCombo">
+        <span class="hudLabel">COMBO</span>
+        <span class="hudValue" id="combo">0</span>
+      </div>
+      <div class="hudSmall">
+        <span class="hudLabel">MAX</span>
+        <span class="hudValue" id="maxCombo">0</span>
       </div>
     </div>
 
-  </div>
-</aside>
+    <div class="hudBlock hudRight">
+      <div class="hudLabel">TIME</div>
+      <div class="hudValue" id="time_dup">--</div>
+    </div>
+  </header>
 
-<!-- ===============================
-     STAGE
-================================ -->
-<section id="stage" class="stage">
-  <canvas id="noteCanvas" class="noteCanvas"></canvas>
-  <div id="hitZone" class="hitZone"></div>
+  <!-- STAGE -->
+  <section class="stage" id="stage" aria-label="Game Stage">
+    <canvas id="noteCanvas" class="noteCanvas" aria-label="Play canvas"></canvas>
+    <div class="hitZone" id="hitZone" aria-label="Tap area"></div>
 
-  <div id="judge" class="judge">
-    <div id="judgeMain" class="judgeMain">GREAT</div>
-    <div id="judgeSub" class="judgeSub">SYNC</div>
-  </div>
-</section>
+    <!-- ✅ 中央ターゲット（これが消えると判定円が消える） -->
+    <div class="targetRoot" id="targetRoot" aria-hidden="true">
+      <div class="targetOuter"></div>
+      <div class="targetCore"></div>
+      <div class="targetRing"></div>
+      <div class="scanLine"></div>
+      <div class="hitFlash" id="hitFlash" aria-hidden="true"></div>
+    </div>
 
-<!-- ===============================
-     CONTROLS
-================================ -->
-<footer class="bottom">
-  <button id="startBtn" class="btn primary" type="button">START</button>
-  <button id="stopBtn" class="btn" type="button">STOP</button>
-  <button id="restartBtn" class="btn" type="button">RESTART</button>
-</footer>
+    <div class="judge" id="judge" aria-hidden="true">
+      <div class="judgeMain" id="judgeMain">GREAT</div>
+      <div class="judgeSub"  id="judgeSub">SYNC</div>
+    </div>
 
-<!-- ===============================
-     AUDIO
-================================ -->
-<audio id="music" src="./audio/music.mp3" preload="auto"></audio>
-<audio id="seTap" src="./audio/se_tap.wav" preload="auto"></audio>
-<audio id="seGreat" src="./audio/se_perfect.wav" preload="auto"></audio>
+    <!-- ✅ リザルト（これが無いと endToResult が失敗しやすい） -->
+    <div class="result" id="result" aria-hidden="true">
+      <div class="resultCard">
+        <div class="resultTitle">RESULT</div>
+
+        <div class="resultRow">
+          <div class="resultKey">SCORE</div>
+          <div class="resultVal" id="resultScore">0</div>
+        </div>
+
+        <div class="resultRow">
+          <div class="resultKey">MAX COMBO</div>
+          <div class="resultVal" id="resultMaxCombo">0</div>
+        </div>
+
+        <div class="resultDivider"></div>
+
+        <div class="aruWrap" aria-label="ARU Gauge">
+          <div class="aruRing" id="aruRing" role="img" aria-label="ARU energy ring">
+            <svg viewBox="0 0 120 120" class="aruSvg" aria-hidden="true">
+              <defs>
+                <linearGradient id="aruGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"  stop-color="rgba(156,60,255,0.95)"/>
+                  <stop offset="55%" stop-color="rgba(0,240,255,0.95)"/>
+                  <stop offset="100%" stop-color="rgba(230,201,107,0.95)"/>
+                </linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="44" class="aruTrack"/>
+              <circle cx="60" cy="60" r="44" class="aruProg" id="aruProg"/>
+            </svg>
+
+            <div class="aruText">
+              <div class="aruLabel">ARU ENERGY</div>
+              <div class="aruValue" id="aruValue">0%</div>
+            </div>
+
+            <div class="aruLayer" aria-hidden="true">
+              <div class="aruGauge">
+                <div class="aruScore" id="aruOverlayScore">0%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dicoLine" id="dicoLine">キミの想いを、共鳴に変えて。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLS -->
+  <footer class="bottom" aria-label="Controls">
+    <button id="startBtn" class="btn primary" type="button">START</button>
+    <button id="stopBtn" class="btn" type="button">STOP</button>
+    <button id="restartBtn" class="btn" type="button">RESTART</button>
+  </footer>
+
+  <!-- AUDIO -->
+  <audio id="music"   src="./audio/music.mp3" preload="auto"></audio>
+  <audio id="seTap"   src="./audio/se_tap.wav" preload="auto"></audio>
+  <audio id="seGreat" src="./audio/se_perfect.wav" preload="auto"></audio>
+
+  <!-- ✅ result/FX用に残す（軽量・安全） -->
+  <div class="srOnly" id="ariaLive" aria-live="polite" aria-atomic="true"></div>
+  <div class="aruFX" aria-hidden="true"></div>
 
 </main>
 
