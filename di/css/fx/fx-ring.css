@@ -1,17 +1,15 @@
 /* /di/css/fx/fx-ring.css
-   AVATAR RING — STABLE + REACT (NO OFFSCREEN GHOST / NO TARGET DRIFT)
-   ✅ keep your existing look (conic ring + inner shade)
-   ✅ keep always-rotate (ringRotate)
-   ✅ absorbPulse stays (flash + scale)
-   ✅ add PERFECT-only ripple + short boost (absorbPerfect)
-   ✅ safety: ring must not create a “new ring elsewhere”
-      → relies on parent (.sideAvatar) being positioned (see note below)
+   AVATAR RING — PRO STABLE COMPOSE v3.0 (LIGHT)
+   ------------------------------------------------------------
+   ✅ FIX: transform collision solved (rotate + scale are composed)
+      - JS sets only:   --ui-rot: "123deg"  (NOT transform)
+      - CSS pulse uses: transform: rotate(var(--ui-rot)) scale(...)
+   ✅ State (persistent): .is-low/.is-mid/.is-high/.is-max
+   ✅ FX   (transient) : .fx-hit/.ringBoost/.ringDampen
+      + compat: .absorbPulse/.absorbPerfect (old names)
+   ✅ Lightweight: no extra DOM, pseudo only
 */
 
-/* ------------------------------------------------------------
-   0) (Recommended) anchor: parent should be positioning context
-   If hud.css already sets .sideAvatar{position:relative;} you can delete this.
------------------------------------------------------------- */
 .sideAvatar{ position:relative; }
 
 /* ------------------------------------------------------------
@@ -23,24 +21,28 @@
   border-radius:999px;
   pointer-events:none;
 
-  /* keep GPU-friendly but DO NOT move center */
-  transform: translateZ(0);
-  will-change: transform, filter, box-shadow;
+  /* ---- composed transform (NO COLLISION) ---- */
+  --ui-rot: 0deg;          /* JS updates */
+  transform: rotate(var(--ui-rot)) scale(1) translateZ(0);
+
+  will-change: transform, filter, opacity;
 }
 
-/* always rotating conic ring */
+/* conic ring (visual) — rotate only inside pseudo (stable) */
 .res-ring::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:inherit;
 
-  background: conic-gradient(from 0deg, var(--res-color), #ffffff, var(--res-color));
+  /* base color can be changed by state classes */
+  background: conic-gradient(from 0deg, var(--res-a), var(--res-b), var(--res-a));
   opacity:.85;
   mix-blend-mode:screen;
 
+  /* keep world-safe rotation (pseudo only) */
   animation: ringRotate 6s linear infinite;
-  transition: filter .25s ease, opacity .25s ease;
+  transition: filter .20s ease, opacity .20s ease;
 }
 
 /* inner shade + frame */
@@ -52,49 +54,102 @@
 
   background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0), rgba(0,0,0,.45));
   border:1px solid rgba(255,255,255,.12);
-  box-shadow: inset 0 0 20px rgba(0,0,0,.3);
+  box-shadow: inset 0 0 20px rgba(0,0,0,.30);
 }
 
 /* ------------------------------------------------------------
-   2) Receive flash (common: GREAT/GOOD/PERFECT)
+   2) Persistent state colors (HYSTERESIS is handled by JS)
+   - Keep it cheap: just swap 2 vars (no heavy filters)
 ------------------------------------------------------------ */
-.res-ring.absorbPulse::before{
-  filter: brightness(1.5) blur(2px);
+.res-ring{
+  --res-a: rgba(0,240,255,0.82);
+  --res-b: rgba(255,255,255,0.90);
+}
+
+/* low */
+.res-ring.is-low{
+  --res-a: rgba(120,160,190,0.55);
+  --res-b: rgba(255,255,255,0.55);
+  opacity: .78;
+}
+
+/* mid */
+.res-ring.is-mid{
+  --res-a: rgba(0,240,255,0.72);
+  --res-b: rgba(255,255,255,0.80);
+  opacity: .86;
+}
+
+/* high */
+.res-ring.is-high{
+  --res-a: rgba(0,240,255,0.86);
+  --res-b: rgba(255,255,255,0.96);
+  opacity: .95;
+}
+
+/* max */
+.res-ring.is-max{
+  --res-a: rgba(0,240,255,0.95);
+  --res-b: rgba(255,210,120,0.70);
   opacity: 1;
 }
 
-/* keep your pulse timing (visual), JS can remove class earlier if desired */
-.res-ring.absorbPulse{
-  animation: ringPulse .6s ease-out;
+/* ------------------------------------------------------------
+   3) Transient FX (tap / pulse / boost / dampen)
+   IMPORTANT: Never destroy state; only adds temporary “feel”.
+   Also: all transform animations KEEP rotate(var(--ui-rot)).
+------------------------------------------------------------ */
+
+/* compat: old names -> new names */
+.res-ring.absorbPulse,
+.res-ring.fx-hit{
+  animation: ringPulse .32s ease-out;
 }
 
-/* ------------------------------------------------------------
-   3) PERFECT-only: ripple + “arrival” feel
-   - no extra DOM
-   - uses box-shadow expansion (lightweight)
------------------------------------------------------------- */
+/* brighter flash on pseudo only (cheap) */
+.res-ring.absorbPulse::before,
+.res-ring.fx-hit::before{
+  filter: brightness(1.50) blur(1.5px);
+  opacity: 1;
+}
+
+/* perfect ripple (compat) */
 .res-ring.absorbPerfect::after{
-  /* preserve existing inset shadow + add expanding outer rings */
   animation: ringRipple 220ms ease-out;
 }
-
-/* ------------------------------------------------------------
-   4) OPTIONAL: PERFECT-only short “boost” impression
-   - do NOT change ringRotate (keeps stable)
-   - just adds tiny brightness kick (cheap)
------------------------------------------------------------- */
+/* optional: perfect kick */
 .res-ring.absorbPerfect::before{
   filter: brightness(1.65) blur(2px);
   opacity: 1;
 }
 
+/* boost / dampen : keep rotate */
+.res-ring.ringBoost{
+  animation: ringBoost 420ms ease-out;
+}
+.res-ring.ringDampen{
+  animation: ringDampen 320ms ease-out;
+}
+
 /* ------------------------------------------------------------
-   Animations
+   Animations (all preserve rotate(var(--ui-rot)))
 ------------------------------------------------------------ */
 @keyframes ringPulse{
-  0%   { transform: translateZ(0) scale(1); }
-  40%  { transform: translateZ(0) scale(1.12); }
-  100% { transform: translateZ(0) scale(1); }
+  0%   { transform: rotate(var(--ui-rot)) scale(1) translateZ(0); }
+  40%  { transform: rotate(var(--ui-rot)) scale(1.10) translateZ(0); }
+  100% { transform: rotate(var(--ui-rot)) scale(1) translateZ(0); }
+}
+
+@keyframes ringBoost{
+  0%   { transform: rotate(var(--ui-rot)) scale(1) translateZ(0); }
+  35%  { transform: rotate(var(--ui-rot)) scale(1.14) translateZ(0); }
+  100% { transform: rotate(var(--ui-rot)) scale(1) translateZ(0); }
+}
+
+@keyframes ringDampen{
+  0%   { transform: rotate(var(--ui-rot)) scale(1) translateZ(0); filter: none; }
+  40%  { transform: rotate(var(--ui-rot)) scale(0.96) translateZ(0); filter: brightness(.92); }
+  100% { transform: rotate(var(--ui-rot)) scale(1) translateZ(0); filter: none; }
 }
 
 @keyframes ringRotate{
@@ -102,18 +157,17 @@
   to  { transform: rotate(360deg); }
 }
 
-/* expanding ripple (outer rings fade out) */
 @keyframes ringRipple{
   0%{
     box-shadow:
-      inset 0 0 20px rgba(0,0,0,.3),
+      inset 0 0 20px rgba(0,0,0,.30),
       0 0 0 0 rgba(0,240,255,.28),
       0 0 0 0 rgba(156,60,255,.18);
     opacity: 1;
   }
   100%{
     box-shadow:
-      inset 0 0 20px rgba(0,0,0,.3),
+      inset 0 0 20px rgba(0,0,0,.30),
       0 0 0 12px rgba(0,240,255,0),
       0 0 0 18px rgba(156,60,255,0);
     opacity: 1;
