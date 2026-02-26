@@ -1,39 +1,45 @@
 /* /di/css/fx/ring-beat.css
-   RingBeat VISUAL — ultra light (POSITION SAFE)
-   - ✅ does NOT override positioning transform
+   RingBeat VISUAL — ultra light (POSITION + ROT SAFE) [FIXED]
+   ✅ does NOT reset JS rotation (--ui-rot)
+   ✅ beat only scales/brightness, rotation stays from ui.js
+   ✅ remove debug overflow !important (side effects)
 */
 
+/* ------------------------------------------------------------
+   Beat (scale + brightness) — SAFE
+------------------------------------------------------------ */
 #avatarRing.rb-beat{
   --rb-k: var(--rb-beat, 0.0);
   animation: rbBeat 720ms ease-in-out infinite;
   will-change: transform, filter;
 }
 
-/* ✅ translate を消す（inset方式の位置を壊さない） */
+/* ✅ IMPORTANT:
+   - keep rotate(var(--ui-rot)) always
+   - never rotate(0deg) here
+*/
 @keyframes rbBeat{
   0%{
-    transform: translateZ(0) rotate(0deg) scale(1);
+    transform: rotate(var(--ui-rot, 0deg)) translateZ(0) scale(1);
     filter: brightness(1);
   }
   35%{
-    transform: translateZ(0) rotate(0deg)
+    transform: rotate(var(--ui-rot, 0deg)) translateZ(0)
       scale(calc(1 + 0.06 + 0.10*var(--rb-k)));
     filter: brightness(calc(1.08 + 0.55*var(--rb-k)));
   }
   100%{
-    transform: translateZ(0) rotate(0deg) scale(1);
+    transform: rotate(var(--ui-rot, 0deg)) translateZ(0) scale(1);
     filter: brightness(1);
   }
 }
 
-/* stop */
-#avatarRing.rb-stop,
-#avatarRing.rb-stop::before,
-#avatarRing.rb-stop::after{
+/* stop (pause only beat anim) */
+#avatarRing.rb-stop{
   animation-play-state: paused !important;
 }
 
-/* glow */
+/* glow (OK: filter only / pseudo only) */
 #avatarRing.rb-glow{
   filter: brightness(1.85) saturate(1.1);
 }
@@ -50,7 +56,9 @@
     0 0 0 16px rgba(156,60,255,.12);
 }
 
-/* absorb */
+/* ------------------------------------------------------------
+   Absorb (unchanged)
+------------------------------------------------------------ */
 .rbAbsorb{
   position: absolute;
   left: 0; top: 0;
@@ -125,8 +133,10 @@
   25%  { width: 180px; opacity: 0.75; }
   100% { width: 220px; opacity: 0.0; }
 }
-/* ===== DEBUG: absorbを絶対見せる ===== */
+
+/* ✅ REMOVE THIS (DANGEROUS):
 .sideAvatar,
 .sideAvatar *{
   overflow: visible !important;
 }
+*/
