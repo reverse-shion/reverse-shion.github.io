@@ -416,7 +416,15 @@
    1: face (.dicoFace)
    2: skin overlay (#avatarRingSkin)  ← faceの前に出す
 */
-#avatarRing{ position:absolute; inset: calc(var(--ring-inset) * -1); border-radius:999px; z-index:0; pointer-events:none; }
+#avatarRing{ position:absolute; inset: calc(var(--ring-inset) * -1); border-radius:999px; z-index:0; pointer-events:none; 
+          /* ✅ JSが回転値を渡す。デフォは0 */
+--ui-rot: 0deg;
+
+/* ✅ transformはここで一本化（JSでtransform直書きしない） */
+transform: rotate(var(--ui-rot)) translateZ(0);
+
+will-change: transform, filter, opacity;
+           }
 .sideAvatar .dicoFace{ position:absolute; left:50%; top:50%; width: var(--face-size); height: var(--face-size);
   transform: translate(-50%,-50%) scale(var(--pulseScale, 1)) translateZ(0);
   border-radius:999px; object-fit:cover; z-index:1; pointer-events:none;
