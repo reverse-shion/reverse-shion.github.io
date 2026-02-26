@@ -153,7 +153,7 @@
         if (spinSpeed > 0) {
           this._ringSpin = (this._ringSpin + spinSpeed) % 360;
           // write only if changed meaningfully (avoid string churn)
-          r.avatarRing.style.transform = `rotate(${this._ringSpin}deg)`;
+          r.avatarRing.style.setProperty("--ui-rot", `${this._ringSpin}deg`);
         } else if (this._ringSpin !== 0) {
           // keep last angle (no need to reset); but if you want freeze at 0, uncomment:
           // this._ringSpin = 0; r.avatarRing.style.transform = "rotate(0deg)";
