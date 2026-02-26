@@ -1,33 +1,38 @@
-/* =========================================================
-   ICON RING – DUAL SPIN + TAROT MOTIF (CSS ONLY)
-   ✅ target is #avatarRingSkin (separate layer)
-   ✅ NO translate(-50%) needed because we use inset-based sizing
-   ========================================================= */
+/* /di/css/fx/icon-ring-react.css
+   ICON RING — DUAL SPIN + TAROT MOTIF v2.2 (SAFE POSITION)
+   ------------------------------------------------------------
+   ✅ Self-contained positioning (won't vanish if hud.css changes)
+   ✅ Uses pseudo only (no extra DOM)
+   ✅ Does not touch #avatarRing (base ring) → no collisions
+*/
 
 #avatarRingSkin{
-  /* position/inset/z-index は hud.css 側で固定済み想定 */
-  will-change: transform, filter;
+  position:absolute;
+  inset:-18px;             /* ringより少し外へ */
+  border-radius:999px;
+  pointer-events:none;
+  z-index: 3;              /* base ring(2想定)より上、faceより下にしたいなら hud.css で調整 */
 
-  /* base spin */
-  --ring-speed: 12s; /* slow (world-safe) */
-  animation: ringSpinSkin var(--ring-speed) linear infinite;
+  will-change: transform, filter, opacity;
+
+  /* speed vars */
+  --ring-speed: 12s;
+  --sweep-speed: 7.2s;
 
   /* palette */
   --tarot-cyan: rgba(0,240,255,0.70);
   --tarot-violet: rgba(156,60,255,0.55);
   --tarot-gold: rgba(255,210,120,0.55);
-  --tarot-white: rgba(255,255,255,0.18);
+
+  animation: ringSpinSkin var(--ring-speed) linear infinite;
 }
 
-/* =========================================================
-   Layer A (slow): ticks + engraving feel
-========================================================= */
+/* Layer A: ticks / engraving */
 #avatarRingSkin::before{
   content:"";
   position:absolute;
   inset:-2px;
-  border-radius:999px;
-  pointer-events:none;
+  border-radius:inherit;
 
   background:
     repeating-conic-gradient(
@@ -39,13 +44,6 @@
       from 0deg,
       rgba(255,255,255,0.0) 0deg 8deg,
       var(--tarot-cyan) 8deg 8.5deg
-    ),
-    radial-gradient(circle at 50% 50%,
-      rgba(255,255,255,0.00) 0%,
-      rgba(255,255,255,0.00) 56%,
-      rgba(255,210,120,0.10) 60%,
-      rgba(0,240,255,0.08) 67%,
-      rgba(255,255,255,0.00) 72%
     );
 
   -webkit-mask: radial-gradient(circle, transparent 57%, #000 60%);
@@ -54,18 +52,15 @@
   filter:
     drop-shadow(0 0 10px rgba(0,240,255,0.20))
     drop-shadow(0 0 14px rgba(255,210,120,0.12));
-  opacity: 0.92;
+  opacity: 0.90;
 }
 
-/* =========================================================
-   Layer B (faster): sweep wedge + star dust
-========================================================= */
+/* Layer B: sweep wedge / dust */
 #avatarRingSkin::after{
   content:"";
   position:absolute;
   inset:-6px;
-  border-radius:999px;
-  pointer-events:none;
+  border-radius:inherit;
 
   background:
     repeating-radial-gradient(circle at 50% 50%,
@@ -74,9 +69,7 @@
     ),
     conic-gradient(
       from 0deg,
-      rgba(156,60,255,0.00) 0deg 300deg,
-      rgba(156,60,255,0.00) 300deg 334deg,
-      rgba(255,210,120,0.00) 334deg 338deg,
+      rgba(156,60,255,0.00) 0deg 338deg,
       rgba(255,210,120,0.55) 338deg 345deg,
       rgba(0,240,255,0.65) 345deg 352deg,
       rgba(0,240,255,0.00) 352deg 360deg
@@ -88,37 +81,28 @@
   filter:
     drop-shadow(0 0 16px rgba(156,60,255,0.22))
     drop-shadow(0 0 18px rgba(255,210,120,0.15));
-  opacity: 0.78;
+  opacity: 0.76;
 
-  --sweep-speed: 7.2s;
   animation: sweepSpin var(--sweep-speed) linear infinite;
 }
 
-/* =========================================================
-   Hit / Boost (optional): skin ring only
-   ※JSで #avatarRingSkin に class を付けるなら効く
-========================================================= */
+/* optional hit (if JS adds fx-hit to skin too) */
 #avatarRingSkin.fx-hit{
   animation:
     ringSpinSkin var(--ring-speed) linear infinite,
     fxRingGlow 120ms ease-out both;
 }
-#avatarRingSkin.fx-boost{ --ring-speed: 5.0s; }
-#avatarRingSkin.fx-boost::after{ --sweep-speed: 3.4s; }
 
-/* =========================================================
-   Keyframes
-========================================================= */
 @keyframes ringSpinSkin{
   from{ transform: rotate(0deg); }
-  to{   transform: rotate(360deg); }
+  to  { transform: rotate(360deg); }
 }
 @keyframes sweepSpin{
   from{ transform: rotate(0deg); }
-  to{   transform: rotate(360deg); }
+  to  { transform: rotate(360deg); }
 }
 @keyframes fxRingGlow{
   0%   { filter: brightness(1); }
-  40%  { filter: brightness(1.55); }
+  40%  { filter: brightness(1.45); }
   100% { filter: brightness(1); }
 }
