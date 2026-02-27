@@ -1,14 +1,14 @@
 /* /di/js/main.js
-   DiCo ARU Phase1 — PRO STABLE ENTRY v2.4.0 (AUDIO ALWAYS PLAYS / DEV APPLY WORKS)
-   -------------------------------------------------------------------------------
+   DiCo ARU Phase1 — PRO STABLE ENTRY v2.3 (RINGBEAT HARDENED)
+   ------------------------------------------------------------
    ✅ iOS Safari safe (gesture unlock, VIDEO PLAY IN-GESTURE)
+   ✅ Prevent double-tap zoom / viewport drift (hitZone scoped)
    ✅ Deterministic state machine: idle -> playing -> result
-   ✅ Single clock (Timing drives everything) ＝ 音源時計は AudioBus が真実
+   ✅ Single clock (Timing drives everything)
    ✅ Legacy engine loader (DI_ENGINE globals) kept
-   ✅ DEV override:
-      - file.type が空でも拡張子で許可（mp3/m4a/wav/aac/mp4）
-      - APPLY は “確実に” 音源差し替え（WebAudio decode 優先 / HTMLAudio fallback）
-      - START/RESTART は差し替え後音源で再生
+   ✅ RingBeat: create after DOM refs, combo notify after judge.hit(t)
+   ✅ RingBeat call is "dual-safe": onCombo / updateCombo both supported
+   ✅ Debug logs to prove: res.name / combo / threshold / gate rejection
 */
 
 "use strict";
@@ -29,7 +29,7 @@ const DEV =
   location.search.includes("dev=1") ||
   location.search.includes("nocache=1");
 
-const BUILD_VER = "2026-02-28";
+const BUILD_VER = "2026-02-26";
 
 // ---------------------------------------------------------------------
 // HELPERS
@@ -39,38 +39,21 @@ const $ = (id) => document.getElementById(id);
 
 const STATES = Object.freeze({ IDLE: "idle", PLAYING: "playing", RESULT: "result" });
 
-function setState(app, s) { app.dataset.state = s; }
-function getState(app) { return app.dataset.state || STATES.IDLE; }
-function assertEl(el, name) { if (!el) throw new Error(`Missing #${name}`); return el; }
-function now() { return performance?.now?.() ?? Date.now(); }
-function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-
-function guessMimeFromName(name = "") {
-  const n = String(name).toLowerCase();
-  if (n.endsWith(".mp3")) return "audio/mpeg";
-  if (n.endsWith(".m4a")) return "audio/mp4";
-  if (n.endsWith(".wav")) return "audio/wav";
-  if (n.endsWith(".aac")) return "audio/aac";
-  if (n.endsWith(".mp4")) return "video/mp4";
-  return "";
+function setState(app, s) {
+  app.dataset.state = s;
 }
-function isAudioLikeFile(file) {
-  if (!file) return false;
-  const type = String(file.type || "").toLowerCase();
-  if (type.startsWith("audio/")) return true;
-  if (type === "video/mp4") return true;
-
-  const name = String(file.name || "").toLowerCase();
-  return (
-    name.endsWith(".mp3") ||
-    name.endsWith(".m4a") ||
-    name.endsWith(".wav") ||
-    name.endsWith(".aac") ||
-    name.endsWith(".mp4")
-  );
+function getState(app) {
+  return app.dataset.state || STATES.IDLE;
 }
-async function readAsArrayBuffer(file) {
-  return await file.arrayBuffer();
+function assertEl(el, name) {
+  if (!el) throw new Error(`Missing #${name}`);
+  return el;
+}
+function now() {
+  return performance?.now?.() ?? Date.now();
+}
+function clamp(v, a, b) {
+  return Math.max(a, Math.min(b, v));
 }
 
 // ---------------------------------------------------------------------
@@ -85,6 +68,7 @@ function withVersion(src) {
   else u.searchParams.set("v", BUILD_VER);
   return u.toString();
 }
+
 function loadScriptOnce(src) {
   if (__scriptCache.has(src)) return __scriptCache.get(src);
 
@@ -100,12 +84,13 @@ function loadScriptOnce(src) {
   __scriptCache.set(src, p);
   return p;
 }
+
 async function loadScriptsSequentially(files) {
   for (const src of files) await loadScriptOnce(src);
 }
 
 const ENGINE_FILES = [
-  "engine/audio-webaudio.js", // legacy; keep loaded but we won't rely on it for music clock
+  "engine/audio.js",
   "engine/timing.js",
   "engine/input.js",
   "engine/judge.js",
@@ -338,9 +323,14 @@ function makeCircleGate({ hitZone, refs }) {
 function disposePreviousIfAny() {
   const prev = globalThis[APP_KEY];
   if (prev && typeof prev.dispose === "function") {
-    try { prev.dispose(); } catch (e) { console.warn("[DiCo] dispose prev failed", e); }
+    try {
+      prev.dispose();
+    } catch (e) {
+      console.warn("[DiCo] dispose prev failed", e);
+    }
   }
 }
+
 function bindPress(btn, fn, signal) {
   let lastTs = -1;
   const wrapped = (e) => {
@@ -354,7 +344,7 @@ function bindPress(btn, fn, signal) {
 }
 
 // ---------------------------------------------------------------------
-// RINGBEAT: HARDENED CALL
+// RINGBEAT: HARDENED CALL (silent-fail killer)
 // ---------------------------------------------------------------------
 function ringBeatNotify(rb, combo) {
   if (!rb) return false;
@@ -366,247 +356,6 @@ function ringBeatNotify(rb, combo) {
   } catch (e) {
     console.warn("[RingBeat] notify failed", e);
     return false;
-  }
-}
-
-// =====================================================================
-// AUDIO BUS (THE SOURCE OF TRUTH)
-//  - WebAudio decode preferred (stable clock, iOS unlock safe)
-//  - HTMLAudio fallback (objectURL) if decode fails
-//  - Exposes methods Timing expects:
-//      unlock / primeUnlock / startMusic / stopMusic / getMusicTime / getDuration
-//      playTap / playGreat
-// =====================================================================
-class AudioBus {
-  constructor({ musicEl, seTapEl, seGreatEl }) {
-    this.musicEl = musicEl;
-    this.seTapEl = seTapEl;
-    this.seGreatEl = seGreatEl;
-
-    this.ctx = null;
-    this.master = null;
-
-    // music state (webaudio)
-    this._buf = null;
-    this._src = null;
-    this._startedAt = 0;   // ctx.currentTime at start
-    this._offset = 0;      // seconds
-    this._playing = false;
-
-    // html fallback
-    this._htmlUrl = "";
-    this._mode = "html"; // "webaudio" | "html"
-  }
-
-  _ensureCtx() {
-    if (this.ctx) return this.ctx;
-    const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
-    if (!AC) return null;
-    this.ctx = new AC({ latencyHint: "interactive" });
-    this.master = this.ctx.createGain();
-    this.master.gain.value = 1;
-    this.master.connect(this.ctx.destination);
-    return this.ctx;
-  }
-
-  async primeUnlock() {
-    // best effort "silent tick" for iOS
-    const ctx = this._ensureCtx();
-    if (!ctx) return;
-    try {
-      if (ctx.state !== "running") await ctx.resume();
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      g.gain.value = 0.00001;
-      osc.connect(g);
-      g.connect(this.master);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.02);
-    } catch {}
-  }
-
-  async unlock() {
-    const ctx = this._ensureCtx();
-    if (!ctx) return;
-    if (ctx.state !== "running") {
-      await ctx.resume();
-    }
-  }
-
-  async loadMusicFromArrayBuffer(ab, { mime = "", name = "" } = {}) {
-    const ctx = this._ensureCtx();
-    if (!ctx) throw new Error("AudioContext not available");
-
-    await this.unlock();
-
-    // decodeAudioData iOS quirks: clone buffer
-    const bufCopy = ab.slice(0);
-    let audioBuf = null;
-    try {
-      audioBuf = await ctx.decodeAudioData(bufCopy);
-    } catch (e) {
-      console.warn("[AudioBus] decodeAudioData failed", e);
-      audioBuf = null;
-    }
-
-    if (audioBuf) {
-      this._buf = audioBuf;
-      this._mode = "webaudio";
-      // keep html element paused/reset (avoid double sound)
-      try {
-        this.musicEl.pause();
-        this.musicEl.currentTime = 0;
-      } catch {}
-      return { mode: "webaudio", duration: audioBuf.duration };
-    }
-
-    // fallback: HTMLAudio with objectURL
-    // NOTE: we can't "use ab directly" in HTMLAudio, so caller must pass File to create objectURL.
-    throw new Error("decode failed; use HTMLAudio fallback with File");
-  }
-
-  async loadMusicFromFile(file) {
-    if (!file) throw new Error("No file");
-    await this.unlock();
-
-    // 1) try WebAudio decode first
-    try {
-      const ab = await readAsArrayBuffer(file);
-      const mime = String(file.type || guessMimeFromName(file.name) || "");
-      const r = await this.loadMusicFromArrayBuffer(ab, { mime, name: file.name });
-      return r;
-    } catch (e) {
-      console.warn("[AudioBus] WebAudio decode path failed, fallback HTMLAudio", e?.message || e);
-    }
-
-    // 2) HTMLAudio fallback (always works if Safari can play that codec)
-    try {
-      if (this._htmlUrl) {
-        try { URL.revokeObjectURL(this._htmlUrl); } catch {}
-        this._htmlUrl = "";
-      }
-      const url = URL.createObjectURL(file);
-      this._htmlUrl = url;
-
-      // stop webaudio if any
-      this.stopMusic({ reset: true });
-      this._buf = null;
-      this._mode = "html";
-
-      this.musicEl.pause();
-      this.musicEl.src = url;
-      this.musicEl.load();
-
-      await new Promise((resolve) => {
-        const done = () => resolve();
-        this.musicEl.addEventListener("canplay", done, { once: true });
-        this.musicEl.addEventListener("loadedmetadata", done, { once: true });
-        setTimeout(resolve, 800);
-      });
-
-      return { mode: "html", duration: Number(this.musicEl.duration) || 0 };
-    } catch (e) {
-      throw new Error("HTMLAudio fallback failed: " + (e?.message || e));
-    }
-  }
-
-  // ---- music controls expected by Timing ----
-  startMusic({ reset = true } = {}) {
-    if (this._mode === "webaudio" && this._buf && this._ensureCtx()) {
-      const ctx = this.ctx;
-      // stop previous
-      try { this._src?.stop?.(); } catch {}
-      this._src = null;
-
-      const src = ctx.createBufferSource();
-      src.buffer = this._buf;
-      src.connect(this.master);
-
-      this._offset = reset ? 0 : (this._offset || 0);
-      this._startedAt = ctx.currentTime;
-      this._playing = true;
-
-      src.onended = () => {
-        // natural end
-        if (this._src === src) {
-          this._playing = false;
-          this._src = null;
-        }
-      };
-
-      this._src = src;
-      try { src.start(0, this._offset); } catch { src.start(); }
-      return;
-    }
-
-    // html fallback
-    try {
-      if (reset) this.musicEl.currentTime = 0;
-      const p = this.musicEl.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
-    } catch {}
-  }
-
-  stopMusic({ reset = false } = {}) {
-    // webaudio
-    try { this._src?.stop?.(); } catch {}
-    this._src = null;
-    this._playing = false;
-    if (reset) this._offset = 0;
-
-    // html
-    try { this.musicEl.pause(); } catch {}
-    if (reset) {
-      try { this.musicEl.currentTime = 0; } catch {}
-    }
-  }
-
-  // Timing が参照する「曲時刻」
-  getMusicTime() {
-    if (this._mode === "webaudio" && this._buf && this.ctx && this._playing) {
-      const t = (this.ctx.currentTime - this._startedAt) + (this._offset || 0);
-      return Math.max(0, t);
-    }
-    // html fallback (or stopped)
-    const ct = Number(this.musicEl.currentTime);
-    return Number.isFinite(ct) ? ct : 0;
-  }
-
-  getDuration() {
-    if (this._mode === "webaudio" && this._buf) return Number(this._buf.duration) || 0;
-    const d = Number(this.musicEl.duration);
-    return Number.isFinite(d) ? d : 0;
-  }
-
-  // ---- SFX ----
-  playTap() {
-    const el = this.seTapEl;
-    if (!el) return;
-    try {
-      el.currentTime = 0;
-      const p = el.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
-    } catch {}
-  }
-  playGreat() {
-    const el = this.seGreatEl;
-    if (!el) return;
-    try {
-      el.currentTime = 0;
-      const p = el.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
-    } catch {}
-  }
-
-  dispose() {
-    this.stopMusic({ reset: true });
-    if (this._htmlUrl) {
-      try { URL.revokeObjectURL(this._htmlUrl); } catch {}
-      this._htmlUrl = "";
-    }
-    try { this.ctx?.close?.(); } catch {}
-    this.ctx = null;
-    this.master = null;
   }
 }
 
@@ -627,7 +376,7 @@ async function boot() {
     raf = 0;
   };
 
-  // DOM refs
+  // DOM refs (first!)
   const app = assertEl($("app"), "app");
   const canvas = assertEl($("noteCanvas"), "noteCanvas");
   const hitZone = assertEl($("hitZone"), "hitZone");
@@ -635,12 +384,6 @@ async function boot() {
   const restartBtn = assertEl($("restartBtn"), "restartBtn");
   const stopBtn = $("stopBtn");
   const fxLayer = assertEl($("fxLayer"), "fxLayer");
-
-  const devPanel = $("devPanel");
-  const devAudioFile = $("devAudioFile");
-  const devChartFile = $("devChartFile");
-  const devApply = $("devApply");
-  const devMsg = $("devMsg");
 
   const music = assertEl($("music"), "music");
   const seTap = $("seTap");
@@ -651,15 +394,13 @@ async function boot() {
   preventIOSZoomAndScroll(hitZone, { signal: ac.signal });
 
   // Chart load
-  let defaultChart;
-  let chartOverride = null;
+  let chart;
   try {
-    defaultChart = await fetchJSON("charts/chart_001.json");
+    chart = await fetchJSON("charts/chart_001.json");
   } catch (e) {
-    defaultChart = fallbackChart();
+    chart = fallbackChart();
     console.warn("[DiCo] chart fallback", e);
   }
-  let chart = defaultChart;
 
   // Legacy globals
   const E = globalThis.DI_ENGINE;
@@ -714,68 +455,10 @@ async function boot() {
   resColor.setByResonance(0);
   applyAruState(app, 0);
 
-  // ✅ AUDIO: single source of truth (NOT legacy AudioManager)
-  let audio = new AudioBus({ musicEl: music, seTapEl: seTap, seGreatEl: seGreat });
-
+  // Managers
+  const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
   const ui = new E.UI(refs);
   const presenter = getResultPresenterSafe({ refs });
-
-  // DEV PANEL
-  if (DEV && devPanel) {
-    devPanel.hidden = false;
-
-    const setDevMsg = (m) => {
-      if (devMsg) devMsg.textContent = m;
-      if (refs.ariaLive) refs.ariaLive.textContent = m;
-    };
-
-    if (devApply) {
-      devApply.addEventListener(
-        "click",
-        async () => {
-          try {
-            setDevMsg("Applying...");
-
-            // APPLY is a gesture => safe to unlock/resume
-            kickVideoInGesture(bgVideo);
-            await audio.unlock();
-            await audio.primeUnlock();
-
-            // 1) chart override
-            const chartFile = devChartFile?.files?.[0];
-            if (chartFile) {
-              const parsed = JSON.parse(await chartFile.text());
-              chartOverride = parsed;
-              console.debug("[DEV] chart override loaded", parsed?.notes?.length || 0);
-            }
-
-            // 2) audio override
-            const aFile = devAudioFile?.files?.[0];
-            if (aFile) {
-              if (!isAudioLikeFile(aFile)) {
-                throw new Error("Unsupported audio: " + (aFile.name || "(no name)"));
-              }
-              setDevMsg("Loading audio...");
-              const r = await audio.loadMusicFromFile(aFile);
-              setDevMsg(`OK (Audio:${r.mode})`);
-              instance.__devAudioMode = r.mode;
-            } else {
-              setDevMsg(chartFile ? "OK (chart)" : "OK");
-            }
-
-            // 3) stop to guarantee START plays from head
-            audio.stopMusic({ reset: true });
-
-          } catch (e) {
-            setDevMsg("ERR: " + (e?.message || e));
-          }
-        },
-        { signal: ac.signal }
-      );
-    }
-  } else if (devPanel) {
-    devPanel.hidden = true;
-  }
 
   // FXCore lazy
   let fx = null;
@@ -800,39 +483,50 @@ async function boot() {
     render.resize?.();
   };
 
-  // Ring FX install
-  instance.ringResonance = new RingResonance({
-    app,
-    ring: refs.avatarRing || $("avatarRing"),
-    fxLayer,
-    icon: refs.dicoFace || $("dicoFace"),
-    maxOrbs: 6,
-  });
+  // -----------------------------------------------------------------
+  // RingBeat Install (AFTER DOM refs exist)
+  // -----------------------------------------------------------------
+instance.ringResonance = new RingResonance({
+  app,
+  ring: refs.avatarRing || $("avatarRing"),
+  fxLayer,
+  icon: refs.dicoFace || $("dicoFace"),
+  maxOrbs: 6,
+});
 
-  instance.ringBeat = new RingBeat({
-    app,
-    avatarRing: refs.avatarRing || $("avatarRing"),
-    targetEl:
-      document.querySelector(".targetCore") ||
-      document.getElementById("hitFlash") ||
-      document.querySelector("#targetRoot .targetCore") ||
-      document.getElementById("targetRoot") ||
-      document.getElementById("hitZone"),
-    fxLayer,
-    resonanceCtrl: instance.ringResonance,
-  });
+instance.ringBeat = new RingBeat({
+  app,
+  avatarRing: refs.avatarRing || $("avatarRing"),
 
-  try { instance.ringBeat.setThreshold?.(5); } catch {}
+  // ✅ 中央の“確実に存在する”要素へフォールバック
+  targetEl:
+    document.querySelector(".targetCore") ||
+    document.getElementById("hitFlash") ||
+    document.querySelector("#targetRoot .targetCore") ||
+    document.getElementById("targetRoot") ||
+    document.getElementById("hitZone"),
 
-  log("BOOT OK", { dev: DEV, build: BUILD_VER });
+  fxLayer,
+  resonanceCtrl: instance.ringResonance,
+});
 
+// ✅ test threshold (5)
+try {
+  instance.ringBeat.setThreshold?.(5);
+} catch {}
+
+log("RingBeat installed", {
+  hasRingBeat: !!instance.ringBeat,
+  threshold: 5,
+  avatarRing: !!(refs.avatarRing || $("avatarRing")),
+  targetCore: !!document.querySelector(".targetCore"),
+  hitFlash: !!document.getElementById("hitFlash"),
+});
   // RAF loop
   function tick() {
     if (!running) return;
     raf = requestAnimationFrame(tick);
 
-    // ✅ Timing is driven by audio clock; Timing側は audio.getMusicTime() を参照する設計である前提
-    // もしTimingが別名を参照している場合でも下のブリッジで救済する
     const t = timing.getSongTime();
     if (!Number.isFinite(t)) return;
 
@@ -853,11 +547,12 @@ async function boot() {
       state: getState(app),
     });
 
-    const dur = Number(audio.getDuration?.() || 0);
+    const a = music;
+    const dur = Number(a?.duration);
     const hasDur = Number.isFinite(dur) && dur > 0;
     const EPS = 0.06;
 
-    if (hasDur && t >= dur - EPS) {
+    if (a && (a.ended || (hasDur && t >= dur - EPS))) {
       endToResult("ENDED");
       return;
     }
@@ -867,38 +562,31 @@ async function boot() {
     }
   }
 
-  // ---- iOS gesture priming ----
   function primeInGesture() {
     kickVideoInGesture(bgVideo);
-    try { audio.primeUnlock?.(); } catch {}
-  }
-  async function unlockBestEffort() {
-    try { await audio.unlock?.(); } catch (e) { console.warn("[DiCo] audio.unlock failed", e?.message || e); }
+    try {
+      audio.primeUnlock?.();
+    } catch {}
   }
 
-  // ---- hard stop ----
+  async function unlockBestEffort() {
+    try {
+      await audio.unlock?.();
+    } catch (e) {
+      console.warn("[DiCo] audio.unlock failed", e?.message || e);
+    }
+  }
+
   function hardStopAll() {
     running = false;
     stopRAF();
-    try { timing.stop?.(audio); } catch {}
-    try { audio.stopMusic?.({ reset: true }); } catch {}
+    try {
+      timing.stop?.(audio);
+    } catch {}
+    try {
+      audio.stopMusic?.({ reset: true });
+    } catch {}
   }
-
-  // ✅ Timing が audio の別名を呼ぶ可能性があるので “橋渡し” を入れる
-  //   - startMusic/stopMusic/getMusicTime/getDuration を持たせる（すでにAudioBusにある）
-  //   - さらに alias を用意して Timing 側の呼び方差に耐える
-  const audioBridge = new Proxy(audio, {
-    get(target, prop) {
-      if (prop in target) return target[prop].bind ? target[prop].bind(target) : target[prop];
-      // aliases
-      if (prop === "playMusic") return target.startMusic.bind(target);
-      if (prop === "stop") return ({ reset } = {}) => target.stopMusic({ reset: !!reset });
-      if (prop === "getTime") return target.getMusicTime.bind(target);
-      if (prop === "time") return target.getMusicTime.bind(target);
-      if (prop === "duration") return target.getDuration.bind(target);
-      return undefined;
-    },
-  });
 
   async function startFromScratch(kind = "START") {
     primeInGesture();
@@ -906,21 +594,11 @@ async function boot() {
 
     hardStopAll();
 
-    chart = chartOverride || defaultChart;
     rebuild();
     judge.reset?.();
 
-    // ✅ 音を先に確実に鳴らす（Timingの内部挙動差を吸収）
-    audio.startMusic({ reset: true });
-
-    // ✅ Timing側の内部状態も開始（audio時計に追随）
-    try {
-      if (kind === "RESTART" && typeof timing.restart === "function") timing.restart(audioBridge);
-      else timing.start(audioBridge, { reset: true });
-    } catch (e) {
-      // Timing.start が audio.startMusic を呼ぶ設計でも、上で鳴ってるので致命傷にならない
-      console.warn("[Timing] start failed (music already started)", e?.message || e);
-    }
+    if (kind === "RESTART" && typeof timing.restart === "function") timing.restart(audio);
+    else timing.start(audio, { reset: true });
 
     setState(app, STATES.PLAYING);
     presenter.hide?.();
@@ -966,8 +644,9 @@ async function boot() {
     running = false;
     stopRAF();
 
-    try { timing.stop?.(audioBridge); } catch {}
-    try { audio.stopMusic?.({ reset: false }); } catch {}
+    try {
+      timing.stop?.(audio);
+    } catch {}
 
     bestEffortPlayVideo(bgVideo);
 
@@ -1012,6 +691,7 @@ async function boot() {
       const res = judge.hit(t);
       ui.onJudge?.(res);
 
+      // ALWAYS notify combo (MISSも含む)
       const comboNow = judge.state.combo || 0;
       const ok = ringBeatNotify(instance.ringBeat, comboNow);
 
@@ -1020,7 +700,7 @@ async function boot() {
           res: res?.name,
           combo: comboNow,
           notified: ok,
-          mode: instance.__devAudioMode || "(default)",
+          hasRB: !!instance.ringBeat,
         });
       }
 
@@ -1039,8 +719,12 @@ async function boot() {
 
   // Resize
   const onResize = () => {
-    try { render?.resize?.(); } catch {}
-    try { input?.recalc?.(); } catch {}
+    try {
+      render?.resize?.();
+    } catch {}
+    try {
+      input?.recalc?.();
+    } catch {}
   };
 
   window.addEventListener("resize", onResize, { passive: true, signal: ac.signal });
@@ -1052,24 +736,35 @@ async function boot() {
 
   // Initial state
   setState(app, STATES.IDLE);
-  try { audio.stopMusic?.({ reset: true }); } catch {}
-  try { bgVideo?.pause?.(); } catch {}
+  try {
+    audio.stopMusic?.({ reset: true });
+  } catch {}
+  try {
+    bgVideo?.pause?.();
+  } catch {}
 
   ui.update?.({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: STATES.IDLE });
-  log("READY");
+  log("BOOT OK");
 
   // Dispose
   instance.dispose = () => {
-    try { ac.abort(); } catch {}
-    try { input?.destroy?.(); } catch {}
-    try { instance.ringResonance?.dispose?.(); } catch {}
-
+    try {
+      ac.abort();
+    } catch {}
+    try {
+      input?.destroy?.();
+    } catch {}
+    try {
+      instance.ringResonance?.dispose?.();
+    } catch {}
     running = false;
     stopRAF();
-
-    try { audio.dispose?.(); } catch {}
-    try { bgVideo?.pause?.(); } catch {}
-
+    try {
+      audio.stopMusic?.({ reset: true });
+    } catch {}
+    try {
+      bgVideo?.pause?.();
+    } catch {}
     instance.running = false;
   };
 }
