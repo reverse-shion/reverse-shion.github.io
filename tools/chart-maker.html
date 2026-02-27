@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>DI Chart Maker</title>
+  <style>
+    body{margin:0;background:#0b0f18;color:#e8eeff;font:14px/1.4 system-ui;padding:12px}
+    .card{background:#111a2a;border:1px solid #2a3754;border-radius:10px;padding:10px;margin-bottom:10px}
+    label{display:block;font-size:12px;color:#9eb0d8;margin:8px 0 4px}
+    input,select,button,textarea{width:100%;box-sizing:border-box;border-radius:8px;border:1px solid #33466d;background:#0e1626;color:#eef3ff;padding:8px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    button{background:#345dff;border-color:#4c72ff;font-weight:700}
+    pre{max-height:180px;overflow:auto;background:#0a1220;border:1px solid #273657;padding:8px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <label>Audio file</label><input id="audioFile" type="file" accept="audio/*" />
+    <div class="row">
+      <div><label>Grid</label><select id="grid"><option value="4">1/4</option><option value="8" selected>1/8</option><option value="16">1/16</option></select></div>
+      <div><label>BPM (0=auto)</label><input id="bpm" type="number" min="0" step="0.1" value="0" /></div>
+    </div>
+    <label>Min Gap (ms): <span id="minGapV">110</span></label><input id="minGap" type="range" min="40" max="260" value="110" />
+    <label>Sensitivity: <span id="thV">1.6</span></label><input id="threshold" type="range" min="0.8" max="3.5" step="0.05" value="1.6" />
+    <label>Low-frequency Weight: <span id="lowWV">1.2</span></label><input id="lowW" type="range" min="0.2" max="3" step="0.05" value="1.2" />
+    <div class="row" style="margin-top:8px"><button id="analyze">Analyze</button><button id="download" disabled>Download chart.json</button></div>
+    <div id="status"></div>
+  </div>
+  <div class="card"><strong>Preview JSON</strong><pre id="preview">{}</pre></div>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const ui = {
+    audioFile: $("audioFile"), grid: $("grid"), bpm: $("bpm"), minGap: $("minGap"), threshold: $("threshold"), lowW: $("lowW"),
+    minGapV: $("minGapV"), thV: $("thV"), lowWV: $("lowWV"), analyze: $("analyze"), download: $("download"), status: $("status"), preview: $("preview")
+  };
+  let chart = null;
+
+  const upd = () => { ui.minGapV.textContent = ui.minGap.value; ui.thV.textContent = ui.threshold.value; ui.lowWV.textContent = ui.lowW.value; };
+  ["input","change"].forEach(ev => { ui.minGap.addEventListener(ev,upd); ui.threshold.addEventListener(ev,upd); ui.lowW.addEventListener(ev,upd); }); upd();
+
+  function hanning(n, N) { return 0.5 - 0.5 * Math.cos((2 * Math.PI * n) / Math.max(1, N - 1)); }
+  function dftMag(frame, bins) {
+    const N = frame.length, out = new Float32Array(bins);
+    for (let k = 0; k < bins; k++) {
+      let re = 0, im = 0, w = 2 * Math.PI * k / N;
+      for (let n = 0; n < N; n++) { const x = frame[n]; re += x * Math.cos(w * n); im -= x * Math.sin(w * n); }
+      out[k] = Math.sqrt(re * re + im * im);
+    }
+    return out;
+  }
+
+  function detectOnsets(chData, sr, opt) {
+    const N = 1024, hop = 512, bins = 32;
+    const frames = Math.max(0, Math.floor((chData.length - N) / hop));
+    const env = new Float32Array(frames);
+    let prev = new Float32Array(bins);
+    for (let f = 0; f < frames; f++) {
+      const start = f * hop;
+      const frame = new Float32Array(N);
+      for (let i = 0; i < N; i++) frame[i] = (chData[start + i] || 0) * hanning(i, N);
+      const mag = dftMag(frame, bins);
+      let flux = 0;
+      for (let k = 0; k < bins; k++) {
+        const d = mag[k] - prev[k];
+        if (d > 0) flux += d * (k < 8 ? opt.lowW : 1);
+      }
+      env[f] = flux;
+      prev = mag;
+    }
+    const mean = env.reduce((a,b)=>a+b,0) / Math.max(1, env.length);
+    const onset = [];
+    for (let i = 2; i < env.length - 2; i++) {
+      if (env[i] > env[i-1] && env[i] > env[i+1] && env[i] > mean * opt.threshold) onset.push(i * hop / sr);
+    }
+    return { env, onset, hop, sr };
+  }
+
+  function estimateBpm(envPack) {
+    const env = envPack.env; if (!env.length) return 120;
+    const fps = envPack.sr / envPack.hop;
+    let bestLag = 0, best = -1;
+    const minLag = Math.floor(fps * 60 / 180), maxLag = Math.floor(fps * 60 / 70);
+    for (let lag = minLag; lag <= maxLag; lag++) {
+      let sum = 0;
+      for (let i = lag; i < env.length; i++) sum += env[i] * env[i - lag];
+      if (sum > best) { best = sum; bestLag = lag; }
+    }
+    if (!bestLag) return 120;
+    return Math.max(70, Math.min(180, 60 * fps / bestLag));
+  }
+
+  function quantize(onsets, bpm, grid, minGapMs) {
+    const step = 60 / bpm / (grid / 4), minGap = minGapMs / 1000;
+    const out = [];
+    let last = -1e9;
+    for (const t of onsets) {
+      const qt = Math.round(t / step) * step;
+      if (qt - last < minGap) continue;
+      if (qt < 0.05) continue;
+      out.push(+qt.toFixed(3));
+      last = qt;
+    }
+    return out;
+  }
+
+  ui.analyze.addEventListener("click", async () => {
+    try {
+      const file = ui.audioFile.files?.[0];
+      if (!file) throw new Error("select audio file");
+      ui.status.textContent = "Decoding...";
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = await ctx.decodeAudioData(await file.arrayBuffer());
+      const data = buf.getChannelData(0);
+      const opt = { threshold: Number(ui.threshold.value), lowW: Number(ui.lowW.value) };
+      const envPack = detectOnsets(data, buf.sampleRate, opt);
+      const autoBpm = estimateBpm(envPack);
+      const bpm = Number(ui.bpm.value) > 0 ? Number(ui.bpm.value) : autoBpm;
+      ui.bpm.value = bpm.toFixed(2);
+      const times = quantize(envPack.onset, bpm, Number(ui.grid.value), Number(ui.minGap.value));
+      chart = {
+        meta: { title: file.name.replace(/\.[^.]+$/, ""), bpm: +bpm.toFixed(2) },
+        offset: 0,
+        scroll: { approach: 1.25 },
+        notes: times.map((t) => ({ t, lane: 1, type: "tap" }))
+      };
+      ui.preview.textContent = JSON.stringify(chart, null, 2).slice(0, 4000);
+      ui.download.disabled = false;
+      ui.status.textContent = `OK: ${chart.notes.length} notes, bpm=${chart.meta.bpm}`;
+      ctx.close();
+    } catch (e) {
+      ui.status.textContent = "Error: " + (e.message || e);
+    }
+  });
+
+  ui.download.addEventListener("click", () => {
+    if (!chart) return;
+    const blob = new Blob([JSON.stringify(chart, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "chart.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+})();
+</script>
+</body>
+</html>

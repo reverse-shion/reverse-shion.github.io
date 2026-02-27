@@ -90,7 +90,7 @@ async function loadScriptsSequentially(files) {
 }
 
 const ENGINE_FILES = [
-  "engine/audio.js",
+  "engine/audio-webaudio.js",
   "engine/timing.js",
   "engine/input.js",
   "engine/judge.js",
@@ -384,6 +384,11 @@ async function boot() {
   const restartBtn = assertEl($("restartBtn"), "restartBtn");
   const stopBtn = $("stopBtn");
   const fxLayer = assertEl($("fxLayer"), "fxLayer");
+  const devPanel = $("devPanel");
+  const devAudioFile = $("devAudioFile");
+  const devChartFile = $("devChartFile");
+  const devApply = $("devApply");
+  const devMsg = $("devMsg");
 
   const music = assertEl($("music"), "music");
   const seTap = $("seTap");
@@ -394,13 +399,15 @@ async function boot() {
   preventIOSZoomAndScroll(hitZone, { signal: ac.signal });
 
   // Chart load
-  let chart;
+  let defaultChart;
+  let chartOverride = null;
   try {
-    chart = await fetchJSON("charts/chart_001.json");
+    defaultChart = await fetchJSON("charts/chart_001.json");
   } catch (e) {
-    chart = fallbackChart();
+    defaultChart = fallbackChart();
     console.warn("[DiCo] chart fallback", e);
   }
+  let chart = defaultChart;
 
   // Legacy globals
   const E = globalThis.DI_ENGINE;
@@ -459,6 +466,36 @@ async function boot() {
   const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
   const ui = new E.UI(refs);
   const presenter = getResultPresenterSafe({ refs });
+
+  if (DEV && devPanel) {
+    devPanel.hidden = false;
+    const setDevMsg = (m) => {
+      if (devMsg) devMsg.textContent = m;
+      if (refs.ariaLive) refs.ariaLive.textContent = m;
+    };
+    if (devApply) {
+      devApply.addEventListener("click", async () => {
+        try {
+          const chartFile = devChartFile?.files?.[0];
+          const audioFile = devAudioFile?.files?.[0];
+          if (chartFile) {
+            const parsed = JSON.parse(await chartFile.text());
+            chartOverride = parsed;
+            if (DEV) console.debug("[DiCo] chart override loaded", parsed?.notes?.length || 0);
+          }
+          if (audioFile) {
+            const ab = await audioFile.arrayBuffer();
+            await audio.loadMusicFromArrayBuffer?.(ab);
+          }
+          setDevMsg("OK");
+        } catch (e) {
+          setDevMsg("ERR: " + (e?.message || e));
+        }
+      }, { signal: ac.signal });
+    }
+  } else if (devPanel) {
+    devPanel.hidden = true;
+  }
 
   // FXCore lazy
   let fx = null;
@@ -547,12 +584,11 @@ log("RingBeat installed", {
       state: getState(app),
     });
 
-    const a = music;
-    const dur = Number(a?.duration);
+    const dur = Number(audio.getDuration?.() || music?.duration);
     const hasDur = Number.isFinite(dur) && dur > 0;
     const EPS = 0.06;
 
-    if (a && (a.ended || (hasDur && t >= dur - EPS))) {
+    if (hasDur && t >= dur - EPS) {
       endToResult("ENDED");
       return;
     }
@@ -594,6 +630,7 @@ log("RingBeat installed", {
 
     hardStopAll();
 
+    chart = chartOverride || defaultChart;
     rebuild();
     judge.reset?.();
 
