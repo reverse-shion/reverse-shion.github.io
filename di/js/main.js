@@ -1,14 +1,14 @@
 /* /di/js/main.js
-   DiCo ARU Phase1 — PRO STABLE ENTRY v2.3.1 (DEV MP3 APPLY FIX)
-   ------------------------------------------------------------
+   DiCo ARU Phase1 — PRO STABLE ENTRY v2.4.0 (AUDIO ALWAYS PLAYS / DEV APPLY WORKS)
+   -------------------------------------------------------------------------------
    ✅ iOS Safari safe (gesture unlock, VIDEO PLAY IN-GESTURE)
    ✅ Deterministic state machine: idle -> playing -> result
-   ✅ Single clock (Timing drives everything)
+   ✅ Single clock (Timing drives everything) ＝ 音源時計は AudioBus が真実
    ✅ Legacy engine loader (DI_ENGINE globals) kept
    ✅ DEV override:
-      - mp3/m4a/wav/mp4 を「typeが空でも拡張子で許可」
-      - APPLYは “確実に” 音を差し替える（WebAudio優先 / HTMLAudio fallback）
-      - START/RESTART は差し替え後の音源で再生
+      - file.type が空でも拡張子で許可（mp3/m4a/wav/aac/mp4）
+      - APPLY は “確実に” 音源差し替え（WebAudio decode 優先 / HTMLAudio fallback）
+      - START/RESTART は差し替え後音源で再生
 */
 
 "use strict";
@@ -29,7 +29,7 @@ const DEV =
   location.search.includes("dev=1") ||
   location.search.includes("nocache=1");
 
-const BUILD_VER = "2026-02-26";
+const BUILD_VER = "2026-02-28";
 
 // ---------------------------------------------------------------------
 // HELPERS
@@ -51,13 +51,9 @@ function guessMimeFromName(name = "") {
   if (n.endsWith(".m4a")) return "audio/mp4";
   if (n.endsWith(".wav")) return "audio/wav";
   if (n.endsWith(".aac")) return "audio/aac";
-  if (n.endsWith(".mp4")) return "video/mp4"; // iOS/Dropboxで音声がここ扱いのことがある
+  if (n.endsWith(".mp4")) return "video/mp4";
   return "";
 }
-
-/**
- * iOS/Dropbox: file.type が "" のことがあるので拡張子で許可する
- */
 function isAudioLikeFile(file) {
   if (!file) return false;
   const type = String(file.type || "").toLowerCase();
@@ -73,7 +69,6 @@ function isAudioLikeFile(file) {
     name.endsWith(".mp4")
   );
 }
-
 async function readAsArrayBuffer(file) {
   return await file.arrayBuffer();
 }
@@ -90,7 +85,6 @@ function withVersion(src) {
   else u.searchParams.set("v", BUILD_VER);
   return u.toString();
 }
-
 function loadScriptOnce(src) {
   if (__scriptCache.has(src)) return __scriptCache.get(src);
 
@@ -106,13 +100,12 @@ function loadScriptOnce(src) {
   __scriptCache.set(src, p);
   return p;
 }
-
 async function loadScriptsSequentially(files) {
   for (const src of files) await loadScriptOnce(src);
 }
 
 const ENGINE_FILES = [
-  "engine/audio-webaudio.js",
+  "engine/audio-webaudio.js", // legacy; keep loaded but we won't rely on it for music clock
   "engine/timing.js",
   "engine/input.js",
   "engine/judge.js",
@@ -348,7 +341,6 @@ function disposePreviousIfAny() {
     try { prev.dispose(); } catch (e) { console.warn("[DiCo] dispose prev failed", e); }
   }
 }
-
 function bindPress(btn, fn, signal) {
   let lastTs = -1;
   const wrapped = (e) => {
@@ -377,77 +369,244 @@ function ringBeatNotify(rb, combo) {
   }
 }
 
-// ---------------------------------------------------------------------
-// DEV AUDIO APPLY (CRITICAL FIX)
-//  - WebAudio優先: audio.loadMusicFromFile / loadMusicFromArrayBuffer
-//  - fallback: <audio id="music"> を objectURL に差し替え（Timing互換が残る）
-// ---------------------------------------------------------------------
-async function applyDevAudioFile({ audioMgr, musicEl, file, instance, setMsg }) {
-  if (!file) return false;
+// =====================================================================
+// AUDIO BUS (THE SOURCE OF TRUTH)
+//  - WebAudio decode preferred (stable clock, iOS unlock safe)
+//  - HTMLAudio fallback (objectURL) if decode fails
+//  - Exposes methods Timing expects:
+//      unlock / primeUnlock / startMusic / stopMusic / getMusicTime / getDuration
+//      playTap / playGreat
+// =====================================================================
+class AudioBus {
+  constructor({ musicEl, seTapEl, seGreatEl }) {
+    this.musicEl = musicEl;
+    this.seTapEl = seTapEl;
+    this.seGreatEl = seGreatEl;
 
-  if (!isAudioLikeFile(file)) {
-    throw new Error("Unsupported audio: " + (file.name || "(no name)"));
+    this.ctx = null;
+    this.master = null;
+
+    // music state (webaudio)
+    this._buf = null;
+    this._src = null;
+    this._startedAt = 0;   // ctx.currentTime at start
+    this._offset = 0;      // seconds
+    this._playing = false;
+
+    // html fallback
+    this._htmlUrl = "";
+    this._mode = "html"; // "webaudio" | "html"
   }
 
-  const mime = String(file.type || guessMimeFromName(file.name) || "").toLowerCase();
-  console.debug("[DEV] audio file", { name: file.name, type: file.type, mime });
-
-  // まず unlock（APPLYはクリック＝ジェスチャー内なのでOK）
-  try { await audioMgr.unlock?.(); } catch {}
-
-  // ① もし AudioManager が file 直読みAPIを持ってるなら最優先
-  if (typeof audioMgr.loadMusicFromFile === "function") {
-    setMsg?.("Loading (file)...");
-    await audioMgr.loadMusicFromFile(file);
-    setMsg?.("OK (WebAudio:file)");
-    instance.__devAudioMode = "webaudio:file";
-    return true;
+  _ensureCtx() {
+    if (this.ctx) return this.ctx;
+    const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
+    if (!AC) return null;
+    this.ctx = new AC({ latencyHint: "interactive" });
+    this.master = this.ctx.createGain();
+    this.master.gain.value = 1;
+    this.master.connect(this.ctx.destination);
+    return this.ctx;
   }
 
-  // ② 次に ArrayBuffer decode
-  if (typeof audioMgr.loadMusicFromArrayBuffer === "function") {
-    setMsg?.("Decoding (arrayBuffer)...");
-    const ab = await readAsArrayBuffer(file);
-    await audioMgr.loadMusicFromArrayBuffer(ab, { mime, name: file.name });
-    setMsg?.("OK (WebAudio:ab)");
-    instance.__devAudioMode = "webaudio:ab";
-    return true;
+  async primeUnlock() {
+    // best effort "silent tick" for iOS
+    const ctx = this._ensureCtx();
+    if (!ctx) return;
+    try {
+      if (ctx.state !== "running") await ctx.resume();
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      g.gain.value = 0.00001;
+      osc.connect(g);
+      g.connect(this.master);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.02);
+    } catch {}
   }
 
-  // ③ 最後の砦: HTMLAudio に差し替え（engine側が HTMLAudio 参照でも動く）
-  setMsg?.("Applying (HTMLAudio)...");
-  try {
-    // revoke old
-    if (instance.__devAudioUrl) {
-      try { URL.revokeObjectURL(instance.__devAudioUrl); } catch {}
-      instance.__devAudioUrl = "";
+  async unlock() {
+    const ctx = this._ensureCtx();
+    if (!ctx) return;
+    if (ctx.state !== "running") {
+      await ctx.resume();
     }
-    const url = URL.createObjectURL(file);
-    instance.__devAudioUrl = url;
+  }
 
-    musicEl.pause();
-    musicEl.src = url;
-    musicEl.load();
+  async loadMusicFromArrayBuffer(ab, { mime = "", name = "" } = {}) {
+    const ctx = this._ensureCtx();
+    if (!ctx) throw new Error("AudioContext not available");
 
-    // engineが music element を差し替え検知する API を持ってれば呼ぶ
-    if (typeof audioMgr.setMusicElement === "function") {
-      audioMgr.setMusicElement(musicEl);
+    await this.unlock();
+
+    // decodeAudioData iOS quirks: clone buffer
+    const bufCopy = ab.slice(0);
+    let audioBuf = null;
+    try {
+      audioBuf = await ctx.decodeAudioData(bufCopy);
+    } catch (e) {
+      console.warn("[AudioBus] decodeAudioData failed", e);
+      audioBuf = null;
     }
 
-    // metadata wait (best effort)
-    await new Promise((resolve) => {
-      const done = () => resolve();
-      musicEl.addEventListener("loadedmetadata", done, { once: true });
-      musicEl.addEventListener("canplay", done, { once: true });
-      setTimeout(resolve, 700);
-    });
+    if (audioBuf) {
+      this._buf = audioBuf;
+      this._mode = "webaudio";
+      // keep html element paused/reset (avoid double sound)
+      try {
+        this.musicEl.pause();
+        this.musicEl.currentTime = 0;
+      } catch {}
+      return { mode: "webaudio", duration: audioBuf.duration };
+    }
 
-    setMsg?.("OK (HTMLAudio)");
-    instance.__devAudioMode = "htmlaudio:url";
-    return true;
-  } catch (e) {
-    console.warn("[DEV] HTMLAudio apply failed", e);
-    throw new Error("Audio apply failed: " + (e?.message || e));
+    // fallback: HTMLAudio with objectURL
+    // NOTE: we can't "use ab directly" in HTMLAudio, so caller must pass File to create objectURL.
+    throw new Error("decode failed; use HTMLAudio fallback with File");
+  }
+
+  async loadMusicFromFile(file) {
+    if (!file) throw new Error("No file");
+    await this.unlock();
+
+    // 1) try WebAudio decode first
+    try {
+      const ab = await readAsArrayBuffer(file);
+      const mime = String(file.type || guessMimeFromName(file.name) || "");
+      const r = await this.loadMusicFromArrayBuffer(ab, { mime, name: file.name });
+      return r;
+    } catch (e) {
+      console.warn("[AudioBus] WebAudio decode path failed, fallback HTMLAudio", e?.message || e);
+    }
+
+    // 2) HTMLAudio fallback (always works if Safari can play that codec)
+    try {
+      if (this._htmlUrl) {
+        try { URL.revokeObjectURL(this._htmlUrl); } catch {}
+        this._htmlUrl = "";
+      }
+      const url = URL.createObjectURL(file);
+      this._htmlUrl = url;
+
+      // stop webaudio if any
+      this.stopMusic({ reset: true });
+      this._buf = null;
+      this._mode = "html";
+
+      this.musicEl.pause();
+      this.musicEl.src = url;
+      this.musicEl.load();
+
+      await new Promise((resolve) => {
+        const done = () => resolve();
+        this.musicEl.addEventListener("canplay", done, { once: true });
+        this.musicEl.addEventListener("loadedmetadata", done, { once: true });
+        setTimeout(resolve, 800);
+      });
+
+      return { mode: "html", duration: Number(this.musicEl.duration) || 0 };
+    } catch (e) {
+      throw new Error("HTMLAudio fallback failed: " + (e?.message || e));
+    }
+  }
+
+  // ---- music controls expected by Timing ----
+  startMusic({ reset = true } = {}) {
+    if (this._mode === "webaudio" && this._buf && this._ensureCtx()) {
+      const ctx = this.ctx;
+      // stop previous
+      try { this._src?.stop?.(); } catch {}
+      this._src = null;
+
+      const src = ctx.createBufferSource();
+      src.buffer = this._buf;
+      src.connect(this.master);
+
+      this._offset = reset ? 0 : (this._offset || 0);
+      this._startedAt = ctx.currentTime;
+      this._playing = true;
+
+      src.onended = () => {
+        // natural end
+        if (this._src === src) {
+          this._playing = false;
+          this._src = null;
+        }
+      };
+
+      this._src = src;
+      try { src.start(0, this._offset); } catch { src.start(); }
+      return;
+    }
+
+    // html fallback
+    try {
+      if (reset) this.musicEl.currentTime = 0;
+      const p = this.musicEl.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch {}
+  }
+
+  stopMusic({ reset = false } = {}) {
+    // webaudio
+    try { this._src?.stop?.(); } catch {}
+    this._src = null;
+    this._playing = false;
+    if (reset) this._offset = 0;
+
+    // html
+    try { this.musicEl.pause(); } catch {}
+    if (reset) {
+      try { this.musicEl.currentTime = 0; } catch {}
+    }
+  }
+
+  // Timing が参照する「曲時刻」
+  getMusicTime() {
+    if (this._mode === "webaudio" && this._buf && this.ctx && this._playing) {
+      const t = (this.ctx.currentTime - this._startedAt) + (this._offset || 0);
+      return Math.max(0, t);
+    }
+    // html fallback (or stopped)
+    const ct = Number(this.musicEl.currentTime);
+    return Number.isFinite(ct) ? ct : 0;
+  }
+
+  getDuration() {
+    if (this._mode === "webaudio" && this._buf) return Number(this._buf.duration) || 0;
+    const d = Number(this.musicEl.duration);
+    return Number.isFinite(d) ? d : 0;
+  }
+
+  // ---- SFX ----
+  playTap() {
+    const el = this.seTapEl;
+    if (!el) return;
+    try {
+      el.currentTime = 0;
+      const p = el.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch {}
+  }
+  playGreat() {
+    const el = this.seGreatEl;
+    if (!el) return;
+    try {
+      el.currentTime = 0;
+      const p = el.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch {}
+  }
+
+  dispose() {
+    this.stopMusic({ reset: true });
+    if (this._htmlUrl) {
+      try { URL.revokeObjectURL(this._htmlUrl); } catch {}
+      this._htmlUrl = "";
+    }
+    try { this.ctx?.close?.(); } catch {}
+    this.ctx = null;
+    this.master = null;
   }
 }
 
@@ -555,8 +714,9 @@ async function boot() {
   resColor.setByResonance(0);
   applyAruState(app, 0);
 
-  // Managers
-  const audio = new E.AudioManager({ music, seTap, seGreat, bgVideo });
+  // ✅ AUDIO: single source of truth (NOT legacy AudioManager)
+  let audio = new AudioBus({ musicEl: music, seTapEl: seTap, seGreatEl: seGreat });
+
   const ui = new E.UI(refs);
   const presenter = getResultPresenterSafe({ refs });
 
@@ -576,6 +736,11 @@ async function boot() {
           try {
             setDevMsg("Applying...");
 
+            // APPLY is a gesture => safe to unlock/resume
+            kickVideoInGesture(bgVideo);
+            await audio.unlock();
+            await audio.primeUnlock();
+
             // 1) chart override
             const chartFile = devChartFile?.files?.[0];
             if (chartFile) {
@@ -584,24 +749,22 @@ async function boot() {
               console.debug("[DEV] chart override loaded", parsed?.notes?.length || 0);
             }
 
-            // 2) audio override (CRITICAL)
+            // 2) audio override
             const aFile = devAudioFile?.files?.[0];
             if (aFile) {
-              await applyDevAudioFile({
-                audioMgr: audio,
-                musicEl: music,
-                file: aFile,
-                instance,
-                setMsg: setDevMsg,
-              });
+              if (!isAudioLikeFile(aFile)) {
+                throw new Error("Unsupported audio: " + (aFile.name || "(no name)"));
+              }
+              setDevMsg("Loading audio...");
+              const r = await audio.loadMusicFromFile(aFile);
+              setDevMsg(`OK (Audio:${r.mode})`);
+              instance.__devAudioMode = r.mode;
             } else {
-              // chartだけでもOK
               setDevMsg(chartFile ? "OK (chart)" : "OK");
             }
 
-            // 3) 念のため停止状態へ（STARTで確実に先頭から鳴る）
-            try { audio.stopMusic?.({ reset: true }); } catch {}
-            try { music.pause(); music.currentTime = 0; } catch {}
+            // 3) stop to guarantee START plays from head
+            audio.stopMusic({ reset: true });
 
           } catch (e) {
             setDevMsg("ERR: " + (e?.message || e));
@@ -661,19 +824,15 @@ async function boot() {
 
   try { instance.ringBeat.setThreshold?.(5); } catch {}
 
-  log("RingBeat installed", {
-    hasRingBeat: !!instance.ringBeat,
-    threshold: 5,
-    avatarRing: !!(refs.avatarRing || $("avatarRing")),
-    targetCore: !!document.querySelector(".targetCore"),
-    hitFlash: !!document.getElementById("hitFlash"),
-  });
+  log("BOOT OK", { dev: DEV, build: BUILD_VER });
 
   // RAF loop
   function tick() {
     if (!running) return;
     raf = requestAnimationFrame(tick);
 
+    // ✅ Timing is driven by audio clock; Timing側は audio.getMusicTime() を参照する設計である前提
+    // もしTimingが別名を参照している場合でも下のブリッジで救済する
     const t = timing.getSongTime();
     if (!Number.isFinite(t)) return;
 
@@ -694,7 +853,7 @@ async function boot() {
       state: getState(app),
     });
 
-    const dur = Number(audio.getDuration?.() || music?.duration);
+    const dur = Number(audio.getDuration?.() || 0);
     const hasDur = Number.isFinite(dur) && dur > 0;
     const EPS = 0.06;
 
@@ -708,22 +867,38 @@ async function boot() {
     }
   }
 
+  // ---- iOS gesture priming ----
   function primeInGesture() {
     kickVideoInGesture(bgVideo);
     try { audio.primeUnlock?.(); } catch {}
   }
-
   async function unlockBestEffort() {
     try { await audio.unlock?.(); } catch (e) { console.warn("[DiCo] audio.unlock failed", e?.message || e); }
   }
 
+  // ---- hard stop ----
   function hardStopAll() {
     running = false;
     stopRAF();
     try { timing.stop?.(audio); } catch {}
     try { audio.stopMusic?.({ reset: true }); } catch {}
-    try { music.pause(); } catch {}
   }
+
+  // ✅ Timing が audio の別名を呼ぶ可能性があるので “橋渡し” を入れる
+  //   - startMusic/stopMusic/getMusicTime/getDuration を持たせる（すでにAudioBusにある）
+  //   - さらに alias を用意して Timing 側の呼び方差に耐える
+  const audioBridge = new Proxy(audio, {
+    get(target, prop) {
+      if (prop in target) return target[prop].bind ? target[prop].bind(target) : target[prop];
+      // aliases
+      if (prop === "playMusic") return target.startMusic.bind(target);
+      if (prop === "stop") return ({ reset } = {}) => target.stopMusic({ reset: !!reset });
+      if (prop === "getTime") return target.getMusicTime.bind(target);
+      if (prop === "time") return target.getMusicTime.bind(target);
+      if (prop === "duration") return target.getDuration.bind(target);
+      return undefined;
+    },
+  });
 
   async function startFromScratch(kind = "START") {
     primeInGesture();
@@ -735,10 +910,17 @@ async function boot() {
     rebuild();
     judge.reset?.();
 
-    // ✅ 重要：音源は “AudioManagerが見てる時計” を真実にする
-    // restart/reset は Timing 側がやる（Timingは audio.getMusicTime() を参照する設計）
-    if (kind === "RESTART" && typeof timing.restart === "function") timing.restart(audio);
-    else timing.start(audio, { reset: true });
+    // ✅ 音を先に確実に鳴らす（Timingの内部挙動差を吸収）
+    audio.startMusic({ reset: true });
+
+    // ✅ Timing側の内部状態も開始（audio時計に追随）
+    try {
+      if (kind === "RESTART" && typeof timing.restart === "function") timing.restart(audioBridge);
+      else timing.start(audioBridge, { reset: true });
+    } catch (e) {
+      // Timing.start が audio.startMusic を呼ぶ設計でも、上で鳴ってるので致命傷にならない
+      console.warn("[Timing] start failed (music already started)", e?.message || e);
+    }
 
     setState(app, STATES.PLAYING);
     presenter.hide?.();
@@ -784,7 +966,8 @@ async function boot() {
     running = false;
     stopRAF();
 
-    try { timing.stop?.(audio); } catch {}
+    try { timing.stop?.(audioBridge); } catch {}
+    try { audio.stopMusic?.({ reset: false }); } catch {}
 
     bestEffortPlayVideo(bgVideo);
 
@@ -837,7 +1020,7 @@ async function boot() {
           res: res?.name,
           combo: comboNow,
           notified: ok,
-          hasRB: !!instance.ringBeat,
+          mode: instance.__devAudioMode || "(default)",
         });
       }
 
@@ -873,7 +1056,7 @@ async function boot() {
   try { bgVideo?.pause?.(); } catch {}
 
   ui.update?.({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: STATES.IDLE });
-  log("BOOT OK");
+  log("READY");
 
   // Dispose
   instance.dispose = () => {
@@ -884,14 +1067,8 @@ async function boot() {
     running = false;
     stopRAF();
 
-    try { audio.stopMusic?.({ reset: true }); } catch {}
+    try { audio.dispose?.(); } catch {}
     try { bgVideo?.pause?.(); } catch {}
-
-    // objectURL revoke (HTMLAudio fallback用)
-    if (instance.__devAudioUrl) {
-      try { URL.revokeObjectURL(instance.__devAudioUrl); } catch {}
-      instance.__devAudioUrl = "";
-    }
 
     instance.running = false;
   };
