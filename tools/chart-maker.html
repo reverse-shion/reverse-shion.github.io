@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <!-- iOS: viewport drift/zoom対策（必要なら viewport-fit=cover もOK） -->
+  <!-- iOS: viewport drift/zoom対策 -->
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>DI Chart Maker — GOD ENGINE (Stable SingleClock)</title>
   <style>
@@ -24,7 +24,6 @@
     button:disabled{opacity:.5;cursor:not-allowed}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
     .hint{font-size:12px;color:#b8c7ef;opacity:.95;margin-top:6px}
     .mini{font-size:12px;opacity:.9}
     .ok{color:var(--ok)} .ng{color:var(--ng)}
@@ -43,8 +42,6 @@
     }
     .hr{height:1px;background:#2a3754;margin:12px 0;opacity:.85}
     .tag{display:inline-block;font-size:12px;padding:2px 8px;border:1px solid #2a3754;border-radius:999px;background:rgba(255,255,255,.03);margin-right:6px}
-
-    /* REC誤爆回避のため、押せるUI領域を明確化 */
     .uiBlock{ position:relative; z-index:2; }
   </style>
 </head>
@@ -179,14 +176,14 @@
 
     <div class="row3">
       <button id="load" class="secondary">1) Load & Decode</button>
-      <button id="auto" class="">2) Auto Generate</button>
+      <button id="auto">2) Auto Generate</button>
       <button id="download" disabled>Download chart.json</button>
     </div>
 
     <div class="row3" style="margin-top:10px">
       <button id="recStart" class="secondary" disabled>REC Start (Play)</button>
       <button id="recStop" class="danger" disabled>REC Stop</button>
-      <button id="buildFromRec" class="" disabled>Build from REC</button>
+      <button id="buildFromRec" disabled>Build from REC</button>
     </div>
 
     <div class="row3" style="margin-top:10px">
@@ -332,27 +329,6 @@
     refreshButtons();
   }
 
-  function refreshButtons(){
-    const hasAudio = !!state.audioBuf;
-    const isRec = state.mode === MODE.REC;
-    const isPrev = state.mode === MODE.PREVIEW;
-
-    ui.load.disabled = false;
-
-    ui.auto.disabled = !hasAudio || isRec || isPrev;
-
-    ui.recStart.disabled = !hasAudio || isRec || isPrev;
-    ui.recStop.disabled = !isRec;
-
-    ui.previewPlay.disabled = !hasAudio || isRec; // previewはrec中禁止
-    ui.clearRec.disabled = isRec ? true : false;  // rec中に消す事故防止
-
-    ui.buildFromRec.disabled = !hasAudio || isRec || rec.taps.length === 0;
-    ui.merge.disabled = !(state.autoChart && state.recChart) || isRec || isPrev;
-
-    ui.download.disabled = !state.lastPayload || isRec; // REC中DL事故防止
-  }
-
   // ----------------------------
   // UI helpers
   // ----------------------------
@@ -417,7 +393,6 @@
   async function unlockAudio(tag){
     const ctx = ensureAudioCtx();
     try{ await ctx.resume(); }catch{}
-    // iOS対策: 無音を一瞬鳴らして unlock をより確実に
     try{
       const o = ctx.createOscillator();
       const g = ctx.createGain();
@@ -656,11 +631,11 @@
   // GOD Auto (Stage/Feel/Style + Chorus + Density Curve)
   // ----------------------------
   function mapFeel(feel01, stage, style){
-    let minGapMs = 130 - feel01*60;       // 130..70
-    let chorusBoost = 1.25 + feel01*0.65; // 1.25..1.90
-    let sixteen = 0.03 + feel01*0.22;     // 0.03..0.25
-    let backBias = 0.06 + feel01*0.22;    // 0.06..0.28
-    let downBias = 0.10 + feel01*0.18;    // 0.10..0.28
+    let minGapMs = 130 - feel01*60;
+    let chorusBoost = 1.25 + feel01*0.65;
+    let sixteen = 0.03 + feel01*0.22;
+    let backBias = 0.06 + feel01*0.22;
+    let downBias = 0.10 + feel01*0.18;
 
     if(stage === "calm"){
       minGapMs += 18; chorusBoost -= 0.18; sixteen -= 0.04;
@@ -699,7 +674,6 @@
     return out;
   }
 
-  // chorus detection: energy over smoothed baseline (time-aware thresholds)
   function detectChorusMask(envPack){
     const env = envPack.env;
     if(env.length < 32) return { mask: new Uint8Array(env.length), ratio:0, segments:[] };
@@ -733,14 +707,12 @@
       mask[i] = (score[i] >= thr) ? 1 : 0;
     }
 
-    // 時間換算して minLen / gapMax を決める（曲によりfpsが変わっても破綻しない）
     const fps = envPack.sr / envPack.hop;
-    const minSec = 3.0;         // 3秒以上をサビ候補
-    const gapSec = 1.0;         // 1秒未満の途切れは埋める
+    const minSec = 3.0;
+    const gapSec = 1.0;
     const minLen = Math.max(8, Math.round(minSec * fps));
     const gapMax = Math.max(4, Math.round(gapSec * fps));
 
-    // remove tiny bursts
     let run=0;
     for(let i=0;i<=mask.length;i++){
       if(i<mask.length && mask[i]) run++;
@@ -751,7 +723,7 @@
         run=0;
       }
     }
-    // fill tiny gaps
+
     let gap=0;
     for(let i=0;i<=mask.length;i++){
       if(i<mask.length && !mask[i]) gap++;
@@ -814,7 +786,6 @@
     if(style==="technical"){ restChance = 0.08; techChance *= 1.20; }
 
     const tEnd = scores.length ? scores[scores.length-1].t : 0;
-
     const fps = envPack.sr / envPack.hop;
 
     for(let barStart=0; barStart < tEnd; barStart += bar){
@@ -947,15 +918,10 @@
     const grid = Number(ui.grid.value)||0;
     let t = times.slice().filter(v => Number.isFinite(v) && v>=0);
 
-    // 1) UI MinGap
     t = applyMinGap(t, Number(ui.minGap.value));
-    // 2) Humanize
     t = humanizeTimes(t, bpm, Number(ui.humanize.value));
-    // 3) Quantize (optional)
     t = quantizeTimes(t, bpm, grid);
-    // 4) MinGap again
     t = applyMinGap(t, Number(ui.minGap.value));
-    // 5) Lead+Offset
     t = addLeadAndOffset(t, Number(ui.leadIn.value), Number(ui.offset.value));
 
     t.sort((a,b)=>a-b);
@@ -1007,7 +973,6 @@
     return out;
   }
 
-  // GOD difficulty thinning: keep strong beats / chorus priority
   function buildGodBundle(baseTimes, bpm){
     const titleBase = (state.fileName||"Song").replace(/\.[^.]+$/, "");
     const meta = {
@@ -1024,7 +989,6 @@
 
     const isStrong = (t) => {
       const phase = (t % beat) / beat;
-      // 0 (強拍) / 0.5 (裏) 近いなら強い扱い
       return (phase < 0.06 || phase > 0.94 || Math.abs(phase-0.5) < 0.06);
     };
 
@@ -1064,22 +1028,44 @@
   }
 
   // ----------------------------
-  // REC: tap capture (single clock)
+  // ✅ REC: tap capture (iOS SAFE / buttons still clickable)
   // ----------------------------
+  const REC_OPTS = { passive: true, capture: true };
   let rec = {
     recording:false,
     startTime:0,
     taps:[],
-    handler:null,
+    detach:null,
+    lastTapAt:-1e9, // sec
   };
 
   function setRecCount(){
     ui.meterC.textContent = `rec taps: ${rec.taps.length}`;
   }
 
-  function isUiElement(el){
+  // 「UI全体」は弾かない。弾くのは “操作系要素” だけ（ここが超重要）
+  function isInteractiveTarget(target){
+    const el = target instanceof Element ? target : null;
     if(!el) return false;
-    return !!el.closest("#uiRoot"); // UI内クリックは除外したい
+    // ボタン/入力などのUI操作だけはRECに入れない（誤爆防止）
+    if(el.closest("button,input,select,textarea,a,label")) return true;
+    // range のつまみも含め確実に弾く
+    if(el.closest("[role='button'],[contenteditable='true']")) return true;
+    return false;
+  }
+
+  function attachTapCapture(onTap){
+    const fire = (ev)=>{
+      onTap(ev);
+    };
+    document.addEventListener("pointerdown", fire, REC_OPTS);
+    document.addEventListener("touchstart",  fire, REC_OPTS);
+    document.addEventListener("mousedown",   fire, REC_OPTS);
+    return ()=>{
+      try{ document.removeEventListener("pointerdown", fire, REC_OPTS); }catch{}
+      try{ document.removeEventListener("touchstart",  fire, REC_OPTS); }catch{}
+      try{ document.removeEventListener("mousedown",   fire, REC_OPTS); }catch{}
+    };
   }
 
   async function startREC(){
@@ -1097,20 +1083,27 @@
     rec.taps = [];
     rec.recording = true;
     rec.startTime = ctx.currentTime;
+    rec.lastTapAt = -1e9;
     setRecCount();
 
-    // REC中はUIボタンを誤爆しやすいので、UI内は除外
-    rec.handler = (ev)=>{
+    rec.detach = attachTapCapture((ev)=>{
       if(!rec.recording) return;
-      if(isUiElement(ev.target)) return;
+
+      // ✅ UI操作（ボタン等）を踏んだ時は記録しない。だけど背景や空白はOK。
+      if(isInteractiveTarget(ev.target)) return;
+
       const t = ctx.currentTime - rec.startTime;
       if(t < 0) return;
+
+      // ✅ pointer + touch 二重発火対策（25ms以内は無視）
+      if(t - rec.lastTapAt < 0.025) return;
+      rec.lastTapAt = t;
+
       rec.taps.push(+t.toFixed(4));
       setRecCount();
-    };
-
-    // capture で先に拾って、UI内は弾く
-    window.addEventListener("pointerdown", rec.handler, { passive:true, capture:true });
+      if(rec.taps.length === 1) setStatus("REC: tap detected ✅", true);
+      refreshButtons();
+    });
 
     src.onended = ()=>{
       if(rec.recording) stopREC();
@@ -1120,30 +1113,59 @@
     audioSrc = src;
 
     setMode(MODE.REC);
-    setStatus("REC started. 画面の“UI以外”を曲に合わせてタップしてOK（誤爆防止）", true);
+    setStatus("REC started. 曲に合わせてタップ！（ボタン等のUI操作は記録されない）", true);
   }
 
   function stopREC(){
+    if(!rec.recording) return;
+
     rec.recording = false;
-    try{ window.removeEventListener("pointerdown", rec.handler, { capture:true }); }catch{}
-    try{ window.removeEventListener("pointerdown", rec.handler, true); }catch{}
-    rec.handler = null;
+    try{ rec.detach?.(); }catch{}
+    rec.detach = null;
 
     stopAudio();
 
     setMode(MODE.LOADED);
-    setStatus(`REC stopped. taps=${rec.taps.length}`, true);
+    setStatus(`REC stopped. taps=${rec.taps.length}`, rec.taps.length>0);
     setRecCount();
+    refreshButtons();
   }
 
   function clearREC(){
     if(rec.recording) return;
     rec.taps = [];
+    rec.lastTapAt = -1e9;
     setRecCount();
     state.recChart = null;
     state.mergedChart = null;
     setStatus("REC cleared.", true);
     refreshButtons();
+  }
+
+  // ----------------------------
+  // Buttons enable/disable (single source of truth)
+  // ----------------------------
+  function refreshButtons(){
+    const hasAudio = !!state.audioBuf;
+    const isRec = state.mode === MODE.REC;
+    const isPrev = state.mode === MODE.PREVIEW;
+
+    ui.load.disabled = false;
+
+    ui.auto.disabled = !hasAudio || isRec || isPrev;
+
+    ui.recStart.disabled = !hasAudio || isRec || isPrev;
+    ui.recStop.disabled  = !isRec; // REC中だけ押せる
+
+    ui.previewPlay.disabled = !hasAudio || isRec;
+    ui.clearRec.disabled = isRec ? true : false;
+
+    // ✅ Buildは「RECが止まっていて」「tapsが1つでもある」なら必ず押せる
+    ui.buildFromRec.disabled = !hasAudio || isRec || (rec.taps.length === 0);
+
+    ui.merge.disabled = !(state.autoChart && state.recChart) || isRec || isPrev;
+
+    ui.download.disabled = !state.lastPayload || isRec;
   }
 
   // ----------------------------
@@ -1169,7 +1191,6 @@
     ui.load.disabled = true;
     setStatus("Loading...", true);
 
-    // 事故防止：全部止める
     stopPreview();
     stopAudio();
     if(rec.recording) stopREC();
@@ -1211,7 +1232,7 @@
       if(!state.audioBuf) throw new Error("audio not loaded");
       await unlockAudio("auto");
 
-      stopPreview(); // preview中にauto事故防止
+      stopPreview();
 
       const data = state.audioBuf.getChannelData(0);
       const opt = { threshold: Number(ui.threshold.value), lowW: Number(ui.lowW.value) };
@@ -1264,7 +1285,6 @@
 
         state.god = buildGodBundle(times, bpm);
 
-        // default: HARD
         showPayload(state.god.hard);
 
         const { lv, nps } = autoLevelFromChart(times, state.audioBuf.duration);
@@ -1414,7 +1434,6 @@
     refreshButtons();
   });
 
-  // 画面が隠れたら事故防止で全部止める（iOSで重要）
   document.addEventListener("visibilitychange", () => {
     if(document.hidden){
       stopPreview();
