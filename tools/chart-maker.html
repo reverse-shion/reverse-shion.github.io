@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>DI Chart Maker — PRO FULL (Auto + TapREC + Addictive)</title>
+  <title>DI Chart Maker — GOD ENGINE (Auto + TapREC + Stage/Feel/Style + 3Diff)</title>
   <style>
     :root{
       --bg:#0b0f18; --card:#111a2a; --bd:#2a3754; --fg:#e8eeff;
@@ -17,19 +17,18 @@
       width:100%;box-sizing:border-box;border-radius:10px;border:1px solid #33466d;
       background:#0e1626;color:#eef3ff;padding:10px
     }
-    button{
-      background:var(--btn);border-color:var(--btnbd);font-weight:800;cursor:pointer
-    }
+    button{background:var(--btn);border-color:var(--btnbd);font-weight:800;cursor:pointer}
     button.secondary{background:#1a2b4d;border-color:#2f4b7d}
     button.danger{background:#5b1d2a;border-color:#8b2d42}
     button:disabled{opacity:.5;cursor:not-allowed}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
     .hint{font-size:12px;color:#b8c7ef;opacity:.95;margin-top:6px}
     .mini{font-size:12px;opacity:.9}
     .ok{color:var(--ok)} .ng{color:var(--ng)}
     pre{
-      max-height:300px;overflow:auto;background:#0a1220;border:1px solid #273657;
+      max-height:320px;overflow:auto;background:#0a1220;border:1px solid #273657;
       padding:10px;border-radius:10px;white-space:pre-wrap
     }
     .pill{
@@ -42,19 +41,76 @@
       padding:6px 10px;border:1px solid #2a3754;border-radius:999px;background:rgba(255,255,255,.03)
     }
     .hr{height:1px;background:#2a3754;margin:12px 0;opacity:.85}
+    .tag{display:inline-block;font-size:12px;padding:2px 8px;border:1px solid #2a3754;border-radius:999px;background:rgba(255,255,255,.03);margin-right:6px}
   </style>
 </head>
 <body>
 
   <div class="card">
     <label>Audio file</label>
-    <input id="audioFile" type="file"
-      accept=".mp3,.m4a,.aac,.wav,.caf,.aiff,.mp4,.mov,audio/*,video/*" />
+    <input id="audioFile" type="file" accept=".mp3,.m4a,.aac,.wav,.caf,.aiff,.mp4,.mov,audio/*,video/*" />
     <div class="hint">
       iOS/Dropbox で type が空のことがあるので拡張子でも判定します。<strong>Files アプリ経由の mp3/m4a 推奨</strong>。
       <br/>このツールは <strong>AudioContext 単一クロック</strong>で「RECタップ」「自動生成」「プレビュー」を完全同期させます。
+      <br/><span class="tag">PRO Auto</span>既存の“リズム気持ちいい”生成
+      <span class="tag">GOD Auto</span>サビ検出＋密度カーブ＋FEEL統合
     </div>
 
+    <!-- GOD UI -->
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Mode</label>
+        <select id="genMode">
+          <option value="pro" selected>PRO Auto（既存）</option>
+          <option value="god">GOD Auto（Stage/Feel/Style）</option>
+        </select>
+        <div class="hint mini">GODは「サビで解放される」密度設計が入る</div>
+      </div>
+      <div>
+        <label>Lane（今は1のみ / 将来3レーン拡張用）</label>
+        <select id="laneMode">
+          <option value="1" selected>1 Lane</option>
+          <option value="3" disabled>3 Lane（coming soon）</option>
+        </select>
+        <div class="hint mini">内部は拡張できる構造で組んであります</div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Stage</label>
+        <select id="stage">
+          <option value="calm">Calm</option>
+          <option value="energy" selected>Energy</option>
+          <option value="chaos">Chaos</option>
+        </select>
+        <div class="hint mini">密度/休符/ピークの出方が変わる（GOD Autoで使用）</div>
+      </div>
+      <div>
+        <label>Style</label>
+        <select id="style">
+          <option value="stable">Stable</option>
+          <option value="groove" selected>Groove</option>
+          <option value="technical">Technical</option>
+        </select>
+        <div class="hint mini">Stable=芯 / Groove=裏拍 / Technical=16分スパイス（GOD Autoで使用）</div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>FEEL（神譜面スライダー）: <span id="feelV">60</span></label>
+        <input id="feel" type="range" min="0" max="100" step="1" value="60" />
+        <div class="hint mini">右へ→密度↑/MinGap↓/裏拍↑/16分↑（GOD Autoで使用）</div>
+      </div>
+      <div>
+        <label>Seed（同じ条件で同じ譜面を再現）</label>
+        <input id="seed" type="number" min="0" step="1" value="1" />
+        <div class="hint mini">神譜面づくりは“再現性”が命。ブレない生成にする</div>
+      </div>
+    </div>
+
+    <!-- existing controls -->
     <div class="row" style="margin-top:10px">
       <div>
         <label>Grid（吸着）</label>
@@ -64,12 +120,12 @@
           <option value="8" selected>1/8</option>
           <option value="16">1/16</option>
         </select>
-        <div class="hint mini">OFF = 人間のノリを残す / 1/8 = 音ゲーっぽく気持ちいい</div>
+        <div class="hint mini">OFF = 人間のノリ / 1/8 = 音ゲーっぽく気持ちいい</div>
       </div>
       <div>
         <label>BPM (0=auto)</label>
         <input id="bpm" type="number" min="0" step="0.1" value="0" />
-        <div class="hint mini">自動推定が合わない曲はここを固定（例: 145）</div>
+        <div class="hint mini">自動推定が合わない曲は固定（例: 145）</div>
       </div>
     </div>
 
@@ -77,12 +133,10 @@
       <div>
         <label>Lead-in（入り遅延）: <span id="leadV">1.20</span>s</label>
         <input id="leadIn" type="range" min="0" max="3" step="0.05" value="1.2" />
-        <div class="hint mini">START直後に落ちてこないように、譜面の先頭に余白を作る</div>
       </div>
       <div>
         <label>Global Offset（微調整）: <span id="offsetV">0</span>ms</label>
         <input id="offset" type="range" min="-250" max="250" step="1" value="0" />
-        <div class="hint mini">端末/イヤホンの遅延分を最後に合わせる（±250ms）</div>
       </div>
     </div>
 
@@ -90,12 +144,10 @@
       <div>
         <label>Min Gap（詰めすぎ防止）: <span id="minGapV">95</span>ms</label>
         <input id="minGap" type="range" min="40" max="240" value="95" />
-        <div class="hint mini">中毒性の目安：<strong>75〜110</strong></div>
       </div>
       <div>
         <label>Kick Bias（低域を叩かせる）: <span id="lowWV">1.25</span></label>
         <input id="lowW" type="range" min="0.2" max="3" step="0.05" value="1.25" />
-        <div class="hint mini">キック強い曲ほど上げる（1.1〜1.6）</div>
       </div>
     </div>
 
@@ -103,12 +155,10 @@
       <div>
         <label>Onset Sensitivity（ピーク検出）: <span id="thV">1.55</span></label>
         <input id="threshold" type="range" min="0.8" max="3.6" step="0.05" value="1.55" />
-        <div class="hint mini">出すぎ→上げる / 少なすぎ→下げる</div>
       </div>
       <div>
         <label>“ノリ”補正（裏拍）: <span id="backV">0.14</span></label>
         <input id="backbeat" type="range" min="0" max="0.35" step="0.01" value="0.14" />
-        <div class="hint mini">裏拍(&)を拾うほど気持ちよさが増える</div>
       </div>
     </div>
 
@@ -116,12 +166,10 @@
       <div>
         <label>安定補正（強拍）: <span id="downV">0.18</span></label>
         <input id="downbeat" type="range" min="0" max="0.35" step="0.01" value="0.18" />
-        <div class="hint mini">1拍目/3拍目を拾うほど“音ゲーの芯”が出る</div>
       </div>
       <div>
         <label>Humanize（前ノリ/溜め）: <span id="humV">0.60</span></label>
         <input id="humanize" type="range" min="0" max="1" step="0.05" value="0.6" />
-        <div class="hint mini">0 = 機械 / 1 = 人間（中毒性は 0.45〜0.75 が強い）</div>
       </div>
     </div>
 
@@ -145,6 +193,30 @@
       <button id="clearRec" class="danger" disabled>Clear REC</button>
     </div>
 
+    <div class="row3" style="margin-top:10px">
+      <div>
+        <label>Download Difficulty（GOD Autoで生成された場合）</label>
+        <select id="dlDiff">
+          <option value="single" selected>Single (last preview)</option>
+          <option value="easy">EASY</option>
+          <option value="normal">NORMAL</option>
+          <option value="hard">HARD</option>
+          <option value="bundle">BUNDLE (easy/normal/hard)</option>
+        </select>
+        <div class="hint mini">PRO Autoはsingleのみ。GOD Autoは3難易度を保持</div>
+      </div>
+      <div>
+        <label>Auto Level（目安）</label>
+        <input id="level" type="text" value="--" readonly />
+        <div class="hint mini">生成ノーツ密度から自動算出</div>
+      </div>
+      <div>
+        <label>Chorus Detect（推定）</label>
+        <input id="chorusInfo" type="text" value="--" readonly />
+        <div class="hint mini">GOD Autoのみ：サビ割合/区間を推定</div>
+      </div>
+    </div>
+
     <div class="statusLine">
       <div id="status" class="hint"></div>
       <div class="meter" id="meterA">audio: --</div>
@@ -157,7 +229,9 @@
       <span class="pill">Lead-in 1.0〜1.6s</span>
       <span class="pill">MinGap 85〜110ms</span>
       <span class="pill">Humanize 0.55〜0.70</span>
-      <span class="pill">Backbeat 0.12〜0.18</span>
+      <span class="pill">FEEL 55〜75</span>
+      <span class="pill">Stage Energy</span>
+      <span class="pill">Style Groove</span>
     </div>
   </div>
 
@@ -172,6 +246,14 @@
 
   const ui = {
     audioFile: $("audioFile"),
+    genMode: $("genMode"),
+    laneMode: $("laneMode"),
+    stage: $("stage"),
+    style: $("style"),
+    feel: $("feel"),
+    feelV: $("feelV"),
+    seed: $("seed"),
+
     grid: $("grid"),
     bpm: $("bpm"),
     leadIn: $("leadIn"),
@@ -203,6 +285,10 @@
     previewPlay: $("previewPlay"),
     clearRec: $("clearRec"),
 
+    dlDiff: $("dlDiff"),
+    level: $("level"),
+    chorusInfo: $("chorusInfo"),
+
     status: $("status"),
     meterA: $("meterA"),
     meterB: $("meterB"),
@@ -217,6 +303,8 @@
     ui.status.innerHTML = ok ? `<span class="ok">${msg}</span>` : `<span class="ng">${msg}</span>`;
   }
   function upd(){
+    ui.feelV.textContent = ui.feel.value;
+
     ui.leadV.textContent = Number(ui.leadIn.value).toFixed(2);
     ui.offsetV.textContent = ui.offset.value;
     ui.minGapV.textContent = ui.minGap.value;
@@ -227,7 +315,7 @@
     ui.humV.textContent = Number(ui.humanize.value).toFixed(2);
   }
   ["input","change"].forEach(ev=>{
-    [ui.grid,ui.bpm,ui.leadIn,ui.offset,ui.minGap,ui.threshold,ui.lowW,ui.backbeat,ui.downbeat,ui.humanize]
+    [ui.genMode,ui.stage,ui.style,ui.feel,ui.seed,ui.grid,ui.bpm,ui.leadIn,ui.offset,ui.minGap,ui.threshold,ui.lowW,ui.backbeat,ui.downbeat,ui.humanize]
       .forEach(el=>el.addEventListener(ev, upd));
   });
   upd();
@@ -245,6 +333,19 @@
   }
 
   // ----------------------------
+  // Seeded RNG (reproducible charts)
+  // ----------------------------
+  function mulberry32(seed){
+    let a = (seed>>>0) || 1;
+    return function(){
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // ----------------------------
   // Audio: single-clock backbone
   // ----------------------------
   const AC = window.AudioContext || window.webkitAudioContext;
@@ -259,30 +360,18 @@
 
   async function decodeFileToAudioBuffer(file){
     const ctx = ensureAudioCtx();
-    await ctx.resume(); // iOS unlock best-effort
+    await ctx.resume();
     const ab = await file.arrayBuffer();
-    // decodeAudioData は iOSで例外が出ることがあるので try/catch
     try{
       return await ctx.decodeAudioData(ab);
     }catch(e){
-      throw new Error("decodeAudioData failed. iOSは Filesアプリ経由の mp3/m4a を推奨。別ファイルで再試行して。");
+      throw new Error("decodeAudioData failed. iOSは Filesアプリ経由の mp3/m4a 推奨。別ファイルで再試行して。");
     }
   }
 
   function stopAudio(){
     try{ audioSrc?.stop?.(); }catch{}
     audioSrc = null;
-  }
-
-  function playAudioFromStart(){
-    const ctx = ensureAudioCtx();
-    stopAudio();
-    const src = ctx.createBufferSource();
-    src.buffer = audioBuf;
-    src.connect(ctx.destination);
-    src.start();
-    audioSrc = src;
-    return src;
   }
 
   // ----------------------------
@@ -325,7 +414,6 @@
       prev = mag;
     }
 
-    // local peak threshold
     const mean = env.reduce((a,b)=>a+b,0) / Math.max(1, env.length);
     const onset = [];
     for (let i = 2; i < env.length - 2; i++) {
@@ -333,7 +421,7 @@
         onset.push(i * hop / sr);
       }
     }
-    return { env, onset, hop, sr };
+    return { env, onset, hop, sr, mean };
   }
 
   function estimateBpm(envPack) {
@@ -352,7 +440,6 @@
     }
     if (!bestLag) return 120;
 
-    // keep musically plausible
     let bpm = 60 * fps / bestLag;
     while (bpm < 80) bpm *= 2;
     while (bpm > 180) bpm /= 2;
@@ -360,7 +447,7 @@
   }
 
   // ----------------------------
-  // Rhythm-first: grid scoring + bar-wise selection (addictive)
+  // PRO Auto (existing rhythm-first)
   // ----------------------------
   function buildGridScores(envPack, bpm, grid){
     const fps = envPack.sr / envPack.hop;
@@ -373,13 +460,11 @@
       scores.push({ t, s: envPack.env[idx] || 0 });
     }
 
-    // normalize
     let mx = 0;
     for(const p of scores) if(p.s > mx) mx = p.s;
     mx = mx || 1;
     for(const p of scores) p.s = p.s / mx;
 
-    // smooth
     for(let i=1;i<scores.length-1;i++){
       scores[i].s = (scores[i-1].s + scores[i].s + scores[i+1].s)/3;
     }
@@ -404,24 +489,20 @@
     const canPlace = (t, strong=false) => {
       const dt = t - lastT;
       if(!strong && dt < minGap) return false;
-      // “完全等間隔”の機械感を避ける
       if(!strong && dt < step*0.95) return false;
       return true;
     };
 
-    // density target per bar (auto)
     const basePerBar = opt.basePerBar ?? 3;
     const addPerBar  = opt.addPerBar  ?? 6;
     const maxPerBar  = opt.maxPerBar  ?? 10;
     const minPerBar  = opt.minPerBar  ?? 2;
 
-    // compute last time
     const tEnd = scores.length ? scores[scores.length-1].t : 0;
 
     for(let barStart=0; barStart < tEnd; barStart += bar){
       const barEnd = barStart + bar;
 
-      // slice bar samples
       const slice = [];
       for(const p of scores){
         if(p.t >= barStart && p.t < barEnd) slice.push(p);
@@ -432,21 +513,16 @@
       let target = Math.round(basePerBar + energy*addPerBar);
       target = Math.max(minPerBar, Math.min(maxPerBar, target));
 
-      // weight with beat-feel
       for(const p of slice){
-        const beatPos = (p.t - barStart)/beat; // 0..4
+        const beatPos = (p.t - barStart)/beat;
         const sub = beatPos % 1;
         const bi = Math.floor(beatPos + 1e-6);
 
         let w = 1.0;
-        // downbeat (1,3)
         if(bi === 0 || bi === 2) w += downBias;
-        // backbeat (&) on 8th
         if(grid >= 8 && Math.abs(sub - 0.5) < 0.12) w += backBias;
-        // 16th spice (tiny)
         if(grid >= 16 && (Math.abs(sub-0.25)<0.10 || Math.abs(sub-0.75)<0.10)) w += 0.06;
 
-        // prefer clearer peaks
         p._score = p.s * w;
       }
 
@@ -465,9 +541,274 @@
         picked++;
       }
 
-      // micro-rest to avoid constant busy
       if(target >= 9){
         lastT = Math.max(lastT, barEnd - step*0.5);
+      }
+    }
+
+    notes.sort((a,b)=>a-b);
+
+    const out=[];
+    let prev=-1e9;
+    for(const t of notes){
+      if(Math.abs(t-prev) > 1e-3) out.push(t);
+      prev=t;
+    }
+    return out;
+  }
+
+  // ----------------------------
+  // GOD Auto (Stage/Feel/Style + Chorus + Density Curve)
+  // ----------------------------
+  function mapFeel(feel01, stage, style){
+    // feel01: 0..1
+    // base maps (feel)
+    let minGapMs = 130 - feel01*60;       // 130..70
+    let chorusBoost = 1.25 + feel01*0.65; // 1.25..1.90
+    let sixteen = 0.03 + feel01*0.22;     // 0.03..0.25
+    let backBias = 0.06 + feel01*0.22;    // 0.06..0.28
+    let downBias = 0.10 + feel01*0.18;    // 0.10..0.28
+
+    // stage modifiers
+    if(stage === "calm"){
+      minGapMs += 18;
+      chorusBoost -= 0.18;
+      sixteen -= 0.04;
+    }else if(stage === "chaos"){
+      minGapMs -= 10;
+      chorusBoost += 0.10;
+      sixteen += 0.06;
+    }
+
+    // style modifiers
+    if(style === "stable"){
+      downBias += 0.08;
+      backBias -= 0.04;
+      sixteen -= 0.04;
+    }else if(style === "groove"){
+      backBias += 0.08;
+      sixteen += 0.02;
+    }else if(style === "technical"){
+      sixteen += 0.08;
+      minGapMs -= 6;
+    }
+
+    // clamp
+    minGapMs = Math.max(55, Math.min(160, minGapMs));
+    sixteen = Math.max(0, Math.min(0.35, sixteen));
+    backBias = Math.max(0, Math.min(0.35, backBias));
+    downBias = Math.max(0, Math.min(0.35, downBias));
+
+    return { minGapMs, chorusBoost, sixteen, backBias, downBias };
+  }
+
+  function smoothArray(a, win){
+    const out = new Float32Array(a.length);
+    const w = Math.max(1, win|0);
+    for(let i=0;i<a.length;i++){
+      let s=0,c=0;
+      for(let k=-w;k<=w;k++){
+        const j=i+k;
+        if(j<0||j>=a.length) continue;
+        s += a[j]; c++;
+      }
+      out[i] = c? (s/c) : a[i];
+    }
+    return out;
+  }
+
+  // chorus detection: energy over smoothed baseline
+  function detectChorusMask(envPack){
+    const env = envPack.env;
+    if(env.length < 32) return { mask: new Uint8Array(env.length), ratio:0, segments:[] };
+
+    // normalize
+    let mx = 0;
+    for(let i=0;i<env.length;i++) if(env[i]>mx) mx=env[i];
+    mx = mx || 1;
+    const norm = new Float32Array(env.length);
+    for(let i=0;i<env.length;i++) norm[i]=env[i]/mx;
+
+    const slow = smoothArray(norm, 24); // baseline
+    const fast = smoothArray(norm, 6);  // local energy
+
+    // score = fast / (slow+eps)
+    const score = new Float32Array(env.length);
+    for(let i=0;i<env.length;i++){
+      score[i] = fast[i] / (slow[i] + 1e-4);
+    }
+
+    // threshold by percentile-ish: mean + k*std
+    let mean=0;
+    for(let i=0;i<score.length;i++) mean += score[i];
+    mean /= score.length;
+
+    let v=0;
+    for(let i=0;i<score.length;i++){ const d=score[i]-mean; v+=d*d; }
+    const std = Math.sqrt(v/score.length);
+
+    const thr = mean + std*0.65; // tuned
+
+    const mask = new Uint8Array(env.length);
+    for(let i=0;i<score.length;i++){
+      mask[i] = (score[i] >= thr) ? 1 : 0;
+    }
+
+    // merge short gaps / remove short bursts
+    const minLen = 18; // ~ (hop=512@44k) => ~0.2s * 18 ≈ 3.6s-ish (coarse)
+    // remove tiny bursts
+    let run=0;
+    for(let i=0;i<=mask.length;i++){
+      if(i<mask.length && mask[i]) run++;
+      else{
+        if(run>0 && run<minLen){
+          for(let j=i-run;j<i;j++) mask[j]=0;
+        }
+        run=0;
+      }
+    }
+    // fill tiny gaps
+    const gapMax = 10;
+    let gap=0;
+    for(let i=0;i<=mask.length;i++){
+      if(i<mask.length && !mask[i]) gap++;
+      else{
+        if(gap>0 && gap<=gapMax){
+          for(let j=i-gap;j<i;j++) mask[j]=1;
+        }
+        gap=0;
+      }
+    }
+
+    // segments
+    const seg=[];
+    let s=-1;
+    for(let i=0;i<=mask.length;i++){
+      const v = (i<mask.length)?mask[i]:0;
+      if(v && s<0) s=i;
+      if(!v && s>=0){
+        seg.push([s, i-1]);
+        s=-1;
+      }
+    }
+
+    let ones=0;
+    for(let i=0;i<mask.length;i++) if(mask[i]) ones++;
+    const ratio = ones / Math.max(1, mask.length);
+
+    return { mask, ratio, segments: seg };
+  }
+
+  // GOD pick: bar-wise + chorus boost + rest injection + 16th spice
+  function pickNotesGod(gridPack, bpm, grid, envPack, godOpt, rng){
+    const { step, scores } = gridPack;
+    const beat = 60 / bpm;
+    const bar  = beat * 4;
+
+    const minGap = Math.max(0.001, (godOpt.minGapMs||95)/1000);
+
+    const notes = [];
+    let lastT = -1e9;
+
+    const canPlace = (t, strong=false) => {
+      const dt = t - lastT;
+      if(!strong && dt < minGap) return false;
+      // avoid machine-gun
+      if(!strong && dt < step*0.92) return false;
+      return true;
+    };
+
+    // chorus mask
+    const chorus = detectChorusMask(envPack);
+    ui.chorusInfo.value = `ratio ${(chorus.ratio*100).toFixed(0)}% / seg ${chorus.segments.length}`;
+
+    // stage baseline density
+    const stage = ui.stage.value;
+    let basePerBar = 3, addPerBar = 7, maxPerBar = 12, minPerBar = 2;
+    if(stage==="calm"){ basePerBar=2; addPerBar=5; maxPerBar=8;  minPerBar=1; }
+    if(stage==="chaos"){basePerBar=4; addPerBar=9; maxPerBar=16; minPerBar=3; }
+
+    // style modifies rest/tech
+    const style = ui.style.value;
+    let restChance = 0.12;   // chance to reduce a bar (rest)
+    let techChance = godOpt.sixteen; // add 16th
+    if(style==="stable"){ restChance = 0.18; techChance *= 0.55; }
+    if(style==="groove"){ restChance = 0.10; techChance *= 0.95; }
+    if(style==="technical"){ restChance = 0.08; techChance *= 1.20; }
+
+    const tEnd = scores.length ? scores[scores.length-1].t : 0;
+
+    for(let barStart=0; barStart < tEnd; barStart += bar){
+      const barEnd = barStart + bar;
+
+      const slice = [];
+      for(const p of scores){
+        if(p.t >= barStart && p.t < barEnd) slice.push(p);
+      }
+      if(!slice.length) continue;
+
+      const energy = slice.reduce((a,b)=>a+b.s,0)/slice.length;
+
+      // detect if this bar is chorus-ish by sampling mask
+      const fps = envPack.sr / envPack.hop;
+      const idxA = Math.max(0, Math.min(envPack.env.length-1, Math.floor(barStart*fps)));
+      const idxB = Math.max(0, Math.min(envPack.env.length-1, Math.floor(barEnd*fps)));
+      let chorusHit = 0, total = Math.max(1, idxB-idxA);
+      for(let i=idxA;i<idxB;i++) chorusHit += chorus.mask[i] ? 1 : 0;
+      const isChorusBar = (chorusHit/total) > 0.55;
+
+      let target = Math.round(basePerBar + energy*addPerBar);
+      target = Math.max(minPerBar, Math.min(maxPerBar, target));
+
+      // chorus boost
+      if(isChorusBar) target = Math.round(target * godOpt.chorusBoost);
+
+      // inject rests (avoid constant busy)
+      if(rng() < restChance){
+        target = Math.max(minPerBar, Math.round(target * 0.72));
+        // add micro rest effect
+        lastT = Math.max(lastT, barStart + beat*0.5);
+      }
+
+      // weight with beat feel (down/back + peaks)
+      const downBias = godOpt.downBias;
+      const backBias = godOpt.backBias;
+
+      for(const p of slice){
+        const beatPos = (p.t - barStart)/beat; // 0..4
+        const sub = beatPos % 1;
+        const bi = Math.floor(beatPos + 1e-6);
+
+        let w = 1.0;
+        if(bi === 0 || bi === 2) w += downBias;               // 1 & 3
+        if(grid >= 8 && Math.abs(sub - 0.5) < 0.13) w += backBias; // &
+        if(grid >= 16 && (Math.abs(sub-0.25)<0.11 || Math.abs(sub-0.75)<0.11)) w += techChance;
+
+        // chorus: more center-ish feel (still 1 lane now, but weight peaks)
+        if(isChorusBar) w += 0.06;
+
+        p._score = p.s * w;
+      }
+
+      slice.sort((a,b)=>b._score - a._score);
+
+      // pick
+      let picked = 0;
+      for(const p of slice){
+        if(picked >= target) break;
+        if(p.t < 0.06) continue;
+
+        const strong = p.s >= 0.80;
+        if(!canPlace(p.t, strong)) continue;
+
+        notes.push(+p.t.toFixed(3));
+        lastT = p.t;
+        picked++;
+      }
+
+      // end-of-bar breathing space for heavy bars
+      if(target >= 10){
+        lastT = Math.max(lastT, barEnd - step*0.6);
       }
     }
 
@@ -484,38 +825,29 @@
   }
 
   // ----------------------------
-  // Humanize (addictive feel)
-  //   - tiny push/pull
-  //   - protect strong beats if quantized
+  // Timing postprocess
   // ----------------------------
   function humanizeTimes(times, bpm, amount01){
     const beat = 60 / bpm;
     const a = Math.max(0, Math.min(1, amount01||0));
-
-    // max 0..14ms
     const maxMs = 14 * a;
-    const pushMs = 8 * a;   // forward on backbeat
-    const pullMs = 6 * a;   // slight behind on downbeat
+    const pushMs = 8 * a;
+    const pullMs = 6 * a;
 
     const out = times.map((t,i)=>{
-      const phase = (t % beat) / beat; // 0..1
+      const phase = (t % beat) / beat;
       let dt = 0;
 
-      // around downbeat (0.0)
-      if(phase < 0.08 || phase > 0.92) dt += (pullMs/1000) * 1.0;
+      if(phase < 0.08 || phase > 0.92) dt += (pullMs/1000);
+      if(Math.abs(phase - 0.5) < 0.08) dt -= (pushMs/1000);
 
-      // around backbeat (0.5)
-      if(Math.abs(phase - 0.5) < 0.08) dt -= (pushMs/1000) * 1.0;
-
-      // tiny random jitter (deterministic-ish from index)
-      const r = (Math.sin((i+1)*999.17) * 0.5 + 0.5); // 0..1
+      const r = (Math.sin((i+1)*999.17) * 0.5 + 0.5);
       const jitter = ((r*2-1) * (maxMs/1000)) * 0.35;
       dt += jitter;
 
       return +(t + dt).toFixed(3);
     });
 
-    // keep sorted + monotonic
     out.sort((a,b)=>a-b);
     return out;
   }
@@ -545,6 +877,123 @@
   }
 
   // ----------------------------
+  // Chart state (+ GOD bundle)
+  // ----------------------------
+  const state = {
+    fileName: "",
+    envPack: null,
+    bpm: 0,
+    autoChart: null,
+    recChart: null,
+    mergedChart: null,
+    lastChart: null,
+
+    // GOD outputs
+    god: null, // {easy, normal, hard, meta}
+  };
+
+  function chartObjFromTimes(times, bpm, titleSuffix=""){
+    return {
+      meta: { title: ((state.fileName||"Song").replace(/\.[^.]+$/, "") + titleSuffix), bpm: +Number(bpm).toFixed(2) },
+      offset: 0,
+      scroll: { approach: 1.25 },
+      notes: times.map(t => ({ t:+t.toFixed(3), lane:1, type:"tap" }))
+    };
+  }
+
+  function finalizeTimes(times, bpm){
+    const grid = Number(ui.grid.value)||0;
+
+    let t = times.slice().filter(v => Number.isFinite(v) && v>=0);
+    t = applyMinGap(t, Number(ui.minGap.value));
+    t = humanizeTimes(t, bpm, Number(ui.humanize.value));
+    t = quantizeTimes(t, bpm, grid);
+    t = applyMinGap(t, Number(ui.minGap.value));
+    t = addLeadAndOffset(t, Number(ui.leadIn.value), Number(ui.offset.value));
+
+    t.sort((a,b)=>a-b);
+    const out=[];
+    let prev=-1e9;
+    for(const x of t){
+      if(Math.abs(x-prev) > 1e-3) out.push(x);
+      prev=x;
+    }
+    return out;
+  }
+
+  function showChart(chart){
+    state.lastChart = chart;
+    ui.preview.textContent = JSON.stringify(chart, null, 2).slice(0, 20000);
+    ui.download.disabled = false;
+  }
+
+  function mergeTimes(aTimes, bTimes){
+    const all = [...aTimes, ...bTimes].sort((x,y)=>x-y);
+    const out=[];
+    let last=-1e9;
+    const minGap = (Number(ui.minGap.value)||0)/1000;
+    for(const t of all){
+      if(t - last < minGap) continue;
+      out.push(t);
+      last = t;
+    }
+    return out;
+  }
+
+  function autoLevelFromChart(times, duration){
+    // notes per second -> level
+    const nps = times.length / Math.max(1e-3, duration);
+    // tuned mapping
+    let lv = Math.round(1 + nps * 2.2);
+    lv = Math.max(1, Math.min(10, lv));
+    return { lv, nps: +nps.toFixed(2) };
+  }
+
+  function buildGodBundle(baseTimes, bpm){
+    // 3難易度：EASY=間引き、NORMAL=軽め、HARD=全部
+    const hard = baseTimes.slice();
+
+    // NORMAL: remove ~20-30% (prefer keep strong beats)
+    const rng = mulberry32(Number(ui.seed.value)||1);
+    const normal = [];
+    for(let i=0;i<hard.length;i++){
+      const keep = (i%4!==0) || (rng() < 0.55);
+      if(keep) normal.push(hard[i]);
+    }
+
+    // EASY: remove about half
+    const easy = [];
+    for(let i=0;i<hard.length;i++){
+      if(i%2===0) easy.push(hard[i]);
+    }
+
+    const titleBase = (state.fileName||"Song").replace(/\.[^.]+$/, "");
+    const meta = {
+      title: titleBase,
+      bpm: +Number(bpm).toFixed(2),
+      stage: ui.stage.value,
+      style: ui.style.value,
+      feel: Number(ui.feel.value),
+      seed: Number(ui.seed.value)||1
+    };
+
+    return {
+      meta,
+      easy: chartObjFromTimes(easy, bpm, " [EASY]"),
+      normal: chartObjFromTimes(normal, bpm, " [NORMAL]"),
+      hard: chartObjFromTimes(hard, bpm, " [HARD]"),
+      bundle: {
+        meta,
+        charts: {
+          easy: chartObjFromTimes(easy, bpm, " [EASY]"),
+          normal: chartObjFromTimes(normal, bpm, " [NORMAL]"),
+          hard: chartObjFromTimes(hard, bpm, " [HARD]")
+        }
+      }
+    };
+  }
+
+  // ----------------------------
   // REC: tap capture on single clock
   // ----------------------------
   let rec = {
@@ -563,7 +1012,6 @@
     const ctx = ensureAudioCtx();
     await ctx.resume();
 
-    // play song in-gesture
     stopAudio();
     const src = ctx.createBufferSource();
     src.buffer = audioBuf;
@@ -574,8 +1022,7 @@
     rec.startTime = ctx.currentTime;
     setRecCount();
 
-    // pointer capture
-    rec.handler = (e)=>{
+    rec.handler = ()=>{
       if(!rec.recording) return;
       const t = ctx.currentTime - rec.startTime;
       if(t < 0) return;
@@ -585,7 +1032,6 @@
     window.addEventListener("pointerdown", rec.handler, { passive:true });
 
     src.onended = ()=>{
-      // auto stop when song ends
       if(rec.recording) stopREC();
     };
 
@@ -605,9 +1051,6 @@
     try{ window.removeEventListener("pointerdown", rec.handler); }catch{}
     rec.handler = null;
 
-    // don't forcibly stop audio (but safe)
-    // stopAudio();
-
     ui.recStart.disabled = false;
     ui.recStop.disabled = true;
     ui.buildFromRec.disabled = rec.taps.length ? false : true;
@@ -626,7 +1069,7 @@
   }
 
   // ----------------------------
-  // Preview (metronome-like click) — optional
+  // Preview metronome
   // ----------------------------
   let previewTimer = null;
   function stopPreview(){
@@ -636,7 +1079,6 @@
     }
   }
 
-  // simple click (osc)
   function playClick(){
     const ctx = ensureAudioCtx();
     const o = ctx.createOscillator();
@@ -650,80 +1092,7 @@
   }
 
   // ----------------------------
-  // Chart state
-  // ----------------------------
-  const state = {
-    fileName: "",
-    envPack: null,
-    bpm: 0,
-    autoChart: null,
-    recChart: null,
-    mergedChart: null,
-    lastChart: null
-  };
-
-  function chartObjFromTimes(times, bpm){
-    return {
-      meta: { title: (state.fileName||"Song").replace(/\.[^.]+$/, ""), bpm: +Number(bpm).toFixed(2) },
-      offset: 0,
-      scroll: { approach: 1.25 },
-      notes: times.map(t => ({ t:+t.toFixed(3), lane:1, type:"tap" }))
-    };
-  }
-
-  function finalizeTimes(times, bpm){
-    const grid = Number(ui.grid.value)||0;
-
-    let t = times.slice().filter(v => Number.isFinite(v) && v>=0);
-    // min gap first (raw)
-    t = applyMinGap(t, Number(ui.minGap.value));
-
-    // humanize (before quantize)
-    t = humanizeTimes(t, bpm, Number(ui.humanize.value));
-
-    // quantize (optional)
-    t = quantizeTimes(t, bpm, grid);
-
-    // min gap again (post-quantize collisions)
-    t = applyMinGap(t, Number(ui.minGap.value));
-
-    // lead-in + offset
-    t = addLeadAndOffset(t, Number(ui.leadIn.value), Number(ui.offset.value));
-
-    // ensure sorted unique
-    t.sort((a,b)=>a-b);
-    const out=[];
-    let prev=-1e9;
-    for(const x of t){
-      if(Math.abs(x-prev) > 1e-3) out.push(x);
-      prev=x;
-    }
-    return out;
-  }
-
-  function showChart(chart){
-    state.lastChart = chart;
-    ui.preview.textContent = JSON.stringify(chart, null, 2).slice(0, 12000);
-    ui.download.disabled = false;
-  }
-
-  function mergeTimes(aTimes, bTimes, bpm){
-    // merge + dedupe + minGap
-    const all = [...aTimes, ...bTimes].sort((x,y)=>x-y);
-    const out=[];
-    let last=-1e9;
-    const minGap = (Number(ui.minGap.value)||0)/1000;
-    for(const t of all){
-      if(t - last < minGap) continue;
-      out.push(t);
-      last = t;
-    }
-    // then humanize/quantize/lead applied already if inputs were finalized
-    return out;
-  }
-
-  // ----------------------------
-  // Main actions
+  // Actions
   // ----------------------------
   ui.load.addEventListener("click", async () => {
     ui.load.disabled = true;
@@ -749,21 +1118,22 @@
       ui.meterA.textContent = `audio: ${Math.max(0, buf.duration).toFixed(2)}s`;
       setStatus(`OK: decoded. duration=${buf.duration.toFixed(2)}s`, true);
 
-      // enable next
       ui.auto.disabled = false;
       ui.recStart.disabled = false;
       ui.previewPlay.disabled = false;
       ui.clearRec.disabled = false;
 
-      // reset charts
       state.envPack = null;
       state.autoChart = null;
       state.recChart = null;
       state.mergedChart = null;
       state.lastChart = null;
+      state.god = null;
+
       ui.preview.textContent = "{}";
       ui.download.disabled = true;
-
+      ui.level.value = "--";
+      ui.chorusInfo.value = "--";
       setRecCount();
 
     }catch(e){
@@ -784,10 +1154,7 @@
       setStatus("Analyzing (spectral flux) ...", true);
 
       const data = audioBuf.getChannelData(0);
-      const opt = {
-        threshold: Number(ui.threshold.value),
-        lowW: Number(ui.lowW.value)
-      };
+      const opt = { threshold: Number(ui.threshold.value), lowW: Number(ui.lowW.value) };
       const envPack = detectOnsets(data, audioBuf.sampleRate, opt);
       state.envPack = envPack;
 
@@ -797,36 +1164,65 @@
       ui.bpm.value = bpm.toFixed(2);
       ui.meterB.textContent = `bpm: ${bpm.toFixed(2)}`;
 
-      // rhythmic selection requires grid (if grid OFF, we still need an internal grid for analysis)
-      const genGrid = Math.max(8, Number(ui.grid.value)||8); // internal base
+      const genGrid = Math.max(8, Number(ui.grid.value)||8);
       const pack = buildGridScores(envPack, bpm, genGrid);
 
-      // feel biases
-      const timesRaw = pickNotesRhythmic(pack, bpm, genGrid, {
-        minGapMs: Number(ui.minGap.value),
-        basePerBar: 3,
-        addPerBar: 6,
-        minPerBar: 2,
-        maxPerBar: 10,
-        downBias: Number(ui.downbeat.value),
-        backBias: Number(ui.backbeat.value),
-        peakThresh: 0.78,
-      });
+      if(ui.genMode.value === "pro"){
+        const timesRaw = pickNotesRhythmic(pack, bpm, genGrid, {
+          minGapMs: Number(ui.minGap.value),
+          basePerBar: 3,
+          addPerBar: 6,
+          minPerBar: 2,
+          maxPerBar: 10,
+          downBias: Number(ui.downbeat.value),
+          backBias: Number(ui.backbeat.value),
+          peakThresh: 0.78,
+        });
 
-      const times = finalizeTimes(timesRaw, bpm);
-      const chart = chartObjFromTimes(times, bpm);
-      state.autoChart = chart;
+        const times = finalizeTimes(timesRaw, bpm);
+        const chart = chartObjFromTimes(times, bpm);
+        state.autoChart = chart;
+        state.god = null;
+        ui.chorusInfo.value = "--";
 
-      showChart(chart);
+        const { lv, nps } = autoLevelFromChart(times, audioBuf.duration);
+        ui.level.value = `Lv.${lv} (nps ${nps})`;
 
-      ui.merge.disabled = !(state.autoChart && state.recChart);
+        showChart(chart);
+        ui.merge.disabled = !(state.autoChart && state.recChart);
 
-      setStatus(`Auto OK: notes=${chart.notes.length}, bpm=${bpm.toFixed(2)}`, true);
+        setStatus(`PRO Auto OK: notes=${chart.notes.length}, bpm=${bpm.toFixed(2)}`, true);
+      }else{
+        // GOD Auto
+        const rng = mulberry32(Number(ui.seed.value)||1);
+        const feel01 = Math.max(0, Math.min(1, Number(ui.feel.value)/100));
+        const god = mapFeel(feel01, ui.stage.value, ui.style.value);
+
+        // GOD uses its own minGap derived from FEEL (but you can still keep UI minGap as additional safety)
+        const timesRaw = pickNotesGod(pack, bpm, genGrid, envPack, god, rng);
+
+        // apply FEEL minGap first, then UI finalize pipeline
+        let times = applyMinGap(timesRaw, god.minGapMs);
+        times = finalizeTimes(times, bpm);
+
+        state.god = buildGodBundle(times, bpm);
+
+        // show HARD by default
+        showChart(state.god.hard);
+
+        const { lv, nps } = autoLevelFromChart(times, audioBuf.duration);
+        ui.level.value = `Lv.${lv} (nps ${nps})`;
+
+        ui.merge.disabled = !(state.autoChart && state.recChart); // GOD doesn't affect merge logic
+
+        setStatus(`GOD Auto OK: HARD notes=${state.god.hard.notes.length}, bpm=${bpm.toFixed(2)} / stage=${ui.stage.value} / feel=${ui.feel.value}`, true);
+      }
 
     }catch(e){
       setStatus("Error: " + (e?.message || e), false);
     }finally{
       ui.auto.disabled = false;
+      ui.download.disabled = false;
     }
   });
 
@@ -840,13 +1236,8 @@
     }
   });
 
-  ui.recStop.addEventListener("click", () => {
-    stopREC();
-  });
-
-  ui.clearRec.addEventListener("click", () => {
-    clearREC();
-  });
+  ui.recStop.addEventListener("click", () => stopREC());
+  ui.clearRec.addEventListener("click", () => clearREC());
 
   ui.buildFromRec.addEventListener("click", async () => {
     ui.buildFromRec.disabled = true;
@@ -856,20 +1247,20 @@
       if(!audioBuf) throw new Error("audio not loaded");
       if(!rec.taps.length) throw new Error("REC taps is empty");
 
-      // bpm: use UI / auto if exists / fallback
       let bpm = Number(ui.bpm.value)||0;
       if(!(bpm>0)){
-        if(state.bpm>0) bpm = state.bpm;
-        else bpm = 145;
+        bpm = state.bpm>0 ? state.bpm : 145;
         ui.bpm.value = bpm.toFixed(2);
       }
       state.bpm = bpm;
       ui.meterB.textContent = `bpm: ${bpm.toFixed(2)}`;
 
-      // REC taps are already seconds from startTime
       const times = finalizeTimes(rec.taps, bpm);
-      const chart = chartObjFromTimes(times, bpm);
+      const chart = chartObjFromTimes(times, bpm, " [REC]");
       state.recChart = chart;
+
+      const { lv, nps } = autoLevelFromChart(times, audioBuf.duration);
+      ui.level.value = `Lv.${lv} (nps ${nps})`;
 
       showChart(chart);
       ui.merge.disabled = !(state.autoChart && state.recChart);
@@ -880,6 +1271,7 @@
       setStatus("Error: " + (e?.message || e), false);
     }finally{
       ui.buildFromRec.disabled = rec.taps.length ? false : true;
+      ui.download.disabled = false;
     }
   });
 
@@ -889,36 +1281,56 @@
 
     try{
       if(!state.autoChart || !state.recChart) throw new Error("need both Auto and REC charts");
-
       const bpm = state.bpm || Number(ui.bpm.value) || 145;
 
       const a = state.autoChart.notes.map(n=>n.t);
       const b = state.recChart.notes.map(n=>n.t);
 
-      const mergedTimes = mergeTimes(a,b,bpm);
-      const chart = chartObjFromTimes(mergedTimes, bpm);
+      const mergedTimes = mergeTimes(a,b);
+      const chart = chartObjFromTimes(mergedTimes, bpm, " [MERGED]");
       state.mergedChart = chart;
 
-      showChart(chart);
+      const { lv, nps } = autoLevelFromChart(mergedTimes, audioBuf.duration);
+      ui.level.value = `Lv.${lv} (nps ${nps})`;
 
+      showChart(chart);
       setStatus(`Merged OK: notes=${chart.notes.length}`, true);
 
     }catch(e){
       setStatus("Error: " + (e?.message || e), false);
     }finally{
       ui.merge.disabled = !(state.autoChart && state.recChart);
+      ui.download.disabled = false;
     }
   });
 
   ui.download.addEventListener("click", () => {
-    const chart = state.lastChart;
-    if(!chart) return;
+    const mode = ui.genMode.value;
+    const diff = ui.dlDiff.value;
 
-    const blob = new Blob([JSON.stringify(chart, null, 2)], { type: "application/json" });
+    // pick payload
+    let payload = null;
+    let name = "chart.json";
+
+    if(mode === "god" && state.god){
+      if(diff === "easy"){ payload = state.god.easy; name="chart_easy.json"; }
+      else if(diff === "normal"){ payload = state.god.normal; name="chart_normal.json"; }
+      else if(diff === "hard"){ payload = state.god.hard; name="chart_hard.json"; }
+      else if(diff === "bundle"){ payload = state.god.bundle; name="chart_bundle.json"; }
+      else { payload = state.lastChart; name="chart.json"; }
+    }else{
+      // PRO mode: always lastChart
+      payload = state.lastChart;
+      name = "chart.json";
+    }
+
+    if(!payload) return;
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     const url = URL.createObjectURL(blob);
     a.href = url;
-    a.download = "chart.json";
+    a.download = name;
     a.click();
     setTimeout(()=>URL.revokeObjectURL(url), 800);
   });
@@ -931,7 +1343,6 @@
     const ctx = ensureAudioCtx();
     await ctx.resume();
 
-    // toggle behavior
     if(previewTimer){
       stopPreview();
       setStatus("Preview stopped.", true);
@@ -950,7 +1361,6 @@
     setStatus("Preview metronome started. (tap feel check)", true);
     ui.previewPlay.textContent = "Preview Stop";
 
-    // click on beat
     playClick();
     previewTimer = setInterval(()=>playClick(), beatMs);
   });
