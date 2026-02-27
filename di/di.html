@@ -48,13 +48,29 @@
   <link rel="preload" href="./faces/dico_face_5.png" as="image" />
 
   <style>
-    #devPanel { position: fixed; left: 8px; right: 8px; bottom: calc(env(safe-area-inset-bottom,0px) + 8px); z-index: 2147483647; padding: 8px; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; background: rgba(10,12,18,.88); color: #e9eefc; font: 12px/1.3 system-ui,sans-serif; backdrop-filter: blur(6px); }
-    #devPanel[hidden] { display:none !important; }
-    #devPanel .devRow { display:flex; gap:6px; align-items:center; margin-top:6px; }
-    #devPanel input, #devPanel button { font-size:12px; }
-    #devPanel input[type=file] { flex:1; min-width:0; }
-    #devMsg { min-width: 2em; }
-  </style>
+  #devPanel{
+    position: fixed;
+    left: 8px;
+    right: 8px;
+
+    /* ✅ footer(START/STOP/RESTART) を塞がない */
+    bottom: calc(env(safe-area-inset-bottom,0px) + 88px);
+
+    z-index: 2147483647;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 10px;
+    background: rgba(10,12,18,.88);
+    color: #e9eefc;
+    font: 12px/1.3 system-ui,sans-serif;
+    backdrop-filter: blur(6px);
+  }
+  #devPanel[hidden]{ display:none !important; }
+  #devPanel .devRow{ display:flex; gap:6px; align-items:center; margin-top:6px; }
+  #devPanel input, #devPanel button{ font-size:12px; }
+  #devPanel input[type=file]{ flex:1; min-width:0; }
+  #devMsg{ min-width: 2em; }
+</style>
 
 </head>
 
