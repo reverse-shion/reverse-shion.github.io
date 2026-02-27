@@ -3,123 +3,161 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>DI Chart Maker (Rhythmic)</title>
+  <title>DI Chart Maker — PRO FULL (Auto + TapREC + Addictive)</title>
   <style>
-    body{margin:0;background:#0b0f18;color:#e8eeff;font:14px/1.4 system-ui;padding:12px}
-    .card{background:#111a2a;border:1px solid #2a3754;border-radius:10px;padding:10px;margin-bottom:10px}
-    label{display:block;font-size:12px;color:#9eb0d8;margin:8px 0 4px}
-    input,select,button,textarea{width:100%;box-sizing:border-box;border-radius:8px;border:1px solid #33466d;background:#0e1626;color:#eef3ff;padding:8px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-    button{background:#345dff;border-color:#4c72ff;font-weight:700}
-    button:disabled{opacity:.5}
-    pre{max-height:260px;overflow:auto;background:#0a1220;border:1px solid #273657;padding:8px;border-radius:8px;white-space:pre-wrap}
-    .hint{font-size:12px;color:#b8c7ef;opacity:.9;margin-top:6px}
-    .ok{color:#7cffc0}
-    .ng{color:#ff7a7a}
+    :root{
+      --bg:#0b0f18; --card:#111a2a; --bd:#2a3754; --fg:#e8eeff;
+      --mut:#9eb0d8; --btn:#345dff; --btnbd:#4c72ff;
+      --ok:#7cffc0; --ng:#ff7a7a;
+    }
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui;padding:12px}
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+    label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}
+    input,select,button,textarea{
+      width:100%;box-sizing:border-box;border-radius:10px;border:1px solid #33466d;
+      background:#0e1626;color:#eef3ff;padding:10px
+    }
+    button{
+      background:var(--btn);border-color:var(--btnbd);font-weight:800;cursor:pointer
+    }
+    button.secondary{background:#1a2b4d;border-color:#2f4b7d}
+    button.danger{background:#5b1d2a;border-color:#8b2d42}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .hint{font-size:12px;color:#b8c7ef;opacity:.95;margin-top:6px}
     .mini{font-size:12px;opacity:.9}
-    .pill{display:inline-block;padding:2px 8px;border:1px solid #2a3754;border-radius:999px;margin-left:6px}
+    .ok{color:var(--ok)} .ng{color:var(--ng)}
+    pre{
+      max-height:300px;overflow:auto;background:#0a1220;border:1px solid #273657;
+      padding:10px;border-radius:10px;white-space:pre-wrap
+    }
+    .pill{
+      display:inline-block;padding:3px 10px;border:1px solid #2a3754;border-radius:999px;margin:4px 6px 0 0;
+      font-size:12px;color:#cfe0ff;background:rgba(255,255,255,.03)
+    }
+    .statusLine{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+    .meter{
+      font:12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      padding:6px 10px;border:1px solid #2a3754;border-radius:999px;background:rgba(255,255,255,.03)
+    }
+    .hr{height:1px;background:#2a3754;margin:12px 0;opacity:.85}
   </style>
 </head>
 <body>
+
   <div class="card">
     <label>Audio file</label>
     <input id="audioFile" type="file"
       accept=".mp3,.m4a,.aac,.wav,.caf,.aiff,.mp4,.mov,audio/*,video/*" />
     <div class="hint">
-      iOS/Dropboxでtype空のことがあるので拡張子でも判定します。できれば Files アプリ経由の mp3/m4a 推奨。
+      iOS/Dropbox で type が空のことがあるので拡張子でも判定します。<strong>Files アプリ経由の mp3/m4a 推奨</strong>。
+      <br/>このツールは <strong>AudioContext 単一クロック</strong>で「RECタップ」「自動生成」「プレビュー」を完全同期させます。
     </div>
 
-    <div class="row" style="margin-top:8px">
+    <div class="row" style="margin-top:10px">
       <div>
-        <label>Grid</label>
+        <label>Grid（吸着）</label>
         <select id="grid">
+          <option value="0">OFF</option>
           <option value="4">1/4</option>
           <option value="8" selected>1/8</option>
           <option value="16">1/16</option>
         </select>
+        <div class="hint mini">OFF = 人間のノリを残す / 1/8 = 音ゲーっぽく気持ちいい</div>
       </div>
       <div>
         <label>BPM (0=auto)</label>
         <input id="bpm" type="number" min="0" step="0.1" value="0" />
+        <div class="hint mini">自動推定が合わない曲はここを固定（例: 145）</div>
       </div>
     </div>
 
-    <div class="row" style="margin-top:8px">
+    <div class="row" style="margin-top:10px">
       <div>
-        <label>Offset (ms): <span id="offsetV">0</span></label>
-        <input id="offset" type="range" min="-200" max="200" value="0" />
-        <div class="hint mini">±200msで“最後のズレ”を合わせる（ほぼ必須）</div>
+        <label>Lead-in（入り遅延）: <span id="leadV">1.20</span>s</label>
+        <input id="leadIn" type="range" min="0" max="3" step="0.05" value="1.2" />
+        <div class="hint mini">START直後に落ちてこないように、譜面の先頭に余白を作る</div>
       </div>
       <div>
-        <label>Min Gap (ms): <span id="minGapV">95</span></label>
-        <input id="minGap" type="range" min="40" max="220" value="95" />
-        <div class="hint mini">詰めすぎ防止（中毒性は 70〜110 が目安）</div>
+        <label>Global Offset（微調整）: <span id="offsetV">0</span>ms</label>
+        <input id="offset" type="range" min="-250" max="250" step="1" value="0" />
+        <div class="hint mini">端末/イヤホンの遅延分を最後に合わせる（±250ms）</div>
       </div>
     </div>
 
-    <div class="row" style="margin-top:8px">
+    <div class="row" style="margin-top:10px">
       <div>
-        <label>Sensitivity: <span id="thV">1.55</span></label>
-        <input id="threshold" type="range" min="0.8" max="3.5" step="0.05" value="1.55" />
+        <label>Min Gap（詰めすぎ防止）: <span id="minGapV">95</span>ms</label>
+        <input id="minGap" type="range" min="40" max="240" value="95" />
+        <div class="hint mini">中毒性の目安：<strong>75〜110</strong></div>
       </div>
       <div>
-        <label>Low-frequency Weight: <span id="lowWV">1.25</span></label>
+        <label>Kick Bias（低域を叩かせる）: <span id="lowWV">1.25</span></label>
         <input id="lowW" type="range" min="0.2" max="3" step="0.05" value="1.25" />
+        <div class="hint mini">キック強い曲ほど上げる（1.1〜1.6）</div>
       </div>
     </div>
 
-    <div class="row3" style="margin-top:8px">
+    <div class="row" style="margin-top:10px">
       <div>
-        <label>Base density / bar: <span id="baseV">3</span></label>
-        <input id="basePerBar" type="range" min="1" max="6" value="3" />
+        <label>Onset Sensitivity（ピーク検出）: <span id="thV">1.55</span></label>
+        <input id="threshold" type="range" min="0.8" max="3.6" step="0.05" value="1.55" />
+        <div class="hint mini">出すぎ→上げる / 少なすぎ→下げる</div>
       </div>
       <div>
-        <label>Energy add / bar: <span id="addV">6</span></label>
-        <input id="addPerBar" type="range" min="0" max="10" value="6" />
-      </div>
-      <div>
-        <label>Max / bar: <span id="maxV">10</span></label>
-        <input id="maxPerBar" type="range" min="4" max="14" value="10" />
-      </div>
-    </div>
-
-    <div class="row" style="margin-top:8px">
-      <div>
-        <label>Backbeat bias: <span id="backV">0.14</span></label>
+        <label>“ノリ”補正（裏拍）: <span id="backV">0.14</span></label>
         <input id="backbeat" type="range" min="0" max="0.35" step="0.01" value="0.14" />
-        <div class="hint mini">裏拍（&）を強める＝“ノリ”が出る</div>
+        <div class="hint mini">裏拍(&)を拾うほど気持ちよさが増える</div>
       </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
       <div>
-        <label>Downbeat bias: <span id="downV">0.18</span></label>
+        <label>安定補正（強拍）: <span id="downV">0.18</span></label>
         <input id="downbeat" type="range" min="0" max="0.35" step="0.01" value="0.18" />
-        <div class="hint mini">強拍（1/3拍）を強める＝安定する</div>
+        <div class="hint mini">1拍目/3拍目を拾うほど“音ゲーの芯”が出る</div>
+      </div>
+      <div>
+        <label>Humanize（前ノリ/溜め）: <span id="humV">0.60</span></label>
+        <input id="humanize" type="range" min="0" max="1" step="0.05" value="0.6" />
+        <div class="hint mini">0 = 機械 / 1 = 人間（中毒性は 0.45〜0.75 が強い）</div>
       </div>
     </div>
 
-    <div class="row" style="margin-top:8px">
-      <div>
-        <label>Enable fills (16th): <span id="fillV">ON</span></label>
-        <select id="enableFill">
-          <option value="1" selected>ON</option>
-          <option value="0">OFF</option>
-        </select>
-        <div class="hint mini">盛り上がり小節の終端に“フィル”を入れて音ゲー化</div>
-      </div>
-      <div>
-        <label>Fill energy threshold: <span id="fillEV">0.62</span></label>
-        <input id="fillEnergy" type="range" min="0.35" max="0.85" step="0.01" value="0.62" />
-      </div>
-    </div>
+    <div class="hr"></div>
 
-    <div class="row" style="margin-top:8px">
-      <button id="analyze">Analyze</button>
+    <div class="row3">
+      <button id="load" class="secondary">1) Load & Decode</button>
+      <button id="auto" class="">2) Auto Generate</button>
       <button id="download" disabled>Download chart.json</button>
     </div>
 
-    <div id="status" class="hint"></div>
+    <div class="row3" style="margin-top:10px">
+      <button id="recStart" class="secondary" disabled>REC Start (Play)</button>
+      <button id="recStop" class="danger" disabled>REC Stop</button>
+      <button id="buildFromRec" class="" disabled>Build from REC</button>
+    </div>
+
+    <div class="row3" style="margin-top:10px">
+      <button id="merge" class="secondary" disabled>Merge (Auto + REC)</button>
+      <button id="previewPlay" class="secondary" disabled>Preview Play (metronome)</button>
+      <button id="clearRec" class="danger" disabled>Clear REC</button>
+    </div>
+
+    <div class="statusLine">
+      <div id="status" class="hint"></div>
+      <div class="meter" id="meterA">audio: --</div>
+      <div class="meter" id="meterB">bpm: --</div>
+      <div class="meter" id="meterC">rec taps: 0</div>
+    </div>
+
     <div class="hint mini">
-      目安：<span class="pill">Grid 1/8</span><span class="pill">MinGap 85〜110</span><span class="pill">Base 3</span><span class="pill">Add 5〜7</span><span class="pill">Backbeat 0.12〜0.18</span>
+      推奨：<span class="pill">Grid 1/8</span>
+      <span class="pill">Lead-in 1.0〜1.6s</span>
+      <span class="pill">MinGap 85〜110ms</span>
+      <span class="pill">Humanize 0.55〜0.70</span>
+      <span class="pill">Backbeat 0.12〜0.18</span>
     </div>
   </div>
 
@@ -131,83 +169,125 @@
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+
   const ui = {
     audioFile: $("audioFile"),
     grid: $("grid"),
     bpm: $("bpm"),
+    leadIn: $("leadIn"),
     offset: $("offset"),
     minGap: $("minGap"),
     threshold: $("threshold"),
     lowW: $("lowW"),
-
-    basePerBar: $("basePerBar"),
-    addPerBar: $("addPerBar"),
-    maxPerBar: $("maxPerBar"),
     backbeat: $("backbeat"),
     downbeat: $("downbeat"),
-    enableFill: $("enableFill"),
-    fillEnergy: $("fillEnergy"),
+    humanize: $("humanize"),
 
+    leadV: $("leadV"),
     offsetV: $("offsetV"),
     minGapV: $("minGapV"),
     thV: $("thV"),
     lowWV: $("lowWV"),
-    baseV: $("baseV"),
-    addV: $("addV"),
-    maxV: $("maxV"),
     backV: $("backV"),
     downV: $("downV"),
-    fillV: $("fillV"),
-    fillEV: $("fillEV"),
+    humV: $("humV"),
 
-    analyze: $("analyze"),
+    load: $("load"),
+    auto: $("auto"),
     download: $("download"),
+
+    recStart: $("recStart"),
+    recStop: $("recStop"),
+    buildFromRec: $("buildFromRec"),
+    merge: $("merge"),
+    previewPlay: $("previewPlay"),
+    clearRec: $("clearRec"),
+
     status: $("status"),
+    meterA: $("meterA"),
+    meterB: $("meterB"),
+    meterC: $("meterC"),
     preview: $("preview"),
   };
 
-  let chart = null;
-
-  const upd = () => {
-    ui.offsetV.textContent = ui.offset.value;
-    ui.minGapV.textContent = ui.minGap.value;
-    ui.thV.textContent = ui.threshold.value;
-    ui.lowWV.textContent = ui.lowW.value;
-
-    ui.baseV.textContent = ui.basePerBar.value;
-    ui.addV.textContent = ui.addPerBar.value;
-    ui.maxV.textContent = ui.maxPerBar.value;
-    ui.backV.textContent = Number(ui.backbeat.value).toFixed(2);
-    ui.downV.textContent = Number(ui.downbeat.value).toFixed(2);
-    ui.fillV.textContent = ui.enableFill.value === "1" ? "ON" : "OFF";
-    ui.fillEV.textContent = Number(ui.fillEnergy.value).toFixed(2);
-  };
-
-  ["input","change"].forEach(ev => {
-    [ui.offset,ui.minGap,ui.threshold,ui.lowW,ui.basePerBar,ui.addPerBar,ui.maxPerBar,ui.backbeat,ui.downbeat,ui.enableFill,ui.fillEnergy]
-      .forEach(el => el.addEventListener(ev, upd));
-  });
-  upd();
-
+  // ----------------------------
+  // UI helpers
+  // ----------------------------
   function setStatus(msg, ok=false){
     ui.status.innerHTML = ok ? `<span class="ok">${msg}</span>` : `<span class="ng">${msg}</span>`;
   }
+  function upd(){
+    ui.leadV.textContent = Number(ui.leadIn.value).toFixed(2);
+    ui.offsetV.textContent = ui.offset.value;
+    ui.minGapV.textContent = ui.minGap.value;
+    ui.thV.textContent = Number(ui.threshold.value).toFixed(2);
+    ui.lowWV.textContent = Number(ui.lowW.value).toFixed(2);
+    ui.backV.textContent = Number(ui.backbeat.value).toFixed(2);
+    ui.downV.textContent = Number(ui.downbeat.value).toFixed(2);
+    ui.humV.textContent = Number(ui.humanize.value).toFixed(2);
+  }
+  ["input","change"].forEach(ev=>{
+    [ui.grid,ui.bpm,ui.leadIn,ui.offset,ui.minGap,ui.threshold,ui.lowW,ui.backbeat,ui.downbeat,ui.humanize]
+      .forEach(el=>el.addEventListener(ev, upd));
+  });
+  upd();
 
   function extLower(name){
     const m = String(name||"").toLowerCase().match(/\.([a-z0-9]+)$/);
     return m ? m[1] : "";
   }
-
   function isProbablyAudioFile(file){
-    const t = String(file?.type || "");
+    const t = String(file?.type || "").toLowerCase();
     if (t.startsWith("audio/")) return true;
+    if (t === "video/mp4") return true;
     const e = extLower(file?.name);
     return ["mp3","m4a","aac","wav","caf","aiff","mp4","mov"].includes(e);
   }
 
-  // -----------------------------
-  // Onset detection (lightweight spectral flux)
-  // -----------------------------
+  // ----------------------------
+  // Audio: single-clock backbone
+  // ----------------------------
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+  let audioBuf = null;
+  let audioSrc = null;
+
+  function ensureAudioCtx(){
+    if (!audioCtx) audioCtx = new AC();
+    return audioCtx;
+  }
+
+  async function decodeFileToAudioBuffer(file){
+    const ctx = ensureAudioCtx();
+    await ctx.resume(); // iOS unlock best-effort
+    const ab = await file.arrayBuffer();
+    // decodeAudioData は iOSで例外が出ることがあるので try/catch
+    try{
+      return await ctx.decodeAudioData(ab);
+    }catch(e){
+      throw new Error("decodeAudioData failed. iOSは Filesアプリ経由の mp3/m4a を推奨。別ファイルで再試行して。");
+    }
+  }
+
+  function stopAudio(){
+    try{ audioSrc?.stop?.(); }catch{}
+    audioSrc = null;
+  }
+
+  function playAudioFromStart(){
+    const ctx = ensureAudioCtx();
+    stopAudio();
+    const src = ctx.createBufferSource();
+    src.buffer = audioBuf;
+    src.connect(ctx.destination);
+    src.start();
+    audioSrc = src;
+    return src;
+  }
+
+  // ----------------------------
+  // Onset detection (spectral flux lightweight)
+  // ----------------------------
   function hanning(n, N) { return 0.5 - 0.5 * Math.cos((2 * Math.PI * n) / Math.max(1, N - 1)); }
 
   function dftMag(frame, bins) {
@@ -245,6 +325,7 @@
       prev = mag;
     }
 
+    // local peak threshold
     const mean = env.reduce((a,b)=>a+b,0) / Math.max(1, env.length);
     const onset = [];
     for (let i = 2; i < env.length - 2; i++) {
@@ -261,7 +342,7 @@
     const fps = envPack.sr / envPack.hop;
 
     let bestLag = 0, best = -1;
-    const minLag = Math.floor(fps * 60 / 180);
+    const minLag = Math.floor(fps * 60 / 190);
     const maxLag = Math.floor(fps * 60 / 70);
 
     for (let lag = minLag; lag <= maxLag; lag++) {
@@ -270,26 +351,17 @@
       if (sum > best) { best = sum; bestLag = lag; }
     }
     if (!bestLag) return 120;
-    return Math.max(70, Math.min(180, 60 * fps / bestLag));
+
+    // keep musically plausible
+    let bpm = 60 * fps / bestLag;
+    while (bpm < 80) bpm *= 2;
+    while (bpm > 180) bpm /= 2;
+    return Math.max(70, Math.min(190, bpm));
   }
 
-  // ------------------------------------
-  // Robust decode (direct decodeAudioData)
-  // ------------------------------------
-  async function decodeFileToAudioBuffer(file){
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    try{
-      const ab = await file.arrayBuffer();
-      const buf = await ctx.decodeAudioData(ab);
-      return buf;
-    } finally {
-      try{ await ctx.close(); }catch{}
-    }
-  }
-
-  // ------------------------------------
-  // Rhythm-first generator (bar-wise selection)
-  // ------------------------------------
+  // ----------------------------
+  // Rhythm-first: grid scoring + bar-wise selection (addictive)
+  // ----------------------------
   function buildGridScores(envPack, bpm, grid){
     const fps = envPack.sr / envPack.hop;
     const step = 60 / bpm / (grid / 4);
@@ -302,12 +374,12 @@
     }
 
     // normalize
-    let max = 0;
-    for(const p of scores) if(p.s > max) max = p.s;
-    max = max || 1;
-    for(const p of scores) p.s = p.s / max;
+    let mx = 0;
+    for(const p of scores) if(p.s > mx) mx = p.s;
+    mx = mx || 1;
+    for(const p of scores) p.s = p.s / mx;
 
-    // smooth (3-tap moving average)
+    // smooth
     for(let i=1;i<scores.length-1;i++){
       scores[i].s = (scores[i-1].s + scores[i].s + scores[i+1].s)/3;
     }
@@ -317,10 +389,10 @@
 
   function pickNotesRhythmic(gridPack, bpm, grid, opt){
     const { step, scores } = gridPack;
-    const beatSec = 60 / bpm;
-    const barSec  = beatSec * 4;
-
+    const beat = 60 / bpm;
+    const bar = beat * 4;
     const minGap = Math.max(0.001, (opt.minGapMs||95)/1000);
+
     const downBias = opt.downBias ?? 0.18;
     const backBias = opt.backBias ?? 0.14;
 
@@ -329,57 +401,59 @@
 
     const peakThresh = opt.peakThresh ?? 0.78;
 
-    // helper: distance guard
     const canPlace = (t, strong=false) => {
       const dt = t - lastT;
       if(!strong && dt < minGap) return false;
-      // “ずっと等間隔”を避ける（step近辺の機械感を軽減）
+      // “完全等間隔”の機械感を避ける
       if(!strong && dt < step*0.95) return false;
       return true;
     };
 
-    for(let barStart=0; barStart < scores[scores.length-1].t; barStart += barSec){
-      const barEnd = barStart + barSec;
+    // density target per bar (auto)
+    const basePerBar = opt.basePerBar ?? 3;
+    const addPerBar  = opt.addPerBar  ?? 6;
+    const maxPerBar  = opt.maxPerBar  ?? 10;
+    const minPerBar  = opt.minPerBar  ?? 2;
 
-      const bar = [];
+    // compute last time
+    const tEnd = scores.length ? scores[scores.length-1].t : 0;
+
+    for(let barStart=0; barStart < tEnd; barStart += bar){
+      const barEnd = barStart + bar;
+
+      // slice bar samples
+      const slice = [];
       for(const p of scores){
-        if(p.t >= barStart && p.t < barEnd) bar.push(p);
+        if(p.t >= barStart && p.t < barEnd) slice.push(p);
       }
-      if(!bar.length) continue;
+      if(!slice.length) continue;
 
-      // energy: average strength of bar
-      const energy = bar.reduce((a,b)=>a+b.s,0)/bar.length;
+      const energy = slice.reduce((a,b)=>a+b.s,0)/slice.length;
+      let target = Math.round(basePerBar + energy*addPerBar);
+      target = Math.max(minPerBar, Math.min(maxPerBar, target));
 
-      const base = opt.basePerBar ?? 3;
-      const add  = opt.addPerBar  ?? 6;
-      let target = Math.round(base + energy*add);
-      target = Math.max(opt.minPerBar ?? 2, Math.min(opt.maxPerBar ?? 10, target));
-
-      // scoring with beat-bias
-      for(const p of bar){
-        const beatPos = (p.t - barStart)/beatSec;      // 0..4
+      // weight with beat-feel
+      for(const p of slice){
+        const beatPos = (p.t - barStart)/beat; // 0..4
         const sub = beatPos % 1;
-        const beatIndex = Math.floor(beatPos + 1e-6);
+        const bi = Math.floor(beatPos + 1e-6);
 
         let w = 1.0;
-
-        // downbeat (1st & 3rd beat)
-        if(beatIndex === 0 || beatIndex === 2) w += downBias;
-
-        // backbeat: 8th "&"
+        // downbeat (1,3)
+        if(bi === 0 || bi === 2) w += downBias;
+        // backbeat (&) on 8th
         if(grid >= 8 && Math.abs(sub - 0.5) < 0.12) w += backBias;
-
-        // tiny swing feel on 16th (only slight)
+        // 16th spice (tiny)
         if(grid >= 16 && (Math.abs(sub-0.25)<0.10 || Math.abs(sub-0.75)<0.10)) w += 0.06;
 
+        // prefer clearer peaks
         p._score = p.s * w;
       }
 
-      bar.sort((a,b)=>b._score - a._score);
+      slice.sort((a,b)=>b._score - a._score);
 
-      // pick best candidates
       let picked = 0;
-      for(const p of bar){
+      for(const p of slice){
         if(picked >= target) break;
         if(p.t < 0.06) continue;
 
@@ -391,25 +465,7 @@
         picked++;
       }
 
-      // fills: only if enabled and energy is high and grid supports 16th
-      if(opt.enableFill && energy > (opt.fillEnergy ?? 0.62) && grid >= 16){
-        const fillStart = barStart + barSec - beatSec*0.5; // last half-beat window
-        const fill = scores.filter(p => p.t >= fillStart && p.t < barEnd);
-        fill.sort((a,b)=>b.s-a.s);
-
-        let f = 0;
-        for(const p of fill){
-          if(f >= 2) break;
-          if(p.t < 0.06) continue;
-          if(!canPlace(p.t, p.s>=peakThresh)) continue;
-          notes.push(+p.t.toFixed(3));
-          lastT = p.t;
-          f++;
-        }
-      }
-
-      // micro-rest: if bar got too dense, force a small gap next bar start
-      // (prevents “always busy”)
+      // micro-rest to avoid constant busy
       if(target >= 9){
         lastT = Math.max(lastT, barEnd - step*0.5);
       }
@@ -417,91 +473,490 @@
 
     notes.sort((a,b)=>a-b);
 
-    // de-dup safeguard
-    const out = [];
-    let prev = -1;
+    // dedupe
+    const out=[];
+    let prev=-1e9;
     for(const t of notes){
-      if(prev < 0 || Math.abs(t-prev) > 1e-3) out.push(t);
-      prev = t;
+      if(Math.abs(t-prev) > 1e-3) out.push(t);
+      prev=t;
     }
     return out;
   }
 
-  ui.analyze.addEventListener("click", async () => {
-    ui.analyze.disabled = true;
+  // ----------------------------
+  // Humanize (addictive feel)
+  //   - tiny push/pull
+  //   - protect strong beats if quantized
+  // ----------------------------
+  function humanizeTimes(times, bpm, amount01){
+    const beat = 60 / bpm;
+    const a = Math.max(0, Math.min(1, amount01||0));
+
+    // max 0..14ms
+    const maxMs = 14 * a;
+    const pushMs = 8 * a;   // forward on backbeat
+    const pullMs = 6 * a;   // slight behind on downbeat
+
+    const out = times.map((t,i)=>{
+      const phase = (t % beat) / beat; // 0..1
+      let dt = 0;
+
+      // around downbeat (0.0)
+      if(phase < 0.08 || phase > 0.92) dt += (pullMs/1000) * 1.0;
+
+      // around backbeat (0.5)
+      if(Math.abs(phase - 0.5) < 0.08) dt -= (pushMs/1000) * 1.0;
+
+      // tiny random jitter (deterministic-ish from index)
+      const r = (Math.sin((i+1)*999.17) * 0.5 + 0.5); // 0..1
+      const jitter = ((r*2-1) * (maxMs/1000)) * 0.35;
+      dt += jitter;
+
+      return +(t + dt).toFixed(3);
+    });
+
+    // keep sorted + monotonic
+    out.sort((a,b)=>a-b);
+    return out;
+  }
+
+  function quantizeTimes(times, bpm, grid){
+    if(!grid || grid<=0) return times.slice();
+    const step = 60 / bpm / (grid/4);
+    return times.map(t => +((Math.round(t/step)*step).toFixed(3)));
+  }
+
+  function applyMinGap(times, minGapMs){
+    const minGap = (Number(minGapMs)||0)/1000;
+    const out=[];
+    let last=-1e9;
+    for(const t of times){
+      if(t - last < minGap) continue;
+      out.push(t);
+      last=t;
+    }
+    return out;
+  }
+
+  function addLeadAndOffset(times, leadInSec, offsetMs){
+    const off = (Number(offsetMs)||0)/1000;
+    const lead = Math.max(0, Number(leadInSec)||0);
+    return times.map(t => +(t + lead + off).toFixed(3)).filter(t => t >= 0.01);
+  }
+
+  // ----------------------------
+  // REC: tap capture on single clock
+  // ----------------------------
+  let rec = {
+    recording:false,
+    startTime:0,
+    taps:[],
+    handler:null,
+  };
+
+  function setRecCount(){
+    ui.meterC.textContent = `rec taps: ${rec.taps.length}`;
+  }
+
+  async function startREC(){
+    if(!audioBuf) throw new Error("audio not loaded");
+    const ctx = ensureAudioCtx();
+    await ctx.resume();
+
+    // play song in-gesture
+    stopAudio();
+    const src = ctx.createBufferSource();
+    src.buffer = audioBuf;
+    src.connect(ctx.destination);
+
+    rec.taps = [];
+    rec.recording = true;
+    rec.startTime = ctx.currentTime;
+    setRecCount();
+
+    // pointer capture
+    rec.handler = (e)=>{
+      if(!rec.recording) return;
+      const t = ctx.currentTime - rec.startTime;
+      if(t < 0) return;
+      rec.taps.push(+t.toFixed(4));
+      setRecCount();
+    };
+    window.addEventListener("pointerdown", rec.handler, { passive:true });
+
+    src.onended = ()=>{
+      // auto stop when song ends
+      if(rec.recording) stopREC();
+    };
+
+    src.start();
+    audioSrc = src;
+
+    ui.recStart.disabled = true;
+    ui.recStop.disabled = false;
+    ui.buildFromRec.disabled = true;
+    ui.clearRec.disabled = false;
+
+    setStatus("REC started. 曲に合わせてタップしてOK（全画面どこでも記録）", true);
+  }
+
+  function stopREC(){
+    rec.recording = false;
+    try{ window.removeEventListener("pointerdown", rec.handler); }catch{}
+    rec.handler = null;
+
+    // don't forcibly stop audio (but safe)
+    // stopAudio();
+
+    ui.recStart.disabled = false;
+    ui.recStop.disabled = true;
+    ui.buildFromRec.disabled = rec.taps.length ? false : true;
+    ui.clearRec.disabled = false;
+
+    setStatus(`REC stopped. taps=${rec.taps.length}`, true);
+    setRecCount();
+  }
+
+  function clearREC(){
+    rec.taps = [];
+    setRecCount();
+    ui.buildFromRec.disabled = true;
+    ui.merge.disabled = !(state.autoChart && state.recChart);
+    setStatus("REC cleared.", true);
+  }
+
+  // ----------------------------
+  // Preview (metronome-like click) — optional
+  // ----------------------------
+  let previewTimer = null;
+  function stopPreview(){
+    if(previewTimer){
+      clearInterval(previewTimer);
+      previewTimer = null;
+    }
+  }
+
+  // simple click (osc)
+  function playClick(){
+    const ctx = ensureAudioCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "square";
+    o.frequency.value = 880;
+    g.gain.value = 0.05;
+    o.connect(g).connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.03);
+  }
+
+  // ----------------------------
+  // Chart state
+  // ----------------------------
+  const state = {
+    fileName: "",
+    envPack: null,
+    bpm: 0,
+    autoChart: null,
+    recChart: null,
+    mergedChart: null,
+    lastChart: null
+  };
+
+  function chartObjFromTimes(times, bpm){
+    return {
+      meta: { title: (state.fileName||"Song").replace(/\.[^.]+$/, ""), bpm: +Number(bpm).toFixed(2) },
+      offset: 0,
+      scroll: { approach: 1.25 },
+      notes: times.map(t => ({ t:+t.toFixed(3), lane:1, type:"tap" }))
+    };
+  }
+
+  function finalizeTimes(times, bpm){
+    const grid = Number(ui.grid.value)||0;
+
+    let t = times.slice().filter(v => Number.isFinite(v) && v>=0);
+    // min gap first (raw)
+    t = applyMinGap(t, Number(ui.minGap.value));
+
+    // humanize (before quantize)
+    t = humanizeTimes(t, bpm, Number(ui.humanize.value));
+
+    // quantize (optional)
+    t = quantizeTimes(t, bpm, grid);
+
+    // min gap again (post-quantize collisions)
+    t = applyMinGap(t, Number(ui.minGap.value));
+
+    // lead-in + offset
+    t = addLeadAndOffset(t, Number(ui.leadIn.value), Number(ui.offset.value));
+
+    // ensure sorted unique
+    t.sort((a,b)=>a-b);
+    const out=[];
+    let prev=-1e9;
+    for(const x of t){
+      if(Math.abs(x-prev) > 1e-3) out.push(x);
+      prev=x;
+    }
+    return out;
+  }
+
+  function showChart(chart){
+    state.lastChart = chart;
+    ui.preview.textContent = JSON.stringify(chart, null, 2).slice(0, 12000);
+    ui.download.disabled = false;
+  }
+
+  function mergeTimes(aTimes, bTimes, bpm){
+    // merge + dedupe + minGap
+    const all = [...aTimes, ...bTimes].sort((x,y)=>x-y);
+    const out=[];
+    let last=-1e9;
+    const minGap = (Number(ui.minGap.value)||0)/1000;
+    for(const t of all){
+      if(t - last < minGap) continue;
+      out.push(t);
+      last = t;
+    }
+    // then humanize/quantize/lead applied already if inputs were finalized
+    return out;
+  }
+
+  // ----------------------------
+  // Main actions
+  // ----------------------------
+  ui.load.addEventListener("click", async () => {
+    ui.load.disabled = true;
+    ui.auto.disabled = true;
+    ui.recStart.disabled = true;
+    ui.previewPlay.disabled = true;
     ui.download.disabled = true;
-    chart = null;
 
-    try {
+    stopPreview();
+    stopAudio();
+
+    try{
       const file = ui.audioFile.files?.[0];
-      if (!file) throw new Error("select audio file");
-      if (!isProbablyAudioFile(file)) {
-        throw new Error(`not an audio file: ${file.name || "(no name)"} type=${file.type || "(empty)"}`);
-      }
+      if(!file) throw new Error("select audio file");
+      if(!isProbablyAudioFile(file)) throw new Error(`not audio: ${file.name} type=${file.type||"(empty)"}`);
 
-      setStatus(`Selected: ${file.name} (type=${file.type || "empty"})`, true);
-      setStatus("Decoding / Analyzing... (iOS may take a moment)", true);
+      setStatus(`Decoding... ${file.name} (type=${file.type || "empty"})`, true);
 
       const buf = await decodeFileToAudioBuffer(file);
-      const data = buf.getChannelData(0);
+      audioBuf = buf;
+      state.fileName = file.name;
 
-      const opt = { threshold: Number(ui.threshold.value), lowW: Number(ui.lowW.value) };
-      const envPack = detectOnsets(data, buf.sampleRate, opt);
+      ui.meterA.textContent = `audio: ${Math.max(0, buf.duration).toFixed(2)}s`;
+      setStatus(`OK: decoded. duration=${buf.duration.toFixed(2)}s`, true);
 
-      const autoBpm = estimateBpm(envPack);
-      const bpm = Number(ui.bpm.value) > 0 ? Number(ui.bpm.value) : autoBpm;
+      // enable next
+      ui.auto.disabled = false;
+      ui.recStart.disabled = false;
+      ui.previewPlay.disabled = false;
+      ui.clearRec.disabled = false;
+
+      // reset charts
+      state.envPack = null;
+      state.autoChart = null;
+      state.recChart = null;
+      state.mergedChart = null;
+      state.lastChart = null;
+      ui.preview.textContent = "{}";
+      ui.download.disabled = true;
+
+      setRecCount();
+
+    }catch(e){
+      setStatus("Error: " + (e?.message || e), false);
+    }finally{
+      ui.load.disabled = false;
+    }
+  });
+
+  ui.auto.addEventListener("click", async () => {
+    ui.auto.disabled = true;
+    ui.merge.disabled = true;
+    ui.download.disabled = true;
+
+    try{
+      if(!audioBuf) throw new Error("audio not loaded");
+
+      setStatus("Analyzing (spectral flux) ...", true);
+
+      const data = audioBuf.getChannelData(0);
+      const opt = {
+        threshold: Number(ui.threshold.value),
+        lowW: Number(ui.lowW.value)
+      };
+      const envPack = detectOnsets(data, audioBuf.sampleRate, opt);
+      state.envPack = envPack;
+
+      let bpm = Number(ui.bpm.value)||0;
+      if(!(bpm>0)) bpm = estimateBpm(envPack);
+      state.bpm = bpm;
       ui.bpm.value = bpm.toFixed(2);
+      ui.meterB.textContent = `bpm: ${bpm.toFixed(2)}`;
 
-      const grid = Number(ui.grid.value);
-      const gridPack = buildGridScores(envPack, bpm, grid);
+      // rhythmic selection requires grid (if grid OFF, we still need an internal grid for analysis)
+      const genGrid = Math.max(8, Number(ui.grid.value)||8); // internal base
+      const pack = buildGridScores(envPack, bpm, genGrid);
 
-      const times = pickNotesRhythmic(gridPack, bpm, grid, {
+      // feel biases
+      const timesRaw = pickNotesRhythmic(pack, bpm, genGrid, {
         minGapMs: Number(ui.minGap.value),
-        basePerBar: Number(ui.basePerBar.value),
-        addPerBar: Number(ui.addPerBar.value),
+        basePerBar: 3,
+        addPerBar: 6,
         minPerBar: 2,
-        maxPerBar: Number(ui.maxPerBar.value),
+        maxPerBar: 10,
         downBias: Number(ui.downbeat.value),
         backBias: Number(ui.backbeat.value),
         peakThresh: 0.78,
-        enableFill: ui.enableFill.value === "1",
-        fillEnergy: Number(ui.fillEnergy.value),
       });
 
-      const offsetMs = Number(ui.offset.value) || 0;
-      const offsetSec = +(offsetMs / 1000).toFixed(3);
+      const times = finalizeTimes(timesRaw, bpm);
+      const chart = chartObjFromTimes(times, bpm);
+      state.autoChart = chart;
 
-      chart = {
-        meta: { title: (file.name || "Song").replace(/\.[^.]+$/, ""), bpm: +bpm.toFixed(2) },
-        offset: offsetSec,
-        scroll: { approach: 1.25 },
-        notes: times.map((t) => ({ t, lane: 1, type: "tap" }))
-      };
+      showChart(chart);
 
-      ui.preview.textContent = JSON.stringify(chart, null, 2).slice(0, 8000);
-      ui.download.disabled = false;
+      ui.merge.disabled = !(state.autoChart && state.recChart);
 
-      setStatus(`OK: ${chart.notes.length} notes, bpm=${chart.meta.bpm}, offset=${chart.offset}s`, true);
+      setStatus(`Auto OK: notes=${chart.notes.length}, bpm=${bpm.toFixed(2)}`, true);
 
-    } catch (e) {
-      ui.preview.textContent = "{}";
+    }catch(e){
       setStatus("Error: " + (e?.message || e), false);
-    } finally {
-      ui.analyze.disabled = false;
+    }finally{
+      ui.auto.disabled = false;
+    }
+  });
+
+  ui.recStart.addEventListener("click", async () => {
+    ui.recStart.disabled = true;
+    try{
+      await startREC();
+    }catch(e){
+      ui.recStart.disabled = false;
+      setStatus("Error: " + (e?.message || e), false);
+    }
+  });
+
+  ui.recStop.addEventListener("click", () => {
+    stopREC();
+  });
+
+  ui.clearRec.addEventListener("click", () => {
+    clearREC();
+  });
+
+  ui.buildFromRec.addEventListener("click", async () => {
+    ui.buildFromRec.disabled = true;
+    ui.download.disabled = true;
+
+    try{
+      if(!audioBuf) throw new Error("audio not loaded");
+      if(!rec.taps.length) throw new Error("REC taps is empty");
+
+      // bpm: use UI / auto if exists / fallback
+      let bpm = Number(ui.bpm.value)||0;
+      if(!(bpm>0)){
+        if(state.bpm>0) bpm = state.bpm;
+        else bpm = 145;
+        ui.bpm.value = bpm.toFixed(2);
+      }
+      state.bpm = bpm;
+      ui.meterB.textContent = `bpm: ${bpm.toFixed(2)}`;
+
+      // REC taps are already seconds from startTime
+      const times = finalizeTimes(rec.taps, bpm);
+      const chart = chartObjFromTimes(times, bpm);
+      state.recChart = chart;
+
+      showChart(chart);
+      ui.merge.disabled = !(state.autoChart && state.recChart);
+
+      setStatus(`REC chart OK: notes=${chart.notes.length}`, true);
+
+    }catch(e){
+      setStatus("Error: " + (e?.message || e), false);
+    }finally{
+      ui.buildFromRec.disabled = rec.taps.length ? false : true;
+    }
+  });
+
+  ui.merge.addEventListener("click", async () => {
+    ui.merge.disabled = true;
+    ui.download.disabled = true;
+
+    try{
+      if(!state.autoChart || !state.recChart) throw new Error("need both Auto and REC charts");
+
+      const bpm = state.bpm || Number(ui.bpm.value) || 145;
+
+      const a = state.autoChart.notes.map(n=>n.t);
+      const b = state.recChart.notes.map(n=>n.t);
+
+      const mergedTimes = mergeTimes(a,b,bpm);
+      const chart = chartObjFromTimes(mergedTimes, bpm);
+      state.mergedChart = chart;
+
+      showChart(chart);
+
+      setStatus(`Merged OK: notes=${chart.notes.length}`, true);
+
+    }catch(e){
+      setStatus("Error: " + (e?.message || e), false);
+    }finally{
+      ui.merge.disabled = !(state.autoChart && state.recChart);
     }
   });
 
   ui.download.addEventListener("click", () => {
-    if (!chart) return;
+    const chart = state.lastChart;
+    if(!chart) return;
+
     const blob = new Blob([JSON.stringify(chart, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     const url = URL.createObjectURL(blob);
     a.href = url;
     a.download = "chart.json";
     a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 500);
+    setTimeout(()=>URL.revokeObjectURL(url), 800);
   });
+
+  ui.previewPlay.addEventListener("click", async () => {
+    if(!audioBuf){
+      setStatus("Load audio first.", false);
+      return;
+    }
+    const ctx = ensureAudioCtx();
+    await ctx.resume();
+
+    // toggle behavior
+    if(previewTimer){
+      stopPreview();
+      setStatus("Preview stopped.", true);
+      ui.previewPlay.textContent = "Preview Play (metronome)";
+      return;
+    }
+
+    let bpm = Number(ui.bpm.value)||0;
+    if(!(bpm>0)){
+      bpm = state.bpm || 145;
+      ui.bpm.value = bpm.toFixed(2);
+      ui.meterB.textContent = `bpm: ${bpm.toFixed(2)}`;
+    }
+    const beatMs = (60 / bpm) * 1000;
+
+    setStatus("Preview metronome started. (tap feel check)", true);
+    ui.previewPlay.textContent = "Preview Stop";
+
+    // click on beat
+    playClick();
+    previewTimer = setInterval(()=>playClick(), beatMs);
+  });
+
 })();
 </script>
+
 </body>
 </html>
