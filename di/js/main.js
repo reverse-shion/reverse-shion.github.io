@@ -1,14 +1,14 @@
 /* /di/js/main.js
-   DiCo ARU Phase1 — PRO STABLE ENTRY v2.3 (RINGBEAT HARDENED)
+   DiCo ARU Phase1 — PRO STABLE ENTRY v2.3.1 (DEV MP3 APPLY FIX)
    ------------------------------------------------------------
    ✅ iOS Safari safe (gesture unlock, VIDEO PLAY IN-GESTURE)
-   ✅ Prevent double-tap zoom / viewport drift (hitZone scoped)
    ✅ Deterministic state machine: idle -> playing -> result
    ✅ Single clock (Timing drives everything)
    ✅ Legacy engine loader (DI_ENGINE globals) kept
-   ✅ RingBeat: create after DOM refs, combo notify after judge.hit(t)
-   ✅ RingBeat call is "dual-safe": onCombo / updateCombo both supported
-   ✅ Debug logs to prove: res.name / combo / threshold / gate rejection
+   ✅ DEV override:
+      - mp3/m4a/wav/mp4 を「typeが空でも拡張子で許可」
+      - APPLYは “確実に” 音を差し替える（WebAudio優先 / HTMLAudio fallback）
+      - START/RESTART は差し替え後の音源で再生
 */
 
 "use strict";
@@ -39,21 +39,43 @@ const $ = (id) => document.getElementById(id);
 
 const STATES = Object.freeze({ IDLE: "idle", PLAYING: "playing", RESULT: "result" });
 
-function setState(app, s) {
-  app.dataset.state = s;
+function setState(app, s) { app.dataset.state = s; }
+function getState(app) { return app.dataset.state || STATES.IDLE; }
+function assertEl(el, name) { if (!el) throw new Error(`Missing #${name}`); return el; }
+function now() { return performance?.now?.() ?? Date.now(); }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+function guessMimeFromName(name = "") {
+  const n = String(name).toLowerCase();
+  if (n.endsWith(".mp3")) return "audio/mpeg";
+  if (n.endsWith(".m4a")) return "audio/mp4";
+  if (n.endsWith(".wav")) return "audio/wav";
+  if (n.endsWith(".aac")) return "audio/aac";
+  if (n.endsWith(".mp4")) return "video/mp4"; // iOS/Dropboxで音声がここ扱いのことがある
+  return "";
 }
-function getState(app) {
-  return app.dataset.state || STATES.IDLE;
+
+/**
+ * iOS/Dropbox: file.type が "" のことがあるので拡張子で許可する
+ */
+function isAudioLikeFile(file) {
+  if (!file) return false;
+  const type = String(file.type || "").toLowerCase();
+  if (type.startsWith("audio/")) return true;
+  if (type === "video/mp4") return true;
+
+  const name = String(file.name || "").toLowerCase();
+  return (
+    name.endsWith(".mp3") ||
+    name.endsWith(".m4a") ||
+    name.endsWith(".wav") ||
+    name.endsWith(".aac") ||
+    name.endsWith(".mp4")
+  );
 }
-function assertEl(el, name) {
-  if (!el) throw new Error(`Missing #${name}`);
-  return el;
-}
-function now() {
-  return performance?.now?.() ?? Date.now();
-}
-function clamp(v, a, b) {
-  return Math.max(a, Math.min(b, v));
+
+async function readAsArrayBuffer(file) {
+  return await file.arrayBuffer();
 }
 
 // ---------------------------------------------------------------------
@@ -323,11 +345,7 @@ function makeCircleGate({ hitZone, refs }) {
 function disposePreviousIfAny() {
   const prev = globalThis[APP_KEY];
   if (prev && typeof prev.dispose === "function") {
-    try {
-      prev.dispose();
-    } catch (e) {
-      console.warn("[DiCo] dispose prev failed", e);
-    }
+    try { prev.dispose(); } catch (e) { console.warn("[DiCo] dispose prev failed", e); }
   }
 }
 
@@ -344,7 +362,7 @@ function bindPress(btn, fn, signal) {
 }
 
 // ---------------------------------------------------------------------
-// RINGBEAT: HARDENED CALL (silent-fail killer)
+// RINGBEAT: HARDENED CALL
 // ---------------------------------------------------------------------
 function ringBeatNotify(rb, combo) {
   if (!rb) return false;
@@ -356,6 +374,80 @@ function ringBeatNotify(rb, combo) {
   } catch (e) {
     console.warn("[RingBeat] notify failed", e);
     return false;
+  }
+}
+
+// ---------------------------------------------------------------------
+// DEV AUDIO APPLY (CRITICAL FIX)
+//  - WebAudio優先: audio.loadMusicFromFile / loadMusicFromArrayBuffer
+//  - fallback: <audio id="music"> を objectURL に差し替え（Timing互換が残る）
+// ---------------------------------------------------------------------
+async function applyDevAudioFile({ audioMgr, musicEl, file, instance, setMsg }) {
+  if (!file) return false;
+
+  if (!isAudioLikeFile(file)) {
+    throw new Error("Unsupported audio: " + (file.name || "(no name)"));
+  }
+
+  const mime = String(file.type || guessMimeFromName(file.name) || "").toLowerCase();
+  console.debug("[DEV] audio file", { name: file.name, type: file.type, mime });
+
+  // まず unlock（APPLYはクリック＝ジェスチャー内なのでOK）
+  try { await audioMgr.unlock?.(); } catch {}
+
+  // ① もし AudioManager が file 直読みAPIを持ってるなら最優先
+  if (typeof audioMgr.loadMusicFromFile === "function") {
+    setMsg?.("Loading (file)...");
+    await audioMgr.loadMusicFromFile(file);
+    setMsg?.("OK (WebAudio:file)");
+    instance.__devAudioMode = "webaudio:file";
+    return true;
+  }
+
+  // ② 次に ArrayBuffer decode
+  if (typeof audioMgr.loadMusicFromArrayBuffer === "function") {
+    setMsg?.("Decoding (arrayBuffer)...");
+    const ab = await readAsArrayBuffer(file);
+    await audioMgr.loadMusicFromArrayBuffer(ab, { mime, name: file.name });
+    setMsg?.("OK (WebAudio:ab)");
+    instance.__devAudioMode = "webaudio:ab";
+    return true;
+  }
+
+  // ③ 最後の砦: HTMLAudio に差し替え（engine側が HTMLAudio 参照でも動く）
+  setMsg?.("Applying (HTMLAudio)...");
+  try {
+    // revoke old
+    if (instance.__devAudioUrl) {
+      try { URL.revokeObjectURL(instance.__devAudioUrl); } catch {}
+      instance.__devAudioUrl = "";
+    }
+    const url = URL.createObjectURL(file);
+    instance.__devAudioUrl = url;
+
+    musicEl.pause();
+    musicEl.src = url;
+    musicEl.load();
+
+    // engineが music element を差し替え検知する API を持ってれば呼ぶ
+    if (typeof audioMgr.setMusicElement === "function") {
+      audioMgr.setMusicElement(musicEl);
+    }
+
+    // metadata wait (best effort)
+    await new Promise((resolve) => {
+      const done = () => resolve();
+      musicEl.addEventListener("loadedmetadata", done, { once: true });
+      musicEl.addEventListener("canplay", done, { once: true });
+      setTimeout(resolve, 700);
+    });
+
+    setMsg?.("OK (HTMLAudio)");
+    instance.__devAudioMode = "htmlaudio:url";
+    return true;
+  } catch (e) {
+    console.warn("[DEV] HTMLAudio apply failed", e);
+    throw new Error("Audio apply failed: " + (e?.message || e));
   }
 }
 
@@ -376,7 +468,7 @@ async function boot() {
     raf = 0;
   };
 
-  // DOM refs (first!)
+  // DOM refs
   const app = assertEl($("app"), "app");
   const canvas = assertEl($("noteCanvas"), "noteCanvas");
   const hitZone = assertEl($("hitZone"), "hitZone");
@@ -384,6 +476,7 @@ async function boot() {
   const restartBtn = assertEl($("restartBtn"), "restartBtn");
   const stopBtn = $("stopBtn");
   const fxLayer = assertEl($("fxLayer"), "fxLayer");
+
   const devPanel = $("devPanel");
   const devAudioFile = $("devAudioFile");
   const devChartFile = $("devChartFile");
@@ -467,31 +560,55 @@ async function boot() {
   const ui = new E.UI(refs);
   const presenter = getResultPresenterSafe({ refs });
 
+  // DEV PANEL
   if (DEV && devPanel) {
     devPanel.hidden = false;
+
     const setDevMsg = (m) => {
       if (devMsg) devMsg.textContent = m;
       if (refs.ariaLive) refs.ariaLive.textContent = m;
     };
+
     if (devApply) {
-      devApply.addEventListener("click", async () => {
-        try {
-          const chartFile = devChartFile?.files?.[0];
-          const audioFile = devAudioFile?.files?.[0];
-          if (chartFile) {
-            const parsed = JSON.parse(await chartFile.text());
-            chartOverride = parsed;
-            if (DEV) console.debug("[DiCo] chart override loaded", parsed?.notes?.length || 0);
+      devApply.addEventListener(
+        "click",
+        async () => {
+          try {
+            setDevMsg("Applying...");
+
+            // 1) chart override
+            const chartFile = devChartFile?.files?.[0];
+            if (chartFile) {
+              const parsed = JSON.parse(await chartFile.text());
+              chartOverride = parsed;
+              console.debug("[DEV] chart override loaded", parsed?.notes?.length || 0);
+            }
+
+            // 2) audio override (CRITICAL)
+            const aFile = devAudioFile?.files?.[0];
+            if (aFile) {
+              await applyDevAudioFile({
+                audioMgr: audio,
+                musicEl: music,
+                file: aFile,
+                instance,
+                setMsg: setDevMsg,
+              });
+            } else {
+              // chartだけでもOK
+              setDevMsg(chartFile ? "OK (chart)" : "OK");
+            }
+
+            // 3) 念のため停止状態へ（STARTで確実に先頭から鳴る）
+            try { audio.stopMusic?.({ reset: true }); } catch {}
+            try { music.pause(); music.currentTime = 0; } catch {}
+
+          } catch (e) {
+            setDevMsg("ERR: " + (e?.message || e));
           }
-          if (audioFile) {
-            const ab = await audioFile.arrayBuffer();
-            await audio.loadMusicFromArrayBuffer?.(ab);
-          }
-          setDevMsg("OK");
-        } catch (e) {
-          setDevMsg("ERR: " + (e?.message || e));
-        }
-      }, { signal: ac.signal });
+        },
+        { signal: ac.signal }
+      );
     }
   } else if (devPanel) {
     devPanel.hidden = true;
@@ -520,45 +637,38 @@ async function boot() {
     render.resize?.();
   };
 
-  // -----------------------------------------------------------------
-  // RingBeat Install (AFTER DOM refs exist)
-  // -----------------------------------------------------------------
-instance.ringResonance = new RingResonance({
-  app,
-  ring: refs.avatarRing || $("avatarRing"),
-  fxLayer,
-  icon: refs.dicoFace || $("dicoFace"),
-  maxOrbs: 6,
-});
+  // Ring FX install
+  instance.ringResonance = new RingResonance({
+    app,
+    ring: refs.avatarRing || $("avatarRing"),
+    fxLayer,
+    icon: refs.dicoFace || $("dicoFace"),
+    maxOrbs: 6,
+  });
 
-instance.ringBeat = new RingBeat({
-  app,
-  avatarRing: refs.avatarRing || $("avatarRing"),
+  instance.ringBeat = new RingBeat({
+    app,
+    avatarRing: refs.avatarRing || $("avatarRing"),
+    targetEl:
+      document.querySelector(".targetCore") ||
+      document.getElementById("hitFlash") ||
+      document.querySelector("#targetRoot .targetCore") ||
+      document.getElementById("targetRoot") ||
+      document.getElementById("hitZone"),
+    fxLayer,
+    resonanceCtrl: instance.ringResonance,
+  });
 
-  // ✅ 中央の“確実に存在する”要素へフォールバック
-  targetEl:
-    document.querySelector(".targetCore") ||
-    document.getElementById("hitFlash") ||
-    document.querySelector("#targetRoot .targetCore") ||
-    document.getElementById("targetRoot") ||
-    document.getElementById("hitZone"),
+  try { instance.ringBeat.setThreshold?.(5); } catch {}
 
-  fxLayer,
-  resonanceCtrl: instance.ringResonance,
-});
+  log("RingBeat installed", {
+    hasRingBeat: !!instance.ringBeat,
+    threshold: 5,
+    avatarRing: !!(refs.avatarRing || $("avatarRing")),
+    targetCore: !!document.querySelector(".targetCore"),
+    hitFlash: !!document.getElementById("hitFlash"),
+  });
 
-// ✅ test threshold (5)
-try {
-  instance.ringBeat.setThreshold?.(5);
-} catch {}
-
-log("RingBeat installed", {
-  hasRingBeat: !!instance.ringBeat,
-  threshold: 5,
-  avatarRing: !!(refs.avatarRing || $("avatarRing")),
-  targetCore: !!document.querySelector(".targetCore"),
-  hitFlash: !!document.getElementById("hitFlash"),
-});
   // RAF loop
   function tick() {
     if (!running) return;
@@ -600,28 +710,19 @@ log("RingBeat installed", {
 
   function primeInGesture() {
     kickVideoInGesture(bgVideo);
-    try {
-      audio.primeUnlock?.();
-    } catch {}
+    try { audio.primeUnlock?.(); } catch {}
   }
 
   async function unlockBestEffort() {
-    try {
-      await audio.unlock?.();
-    } catch (e) {
-      console.warn("[DiCo] audio.unlock failed", e?.message || e);
-    }
+    try { await audio.unlock?.(); } catch (e) { console.warn("[DiCo] audio.unlock failed", e?.message || e); }
   }
 
   function hardStopAll() {
     running = false;
     stopRAF();
-    try {
-      timing.stop?.(audio);
-    } catch {}
-    try {
-      audio.stopMusic?.({ reset: true });
-    } catch {}
+    try { timing.stop?.(audio); } catch {}
+    try { audio.stopMusic?.({ reset: true }); } catch {}
+    try { music.pause(); } catch {}
   }
 
   async function startFromScratch(kind = "START") {
@@ -634,6 +735,8 @@ log("RingBeat installed", {
     rebuild();
     judge.reset?.();
 
+    // ✅ 重要：音源は “AudioManagerが見てる時計” を真実にする
+    // restart/reset は Timing 側がやる（Timingは audio.getMusicTime() を参照する設計）
     if (kind === "RESTART" && typeof timing.restart === "function") timing.restart(audio);
     else timing.start(audio, { reset: true });
 
@@ -681,9 +784,7 @@ log("RingBeat installed", {
     running = false;
     stopRAF();
 
-    try {
-      timing.stop?.(audio);
-    } catch {}
+    try { timing.stop?.(audio); } catch {}
 
     bestEffortPlayVideo(bgVideo);
 
@@ -728,7 +829,6 @@ log("RingBeat installed", {
       const res = judge.hit(t);
       ui.onJudge?.(res);
 
-      // ALWAYS notify combo (MISSも含む)
       const comboNow = judge.state.combo || 0;
       const ok = ringBeatNotify(instance.ringBeat, comboNow);
 
@@ -756,12 +856,8 @@ log("RingBeat installed", {
 
   // Resize
   const onResize = () => {
-    try {
-      render?.resize?.();
-    } catch {}
-    try {
-      input?.recalc?.();
-    } catch {}
+    try { render?.resize?.(); } catch {}
+    try { input?.recalc?.(); } catch {}
   };
 
   window.addEventListener("resize", onResize, { passive: true, signal: ac.signal });
@@ -773,35 +869,30 @@ log("RingBeat installed", {
 
   // Initial state
   setState(app, STATES.IDLE);
-  try {
-    audio.stopMusic?.({ reset: true });
-  } catch {}
-  try {
-    bgVideo?.pause?.();
-  } catch {}
+  try { audio.stopMusic?.({ reset: true }); } catch {}
+  try { bgVideo?.pause?.(); } catch {}
 
   ui.update?.({ t: 0, score: 0, combo: 0, maxCombo: 0, resonance: 0, state: STATES.IDLE });
   log("BOOT OK");
 
   // Dispose
   instance.dispose = () => {
-    try {
-      ac.abort();
-    } catch {}
-    try {
-      input?.destroy?.();
-    } catch {}
-    try {
-      instance.ringResonance?.dispose?.();
-    } catch {}
+    try { ac.abort(); } catch {}
+    try { input?.destroy?.(); } catch {}
+    try { instance.ringResonance?.dispose?.(); } catch {}
+
     running = false;
     stopRAF();
-    try {
-      audio.stopMusic?.({ reset: true });
-    } catch {}
-    try {
-      bgVideo?.pause?.();
-    } catch {}
+
+    try { audio.stopMusic?.({ reset: true }); } catch {}
+    try { bgVideo?.pause?.(); } catch {}
+
+    // objectURL revoke (HTMLAudio fallback用)
+    if (instance.__devAudioUrl) {
+      try { URL.revokeObjectURL(instance.__devAudioUrl); } catch {}
+      instance.__devAudioUrl = "";
+    }
+
     instance.running = false;
   };
 }
