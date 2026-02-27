@@ -58,10 +58,17 @@
 
       // ✅ reset=true の時は必ず曲を先頭へ
       if (a && a.music && reset) {
-        try {
-          a.music.pause();
-          a.music.currentTime = 0;
-        } catch {}
+        const isMedia = typeof HTMLMediaElement !== "undefined" && a.music instanceof HTMLMediaElement;
+        if (isMedia) {
+          try {
+            a.music.pause();
+            a.music.currentTime = 0;
+          } catch {}
+        } else {
+          try {
+            a.stopMusic?.({ reset: true });
+          } catch {}
+        }
       }
 
       // start/resume music
