@@ -1,0 +1,99 @@
+:root{
+  --site-bg:#050816;
+  --site-text:#eef4ff;
+  --site-text-soft:#cdd9f6;
+  --site-muted:#91a6cf;
+
+  --site-accent:#9fd3ff;
+  --site-accent-2:#7be7ff;
+  --site-accent-3:#c6a6ff;
+  --site-gold:#ffe3a8;
+
+  --site-radius-xl:28px;
+  --site-radius-lg:22px;
+  --site-radius-md:16px;
+  --site-radius-sm:12px;
+
+  --site-shadow-lg:0 18px 60px rgba(0,0,0,.42);
+  --site-shadow-md:0 12px 34px rgba(0,0,0,.28);
+  --site-shadow-sm:0 6px 18px rgba(0,0,0,.18);
+
+  --font-title:"Shippori Mincho", serif;
+  --font-body:"Noto Sans JP", system-ui, sans-serif;
+
+  --site-transition:.35s ease;
+}
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  color:var(--site-text);
+  font-family:var(--font-body);
+  background:var(--site-bg);
+  line-height:1.82;
+  letter-spacing:.02em;
+}
+
+img{
+  max-width:100%;
+  display:block;
+}
+
+a{
+  color:inherit;
+}
+
+::selection{
+  background:rgba(159,211,255,.30);
+  color:#fff;
+}
+
+a:focus-visible,
+button:focus-visible{
+  outline:2px solid rgba(255,227,168,.86);
+  outline-offset:3px;
+  border-radius:10px;
+}
+
+.reveal{
+  opacity:1;
+  transform:none;
+}
+
+.js-enabled .reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .65s ease, transform .65s ease;
+}
+
+.js-enabled .reveal.is-visible{
+  opacity:1;
+  transform:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{
+    scroll-behavior:auto;
+  }
+
+  *,
+  *::before,
+  *::after{
+    animation:none !important;
+    transition:none !important;
+  }
+
+  .js-enabled .reveal{
+    opacity:1 !important;
+    transform:none !important;
+  }
+}
