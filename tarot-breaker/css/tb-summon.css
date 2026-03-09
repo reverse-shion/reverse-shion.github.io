@@ -8,17 +8,71 @@
   pointer-events: none;
 }
 .tb-summon-stage { position: relative; display: grid; gap: 1rem; justify-items: center; }
-.tb-card-wrap { perspective: 1100px; width: min(320px, 100%); }
-.tb-arcana-card { position: relative; width: 100%; min-height: 420px; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.2,.8,.2,1); }
+.tb-summon-trigger[disabled] {
+  opacity: .74;
+  cursor: not-allowed;
+}
+.tb-card-wrap { perspective: 1100px; width: min(340px, 100%); }
+.tb-arcana-card {
+  position: relative;
+  width: 100%;
+  min-height: 468px;
+  transform-style: preserve-3d;
+  transition: transform .9s cubic-bezier(.2,.8,.2,1), filter .6s ease;
+}
+.tb-arcana-card[data-phase="connecting"] { filter: saturate(1.2) brightness(1.08); }
+.tb-arcana-card[data-phase="revealed"] { filter: drop-shadow(0 8px 22px rgba(113, 140, 255, 0.22)); }
 .tb-arcana-card[data-flip="true"] { transform: rotateY(180deg); }
 .tb-arcana-face {
   position: absolute; inset: 0; backface-visibility: hidden;
   border-radius: 16px; border: 1px solid var(--tb-border);
   padding: 1.2rem; display: flex; flex-direction: column; justify-content: center;
+  gap: .4rem;
   background: linear-gradient(160deg, rgba(18, 25, 45, .94), rgba(7, 10, 18, .94));
   text-align: center;
 }
-.tb-arcana-face--back { transform: rotateY(180deg); background: linear-gradient(160deg, rgba(29, 35, 64, .92), rgba(7, 10, 18, .96)); }
-.tb-card-mark { letter-spacing: .2em; color: var(--tb-gold); font-size: .75rem; }
-.tb-arcana-keyword { color: var(--tb-accent); font-weight: 700; }
-.tb-summon-status { color: var(--tb-muted); text-align: center; }
+.tb-arcana-face--front {
+  background-image:
+    linear-gradient(160deg, rgba(18, 25, 45, .94), rgba(7, 10, 18, .94)),
+    radial-gradient(circle at 45% 8%, rgba(255, 245, 212, .14), transparent 34%);
+}
+.tb-arcana-face--front::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 175, 124, 0.18);
+  pointer-events: none;
+}
+.tb-arcana-face--back {
+  transform: rotateY(180deg);
+  background: linear-gradient(160deg, rgba(29, 35, 64, .92), rgba(7, 10, 18, .96));
+}
+.tb-arcana-face--back p { letter-spacing: .15em; margin: 0; color: rgba(233, 226, 194, 0.92); }
+.tb-arcana-face--back small { color: var(--tb-muted); letter-spacing: .12em; }
+.tb-card-mark { letter-spacing: .2em; color: var(--tb-gold); font-size: .75rem; margin: 0; }
+.tb-arcana-subtitle { color: var(--tb-accent); font-size: .78rem; letter-spacing: .16em; margin: .2rem 0 0; text-transform: uppercase; }
+.tb-arcana-face h3 { margin: .2rem 0; font-size: 1.45rem; font-family: "Shippori Mincho", serif; line-height: 1.45; }
+.tb-arcana-keyword {
+  color: rgba(232, 219, 170, .94);
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.tb-arcana-omen {
+  color: var(--tb-muted);
+  font-size: .96rem;
+  max-width: 24ch;
+  margin: .35rem auto 0;
+}
+.tb-summon-status {
+  color: var(--tb-muted);
+  text-align: center;
+  min-height: 2.2rem;
+  max-width: 40ch;
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .tb-card-wrap { width: min(100%, 332px); }
+  .tb-arcana-card { min-height: 452px; }
+}
