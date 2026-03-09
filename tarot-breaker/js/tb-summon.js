@@ -4,6 +4,7 @@ window.TB?.ready(() => {
 
   const button = root.querySelector('[data-summon-button]');
   const card = root.querySelector('.tb-arcana-card');
+  const stage = root.closest('.tb-summon-stage') || root;
   const status = root.querySelector('[data-summon-status]');
   const nameEl = root.querySelector('[data-arcana-name]');
   const subtitleEl = root.querySelector('[data-arcana-subtitle]');
@@ -78,6 +79,12 @@ window.TB?.ready(() => {
 
   const setIdle = () => {
     card.dataset.phase = 'idle';
+    stage.classList.remove('is-ritual-live');
+  };
+
+  const setRevealed = () => {
+    card.dataset.phase = 'revealed';
+    stage.classList.add('is-ritual-live');
   };
 
   fetch('./data/arcana.json')
@@ -90,7 +97,7 @@ window.TB?.ready(() => {
       if (stored?.date === todayKey()) {
         renderCard(stored.card);
         card.dataset.flip = 'true';
-        card.dataset.phase = 'revealed';
+        setRevealed();
         button.disabled = true;
         button.textContent = '本日の記録を表示中';
         status.textContent = '本日のタロット展開は記録されています。受信済みの一枚を、必要なだけ見届けてください。';
@@ -104,7 +111,7 @@ window.TB?.ready(() => {
       if (stored?.date === todayKey()) {
         renderCard(stored.card);
         card.dataset.flip = 'true';
-        card.dataset.phase = 'revealed';
+        setRevealed();
         button.disabled = true;
         button.textContent = '本日の記録を表示中';
         status.textContent = '本日のタロット展開は記録されています。予備記録から同期表示しています。';
@@ -121,7 +128,7 @@ window.TB?.ready(() => {
     if (stored?.date === todayKey()) {
       renderCard(stored.card);
       card.dataset.flip = 'true';
-      card.dataset.phase = 'revealed';
+      setRevealed();
       button.disabled = true;
       button.textContent = '本日の記録を表示中';
       status.textContent = '本日のタロット展開は記録されています。受信済みの一枚を確認してください。';
@@ -133,6 +140,7 @@ window.TB?.ready(() => {
     button.textContent = '星界接続中...';
     card.dataset.flip = 'false';
     card.dataset.phase = 'connecting';
+    stage.classList.remove('is-ritual-live');
     status.textContent = '星界接続を開始。観測窓を開いています…';
     await sleep(860);
 
@@ -142,7 +150,7 @@ window.TB?.ready(() => {
     const pick = arcana[Math.floor(Math.random() * arcana.length)];
     renderCard(pick);
     card.dataset.flip = 'true';
-    card.dataset.phase = 'revealed';
+    setRevealed();
     storeCard(pick);
 
     status.textContent = '展開完了：今日の一枚を記録しました。門はまだ開いています。';
