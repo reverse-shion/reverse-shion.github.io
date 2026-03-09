@@ -1,0 +1,24 @@
+.tb-summon-section { position: relative; overflow: hidden; }
+.tb-summon-section::before {
+  content: "";
+  position: absolute;
+  inset: -20% 30% auto -20%;
+  height: 320px;
+  background: radial-gradient(circle at center, rgba(148, 164, 247, .17), transparent 65%);
+  pointer-events: none;
+}
+.tb-summon-stage { position: relative; display: grid; gap: 1rem; justify-items: center; }
+.tb-card-wrap { perspective: 1100px; width: min(320px, 100%); }
+.tb-arcana-card { position: relative; width: 100%; min-height: 420px; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.2,.8,.2,1); }
+.tb-arcana-card[data-flip="true"] { transform: rotateY(180deg); }
+.tb-arcana-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border-radius: 16px; border: 1px solid var(--tb-border);
+  padding: 1.2rem; display: flex; flex-direction: column; justify-content: center;
+  background: linear-gradient(160deg, rgba(18, 25, 45, .94), rgba(7, 10, 18, .94));
+  text-align: center;
+}
+.tb-arcana-face--back { transform: rotateY(180deg); background: linear-gradient(160deg, rgba(29, 35, 64, .92), rgba(7, 10, 18, .96)); }
+.tb-card-mark { letter-spacing: .2em; color: var(--tb-gold); font-size: .75rem; }
+.tb-arcana-keyword { color: var(--tb-accent); font-weight: 700; }
+.tb-summon-status { color: var(--tb-muted); text-align: center; }
