@@ -11,9 +11,14 @@
 
   // 常にbodyの上余白を確保（Safariノッチ対応も含む）
   const root = document.documentElement;
-  const headerH = getComputedStyle(root).getPropertyValue('--header-h') || '64px';
-  document.body.style.paddingTop =
-    `calc(${headerH.trim()} + env(safe-area-inset-top, 0px))`;
+  const syncHeaderOffset = () => {
+    const measured = Math.ceil(header.getBoundingClientRect().height);
+    const fallback = parseFloat(getComputedStyle(root).getPropertyValue('--header-h')) || 64;
+    const headerH = Math.max(measured, fallback);
+    root.style.setProperty('--header-h', `${headerH}px`);
+    document.body.style.paddingTop = `calc(${headerH}px + env(safe-area-inset-top, 0px))`;
+  };
+  syncHeaderOffset();
 
   function showHeader() {
     header.classList.remove('hide');        // 旧クラス互換
@@ -36,6 +41,9 @@
     lastY = currentY;
   }, { passive: true });
 
+  window.addEventListener('resize', syncHeaderOffset, { passive: true });
+  window.addEventListener('orientationchange', syncHeaderOffset, { passive: true });
+
   // ヘッダーに触れている間は固定表示（タップ/ドラッグ/ホバー）
   const holdOn = () => { header.dataset.hold = '1'; showHeader(); if (hideTimer) clearTimeout(hideTimer); };
   const holdOff = () => {
@@ -52,4 +60,5 @@
 
   // 初期表示は出しておく
   showHeader();
+  requestAnimationFrame(syncHeaderOffset);
 })();
