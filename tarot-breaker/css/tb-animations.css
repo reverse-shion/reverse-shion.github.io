@@ -1,7 +1,8 @@
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s ease; }
-.reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal { opacity: 1; transform: none; }
+.js-enabled .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s ease; }
+.js-enabled .reveal.is-visible { opacity: 1; transform: translateY(0); }
 
-.tb-arcana-card[data-phase="connecting"] .tb-arcana-face--back {
+.tb-arcana-card[data-phase="connecting"] .tb-arcana-face--front {
   animation: tb-card-breathe 1.8s ease-in-out infinite;
 }
 
@@ -12,5 +13,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .reveal, .tb-arcana-card, .tb-btn, .tb-story { transition: none !important; transform: none !important; opacity: 1 !important; }
-  .tb-arcana-card[data-phase="connecting"] .tb-arcana-face--back { animation: none !important; }
+  .tb-arcana-card[data-phase="connecting"] .tb-arcana-face--front { animation: none !important; }
 }
