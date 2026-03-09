@@ -30,6 +30,7 @@
 }
 
 .tb-summon-stage {
+  --ritual-glow: rgba(146, 176, 255, 0);
   position: relative;
   isolation: isolate;
   display: grid;
@@ -39,18 +40,69 @@
   margin-inline: auto;
   padding-inline: clamp(.2rem, 2.4vw, .78rem);
 }
+.tb-summon-stage::before,
+.tb-summon-stage::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.tb-summon-stage::before {
+  inset: 2.5rem 2rem auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(199, 220, 255, .68), transparent);
+}
+.tb-summon-stage::after {
+  inset: 0;
+  margin: auto;
+  width: min(320px, 90%);
+  height: min(320px, 90vw);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(163, 190, 255, .22), rgba(163, 190, 255, 0) 62%);
+  transform: scale(.68);
+}
+
 .tb-summon-trigger {
-  min-height: 2.8rem;
-  letter-spacing: .04em;
+  position: relative;
+  z-index: 3;
+  min-height: 3rem;
+  min-width: min(100%, 18.2rem);
+  padding: .84rem 1.4rem;
+  letter-spacing: .08em;
+  color: #f5f7ff;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(172, 195, 255, .35);
+  border-color: rgba(214, 220, 255, .38);
+  box-shadow: 0 10px 30px rgba(3, 6, 18, .45), 0 0 0 1px rgba(198, 178, 132, .2) inset;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+}
+.tb-summon-trigger:hover,
+.tb-summon-trigger:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 34px rgba(3, 6, 18, .5), 0 0 18px rgba(141, 172, 255, .22);
 }
 .tb-summon-trigger[disabled] {
-  opacity: .74;
-  cursor: not-allowed;
+  opacity: 1;
+  cursor: pointer;
+}
+.tb-summon-stage[data-state="connecting"] .tb-summon-trigger {
+  color: #f8fbff;
+  border-color: rgba(194, 211, 255, .66);
+  box-shadow: 0 0 0 1px rgba(195, 220, 255, .36) inset, 0 0 18px rgba(147, 175, 255, .26);
+}
+.tb-summon-stage[data-state="connecting"]::before {
+  opacity: .85;
+}
+.tb-summon-stage[data-state="connecting"]::after {
+  opacity: .82;
+  animation: tb-ritual-ripple 1.9s ease-out infinite;
 }
 
 .tb-card-wrap {
   position: relative;
-  perspective: 1200px;
+  z-index: 2;
   width: min(100%, 340px);
   margin-inline: auto;
 }
@@ -60,10 +112,10 @@
   inset: 10% 14%;
   border-radius: 18px;
   z-index: -1;
-  background: radial-gradient(circle, rgba(130, 162, 255, .28), rgba(130, 162, 255, 0) 66%);
+  background: radial-gradient(circle, rgba(130, 162, 255, .34), rgba(130, 162, 255, 0) 66%);
   filter: blur(12px);
-  opacity: .45;
-  transition: opacity .7s ease;
+  opacity: .38;
+  transition: opacity .8s ease;
 }
 
 .tb-arcana-card {
@@ -71,40 +123,34 @@
   width: 100%;
   min-height: 468px;
   margin-inline: auto;
-  transform-style: preserve-3d;
-  transition: transform .9s cubic-bezier(.2,.8,.2,1), filter .6s ease;
+  transform: translateY(4px) scale(.992);
+  opacity: .93;
+  transition: transform .9s cubic-bezier(.2,.8,.2,1), filter .6s ease, opacity .6s ease;
 }
-.tb-arcana-card[data-phase="connecting"] {
-  filter: saturate(1.15) brightness(1.06);
-}
-.tb-arcana-card[data-phase="revealed"] {
-  filter: drop-shadow(0 12px 26px rgba(113, 140, 255, 0.24));
-}
-.tb-arcana-card[data-phase="revealed"] + .tb-summon-status,
-.tb-arcana-card[data-phase="revealed"] ~ .tb-summon-status {
-  color: rgba(229, 235, 255, .88);
-}
-.tb-arcana-card[data-phase="revealed"] {
-  animation: tb-card-reveal .95s cubic-bezier(.21,.77,.31,1) both;
-}
-.tb-arcana-card[data-phase="connecting"] + .tb-summon-status,
-.tb-arcana-card[data-phase="connecting"] ~ .tb-summon-status {
-  color: #d0dcff;
-}
-.tb-arcana-card[data-flip="true"] { transform: rotateY(180deg); }
 
-.tb-summon-stage.is-ritual-live .tb-card-wrap::before {
+/* NOTE: We intentionally avoid rotateY/scaleX transforms on the card body.
+   This removes iOS Safari mirrored glyph artifacts caused by 3D flip + backface rendering. */
+.tb-arcana-card[data-phase="connecting"] {
+  filter: saturate(1.1) brightness(1.06);
+}
+.tb-arcana-card[data-phase="revealed"] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: drop-shadow(0 12px 26px rgba(113, 140, 255, 0.24));
+  animation: tb-card-reveal 1.05s cubic-bezier(.21,.77,.31,1) both;
+}
+
+.tb-summon-stage[data-state="revealed"] .tb-card-wrap::before {
   opacity: .82;
 }
-.tb-summon-stage.is-ritual-live .tb-summon-status {
-  text-shadow: 0 0 10px rgba(152, 177, 255, .2);
+.tb-summon-stage[data-state="revealed"] .tb-summon-status {
+  color: rgba(229, 235, 255, .92);
+  text-shadow: 0 0 10px rgba(152, 177, 255, .22);
 }
 
 .tb-arcana-face {
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   border-radius: 16px;
   border: 1px solid var(--tb-border);
   padding: 1.2rem;
@@ -112,14 +158,14 @@
   flex-direction: column;
   justify-content: center;
   gap: .4rem;
-  background: linear-gradient(160deg, rgba(18, 25, 45, .94), rgba(7, 10, 18, .94));
+  background: linear-gradient(160deg, rgba(18, 25, 45, .95), rgba(7, 10, 18, .96));
   text-align: center;
   overflow: hidden;
 }
 .tb-arcana-face--front {
-  transform: rotateY(0deg);
+  z-index: 2;
   background-image:
-    linear-gradient(160deg, rgba(18, 25, 45, .94), rgba(7, 10, 18, .94)),
+    linear-gradient(160deg, rgba(18, 25, 45, .95), rgba(7, 10, 18, .96)),
     radial-gradient(circle at 45% 8%, rgba(255, 245, 212, .14), transparent 34%);
 }
 .tb-arcana-face--front::before {
@@ -131,16 +177,14 @@
   pointer-events: none;
 }
 .tb-arcana-face--back {
-  transform: rotateY(180deg);
-  background: linear-gradient(160deg, rgba(29, 35, 64, .92), rgba(7, 10, 18, .96));
+  z-index: 1;
+  opacity: .35;
+  transform: scale(.99);
+  filter: blur(.2px) saturate(.9);
+  background: linear-gradient(160deg, rgba(29, 35, 64, .7), rgba(7, 10, 18, .88));
 }
-.tb-arcana-face--back p,
-.tb-arcana-face--back small {
-  transform: translateZ(.01px);
-}
-
-.tb-arcana-face--back p { letter-spacing: .15em; margin: 0; color: rgba(233, 226, 194, 0.92); }
-.tb-arcana-face--back small { color: var(--tb-muted); letter-spacing: .12em; }
+.tb-arcana-face--back p { letter-spacing: .15em; margin: 0; color: rgba(233, 226, 194, 0.66); }
+.tb-arcana-face--back small { color: rgba(183, 189, 208, .76); letter-spacing: .12em; }
 .tb-card-mark { letter-spacing: .2em; color: var(--tb-gold); font-size: .75rem; margin: 0; }
 .tb-arcana-subtitle { color: var(--tb-accent); font-size: .78rem; letter-spacing: .16em; margin: .2rem 0 0; text-transform: uppercase; }
 .tb-arcana-face h3 { margin: .2rem 0; font-size: 1.45rem; font-family: "Shippori Mincho", serif; line-height: 1.45; }
@@ -154,26 +198,38 @@
   font-size: .96rem;
   max-width: 24ch;
   margin: .35rem auto 0;
+  line-height: 1.9;
 }
 .tb-summon-status {
   color: var(--tb-muted);
   text-align: center;
-  min-height: 2.2rem;
+  min-height: 2.5rem;
   max-width: 40ch;
   margin: .1rem auto 0;
 }
 
 @keyframes tb-card-reveal {
-  0% { transform: rotateY(180deg) translateY(14px) scale(.985); }
-  55% { transform: rotateY(180deg) translateY(-2px) scale(1.01); }
-  100% { transform: rotateY(180deg) translateY(0) scale(1); }
+  0% { transform: translateY(14px) scale(.982); opacity: .5; }
+  65% { transform: translateY(-2px) scale(1.008); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes tb-ritual-ripple {
+  0% { transform: scale(.66); opacity: 0; }
+  25% { opacity: .65; }
+  100% { transform: scale(1.08); opacity: 0; }
 }
 
 @media (max-width: 700px) {
   .tb-summon-stage {
     width: min(100%, 372px);
     padding-inline: 0;
-    gap: .88rem;
+    gap: .9rem;
+  }
+  .tb-summon-trigger {
+    width: min(100%, 19rem);
+    min-height: 3.1rem;
+    font-size: .96rem;
   }
   .tb-card-wrap {
     width: min(100%, 332px);
@@ -186,11 +242,16 @@
 @media (prefers-reduced-motion: reduce) {
   .tb-card-wrap::before,
   .tb-summon-section::before,
-  .tb-summon-section::after {
+  .tb-summon-section::after,
+  .tb-summon-stage::after,
+  .tb-summon-stage::before,
+  .tb-arcana-card,
+  .tb-summon-trigger {
     transition: none !important;
     animation: none !important;
   }
-  .tb-arcana-card[data-phase="revealed"] {
-    animation: none !important;
+  .tb-arcana-card {
+    transform: none !important;
+    opacity: 1 !important;
   }
 }

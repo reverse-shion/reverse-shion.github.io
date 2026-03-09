@@ -74,17 +74,26 @@ window.TB?.ready(() => {
     omenEl.textContent = pick.meaning || pick.omen || '今日の一枚は、あなたの歩幅に静かに同調します。';
   };
 
+  const setStageState = (phase, state) => {
+    card.dataset.phase = phase;
+    stage.dataset.state = state;
+  };
+
   let arcana = fallback;
   let busy = false;
 
-  const setIdle = () => {
-    card.dataset.phase = 'idle';
-    stage.classList.remove('is-ritual-live');
+  const resetIdle = () => {
+    setStageState('idle', 'idle');
+    status.textContent = '待機中：セレフィーズ認証は静かに維持されています。';
+    button.textContent = 'タロット展開';
+    button.removeAttribute('aria-busy');
   };
 
-  const setRevealed = () => {
-    card.dataset.phase = 'revealed';
-    stage.classList.add('is-ritual-live');
+  const showStoredResult = (stored, fallbackMessage) => {
+    renderCard(stored.card);
+    setStageState('revealed', 'revealed');
+    button.textContent = '今日の徴を確認する';
+    status.textContent = fallbackMessage || '本日のタロット展開は記録されています。今日の徴をゆっくり読み解いてください。';
   };
 
   fetch('./data/arcana.json')
@@ -95,66 +104,51 @@ window.TB?.ready(() => {
       }
       const stored = parseStored();
       if (stored?.date === todayKey()) {
-        renderCard(stored.card);
-        card.dataset.flip = 'true';
-        setRevealed();
-        button.disabled = true;
-        button.textContent = '本日の記録を表示中';
-        status.textContent = '本日のタロット展開は記録されています。受信済みの一枚を、必要なだけ見届けてください。';
+        showStoredResult(stored);
       } else {
-        setIdle();
-        status.textContent = '待機中：セレフィーズ認証は静かに維持されています。';
+        resetIdle();
       }
     })
     .catch(() => {
       const stored = parseStored();
       if (stored?.date === todayKey()) {
-        renderCard(stored.card);
-        card.dataset.flip = 'true';
-        setRevealed();
-        button.disabled = true;
-        button.textContent = '本日の記録を表示中';
-        status.textContent = '本日のタロット展開は記録されています。予備記録から同期表示しています。';
+        showStoredResult(stored, '本日のタロット展開は記録されています。予備記録から同期表示しています。');
         return;
       }
-      setIdle();
-      status.textContent = '接続注意：記録の読み込みに失敗したため、予備アーカイブで展開できます。';
+      resetIdle();
+      status.textContent = '接続注意：記録の読み込みに失敗したため、予備アーカイブで展開します。';
     });
 
   button.addEventListener('click', async () => {
-    if (busy || button.disabled) return;
+    if (busy) return;
 
     const stored = parseStored();
     if (stored?.date === todayKey()) {
-      renderCard(stored.card);
-      card.dataset.flip = 'true';
-      setRevealed();
-      button.disabled = true;
-      button.textContent = '本日の記録を表示中';
-      status.textContent = '本日のタロット展開は記録されています。受信済みの一枚を確認してください。';
+      showStoredResult(stored, '今日の徴は記録済みです。門の前で静かに読み解いてください。');
       return;
     }
 
     busy = true;
-    button.disabled = true;
-    button.textContent = '星界接続中...';
-    card.dataset.flip = 'false';
-    card.dataset.phase = 'connecting';
-    stage.classList.remove('is-ritual-live');
-    status.textContent = '星界接続を開始。観測窓を開いています…';
-    await sleep(860);
+    button.setAttribute('aria-busy', 'true');
+    button.textContent = '星界接続中…';
+    setStageState('connecting', 'connecting');
+    status.textContent = '星界接続を開始。儀式回路を起動しています…';
+    await sleep(900);
 
-    status.textContent = '観測同期中… 一枚の徴を受信しています。';
-    await sleep(780);
+    status.textContent = '同期中… 星粒の位相を合わせています。';
+    await sleep(1200);
+
+    status.textContent = '徴の記録中… まもなく今日の一枚が現れます。';
+    await sleep(1000);
 
     const pick = arcana[Math.floor(Math.random() * arcana.length)];
     renderCard(pick);
-    card.dataset.flip = 'true';
-    setRevealed();
+    setStageState('revealed', 'revealed');
     storeCard(pick);
 
-    status.textContent = '展開完了：今日の一枚を記録しました。門はまだ開いています。';
-    button.textContent = '本日の記録を表示中';
+    button.removeAttribute('aria-busy');
+    button.textContent = '今日の徴を確認する';
+    status.textContent = '展開完了：今日の一枚を記録しました。門は静かに開き続けています。';
     busy = false;
   });
 });

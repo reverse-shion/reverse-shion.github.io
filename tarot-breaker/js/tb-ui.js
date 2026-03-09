@@ -1,6 +1,14 @@
 window.TB?.ready(() => {
+  const root = document.documentElement;
+  root.classList.add('js-enabled');
+
   const nodes = document.querySelectorAll(window.TB.selectors.reveal);
   if (!nodes.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    nodes.forEach((node) => node.classList.add('is-visible'));
+    return;
+  }
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
