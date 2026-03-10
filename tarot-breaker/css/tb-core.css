@@ -40,7 +40,10 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--tb-bg);
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 50% -6%, rgba(115, 140, 255, 0.20), transparent 44%),
+    linear-gradient(180deg, #070b18 0%, #050813 46%, #04060f 100%);
   color: var(--tb-text);
 }
 
@@ -87,7 +90,7 @@ img {
 .tb-cosmic-bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   overflow: hidden;
   pointer-events: none;
   background:
@@ -95,7 +98,7 @@ img {
     radial-gradient(circle at 12% 26%, rgba(106, 122, 220, 0.11), transparent 22%),
     radial-gradient(circle at 84% 62%, rgba(209, 174, 110, 0.08), transparent 18%),
     radial-gradient(circle at 50% 100%, rgba(66, 88, 170, 0.08), transparent 32%),
-    linear-gradient(180deg, rgba(5, 8, 19, 0.52), rgba(4, 7, 15, 0.72) 48%, rgba(3, 5, 12, 0.94) 100%);
+    linear-gradient(180deg, rgba(5, 8, 19, 0.30), rgba(4, 7, 15, 0.46) 48%, rgba(3, 5, 12, 0.64) 100%);
 }
 
 #tb-star-canvas {
@@ -119,7 +122,7 @@ img {
 
 .tb-cosmic-haze {
   z-index: 2;
-  opacity: 0.58;
+  opacity: 0.36;
   background:
     radial-gradient(circle at 18% 20%, rgba(127, 141, 214, 0.14), transparent 38%),
     radial-gradient(circle at 74% 22%, rgba(203, 168, 114, 0.10), transparent 24%),
@@ -129,7 +132,7 @@ img {
 
 .tb-cosmic-noise {
   z-index: 3;
-  opacity: 0.022;
+  opacity: 0.012;
   mix-blend-mode: screen;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
@@ -231,7 +234,7 @@ img {
   border: 1px solid var(--tb-border);
   border-radius: var(--tb-radius);
   background:
-    linear-gradient(180deg, rgba(11, 17, 32, 0.56), rgba(8, 12, 24, 0.48));
+    linear-gradient(180deg, rgba(11, 17, 32, 0.44), rgba(8, 12, 24, 0.36));
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow:
@@ -250,7 +253,7 @@ img {
     radial-gradient(circle at 12% 0%, rgba(157, 184, 255, 0.05), transparent 26%),
     radial-gradient(circle at 88% 8%, rgba(206, 176, 122, 0.04), transparent 22%),
     radial-gradient(circle at 50% 100%, rgba(157, 184, 255, 0.04), transparent 34%);
-  z-index: -1;
+  z-index: -2;
 }
 
 .tb-section-kicker {
@@ -373,7 +376,7 @@ p {
   border: 1px solid var(--tb-border);
   border-radius: var(--tb-radius-sm);
   background:
-    linear-gradient(180deg, rgba(11, 17, 31, 0.60), rgba(8, 12, 24, 0.50));
+    linear-gradient(180deg, rgba(11, 17, 31, 0.52), rgba(8, 12, 24, 0.42));
   box-shadow:
     var(--tb-shadow-soft),
     0 0 0 1px rgba(255, 224, 160, 0.02) inset;
@@ -567,10 +570,10 @@ p {
   }
 
   .tb-cosmic-haze {
-    opacity: 0.50;
+    opacity: 0.3;
   }
 
   .tb-cosmic-noise {
-    opacity: 0.016;
+    opacity: 0.009;
   }
 }

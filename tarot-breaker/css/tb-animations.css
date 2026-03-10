@@ -11,7 +11,124 @@
   50% { box-shadow: inset 0 0 0 1px rgba(201, 175, 124, 0.36), 0 0 26px rgba(113, 140, 255, 0.24); }
 }
 
+.tb-intro-lock {
+  overflow: hidden;
+}
+
+.tb-intro[hidden] {
+  display: none !important;
+}
+
+.tb-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 35%, rgba(29, 39, 81, .45), #010205 64%);
+  opacity: 0;
+  transition: opacity .42s ease;
+}
+
+.tb-intro.is-active {
+  opacity: 1;
+}
+
+.tb-intro.is-hiding {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tb-intro-inner {
+  width: min(90vw, 540px);
+  text-align: center;
+}
+
+.tb-intro-brand {
+  letter-spacing: .18em;
+  color: rgba(226, 233, 255, .8);
+  margin-bottom: .6rem;
+}
+
+.tb-intro-title {
+  font: 700 clamp(1.5rem, 6vw, 2.4rem) "Shippori Mincho", serif;
+  margin: 0 0 1rem;
+  color: #f6edd8;
+  text-shadow: 0 0 24px rgba(217, 188, 128, .24);
+  animation: tb-intro-fade .8s ease .12s both;
+}
+
+.tb-intro-cards {
+  position: relative;
+  width: min(85vw, 420px);
+  height: min(52vw, 210px);
+  margin: 0 auto;
+}
+
+.tb-intro-card {
+  position: absolute;
+  width: 130px;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  border: 1px solid rgba(214, 220, 255, .34);
+  background: linear-gradient(165deg, rgba(22, 29, 52, .92), rgba(8, 10, 18, .98));
+  display: grid;
+  place-items: center;
+  font: 600 .72rem "Noto Sans JP", sans-serif;
+  letter-spacing: .16em;
+  color: rgba(235, 238, 255, .86);
+  box-shadow: 0 0 24px rgba(123, 153, 255, .12), inset 0 0 0 1px rgba(212, 183, 120, .18);
+  opacity: 0;
+}
+
+.tb-intro-card--compass {
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%) scale(.82);
+  animation: tb-intro-card .58s ease .6s forwards, tb-intro-pulse 1s ease 1.6s;
+}
+
+.tb-intro-card--trigger {
+  left: 6%;
+  bottom: 0;
+  transform: scale(.82);
+  animation: tb-intro-card .58s ease .86s forwards, tb-intro-pulse 1s ease 1.88s;
+}
+
+.tb-intro-card--route {
+  right: 6%;
+  bottom: 0;
+  transform: scale(.82);
+  animation: tb-intro-card .58s ease 1.1s forwards, tb-intro-pulse 1s ease 2.08s;
+}
+
+.tb-intro-skip {
+  position: absolute;
+  top: .9rem;
+  right: .9rem;
+  border: 1px solid rgba(216, 223, 255, .35);
+  background: rgba(10, 14, 26, .7);
+  color: #eff4ff;
+  min-height: 36px;
+  padding: 0 .9rem;
+  border-radius: 999px;
+}
+
+@keyframes tb-intro-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tb-intro-card {
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes tb-intro-pulse {
+  50% { box-shadow: 0 0 34px rgba(125, 157, 255, .32), 0 0 16px rgba(210, 182, 122, .2), inset 0 0 0 1px rgba(212, 183, 120, .42); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal, .tb-arcana-card, .tb-btn, .tb-story { transition: none !important; transform: none !important; opacity: 1 !important; }
   .tb-arcana-card[data-phase="connecting"] .tb-arcana-face--front { animation: none !important; }
+  .tb-intro { display: none !important; }
 }

@@ -3,7 +3,8 @@ window.TB?.ready(() => {
   if (!root) return;
 
   const button = root.querySelector('[data-summon-button]');
-  const card = root.querySelector('.tb-arcana-card');
+  const cardWrap = root.querySelector('[data-summon-card]');
+  const card = cardWrap?.querySelector('.tb-arcana-card') || root.querySelector('.tb-arcana-card');
   const stage = root.closest('.tb-summon-stage') || root;
   const status = root.querySelector('[data-summon-status]');
   const nameEl = root.querySelector('[data-arcana-name]');
@@ -11,6 +12,11 @@ window.TB?.ready(() => {
   const themeEl = root.querySelector('[data-arcana-theme]');
   const keywordEl = root.querySelector('[data-arcana-keyword]');
   const omenEl = root.querySelector('[data-arcana-omen]');
+
+  if (!button || !card || !status || !nameEl || !subtitleEl || !themeEl || !keywordEl || !omenEl) {
+    console.error('[tb-summon] required node missing');
+    return;
+  }
 
   const storageKey = 'tb-daily-spread';
   const fallback = [
@@ -42,10 +48,7 @@ window.TB?.ready(() => {
 
   const todayKey = () => {
     const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   };
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -63,7 +66,11 @@ window.TB?.ready(() => {
   };
 
   const storeCard = (cardData) => {
-    localStorage.setItem(storageKey, JSON.stringify({ date: todayKey(), card: cardData }));
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ date: todayKey(), card: cardData }));
+    } catch {
+      // ignore storage failures
+    }
   };
 
   const renderCard = (pick) => {
@@ -76,6 +83,7 @@ window.TB?.ready(() => {
 
   const setStageState = (phase, state) => {
     card.dataset.phase = phase;
+    card.dataset.flip = phase === 'revealed' ? 'true' : 'false';
     stage.dataset.state = state;
   };
 
@@ -130,25 +138,34 @@ window.TB?.ready(() => {
 
     busy = true;
     button.setAttribute('aria-busy', 'true');
-    button.textContent = '星界接続中…';
-    setStageState('connecting', 'connecting');
-    status.textContent = '星界接続を開始。儀式回路を起動しています…';
-    await sleep(900);
 
-    status.textContent = '同期中… 星粒の位相を合わせています。';
-    await sleep(1200);
+    try {
+      button.textContent = '星界接続中…';
+      setStageState('connecting', 'connecting');
+      status.textContent = '星界接続を開始。儀式回路を起動しています…';
+      await sleep(700);
 
-    status.textContent = '徴の記録中… まもなく今日の一枚が現れます。';
-    await sleep(1000);
+      status.textContent = '同期中… 星粒の位相を合わせています。';
+      await sleep(900);
 
-    const pick = arcana[Math.floor(Math.random() * arcana.length)];
-    renderCard(pick);
-    setStageState('revealed', 'revealed');
-    storeCard(pick);
+      status.textContent = '徴の記録中… まもなく今日の一枚が現れます。';
+      await sleep(700);
 
-    button.removeAttribute('aria-busy');
-    button.textContent = '今日の徴を確認する';
-    status.textContent = '展開完了：今日の一枚を記録しました。門は静かに開き続けています。';
-    busy = false;
+      const source = Array.isArray(arcana) && arcana.length ? arcana : fallback;
+      const pick = source[Math.floor(Math.random() * source.length)];
+      renderCard(pick);
+      setStageState('revealed', 'revealed');
+      storeCard(pick);
+
+      button.textContent = '今日の徴を確認する';
+      status.textContent = '展開完了：今日の一枚を記録しました。門は静かに開き続けています。';
+    } catch (error) {
+      console.error('[tb-summon] reveal failed', error);
+      resetIdle();
+      status.textContent = '接続失敗：儀式回路を再同期します。もう一度タロット展開を押してください。';
+    } finally {
+      button.removeAttribute('aria-busy');
+      busy = false;
+    }
   });
 });
