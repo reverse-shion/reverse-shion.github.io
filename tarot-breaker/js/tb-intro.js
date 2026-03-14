@@ -3,37 +3,60 @@ window.TB?.ready(() => {
   if (!intro) return;
 
   const skip = intro.querySelector('[data-tb-intro-skip]');
-  const key = 'tb-intro-seen-v1';
+  const key = 'tb-intro-seen-v2';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  let done = false;
+  let closeTimer = null;
+  let cleanupTimer = null;
+
+  const cleanup = () => {
+    intro.hidden = true;
+    intro.setAttribute('aria-hidden', 'true');
+    intro.classList.remove('is-active', 'is-hiding');
+    document.body.classList.remove('tb-intro-lock');
+  };
+
   const finish = () => {
+    intro.classList.remove('is-active');
     intro.classList.add('is-hiding');
-    setTimeout(() => {
-      intro.hidden = true;
-      intro.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('tb-intro-lock');
-    }, 420);
+
+    cleanupTimer = window.setTimeout(() => {
+      cleanup();
+    }, 540);
+  };
+
+  const closeOnce = () => {
+    if (done) return;
+    done = true;
+
+    try {
+      localStorage.setItem(key, '1');
+    } catch {}
+
+    if (closeTimer) clearTimeout(closeTimer);
+    finish();
   };
 
   if (localStorage.getItem(key) === '1' || reduceMotion) {
-    intro.hidden = true;
-    intro.setAttribute('aria-hidden', 'true');
+    cleanup();
     return;
   }
 
   document.body.classList.add('tb-intro-lock');
   intro.hidden = false;
   intro.setAttribute('aria-hidden', 'false');
-  requestAnimationFrame(() => intro.classList.add('is-active'));
 
-  let done = false;
-  const closeOnce = () => {
-    if (done) return;
-    done = true;
-    try { localStorage.setItem(key, '1'); } catch {}
-    finish();
-  };
+  requestAnimationFrame(() => {
+    intro.classList.add('is-active');
+  });
 
   skip?.addEventListener('click', closeOnce);
-  setTimeout(closeOnce, 2600);
+
+  closeTimer = window.setTimeout(closeOnce, 3400);
+
+  window.addEventListener('pagehide', () => {
+    if (closeTimer) clearTimeout(closeTimer);
+    if (cleanupTimer) clearTimeout(cleanupTimer);
+  }, { once: true });
 });
