@@ -1,421 +1,1344 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>星の記憶 — Aster Memory</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/css/shiopon-companion.css">
-<script src="/js/shiopon-visual.js"></script>
-<script src="/js/shiopon-core.js"></script>
-<script src="/js/shiopon-bootstrap.js"></script>  
-<script src="/js/shiopon-visual.v2.3.js?v=20251209"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&display=swap" rel="stylesheet" />
 
-<script src="/js/common.js"></script>
+  <link rel="stylesheet" href="/css/shiopon-companion.css" />
+  <script src="/js/shiopon-visual.js"></script>
+  <script src="/js/shiopon-core.js"></script>
+  <script src="/js/shiopon-bootstrap.js"></script>
+  <script src="/js/shiopon-visual.v2.3.js?v=20251209"></script>
+  <script src="/js/common.js"></script>
 
-  
   <style>
     :root {
-      --glow-blue: #7fd2ff;
-      --glow-emerald: #6ef1c9;
-      --deep-night: #020816;
-      --violet: #a676ff;
-      --warm-amber: #ffb77c;
+      --bg-0: #020816;
+      --bg-1: #061126;
+      --bg-2: #0c1733;
+      --text-main: #f8f5ff;
+      --text-soft: #d9e5ff;
+      --text-muted: #aebfe0;
+      --line: rgba(173, 215, 255, 0.22);
+      --glass: rgba(9, 18, 42, 0.58);
+      --glass-strong: rgba(11, 20, 48, 0.78);
+      --shadow-deep: rgba(0, 0, 0, 0.58);
+      --star-white: rgba(255,255,255,0.95);
+      --star-blue: rgba(116, 207, 255, 0.9);
+      --gold: #e5c781;
+      --official: #75c8ff;
+      --campus: #b595ff;
+      --aru: #58f0ff;
+      --core: #d8f2ff;
+      --oracle: #d6a6ff;
+      --discord: #74e8c9;
+      --time: #ffbd78;
+      --archive: #9fc7ff;
+
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+
+      --header-w: 1240px;
+      --content-w: 1280px;
+
+      --ease-smooth: cubic-bezier(.22,.8,.25,1);
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Shippori Mincho", serif;
-      color: #f8f4ff;
-      background: #020816;
       overflow-x: hidden;
+      color: var(--text-main);
+      font-family: "Shippori Mincho", serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(115, 174, 255, 0.16), transparent 36%),
+        radial-gradient(circle at 10% 10%, rgba(210, 150, 255, 0.10), transparent 30%),
+        radial-gradient(circle at 90% 90%, rgba(72, 201, 255, 0.10), transparent 28%),
+        linear-gradient(180deg, #01040d 0%, #020816 26%, #071022 60%, #030713 100%);
+      letter-spacing: 0.01em;
     }
+
+    body.page-fade-out {
+      animation: pageFadeOut 0.9s ease forwards;
+    }
+
+    @keyframes pageFadeOut {
+      to {
+        opacity: 0;
+        transform: scale(0.995);
+        filter: blur(3px);
+      }
+    }
+
     .bg {
       position: fixed;
       inset: 0;
-      background-image:
-        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.08), transparent 55%),
-        radial-gradient(circle at 90% 100%, rgba(140,230,255,0.12), transparent 60%),
-        url("aster-memory-bg.png");
-      background-size: cover;
-      background-position: center;
-      z-index: -3;
-      filter: saturate(1.1) brightness(1.05);
+      z-index: -5;
+      background:
+        radial-gradient(circle at 18% 14%, rgba(255,255,255,0.06), transparent 0 26%),
+        radial-gradient(circle at 78% 18%, rgba(131,198,255,0.10), transparent 0 28%),
+        radial-gradient(circle at 78% 80%, rgba(151,112,255,0.10), transparent 0 24%),
+        linear-gradient(180deg, rgba(10,18,40,0.30), rgba(4,8,20,0.60)),
+        url("aster-memory-bg.png") center / cover no-repeat;
+      filter: saturate(1.08) brightness(1.02);
+      transform: scale(1.03);
     }
-    .star-layer {
+
+    .veil {
+      position: fixed;
+      inset: 0;
+      z-index: -4;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(1, 4, 13, 0.04), rgba(1, 4, 13, 0.22) 28%, rgba(1, 4, 13, 0.5) 100%);
+    }
+
+    .star-layer,
+    .dust-layer,
+    .orb-layer {
       position: fixed;
       inset: 0;
       pointer-events: none;
       overflow: hidden;
-      z-index: -2;
-    }
-    .star {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(200,240,255,0));
-      animation: floatStar 5s ease-in-out infinite;
-      opacity: 0.7;
-      filter: drop-shadow(0 0 6px rgba(120,200,255,0.7));
-    }
-    @keyframes floatStar {
-      0% { transform: translateY(0); opacity: 0.6; }
-      50% { transform: translateY(-10px); opacity: 1; }
-      100% { transform: translateY(0); opacity: 0.6; }
     }
 
-    main.memory-main {
+    .star-layer { z-index: -3; }
+    .dust-layer { z-index: -2; }
+    .orb-layer { z-index: -1; }
+
+    .star {
+      position: absolute;
+      border-radius: 999px;
+      background: radial-gradient(circle, var(--star-white), rgba(205,237,255,0.24) 42%, rgba(205,237,255,0) 72%);
+      filter: drop-shadow(0 0 6px rgba(118, 204, 255, 0.68));
+      opacity: 0.78;
+      animation: starFloat linear infinite;
+    }
+
+    @keyframes starFloat {
+      0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.40; }
+      50%  { transform: translate3d(0, -14px, 0) scale(1.08); opacity: 1; }
+      100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.40; }
+    }
+
+    .dust {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: rgba(220, 240, 255, 0.34);
+      box-shadow: 0 0 12px rgba(140, 202, 255, 0.22);
+      animation: dustDrift linear infinite;
+    }
+
+    @keyframes dustDrift {
+      0% { transform: translate3d(0, 0, 0); opacity: 0; }
+      10% { opacity: .4; }
+      50% { opacity: .9; }
+      100% { transform: translate3d(18px, -42px, 0); opacity: 0; }
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(24px);
+      opacity: 0.18;
+      animation: orbPulse 9s ease-in-out infinite;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.10; }
+      50%      { transform: translateY(-10px) scale(1.08); opacity: 0.22; }
+    }
+
+    .memory-main {
       position: relative;
-      max-width: 1200px;
+      max-width: var(--content-w);
       margin: 0 auto;
-      padding: 70px 20px 100px;
-      text-align: center;
+      padding: 54px 20px 110px;
     }
+
     .memory-header {
-      background: linear-gradient(135deg, rgba(10,20,50,0.7), rgba(30,10,60,0.5));
-      border: 1px solid rgba(120,200,255,0.3);
-      border-radius: 18px;
-      padding: 28px 18px;
+      position: relative;
+      max-width: var(--header-w);
+      margin: 0 auto 32px;
+      padding: 34px 26px 30px;
+      border: 1px solid rgba(155, 213, 255, 0.24);
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(13, 24, 58, 0.72), rgba(21, 14, 48, 0.58)),
+        radial-gradient(circle at top, rgba(195, 228, 255, 0.10), transparent 58%);
       box-shadow:
-        0 8px 30px rgba(0,0,0,0.4),
-        inset 0 0 40px rgba(120,200,255,0.12);
-      backdrop-filter: blur(6px);
+        0 18px 50px rgba(0,0,0,0.34),
+        inset 0 0 40px rgba(118, 194, 255, 0.08),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      isolation: isolate;
     }
+
+    .memory-header::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background:
+        linear-gradient(135deg,
+          rgba(130, 214, 255, 0.28),
+          rgba(255,255,255,0.04),
+          rgba(194, 141, 255, 0.22));
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0.72;
+    }
+
+    .memory-header::after {
+      content: "";
+      position: absolute;
+      inset: auto -8% -24% auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124, 205, 255, 0.18), rgba(124, 205, 255, 0));
+      z-index: -1;
+      filter: blur(18px);
+    }
+
     .memory-subtitle {
-      letter-spacing: 0.2em;
-      font-size: 0.95rem;
-      color: #d8eaff;
-      margin: 0 0 8px;
+      margin: 0 0 10px;
+      text-align: center;
+      font-size: 0.88rem;
+      letter-spacing: 0.28em;
+      color: #d8e9ff;
+      text-transform: uppercase;
+      opacity: 0.95;
     }
+
     .memory-title {
       margin: 0;
-      font-size: 2.1rem;
-      color: #fefbff;
-      text-shadow: 0 4px 20px rgba(100,160,255,0.45);
+      text-align: center;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.3;
+      color: #fffdfd;
+      text-shadow:
+        0 0 20px rgba(129, 198, 255, 0.22),
+        0 10px 24px rgba(0, 0, 0, 0.38);
     }
+
     .memory-lead {
-      margin: 18px 0 0;
-      line-height: 1.8;
-      font-size: 1rem;
-      color: #e8e5ff;
+      max-width: 860px;
+      margin: 18px auto 0;
+      text-align: center;
+      line-height: 1.95;
+      font-size: clamp(0.95rem, 2vw, 1.04rem);
+      color: var(--text-soft);
+    }
+
+    .memory-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .memory-tag {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(153, 209, 255, 0.18);
+      background: rgba(220, 238, 255, 0.05);
+      color: #e6f1ff;
+      font-size: 0.83rem;
+      line-height: 1;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 0 14px rgba(116, 190, 255, 0.05);
+    }
+
+    .grid-shell {
+      position: relative;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 10px 0 0;
+    }
+
+    .grid-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(144, 217, 255, 0.07), transparent 38%),
+        radial-gradient(circle at 10% 100%, rgba(193, 140, 255, 0.06), transparent 30%);
+      filter: blur(18px);
+      pointer-events: none;
     }
 
     .crystal-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 22px;
-      margin-top: 36px;
-    }
-    .crystal-gate {
       position: relative;
-      background: linear-gradient(160deg, rgba(50,110,150,0.55), rgba(20,35,70,0.75));
-      border: 1px solid rgba(120,200,255,0.35);
-      border-radius: 16px;
-      padding: 22px 16px 18px;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 22px;
+      z-index: 1;
+    }
+
+    .crystal-gate {
+      --accent: var(--official);
+      --accent-soft: rgba(117, 200, 255, 0.22);
+      --accent-deep: rgba(117, 200, 255, 0.42);
+      --crystal-top: rgba(214, 240, 255, 0.95);
+      --crystal-mid: rgba(114, 194, 255, 0.85);
+      --crystal-bottom: rgba(34, 44, 108, 0.95);
+      --tile-bg-a: rgba(20, 32, 72, 0.68);
+      --tile-bg-b: rgba(9, 18, 42, 0.84);
+
+      position: relative;
+      grid-column: span 4;
+      min-height: 340px;
+      padding: 20px 18px 18px;
+      border: 1px solid color-mix(in srgb, var(--accent) 28%, rgba(255,255,255,0.08));
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 52%),
+        linear-gradient(160deg, var(--tile-bg-a), var(--tile-bg-b));
+      box-shadow:
+        0 16px 40px rgba(0,0,0,0.36),
+        inset 0 0 30px color-mix(in srgb, var(--accent) 10%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.08);
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.35s ease, border-color 0.3s ease;
       outline: none;
-      box-shadow:
-        0 10px 30px rgba(0,0,0,0.35),
-        inset 0 0 30px rgba(110,200,255,0.12);
-      backdrop-filter: blur(3px);
+      transition:
+        transform 0.55s var(--ease-smooth),
+        box-shadow 0.55s var(--ease-smooth),
+        border-color 0.4s ease,
+        background 0.4s ease;
+      backdrop-filter: blur(10px);
+      isolation: isolate;
     }
+
     .crystal-gate::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.1), rgba(255,255,255,0));
-      opacity: 0.6;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), transparent 18%),
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.10), transparent 38%);
       pointer-events: none;
-    }
-    .crystal-gate:hover, .crystal-gate:focus-visible {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 20px rgba(120,200,255,0.5);
-      border-color: rgba(160,230,255,0.9);
-    }
-    .crystal-pillar {
-      width: 60px;
-      height: 160px;
-      margin: 0 auto 14px;
-      background: linear-gradient(145deg, rgba(140,230,255,0.8), rgba(90,140,240,0.7) 45%, rgba(30,20,80,0.9));
-      clip-path: polygon(50% 0%, 100% 25%, 90% 100%, 10% 100%, 0% 25%);
-      box-shadow:
-        0 0 18px rgba(130,220,255,0.8),
-        inset 0 0 30px rgba(255,255,255,0.35);
-      position: relative;
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
-    }
-    .crystal-pillar::after {
-      content: "";
-      position: absolute;
-      inset: 12px;
-      background: linear-gradient(160deg, rgba(255,255,255,0.4), rgba(110,200,255,0.25), rgba(40,20,120,0.35));
-      clip-path: polygon(50% 0%, 100% 25%, 90% 100%, 10% 100%, 0% 25%);
-      filter: blur(1px);
-      opacity: 0.9;
-    }
-    .crystal-gate:hover .crystal-pillar, .crystal-gate:focus-visible .crystal-pillar {
-      transform: translateY(-4px) scale(1.03);
-      box-shadow:
-        0 0 22px rgba(130,220,255,0.95),
-        inset 0 0 36px rgba(255,255,255,0.5);
-    }
-    .crystal-label {
-      display: grid;
-      gap: 6px;
-      color: #f5f7ff;
-      text-shadow: 0 0 10px rgba(130,200,255,0.35);
-    }
-    .crystal-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-    .crystal-caption {
-      font-size: 0.9rem;
-      color: #d5e4ff;
-      line-height: 1.6;
+      opacity: 0.75;
     }
 
-    .core-gate {
-      background: linear-gradient(160deg, rgba(80,120,200,0.75), rgba(30,10,60,0.9));
-      border-color: rgba(190,230,255,0.8);
-      box-shadow: 0 14px 40px rgba(0,0,0,0.55), 0 0 24px rgba(120,200,255,0.6);
-      animation: corePulse 3.4s ease-in-out infinite;
+    .crystal-gate::after {
+      content: "";
+      position: absolute;
+      inset: auto -12% -22% auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 32%, transparent), transparent 68%);
+      opacity: 0.46;
+      filter: blur(14px);
+      pointer-events: none;
+      transition: transform 0.55s var(--ease-smooth), opacity 0.4s ease;
+      z-index: 0;
     }
+
+    .crystal-gate:hover,
+    .crystal-gate:focus-visible {
+      transform: translateY(-10px) scale(1.018);
+      border-color: color-mix(in srgb, var(--accent) 64%, white 12%);
+      box-shadow:
+        0 24px 60px rgba(0,0,0,0.48),
+        0 0 28px color-mix(in srgb, var(--accent) 36%, transparent),
+        inset 0 0 42px color-mix(in srgb, var(--accent) 14%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.14);
+    }
+
+    .crystal-gate:hover::after,
+    .crystal-gate:focus-visible::after {
+      transform: scale(1.08);
+      opacity: 0.62;
+    }
+
+    .crystal-gate.is-featured {
+      grid-column: span 6;
+      min-height: 360px;
+    }
+
+    .crystal-gate.is-core {
+      animation: corePulse 3.8s ease-in-out infinite;
+    }
+
     @keyframes corePulse {
-      0% { transform: scale(1); box-shadow: 0 14px 40px rgba(0,0,0,0.55), 0 0 18px rgba(120,200,255,0.55); }
-      45% { transform: scale(1.02); box-shadow: 0 14px 48px rgba(0,0,0,0.6), 0 0 28px rgba(150,230,255,0.9); }
-      90% { transform: scale(1); box-shadow: 0 14px 40px rgba(0,0,0,0.55), 0 0 18px rgba(120,200,255,0.55); }
-      100% { transform: scale(1); }
+      0%, 100% {
+        box-shadow:
+          0 18px 44px rgba(0,0,0,0.42),
+          0 0 20px color-mix(in srgb, var(--accent) 28%, transparent),
+          inset 0 0 34px color-mix(in srgb, var(--accent) 10%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.10);
+      }
+      50% {
+        box-shadow:
+          0 24px 58px rgba(0,0,0,0.52),
+          0 0 34px color-mix(in srgb, var(--accent) 44%, transparent),
+          inset 0 0 54px color-mix(in srgb, var(--accent) 16%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.14);
+      }
+    }
+
+    .crystal-aura {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .crystal-ring,
+    .crystal-ring-2 {
+      position: absolute;
+      left: 50%;
+      top: 120px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--accent) 28%, rgba(255,255,255,0.08));
+      opacity: 0.55;
+      filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 16%, transparent));
+      transition: transform 0.55s var(--ease-smooth), opacity 0.3s ease;
+    }
+
+    .crystal-ring {
+      width: 132px;
+      height: 132px;
+    }
+
+    .crystal-ring-2 {
+      width: 176px;
+      height: 176px;
+      opacity: 0.24;
+    }
+
+    .crystal-gate:hover .crystal-ring,
+    .crystal-gate:focus-visible .crystal-ring {
+      transform: translateX(-50%) scale(1.06) rotate(8deg);
+      opacity: 0.8;
+    }
+
+    .crystal-gate:hover .crystal-ring-2,
+    .crystal-gate:focus-visible .crystal-ring-2 {
+      transform: translateX(-50%) scale(1.08) rotate(-10deg);
+      opacity: 0.42;
+    }
+
+    .crystal-shards {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .crystal-shards span {
+      position: absolute;
+      display: block;
+      width: 10px;
+      height: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.46), color-mix(in srgb, var(--accent) 62%, rgba(255,255,255,0.05)));
+      clip-path: polygon(50% 0%, 100% 26%, 88% 100%, 12% 100%, 0% 26%);
+      opacity: 0.2;
+      box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 22%, transparent);
+      animation: shardFloat 5.6s ease-in-out infinite;
+    }
+
+    .crystal-shards span:nth-child(1) { left: 16%; top: 24%; animation-delay: 0s; transform: rotate(-14deg); }
+    .crystal-shards span:nth-child(2) { right: 18%; top: 30%; animation-delay: .8s; transform: rotate(16deg); }
+    .crystal-shards span:nth-child(3) { left: 24%; bottom: 22%; animation-delay: 1.4s; transform: rotate(8deg); }
+    .crystal-shards span:nth-child(4) { right: 24%; bottom: 18%; animation-delay: .4s; transform: rotate(-10deg); }
+
+    @keyframes shardFloat {
+      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); opacity: .14; }
+      50%      { transform: translateY(-10px) rotate(calc(var(--rot, 0deg) + 4deg)); opacity: .34; }
+    }
+
+    .crystal-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .crystal-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .crystal-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 10%, rgba(255,255,255,0.03));
+      border: 1px solid color-mix(in srgb, var(--accent) 22%, rgba(255,255,255,0.08));
+      color: #ebf6ff;
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .crystal-kicker::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .crystal-arrow {
+      font-size: 1rem;
+      color: color-mix(in srgb, var(--accent) 68%, white 20%);
+      opacity: 0.7;
+      transform: translateX(0);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    .crystal-gate:hover .crystal-arrow,
+    .crystal-gate:focus-visible .crystal-arrow {
+      transform: translateX(4px);
+      opacity: 1;
+    }
+
+    .crystal-core {
+      position: relative;
+      width: 92px;
+      height: 192px;
+      margin: 6px auto 16px;
+      filter: drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 26%, transparent));
+      transition: transform 0.55s var(--ease-smooth), filter 0.45s ease;
+    }
+
+    .crystal-core::before,
+    .crystal-core::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(50% 0%, 100% 24%, 90% 100%, 10% 100%, 0% 24%);
+      border-radius: 8px;
+    }
+
+    .crystal-core::before {
+      background:
+        linear-gradient(160deg,
+          rgba(255,255,255,0.78) 0%,
+          var(--crystal-top) 14%,
+          var(--crystal-mid) 42%,
+          var(--crystal-bottom) 100%);
+      box-shadow:
+        0 0 24px color-mix(in srgb, var(--accent) 34%, transparent),
+        inset 0 0 36px rgba(255,255,255,0.22);
+    }
+
+    .crystal-core::after {
+      inset: 12px;
+      background:
+        linear-gradient(170deg,
+          rgba(255,255,255,0.45),
+          color-mix(in srgb, var(--accent) 16%, rgba(255,255,255,0.05)) 32%,
+          rgba(18, 24, 90, 0.18) 76%,
+          rgba(4, 6, 22, 0.24));
+      opacity: 0.92;
+      filter: blur(0.5px);
+    }
+
+    .crystal-light {
+      position: absolute;
+      left: 50%;
+      top: 18px;
+      width: 46px;
+      height: 46px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.92), color-mix(in srgb, var(--accent) 42%, transparent), rgba(255,255,255,0));
+      filter: blur(2px);
+      opacity: 0.82;
+      pointer-events: none;
+    }
+
+    .crystal-gate:hover .crystal-core,
+    .crystal-gate:focus-visible .crystal-core {
+      transform: translateY(-4px) scale(1.04);
+      filter: drop-shadow(0 0 28px color-mix(in srgb, var(--accent) 36%, transparent));
+    }
+
+    .crystal-title {
+      margin: 0;
+      font-size: 1.18rem;
+      line-height: 1.4;
+      font-weight: 700;
+      color: #fdfcff;
+      text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 14%, transparent);
+    }
+
+    .crystal-caption {
+      margin-top: 8px;
+      line-height: 1.8;
+      font-size: 0.94rem;
+      color: var(--text-soft);
+      min-height: 5.4em;
+    }
+
+    .crystal-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .crystal-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      line-height: 1;
+      color: #e9f5ff;
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, rgba(255,255,255,0.06));
+      background: color-mix(in srgb, var(--accent) 8%, rgba(255,255,255,0.02));
+    }
+
+    .crystal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: auto;
+      padding-top: 16px;
+    }
+
+    .crystal-enter {
+      font-size: 0.85rem;
+      color: color-mix(in srgb, var(--accent) 78%, white 10%);
+      letter-spacing: 0.06em;
+    }
+
+    .crystal-status {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      opacity: 0.9;
+    }
+
+    .gate-official {
+      --accent: var(--official);
+      --tile-bg-a: rgba(22, 42, 86, 0.74);
+      --tile-bg-b: rgba(11, 18, 48, 0.92);
+      --crystal-top: rgba(228, 247, 255, 0.98);
+      --crystal-mid: rgba(114, 202, 255, 0.88);
+      --crystal-bottom: rgba(25, 54, 126, 0.98);
+    }
+
+    .gate-campus {
+      --accent: var(--campus);
+      --tile-bg-a: rgba(45, 36, 88, 0.74);
+      --tile-bg-b: rgba(15, 19, 52, 0.92);
+      --crystal-top: rgba(245, 233, 255, 0.98);
+      --crystal-mid: rgba(191, 145, 255, 0.88);
+      --crystal-bottom: rgba(66, 42, 128, 0.98);
+    }
+
+    .gate-aru {
+      --accent: var(--aru);
+      --tile-bg-a: rgba(12, 58, 92, 0.74);
+      --tile-bg-b: rgba(7, 18, 44, 0.94);
+      --crystal-top: rgba(232, 255, 255, 0.98);
+      --crystal-mid: rgba(88, 240, 255, 0.88);
+      --crystal-bottom: rgba(19, 74, 112, 0.98);
+    }
+
+    .gate-core {
+      --accent: var(--gold);
+      --tile-bg-a: rgba(52, 42, 80, 0.78);
+      --tile-bg-b: rgba(10, 16, 42, 0.96);
+      --crystal-top: rgba(255, 250, 235, 1);
+      --crystal-mid: rgba(226, 199, 129, 0.92);
+      --crystal-bottom: rgba(74, 52, 126, 0.98);
+    }
+
+    .gate-oracle {
+      --accent: var(--oracle);
+      --tile-bg-a: rgba(56, 28, 82, 0.74);
+      --tile-bg-b: rgba(14, 14, 46, 0.92);
+      --crystal-top: rgba(249, 239, 255, 1);
+      --crystal-mid: rgba(214, 166, 255, 0.88);
+      --crystal-bottom: rgba(74, 33, 115, 0.98);
+    }
+
+    .gate-discord {
+      --accent: var(--discord);
+      --tile-bg-a: rgba(20, 62, 72, 0.74);
+      --tile-bg-b: rgba(10, 22, 38, 0.92);
+      --crystal-top: rgba(235, 255, 248, 1);
+      --crystal-mid: rgba(116, 232, 201, 0.88);
+      --crystal-bottom: rgba(29, 88, 91, 0.98);
+    }
+
+    .gate-time {
+      --accent: var(--time);
+      --tile-bg-a: rgba(74, 45, 28, 0.72);
+      --tile-bg-b: rgba(18, 16, 38, 0.94);
+      --crystal-top: rgba(255, 244, 227, 1);
+      --crystal-mid: rgba(255, 189, 120, 0.90);
+      --crystal-bottom: rgba(92, 51, 29, 0.98);
+    }
+
+    .gate-archive {
+      --accent: var(--archive);
+      --tile-bg-a: rgba(22, 34, 68, 0.72);
+      --tile-bg-b: rgba(10, 16, 40, 0.94);
+      --crystal-top: rgba(238, 247, 255, 1);
+      --crystal-mid: rgba(159, 199, 255, 0.88);
+      --crystal-bottom: rgba(35, 54, 102, 0.98);
+    }
+
+    .section-note {
+      max-width: 980px;
+      margin: 30px auto 0;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(150, 205, 255, 0.14);
+      background: rgba(12, 18, 44, 0.42);
+      color: var(--text-muted);
+      line-height: 1.8;
+      text-align: center;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
     }
 
     .core-transition {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at center,
-        rgba(230,245,255,0.0) 0%,
-        rgba(230,245,255,0.3) 35%,
-        rgba(5,8,20,1) 100%);
+      z-index: 50;
       opacity: 0;
       pointer-events: none;
-      z-index: 50;
+      background:
+        radial-gradient(circle at center,
+          rgba(255,255,255,0) 0%,
+          rgba(230, 245, 255, 0.16) 18%,
+          rgba(230, 245, 255, 0.40) 34%,
+          rgba(3,8,20,0.96) 100%);
     }
+
     body.core-transition-active .core-transition {
-      animation: coreGateFlash 1.8s ease-out forwards;
+      animation: coreGateFlash 1.7s ease-out forwards;
     }
+
     @keyframes coreGateFlash {
-      0%   { opacity: 0; }
-      20%  { opacity: 1; }
+      0% { opacity: 0; }
+      20% { opacity: 1; }
       100% { opacity: 1; }
     }
-    .core-transition::before {
+
+    .core-transition::before,
+    .core-transition::after {
       content: "";
       position: absolute;
-      top: 50%;
       left: 50%;
-      width: 40vmin;
-      height: 40vmin;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
       border-radius: 50%;
-      border: 2px solid rgba(200,230,255,0.8);
-      box-shadow:
-        0 0 20px rgba(200,230,255,0.8),
-        0 0 60px rgba(160,210,255,0.9);
-      transform: translate(-50%, -50%) scale(0.7);
       opacity: 0;
     }
+
+    .core-transition::before {
+      width: 34vmin;
+      height: 34vmin;
+      border: 2px solid rgba(234, 216, 172, 0.8);
+      box-shadow:
+        0 0 30px rgba(229, 199, 129, 0.7),
+        0 0 80px rgba(180, 212, 255, 0.4);
+    }
+
+    .core-transition::after {
+      width: 52vmin;
+      height: 52vmin;
+      border: 1px solid rgba(196, 230, 255, 0.4);
+      box-shadow: 0 0 60px rgba(180, 212, 255, 0.24);
+    }
+
     body.core-transition-active .core-transition::before {
-      animation: coreRing 1.8s ease-out forwards;
-    }
-    @keyframes coreRing {
-      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-      40%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6); }
+      animation: coreRingA 1.7s ease-out forwards;
     }
 
-    .page-fade-out {
-      animation: pageFadeOut 0.9s ease forwards;
-    }
-    @keyframes pageFadeOut {
-      to { opacity: 0; filter: blur(2px); }
+    body.core-transition-active .core-transition::after {
+      animation: coreRingB 1.7s ease-out forwards;
     }
 
-    @media (max-width: 960px) {
-      .memory-title { font-size: 1.7rem; }
-      .memory-lead { font-size: 0.95rem; line-height: 1.7; }
-      .crystal-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-      .crystal-pillar { height: 140px; }
+    @keyframes coreRingA {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.48); }
+      35%  { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.56); }
     }
-    @media (max-width: 640px) {
-      main.memory-main { padding: 60px 16px 80px; }
-      .crystal-grid { grid-template-columns: 1fr; }
-      .memory-title { font-size: 1.5rem; }
-      .memory-lead { font-size: 0.92rem; }
+
+    @keyframes coreRingB {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+      45%  { opacity: .5; transform: translate(-50%, -50%) scale(1.08); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.76); }
+    }
+
+    @media (max-width: 1180px) {
+      .crystal-gate,
+      .crystal-gate.is-featured {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .memory-main {
+        padding: 42px 16px 90px;
+      }
+
+      .memory-header {
+        padding: 26px 18px 24px;
+        border-radius: 22px;
+      }
+
+      .memory-subtitle {
+        font-size: 0.8rem;
+        letter-spacing: 0.18em;
+      }
+
+      .memory-lead {
+        line-height: 1.82;
+        font-size: 0.94rem;
+      }
+
+      .memory-tags {
+        gap: 8px;
+      }
+
+      .memory-tag {
+        font-size: 0.76rem;
+        padding: 7px 11px;
+      }
+
+      .crystal-grid {
+        gap: 16px;
+      }
+
+      .crystal-gate,
+      .crystal-gate.is-featured {
+        grid-column: span 12;
+        min-height: 316px;
+        padding: 18px 16px 16px;
+      }
+
+      .crystal-ring {
+        width: 118px;
+        height: 118px;
+      }
+
+      .crystal-ring-2 {
+        width: 154px;
+        height: 154px;
+      }
+
+      .crystal-core {
+        width: 82px;
+        height: 170px;
+        margin-bottom: 14px;
+      }
+
+      .crystal-caption {
+        min-height: auto;
+      }
+
+      .crystal-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="bg"></div>
+  <div class="bg" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true"></div>
   <div class="star-layer" aria-hidden="true"></div>
+  <div class="dust-layer" aria-hidden="true"></div>
+  <div class="orb-layer" aria-hidden="true"></div>
   <div class="core-transition" aria-hidden="true"></div>
 
   <main class="memory-main">
     <header class="memory-header">
       <p class="memory-subtitle">星の記憶 — Aster Memory</p>
-      <h1 class="memory-title">星界の記憶をたゆたうクリスタルの間</h1>
+      <h1 class="memory-title">物語・記録・共鳴へつながる、星界の八つの結晶回廊</h1>
       <p class="memory-lead">
-        ここに並ぶクリスタルは、詩韻思想の世界に刻まれた「記憶のかけら」です。<br>
-        ひとつを選び、そっと触れてください。
+        ここに並ぶクリスタルは、TAROT BREAKERの世界へ続く記憶の門。<br />
+        物語の入口を辿るもよし、ゲームに触れるもよし、深層の神託へ降りるもよし。<br />
+        あなたの心が反応する結晶に、そっと触れてください。
       </p>
+      <div class="memory-tags" aria-label="サイト案内">
+        <span class="memory-tag">公式サイト</span>
+        <span class="memory-tag">学園領域</span>
+        <span class="memory-tag">DiCoゲーム</span>
+        <span class="memory-tag">星界中枢</span>
+        <span class="memory-tag">神託</span>
+        <span class="memory-tag">コミュニティ</span>
+        <span class="memory-tag">記録</span>
+        <span class="memory-tag">アーカイブ</span>
+      </div>
     </header>
 
-    <section class="crystal-grid" aria-label="星の記憶ゲート一覧">
-      <div class="crystal-gate" data-dest="starting-town.html" tabindex="0" aria-label="Discord『始まりの町』へ移動">
-        <div class="crystal-pillar"></div>
-        <div class="crystal-label">
-          <span class="crystal-title">Discord「始まりの町」</span>
-          <span class="crystal-caption">星界に最初の焔が灯った場所</span>
-        </div>
-      </div>
+    <div class="grid-shell">
+      <section class="crystal-grid" aria-label="星の記憶ゲート一覧">
 
-      <div class="crystal-gate" data-dest="links.html" tabindex="0" aria-label="星界ゲートロビーへ移動">
-        <div class="crystal-pillar"></div>
-        <div class="crystal-label">
-          <span class="crystal-title">時間記録殿</span>
-          <span class="crystal-caption">諸界を結ぶ、光のログ</span>
-        </div>
-      </div>
+        <!-- TAROT BREAKER 公式 -->
+        <article class="crystal-gate gate-official is-featured" data-dest="tarot-breaker/" tabindex="0" aria-label="TAROT BREAKER 公式へ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-14deg"></span>
+            <span style="--rot:16deg"></span>
+            <span style="--rot:8deg"></span>
+            <span style="--rot:-10deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">Official Gateway</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">TAROT BREAKER 公式</h2>
+            <p class="crystal-caption">
+              TAROT BREAKERの物語、世界観、登場人物、導線をまとめた公式入口。
+              初めて訪れる人にも分かりやすく、すべての始まりに触れられる中心サイト。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">初見向け</span>
+              <span class="crystal-chip">世界観入口</span>
+              <span class="crystal-chip">最重要導線</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">最初に触れるべき結晶</span>
+              <span class="crystal-status">OPEN GATE</span>
+            </div>
+          </div>
+        </article>
 
-      <div class="crystal-gate" data-dest="campus.html" tabindex="0" aria-label="TAROT BREAKER 星界アリーナへ移動">
-        <div class="crystal-pillar"></div>
-        <div class="crystal-label">
-          <span class="crystal-title">TAROT BREAKER Campus</span>
-          <span class="crystal-caption">シオン達の大学</span>
-        </div>
-      </div>
+        <!-- CAMPUS -->
+        <article class="crystal-gate gate-campus" data-dest="campus.html" tabindex="0" aria-label="TAROT BREAKER Campusへ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-12deg"></span>
+            <span style="--rot:18deg"></span>
+            <span style="--rot:6deg"></span>
+            <span style="--rot:-8deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">Campus Realm</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">TAROT BREAKER Campus</h2>
+            <p class="crystal-caption">
+              シオンたちが息づく学園領域。
+              日常、関係性、空気感に触れながら、物語の“人の温度”を感じられるキャンパスゲート。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">学園</span>
+              <span class="crystal-chip">キャラクター導線</span>
+              <span class="crystal-chip">日常領域</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">学園世界へ降りる</span>
+              <span class="crystal-status">CHARACTER ACCESS</span>
+            </div>
+          </div>
+        </article>
 
-      <div class="crystal-gate" data-dest="distortion.html" tabindex="0" aria-label="セレフィアスのお告げの間へ移動">
-        <div class="crystal-pillar"></div>
-        <div class="crystal-label">
-          <span class="crystal-title">セレフィアスのお告げの間</span>
-          <span class="crystal-caption">祈りと啓示がこだまする聖域</span>
-        </div>
-      </div>
+        <!-- ARU -->
+        <article class="crystal-gate gate-aru" data-dest="di/di.html" tabindex="0" aria-label="ARUへ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-15deg"></span>
+            <span style="--rot:14deg"></span>
+            <span style="--rot:9deg"></span>
+            <span style="--rot:-7deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">DiCo Resonance</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">ARU</h2>
+            <p class="crystal-caption">
+              DiCoが導く共鳴ゲーム領域。
+              リズム、光、反応が重なり合い、TAROT BREAKERの鼓動を“体験”として味わえるプレイ空間。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">DiCo</span>
+              <span class="crystal-chip">ゲーム体験</span>
+              <span class="crystal-chip">共鳴演出</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">プレイ領域へ接続</span>
+              <span class="crystal-status">PLAYABLE SYSTEM</span>
+            </div>
+          </div>
+        </article>
 
-      <div class="crystal-gate core-gate" data-dest="cosmic-resonance-tunnel.html" tabindex="0" aria-label="星命核 — Star-Soul Core へ進む">
-        <div class="crystal-pillar"></div>
-        <div class="crystal-label">
-          <span class="crystal-title">星命核 — Star-Soul Core</span>
-          <span class="crystal-caption">詩韻思想の心臓部に至る、ただひとつの結晶</span>
-        </div>
-      </div>
+        <!-- 星命核 -->
+        <article class="crystal-gate gate-core is-featured is-core" data-dest="cosmic-resonance-tunnel.html" tabindex="0" aria-label="星命核へ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-16deg"></span>
+            <span style="--rot:16deg"></span>
+            <span style="--rot:8deg"></span>
+            <span style="--rot:-9deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">Star-Soul Core</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">星命核</h2>
+            <p class="crystal-caption">
+              星と魂の記録が集束する中枢結晶。
+              TAROT BREAKER世界の深層へつながる、もっとも神秘的で特別な深部ゲート。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">中枢領域</span>
+              <span class="crystal-chip">深層導線</span>
+              <span class="crystal-chip">特別演出</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">星界の深部へ降下する</span>
+              <span class="crystal-status">CORE LINK</span>
+            </div>
+          </div>
+        </article>
 
-      <div class="crystal-gate" data-dest="di/di.html" tabindex="0" aria-label="聖記回廊へ移動">
-        <div class="crystal-pillar"></div>
-        <div class="crystal-label">
-          <span class="crystal-title">ARU</span>
-          <span class="crystal-caption">古き祈りの写本が並ぶ静謐な廊</span>
-        </div>
-      </div>
+        <!-- セレフィアス -->
+        <article class="crystal-gate gate-oracle" data-dest="distortion.html" tabindex="0" aria-label="セレフィアスのお告げの間へ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-13deg"></span>
+            <span style="--rot:17deg"></span>
+            <span style="--rot:7deg"></span>
+            <span style="--rot:-10deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">Oracle Chamber</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">セレフィアスのお告げの間</h2>
+            <p class="crystal-caption">
+              神秘の言葉が降りる啓示の間。
+              セレフィアスの気配に触れながら、深い導きと星界のメッセージを受け取るための聖域。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">神託</span>
+              <span class="crystal-chip">詩的導き</span>
+              <span class="crystal-chip">聖域</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">啓示の間へ進む</span>
+              <span class="crystal-status">SACRED ACCESS</span>
+            </div>
+          </div>
+        </article>
 
-      <div class="crystal-gate" data-dest="tarot-breaker/" tabindex="0" aria-label="TAROT BREAKER 公式記録殿へ移動">
-  <div class="crystal-pillar"></div>
-  <div class="crystal-label">
-    <span class="crystal-title">TAROT BREAKER 公式記録殿</span>
-    <span class="crystal-caption">星の言霊とタロットが交差する、物語世界の公式入口</span>
-  </div>
-</div>
+        <!-- Discord -->
+        <article class="crystal-gate gate-discord" data-dest="starting-town.html" tabindex="0" aria-label="Discord『始まりの町』へ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-12deg"></span>
+            <span style="--rot:12deg"></span>
+            <span style="--rot:10deg"></span>
+            <span style="--rot:-6deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">Community Town</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">Discord「始まりの町」</h2>
+            <p class="crystal-caption">
+              仲間たちが集う最初の拠点。
+              交流、参加、共鳴の火種が灯る、ファンと旅の仲間を結ぶためのコミュニティゲート。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">交流</span>
+              <span class="crystal-chip">コミュニティ</span>
+              <span class="crystal-chip">参加導線</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">仲間の町へ入る</span>
+              <span class="crystal-status">JOIN THE TOWN</span>
+            </div>
+          </div>
+        </article>
 
-      <div class="crystal-gate" data-dest="serephias-global.html" tabindex="0" aria-label="星の大聖堂へ移動">
-        <div class="crystal-pillar"></div>
-        <div class="crystal-label">
-          <span class="crystal-title">Star Archive</span>
-          <span class="crystal-caption">Where echoes of stars are preserved.</span>
-        </div>
-      </div>
-    </section>
+        <!-- 時間記録殿 -->
+        <article class="crystal-gate gate-time" data-dest="links.html" tabindex="0" aria-label="時間記録殿へ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-14deg"></span>
+            <span style="--rot:14deg"></span>
+            <span style="--rot:8deg"></span>
+            <span style="--rot:-8deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">Chronicle Hall</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">時間記録殿</h2>
+            <p class="crystal-caption">
+              更新導線や各種記録を辿るための回廊。
+              星界の流れ、足跡、つながりを時の線として見渡せるログの神殿。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">リンク集</span>
+              <span class="crystal-chip">記録</span>
+              <span class="crystal-chip">時系列導線</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">記録の回廊を辿る</span>
+              <span class="crystal-status">TIMELINE ACCESS</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Star Archive -->
+        <article class="crystal-gate gate-archive" data-dest="serephias-global.html" tabindex="0" aria-label="Star Archiveへ移動">
+          <div class="crystal-aura">
+            <div class="crystal-ring"></div>
+            <div class="crystal-ring-2"></div>
+          </div>
+          <div class="crystal-shards" aria-hidden="true">
+            <span style="--rot:-13deg"></span>
+            <span style="--rot:15deg"></span>
+            <span style="--rot:9deg"></span>
+            <span style="--rot:-7deg"></span>
+          </div>
+          <div class="crystal-inner">
+            <div class="crystal-topline">
+              <span class="crystal-kicker">Archive Vault</span>
+              <span class="crystal-arrow">↗</span>
+            </div>
+            <div class="crystal-core"><span class="crystal-light"></span></div>
+            <h2 class="crystal-title">Star Archive</h2>
+            <p class="crystal-caption">
+              星の記録と残響を保存する保管庫。
+              過去の光、断片化した記憶、世界の余韻を静かに収蔵するアーカイブ領域。
+            </p>
+            <div class="crystal-meta">
+              <span class="crystal-chip">保管庫</span>
+              <span class="crystal-chip">星の記録</span>
+              <span class="crystal-chip">静謐領域</span>
+            </div>
+            <div class="crystal-footer">
+              <span class="crystal-enter">保管された星々へ</span>
+              <span class="crystal-status">ARCHIVE OPEN</span>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <p class="section-note">
+      光の強い結晶は“入口”、深く脈打つ結晶は“深層”を示しています。<br />
+      初めてなら「TAROT BREAKER 公式」から。世界の核心へ進むなら「星命核」へ。
+    </p>
   </main>
 
+  <div id="shiopon-root"></div>
+
   <script>
-    function spawnStars(count = 80) {
-      const layer = document.querySelector('.star-layer');
+    function createStars(count = 90) {
+      const layer = document.querySelector(".star-layer");
+      if (!layer) return;
+
       const fragment = document.createDocumentFragment();
+
       for (let i = 0; i < count; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        const size = Math.random() * 3 + 2;
+        const star = document.createElement("span");
+        star.className = "star";
+        const size = Math.random() * 2.8 + 1.6;
         star.style.width = `${size}px`;
         star.style.height = `${size}px`;
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-        const delay = Math.random() * 4;
-        star.style.animationDuration = `${4 + Math.random() * 3}s`;
-        star.style.animationDelay = `${delay}s`;
+        star.style.animationDuration = `${4.5 + Math.random() * 4.5}s`;
+        star.style.animationDelay = `${Math.random() * 4}s`;
         fragment.appendChild(star);
       }
+
       layer.appendChild(fragment);
     }
 
+    function createDust(count = 56) {
+      const layer = document.querySelector(".dust-layer");
+      if (!layer) return;
+
+      const fragment = document.createDocumentFragment();
+
+      for (let i = 0; i < count; i++) {
+        const dust = document.createElement("span");
+        dust.className = "dust";
+        dust.style.left = `${Math.random() * 100}%`;
+        dust.style.top = `${Math.random() * 100}%`;
+        dust.style.animationDuration = `${8 + Math.random() * 9}s`;
+        dust.style.animationDelay = `${Math.random() * 8}s`;
+        fragment.appendChild(dust);
+      }
+
+      layer.appendChild(fragment);
+    }
+
+    function createOrbs() {
+      const layer = document.querySelector(".orb-layer");
+      if (!layer) return;
+
+      const configs = [
+        { left: "7%",  top: "18%", size: 220, color: "rgba(119, 205, 255, 0.35)" },
+        { left: "78%", top: "12%", size: 180, color: "rgba(183, 130, 255, 0.28)" },
+        { left: "70%", top: "72%", size: 240, color: "rgba(115, 229, 212, 0.24)" }
+      ];
+
+      const fragment = document.createDocumentFragment();
+
+      configs.forEach((cfg, idx) => {
+        const orb = document.createElement("span");
+        orb.className = "orb";
+        orb.style.left = cfg.left;
+        orb.style.top = cfg.top;
+        orb.style.width = `${cfg.size}px`;
+        orb.style.height = `${cfg.size}px`;
+        orb.style.background = `radial-gradient(circle, ${cfg.color}, rgba(255,255,255,0))`;
+        orb.style.animationDelay = `${idx * 1.2}s`;
+        fragment.appendChild(orb);
+      });
+
+      layer.appendChild(fragment);
+    }
+
+    function activateGate(gate) {
+      const dest = gate?.dataset?.dest;
+      if (!dest) return;
+
+      if (gate.classList.contains("gate-core")) {
+        document.body.classList.add("core-transition-active");
+        window.setTimeout(() => {
+          window.location.href = dest;
+        }, 1700);
+        return;
+      }
+
+      document.body.classList.add("page-fade-out");
+      window.setTimeout(() => {
+        window.location.href = dest;
+      }, 860);
+    }
+
     function setupGates() {
-      const gates = document.querySelectorAll('.crystal-gate');
-      gates.forEach(gate => {
-        const handleActivate = () => {
-          const dest = gate.dataset.dest;
-          if (!dest) return;
-          if (gate.classList.contains('core-gate')) {
-            document.body.classList.add('core-transition-active');
-            setTimeout(() => {
-              window.location.href = dest;
-            }, 1800);
-          } else {
-            document.body.classList.add('page-fade-out');
-            setTimeout(() => {
-              window.location.href = dest;
-            }, 900);
-          }
-        };
-        gate.addEventListener('click', handleActivate);
-        gate.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+      const gates = document.querySelectorAll(".crystal-gate");
+
+      gates.forEach((gate) => {
+        gate.addEventListener("click", () => activateGate(gate));
+        gate.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            handleActivate();
+            activateGate(gate);
           }
         });
       });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      spawnStars(85);
+    document.addEventListener("DOMContentLoaded", () => {
+      createStars(92);
+      createDust(60);
+      createOrbs();
       setupGates();
     });
   </script>
 
-  <div id="shiopon-root"></div>
+  <script>
+    window.ShioponGates = [
+      { id: "star-soul", name: "星命核", url: "/star-soul-core.html" },
+      { id: "library", name: "記憶の図書館", url: "/library.html" }
+    ];
 
-<script>
-// library.html 専用ゲート設定
-window.ShioponGates = [
-   { id: "star-soul",   name: "星命核",           url: "/star-soul-core.html" },
-   { id: "library",     name: "記憶の図書館",     url: "/library.html" }
-];
+    window.ShioponConfig = {
+      mode: "normal",
+      size: "normal"
+    };
+  </script>
 
-window.ShioponConfig = {
- mode: "normal",
- size: "normal"
-};
-</script>
+  <button id="svTalkBtn" class="sv-talk__btn" type="button" aria-label="みんなと話す">
+    <img class="sv-talk__img" src="/assets/skit/family.png" alt="" />
+  </button>
 
- <button id="svTalkBtn" class="sv-talk__btn" type="button" aria-label="みんなと話す">
-  <img class="sv-talk__img" src="/assets/skit/family.png" alt="">
-</button>
-
-<script src="/js/shiopon-skit-loader.js"></script>
-  
+  <script src="/js/shiopon-skit-loader.js"></script>
 </body>
 </html>
