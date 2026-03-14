@@ -2,7 +2,6 @@ window.TB?.ready(() => {
   const intro = document.querySelector('[data-tb-intro]');
   if (!intro) return;
 
-  const skip = intro.querySelector('[data-tb-intro-skip]');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let done = false;
@@ -46,9 +45,7 @@ window.TB?.ready(() => {
     intro.classList.add('is-active');
   });
 
-  skip?.addEventListener('click', closeOnce);
-
-  closeTimer = window.setTimeout(closeOnce, 2400);
+  closeTimer = window.setTimeout(closeOnce, 2200);
 
   window.addEventListener('pagehide', () => {
     if (closeTimer) clearTimeout(closeTimer);
