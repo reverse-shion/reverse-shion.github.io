@@ -40,7 +40,7 @@
 }
 
 /* =========================
-   MYTHIC INTRO
+   STARREALM GATE INTRO
 ========================= */
 
 .tb-intro {
@@ -50,18 +50,20 @@
   display: grid;
   place-items: center;
   overflow: hidden;
+  isolation: isolate;
   background:
-    radial-gradient(circle at 50% 18%, rgba(136, 160, 255, 0.16), transparent 18%),
-    radial-gradient(circle at 18% 24%, rgba(118, 90, 220, 0.12), transparent 18%),
-    radial-gradient(circle at 82% 18%, rgba(218, 184, 118, 0.08), transparent 14%),
-    linear-gradient(180deg, rgba(5, 8, 18, 0.74), rgba(2, 4, 10, 0.92));
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+    radial-gradient(circle at 50% 12%, rgba(132, 158, 255, 0.18), transparent 16%),
+    radial-gradient(circle at 22% 22%, rgba(110, 86, 212, 0.14), transparent 18%),
+    radial-gradient(circle at 80% 18%, rgba(215, 183, 118, 0.10), transparent 14%),
+    radial-gradient(circle at 50% 50%, rgba(95, 118, 208, 0.10), transparent 42%),
+    linear-gradient(180deg, rgba(4, 7, 18, 0.72), rgba(2, 4, 10, 0.94));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   opacity: 0;
   visibility: hidden;
   transition:
-    opacity .46s ease,
-    visibility .46s ease;
+    opacity .54s ease,
+    visibility .54s ease;
 }
 
 .tb-intro::before,
@@ -72,19 +74,32 @@
   pointer-events: none;
 }
 
+/* 星界ゲート本体 */
 .tb-intro::before {
+  inset: -10%;
   background:
-    radial-gradient(circle at 50% 50%, rgba(140, 168, 255, 0.12), transparent 28%),
-    radial-gradient(circle at 50% 50%, rgba(208, 177, 116, 0.07), transparent 42%);
-  filter: blur(18px);
-  transform: scale(1.08);
-  opacity: .9;
+    url("../img/world/tb-seikai-gate.webp")
+    center center / min(150vmax, 1800px) no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.12;
+  filter:
+    brightness(0.96)
+    contrast(1.18)
+    saturate(1.02)
+    drop-shadow(0 0 18px rgba(212, 183, 120, 0.14))
+    drop-shadow(0 0 36px rgba(118, 145, 255, 0.10));
+  transform-origin: 50% 50%;
+  animation: tb-seikai-gate-orbit 34s linear infinite;
 }
 
+/* 上から被せる星霧・光膜 */
 .tb-intro::after {
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%, rgba(0,0,0,0.14) 100%);
+    radial-gradient(circle at 50% 50%, rgba(255, 238, 205, 0.06), transparent 26%),
+    radial-gradient(circle at 50% 48%, rgba(132, 160, 255, 0.10), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%, rgba(0,0,0,0.18) 100%);
   mix-blend-mode: screen;
+  opacity: 0.95;
 }
 
 .tb-intro.is-active {
@@ -101,44 +116,50 @@
 .tb-intro-inner {
   position: relative;
   z-index: 2;
-  width: min(92vw, 620px);
+  width: min(92vw, 680px);
   display: grid;
   justify-items: center;
-  gap: clamp(.65rem, 2vw, 1.05rem);
+  gap: clamp(.7rem, 2vw, 1.1rem);
   text-align: center;
-  padding: clamp(1rem, 3vw, 1.6rem) 0;
+  padding: clamp(1rem, 3vw, 1.8rem) 0;
 }
 
 .tb-intro-brand {
   margin: 0;
-  font-size: clamp(.68rem, 1.8vw, .78rem);
-  letter-spacing: .24em;
-  color: rgba(226, 233, 255, .80);
-  text-shadow: 0 0 12px rgba(141, 170, 255, .12);
-  animation: tb-intro-fade-up .7s ease .08s both;
+  font-size: clamp(.68rem, 1.7vw, .80rem);
+  letter-spacing: .30em;
+  color: rgba(228, 235, 255, 0.84);
+  text-shadow:
+    0 0 10px rgba(141, 170, 255, 0.16),
+    0 0 22px rgba(141, 170, 255, 0.10);
+  animation: tb-intro-fade-up .8s ease .06s both;
 }
 
 .tb-intro-title {
   margin: 0;
   font-family: "Shippori Mincho", serif;
-  font-size: clamp(1.56rem, 5vw, 2.7rem);
+  font-size: clamp(1.7rem, 5vw, 2.95rem);
   font-weight: 700;
   letter-spacing: .18em;
-  color: #f6edd8;
+  color: #f8efda;
   text-shadow:
-    0 0 20px rgba(217, 188, 128, .18),
-    0 0 34px rgba(123, 153, 255, .14);
-  animation: tb-intro-fade-up .8s ease .18s both;
+    0 0 18px rgba(218, 188, 128, 0.18),
+    0 0 34px rgba(130, 158, 255, 0.15),
+    0 0 60px rgba(255, 239, 210, 0.05);
+  animation: tb-intro-fade-up .95s ease .18s both;
 }
 
-/* 三角形エリア */
+/* =========================
+   CARD SPREAD AREA
+========================= */
+
 .tb-intro-cards {
-  --spread-w: min(88vw, 430px);
-  --card-w: clamp(88px, 20vw, 132px);
+  --spread-w: min(88vw, 450px);
+  --card-w: clamp(90px, 20vw, 136px);
   --card-ratio: 1.5;
   --card-h: calc(var(--card-w) * var(--card-ratio));
-  --tri-top-y: 2%;
-  --tri-bottom-y: 54%;
+  --tri-top-y: 1%;
+  --tri-bottom-y: 55%;
   --tri-side-x: 22%;
   --top-rot: -4deg;
   --left-rot: -12deg;
@@ -146,11 +167,11 @@
 
   position: relative;
   width: var(--spread-w);
-  height: calc(var(--card-h) + 86px);
-  margin: .35rem auto 0;
+  height: calc(var(--card-h) + 96px);
+  margin: .4rem auto 0;
 }
 
-/* 神秘リング */
+/* 星界核の淡光 */
 .tb-intro-cards::before,
 .tb-intro-cards::after {
   content: "";
@@ -162,25 +183,32 @@
   transform: translate(-50%, -50%);
 }
 
+/* 中心の呼吸光 */
 .tb-intro-cards::before {
-  width: min(70vw, 320px);
-  height: min(70vw, 320px);
+  width: min(74vw, 340px);
+  height: min(74vw, 340px);
   background:
-    radial-gradient(circle, rgba(142, 170, 255, 0.16), rgba(142, 170, 255, 0) 64%);
-  filter: blur(14px);
+    radial-gradient(circle,
+      rgba(145, 171, 255, 0.22) 0%,
+      rgba(145, 171, 255, 0.08) 26%,
+      rgba(212, 183, 120, 0.08) 44%,
+      rgba(145, 171, 255, 0) 68%);
+  filter: blur(16px);
   opacity: .95;
-  animation: tb-intro-core-breathe 3.2s ease-in-out infinite;
+  animation: tb-intro-core-breathe 3.6s ease-in-out infinite;
 }
 
+/* 儀式リング */
 .tb-intro-cards::after {
-  width: min(72vw, 334px);
-  height: min(72vw, 334px);
-  border: 1px solid rgba(188, 203, 255, .14);
+  width: min(76vw, 360px);
+  height: min(76vw, 360px);
+  border: 1px solid rgba(188, 203, 255, 0.14);
   box-shadow:
-    0 0 0 1px rgba(209, 182, 122, .06) inset,
-    0 0 30px rgba(123, 153, 255, .10);
-  opacity: .72;
-  animation: tb-intro-ring-spin 12s linear infinite;
+    0 0 0 1px rgba(209, 182, 122, 0.06) inset,
+    0 0 24px rgba(123, 153, 255, 0.10),
+    0 0 42px rgba(212, 183, 120, 0.08);
+  opacity: .74;
+  animation: tb-intro-ring-spin 14s linear infinite;
 }
 
 .tb-intro-card {
@@ -193,20 +221,22 @@
   place-items: center;
   padding: .75rem;
   border-radius: 14px;
-  border: 1px solid rgba(214, 220, 255, .26);
+  border: 1px solid rgba(214, 220, 255, 0.24);
   background:
-    linear-gradient(165deg, rgba(20, 27, 48, .94), rgba(7, 10, 18, .98)),
-    radial-gradient(circle at 50% 12%, rgba(255, 234, 188, .08), transparent 26%);
-  color: rgba(238, 241, 255, .90);
+    linear-gradient(165deg, rgba(18, 24, 42, 0.94), rgba(6, 9, 18, 0.98)),
+    radial-gradient(circle at 50% 10%, rgba(255, 231, 184, 0.10), transparent 24%);
+  color: rgba(239, 243, 255, 0.92);
   font: 700 clamp(.6rem, 1.8vw, .74rem) "Noto Sans JP", sans-serif;
   letter-spacing: .18em;
   text-align: center;
   box-shadow:
-    0 0 24px rgba(123, 153, 255, .10),
-    0 10px 26px rgba(0, 0, 0, .34),
-    inset 0 0 0 1px rgba(212, 183, 120, .14);
+    0 0 24px rgba(123, 153, 255, 0.12),
+    0 10px 28px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 1px rgba(212, 183, 120, 0.14);
   overflow: hidden;
   opacity: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .tb-intro-card::before,
@@ -220,23 +250,24 @@
 
 .tb-intro-card::before {
   inset: 8px;
-  border: 1px solid rgba(212, 183, 120, .16);
+  border: 1px solid rgba(212, 183, 120, 0.18);
+  box-shadow: inset 0 0 20px rgba(212, 183, 120, 0.04);
 }
 
 .tb-intro-card::after {
   background:
-    linear-gradient(180deg, rgba(255,255,255,.05), transparent 28%, rgba(0,0,0,.10));
+    linear-gradient(180deg, rgba(255,255,255,0.06), transparent 26%, rgba(0,0,0,0.14));
 }
 
 .tb-intro-card--compass {
   transform:
     translate(-50%, -50%)
-    translateY(-26px)
+    translateY(-28px)
     scale(.82)
     rotate(var(--top-rot));
   animation:
-    tb-intro-card-top .72s cubic-bezier(.22,.88,.25,1) .42s forwards,
-    tb-intro-card-glow 1.5s ease-in-out 1.45s 1;
+    tb-intro-card-top .78s cubic-bezier(.22,.88,.25,1) .42s forwards,
+    tb-intro-card-glow 1.8s ease-in-out 1.45s 1;
 }
 
 .tb-intro-card--trigger {
@@ -247,8 +278,8 @@
     scale(.82)
     rotate(var(--left-rot));
   animation:
-    tb-intro-card-left .72s cubic-bezier(.22,.88,.25,1) .66s forwards,
-    tb-intro-card-glow 1.5s ease-in-out 1.68s 1;
+    tb-intro-card-left .78s cubic-bezier(.22,.88,.25,1) .68s forwards,
+    tb-intro-card-glow 1.8s ease-in-out 1.68s 1;
 }
 
 .tb-intro-card--route {
@@ -259,8 +290,8 @@
     scale(.82)
     rotate(var(--right-rot));
   animation:
-    tb-intro-card-right .72s cubic-bezier(.22,.88,.25,1) .90s forwards,
-    tb-intro-card-glow 1.5s ease-in-out 1.92s 1;
+    tb-intro-card-right .78s cubic-bezier(.22,.88,.25,1) .94s forwards,
+    tb-intro-card-glow 1.8s ease-in-out 1.92s 1;
 }
 
 .tb-intro-skip {
@@ -271,24 +302,31 @@
   min-height: 38px;
   padding: 0 .92rem;
   border-radius: 999px;
-  border: 1px solid rgba(216, 223, 255, .30);
-  background: rgba(10, 14, 26, .72);
+  border: 1px solid rgba(216, 223, 255, 0.28);
+  background: rgba(8, 12, 24, 0.70);
   color: #eff4ff;
   font: 600 .74rem "Noto Sans JP", sans-serif;
   letter-spacing: .14em;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow:
-    0 8px 20px rgba(0,0,0,.24),
-    inset 0 0 0 1px rgba(255,255,255,.03);
+    0 8px 20px rgba(0,0,0,0.24),
+    inset 0 0 0 1px rgba(255,255,255,0.03);
+  transition:
+    border-color .25s ease,
+    box-shadow .25s ease,
+    transform .25s ease,
+    background-color .25s ease;
 }
 
 .tb-intro-skip:hover,
 .tb-intro-skip:focus-visible {
-  border-color: rgba(201, 175, 124, .34);
+  border-color: rgba(201, 175, 124, 0.34);
+  background: rgba(10, 15, 28, 0.82);
   box-shadow:
-    0 8px 22px rgba(0,0,0,.28),
-    0 0 16px rgba(141, 172, 255, .14);
+    0 8px 22px rgba(0,0,0,0.28),
+    0 0 16px rgba(141, 172, 255, 0.14);
+  transform: translateY(-1px);
 }
 
 /* =========================
@@ -298,11 +336,13 @@
 @keyframes tb-intro-fade-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 }
 
@@ -314,8 +354,9 @@
     transform:
       translate(-50%, -50%)
       translateY(0)
-      scale(.80)
+      scale(.78)
       rotate(0deg);
+    filter: blur(8px);
   }
   70% {
     opacity: 1;
@@ -323,8 +364,9 @@
     top: var(--tri-top-y);
     transform:
       translate(-50%, 0)
-      scale(1.02)
+      scale(1.03)
       rotate(calc(var(--top-rot) * 1.1));
+    filter: blur(0);
   }
   100% {
     opacity: 1;
@@ -334,6 +376,7 @@
       translate(-50%, 0)
       scale(1)
       rotate(var(--top-rot));
+    filter: blur(0);
   }
 }
 
@@ -344,8 +387,9 @@
     top: 50%;
     transform:
       translate(-50%, -50%)
-      scale(.80)
+      scale(.78)
       rotate(0deg);
+    filter: blur(8px);
   }
   70% {
     opacity: 1;
@@ -353,8 +397,9 @@
     top: var(--tri-bottom-y);
     transform:
       translate(-50%, 0)
-      scale(1.02)
+      scale(1.03)
       rotate(calc(var(--left-rot) * 1.05));
+    filter: blur(0);
   }
   100% {
     opacity: 1;
@@ -364,6 +409,7 @@
       translate(-50%, 0)
       scale(1)
       rotate(var(--left-rot));
+    filter: blur(0);
   }
 }
 
@@ -374,8 +420,9 @@
     top: 50%;
     transform:
       translate(-50%, -50%)
-      scale(.80)
+      scale(.78)
       rotate(0deg);
+    filter: blur(8px);
   }
   70% {
     opacity: 1;
@@ -383,8 +430,9 @@
     top: var(--tri-bottom-y);
     transform:
       translate(-50%, 0)
-      scale(1.02)
+      scale(1.03)
       rotate(calc(var(--right-rot) * 1.05));
+    filter: blur(0);
   }
   100% {
     opacity: 1;
@@ -394,33 +442,34 @@
       translate(-50%, 0)
       scale(1)
       rotate(var(--right-rot));
+    filter: blur(0);
   }
 }
 
 @keyframes tb-intro-card-glow {
   0%, 100% {
     box-shadow:
-      0 0 24px rgba(123, 153, 255, .10),
-      0 10px 26px rgba(0, 0, 0, .34),
-      inset 0 0 0 1px rgba(212, 183, 120, .14);
+      0 0 24px rgba(123, 153, 255, 0.12),
+      0 10px 28px rgba(0, 0, 0, 0.36),
+      inset 0 0 0 1px rgba(212, 183, 120, 0.14);
   }
   50% {
     box-shadow:
-      0 0 34px rgba(125, 157, 255, .24),
-      0 0 18px rgba(210, 182, 122, .16),
-      0 12px 30px rgba(0, 0, 0, .36),
-      inset 0 0 0 1px rgba(212, 183, 120, .34);
+      0 0 36px rgba(125, 157, 255, 0.24),
+      0 0 18px rgba(210, 182, 122, 0.16),
+      0 12px 32px rgba(0, 0, 0, 0.38),
+      inset 0 0 0 1px rgba(212, 183, 120, 0.30);
   }
 }
 
 @keyframes tb-intro-core-breathe {
   0%, 100% {
     opacity: .82;
-    transform: translate(-50%, -50%) scale(.96);
+    transform: translate(-50%, -50%) scale(.94);
   }
   50% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.04);
+    transform: translate(-50%, -50%) scale(1.06);
   }
 }
 
@@ -433,24 +482,59 @@
   }
 }
 
+/* 1本に統合して transform 競合を解消 */
+@keyframes tb-seikai-gate-orbit {
+  0% {
+    opacity: 0.10;
+    transform: scale(1.02) rotate(0deg);
+  }
+  25% {
+    opacity: 0.12;
+    transform: scale(1.05) rotate(90deg);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scale(1.08) rotate(180deg);
+  }
+  75% {
+    opacity: 0.12;
+    transform: scale(1.05) rotate(270deg);
+  }
+  100% {
+    opacity: 0.10;
+    transform: scale(1.02) rotate(360deg);
+  }
+}
+
 /* =========================
    MOBILE
 ========================= */
 
 @media (max-width: 700px) {
+  .tb-intro {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .tb-intro::before {
+    inset: -18%;
+    background-size: min(178vmax, 1500px);
+    opacity: 0.13;
+  }
+
   .tb-intro-inner {
     width: min(94vw, 420px);
-    gap: .78rem;
+    gap: .82rem;
     padding: 1.1rem 0;
   }
 
   .tb-intro-brand {
     font-size: .66rem;
-    letter-spacing: .20em;
+    letter-spacing: .22em;
   }
 
   .tb-intro-title {
-    font-size: clamp(1.28rem, 7vw, 2rem);
+    font-size: clamp(1.3rem, 7vw, 2.06rem);
     letter-spacing: .14em;
   }
 
@@ -465,7 +549,6 @@
     --top-rot: -3deg;
     --left-rot: -10deg;
     --right-rot: 10deg;
-
     height: calc(var(--card-h) + 62px);
   }
 
@@ -496,6 +579,12 @@
 }
 
 @media (max-width: 390px) {
+  .tb-intro::before {
+    inset: -22%;
+    background-size: min(188vmax, 1350px);
+    opacity: 0.14;
+  }
+
   .tb-intro-cards {
     --spread-w: min(94vw, 318px);
     --card-w: clamp(72px, 25vw, 96px);
@@ -504,7 +593,6 @@
     --tri-top-y: 5%;
     --tri-bottom-y: 57%;
     --tri-side-x: 25.5%;
-
     height: calc(var(--card-h) + 52px);
   }
 
