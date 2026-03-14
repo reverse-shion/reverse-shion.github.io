@@ -3,7 +3,6 @@ window.TB?.ready(() => {
   if (!intro) return;
 
   const skip = intro.querySelector('[data-tb-intro-skip]');
-  const key = 'tb-intro-seen-v2';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let done = false;
@@ -30,15 +29,11 @@ window.TB?.ready(() => {
     if (done) return;
     done = true;
 
-    try {
-      localStorage.setItem(key, '1');
-    } catch {}
-
     if (closeTimer) clearTimeout(closeTimer);
     finish();
   };
 
-  if (localStorage.getItem(key) === '1' || reduceMotion) {
+  if (reduceMotion) {
     cleanup();
     return;
   }
@@ -53,7 +48,7 @@ window.TB?.ready(() => {
 
   skip?.addEventListener('click', closeOnce);
 
-  closeTimer = window.setTimeout(closeOnce, 3400);
+  closeTimer = window.setTimeout(closeOnce, 2400);
 
   window.addEventListener('pagehide', () => {
     if (closeTimer) clearTimeout(closeTimer);
