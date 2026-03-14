@@ -52,11 +52,11 @@
   overflow: hidden;
   isolation: isolate;
   background:
-    radial-gradient(circle at 50% 12%, rgba(132, 158, 255, 0.18), transparent 16%),
-    radial-gradient(circle at 22% 22%, rgba(110, 86, 212, 0.14), transparent 18%),
-    radial-gradient(circle at 80% 18%, rgba(215, 183, 118, 0.10), transparent 14%),
-    radial-gradient(circle at 50% 50%, rgba(95, 118, 208, 0.10), transparent 42%),
-    linear-gradient(180deg, rgba(4, 7, 18, 0.72), rgba(2, 4, 10, 0.94));
+    radial-gradient(circle at 50% 12%, rgba(132, 158, 255, 0.16), transparent 16%),
+    radial-gradient(circle at 20% 22%, rgba(108, 86, 212, 0.13), transparent 19%),
+    radial-gradient(circle at 80% 16%, rgba(215, 183, 118, 0.09), transparent 14%),
+    radial-gradient(circle at 50% 50%, rgba(92, 116, 208, 0.11), transparent 43%),
+    linear-gradient(180deg, rgba(4, 7, 18, 0.80), rgba(2, 4, 10, 0.96));
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   opacity: 0;
@@ -74,32 +74,34 @@
   pointer-events: none;
 }
 
-/* 星界ゲート本体 */
+/* 星界ゲート本体：固定・巨大表示 */
 .tb-intro::before {
-  inset: -10%;
-  background:
-    url("../img/world/tb-seikai-gate.webp")
-    center center / min(150vmax, 1800px) no-repeat;
+  inset: -26%;
+  background-image: url("/img/world/tb-seikai-gate.webp");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: min(205vmax, 2300px);
   mix-blend-mode: multiply;
-  opacity: 0.12;
+  opacity: 0.22;
   filter:
-    brightness(0.96)
-    contrast(1.18)
-    saturate(1.02)
-    drop-shadow(0 0 18px rgba(212, 183, 120, 0.14))
-    drop-shadow(0 0 36px rgba(118, 145, 255, 0.10));
-  transform-origin: 50% 50%;
-  animation: tb-seikai-gate-orbit 34s linear infinite;
+    brightness(1.03)
+    contrast(1.24)
+    saturate(1.08)
+    drop-shadow(0 0 16px rgba(212, 183, 120, 0.12))
+    drop-shadow(0 0 30px rgba(118, 145, 255, 0.08));
+  transform: scale(1.02);
+  transform-origin: center center;
+  animation: tb-seikai-gate-breathe 5.8s ease-in-out infinite;
 }
 
-/* 上から被せる星霧・光膜 */
+/* 上にかかる星霧・光膜 */
 .tb-intro::after {
   background:
-    radial-gradient(circle at 50% 50%, rgba(255, 238, 205, 0.06), transparent 26%),
-    radial-gradient(circle at 50% 48%, rgba(132, 160, 255, 0.10), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%, rgba(0,0,0,0.18) 100%);
+    radial-gradient(circle at 50% 50%, rgba(255, 238, 205, 0.05), transparent 24%),
+    radial-gradient(circle at 50% 46%, rgba(132, 160, 255, 0.08), transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), transparent 18%, rgba(0,0,0,0.20) 100%);
   mix-blend-mode: screen;
-  opacity: 0.95;
+  opacity: 0.92;
 }
 
 .tb-intro.is-active {
@@ -119,12 +121,15 @@
   width: min(92vw, 680px);
   display: grid;
   justify-items: center;
-  gap: clamp(.7rem, 2vw, 1.1rem);
+  gap: clamp(.7rem, 2vw, 1.08rem);
   text-align: center;
   padding: clamp(1rem, 3vw, 1.8rem) 0;
+  transform: translateY(-3.8vh);
 }
 
 .tb-intro-brand {
+  position: relative;
+  z-index: 2;
   margin: 0;
   font-size: clamp(.68rem, 1.7vw, .80rem);
   letter-spacing: .30em;
@@ -132,10 +137,12 @@
   text-shadow:
     0 0 10px rgba(141, 170, 255, 0.16),
     0 0 22px rgba(141, 170, 255, 0.10);
-  animation: tb-intro-fade-up .8s ease .06s both;
+  animation: tb-intro-fade-up .8s ease .04s both;
 }
 
 .tb-intro-title {
+  position: relative;
+  z-index: 2;
   margin: 0;
   font-family: "Shippori Mincho", serif;
   font-size: clamp(1.7rem, 5vw, 2.95rem);
@@ -146,7 +153,7 @@
     0 0 18px rgba(218, 188, 128, 0.18),
     0 0 34px rgba(130, 158, 255, 0.15),
     0 0 60px rgba(255, 239, 210, 0.05);
-  animation: tb-intro-fade-up .95s ease .18s both;
+  animation: tb-intro-fade-up .95s ease .16s both;
 }
 
 /* =========================
@@ -166,9 +173,10 @@
   --right-rot: 12deg;
 
   position: relative;
+  z-index: 2;
   width: var(--spread-w);
   height: calc(var(--card-h) + 96px);
-  margin: .4rem auto 0;
+  margin: .35rem auto 0;
 }
 
 /* 星界核の淡光 */
@@ -259,6 +267,56 @@
     linear-gradient(180deg, rgba(255,255,255,0.06), transparent 26%, rgba(0,0,0,0.14));
 }
 
+/* カードの上にうっすら星粒 */
+.tb-intro-inner::before,
+.tb-intro-inner::after {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.tb-intro.is-active .tb-intro-inner::before,
+.tb-intro.is-active .tb-intro-inner::after {
+  opacity: 1;
+}
+
+.tb-intro-inner::before {
+  background:
+    radial-gradient(circle, rgba(255, 239, 210, 0.95) 0 1px, transparent 1.8px) 8% 14% / 120px 120px,
+    radial-gradient(circle, rgba(158, 184, 255, 0.85) 0 1.2px, transparent 2px) 22% 66% / 160px 160px,
+    radial-gradient(circle, rgba(255, 230, 170, 0.88) 0 1px, transparent 2px) 76% 22% / 140px 140px,
+    radial-gradient(circle, rgba(177, 199, 255, 0.82) 0 1.1px, transparent 2px) 84% 70% / 180px 180px,
+    radial-gradient(circle, rgba(255, 244, 230, 0.72) 0 0.9px, transparent 2px) 52% 8% / 150px 150px,
+    radial-gradient(circle, rgba(143, 168, 255, 0.72) 0 1px, transparent 2px) 48% 88% / 170px 170px;
+  filter:
+    blur(.2px)
+    drop-shadow(0 0 8px rgba(130, 158, 255, 0.20))
+    drop-shadow(0 0 10px rgba(218, 188, 128, 0.16));
+  animation:
+    tb-intro-starfall-a 5.6s ease-in-out infinite,
+    tb-intro-star-twinkle 2.8s ease-in-out infinite;
+}
+
+.tb-intro-inner::after {
+  background:
+    radial-gradient(circle, rgba(255, 243, 222, 0.90) 0 1px, transparent 2px) 14% 38% / 150px 150px,
+    radial-gradient(circle, rgba(165, 190, 255, 0.82) 0 1.2px, transparent 2px) 68% 18% / 170px 170px,
+    radial-gradient(circle, rgba(255, 226, 178, 0.80) 0 1px, transparent 2px) 90% 44% / 130px 130px,
+    radial-gradient(circle, rgba(185, 206, 255, 0.76) 0 1px, transparent 2px) 34% 86% / 180px 180px,
+    radial-gradient(circle, rgba(255, 251, 240, 0.70) 0 0.8px, transparent 2px) 58% 54% / 120px 120px;
+  filter:
+    blur(.35px)
+    drop-shadow(0 0 10px rgba(130, 158, 255, 0.18))
+    drop-shadow(0 0 12px rgba(218, 188, 128, 0.14));
+  animation:
+    tb-intro-starfall-b 6.8s ease-in-out infinite,
+    tb-intro-star-twinkle 3.3s ease-in-out infinite reverse;
+}
+
 .tb-intro-card--compass {
   transform:
     translate(-50%, -50%)
@@ -292,41 +350,6 @@
   animation:
     tb-intro-card-right .78s cubic-bezier(.22,.88,.25,1) .94s forwards,
     tb-intro-card-glow 1.8s ease-in-out 1.92s 1;
-}
-
-.tb-intro-skip {
-  position: absolute;
-  top: max(.9rem, env(safe-area-inset-top, 0px));
-  right: .9rem;
-  z-index: 3;
-  min-height: 38px;
-  padding: 0 .92rem;
-  border-radius: 999px;
-  border: 1px solid rgba(216, 223, 255, 0.28);
-  background: rgba(8, 12, 24, 0.70);
-  color: #eff4ff;
-  font: 600 .74rem "Noto Sans JP", sans-serif;
-  letter-spacing: .14em;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.24),
-    inset 0 0 0 1px rgba(255,255,255,0.03);
-  transition:
-    border-color .25s ease,
-    box-shadow .25s ease,
-    transform .25s ease,
-    background-color .25s ease;
-}
-
-.tb-intro-skip:hover,
-.tb-intro-skip:focus-visible {
-  border-color: rgba(201, 175, 124, 0.34);
-  background: rgba(10, 15, 28, 0.82);
-  box-shadow:
-    0 8px 22px rgba(0,0,0,0.28),
-    0 0 16px rgba(141, 172, 255, 0.14);
-  transform: translateY(-1px);
 }
 
 /* =========================
@@ -482,225 +505,15 @@
   }
 }
 
-/* 1本に統合して transform 競合を解消 */
-@keyframes tb-seikai-gate-orbit {
-  0% {
-    opacity: 0.10;
-    transform: scale(1.02) rotate(0deg);
-  }
-  25% {
-    opacity: 0.12;
-    transform: scale(1.05) rotate(90deg);
+@keyframes tb-seikai-gate-breathe {
+  0%, 100% {
+    opacity: 0.20;
+    transform: scale(1.015);
   }
   50% {
-    opacity: 0.15;
-    transform: scale(1.08) rotate(180deg);
+    opacity: 0.24;
+    transform: scale(1.035);
   }
-  75% {
-    opacity: 0.12;
-    transform: scale(1.05) rotate(270deg);
-  }
-  100% {
-    opacity: 0.10;
-    transform: scale(1.02) rotate(360deg);
-  }
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 700px) {
-  .tb-intro {
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-  }
-
-  .tb-intro::before {
-    inset: -18%;
-    background-size: min(178vmax, 1500px);
-    opacity: 0.13;
-  }
-
-  .tb-intro-inner {
-    width: min(94vw, 420px);
-    gap: .82rem;
-    padding: 1.1rem 0;
-  }
-
-  .tb-intro-brand {
-    font-size: .66rem;
-    letter-spacing: .22em;
-  }
-
-  .tb-intro-title {
-    font-size: clamp(1.3rem, 7vw, 2.06rem);
-    letter-spacing: .14em;
-  }
-
-  .tb-intro-cards {
-    --spread-w: min(92vw, 350px);
-    --card-w: clamp(78px, 24vw, 108px);
-    --card-ratio: 1.5;
-    --card-h: calc(var(--card-w) * var(--card-ratio));
-    --tri-top-y: 4%;
-    --tri-bottom-y: 56%;
-    --tri-side-x: 24%;
-    --top-rot: -3deg;
-    --left-rot: -10deg;
-    --right-rot: 10deg;
-    height: calc(var(--card-h) + 62px);
-  }
-
-  .tb-intro-cards::before {
-    width: min(78vw, 270px);
-    height: min(78vw, 270px);
-  }
-
-  .tb-intro-cards::after {
-    width: min(80vw, 286px);
-    height: min(80vw, 286px);
-  }
-
-  .tb-intro-card {
-    border-radius: 12px;
-    font-size: .62rem;
-    letter-spacing: .14em;
-    padding: .58rem;
-  }
-
-  .tb-intro-skip {
-    top: max(.7rem, env(safe-area-inset-top, 0px));
-    right: .7rem;
-    min-height: 36px;
-    padding-inline: .82rem;
-    font-size: .7rem;
-  }
-}
-
-@media (max-width: 390px) {
-  .tb-intro::before {
-    inset: -22%;
-    background-size: min(188vmax, 1350px);
-    opacity: 0.14;
-  }
-
-  .tb-intro-cards {
-    --spread-w: min(94vw, 318px);
-    --card-w: clamp(72px, 25vw, 96px);
-    --card-ratio: 1.5;
-    --card-h: calc(var(--card-w) * var(--card-ratio));
-    --tri-top-y: 5%;
-    --tri-bottom-y: 57%;
-    --tri-side-x: 25.5%;
-    height: calc(var(--card-h) + 52px);
-  }
-
-  .tb-intro-title {
-    letter-spacing: .10em;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .tb-arcana-card,
-  .tb-btn,
-  .tb-story {
-    transition: none !important;
-    transform: none !important;
-    opacity: 1 !important;
-  }
-
-  .tb-arcana-card[data-phase="connecting"] .tb-arcana-face--front {
-    animation: none !important;
-  }
-
-  .tb-intro {
-    display: none !important;
-  }
-
-  .tb-intro::before,
-  .tb-intro::after,
-  .tb-intro-cards::before,
-  .tb-intro-cards::after,
-  .tb-intro-card,
-  .tb-intro-title,
-  .tb-intro-brand {
-    animation: none !important;
-  }
-}
-
-.tb-intro::before {
-  inset: -10%;
-  background:
-    url("/img/world/tb-seikai-gate.webp")
-    center center / min(130vmax, 1500px) no-repeat;
-  opacity: 0.75;
-  mix-blend-mode: normal;
-  filter: contrast(1.2);
-  transform-origin: 50% 50%;
-  animation: tb-seikai-gate-orbit 34s linear infinite;
-}
-
-/* =========================
-   STAR DUST / GATE PARTICLES
-========================= */
-
-.tb-intro-inner::before,
-.tb-intro-inner::after {
-  content: "";
-  position: absolute;
-  inset: -14%;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
-.tb-intro.is-active .tb-intro-inner::before,
-.tb-intro.is-active .tb-intro-inner::after {
-  opacity: 1;
-}
-
-.tb-intro-inner::before {
-  background:
-    radial-gradient(circle, rgba(255, 239, 210, 0.95) 0 1px, transparent 1.8px) 8% 14% / 120px 120px,
-    radial-gradient(circle, rgba(158, 184, 255, 0.85) 0 1.2px, transparent 2px) 22% 66% / 160px 160px,
-    radial-gradient(circle, rgba(255, 230, 170, 0.88) 0 1px, transparent 2px) 76% 22% / 140px 140px,
-    radial-gradient(circle, rgba(177, 199, 255, 0.82) 0 1.1px, transparent 2px) 84% 70% / 180px 180px,
-    radial-gradient(circle, rgba(255, 244, 230, 0.72) 0 0.9px, transparent 2px) 52% 8% / 150px 150px,
-    radial-gradient(circle, rgba(143, 168, 255, 0.72) 0 1px, transparent 2px) 48% 88% / 170px 170px;
-  filter:
-    blur(.2px)
-    drop-shadow(0 0 8px rgba(130, 158, 255, 0.20))
-    drop-shadow(0 0 10px rgba(218, 188, 128, 0.16));
-  animation:
-    tb-intro-starfall-a 5.6s ease-in-out infinite,
-    tb-intro-star-twinkle 2.8s ease-in-out infinite;
-}
-
-.tb-intro-inner::after {
-  background:
-    radial-gradient(circle, rgba(255, 243, 222, 0.90) 0 1px, transparent 2px) 14% 38% / 150px 150px,
-    radial-gradient(circle, rgba(165, 190, 255, 0.82) 0 1.2px, transparent 2px) 68% 18% / 170px 170px,
-    radial-gradient(circle, rgba(255, 226, 178, 0.80) 0 1px, transparent 2px) 90% 44% / 130px 130px,
-    radial-gradient(circle, rgba(185, 206, 255, 0.76) 0 1px, transparent 2px) 34% 86% / 180px 180px,
-    radial-gradient(circle, rgba(255, 251, 240, 0.70) 0 0.8px, transparent 2px) 58% 54% / 120px 120px;
-  filter:
-    blur(.35px)
-    drop-shadow(0 0 10px rgba(130, 158, 255, 0.18))
-    drop-shadow(0 0 12px rgba(218, 188, 128, 0.14));
-  animation:
-    tb-intro-starfall-b 6.8s ease-in-out infinite,
-    tb-intro-star-twinkle 3.3s ease-in-out infinite reverse;
-}
-
-.tb-intro-brand,
-.tb-intro-title,
-.tb-intro-cards,
-.tb-intro-skip {
-  position: relative;
-  z-index: 2;
 }
 
 @keyframes tb-intro-starfall-a {
@@ -754,7 +567,70 @@
   }
 }
 
+/* =========================
+   MOBILE
+========================= */
+
 @media (max-width: 700px) {
+  .tb-intro {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .tb-intro::before {
+    inset: -32%;
+    background-size: min(238vmax, 2200px);
+    opacity: 0.23;
+  }
+
+  .tb-intro-inner {
+    width: min(94vw, 420px);
+    gap: .82rem;
+    padding: 1.1rem 0;
+    transform: translateY(-4.2vh);
+  }
+
+  .tb-intro-brand {
+    font-size: .66rem;
+    letter-spacing: .22em;
+  }
+
+  .tb-intro-title {
+    font-size: clamp(1.3rem, 7vw, 2.06rem);
+    letter-spacing: .14em;
+  }
+
+  .tb-intro-cards {
+    --spread-w: min(92vw, 350px);
+    --card-w: clamp(78px, 24vw, 108px);
+    --card-ratio: 1.5;
+    --card-h: calc(var(--card-w) * var(--card-ratio));
+    --tri-top-y: 4%;
+    --tri-bottom-y: 56%;
+    --tri-side-x: 24%;
+    --top-rot: -3deg;
+    --left-rot: -10deg;
+    --right-rot: 10deg;
+    height: calc(var(--card-h) + 62px);
+  }
+
+  .tb-intro-cards::before {
+    width: min(78vw, 270px);
+    height: min(78vw, 270px);
+  }
+
+  .tb-intro-cards::after {
+    width: min(80vw, 286px);
+    height: min(80vw, 286px);
+  }
+
+  .tb-intro-card {
+    border-radius: 12px;
+    font-size: .62rem;
+    letter-spacing: .14em;
+    padding: .58rem;
+  }
+
   .tb-intro-inner::before,
   .tb-intro-inner::after {
     inset: -10%;
@@ -776,10 +652,65 @@
   }
 }
 
+@media (max-width: 390px) {
+  .tb-intro::before {
+    inset: -36%;
+    background-size: min(258vmax, 2300px);
+    opacity: 0.24;
+  }
+
+  .tb-intro-inner {
+    transform: translateY(-4.8vh);
+  }
+
+  .tb-intro-cards {
+    --spread-w: min(94vw, 318px);
+    --card-w: clamp(72px, 25vw, 96px);
+    --card-ratio: 1.5;
+    --card-h: calc(var(--card-w) * var(--card-ratio));
+    --tri-top-y: 5%;
+    --tri-bottom-y: 57%;
+    --tri-side-x: 25.5%;
+    height: calc(var(--card-h) + 52px);
+  }
+
+  .tb-intro-title {
+    letter-spacing: .10em;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .tb-arcana-card,
+  .tb-btn,
+  .tb-story {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .tb-arcana-card[data-phase="connecting"] .tb-arcana-face--front {
+    animation: none !important;
+  }
+
+  .tb-intro {
+    display: none !important;
+  }
+
+  .tb-intro::before,
+  .tb-intro::after,
+  .tb-intro-cards::before,
+  .tb-intro-cards::after,
+  .tb-intro-card,
+  .tb-intro-title,
+  .tb-intro-brand,
   .tb-intro-inner::before,
   .tb-intro-inner::after {
     animation: none !important;
+  }
+
+  .tb-intro-inner::before,
+  .tb-intro-inner::after {
     opacity: 0.35 !important;
     transform: none !important;
   }
