@@ -641,3 +641,146 @@
   transform-origin: 50% 50%;
   animation: tb-seikai-gate-orbit 34s linear infinite;
 }
+
+/* =========================
+   STAR DUST / GATE PARTICLES
+========================= */
+
+.tb-intro-inner::before,
+.tb-intro-inner::after {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.tb-intro.is-active .tb-intro-inner::before,
+.tb-intro.is-active .tb-intro-inner::after {
+  opacity: 1;
+}
+
+.tb-intro-inner::before {
+  background:
+    radial-gradient(circle, rgba(255, 239, 210, 0.95) 0 1px, transparent 1.8px) 8% 14% / 120px 120px,
+    radial-gradient(circle, rgba(158, 184, 255, 0.85) 0 1.2px, transparent 2px) 22% 66% / 160px 160px,
+    radial-gradient(circle, rgba(255, 230, 170, 0.88) 0 1px, transparent 2px) 76% 22% / 140px 140px,
+    radial-gradient(circle, rgba(177, 199, 255, 0.82) 0 1.1px, transparent 2px) 84% 70% / 180px 180px,
+    radial-gradient(circle, rgba(255, 244, 230, 0.72) 0 0.9px, transparent 2px) 52% 8% / 150px 150px,
+    radial-gradient(circle, rgba(143, 168, 255, 0.72) 0 1px, transparent 2px) 48% 88% / 170px 170px;
+  filter:
+    blur(.2px)
+    drop-shadow(0 0 8px rgba(130, 158, 255, 0.20))
+    drop-shadow(0 0 10px rgba(218, 188, 128, 0.16));
+  animation:
+    tb-intro-starfall-a 5.6s ease-in-out infinite,
+    tb-intro-star-twinkle 2.8s ease-in-out infinite;
+}
+
+.tb-intro-inner::after {
+  background:
+    radial-gradient(circle, rgba(255, 243, 222, 0.90) 0 1px, transparent 2px) 14% 38% / 150px 150px,
+    radial-gradient(circle, rgba(165, 190, 255, 0.82) 0 1.2px, transparent 2px) 68% 18% / 170px 170px,
+    radial-gradient(circle, rgba(255, 226, 178, 0.80) 0 1px, transparent 2px) 90% 44% / 130px 130px,
+    radial-gradient(circle, rgba(185, 206, 255, 0.76) 0 1px, transparent 2px) 34% 86% / 180px 180px,
+    radial-gradient(circle, rgba(255, 251, 240, 0.70) 0 0.8px, transparent 2px) 58% 54% / 120px 120px;
+  filter:
+    blur(.35px)
+    drop-shadow(0 0 10px rgba(130, 158, 255, 0.18))
+    drop-shadow(0 0 12px rgba(218, 188, 128, 0.14));
+  animation:
+    tb-intro-starfall-b 6.8s ease-in-out infinite,
+    tb-intro-star-twinkle 3.3s ease-in-out infinite reverse;
+}
+
+.tb-intro-brand,
+.tb-intro-title,
+.tb-intro-cards,
+.tb-intro-skip {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes tb-intro-starfall-a {
+  0% {
+    transform: translateY(-14px) scale(0.98);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(18px) scale(1.03);
+    opacity: 0;
+  }
+}
+
+@keyframes tb-intro-starfall-b {
+  0% {
+    transform: translateY(-20px) scale(1.02) rotate(0deg);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.72;
+  }
+  55% {
+    transform: translateY(4px) scale(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(24px) scale(0.99) rotate(1deg);
+    opacity: 0;
+  }
+}
+
+@keyframes tb-intro-star-twinkle {
+  0%, 100% {
+    filter:
+      blur(.25px)
+      drop-shadow(0 0 8px rgba(130, 158, 255, 0.18))
+      drop-shadow(0 0 10px rgba(218, 188, 128, 0.14));
+  }
+  50% {
+    filter:
+      blur(.1px)
+      drop-shadow(0 0 12px rgba(130, 158, 255, 0.28))
+      drop-shadow(0 0 16px rgba(218, 188, 128, 0.22));
+  }
+}
+
+@media (max-width: 700px) {
+  .tb-intro-inner::before,
+  .tb-intro-inner::after {
+    inset: -10%;
+  }
+
+  .tb-intro-inner::before {
+    background:
+      radial-gradient(circle, rgba(255, 239, 210, 0.92) 0 1px, transparent 2px) 12% 18% / 92px 92px,
+      radial-gradient(circle, rgba(158, 184, 255, 0.82) 0 1px, transparent 2px) 74% 20% / 110px 110px,
+      radial-gradient(circle, rgba(255, 230, 170, 0.82) 0 1px, transparent 2px) 26% 74% / 116px 116px,
+      radial-gradient(circle, rgba(177, 199, 255, 0.76) 0 1px, transparent 2px) 84% 78% / 124px 124px;
+  }
+
+  .tb-intro-inner::after {
+    background:
+      radial-gradient(circle, rgba(255, 243, 222, 0.86) 0 1px, transparent 2px) 18% 42% / 108px 108px,
+      radial-gradient(circle, rgba(165, 190, 255, 0.78) 0 1px, transparent 2px) 68% 60% / 116px 116px,
+      radial-gradient(circle, rgba(255, 226, 178, 0.76) 0 1px, transparent 2px) 88% 30% / 100px 100px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-intro-inner::before,
+  .tb-intro-inner::after {
+    animation: none !important;
+    opacity: 0.35 !important;
+    transform: none !important;
+  }
+}
