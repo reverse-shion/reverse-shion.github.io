@@ -21,14 +21,18 @@ window.TB?.ready(() => {
 
     cleanupTimer = window.setTimeout(() => {
       cleanup();
-    }, 540);
+    }, 560);
   };
 
   const closeOnce = () => {
     if (done) return;
     done = true;
 
-    if (closeTimer) clearTimeout(closeTimer);
+    if (closeTimer) {
+      window.clearTimeout(closeTimer);
+      closeTimer = null;
+    }
+
     finish();
   };
 
@@ -45,10 +49,14 @@ window.TB?.ready(() => {
     intro.classList.add('is-active');
   });
 
-  closeTimer = window.setTimeout(closeOnce, 2200);
+  closeTimer = window.setTimeout(closeOnce, 2850);
 
-  window.addEventListener('pagehide', () => {
-    if (closeTimer) clearTimeout(closeTimer);
-    if (cleanupTimer) clearTimeout(cleanupTimer);
-  }, { once: true });
+  window.addEventListener(
+    'pagehide',
+    () => {
+      if (closeTimer) window.clearTimeout(closeTimer);
+      if (cleanupTimer) window.clearTimeout(cleanupTimer);
+    },
+    { once: true }
+  );
 });
