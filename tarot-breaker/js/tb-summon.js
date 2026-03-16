@@ -1,171 +1,79 @@
-window.TB?.ready(() => {
+TB.register(() => {
+
   const root = document.querySelector('[data-summon-root]');
   if (!root) return;
 
   const button = root.querySelector('[data-summon-button]');
   const cardWrap = root.querySelector('[data-summon-card]');
-  const card = cardWrap?.querySelector('.tb-arcana-card') || root.querySelector('.tb-arcana-card');
-  const stage = root.closest('.tb-summon-stage') || root;
+  const card = cardWrap?.querySelector('.tb-arcana-card');
+  const stage = root.closest('.tb-summon-stage');
   const status = root.querySelector('[data-summon-status]');
+
   const nameEl = root.querySelector('[data-arcana-name]');
   const subtitleEl = root.querySelector('[data-arcana-subtitle]');
   const themeEl = root.querySelector('[data-arcana-theme]');
   const keywordEl = root.querySelector('[data-arcana-keyword]');
   const omenEl = root.querySelector('[data-arcana-omen]');
 
-  if (!button || !card || !status || !nameEl || !subtitleEl || !themeEl || !keywordEl || !omenEl) {
-    console.error('[tb-summon] required node missing');
-    return;
-  }
+  if (!button || !card) return;
 
-  const storageKey = 'tb-daily-spread';
-  const fallback = [
+  const arcana = [
     {
-      id: 'arcana-fb-01',
-      name: 'The Gatekeeper',
-      subtitle: 'Threshold Signal',
-      message: '境界に立つ呼吸が、最初の星界接続となる。',
-      keyword: '境界 / 受容 / 始動',
-      meaning: '門前で留まり、兆しを受信する。'
+      name: "The Gatekeeper",
+      subtitle: "Threshold Signal",
+      message: "境界に立つ呼吸が、最初の星界接続となる。",
+      keyword: "境界 / 受容 / 始動",
+      meaning: "門前で留まり、兆しを受信する。"
     },
     {
-      id: 'arcana-fb-02',
-      name: 'The Resonance',
-      subtitle: 'Echo Link',
-      message: '誰かの声と重なった瞬間、灯火は再起動する。',
-      keyword: '共鳴 / 再起 / 連結',
-      meaning: '今の選択は、孤立ではなく共振で開く。'
+      name: "The Resonance",
+      subtitle: "Echo Link",
+      message: "誰かの声と重なった瞬間、灯火は再起動する。",
+      keyword: "共鳴 / 再起 / 連結",
+      meaning: "今の選択は、孤立ではなく共振で開く。"
     },
     {
-      id: 'arcana-fb-03',
-      name: 'The Quiet Star',
-      subtitle: 'Silent Observatory',
-      message: '静かな夜ほど、徴は澄んだ輪郭を持つ。',
-      keyword: '沈黙 / 観測 / 余韻',
-      meaning: '急がず観測するほど、言葉は正確になる。'
+      name: "The Quiet Star",
+      subtitle: "Silent Observatory",
+      message: "静かな夜ほど、徴は澄んだ輪郭を持つ。",
+      keyword: "沈黙 / 観測 / 余韻",
+      meaning: "急がず観測するほど、言葉は正確になる。"
     }
   ];
 
-  const todayKey = () => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  const render = (cardData) => {
+
+    subtitleEl.textContent = cardData.subtitle;
+    nameEl.textContent = cardData.name;
+    themeEl.textContent = cardData.message;
+    keywordEl.textContent = cardData.keyword;
+    omenEl.textContent = cardData.meaning;
+
   };
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  button.addEventListener("click", async () => {
 
-  const parseStored = () => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!parsed?.date || !parsed?.card) return null;
-      return parsed;
-    } catch {
-      return null;
-    }
-  };
+    button.textContent = "星界接続中…";
+    status.textContent = "星界回路を起動しています…";
 
-  const storeCard = (cardData) => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify({ date: todayKey(), card: cardData }));
-    } catch {
-      // ignore storage failures
-    }
-  };
+    await sleep(700);
 
-  const renderCard = (pick) => {
-    subtitleEl.textContent = pick.subtitle || 'Stellar Omen';
-    nameEl.textContent = pick.name || 'Unknown Arcana';
-    themeEl.textContent = pick.message || pick.theme || '星界からの徴を受信しました。';
-    keywordEl.textContent = pick.keyword || pick.meaning || '――';
-    omenEl.textContent = pick.meaning || pick.omen || '今日の一枚は、あなたの歩幅に静かに同調します。';
-  };
+    status.textContent = "共鳴位相を同期中…";
 
-  const setStageState = (phase, state) => {
-    card.dataset.phase = phase;
-    card.dataset.flip = phase === 'revealed' ? 'true' : 'false';
-    stage.dataset.state = state;
-  };
+    await sleep(800);
 
-  let arcana = fallback;
-  let busy = false;
+    const pick = arcana[Math.floor(Math.random() * arcana.length)];
 
-  const resetIdle = () => {
-    setStageState('idle', 'idle');
-    status.textContent = '待機中：セレフィーズ認証は静かに維持されています。';
-    button.textContent = 'タロット展開';
-    button.removeAttribute('aria-busy');
-  };
+    render(pick);
 
-  const showStoredResult = (stored, fallbackMessage) => {
-    renderCard(stored.card);
-    setStageState('revealed', 'revealed');
-    button.textContent = '今日の徴を確認する';
-    status.textContent = fallbackMessage || '本日のタロット展開は記録されています。今日の徴をゆっくり読み解いてください。';
-  };
+    card.dataset.phase = "revealed";
+    card.dataset.flip = "true";
 
-  fetch('./data/arcana.json')
-    .then((res) => (res.ok ? res.json() : Promise.reject(new Error('json load failed'))))
-    .then((data) => {
-      if (Array.isArray(data?.cards) && data.cards.length) {
-        arcana = data.cards;
-      }
-      const stored = parseStored();
-      if (stored?.date === todayKey()) {
-        showStoredResult(stored);
-      } else {
-        resetIdle();
-      }
-    })
-    .catch(() => {
-      const stored = parseStored();
-      if (stored?.date === todayKey()) {
-        showStoredResult(stored, '本日のタロット展開は記録されています。予備記録から同期表示しています。');
-        return;
-      }
-      resetIdle();
-      status.textContent = '接続注意：記録の読み込みに失敗したため、予備アーカイブで展開します。';
-    });
+    button.textContent = "今日の徴を確認する";
+    status.textContent = "展開完了：今日の徴を記録しました。";
 
-  button.addEventListener('click', async () => {
-    if (busy) return;
-
-    const stored = parseStored();
-    if (stored?.date === todayKey()) {
-      showStoredResult(stored, '今日の徴は記録済みです。門の前で静かに読み解いてください。');
-      return;
-    }
-
-    busy = true;
-    button.setAttribute('aria-busy', 'true');
-
-    try {
-      button.textContent = '星界接続中…';
-      setStageState('connecting', 'connecting');
-      status.textContent = '星界接続を開始。儀式回路を起動しています…';
-      await sleep(700);
-
-      status.textContent = '同期中… 星粒の位相を合わせています。';
-      await sleep(900);
-
-      status.textContent = '徴の記録中… まもなく今日の一枚が現れます。';
-      await sleep(700);
-
-      const source = Array.isArray(arcana) && arcana.length ? arcana : fallback;
-      const pick = source[Math.floor(Math.random() * source.length)];
-      renderCard(pick);
-      setStageState('revealed', 'revealed');
-      storeCard(pick);
-
-      button.textContent = '今日の徴を確認する';
-      status.textContent = '展開完了：今日の一枚を記録しました。門は静かに開き続けています。';
-    } catch (error) {
-      console.error('[tb-summon] reveal failed', error);
-      resetIdle();
-      status.textContent = '接続失敗：儀式回路を再同期します。もう一度タロット展開を押してください。';
-    } finally {
-      button.removeAttribute('aria-busy');
-      busy = false;
-    }
   });
+
 });
