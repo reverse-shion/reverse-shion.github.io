@@ -16,7 +16,10 @@ TB.register(() => {
   if (
     !button || !card || !status ||
     !nameEl || !subtitleEl || !themeEl || !keywordEl || !omenEl
-  ) return;
+  ) {
+    console.warn('tb-summon: required elements not found');
+    return;
+  }
 
   const arcana = [
     {
@@ -44,43 +47,72 @@ TB.register(() => {
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const render = (cardData) => {
-    subtitleEl.textContent = cardData.subtitle;
-    nameEl.textContent = cardData.name;
-    themeEl.textContent = cardData.message;
-    keywordEl.textContent = cardData.keyword;
-    omenEl.textContent = cardData.meaning;
+  const setText = (el, value) => {
+    if (el) el.textContent = value;
   };
 
+  const render = (cardData) => {
+    setText(subtitleEl, cardData.subtitle);
+    setText(nameEl, cardData.name);
+    setText(themeEl, cardData.message);
+    setText(keywordEl, cardData.keyword);
+    setText(omenEl, cardData.meaning);
+  };
+
+  // 初期状態を明示
+  card.dataset.phase = 'idle';
+  card.dataset.flip = 'false';
+
   let busy = false;
+  let lastIndex = -1;
+
+  const pickArcana = () => {
+    if (arcana.length <= 1) return arcana[0];
+
+    let nextIndex = lastIndex;
+    while (nextIndex === lastIndex) {
+      nextIndex = Math.floor(Math.random() * arcana.length);
+    }
+    lastIndex = nextIndex;
+    return arcana[nextIndex];
+  };
 
   button.addEventListener('click', async () => {
     if (busy) return;
     busy = true;
 
-    button.disabled = true;
-    button.textContent = '星界接続中…';
-    status.textContent = '星界回路を起動しています…';
+    try {
+      button.disabled = true;
+      button.textContent = '星界接続中…';
+      status.textContent = '星界回路を起動しています…';
 
-    card.dataset.phase = 'charging';
-    card.dataset.flip = 'false';
+      card.dataset.phase = 'charging';
+      card.dataset.flip = 'false';
 
-    await sleep(700);
+      await sleep(650);
 
-    status.textContent = '共鳴位相を同期中…';
+      card.dataset.phase = 'syncing';
+      status.textContent = '共鳴位相を同期中…';
 
-    await sleep(800);
+      await sleep(780);
 
-    const pick = arcana[Math.floor(Math.random() * arcana.length)];
-    render(pick);
+      const pick = pickArcana();
+      render(pick);
 
-    card.dataset.phase = 'revealed';
-    card.dataset.flip = 'true';
+      card.dataset.phase = 'revealed';
+      card.dataset.flip = 'true';
 
-    button.textContent = 'もう一度、展開する';
-    status.textContent = '展開完了：今日の徴を記録しました。';
-
-    button.disabled = false;
-    busy = false;
+      button.textContent = 'もう一度、展開する';
+      status.textContent = `展開完了：「${pick.name}」の徴を記録しました。`;
+    } catch (error) {
+      console.error('tb-summon error:', error);
+      status.textContent = '接続に失敗しました。少し時間をおいて、もう一度お試しください。';
+      button.textContent = '再度、星界に触れる';
+      card.dataset.phase = 'idle';
+      card.dataset.flip = 'false';
+    } finally {
+      button.disabled = false;
+      busy = false;
+    }
   });
 });
