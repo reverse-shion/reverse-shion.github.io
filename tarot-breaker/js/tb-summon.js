@@ -59,9 +59,9 @@ TB.register(() => {
     setText(omenEl, cardData.meaning);
   };
 
-  // 初期状態を明示
   card.dataset.phase = 'idle';
   card.dataset.flip = 'false';
+  root.dataset.state = 'idle';
 
   let busy = false;
   let lastIndex = -1;
@@ -86,11 +86,13 @@ TB.register(() => {
       button.textContent = '星界接続中…';
       status.textContent = '星界回路を起動しています…';
 
+      root.dataset.state = 'charging';
       card.dataset.phase = 'charging';
       card.dataset.flip = 'false';
 
       await sleep(650);
 
+      root.dataset.state = 'syncing';
       card.dataset.phase = 'syncing';
       status.textContent = '共鳴位相を同期中…';
 
@@ -99,6 +101,7 @@ TB.register(() => {
       const pick = pickArcana();
       render(pick);
 
+      root.dataset.state = 'revealed';
       card.dataset.phase = 'revealed';
       card.dataset.flip = 'true';
 
@@ -106,6 +109,7 @@ TB.register(() => {
       status.textContent = `展開完了：「${pick.name}」の徴を記録しました。`;
     } catch (error) {
       console.error('tb-summon error:', error);
+      root.dataset.state = 'idle';
       status.textContent = '接続に失敗しました。少し時間をおいて、もう一度お試しください。';
       button.textContent = '再度、星界に触れる';
       card.dataset.phase = 'idle';
