@@ -27,8 +27,14 @@
   --tb-radius-sm: 14px;
   --tb-radius-xs: 12px;
 
+  --tb-container: 1120px;
+  --tb-reading: 68ch;
   --header-h: 64px;
 }
+
+/* =========================
+   RESET / BASE
+========================= */
 
 *,
 *::before,
@@ -41,7 +47,22 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  background: transparent;
   color: var(--tb-text);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+  font-family: "Noto Sans JP", sans-serif;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   background:
     radial-gradient(circle at 50% -12%, rgba(126, 154, 255, 0.18), transparent 26%),
     radial-gradient(circle at 15% 18%, rgba(104, 82, 191, 0.18), transparent 22%),
@@ -49,44 +70,122 @@ body {
     linear-gradient(180deg, #08101f 0%, #050915 38%, #03060f 100%);
 }
 
-body {
-  position: relative;
-  font-family: "Noto Sans JP", sans-serif;
-  line-height: 1.85;
-  letter-spacing: 0.01em;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
+
+h2 {
+  font-family: "Shippori Mincho", serif;
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  line-height: 1.28;
+  color: #f6f2ea;
+}
+
+h3 {
+  font-family: "Shippori Mincho", serif;
+  line-height: 1.35;
+  color: #f7f3ea;
+}
+
+p,
+ul,
+ol,
+dl,
+blockquote {
+  margin: 0 0 1rem;
+}
+
+p {
+  max-width: var(--tb-reading);
+}
+
+small {
+  font-size: 0.88em;
+}
+
+strong {
+  color: #faf6ed;
+}
+
+em {
+  color: var(--tb-gold-soft);
+}
+
+::selection {
+  background: rgba(157, 184, 255, 0.24);
+  color: #fff;
+}
+
+/* =========================
+   ELEMENTS
+========================= */
 
 a {
   color: inherit;
   text-decoration: none;
 }
 
-img {
-  max-width: 100%;
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
+  max-width: 100%;
 }
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(156, 184, 255, 0.8);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* =========================
+   ACCESSIBILITY
+========================= */
 
 .tb-skip {
   position: absolute;
-  left: -999px;
+  left: -9999px;
+  top: auto;
 }
 
 .tb-skip:focus {
   left: 1rem;
   top: 1rem;
-  padding: 0.55rem 0.8rem;
+  z-index: 100;
+  padding: 0.56rem 0.84rem;
   border-radius: 10px;
   background: #fff;
   color: #000;
-  z-index: 100;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
 }
 
 /* =========================
    COSMIC BACKGROUND
-   神秘寄りに完全再設計
+   神IPサイト全体の空気層
 ========================= */
 
 .tb-cosmic-bg {
@@ -122,9 +221,9 @@ img {
   content: "";
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background:
     linear-gradient(180deg, rgba(4, 7, 16, 0.04), rgba(4, 7, 16, 0.18) 35%, rgba(2, 4, 10, 0.34) 100%);
-  pointer-events: none;
 }
 
 #tb-star-canvas {
@@ -132,12 +231,11 @@ img {
   inset: 0;
   width: 100%;
   height: 100%;
-  display: block;
-  opacity: 0.96;
+  opacity: 0.98;
   filter:
-    drop-shadow(0 0 6px rgba(255, 244, 214, 0.16))
-    drop-shadow(0 0 14px rgba(145, 176, 255, 0.16))
-    drop-shadow(0 0 24px rgba(133, 104, 220, 0.10));
+    drop-shadow(0 0 8px rgba(255, 240, 210, 0.18))
+    drop-shadow(0 0 16px rgba(145, 176, 255, 0.18))
+    drop-shadow(0 0 26px rgba(132, 104, 220, 0.12));
 }
 
 .tb-cosmic-haze,
@@ -168,6 +266,76 @@ img {
 }
 
 /* =========================
+   INTRO OVERLAY
+========================= */
+
+.tb-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(143, 170, 255, 0.14), transparent 22%),
+    linear-gradient(180deg, rgba(3, 6, 14, 0.86), rgba(3, 5, 10, 0.94));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.tb-intro[hidden] {
+  display: none;
+}
+
+.tb-intro-inner {
+  width: min(760px, 100%);
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+  border: 1px solid rgba(214, 220, 255, 0.16);
+  border-radius: 22px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(210, 181, 122, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(11, 16, 31, 0.84), rgba(6, 10, 20, 0.92));
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 229, 172, 0.04) inset;
+}
+
+.tb-intro-brand {
+  margin: 0 0 0.55rem;
+  color: var(--tb-gold);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.tb-intro-title {
+  margin: 0;
+  font-family: "Shippori Mincho", serif;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1.2;
+  color: #faf6ee;
+}
+
+.tb-intro-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.tb-intro-card {
+  padding: 0.9rem 0.8rem;
+  border-radius: 14px;
+  border: 1px solid rgba(214, 220, 255, 0.14);
+  background:
+    linear-gradient(180deg, rgba(16, 23, 43, 0.76), rgba(9, 13, 24, 0.9));
+  color: var(--tb-muted);
+  letter-spacing: 0.14em;
+  font-size: 0.76rem;
+}
+
+/* =========================
    HEADER
 ========================= */
 
@@ -180,17 +348,18 @@ img {
   align-items: center;
   gap: 1rem;
   padding: calc(0.86rem + env(safe-area-inset-top, 0px)) 1.4rem 0.86rem;
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
   background:
     linear-gradient(180deg, rgba(5, 8, 18, 0.90), rgba(5, 8, 18, 0.66));
   border-bottom: 1px solid rgba(212, 200, 163, 0.18);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.30),
     0 1px 0 rgba(255, 223, 166, 0.05) inset;
 }
 
 .tb-home-link {
+  flex: 0 0 auto;
   font-family: "Shippori Mincho", serif;
   font-size: 0.84rem;
   letter-spacing: 0.16em;
@@ -215,10 +384,10 @@ img {
   justify-content: center;
   min-height: 2.2rem;
   padding: 0.44rem 0.84rem;
-  border-radius: 999px;
-  letter-spacing: 0.08em;
   border: 1px solid transparent;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.02);
+  letter-spacing: 0.08em;
   transition:
     border-color 0.28s ease,
     color 0.28s ease,
@@ -246,13 +415,14 @@ img {
 .tb-main {
   position: relative;
   z-index: 1;
-  width: min(1120px, calc(100% - 2rem));
+  width: min(var(--tb-container), calc(100% - 2rem));
   margin: 0 auto;
   padding-block: clamp(1.4rem, 2.5vw, 2.2rem) 5rem;
 }
 
 /* =========================
-   SECTION / PANEL FOUNDATION
+   SECTION FOUNDATION
+   Hero / sections 側で詳細を上書きしても崩れない基礎
 ========================= */
 
 .tb-section,
@@ -278,43 +448,23 @@ img {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: -1;
   pointer-events: none;
   border-radius: inherit;
   background:
     radial-gradient(circle at 12% 0%, rgba(157, 184, 255, 0.08), transparent 26%),
     radial-gradient(circle at 88% 8%, rgba(206, 176, 122, 0.06), transparent 22%),
     radial-gradient(circle at 50% 100%, rgba(157, 184, 255, 0.05), transparent 34%);
-  z-index: -2;
 }
 
 .tb-section-kicker {
   margin: 0 0 0.7rem;
+  color: var(--tb-gold);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--tb-gold);
   text-shadow: 0 0 18px rgba(206, 176, 122, 0.12);
-}
-
-h2 {
-  margin: 0 0 1.1rem;
-  font-family: "Shippori Mincho", serif;
-  font-size: clamp(1.5rem, 3vw, 2.3rem);
-  line-height: 1.28;
-  letter-spacing: 0.03em;
-  color: #f6f2ea;
-}
-
-h3 {
-  margin: 0 0 0.6rem;
-  font-family: "Shippori Mincho", serif;
-  line-height: 1.35;
-  color: #f7f3ea;
-}
-
-p {
-  margin: 0 0 1rem;
 }
 
 .tb-lead {
@@ -323,7 +473,7 @@ p {
 }
 
 /* =========================
-   BUTTONS
+   BUTTON FOUNDATION
 ========================= */
 
 .tb-actions {
@@ -340,15 +490,16 @@ p {
   justify-content: center;
   min-height: 52px;
   padding: 0.82rem 1.24rem;
-  border-radius: 999px;
   border: 1px solid var(--tb-border);
+  border-radius: 999px;
   overflow: hidden;
   box-shadow: var(--tb-shadow-soft);
   transition:
     transform 0.28s ease,
     border-color 0.28s ease,
     box-shadow 0.28s ease,
-    background 0.28s ease;
+    background 0.28s ease,
+    color 0.28s ease;
 }
 
 .tb-btn::before {
@@ -382,7 +533,7 @@ p {
 }
 
 /* =========================
-   GRID / CARDS / STORIES
+   CARD / GRID FOUNDATION
 ========================= */
 
 .tb-grid {
@@ -396,6 +547,10 @@ p {
 
 .tb-grid--3 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.tb-grid--2 {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .tb-card,
@@ -463,26 +618,15 @@ p {
 }
 
 /* =========================
-   STEPS / WIDE ART
+   WIDE ART / STEPS / INLINE
 ========================= */
-
-.tb-steps {
-  margin: 0;
-  padding-left: 1.2rem;
-  display: grid;
-  gap: 0.6rem;
-}
-
-.tb-steps li {
-  color: var(--tb-text);
-}
 
 .tb-wide-art {
   position: relative;
   margin: 0 0 1.4rem;
-  border-radius: var(--tb-radius-sm);
   overflow: hidden;
   border: 1px solid var(--tb-border);
+  border-radius: var(--tb-radius-sm);
   box-shadow:
     var(--tb-shadow-soft),
     0 0 0 1px rgba(255, 226, 169, 0.03) inset;
@@ -497,18 +641,54 @@ p {
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 20%, rgba(4, 7, 17, 0.16));
 }
 
+.tb-steps {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.tb-steps li {
+  color: var(--tb-text);
+}
+
+.tb-inline-link {
+  color: var(--tb-gold-soft);
+  border-bottom: 1px solid rgba(241, 221, 179, 0.26);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.tb-inline-link:hover,
+.tb-inline-link:focus-visible {
+  color: #f7e8c8;
+  border-color: rgba(247, 232, 200, 0.56);
+}
+
 /* =========================
-   TEXT SELECTION
+   UTILITY
 ========================= */
 
-::selection {
-  background: rgba(157, 184, 255, 0.24);
-  color: #fff;
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 /* =========================
    MOBILE
 ========================= */
+
+@media (max-width: 900px) {
+  .tb-main {
+    width: calc(100% - 1.2rem);
+  }
+}
 
 @media (max-width: 700px) {
   .tb-header {
@@ -523,10 +703,10 @@ p {
   }
 
   .tb-nav {
-    overflow-x: auto;
     width: 100%;
     flex-wrap: nowrap;
     justify-content: flex-start;
+    overflow-x: auto;
     padding-bottom: 0.16rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -564,8 +744,8 @@ p {
   }
 
   h2 {
-    font-size: clamp(1.35rem, 7vw, 1.82rem);
     margin-bottom: 0.95rem;
+    font-size: clamp(1.35rem, 7vw, 1.82rem);
   }
 
   .tb-lead {
@@ -596,6 +776,7 @@ p {
 
   .tb-grid--4,
   .tb-grid--3,
+  .tb-grid--2,
   .tb-story-list {
     grid-template-columns: 1fr;
   }
@@ -607,49 +788,43 @@ p {
   .tb-cosmic-noise {
     opacity: 0.014;
   }
+
+  .tb-intro-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  background: transparent;
-  color: var(--tb-text);
+@media (max-width: 420px) {
+  .tb-main {
+    width: calc(100% - 0.8rem);
+  }
+
+  .tb-section,
+  .tb-final-cta {
+    padding: 1rem 0.92rem 1.05rem;
+  }
+
+  .tb-btn {
+    min-height: 52px;
+    font-size: 0.95rem;
+  }
 }
 
-body {
-  position: relative;
-  font-family: "Noto Sans JP", sans-serif;
-  line-height: 1.85;
-  letter-spacing: 0.01em;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  overflow-x: hidden;
-}
+/* =========================
+   REDUCED MOTION
+========================= */
 
-.tb-cosmic-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  overflow: hidden;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(138, 164, 255, 0.10), transparent 28%),
-    radial-gradient(circle at 12% 26%, rgba(106, 122, 220, 0.11), transparent 22%),
-    radial-gradient(circle at 84% 62%, rgba(209, 174, 110, 0.08), transparent 18%),
-    radial-gradient(circle at 50% 100%, rgba(66, 88, 170, 0.08), transparent 32%),
-    linear-gradient(180deg, rgba(5, 8, 19, 0.10), rgba(4, 7, 15, 0.18) 48%, rgba(3, 5, 12, 0.28) 100%);
-}
-#tb-star-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  opacity: 0.98;
-  filter:
-    drop-shadow(0 0 8px rgba(255, 240, 210, 0.18))
-    drop-shadow(0 0 16px rgba(145, 176, 255, 0.18))
-    drop-shadow(0 0 26px rgba(132, 104, 220, 0.12));
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .tb-nav a,
+  .tb-btn,
+  .tb-card,
+  .tb-panel,
+  .tb-story,
+  .tb-inline-link {
+    transition: none;
+  }
 }
