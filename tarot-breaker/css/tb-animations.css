@@ -1,6 +1,5 @@
 /* =========================
    REVEAL
-   “現れる”ではなく“目覚める”
 ========================= */
 
 .reveal {
@@ -11,12 +10,12 @@
 
 .js-enabled .reveal {
   opacity: 0;
-  transform: translateY(22px) scale(0.985);
-  filter: blur(10px);
+  transform: translateY(20px) scale(0.988);
+  filter: blur(8px);
   transition:
-    opacity 0.95s cubic-bezier(0.22, 0.82, 0.2, 1),
-    transform 0.95s cubic-bezier(0.22, 0.82, 0.2, 1),
-    filter 0.95s cubic-bezier(0.22, 0.82, 0.2, 1);
+    opacity 0.88s cubic-bezier(0.22, 0.82, 0.2, 1),
+    transform 0.88s cubic-bezier(0.22, 0.82, 0.2, 1),
+    filter 0.88s cubic-bezier(0.22, 0.82, 0.2, 1);
   will-change: opacity, transform, filter;
 }
 
@@ -56,7 +55,7 @@
 .tb-arcana-card[data-phase="connecting"] .tb-arcana-face--front {
   animation:
     tb-card-breathe 1.9s ease-in-out infinite,
-    tb-card-shimmer 4.2s linear infinite;
+    tb-card-shimmer 4s linear infinite;
 }
 
 .tb-arcana-card[data-phase="connecting"] {
@@ -76,9 +75,8 @@
 }
 
 /* =========================
-   MYTHIC STARREALM INTRO
-   背景紋章を“後ろの画像”ではなく
-   儀式場そのものへ昇華
+   TAROT SPREAD INTRO
+   背景紋章主役版
 ========================= */
 
 .tb-intro {
@@ -90,13 +88,12 @@
   overflow: hidden;
   isolation: isolate;
   background:
-    radial-gradient(circle at 50% 10%, rgba(121, 151, 255, 0.14), transparent 16%),
-    radial-gradient(circle at 18% 24%, rgba(102, 79, 205, 0.11), transparent 18%),
-    radial-gradient(circle at 82% 18%, rgba(219, 186, 123, 0.08), transparent 14%),
-    radial-gradient(circle at 50% 52%, rgba(93, 118, 208, 0.10), transparent 44%),
-    linear-gradient(180deg, rgba(4, 7, 18, 0.78), rgba(2, 4, 10, 0.95));
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+    radial-gradient(circle at 50% 12%, rgba(121, 151, 255, 0.06), transparent 18%),
+    radial-gradient(circle at 18% 24%, rgba(102, 79, 205, 0.05), transparent 20%),
+    radial-gradient(circle at 82% 18%, rgba(219, 186, 123, 0.04), transparent 16%),
+    linear-gradient(180deg, rgba(4, 7, 18, 0.20), rgba(2, 4, 10, 0.46));
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.56s ease, visibility 0.56s ease;
@@ -110,38 +107,37 @@
   pointer-events: none;
 }
 
-/* 背景紋章：中央の神殿空間へ収束する */
+/* 背景紋章そのもの */
 .tb-intro::before {
-  inset: -26%;
+  inset: -10%;
   background-image: url("/img/world/tb-seikai-gate.webp");
   background-position: center center;
   background-repeat: no-repeat;
-  background-size: min(228vmax, 2480px);
+  background-size: min(150vmax, 1500px);
+  opacity: 0.82;
   mix-blend-mode: screen;
-  opacity: 0.32;
   filter:
-    brightness(0.68)
-    contrast(1.16)
+    brightness(0.96)
+    contrast(1.05)
     saturate(0.94)
-    drop-shadow(0 0 18px rgba(212, 183, 120, 0.10))
-    drop-shadow(0 0 34px rgba(118, 145, 255, 0.10));
-  transform: scale(1.02);
+    drop-shadow(0 0 14px rgba(212, 183, 120, 0.06))
+    drop-shadow(0 0 22px rgba(118, 145, 255, 0.06));
+  transform: scale(1.01);
   transform-origin: center center;
   animation:
     tb-seikai-gate-breathe 6.2s ease-in-out infinite,
-    tb-seikai-gate-drift 14s ease-in-out infinite;
+    tb-seikai-gate-drift 13.5s ease-in-out infinite;
 }
 
-/* 紋章の上にかかる光膜 */
+/* 薄い光膜だけ残す */
 .tb-intro::after {
   background:
-    radial-gradient(circle at 50% 50%, rgba(255, 239, 208, 0.05), transparent 24%),
-    radial-gradient(circle at 50% 44%, rgba(132, 160, 255, 0.08), transparent 36%),
-    radial-gradient(circle at 50% 72%, rgba(214, 187, 128, 0.05), transparent 22%),
-    linear-gradient(180deg, rgba(255,255,255,0.016), transparent 18%, rgba(0,0,0,0.24) 100%);
+    radial-gradient(circle at 50% 50%, rgba(255, 239, 208, 0.02), transparent 24%),
+    radial-gradient(circle at 50% 44%, rgba(132, 160, 255, 0.03), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.008), transparent 18%, rgba(0,0,0,0.08) 100%);
   mix-blend-mode: screen;
-  opacity: 0.92;
-  animation: tb-intro-mist-breathe 5.8s ease-in-out infinite;
+  opacity: 0.68;
+  animation: tb-intro-mist-breathe 5.6s ease-in-out infinite;
 }
 
 .tb-intro.is-active {
@@ -156,8 +152,8 @@
 }
 
 /* =========================
-   RITUAL CHAMBER
-   中央の“黒いエリア”を本物の儀式盤へ
+   CENTER RITUAL SPACE
+   黒箱ではなく透明な聖域
 ========================= */
 
 .tb-intro-inner {
@@ -165,24 +161,21 @@
   z-index: 2;
   display: grid;
   justify-items: center;
-  gap: clamp(0.78rem, 2vw, 1.16rem);
-  width: min(92vw, 720px);
-  padding: clamp(1.25rem, 3vw, 2rem) clamp(1rem, 2.5vw, 1.5rem);
+  gap: clamp(0.68rem, 2vw, 1rem);
+  width: min(90vw, 560px);
+  padding: clamp(0.9rem, 2.6vw, 1.3rem) clamp(0.8rem, 2vw, 1rem);
   text-align: center;
-  transform: translateY(-4.2vh);
+  transform: translateY(-3.6vh);
 
-  border: 1px solid rgba(214, 220, 255, 0.14);
-  border-radius: 24px;
+  border: 1px solid rgba(214, 220, 255, 0.10);
+  border-radius: 22px;
   background:
-    radial-gradient(circle at 50% 0%, rgba(214, 187, 128, 0.08), transparent 26%),
-    radial-gradient(circle at 50% 100%, rgba(132, 160, 255, 0.06), transparent 34%),
-    linear-gradient(160deg, rgba(10, 16, 32, 0.72), rgba(6, 10, 22, 0.88));
+    linear-gradient(160deg, rgba(8, 14, 28, 0.28), rgba(6, 10, 22, 0.40));
   box-shadow:
-    0 24px 72px rgba(0, 0, 0, 0.52),
-    0 0 0 1px rgba(255, 228, 170, 0.04) inset,
-    0 0 48px rgba(126, 156, 255, 0.10);
-  backdrop-filter: blur(16px) saturate(128%);
-  -webkit-backdrop-filter: blur(16px) saturate(128%);
+    0 12px 34px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(255, 228, 170, 0.02) inset;
+  backdrop-filter: blur(6px) saturate(112%);
+  -webkit-backdrop-filter: blur(6px) saturate(112%);
 }
 
 .tb-intro-inner::before,
@@ -192,40 +185,22 @@
   pointer-events: none;
 }
 
-/* 儀式盤の内側金縁 */
 .tb-intro-inner::before {
-  inset: 12px;
-  z-index: 0;
-  border: 1px solid rgba(212, 183, 120, 0.16);
-  border-radius: 18px;
-  box-shadow:
-    inset 0 0 30px rgba(212, 183, 120, 0.03),
-    inset 0 0 0 1px rgba(255, 237, 197, 0.02);
+  inset: 10px;
+  border: 1px solid rgba(212, 183, 120, 0.10);
+  border-radius: 16px;
+  opacity: 0.8;
 }
 
-/* 星霧 */
 .tb-intro-inner::after {
-  inset: -10%;
-  z-index: 1;
-  opacity: 0.72;
+  inset: 0;
   background:
-    radial-gradient(circle, rgba(255, 240, 212, 0.94) 0 1px, transparent 1.9px) 8% 14% / 128px 128px,
-    radial-gradient(circle, rgba(162, 188, 255, 0.82) 0 1.2px, transparent 2px) 22% 66% / 168px 168px,
-    radial-gradient(circle, rgba(255, 228, 176, 0.84) 0 1px, transparent 2px) 76% 22% / 148px 148px,
-    radial-gradient(circle, rgba(181, 201, 255, 0.76) 0 1.1px, transparent 2px) 84% 70% / 184px 184px,
-    radial-gradient(circle, rgba(255, 248, 236, 0.62) 0 0.9px, transparent 2px) 52% 8% / 156px 156px,
-    radial-gradient(circle, rgba(144, 170, 255, 0.66) 0 1px, transparent 2px) 48% 88% / 176px 176px;
-  filter:
-    blur(0.22px)
-    drop-shadow(0 0 10px rgba(130, 158, 255, 0.18))
-    drop-shadow(0 0 12px rgba(218, 188, 128, 0.12));
-  animation:
-    tb-intro-starfall-a 6.2s ease-in-out infinite,
-    tb-intro-star-twinkle 3.2s ease-in-out infinite;
-}
-
-.tb-intro.is-active .tb-intro-inner::after {
-  opacity: 0.78;
+    radial-gradient(circle, rgba(255, 240, 212, 0.65) 0 1px, transparent 2px) 16% 24% / 180px 180px,
+    radial-gradient(circle, rgba(162, 188, 255, 0.55) 0 1px, transparent 2px) 78% 34% / 210px 210px,
+    radial-gradient(circle, rgba(255, 228, 176, 0.46) 0 1px, transparent 2px) 34% 84% / 220px 220px;
+  opacity: 0.18;
+  filter: blur(0.15px);
+  animation: tb-intro-star-twinkle 3.4s ease-in-out infinite;
 }
 
 /* =========================
@@ -237,12 +212,12 @@
   z-index: 3;
   margin: 0;
   font-size: clamp(0.68rem, 1.7vw, 0.8rem);
-  letter-spacing: 0.32em;
-  color: rgba(228, 235, 255, 0.82);
+  letter-spacing: 0.30em;
+  color: rgba(235, 240, 255, 0.9);
   text-shadow:
-    0 0 10px rgba(141, 170, 255, 0.14),
-    0 0 24px rgba(141, 170, 255, 0.10);
-  animation: tb-intro-fade-up 0.88s ease 0.06s both;
+    0 0 10px rgba(141, 170, 255, 0.08),
+    0 0 16px rgba(141, 170, 255, 0.05);
+  animation: tb-intro-fade-up 0.8s ease 0.04s both;
 }
 
 .tb-intro-title {
@@ -250,84 +225,71 @@
   z-index: 3;
   margin: 0;
   font-family: "Shippori Mincho", serif;
-  font-size: clamp(1.78rem, 5vw, 3.05rem);
+  font-size: clamp(1.9rem, 5vw, 3.1rem);
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   color: #f8efda;
   text-shadow:
-    0 0 18px rgba(218, 188, 128, 0.22),
-    0 0 34px rgba(130, 158, 255, 0.16),
-    0 0 64px rgba(255, 239, 210, 0.06);
+    0 0 14px rgba(218, 188, 128, 0.16),
+    0 0 24px rgba(130, 158, 255, 0.08);
   animation:
-    tb-intro-fade-up 1.04s ease 0.18s both,
-    tb-title-glow 5.2s ease-in-out 1.1s infinite;
+    tb-intro-fade-up 1s ease 0.14s both,
+    tb-title-glow 4.8s ease-in-out 1s infinite;
 }
 
 /* =========================
-   CARD SPREAD
-   UIではなく召喚具として見せる
+   TAROT RITUAL
+   紋章中心から3枚召喚
 ========================= */
 
 .tb-intro-cards {
-  --spread-w: min(88vw, 490px);
-  --card-w: clamp(96px, 20vw, 142px);
+  --spread-w: min(80vw, 390px);
+  --card-w: clamp(88px, 18vw, 118px);
   --card-ratio: 1.5;
   --card-h: calc(var(--card-w) * var(--card-ratio));
-  --tri-top-y: 0%;
-  --tri-bottom-y: 58%;
-  --tri-side-x: 22%;
-  --top-rot: -3deg;
-  --left-rot: -11deg;
-  --right-rot: 11deg;
 
   position: relative;
   z-index: 3;
   width: var(--spread-w);
-  height: calc(var(--card-h) + 114px);
-  margin: 0.36rem auto 0;
+  height: calc(var(--card-h) + 80px);
+  margin: 0.18rem auto 0;
 }
 
+/* 背景紋章の上に薄い召喚円だけ */
 .tb-intro-cards::before,
 .tb-intro-cards::after {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  border-radius: 999px;
   pointer-events: none;
   transform: translate(-50%, -50%);
+  border-radius: 999px;
 }
 
-/* 核心光 */
 .tb-intro-cards::before {
-  width: min(76vw, 360px);
-  height: min(76vw, 360px);
-  background:
-    radial-gradient(circle,
-      rgba(150, 175, 255, 0.22) 0%,
-      rgba(150, 175, 255, 0.08) 26%,
-      rgba(212, 183, 120, 0.08) 44%,
-      rgba(150, 175, 255, 0) 68%);
-  filter: blur(18px);
-  opacity: 0.98;
+  width: min(66vw, 250px);
+  height: min(66vw, 250px);
+  background: radial-gradient(circle, rgba(126, 156, 255, 0.10), rgba(126, 156, 255, 0) 66%);
+  filter: blur(14px);
+  opacity: 0.72;
   animation: tb-intro-core-breathe 3.8s ease-in-out infinite;
 }
 
-/* 儀式リング */
 .tb-intro-cards::after {
-  width: min(78vw, 388px);
-  height: min(78vw, 388px);
-  border: 1px solid rgba(188, 203, 255, 0.14);
+  width: min(68vw, 270px);
+  height: min(68vw, 270px);
+  border: 1px solid rgba(188, 203, 255, 0.10);
   box-shadow:
-    0 0 0 1px rgba(209, 182, 122, 0.06) inset,
-    0 0 24px rgba(123, 153, 255, 0.10),
-    0 0 46px rgba(212, 183, 120, 0.08);
-  opacity: 0.74;
+    0 0 14px rgba(123, 153, 255, 0.06),
+    0 0 22px rgba(212, 183, 120, 0.05);
+  opacity: 0.56;
   animation:
-    tb-intro-ring-spin 16s linear infinite,
-    tb-intro-ring-pulse 5.8s ease-in-out infinite;
+    tb-intro-ring-spin 18s linear infinite,
+    tb-intro-ring-pulse 6s ease-in-out infinite;
 }
 
+/* 聖なる儀式カード */
 .tb-intro-card {
   position: absolute;
   left: 50%;
@@ -336,84 +298,63 @@
   place-items: center;
   width: var(--card-w);
   height: var(--card-h);
-  padding: 0.78rem;
-  border: 1px solid rgba(214, 220, 255, 0.24);
+  padding: 0.72rem;
+  border: 1px solid rgba(226, 232, 255, 0.24);
   border-radius: 18px;
   background:
-    linear-gradient(165deg, rgba(18, 24, 42, 0.95), rgba(6, 9, 18, 0.985)),
-    radial-gradient(circle at 50% 10%, rgba(255, 231, 184, 0.10), transparent 24%);
-  color: rgba(239, 243, 255, 0.96);
+    linear-gradient(165deg, rgba(9, 16, 34, 0.70), rgba(6, 10, 22, 0.82)),
+    radial-gradient(circle at 50% 14%, rgba(255, 232, 188, 0.07), transparent 26%);
+  color: rgba(245, 248, 255, 0.96);
   font: 700 clamp(0.62rem, 1.8vw, 0.76rem) "Noto Sans JP", sans-serif;
   letter-spacing: 0.18em;
   text-align: center;
-  box-shadow:
-    0 0 26px rgba(123, 153, 255, 0.12),
-    0 12px 30px rgba(0, 0, 0, 0.42),
-    inset 0 0 0 1px rgba(212, 183, 120, 0.14);
   overflow: hidden;
   opacity: 0;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.24),
+    inset 0 0 0 1px rgba(212, 183, 120, 0.10);
 }
 
 .tb-intro-card::before,
 .tb-intro-card::after {
   content: "";
   position: absolute;
-  inset: 0;
   border-radius: inherit;
   pointer-events: none;
 }
 
 .tb-intro-card::before {
-  inset: 8px;
-  border: 1px solid rgba(212, 183, 120, 0.18);
-  box-shadow: inset 0 0 22px rgba(212, 183, 120, 0.04);
+  inset: 7px;
+  border: 1px solid rgba(212, 183, 120, 0.12);
 }
 
 .tb-intro-card::after {
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.07), transparent 22%, rgba(0,0,0,0.16));
+  inset: -18%;
+  background: radial-gradient(circle at 50% 50%, rgba(132, 160, 255, 0.18), transparent 62%);
+  opacity: 0;
 }
 
-/* 上札 */
+/* 3枚それぞれから光 */
 .tb-intro-card--compass {
-  transform:
-    translate(-50%, -50%)
-    translateY(-26px)
-    scale(0.82)
-    rotate(var(--top-rot));
   animation:
-    tb-intro-card-top 0.9s cubic-bezier(0.22, 0.88, 0.25, 1) 0.44s forwards,
-    tb-intro-card-glow 2.1s ease-in-out 1.55s 1,
-    tb-intro-card-float-top 4.8s ease-in-out 2.2s infinite;
+    tb-card-emerge-top 0.9s cubic-bezier(0.22, 0.88, 0.25, 1) 0.34s forwards,
+    tb-card-ray 2.2s ease-out 1.08s 1,
+    tb-intro-card-float-top 5.2s ease-in-out 2.1s infinite;
 }
 
-/* 左札 */
 .tb-intro-card--trigger {
-  transform:
-    translate(-50%, -50%)
-    translateX(-8px)
-    translateY(8px)
-    scale(0.82)
-    rotate(var(--left-rot));
   animation:
-    tb-intro-card-left 0.9s cubic-bezier(0.22, 0.88, 0.25, 1) 0.72s forwards,
-    tb-intro-card-glow 2.1s ease-in-out 1.78s 1,
-    tb-intro-card-float-left 5.4s ease-in-out 2.35s infinite;
+    tb-card-emerge-left 0.9s cubic-bezier(0.22, 0.88, 0.25, 1) 0.56s forwards,
+    tb-card-ray 2.2s ease-out 1.28s 1,
+    tb-intro-card-float-left 5.6s ease-in-out 2.3s infinite;
 }
 
-/* 右札 */
 .tb-intro-card--route {
-  transform:
-    translate(-50%, -50%)
-    translateX(8px)
-    translateY(8px)
-    scale(0.82)
-    rotate(var(--right-rot));
   animation:
-    tb-intro-card-right 0.9s cubic-bezier(0.22, 0.88, 0.25, 1) 0.99s forwards,
-    tb-intro-card-glow 2.1s ease-in-out 2.02s 1,
+    tb-card-emerge-right 0.9s cubic-bezier(0.22, 0.88, 0.25, 1) 0.78s forwards,
+    tb-card-ray 2.2s ease-out 1.48s 1,
     tb-intro-card-float-right 5.1s ease-in-out 2.5s infinite;
 }
 
@@ -427,19 +368,19 @@
 
 .tb-intro[data-intro-state="active"] .tb-intro-title {
   animation:
-    tb-intro-fade-up 1.04s ease 0.18s both,
-    tb-title-glow 5.2s ease-in-out 1.1s infinite;
+    tb-intro-fade-up 1s ease 0.14s both,
+    tb-title-glow 4.8s ease-in-out 1s infinite;
 }
 
 .tb-intro[data-intro-state="closing"] .tb-intro-inner {
-  transform: translateY(-5.6vh) scale(0.985);
+  transform: translateY(-4.6vh) scale(0.99);
   opacity: 0;
   transition: transform 0.56s ease, opacity 0.56s ease;
 }
 
 .tb-intro[data-intro-state="closing"]::before {
-  opacity: 0.18;
-  transform: scale(1.08);
+  opacity: 0.24;
+  transform: scale(1.04);
   transition: opacity 0.56s ease, transform 0.56s ease;
 }
 
@@ -459,8 +400,8 @@
 @keyframes tb-intro-fade-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
-    filter: blur(5px);
+    transform: translateY(10px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
@@ -472,141 +413,120 @@
 @keyframes tb-title-glow {
   0%, 100% {
     text-shadow:
-      0 0 18px rgba(218, 188, 128, 0.18),
-      0 0 34px rgba(130, 158, 255, 0.14),
-      0 0 64px rgba(255, 239, 210, 0.04);
+      0 0 14px rgba(218, 188, 128, 0.14),
+      0 0 24px rgba(130, 158, 255, 0.08);
   }
   50% {
     text-shadow:
-      0 0 24px rgba(218, 188, 128, 0.28),
-      0 0 42px rgba(130, 158, 255, 0.22),
-      0 0 84px rgba(255, 239, 210, 0.08);
+      0 0 18px rgba(218, 188, 128, 0.22),
+      0 0 30px rgba(130, 158, 255, 0.14);
   }
 }
 
-@keyframes tb-intro-card-top {
+@keyframes tb-card-emerge-top {
   0% {
     opacity: 0;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) translateY(0) scale(0.74) rotate(0deg);
-    filter: blur(12px);
+    transform: translate(-50%, -50%) scale(0.34) rotate(0deg);
+    filter: blur(14px);
   }
-  72% {
+  68% {
     opacity: 1;
-    left: 50%;
-    top: var(--tri-top-y);
-    transform: translate(-50%, 0) scale(1.05) rotate(calc(var(--top-rot) * 1.08));
+    transform: translate(-50%, -112px) scale(1.05) rotate(-3deg);
     filter: blur(0);
   }
   100% {
     opacity: 1;
-    left: 50%;
-    top: var(--tri-top-y);
-    transform: translate(-50%, 0) scale(1) rotate(var(--top-rot));
+    transform: translate(-50%, -104px) scale(1) rotate(-3deg);
     filter: blur(0);
   }
 }
 
-@keyframes tb-intro-card-left {
+@keyframes tb-card-emerge-left {
   0% {
     opacity: 0;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) scale(0.74) rotate(0deg);
-    filter: blur(12px);
+    transform: translate(-50%, -50%) scale(0.34) rotate(0deg);
+    filter: blur(14px);
   }
-  72% {
+  68% {
     opacity: 1;
-    left: var(--tri-side-x);
-    top: var(--tri-bottom-y);
-    transform: translate(-50%, 0) scale(1.05) rotate(calc(var(--left-rot) * 1.06));
+    transform: translate(-128px, 18px) scale(1.05) rotate(-11deg);
     filter: blur(0);
   }
   100% {
     opacity: 1;
-    left: var(--tri-side-x);
-    top: var(--tri-bottom-y);
-    transform: translate(-50%, 0) scale(1) rotate(var(--left-rot));
+    transform: translate(-120px, 24px) scale(1) rotate(-11deg);
     filter: blur(0);
   }
 }
 
-@keyframes tb-intro-card-right {
+@keyframes tb-card-emerge-right {
   0% {
     opacity: 0;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) scale(0.74) rotate(0deg);
-    filter: blur(12px);
+    transform: translate(-50%, -50%) scale(0.34) rotate(0deg);
+    filter: blur(14px);
   }
-  72% {
+  68% {
     opacity: 1;
-    left: calc(100% - var(--tri-side-x));
-    top: var(--tri-bottom-y);
-    transform: translate(-50%, 0) scale(1.05) rotate(calc(var(--right-rot) * 1.06));
+    transform: translate(22px, 12px) scale(1.05) rotate(11deg);
     filter: blur(0);
   }
   100% {
     opacity: 1;
-    left: calc(100% - var(--tri-side-x));
-    top: var(--tri-bottom-y);
-    transform: translate(-50%, 0) scale(1) rotate(var(--right-rot));
+    transform: translate(16px, 18px) scale(1) rotate(11deg);
     filter: blur(0);
   }
 }
 
-@keyframes tb-intro-card-glow {
+@keyframes tb-card-ray {
   0%, 100% {
     box-shadow:
-      0 0 26px rgba(123, 153, 255, 0.12),
-      0 12px 30px rgba(0, 0, 0, 0.42),
-      inset 0 0 0 1px rgba(212, 183, 120, 0.14);
+      0 10px 20px rgba(0, 0, 0, 0.24),
+      inset 0 0 0 1px rgba(212, 183, 120, 0.10);
   }
   50% {
     box-shadow:
-      0 0 42px rgba(125, 157, 255, 0.24),
-      0 0 22px rgba(210, 182, 122, 0.16),
-      0 14px 34px rgba(0, 0, 0, 0.42),
-      inset 0 0 0 1px rgba(212, 183, 120, 0.32);
+      0 0 18px rgba(130, 158, 255, 0.16),
+      0 0 28px rgba(212, 183, 120, 0.10),
+      0 12px 22px rgba(0, 0, 0, 0.24),
+      inset 0 0 0 1px rgba(212, 183, 120, 0.18);
   }
 }
 
 @keyframes tb-intro-card-float-top {
   0%, 100% {
-    transform: translate(-50%, 0) scale(1) rotate(var(--top-rot));
+    transform: translate(-50%, -104px) scale(1) rotate(-3deg);
   }
   50% {
-    transform: translate(-50%, -7px) scale(1.016) rotate(calc(var(--top-rot) - 0.8deg));
+    transform: translate(-50%, -110px) scale(1.012) rotate(-3.5deg);
   }
 }
 
 @keyframes tb-intro-card-float-left {
   0%, 100% {
-    transform: translate(-50%, 0) scale(1) rotate(var(--left-rot));
+    transform: translate(-120px, 24px) scale(1) rotate(-11deg);
   }
   50% {
-    transform: translate(-50%, 5px) scale(1.012) rotate(calc(var(--left-rot) + 0.7deg));
+    transform: translate(-120px, 18px) scale(1.01) rotate(-10.4deg);
   }
 }
 
 @keyframes tb-intro-card-float-right {
   0%, 100% {
-    transform: translate(-50%, 0) scale(1) rotate(var(--right-rot));
+    transform: translate(16px, 18px) scale(1) rotate(11deg);
   }
   50% {
-    transform: translate(-50%, 4px) scale(1.012) rotate(calc(var(--right-rot) - 0.7deg));
+    transform: translate(16px, 12px) scale(1.01) rotate(10.4deg);
   }
 }
 
 @keyframes tb-intro-core-breathe {
   0%, 100% {
-    opacity: 0.84;
-    transform: translate(-50%, -50%) scale(0.94);
+    opacity: 0.72;
+    transform: translate(-50%, -50%) scale(0.96);
   }
   50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 0.88;
+    transform: translate(-50%, -50%) scale(1.04);
   }
 }
 
@@ -621,90 +541,58 @@
 
 @keyframes tb-intro-ring-pulse {
   0%, 100% {
-    opacity: 0.66;
-    box-shadow:
-      0 0 0 1px rgba(209, 182, 122, 0.06) inset,
-      0 0 24px rgba(123, 153, 255, 0.10),
-      0 0 46px rgba(212, 183, 120, 0.08);
+    opacity: 0.52;
   }
   50% {
-    opacity: 0.88;
-    box-shadow:
-      0 0 0 1px rgba(209, 182, 122, 0.12) inset,
-      0 0 30px rgba(123, 153, 255, 0.16),
-      0 0 58px rgba(212, 183, 120, 0.11);
+    opacity: 0.68;
   }
 }
 
 @keyframes tb-seikai-gate-breathe {
   0%, 100% {
-    opacity: 0.30;
-    transform: scale(1.02);
+    opacity: 0.82;
+    transform: scale(1.01);
   }
   50% {
-    opacity: 0.38;
-    transform: scale(1.05);
+    opacity: 0.9;
+    transform: scale(1.025);
   }
 }
 
 @keyframes tb-seikai-gate-drift {
   0%, 100% {
     filter:
-      brightness(0.68)
-      contrast(1.16)
+      brightness(0.96)
+      contrast(1.05)
       saturate(0.94)
-      drop-shadow(0 0 18px rgba(212, 183, 120, 0.10))
-      drop-shadow(0 0 34px rgba(118, 145, 255, 0.10));
+      drop-shadow(0 0 14px rgba(212, 183, 120, 0.06))
+      drop-shadow(0 0 22px rgba(118, 145, 255, 0.06));
   }
   50% {
     filter:
-      brightness(0.72)
-      contrast(1.18)
+      brightness(1)
+      contrast(1.07)
       saturate(0.98)
-      drop-shadow(0 0 22px rgba(212, 183, 120, 0.14))
-      drop-shadow(0 0 40px rgba(118, 145, 255, 0.12));
+      drop-shadow(0 0 18px rgba(212, 183, 120, 0.08))
+      drop-shadow(0 0 26px rgba(118, 145, 255, 0.08));
   }
 }
 
 @keyframes tb-intro-mist-breathe {
   0%, 100% {
-    opacity: 0.86;
+    opacity: 0.62;
   }
   50% {
-    opacity: 0.98;
-  }
-}
-
-@keyframes tb-intro-starfall-a {
-  0% {
-    transform: translateY(-16px) scale(0.98);
-    opacity: 0;
-  }
-  18% {
-    opacity: 0.82;
-  }
-  50% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(20px) scale(1.03);
-    opacity: 0;
+    opacity: 0.74;
   }
 }
 
 @keyframes tb-intro-star-twinkle {
   0%, 100% {
-    filter:
-      blur(0.25px)
-      drop-shadow(0 0 8px rgba(130, 158, 255, 0.18))
-      drop-shadow(0 0 10px rgba(218, 188, 128, 0.14));
+    opacity: 0.18;
   }
   50% {
-    filter:
-      blur(0.08px)
-      drop-shadow(0 0 12px rgba(130, 158, 255, 0.28))
-      drop-shadow(0 0 16px rgba(218, 188, 128, 0.22));
+    opacity: 0.28;
   }
 }
 
@@ -716,17 +604,17 @@
   }
   50% {
     box-shadow:
-      inset 0 0 0 1px rgba(201, 175, 124, 0.36),
-      0 0 26px rgba(113, 140, 255, 0.24);
+      inset 0 0 0 1px rgba(201, 175, 124, 0.34),
+      0 0 22px rgba(113, 140, 255, 0.18);
   }
 }
 
 @keyframes tb-card-shimmer {
   0% {
-    background-position: 0% 0%, 45% 8%;
+    background-position: 0% 0%, 46% 10%;
   }
   100% {
-    background-position: 0% 0%, 58% 14%;
+    background-position: 0% 0%, 56% 14%;
   }
 }
 
@@ -779,20 +667,6 @@
   }
 }
 
-@keyframes tb-ritual-ripple {
-  0% {
-    transform: scale(0.66);
-    opacity: 0;
-  }
-  25% {
-    opacity: 0.65;
-  }
-  100% {
-    transform: scale(1.08);
-    opacity: 0;
-  }
-}
-
 /* =========================
    MOBILE
 ========================= */
@@ -804,22 +678,22 @@
   }
 
   .tb-intro {
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(0.8px);
+    -webkit-backdrop-filter: blur(0.8px);
   }
 
   .tb-intro::before {
-    inset: -34%;
-    background-size: min(252vmax, 2400px);
-    opacity: 0.34;
+    inset: -12%;
+    background-size: min(146vmax, 980px);
+    opacity: 0.88;
   }
 
   .tb-intro-inner {
     width: min(94vw, 420px);
-    gap: 0.84rem;
-    padding: 1.1rem 0.78rem;
+    gap: 0.78rem;
+    padding: 0.92rem 0.78rem;
     border-radius: 18px;
-    transform: translateY(-4.6vh);
+    transform: translateY(-3.8vh);
   }
 
   .tb-intro-brand {
@@ -833,61 +707,123 @@
   }
 
   .tb-intro-cards {
-    --spread-w: min(92vw, 350px);
-    --card-w: clamp(78px, 24vw, 108px);
-    --card-ratio: 1.5;
-    --card-h: calc(var(--card-w) * var(--card-ratio));
-    --tri-top-y: 4%;
-    --tri-bottom-y: 56%;
-    --tri-side-x: 24%;
-    --top-rot: -3deg;
-    --left-rot: -10deg;
-    --right-rot: 10deg;
-    height: calc(var(--card-h) + 62px);
+    --spread-w: min(88vw, 330px);
+    --card-w: clamp(74px, 24vw, 102px);
+    --card-h: calc(var(--card-w) * 1.5);
+    height: calc(var(--card-h) + 54px);
   }
 
   .tb-intro-cards::before {
-    width: min(78vw, 270px);
-    height: min(78vw, 270px);
+    width: min(72vw, 220px);
+    height: min(72vw, 220px);
   }
 
   .tb-intro-cards::after {
-    width: min(80vw, 286px);
-    height: min(80vw, 286px);
+    width: min(74vw, 238px);
+    height: min(74vw, 238px);
   }
 
   .tb-intro-card {
-    padding: 0.58rem;
+    padding: 0.56rem;
     border-radius: 13px;
-    font-size: 0.62rem;
+    font-size: 0.60rem;
     letter-spacing: 0.14em;
+  }
+
+  @keyframes tb-card-emerge-top {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.34) rotate(0deg);
+      filter: blur(14px);
+    }
+    68% {
+      opacity: 1;
+      transform: translate(-50%, -88px) scale(1.05) rotate(-3deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -82px) scale(1) rotate(-3deg);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes tb-card-emerge-left {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.34) rotate(0deg);
+      filter: blur(14px);
+    }
+    68% {
+      opacity: 1;
+      transform: translate(-96px, 14px) scale(1.05) rotate(-10deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-90px, 18px) scale(1) rotate(-10deg);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes tb-card-emerge-right {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.34) rotate(0deg);
+      filter: blur(14px);
+    }
+    68% {
+      opacity: 1;
+      transform: translate(16px, 12px) scale(1.05) rotate(10deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(12px, 16px) scale(1) rotate(10deg);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes tb-intro-card-float-top {
+    0%, 100% {
+      transform: translate(-50%, -82px) scale(1) rotate(-3deg);
+    }
+    50% {
+      transform: translate(-50%, -87px) scale(1.01) rotate(-3.4deg);
+    }
+  }
+
+  @keyframes tb-intro-card-float-left {
+    0%, 100% {
+      transform: translate(-90px, 18px) scale(1) rotate(-10deg);
+    }
+    50% {
+      transform: translate(-90px, 13px) scale(1.01) rotate(-9.4deg);
+    }
+  }
+
+  @keyframes tb-intro-card-float-right {
+    0%, 100% {
+      transform: translate(12px, 16px) scale(1) rotate(10deg);
+    }
+    50% {
+      transform: translate(12px, 11px) scale(1.01) rotate(9.4deg);
+    }
   }
 }
 
 @media (max-width: 390px) {
   .tb-intro::before {
-    inset: -38%;
-    background-size: min(270vmax, 2450px);
-    opacity: 0.35;
+    inset: -10%;
+    background-size: min(148vmax, 860px);
   }
 
   .tb-intro-inner {
-    transform: translateY(-5vh);
-  }
-
-  .tb-intro-cards {
-    --spread-w: min(94vw, 318px);
-    --card-w: clamp(72px, 25vw, 96px);
-    --card-ratio: 1.5;
-    --card-h: calc(var(--card-w) * var(--card-ratio));
-    --tri-top-y: 5%;
-    --tri-bottom-y: 57%;
-    --tri-side-x: 25.5%;
-    height: calc(var(--card-h) + 52px);
+    transform: translateY(-3.4vh);
   }
 
   .tb-intro-title {
-    letter-spacing: 0.10em;
+    letter-spacing: 0.1em;
   }
 }
 
@@ -932,7 +868,7 @@
 
   .tb-intro-inner::before,
   .tb-intro-inner::after {
-    opacity: 0.35 !important;
+    opacity: 0.2 !important;
     transform: none !important;
   }
 }
