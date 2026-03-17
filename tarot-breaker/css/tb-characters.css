@@ -1,28 +1,29 @@
 .tb-character-list {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
   margin-top: 1.2rem;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .tb-character {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--tb-border);
-  border-radius: var(--tb-radius-sm);
+  border: 1px solid rgba(214, 193, 145, 0.16);
+  border-radius: 16px;
   background:
-    radial-gradient(circle at 50% 0%, rgba(210, 181, 122, 0.06), transparent 26%),
-    linear-gradient(180deg, rgba(10, 15, 29, 0.8), rgba(7, 11, 22, 0.72));
+    radial-gradient(circle at 50% 0%, rgba(210, 181, 122, 0.07), transparent 28%),
+    linear-gradient(180deg, rgba(10, 14, 28, 0.9), rgba(7, 11, 22, 0.82));
   box-shadow:
-    var(--tb-shadow-soft),
-    0 0 0 1px rgba(255, 226, 169, 0.03) inset;
+    0 14px 30px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(255, 226, 169, 0.04) inset,
+    0 0 24px rgba(120, 140, 255, 0.06);
   backdrop-filter: blur(8px) saturate(120%);
   -webkit-backdrop-filter: blur(8px) saturate(120%);
   transition:
-    transform 0.28s ease,
-    border-color 0.28s ease,
-    box-shadow 0.28s ease,
-    background 0.28s ease;
+    transform 0.32s ease,
+    border-color 0.32s ease,
+    box-shadow 0.32s ease,
+    background 0.32s ease;
   isolation: isolate;
 }
 
@@ -33,18 +34,31 @@
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 85% 0%, rgba(155, 181, 255, 0.08), transparent 22%),
-    radial-gradient(circle at 8% 100%, rgba(210, 181, 122, 0.05), transparent 24%);
+    radial-gradient(circle at 82% 8%, rgba(160, 180, 255, 0.10), transparent 20%),
+    radial-gradient(circle at 12% 100%, rgba(212, 185, 126, 0.06), transparent 24%);
+}
+
+.tb-character::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 18%),
+    linear-gradient(135deg, transparent 0%, rgba(170, 150, 255, 0.05) 48%, transparent 100%);
+  mix-blend-mode: screen;
+  opacity: 0.8;
 }
 
 .tb-character:hover,
 .tb-character:focus-within {
-  transform: translateY(-3px);
-  border-color: rgba(216, 196, 146, 0.32);
+  transform: translateY(-4px);
+  border-color: rgba(222, 204, 160, 0.34);
   box-shadow:
-    0 16px 34px rgba(0, 0, 0, 0.32),
-    0 0 24px rgba(153, 175, 255, 0.1),
-    0 0 0 1px rgba(255, 226, 169, 0.04) inset;
+    0 18px 38px rgba(0, 0, 0, 0.38),
+    0 0 30px rgba(143, 162, 255, 0.12),
+    0 0 0 1px rgba(255, 226, 169, 0.05) inset;
 }
 
 .tb-character-link {
@@ -59,23 +73,66 @@
 .tb-character-media {
   position: relative;
   overflow: hidden;
-  background: rgba(5, 8, 16, 0.72);
+  background:
+    radial-gradient(circle at 50% 12%, rgba(180, 160, 255, 0.10), transparent 26%),
+    rgba(5, 8, 16, 0.78);
 }
 
+/* 画像本体 */
 .tb-character img,
 .tb-character-link > img {
+  display: block;
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  object-position: center 20%;
-  transform: scale(1.01);
+  object-position: center 18%;
+  transform: scale(1.015);
   transition:
-    transform 0.42s ease,
-    filter 0.32s ease;
+    transform 0.48s ease,
+    filter 0.36s ease;
   filter:
-    saturate(0.98)
-    contrast(1.04)
-    brightness(0.94);
+    saturate(1.02)
+    contrast(1.03)
+    brightness(0.98);
+}
+
+/* 顔に線を作る原因だった上部オーバーレイを削除 */
+.tb-character-link::before {
+  content: none;
+}
+
+/* 下部だけ自然に落とす */
+.tb-character-link::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42%;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(6, 10, 20, 0) 0%,
+      rgba(6, 10, 20, 0.08) 28%,
+      rgba(6, 10, 20, 0.34) 62%,
+      rgba(5, 8, 18, 0.86) 100%
+    );
+}
+
+/* 画像にほんのり神秘光をのせる */
+.tb-character-media::after,
+.tb-character-link > img + .tb-image-glow {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.10), transparent 22%),
+    radial-gradient(circle at 50% 0%, rgba(168, 139, 255, 0.14), transparent 34%),
+    radial-gradient(circle at 50% 100%, rgba(255, 214, 143, 0.06), transparent 26%);
+  mix-blend-mode: screen;
+  opacity: 0.85;
 }
 
 .tb-character:hover img,
@@ -84,70 +141,40 @@
 .tb-character:focus-within .tb-character-link > img {
   transform: scale(1.04);
   filter:
-    saturate(1)
-    contrast(1.06)
-    brightness(0.98);
-}
-
-.tb-character-link > img {
-  position: relative;
-}
-
-.tb-character-link > img::before {
-  content: "";
-}
-
-.tb-character-link::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto auto 0;
-  width: 100%;
-  height: clamp(180px, 34vw, 280px);
-  z-index: 2;
-  pointer-events: none;
-  background:
-    linear-gradient(to bottom, rgba(4, 7, 16, 0.03), transparent 38%),
-    linear-gradient(to top, rgba(5, 8, 16, 0.06), transparent 16%);
-}
-
-.tb-character-link::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    linear-gradient(to bottom, transparent 0%, transparent 46%, rgba(6, 10, 20, 0.24) 68%, rgba(6, 10, 20, 0.82) 100%);
+    saturate(1.05)
+    contrast(1.05)
+    brightness(1);
 }
 
 .tb-character h3 {
   position: relative;
   z-index: 3;
-  margin: 0.88rem 0.88rem 0.2rem;
+  margin: 0.92rem 0.92rem 0.2rem;
   font-family: "Shippori Mincho", serif;
   font-size: 1.08rem;
-  line-height: 1.32;
-  letter-spacing: 0.02em;
+  line-height: 1.34;
+  letter-spacing: 0.03em;
   color: #f8f4ea;
+  text-shadow: 0 0 12px rgba(210, 188, 255, 0.08);
 }
 
 .tb-character .role {
   position: relative;
   z-index: 3;
-  margin: 0 0.88rem 0.78rem;
-  color: var(--tb-gold-soft);
+  margin: 0 0.92rem 0.78rem;
+  color: #d9c089;
   font-size: 0.88rem;
   line-height: 1.5;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 
 .tb-character p {
   position: relative;
   z-index: 3;
-  margin: 0 0.88rem 1rem;
-  color: var(--tb-muted);
+  margin: 0 0.92rem 1rem;
+  color: rgba(231, 235, 245, 0.8);
   font-size: 0.94rem;
-  line-height: 1.8;
+  line-height: 1.82;
 }
 
 .tb-character .role + p {
@@ -158,16 +185,18 @@
   outline: none;
 }
 
-.tb-character-link:focus-visible .tb-character {
-  outline: none;
+.tb-character:has(.tb-character-link:focus-visible) {
+  border-color: rgba(226, 206, 156, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(255, 226, 169, 0.08) inset,
+    0 0 0 3px rgba(150, 169, 255, 0.14),
+    0 18px 38px rgba(0, 0, 0, 0.38);
 }
 
-/* compact rows for character-heavy sections */
 .tb-character-list--compact {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
-/* mobile */
 @media (max-width: 820px) {
   .tb-character-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -181,28 +210,32 @@
   }
 
   .tb-character {
-    border-radius: 13px;
+    border-radius: 14px;
   }
 
   .tb-character h3 {
-    margin: 0.82rem 0.82rem 0.16rem;
+    margin: 0.84rem 0.84rem 0.16rem;
     font-size: 1.02rem;
   }
 
   .tb-character .role {
-    margin: 0 0.82rem 0.66rem;
-    font-size: 0.85rem;
+    margin: 0 0.84rem 0.64rem;
+    font-size: 0.84rem;
   }
 
   .tb-character p {
-    margin: 0 0.82rem 0.92rem;
+    margin: 0 0.84rem 0.94rem;
     font-size: 0.92rem;
   }
 
   .tb-character img,
   .tb-character-link > img {
     aspect-ratio: 4 / 5;
-    object-position: center 18%;
+    object-position: center 16%;
+  }
+
+  .tb-character-link::after {
+    height: 40%;
   }
 }
 
