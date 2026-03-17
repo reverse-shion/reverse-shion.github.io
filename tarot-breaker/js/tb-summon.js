@@ -1,12 +1,10 @@
 TB.register(() => {
-
   const root = document.querySelector('[data-summon-root]');
   if (!root) return;
 
   const button = root.querySelector('[data-summon-button]');
   const cardWrap = root.querySelector('[data-summon-card]');
   const card = cardWrap?.querySelector('.tb-arcana-card');
-  const stage = root.closest('.tb-summon-stage');
   const status = root.querySelector('[data-summon-status]');
 
   const nameEl = root.querySelector('[data-arcana-name]');
@@ -15,7 +13,10 @@ TB.register(() => {
   const keywordEl = root.querySelector('[data-arcana-keyword]');
   const omenEl = root.querySelector('[data-arcana-omen]');
 
-  if (!button || !card) return;
+  if (
+    !button || !card || !status ||
+    !nameEl || !subtitleEl || !themeEl || !keywordEl || !omenEl
+  ) return;
 
   const arcana = [
     {
@@ -41,39 +42,45 @@ TB.register(() => {
     }
   ];
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const render = (cardData) => {
-
     subtitleEl.textContent = cardData.subtitle;
     nameEl.textContent = cardData.name;
     themeEl.textContent = cardData.message;
     keywordEl.textContent = cardData.keyword;
     omenEl.textContent = cardData.meaning;
-
   };
 
-  button.addEventListener("click", async () => {
+  let busy = false;
 
-    button.textContent = "星界接続中…";
-    status.textContent = "星界回路を起動しています…";
+  button.addEventListener('click', async () => {
+    if (busy) return;
+    busy = true;
+
+    button.disabled = true;
+    button.textContent = '星界接続中…';
+    status.textContent = '星界回路を起動しています…';
+
+    card.dataset.phase = 'charging';
+    card.dataset.flip = 'false';
 
     await sleep(700);
 
-    status.textContent = "共鳴位相を同期中…";
+    status.textContent = '共鳴位相を同期中…';
 
     await sleep(800);
 
     const pick = arcana[Math.floor(Math.random() * arcana.length)];
-
     render(pick);
 
-    card.dataset.phase = "revealed";
-    card.dataset.flip = "true";
+    card.dataset.phase = 'revealed';
+    card.dataset.flip = 'true';
 
-    button.textContent = "今日の徴を確認する";
-    status.textContent = "展開完了：今日の徴を記録しました。";
+    button.textContent = 'もう一度、展開する';
+    status.textContent = '展開完了：今日の徴を記録しました。';
 
+    button.disabled = false;
+    busy = false;
   });
-
 });
