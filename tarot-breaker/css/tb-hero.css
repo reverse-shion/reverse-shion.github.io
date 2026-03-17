@@ -1,15 +1,26 @@
 .tb-hero {
+  --hero-overlay-top: rgba(4, 7, 16, 0.16);
+  --hero-overlay-mid: rgba(5, 8, 18, 0.52);
+  --hero-overlay-bottom: rgba(3, 5, 12, 0.92);
+  --hero-gold: rgba(214, 186, 126, 0.28);
+  --hero-blue: rgba(140, 170, 255, 0.18);
+  --hero-glow: rgba(255, 220, 150, 0.1);
+
   position: relative;
-  margin-top: 2rem;
-  min-height: min(88vh, 860px);
-  border: 1px solid var(--tb-border);
-  border-radius: 24px;
+  isolation: isolate;
   overflow: hidden;
-  padding: clamp(1.4rem, 3vw, 2.8rem);
+  margin-top: clamp(1rem, 2.2vw, 1.8rem);
+  min-height: min(100svh - 5.5rem, 980px);
+  border: 1px solid rgba(214, 220, 255, 0.16);
+  border-radius: 28px;
   background:
-    radial-gradient(circle at 50% 18%, rgba(255, 220, 140, 0.08), transparent 30%),
-    linear-gradient(165deg, rgba(10, 15, 30, 0.92), rgba(9, 13, 24, 0.7));
-  box-sizing: border-box;
+    radial-gradient(circle at 50% 10%, rgba(255, 220, 140, 0.1), transparent 26%),
+    radial-gradient(circle at 78% 24%, rgba(125, 156, 255, 0.14), transparent 30%),
+    linear-gradient(180deg, #0b1020 0%, #080c18 55%, #05070f 100%);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 228, 170, 0.04) inset,
+    0 0 44px rgba(255, 215, 140, 0.05);
 }
 
 .tb-hero *,
@@ -18,244 +29,477 @@
   box-sizing: border-box;
 }
 
+/* cinematic background media */
+.tb-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.tb-hero-video,
+.tb-hero-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tb-hero-video {
+  filter:
+    saturate(0.98)
+    contrast(1.04)
+    brightness(0.82);
+}
+
+.tb-hero-poster {
+  filter:
+    saturate(0.96)
+    contrast(1.05)
+    brightness(0.78);
+  transform: scale(1.035);
+  transform-origin: center center;
+}
+
+/* cinematic overlays */
+.tb-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 52% 14%, rgba(255, 219, 145, 0.14), transparent 19%),
+    radial-gradient(circle at 82% 24%, rgba(122, 155, 255, 0.12), transparent 23%),
+    linear-gradient(
+      to bottom,
+      var(--hero-overlay-top) 0%,
+      rgba(4, 6, 14, 0.24) 16%,
+      var(--hero-overlay-mid) 48%,
+      rgba(4, 6, 14, 0.72) 72%,
+      var(--hero-overlay-bottom) 100%
+    );
+  pointer-events: none;
+}
+
+.tb-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, rgba(3, 5, 12, 0.68) 0%, rgba(3, 5, 12, 0.24) 38%, transparent 62%),
+    radial-gradient(circle at 50% 100%, rgba(255, 214, 128, 0.08), transparent 34%);
+  mix-blend-mode: normal;
+}
+
+/* decorative layers */
 .tb-hero-layer {
   position: absolute;
-  inset: -8%;
+  inset: -10%;
+  z-index: 1;
   pointer-events: none;
 }
 
 .tb-hero-layer--sigil {
-  background: radial-gradient(circle at center, rgba(151, 168, 255, 0.18), transparent 45%);
+  background:
+    radial-gradient(circle at center, rgba(156, 176, 255, 0.16), transparent 24%),
+    radial-gradient(circle at center, rgba(255, 223, 156, 0.08), transparent 40%);
+  filter: blur(4px);
+  opacity: 0.9;
 }
 
 .tb-hero-layer--ring {
-  background: conic-gradient(
-    from 90deg,
-    transparent 0 45%,
-    rgba(198, 174, 126, 0.2) 55%,
-    transparent 65%
-  );
+  inset: -18%;
+  background:
+    conic-gradient(
+      from 120deg,
+      transparent 0 14%,
+      rgba(210, 184, 126, 0.08) 18%,
+      transparent 23%,
+      transparent 46%,
+      rgba(147, 170, 255, 0.08) 52%,
+      transparent 58%,
+      transparent 76%,
+      rgba(210, 184, 126, 0.07) 82%,
+      transparent 88%,
+      transparent 100%
+    );
   mix-blend-mode: screen;
+  opacity: 0.8;
+  animation: tbHeroRotate 36s linear infinite;
 }
 
 .tb-hero-layer--veil {
-  background: linear-gradient(to bottom, rgba(2, 3, 9, 0.08), rgba(2, 3, 9, 0.8));
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 225, 165, 0.06), transparent 22%),
+    linear-gradient(to bottom, rgba(2, 3, 8, 0.06), rgba(2, 3, 8, 0.74));
+  opacity: 0.95;
 }
 
+/* inner layout */
 .tb-hero-inner {
   position: relative;
   z-index: 2;
-  width: min(680px, 100%);
+  display: grid;
+  align-content: end;
+  min-height: min(100svh - 5.5rem, 980px);
+  padding:
+    clamp(2rem, 4vw, 4rem)
+    clamp(1.2rem, 3vw, 3rem)
+    clamp(2rem, 5vw, 3.4rem);
+  width: min(760px, 100%);
 }
 
 .tb-kicker {
-  margin: 0;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  color: var(--tb-gold);
+  margin: 0 0 0.7rem;
+  color: rgba(227, 195, 128, 0.96);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(255, 218, 145, 0.12);
 }
 
 .tb-hero h1 {
-  margin: 0.6rem 0 1rem;
+  margin: 0;
   font-family: "Shippori Mincho", serif;
-  line-height: 1.15;
+  line-height: 1.04;
+  text-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.34),
+    0 0 28px rgba(255, 226, 160, 0.05);
 }
 
 .tb-hero h1 span {
   display: block;
-  font-size: clamp(2rem, 5.2vw, 4rem);
+  font-size: clamp(2.45rem, 6vw, 5.3rem);
+  font-weight: 700;
   letter-spacing: 0.08em;
+  color: #f6f1e6;
 }
 
 .tb-hero h1 small {
   display: block;
-  margin-top: 0.5rem;
-  color: var(--tb-muted);
-  font-size: 0.85rem;
-  letter-spacing: 0.16em;
+  margin-top: 0.85rem;
+  font-size: clamp(0.82rem, 1.35vw, 0.98rem);
+  letter-spacing: 0.18em;
+  line-height: 1.7;
+  color: rgba(202, 211, 232, 0.9);
+  text-transform: uppercase;
 }
 
 .tb-hero-lead {
-  max-width: 36ch;
+  max-width: 38ch;
+  margin: 1.4rem 0 0;
+  font-size: clamp(0.98rem, 1.5vw, 1.08rem);
+  line-height: 1.95;
+  color: rgba(240, 239, 235, 0.92);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.28);
 }
 
+.tb-actions,
+.tb-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: center;
+  margin-top: 1.7rem;
+}
+
+.tb-hero .tb-btn,
+.tb-hero .tb-action,
+.tb-hero-actions a,
+.tb-hero-actions button {
+  position: relative;
+  min-height: 56px;
+  padding: 0.98rem 1.45rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  transition:
+    transform 0.24s ease,
+    box-shadow 0.24s ease,
+    border-color 0.24s ease,
+    background-color 0.24s ease,
+    color 0.24s ease;
+}
+
+.tb-hero .tb-btn--primary {
+  border: 1px solid rgba(231, 206, 157, 0.34);
+  background:
+    linear-gradient(180deg, rgba(230, 202, 145, 0.2), rgba(194, 155, 90, 0.14));
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(255, 232, 184, 0.08) inset,
+    0 0 26px rgba(255, 212, 126, 0.08);
+}
+
+.tb-hero .tb-btn--ghost {
+  border: 1px solid rgba(214, 220, 255, 0.2);
+  background: rgba(10, 14, 28, 0.28);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+.tb-hero .tb-btn:hover,
+.tb-hero .tb-btn:focus-visible,
+.tb-hero .tb-action:hover,
+.tb-hero .tb-action:focus-visible,
+.tb-hero-actions a:hover,
+.tb-hero-actions a:focus-visible,
+.tb-hero-actions button:hover,
+.tb-hero-actions button:focus-visible {
+  transform: translateY(-2px);
+}
+
+.tb-hero .tb-btn--primary:hover,
+.tb-hero .tb-btn--primary:focus-visible {
+  border-color: rgba(242, 219, 169, 0.54);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(255, 239, 197, 0.12) inset,
+    0 0 30px rgba(255, 216, 130, 0.13);
+}
+
+.tb-hero .tb-btn--ghost:hover,
+.tb-hero .tb-btn--ghost:focus-visible {
+  border-color: rgba(214, 220, 255, 0.32);
+  background: rgba(12, 16, 32, 0.42);
+}
+
+/* optional cinematic side visual if old markup remains */
 .tb-hero-visual {
   position: absolute;
-  right: 1.6rem;
-  bottom: 1.4rem;
-  width: min(38vw, 460px);
+  right: clamp(1rem, 2.2vw, 2rem);
+  bottom: clamp(1rem, 2.4vw, 1.8rem);
+  z-index: 2;
+  width: min(30vw, 360px);
   aspect-ratio: 4 / 5;
-  border-radius: 14px;
+  border-radius: 18px;
   overflow: hidden;
-  border: 1px solid var(--tb-border);
+  border: 1px solid rgba(214, 220, 255, 0.16);
+  background: rgba(4, 8, 18, 0.52);
   box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 224, 160, 0.06) inset,
-    0 0 30px rgba(255, 210, 120, 0.08);
-  background: rgba(4, 8, 18, 0.75);
-  isolation: isolate;
+    0 22px 42px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(255, 228, 170, 0.05) inset,
+    0 0 26px rgba(255, 213, 126, 0.06);
+  opacity: 0.92;
 }
 
 .tb-hero-visual::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow:
-    0 0 0 1px rgba(255, 225, 170, 0.18) inset,
-    0 0 22px rgba(255, 205, 120, 0.12);
-  opacity: 0.9;
   z-index: 2;
-}
-
-.tb-hero-visual::after {
-  content: "";
-  position: absolute;
-  inset: 0;
+  pointer-events: none;
   background:
-    linear-gradient(to top, rgba(5, 8, 16, 0.48), transparent 38%),
-    radial-gradient(circle at 50% 12%, rgba(255, 218, 145, 0.1), transparent 30%);
-  pointer-events: none;
-  z-index: 2;
+    linear-gradient(to top, rgba(5, 8, 16, 0.44), transparent 36%),
+    radial-gradient(circle at 50% 12%, rgba(255, 218, 145, 0.08), transparent 30%);
 }
 
 .tb-hero-visual img {
-  display: block;
   width: 100%;
   height: 100%;
+  display: block;
   object-fit: cover;
   object-position: 50% 22%;
   transform: scale(1.04);
 }
 
-/* もしボタン群がこのクラスなら有効 */
-.tb-hero-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-top: 1.2rem;
-}
-
-/* ボタンらしき要素をまとめて安定化 */
-.tb-hero-actions a,
-.tb-hero-actions button,
-.tb-hero .tb-btn,
-.tb-hero .tb-action {
-  min-height: 56px;
-  padding: 0.95rem 1.4rem;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* tablet */
-@media (max-width: 900px) {
+/* mobile / tablet tuning */
+@media (max-width: 1100px) {
   .tb-hero {
-    min-height: auto;
-    padding-bottom: 1.5rem;
+    min-height: min(92svh, 920px);
   }
 
   .tb-hero-inner {
-    width: 100%;
+    width: min(700px, 100%);
   }
 
   .tb-hero-visual {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    width: min(100%, 560px);
-    margin: 1.4rem auto 0;
+    width: min(34vw, 320px);
   }
 }
 
-/* mobile */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .tb-hero {
-    padding: 1.2rem 1rem 1.35rem;
-    border-radius: 18px;
+    min-height: min(88svh, 860px);
+    border-radius: 24px;
+  }
+
+  .tb-hero::after {
+    background:
+      linear-gradient(to right, rgba(3, 5, 12, 0.44) 0%, rgba(3, 5, 12, 0.16) 48%, transparent 76%),
+      radial-gradient(circle at 50% 100%, rgba(255, 214, 128, 0.08), transparent 36%);
   }
 
   .tb-hero-inner {
+    min-height: min(88svh, 860px);
+    padding:
+      clamp(1.8rem, 4vw, 2.4rem)
+      clamp(1rem, 3vw, 1.5rem)
+      clamp(1.8rem, 5vw, 2.4rem);
+  }
+
+  .tb-hero-lead {
+    max-width: 34ch;
+  }
+
+  .tb-hero-visual {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .tb-hero {
+    min-height: min(86svh, 820px);
+    margin-top: 0.9rem;
+    border-radius: 20px;
+  }
+
+  .tb-hero::before {
+    background:
+      radial-gradient(circle at 50% 12%, rgba(255, 219, 145, 0.11), transparent 20%),
+      linear-gradient(
+        to bottom,
+        rgba(5, 7, 16, 0.12) 0%,
+        rgba(5, 7, 16, 0.22) 18%,
+        rgba(5, 7, 16, 0.48) 48%,
+        rgba(4, 6, 12, 0.8) 74%,
+        rgba(3, 5, 10, 0.94) 100%
+      );
+  }
+
+  .tb-hero::after {
+    background:
+      linear-gradient(to bottom, transparent 0%, transparent 44%, rgba(3, 5, 10, 0.28) 60%, rgba(3, 5, 10, 0.72) 100%);
+  }
+
+  .tb-hero-poster,
+  .tb-hero-video {
+    object-position: 58% center;
+  }
+
+  .tb-hero-inner {
+    min-height: min(86svh, 820px);
     width: 100%;
+    align-content: end;
+    padding: 1.15rem 1rem 1.25rem;
   }
 
   .tb-kicker {
     font-size: 0.72rem;
     letter-spacing: 0.16em;
-  }
-
-  .tb-hero h1 {
-    margin: 0.55rem 0 0.9rem;
+    margin-bottom: 0.6rem;
   }
 
   .tb-hero h1 span {
-    font-size: clamp(1.7rem, 8vw, 2.3rem);
+    font-size: clamp(2rem, 9.2vw, 2.9rem);
     letter-spacing: 0.05em;
   }
 
   .tb-hero h1 small {
+    margin-top: 0.7rem;
     font-size: 0.76rem;
     letter-spacing: 0.12em;
+    line-height: 1.7;
   }
 
   .tb-hero-lead {
     max-width: 100%;
+    margin-top: 1rem;
+    font-size: 0.96rem;
+    line-height: 1.9;
   }
 
-  .tb-hero-visual {
-    width: 100%;
-    max-width: 100%;
-    aspect-ratio: 3 / 4;
-    border-radius: 12px;
-    margin: 1.1rem auto 0;
-    left: 0;
-  }
-
-  .tb-hero-visual img {
-    object-position: 52% 20%;
-    transform: scale(1.02);
-  }
-
+  .tb-actions,
   .tb-hero-actions {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0.85rem;
+    gap: 0.8rem;
     width: 100%;
-    margin-top: 1rem;
+    margin-top: 1.15rem;
   }
 
-  .tb-hero-actions a,
-  .tb-hero-actions button,
   .tb-hero .tb-btn,
-  .tb-hero .tb-action {
+  .tb-hero .tb-action,
+  .tb-hero-actions a,
+  .tb-hero-actions button {
     width: 100%;
     min-height: 54px;
-    padding: 0.9rem 1rem;
-    font-size: 0.98rem;
+    padding: 0.95rem 1rem;
     white-space: normal;
+    font-size: 0.97rem;
   }
 }
 
+@media (max-width: 480px) {
+  .tb-hero {
+    min-height: min(84svh, 760px);
+  }
+
+  .tb-hero-inner {
+    min-height: min(84svh, 760px);
+  }
+
+  .tb-hero h1 span {
+    font-size: clamp(1.9rem, 9vw, 2.5rem);
+  }
+
+  .tb-hero-lead br {
+    display: none;
+  }
+}
 
 @media (max-width: 390px) {
-  .tb-hero .tb-actions {
-    grid-template-columns: 1fr;
-    gap: 0.72rem;
+  .tb-hero {
+    border-radius: 18px;
+  }
+
+  .tb-kicker {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+  }
+
+  .tb-hero h1 small {
+    font-size: 0.72rem;
   }
 
   .tb-hero .tb-btn {
-    min-height: 54px;
-    width: 100%;
-    font-size: 0.95rem;
+    min-height: 52px;
+    font-size: 0.94rem;
     padding-inline: 0.92rem;
   }
+}
 
-  .tb-hero-visual img {
-    object-position: 52% 18%;
+@media (prefers-reduced-motion: reduce) {
+  .tb-hero-layer--ring {
+    animation: none;
+  }
+
+  .tb-hero-poster {
+    transform: none;
+  }
+
+  .tb-hero .tb-btn,
+  .tb-hero .tb-action,
+  .tb-hero-actions a,
+  .tb-hero-actions button {
+    transition: none;
+  }
+}
+
+@keyframes tbHeroRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
