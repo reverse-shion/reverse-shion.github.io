@@ -1,62 +1,117 @@
 window.TB?.ready(() => {
-  const intro = document.querySelector('[data-tb-intro]');
+  const intro = document.querySelector("[data-tb-intro]");
   if (!intro) return;
 
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  let done = false;
-  let closeTimer = null;
-  let cleanupTimer = null;
-
-  const cleanup = () => {
-    intro.hidden = true;
-    intro.setAttribute('aria-hidden', 'true');
-    intro.classList.remove('is-active', 'is-hiding');
-    document.body.classList.remove('tb-intro-lock');
-  };
-
-  const finish = () => {
-    intro.classList.remove('is-active');
-    intro.classList.add('is-hiding');
-
-    cleanupTimer = window.setTimeout(() => {
-      cleanup();
-    }, 560);
-  };
-
-  const closeOnce = () => {
-    if (done) return;
-    done = true;
-
-    if (closeTimer) {
-      window.clearTimeout(closeTimer);
-      closeTimer = null;
-    }
-
-    finish();
-  };
-
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduceMotion) {
-    cleanup();
+    intro.hidden = true;
+    intro.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("tb-intro-lock");
     return;
   }
 
-  document.body.classList.add('tb-intro-lock');
+  const ACTIVE_CLASS = "is-active";
+  const HIDING_CLASS = "is-hiding";
+  const LOCK_CLASS = "tb-intro-lock";
+
+  const MIN_VISIBLE_MS = 2400;
+  const FADE_OUT_MS = 640;
+  const ACTIVATE_DELAY_MS = 60;
+
+  let isClosed = false;
+  let isCleaningUp = false;
+
+  let visibleTimer = null;
+  let activateTimer = null;
+  let cleanupTimer = null;
+
+  const clearTimers = () => {
+    if (visibleTimer) {
+      window.clearTimeout(visibleTimer);
+      visibleTimer = null;
+    }
+    if (activateTimer) {
+      window.clearTimeout(activateTimer);
+      activateTimer = null;
+    }
+    if (cleanupTimer) {
+      window.clearTimeout(cleanupTimer);
+      cleanupTimer = null;
+    }
+  };
+
+  const cleanup = () => {
+    if (isCleaningUp) return;
+    isCleaningUp = true;
+
+    clearTimers();
+
+    intro.hidden = true;
+    intro.setAttribute("aria-hidden", "true");
+    intro.classList.remove(ACTIVE_CLASS, HIDING_CLASS);
+    intro.removeAttribute("data-intro-state");
+    document.body.classList.remove(LOCK_CLASS);
+
+    removeCloseListeners();
+  };
+
+  const finish = () => {
+    if (isClosed) return;
+    isClosed = true;
+
+    intro.setAttribute("data-intro-state", "closing");
+    intro.classList.remove(ACTIVE_CLASS);
+    intro.classList.add(HIDING_CLASS);
+
+    cleanupTimer = window.setTimeout(() => {
+      cleanup();
+    }, FADE_OUT_MS);
+  };
+
+  const closeOnce = () => {
+    if (isClosed) return;
+    finish();
+  };
+
+  const handleEarlyClose = () => {
+    closeOnce();
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
+      cleanup();
+    }
+  };
+
+  const addCloseListeners = () => {
+    window.addEventListener("pointerdown", handleEarlyClose, { once: true, passive: true });
+    window.addEventListener("keydown", handleEarlyClose, { once: true });
+    window.addEventListener("pagehide", cleanup, { once: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+  };
+
+  const removeCloseListeners = () => {
+    window.removeEventListener("pointerdown", handleEarlyClose);
+    window.removeEventListener("keydown", handleEarlyClose);
+    window.removeEventListener("pagehide", cleanup);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+
   intro.hidden = false;
-  intro.setAttribute('aria-hidden', 'false');
+  intro.setAttribute("aria-hidden", "false");
+  intro.setAttribute("data-intro-state", "preparing");
+  document.body.classList.add(LOCK_CLASS);
 
-  requestAnimationFrame(() => {
-    intro.classList.add('is-active');
-  });
+  addCloseListeners();
 
-  closeTimer = window.setTimeout(closeOnce, 2850);
+  activateTimer = window.setTimeout(() => {
+    requestAnimationFrame(() => {
+      intro.setAttribute("data-intro-state", "active");
+      intro.classList.add(ACTIVE_CLASS);
+    });
+  }, ACTIVATE_DELAY_MS);
 
-  window.addEventListener(
-    'pagehide',
-    () => {
-      if (closeTimer) window.clearTimeout(closeTimer);
-      if (cleanupTimer) window.clearTimeout(cleanupTimer);
-    },
-    { once: true }
-  );
+  visibleTimer = window.setTimeout(() => {
+    closeOnce();
+  }, MIN_VISIBLE_MS);
 });
