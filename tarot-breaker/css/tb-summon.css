@@ -624,3 +624,249 @@
     display: none;
   }
 }
+/* =========================================================
+   TAROT BREAKER / Summon
+   追加差分：神演出強化
+   - JSの data-state / data-phase に追従
+========================================================= */
+
+/* -----------------------------------------
+   ステージ全体の微アニメーション
+----------------------------------------- */
+
+@keyframes tbSummonSigilPulse {
+  0% {
+    opacity: 0.72;
+    transform: translate(-50%, -50%) scale(0.985) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.015) rotate(0.6deg);
+  }
+  100% {
+    opacity: 0.78;
+    transform: translate(-50%, -50%) scale(0.99) rotate(0deg);
+  }
+}
+
+@keyframes tbSummonHaloBreath {
+  0% {
+    opacity: 0.48;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  50% {
+    opacity: 0.88;
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+  100% {
+    opacity: 0.54;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+@keyframes tbSummonCardGlow {
+  0% {
+    filter:
+      drop-shadow(0 0 18px rgba(145, 168, 255, 0.18))
+      drop-shadow(0 0 36px rgba(100, 124, 255, 0.10));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 28px rgba(165, 188, 255, 0.30))
+      drop-shadow(0 0 52px rgba(110, 132, 255, 0.18))
+      drop-shadow(0 0 14px rgba(219, 193, 142, 0.08));
+  }
+  100% {
+    filter:
+      drop-shadow(0 0 20px rgba(145, 168, 255, 0.20))
+      drop-shadow(0 0 40px rgba(100, 124, 255, 0.12));
+  }
+}
+
+@keyframes tbSummonButtonShine {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(140%);
+  }
+}
+
+/* -----------------------------------------
+   初期状態
+----------------------------------------- */
+
+[data-summon-root][data-state="idle"] .tb-summon-status {
+  border-color: rgba(190, 206, 255, 0.12);
+}
+
+/* -----------------------------------------
+   charging
+----------------------------------------- */
+
+[data-summon-root][data-state="charging"] .tb-card-wrap::after {
+  opacity: 1;
+  animation: tbSummonHaloBreath 1.3s ease-in-out infinite;
+}
+
+[data-summon-root][data-state="charging"] .tb-summon-status {
+  border-color: rgba(145, 168, 255, 0.22);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.14),
+    0 0 0 1px rgba(255, 240, 210, 0.02) inset,
+    0 0 18px rgba(110, 134, 255, 0.08);
+}
+
+[data-summon-root][data-state="charging"] ~ .tb-summon-status {
+  border-color: rgba(145, 168, 255, 0.22);
+}
+
+.tb-arcana-card[data-phase="charging"] {
+  animation: tbSummonCardGlow 1.2s ease-in-out infinite;
+}
+
+/* -----------------------------------------
+   syncing
+----------------------------------------- */
+
+[data-summon-root][data-state="syncing"] .tb-card-wrap::after {
+  opacity: 1;
+  animation: tbSummonHaloBreath 0.95s ease-in-out infinite;
+}
+
+.tb-arcana-card[data-phase="syncing"] {
+  animation: tbSummonCardGlow 0.9s ease-in-out infinite;
+  filter:
+    drop-shadow(0 0 28px rgba(155, 180, 255, 0.34))
+    drop-shadow(0 0 58px rgba(110, 132, 255, 0.20))
+    drop-shadow(0 0 18px rgba(219, 193, 142, 0.10));
+}
+
+[data-summon-root][data-state="syncing"] .tb-summon-status {
+  border-color: rgba(175, 196, 255, 0.26);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.14),
+    0 0 0 1px rgba(255, 240, 210, 0.02) inset,
+    0 0 22px rgba(140, 162, 255, 0.10);
+}
+
+/* -----------------------------------------
+   revealed
+----------------------------------------- */
+
+[data-summon-root][data-state="revealed"] .tb-card-wrap::after {
+  opacity: 0.96;
+  animation: tbSummonSigilPulse 3.4s ease-in-out infinite;
+}
+
+[data-summon-root][data-state="revealed"] .tb-summon-status {
+  border-color: rgba(214, 194, 145, 0.20);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.14),
+    0 0 0 1px rgba(255, 240, 210, 0.02) inset,
+    0 0 18px rgba(219, 193, 142, 0.08);
+}
+
+[data-summon-root][data-state="revealed"] .tb-summon-trigger {
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(255, 240, 210, 0.03) inset,
+    0 0 28px rgba(214, 194, 145, 0.10),
+    0 0 26px rgba(110, 134, 255, 0.08);
+}
+
+/* -----------------------------------------
+   ボタンの押下演出
+----------------------------------------- */
+
+[data-summon-root][data-state="charging"] .tb-summon-trigger::before,
+[data-summon-root][data-state="syncing"] .tb-summon-trigger::before {
+  animation: tbSummonButtonShine 1.05s ease forwards;
+}
+
+/* -----------------------------------------
+   カード表面の出現感
+----------------------------------------- */
+
+.tb-arcana-card[data-phase="revealed"] .tb-arcana-face--front::after {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), transparent 18%),
+    linear-gradient(135deg, transparent 0%, rgba(162,145,255,0.08) 48%, transparent 100%),
+    radial-gradient(circle at 50% 12%, rgba(255, 226, 180, 0.08), transparent 20%);
+}
+
+/* -----------------------------------------
+   めくれた後の静かな浮遊感
+----------------------------------------- */
+
+.tb-arcana-card[data-phase="revealed"] {
+  transform-origin: center center;
+}
+
+.tb-card-wrap:hover .tb-arcana-card[data-phase="revealed"] {
+  transform: rotateY(180deg) translateY(-2px) scale(1.005);
+}
+
+/* -----------------------------------------
+   stage自体の召喚強化
+----------------------------------------- */
+
+[data-summon-root][data-state="charging"]::before,
+[data-summon-root][data-state="syncing"]::before,
+[data-summon-root][data-state="revealed"]::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  pointer-events: none;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(128, 152, 255, 0.10), transparent 42%),
+    radial-gradient(circle at 50% 22%, rgba(219, 193, 142, 0.06), transparent 18%);
+  filter: blur(22px);
+  z-index: 0;
+}
+
+[data-summon-root][data-state="syncing"]::before {
+  opacity: 1;
+}
+
+[data-summon-root][data-state="revealed"]::before {
+  opacity: 0.84;
+}
+
+/* -----------------------------------------
+   モバイル微調整
+----------------------------------------- */
+
+@media (max-width: 560px) {
+  .tb-arcana-card[data-phase="charging"],
+  .tb-arcana-card[data-phase="syncing"] {
+    animation-duration: 1.05s;
+  }
+
+  [data-summon-root][data-state="charging"] .tb-card-wrap::after,
+  [data-summon-root][data-state="syncing"] .tb-card-wrap::after {
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+}
+
+/* -----------------------------------------
+   reduce motion
+----------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-arcana-card[data-phase="charging"],
+  .tb-arcana-card[data-phase="syncing"],
+  [data-summon-root][data-state="charging"] .tb-card-wrap::after,
+  [data-summon-root][data-state="syncing"] .tb-card-wrap::after,
+  [data-summon-root][data-state="revealed"] .tb-card-wrap::after,
+  [data-summon-root][data-state="charging"] .tb-summon-trigger::before,
+  [data-summon-root][data-state="syncing"] .tb-summon-trigger::before {
+    animation: none !important;
+  }
+}
