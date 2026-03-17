@@ -79,6 +79,19 @@ body.tb-body {
   padding: 40px 0;
 }
 
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 /* =========================
    BACKGROUND STARS
 ========================= */
@@ -207,6 +220,7 @@ body.tb-body {
     radial-gradient(circle at 50% 0%, rgba(188,217,255,.08), transparent 24%);
   box-shadow: var(--cg-shadow-strong);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   overflow: hidden;
 }
 
@@ -311,6 +325,7 @@ body.tb-body {
   z-index: 8;
   background: rgba(5, 8, 16, 0.68);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255,255,255,0.04);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
@@ -342,7 +357,12 @@ body.tb-body {
   color: var(--cg-text-soft);
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.03);
-  transition: 0.24s ease;
+  transition:
+    transform 0.24s ease,
+    background 0.24s ease,
+    border-color 0.24s ease,
+    box-shadow 0.24s ease,
+    color 0.24s ease;
 }
 
 .cg-chip:hover,
@@ -350,6 +370,7 @@ body.tb-body {
   color: #fff;
   border-color: rgba(214,179,106,0.28);
   background: rgba(214,179,106,0.08);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
 }
 
 /* =========================
@@ -371,7 +392,8 @@ body.tb-body {
     transform 0.24s ease,
     background 0.24s ease,
     border-color 0.24s ease,
-    box-shadow 0.24s ease;
+    box-shadow 0.24s ease,
+    color 0.24s ease;
 }
 
 .cg-link {
@@ -392,6 +414,13 @@ body.tb-body {
 .cg-btn--primary {
   border-color: rgba(214,179,106,0.34);
   background: linear-gradient(180deg, rgba(214,179,106,0.17), rgba(214,179,106,0.07));
+}
+
+.cg-btn:focus-visible,
+.cg-link:focus-visible,
+.cg-chip:focus-visible {
+  outline: 2px solid rgba(141,216,255,0.65);
+  outline-offset: 2px;
 }
 
 .cg-links {
