@@ -40,6 +40,14 @@ window.TB?.ready(() => {
     }
   };
 
+  const removeCloseListeners = () => {
+    intro.removeEventListener("pointerdown", handleEarlyClose);
+    intro.removeEventListener("click", handleEarlyClose);
+    window.removeEventListener("keydown", handleEarlyClose);
+    window.removeEventListener("pagehide", cleanup);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+
   const cleanup = () => {
     if (isCleaningUp) return;
     isCleaningUp = true;
@@ -73,9 +81,10 @@ window.TB?.ready(() => {
     finish();
   };
 
-  const handleEarlyClose = () => {
+  function handleEarlyClose(event) {
+    event.stopPropagation();
     closeOnce();
-  };
+  }
 
   const handleVisibilityChange = () => {
     if (document.hidden) {
@@ -84,17 +93,13 @@ window.TB?.ready(() => {
   };
 
   const addCloseListeners = () => {
-    window.addEventListener("pointerdown", handleEarlyClose, { once: true, passive: true });
+    /* window全体ではなく intro 自体だけで受ける */
+    intro.addEventListener("pointerdown", handleEarlyClose, { once: true, passive: false });
+    intro.addEventListener("click", handleEarlyClose, { once: true, passive: false });
+
     window.addEventListener("keydown", handleEarlyClose, { once: true });
     window.addEventListener("pagehide", cleanup, { once: true });
     document.addEventListener("visibilitychange", handleVisibilityChange);
-  };
-
-  const removeCloseListeners = () => {
-    window.removeEventListener("pointerdown", handleEarlyClose);
-    window.removeEventListener("keydown", handleEarlyClose);
-    window.removeEventListener("pagehide", cleanup);
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
   };
 
   intro.hidden = false;
