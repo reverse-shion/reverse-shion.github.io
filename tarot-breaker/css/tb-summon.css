@@ -319,3 +319,62 @@
 .tb-hero-layer * {
   pointer-events: none !important;
 }
+
+/* ===== Pamera flip Safari fix ===== */
+
+.tb-card-wrap {
+  perspective: 2000px;
+  -webkit-perspective: 2000px;
+}
+
+.tb-arcana-card {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.tb-arcana-card[data-flip="true"] {
+  transform: rotateY(180deg);
+}
+
+.tb-arcana-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.tb-arcana-face--front {
+  transform: rotateY(180deg) translateZ(1px);
+  -webkit-transform: rotateY(180deg) translateZ(1px);
+  z-index: 3;
+}
+
+.tb-arcana-face--back {
+  transform: rotateY(0deg) translateZ(0);
+  -webkit-transform: rotateY(0deg) translateZ(0);
+  z-index: 2;
+}
+
+.tb-pamera-card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+
+  pointer-events: none !important;
+}
