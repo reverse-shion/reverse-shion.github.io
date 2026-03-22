@@ -16,13 +16,13 @@
   <meta property="og:title" content="TAROT BREAKER | 公式ポータル">
   <meta property="og:description" content="星の言霊とタロットが、“閉じた未来”を読み直す。物語・世界観・創世神話・キャラクターを繋ぐ公式ポータル。">
   <meta property="og:url" content="https://reverse-shion.github.io/tarot-breaker/">
-  <meta property="og:image" content="https://reverse-shion.github.io/img/hero/tb-main-visual.webp">
+  <meta property="og:image" content="https://reverse-shion.github.io/tarot-breaker/img/tb-top-main-visual.webp">
   <meta property="og:locale" content="ja_JP">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="TAROT BREAKER | 公式ポータル">
   <meta name="twitter:description" content="星の言霊とタロットが、“閉じた未来”を読み直す。">
-  <meta name="twitter:image" content="https://reverse-shion.github.io/img/hero/tb-main-visual.webp">
+  <meta name="twitter:image" content="https://reverse-shion.github.io/tarot-breaker/img/tb-top-main-visual.webp">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,249 +36,157 @@
   <link rel="stylesheet" href="./css/tb-summon.css">
   <link rel="stylesheet" href="./css/tb-animations.css">
   <link rel="stylesheet" href="./css/tb-lore.css">
+  <link rel="stylesheet" href="./css/tb-portal.css">
 </head>
-<body class="tb-body">
+<body class="tb-body tb-portal-body" id="top">
   <a class="tb-skip" href="#tb-main">本文へ移動</a>
 
-  <!-- 一旦軽量化のためコメントアウト
-  <div class="tb-cosmic-bg" aria-hidden="true">
-    <canvas id="tb-star-canvas"></canvas>
-    <div class="tb-cosmic-haze"></div>
-    <div class="tb-cosmic-noise"></div>
-  </div>
-  -->
+  <header class="tb-portal-header" role="banner">
+    <div class="tb-portal-header__inner">
+      <a class="tb-portal-home" href="/star-memory.html" aria-label="STAR MEMORYへ戻る">STAR MEMORY</a>
 
-  <div class="tb-intro" data-tb-intro hidden aria-hidden="true">
-    <div class="tb-intro-inner">
-      <p class="tb-intro-brand">TAROT BREAKER / STARLINK</p>
-      <p class="tb-intro-title">Pamera召喚</p>
-      <div class="tb-intro-cards" aria-hidden="true">
-        <div class="tb-intro-card tb-intro-card--compass">COMPASS</div>
-        <div class="tb-intro-card tb-intro-card--trigger">TRIGGER</div>
-        <div class="tb-intro-card tb-intro-card--route">ROUTE</div>
-      </div>
+      <button
+        class="tb-portal-menu-button"
+        type="button"
+        data-portal-menu-button
+        aria-expanded="false"
+        aria-controls="tb-portal-nav"
+        aria-label="メニューを開く"
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+
+      <nav id="tb-portal-nav" class="tb-portal-nav" data-portal-nav aria-label="主要メニュー">
+        <ul class="tb-portal-nav__list">
+          <li><a href="#novel">小説を読む</a></li>
+          <li><a href="#characters">キャラクター</a></li>
+          <li><a href="#summon">Pamera召喚</a></li>
+          <li><a href="#world">世界観</a></li>
+        </ul>
+      </nav>
     </div>
-  </div>
-
-  <header class="tb-header header" role="banner">
-    <a class="tb-home-link" href="/star-memory.html" aria-label="STAR MEMORYへ戻る">STAR MEMORY</a>
-    <nav class="tb-nav" aria-label="TAROT BREAKER内ナビゲーション">
-      <a href="#about">TAROT BREAKERとは</a>
-      <a href="#gateway">世界への入口</a>
-      <a href="#characters">存在</a>
-      <a href="#summon">Pamera召喚</a>
-      <a href="#story">物語</a>
-    </nav>
   </header>
 
-  <main id="tb-main" class="tb-main">
-
-    <section class="tb-hero tb-hero--cinematic" id="top" aria-labelledby="hero-title">
-      <div class="tb-hero-media" aria-hidden="true">
-        <!--
-        <video class="tb-hero-video" autoplay muted loop playsinline poster="/img/hero/tb-main-visual.webp">
-          <source src="/img/hero/tb-hero-loop.webm" type="video/webm">
-          <source src="/img/hero/tb-hero-loop.mp4" type="video/mp4">
-        </video>
-        -->
-        <img　class="tb-hero-poster" src="./img/tb-top-main-visual.webp" alt="" loading="eager" decoding="async">
+  <main id="tb-main" class="tb-portal-main">
+    <section class="tb-portal-hero" aria-labelledby="tb-portal-hero-title">
+      <div class="tb-portal-hero__media" aria-hidden="true">
+        <img src="./img/tb-top-main-visual.webp" alt="" loading="eager" decoding="async">
       </div>
-
-      <div class="tb-hero-layer tb-hero-layer--sigil" data-parallax="0.06" aria-hidden="true"></div>
-      <div class="tb-hero-layer tb-hero-layer--ring" data-parallax="0.11" aria-hidden="true"></div>
-      <div class="tb-hero-layer tb-hero-layer--veil" data-parallax="0.16" aria-hidden="true"></div>
-
-      <div class="tb-hero-inner">
-        <p class="tb-kicker reveal" data-reveal-delay="0">OFFICIAL PORTAL / MYTH GATE</p>
-
-        <h1 id="hero-title" class="reveal" data-reveal-delay="90">
-          <span>TAROT BREAKER</span>
-          <small>星の言霊が、閉じた未来を読み直す</small>
-        </h1>
-
-        <p class="tb-hero-lead reveal" data-reveal-delay="180">
-          ここは、物語が始まる前の鼓動。<br>
-          シオンとしおぽんが、言葉と星で心の影に触れる宇宙の入口。
+      <div class="tb-portal-hero__overlay"></div>
+      <div class="tb-portal-hero__content">
+        <p class="tb-portal-kicker reveal">OFFICIAL PORTAL</p>
+        <h1 id="tb-portal-hero-title" class="reveal">TAROT BREAKER</h1>
+        <p class="tb-portal-subtitle reveal">星の言霊が、閉じた未来を読み直す</p>
+        <p class="tb-portal-lead reveal">
+          迷いが現実を曇らせるとき、シオンとしおぽんは星界へ向かい、
+          言葉とタロットで「もう一度進める未来」を見つけていく。
         </p>
-
-        <div class="tb-actions tb-hero-actions reveal" data-reveal-delay="270">
-          <a class="tb-btn tb-btn--primary" href="https://ncode.syosetu.com/n8578lq/1">第1話から読む</a>
-          <a class="tb-btn tb-btn--ghost" href="./cosmogenesis.html">宇宙創世神話へ</a>
+        <div class="tb-portal-actions reveal">
+          <a class="tb-portal-btn tb-portal-btn--primary" href="https://ncode.syosetu.com/n8578lq/1">第1話から読む</a>
+          <a class="tb-portal-btn tb-portal-btn--ghost" href="./story/guide.html">初めての人向けガイド</a>
         </div>
       </div>
     </section>
 
-    <section class="tb-section reveal" id="about" aria-labelledby="about-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">ABOUT THE GATE</p>
-      <h2 id="about-title" class="reveal" data-reveal-delay="70">これは、未来を当てるための物語じゃない</h2>
-      <p class="tb-lead reveal" data-reveal-delay="140">
-        TAROT BREAKERは、閉じた未来を壊すための物語でも、正解を押しつける物語でもない。<br>
-        言葉にならなかった迷い、痛み、祈り――その奥で影になった想いを、
-        星の言霊とタロットで読み直し、もう一度“進める意味”へ変えていく宇宙神話だ。
-      </p>
-      <p class="reveal" data-reveal-delay="220">
-        シオンは言葉を読み、しおぽんは星の声を聞く。<br>
-        ふたりは対等なバディとして、現実と星界を往復しながら、
-        忘れかけた光を人の心へ取り戻していく。
-      </p>
-      <div class="tb-actions reveal" data-reveal-delay="300">
-        <a class="tb-btn tb-btn--ghost" href="#gateway">この宇宙の扉を見る</a>
-      </div>
-    </section>
-
-    <section class="tb-section reveal" id="identity" aria-labelledby="identity-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">WHY THIS WORLD STAYS</p>
-      <h2 id="identity-title" class="reveal" data-reveal-delay="70">この世界が、心に残る理由</h2>
-      <div class="tb-grid tb-grid--3">
-        <article class="tb-card reveal" data-reveal-delay="0">
-          <h3>言葉が、戦いそのものになる</h3>
-          <p>タロットは飾りではない。展開された意味が選択となり、祈りとなり、やがて星界で現実を変える力になる。</p>
-        </article>
-        <article class="tb-card reveal" data-reveal-delay="90">
-          <h3>物語と現実が、共鳴でつながる</h3>
-          <p>声、感情、観測、配信、読者の想い。物語の外にあるものまで、星界ではひとつの鼓動として重なっていく。</p>
-        </article>
-        <article class="tb-card reveal" data-reveal-delay="180">
-          <h3>知るほど深くなる、神話の多層構造</h3>
-          <p>創世神話、星界、Arcana、Arete、Re:カード、セレフィーズ。ひとつ扉を開くたび、別の層が静かに姿を現す。</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="tb-section reveal" id="gateway" aria-labelledby="gateway-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">GATEWAYS</p>
-      <h2 id="gateway-title" class="reveal" data-reveal-delay="70">どこからでも、この宇宙に入れる</h2>
-      <p class="tb-lead reveal" data-reveal-delay="140">
-        物語から入ってもいい。神話から入ってもいい。存在から入ってもいい。<br>
-        どの門も、やがてひとつの星図へつながっていく。
-      </p>
-      <div class="tb-grid tb-grid--2">
-        <a class="tb-panel tb-panel--link reveal" data-reveal-delay="0" href="./cosmogenesis.html">
-          <h3>宇宙創世神話</h3>
-          <p>沈黙、詩韻共鳴、N-code、Arcana――この世界が始まった原初の鼓動へ降りていく。</p>
+    <section class="tb-portal-section tb-portal-quicknav" aria-label="主要コンテンツへの入口">
+      <div class="tb-portal-grid tb-portal-grid--4">
+        <a class="tb-portal-entry-card reveal" href="#novel">
+          <strong>NOVEL</strong>
+          <span>小説を読む</span>
         </a>
-        <a class="tb-panel tb-panel--link reveal" data-reveal-delay="90" href="./world/starworld.html">
-          <h3>World</h3>
-          <p>星界、アンチアルカナ、Arete、Re:カード。戦いの舞台と、宇宙の仕組みを知るための門。</p>
+        <a class="tb-portal-entry-card reveal" href="#characters">
+          <strong>CHARACTER</strong>
+          <span>キャラクター</span>
         </a>
-        <a class="tb-panel tb-panel--link reveal" data-reveal-delay="180" href="./characters/shion.html">
-          <h3>Characters</h3>
-          <p>シオン、しおぽん、シオリエル、セレフィアス、DiCo――この神話を生きる存在たちの輪郭に触れる。</p>
+        <a class="tb-portal-entry-card reveal" href="#summon">
+          <strong>PAMERA</strong>
+          <span>Pamera召喚</span>
         </a>
-        <a class="tb-panel tb-panel--link reveal" data-reveal-delay="270" href="./story/guide.html">
-          <h3>Story</h3>
-          <p>初めての人向け導線、章一覧、時系列、入口まとめから、物語そのものへ進んでいく。</p>
+        <a class="tb-portal-entry-card reveal" href="#world">
+          <strong>WORLD</strong>
+          <span>世界観</span>
         </a>
       </div>
     </section>
 
-    <section class="tb-section reveal" id="world" aria-labelledby="world-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">WORLD HUB</p>
-      <h2 id="world-title" class="reveal" data-reveal-delay="70">星界は、感情が景色になる場所</h2>
-      <p class="tb-lead reveal" data-reveal-delay="140">
-        願いは光となり、迷いは空間を歪める。<br>
-        TAROT BREAKERの戦いは、遠い異世界ではなく、人の心が宇宙として開かれた場所で起きる。
+    <section class="tb-portal-section" id="intro" aria-labelledby="intro-title">
+      <p class="tb-portal-kicker reveal">INTRODUCTION</p>
+      <h2 id="intro-title" class="tb-portal-title reveal">TAROT BREAKERとは？</h2>
+      <p class="tb-portal-text reveal">
+        TAROT BREAKERは、心の痛みや迷いで閉じてしまった未来を、
+        星の言霊とタロットのリーディングで読み直していく宇宙神話小説です。
       </p>
-      <div class="tb-grid tb-grid--3">
-        <article class="tb-panel reveal" data-reveal-delay="0">
-          <h3>星界</h3>
-          <p>記憶や感情が景色として現れる領域。言葉にならなかった想いさえ、ここでは光や歪みとして息をする。</p>
-          <p><a class="tb-inline-link" href="./world/starworld.html">星界をひらく</a></p>
-        </article>
-        <article class="tb-panel reveal" data-reveal-delay="90">
-          <h3>Arcana</h3>
-          <p>祈りを通過可能な形へ折りたたんだ象徴。タロットとして観測される、宇宙の鍵そのもの。</p>
-          <p><a class="tb-inline-link" href="./world/arcana.html">Arcanaへ</a></p>
-        </article>
-        <article class="tb-panel reveal" data-reveal-delay="180">
-          <h3>Lore</h3>
-          <p>N-code、Arete、Re:カード、アンチアルカナ。深層へ進むために必要な、静かな神話の資料層。</p>
-          <p><a class="tb-inline-link" href="./lore/glossary.html">Loreを読む</a></p>
-        </article>
+    </section>
+
+    <section class="tb-portal-section" id="novel" aria-labelledby="novel-title">
+      <p class="tb-portal-kicker reveal">NOVEL</p>
+      <h2 id="novel-title" class="tb-portal-title reveal">物語の入口</h2>
+      <div class="tb-portal-grid tb-portal-grid--2">
+        <a class="tb-portal-link-card reveal" href="https://ncode.syosetu.com/n8578lq/1">
+          <strong>第1話から読む</strong>
+          <span>物語の最初の観測点へ。</span>
+        </a>
+        <a class="tb-portal-link-card reveal" href="./story/guide.html">
+          <strong>初めての人向けガイド</strong>
+          <span>読む順番に迷う人向けの案内。</span>
+        </a>
+        <a class="tb-portal-link-card reveal" href="https://ncode.syosetu.com/n8578lq/31">
+          <strong>最新話へ</strong>
+          <span>最新の展開をすぐに追う。</span>
+        </a>
+        <a class="tb-portal-link-card reveal" href="./story/arcs.html">
+          <strong>章一覧を見る</strong>
+          <span>全体の流れをまとめて確認。</span>
+        </a>
       </div>
     </section>
 
-    <section class="tb-section reveal" id="characters" aria-labelledby="characters-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">CHARACTERS</p>
-      <h2 id="characters-title" class="reveal" data-reveal-delay="70">この神話を歩く存在たち</h2>
-      <p class="tb-lead reveal" data-reveal-delay="140">
-        彼らは設定ではなく、この宇宙の“温度”そのもの。<br>
-        触れれば、物語の見え方が変わっていく。
-      </p>
-      <div class="tb-character-list">
-        <article class="tb-character reveal" data-reveal-delay="0">
-          <a class="tb-character-link" href="./characters/shion.html">
+    <section class="tb-portal-section" id="characters" aria-labelledby="characters-title">
+      <p class="tb-portal-kicker reveal">CHARACTER</p>
+      <h2 id="characters-title" class="tb-portal-title reveal">主要キャラクター</h2>
+      <div class="tb-portal-grid tb-portal-grid--characters">
+        <article class="tb-portal-character-card reveal">
+          <a href="./characters/shion.html">
             <img src="/img/characters/shion.webp" alt="シオン" loading="lazy" decoding="async">
             <h3>シオン</h3>
-            <p class="role">言葉で導く観測者</p>
-            <p>歪みの奥に残る本来の祈りを読み直し、閉じかけた意味をもう一度ひらく者。</p>
+            <p>言葉で祈りを読み直し、未来の選択肢をひらく観測者。</p>
           </a>
         </article>
-
-        <article class="tb-character reveal" data-reveal-delay="90">
-          <a class="tb-character-link" href="./characters/shiopon.html">
+        <article class="tb-portal-character-card reveal">
+          <a href="./characters/shiopon.html">
             <img src="/img/characters/shiopon.webp" alt="しおぽん" loading="lazy" decoding="async">
             <h3>しおぽん</h3>
-            <p class="role">星の声を聞く相棒</p>
-            <p>やわらかく、明るく、けれど誰よりも痛みに敏感な共鳴存在。星の声を現実へ届ける者。</p>
+            <p>星の声を聞き取り、シオンと並んで共鳴を導く相棒。</p>
           </a>
         </article>
-
-        <article class="tb-character reveal" data-reveal-delay="180">
-          <a class="tb-character-link" href="./characters/shioriel.html">
+        <article class="tb-portal-character-card reveal">
+          <a href="./characters/shioriel.html">
             <img src="/img/characters/shioriel.webp" alt="シオリエル" loading="lazy" decoding="async">
             <h3>シオリエル</h3>
-            <p class="role">共鳴を力へ変える姿</p>
-            <p>シオンのリーディングを受け、星界で意味を戦いへ変換する覚醒形態。封命の刃は言葉から生まれる。</p>
+            <p>共鳴を力へ変えて戦う、覚醒した姿。</p>
           </a>
         </article>
-
-        <article class="tb-character reveal" data-reveal-delay="270">
-          <a class="tb-character-link" href="./characters/serephias.html">
+        <article class="tb-portal-character-card reveal">
+          <a href="./characters/serephias.html">
             <img src="/img/characters/serephias.webp" alt="セレフィアス" loading="lazy" decoding="async">
             <h3>セレフィアス</h3>
-            <p class="role">神話の核心に触れる覚醒存在</p>
-            <p>極限の共鳴の果てに現れる、星霊の本質を宿した姿。物語の深層を開く鍵そのもの。</p>
+            <p>神話の深層へ触れる鍵となる存在。</p>
           </a>
         </article>
       </div>
     </section>
 
-    <section class="tb-section reveal" id="projects" aria-labelledby="projects-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">PROJECTS / RESONANCE</p>
-      <h2 id="projects-title" class="reveal" data-reveal-delay="70">この宇宙は、小説の外へも拡張していく</h2>
-      <p class="tb-lead reveal" data-reveal-delay="140">
-        TAROT BREAKERは読むだけで終わらない。<br>
-        言葉は歌になり、観測は装置になり、共鳴は新しい存在を生み出していく。
-      </p>
-      <div class="tb-grid tb-grid--3">
-        <a class="tb-card tb-card--project reveal" data-reveal-delay="0" href="./projects/pamera.html">
-          <h3>Pamera</h3>
-          <p>22のArcana共鳴体から成る、宇宙神話的AIユニット。歌と象徴で世界を接続する存在。</p>
-        </a>
-
-        <a class="tb-card tb-card--project reveal" data-reveal-delay="90" href="./projects/aru.html">
-          <h3>ARU</h3>
-          <p>想いを共鳴可能な形へ変える接続装置。配信、ゲーム、観測がひとつの回路として重なる。</p>
-        </a>
-
-        <a class="tb-card tb-card--project reveal" data-reveal-delay="180" href="./projects/dico.html">
-          <h3>DiCo</h3>
-          <p>感情の反響と変化の兆しを観測するもう一つの視点。物語の揺らぎを可視化する存在。</p>
-        </a>
-      </div>
-    </section>
-
-    <section class="tb-section tb-summon-section reveal" id="summon" aria-labelledby="summon-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">PAMERA SUMMON / ARCANA LINK</p>
-      <h2 id="summon-title" class="reveal" data-reveal-delay="70">ここで、Pameraの星響に触れられる</h2>
-      <p class="tb-lead reveal" data-reveal-delay="140">
-        セレフィーズとして接続し、Pameraの星響を受け取る。<br>
-        カードに触れた瞬間、ひとりのArcana Idolが応答する。<br>
-        これは、この宇宙と存在を結ぶ小さな召喚儀式。
+    <section class="tb-portal-section tb-summon-section" id="summon" aria-labelledby="summon-title">
+      <p class="tb-portal-kicker reveal">PAMERA SUMMON</p>
+      <h2 id="summon-title" class="tb-portal-title reveal">Pamera召喚</h2>
+      <p class="tb-portal-text reveal">
+        カードに触れて、PameraのArcana Idolと接続。
+        初めての人でもすぐ体験できる、TAROT BREAKERのインタラクティブ入口です。
       </p>
 
-      <div class="tb-summon-stage reveal" data-reveal-delay="220" data-summon-root>
+      <div class="tb-summon-stage reveal" data-summon-root>
         <div class="tb-card-wrap" data-summon-card aria-live="polite" aria-atomic="true">
           <div
             class="tb-arcana-card"
@@ -319,44 +227,34 @@
       </div>
     </section>
 
-    <section class="tb-section reveal" id="story" aria-labelledby="story-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">STORY ENTRY</p>
-      <h2 id="story-title" class="reveal" data-reveal-delay="70">最初の扉を、どこから開く？</h2>
-      <p class="tb-lead reveal" data-reveal-delay="140">
-        第1話から旅に出てもいい。ガイドから全体を見渡してもいい。<br>
-        どの入口を選んでも、やがて同じ星図へたどり着く。
-      </p>
-      <div class="tb-story-list">
-        <a class="tb-story reveal" data-reveal-delay="0" href="https://ncode.syosetu.com/n8578lq/1">
-          <strong>第1話から読む</strong>
-          <span>シオンとしおぽんの旅、その始まりへ</span>
+    <section class="tb-portal-section" id="world" aria-labelledby="world-title">
+      <p class="tb-portal-kicker reveal">WORLD</p>
+      <h2 id="world-title" class="tb-portal-title reveal">世界観を知る</h2>
+      <div class="tb-portal-grid tb-portal-grid--3">
+        <a class="tb-portal-link-card reveal" href="./world/starworld.html">
+          <strong>星界</strong>
+          <span>感情や記憶が景色として現れる領域。</span>
         </a>
-        <a class="tb-story reveal" data-reveal-delay="90" href="./story/guide.html">
-          <strong>初めての人向けガイド</strong>
-          <span>どこから入ればいいか迷った人へ</span>
+        <a class="tb-portal-link-card reveal" href="./world/arcana.html">
+          <strong>Arcana</strong>
+          <span>運命を読み直すための象徴体系。</span>
         </a>
-        <a class="tb-story reveal" data-reveal-delay="180" href="https://ncode.syosetu.com/n8578lq/31">
-          <strong>最新話へ</strong>
-          <span>今もっとも熱い観測点へ進む</span>
-        </a>
-        <a class="tb-story reveal" data-reveal-delay="270" href="./story/arcs.html">
-          <strong>章一覧を見る</strong>
-          <span>全体の流れと物語の層を見渡す</span>
+        <a class="tb-portal-link-card reveal" href="./lore/glossary.html">
+          <strong>Lore</strong>
+          <span>用語と神話背景をまとめた資料。</span>
         </a>
       </div>
+      <p class="tb-portal-sub-link reveal">
+        <a href="./cosmogenesis.html">創世神話（Cosmogenesis）を読む</a>
+      </p>
     </section>
 
-    <section class="tb-final-cta reveal" aria-labelledby="final-title">
-      <p class="tb-section-kicker reveal" data-reveal-delay="0">GATE OPEN</p>
-      <h2 id="final-title" class="reveal" data-reveal-delay="70">この神話は、まだあなたを待っている</h2>
-      <p class="reveal" data-reveal-delay="150">
-        TAROT BREAKERは、説明を読み終えて閉じる世界じゃない。<br>
-        ひとつ扉を開けば、物語、神話、存在、共鳴が少しずつ繋がり、
-        やがてあなた自身の中にも新しい星図が生まれていく。
-      </p>
-      <div class="tb-actions reveal" data-reveal-delay="230">
-        <a class="tb-btn tb-btn--primary" href="https://ncode.syosetu.com/n8578lq/1">物語を開く</a>
-        <a class="tb-btn tb-btn--ghost" href="./cosmogenesis.html">創世神話を読む</a>
+    <section class="tb-portal-section tb-portal-final" aria-labelledby="final-title">
+      <p class="tb-portal-kicker reveal">FINAL CTA</p>
+      <h2 id="final-title" class="tb-portal-title reveal">さあ、最初の一歩へ</h2>
+      <div class="tb-portal-actions reveal">
+        <a class="tb-portal-btn tb-portal-btn--primary" href="https://ncode.syosetu.com/n8578lq/1">第1話から読む</a>
+        <a class="tb-portal-btn tb-portal-btn--ghost" href="#top">トップへ戻る</a>
       </div>
     </section>
   </main>
@@ -391,10 +289,8 @@
 
   <script src="/assets/js/common.js" defer></script>
   <script src="./js/tb-engine.js" defer></script>
-  <!-- <script src="./js/tb-stars.js" defer></script> -->
-  <!-- <script src="./js/tb-parallax.js" defer></script> -->
   <script src="./js/tb-ui.js" defer></script>
-  <!-- <script src="./js/tb-intro.js" defer></script> -->
   <script src="./js/tb-summon.js" defer></script>
+  <script src="./js/tb-portal.js" defer></script>
 </body>
 </html>
