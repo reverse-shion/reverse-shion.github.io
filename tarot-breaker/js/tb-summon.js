@@ -2,13 +2,12 @@ TB.ready(() => {
   const root = document.querySelector('[data-summon-root]');
   if (!root) return;
 
-  const button = root.querySelector('[data-summon-button]');
   const cardWrap = root.querySelector('[data-summon-card]');
   const card = cardWrap?.querySelector('.tb-arcana-card');
   const status = root.querySelector('[data-summon-status]');
   const pameraImage = root.querySelector('[data-pamera-image]');
 
-  if (!button || !card || !status || !pameraImage) {
+  if (!card || !status || !pameraImage) {
     console.warn('tb-summon: required elements not found');
     return;
   }
@@ -47,29 +46,32 @@ TB.ready(() => {
   ];
 
   let revealedMember = null;
+  let isNavigating = false;
+
+  const setStatus = (message) => {
+    status.textContent = message;
+  };
 
   const setIdle = () => {
+    revealedMember = null;
+    isNavigating = false;
+
     root.dataset.state = 'idle';
     card.dataset.phase = 'idle';
     card.dataset.flip = 'false';
     card.dataset.linkReady = 'false';
-    status.textContent = '待機中：カードに触れると、Pameraとの接続が始まります。';
+
     card.setAttribute('aria-label', 'Pamera召喚カード');
+    setStatus('待機中：カードに触れると、Pameraとの接続が始まります。');
   };
 
-  const setReady = () => {
-    revealedMember = null;
-    root.dataset.state = 'ready';
-    card.dataset.phase = 'ready';
-    card.dataset.flip = 'false';
-    card.dataset.linkReady = 'false';
-    button.textContent = '再召喚する';
-    status.textContent = '接続準備完了：カードに触れてPameraを召喚してください。';
-    card.focus({ preventScroll: true });
+  const pickRandomMember = () => {
+    const index = Math.floor(Math.random() * PAMERA_MEMBERS.length);
+    return PAMERA_MEMBERS[index];
   };
 
   const revealMember = () => {
-    const pick = PAMERA_MEMBERS[Math.floor(Math.random() * PAMERA_MEMBERS.length)];
+    const pick = pickRandomMember();
     revealedMember = pick;
 
     pameraImage.src = pick.image;
@@ -79,26 +81,37 @@ TB.ready(() => {
     card.dataset.phase = 'revealed';
     card.dataset.flip = 'true';
     card.dataset.linkReady = 'true';
-    card.setAttribute('aria-label', `Pamera ${pick.name} が応答中。再タップで個別ページへ移動`);
-    status.textContent = '接続完了：もう一度カードに触れると、その存在のページへ進みます。';
+
+    card.setAttribute(
+      'aria-label',
+      `Pamera ${pick.name} が応答中。もう一度タップで個別ページへ移動`
+    );
+
+    setStatus('接続完了：もう一度カードに触れると、その存在のページへ進みます。');
+  };
+
+  const navigateToMember = () => {
+    if (!revealedMember || isNavigating) return;
+    isNavigating = true;
+    window.location.href = revealedMember.url;
   };
 
   const onCardAction = () => {
-    if (card.dataset.phase === 'idle') {
-      status.textContent = 'まず「Pamera召喚」を押して、接続を開始してください。';
+    const isFlipped = card.dataset.flip === 'true';
+    const linkReady = card.dataset.linkReady === 'true';
+
+    if (!isFlipped) {
+      revealMember();
       return;
     }
 
-    if (card.dataset.linkReady === 'true' && revealedMember) {
-      location.href = revealedMember.url;
-      return;
+    if (linkReady) {
+      navigateToMember();
     }
-
-    revealMember();
   };
 
-  button.addEventListener('click', setReady);
   card.addEventListener('click', onCardAction);
+
   card.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
