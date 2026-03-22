@@ -1,7 +1,5 @@
 window.TB?.ready(() => {
   const root = document.documentElement;
-  root.classList.add("js-enabled");
-
   const selector = window.TB?.selectors?.reveal || ".reveal";
   const nodes = Array.from(document.querySelectorAll(selector));
   if (!nodes.length) return;
@@ -20,12 +18,10 @@ window.TB?.ready(() => {
     }, delay);
   };
 
-  if (!("IntersectionObserver" in window)) {
-    nodes.forEach((node, index) => {
-      revealNow(node, Math.min(index * 60, 240));
-    });
-    return;
-  }
+  const isInInitialViewport = (node) => {
+    const rect = node.getBoundingClientRect();
+    return rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
+  };
 
   const getStaggerDelay = (node, fallbackIndex = 0) => {
     const custom = node.getAttribute("data-reveal-delay");
@@ -49,13 +45,32 @@ window.TB?.ready(() => {
     return Math.min(fallbackIndex * 70, 280);
   };
 
+  // 先に初期表示領域の要素を可視化
+  nodes.forEach((node) => {
+    if (isInInitialViewport(node)) {
+      node.classList.add("is-visible");
+    }
+  });
+
+  // その後で js-enabled を付与
+  root.classList.add("js-enabled");
+
+  if (!("IntersectionObserver" in window)) {
+    nodes.forEach((node, index) => {
+      revealNow(node, Math.min(index * 60, 240));
+    });
+    return;
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry, entryIndex) => {
         if (!entry.isIntersecting) return;
 
         const node = entry.target;
-        const delay = getStaggerDelay(node, entryIndex);
+        const delay = node.classList.contains("is-visible")
+          ? 0
+          : getStaggerDelay(node, entryIndex);
 
         revealNow(node, delay);
         observer.unobserve(node);
@@ -67,5 +82,9 @@ window.TB?.ready(() => {
     }
   );
 
-  nodes.forEach((node) => observer.observe(node));
+  nodes.forEach((node) => {
+    if (!node.classList.contains("is-visible")) {
+      observer.observe(node);
+    }
+  });
 });
