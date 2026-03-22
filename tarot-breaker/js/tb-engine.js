@@ -9,6 +9,7 @@
 
   window.TB = {
     ready,
+    register: ready,
     selectors: {
       reveal: '.reveal'
     }
