@@ -45,14 +45,12 @@ window.TB?.ready(() => {
     return Math.min(fallbackIndex * 70, 280);
   };
 
-  // 先に初期表示領域の要素を可視化
   nodes.forEach((node) => {
     if (isInInitialViewport(node)) {
       node.classList.add("is-visible");
     }
   });
 
-  // その後で js-enabled を付与
   root.classList.add("js-enabled");
 
   if (!("IntersectionObserver" in window)) {
