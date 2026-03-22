@@ -3,9 +3,15 @@
   --tb-portal-panel: rgba(15, 22, 42, 0.78);
   --tb-portal-panel-strong: rgba(11, 17, 34, 0.92);
   --tb-portal-border: rgba(170, 192, 255, 0.24);
+  --tb-portal-border-soft: rgba(173, 193, 255, 0.18);
   --tb-portal-accent: #d8be8d;
   --tb-portal-text: #edf1ff;
   --tb-portal-text-muted: rgba(237, 241, 255, 0.78);
+  --tb-portal-shadow: 0 20px 40px rgba(0, 0, 0, 0.26);
+  --tb-portal-shadow-soft: 0 10px 22px rgba(0, 0, 0, 0.25);
+  --tb-portal-radius-lg: 22px;
+  --tb-portal-radius-md: 18px;
+  --tb-portal-radius-sm: 14px;
 }
 
 .tb-portal-body {
@@ -64,6 +70,7 @@
   font-size: 0.94rem;
   padding: 0.4rem 0.6rem;
   border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .tb-portal-nav a:hover,
@@ -108,8 +115,7 @@
 }
 
 /* =========================================
-   HERO / 完成版
-   文字をイラストに重ねない分離レイアウト
+   HERO
 ========================================= */
 
 .tb-portal-hero {
@@ -124,33 +130,18 @@
   align-items: stretch;
 }
 
-.tb-portal-hero__content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(1.2rem, 4vw, 2.4rem);
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(11, 17, 34, 0.96) 0%, rgba(10, 16, 31, 0.92) 100%);
-  border: 1px solid var(--tb-portal-border);
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
 .tb-portal-hero__visual {
+  order: 1;
   position: relative;
 }
 
 .tb-portal-hero__media {
   position: relative;
   overflow: hidden;
-  border-radius: 22px;
-  min-height: 360px;
+  border-radius: var(--tb-portal-radius-lg);
+  min-height: 320px;
   background: #060a14;
-  border: 1px solid rgba(173, 193, 255, 0.18);
+  border: 1px solid var(--tb-portal-border-soft);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
 }
 
@@ -158,9 +149,26 @@
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 360px;
+  min-height: 320px;
   object-fit: cover;
   object-position: center center;
+}
+
+.tb-portal-hero__content {
+  order: 2;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.2rem, 4vw, 2.2rem);
+  border-radius: var(--tb-portal-radius-lg);
+  background:
+    linear-gradient(180deg, rgba(11, 17, 34, 0.96) 0%, rgba(10, 16, 31, 0.92) 100%);
+  border: 1px solid var(--tb-portal-border);
+  box-shadow:
+    var(--tb-portal-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .tb-portal-hero__overlay {
@@ -168,20 +176,20 @@
 }
 
 .tb-portal-kicker {
+  margin: 0 0 0.6rem;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   color: var(--tb-portal-text-muted);
-  margin: 0 0 0.6rem;
 }
 
 .tb-portal-hero h1,
 .tb-portal-title {
-  font-family: "Shippori Mincho", serif;
   margin: 0;
+  font-family: "Shippori Mincho", serif;
 }
 
 .tb-portal-hero h1 {
-  font-size: clamp(2.2rem, 7.2vw, 4.4rem);
+  font-size: clamp(2.2rem, 7.2vw, 4.2rem);
   line-height: 0.96;
   letter-spacing: 0.04em;
   color: #f6f1e8;
@@ -190,14 +198,14 @@
 .tb-portal-subtitle {
   margin: 0.75rem 0 0;
   font-size: clamp(1rem, 2.8vw, 1.35rem);
-  color: var(--tb-portal-text-muted);
   line-height: 1.8;
+  color: var(--tb-portal-text-muted);
 }
 
 .tb-portal-lead,
 .tb-portal-text {
-  color: var(--tb-portal-text-muted);
   line-height: 1.8;
+  color: var(--tb-portal-text-muted);
 }
 
 .tb-portal-lead {
@@ -216,11 +224,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 0.78rem 1.2rem;
+  min-height: 48px;
+  padding: 0.82rem 1.2rem;
   border-radius: 999px;
-  text-decoration: none;
   border: 1px solid transparent;
+  text-decoration: none;
   font-weight: 700;
   transition:
     transform 0.2s ease,
@@ -235,9 +243,9 @@
 }
 
 .tb-portal-btn--ghost {
-  border-color: var(--tb-portal-border);
   color: var(--tb-portal-text);
   background: rgba(14, 20, 38, 0.62);
+  border-color: var(--tb-portal-border);
 }
 
 .tb-portal-btn:hover,
@@ -250,7 +258,7 @@
 .tb-portal-character-card a:focus-visible {
   outline: none;
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--tb-portal-shadow-soft);
 }
 
 /* =========================================
@@ -261,7 +269,7 @@
   margin-top: 1.2rem;
   padding: clamp(1rem, 2.8vw, 1.8rem);
   border: 1px solid var(--tb-portal-border);
-  border-radius: 18px;
+  border-radius: var(--tb-portal-radius-md);
   background: var(--tb-portal-panel);
 }
 
@@ -284,22 +292,25 @@
 .tb-portal-link-card,
 .tb-portal-character-card a {
   display: block;
-  background: var(--tb-portal-panel-strong);
+  padding: 0.9rem;
+  border-radius: var(--tb-portal-radius-sm);
   border: 1px solid rgba(173, 193, 255, 0.2);
-  border-radius: 14px;
+  background: var(--tb-portal-panel-strong);
   color: var(--tb-portal-text);
   text-decoration: none;
-  padding: 0.9rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .tb-portal-entry-card strong,
 .tb-portal-link-card strong {
   display: block;
-  color: var(--tb-portal-accent);
+  margin-bottom: 0.25rem;
   font-size: 0.82rem;
   letter-spacing: 0.08em;
-  margin-bottom: 0.25rem;
+  color: var(--tb-portal-accent);
 }
 
 .tb-portal-entry-card span,
@@ -344,24 +355,14 @@
   .tb-portal-grid--characters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
-
-@media (min-width: 980px) {
-  .tb-portal-hero__inner {
-    grid-template-columns: minmax(360px, 430px) minmax(0, 1fr);
-    gap: 1.2rem;
-  }
-
-  .tb-portal-hero__content {
-    min-height: 680px;
-    padding: 2rem 2rem;
-  }
 
   .tb-portal-hero__media,
   .tb-portal-hero__media img {
-    min-height: 680px;
+    min-height: 420px;
   }
+}
 
+@media (min-width: 980px) {
   .tb-portal-grid--4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -373,15 +374,14 @@
   .tb-portal-grid--characters {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-}
 
-@media (max-width: 979px) {
-  .tb-portal-hero__content {
-    order: 1;
+  .tb-portal-hero__media,
+  .tb-portal-hero__media img {
+    min-height: 560px;
   }
 
-  .tb-portal-hero__visual {
-    order: 2;
+  .tb-portal-hero__content {
+    padding: 2rem;
   }
 }
 
@@ -395,10 +395,10 @@
     left: 1rem;
     right: 1rem;
     top: calc(100% + 0.5rem);
+    padding: 0.7rem;
     border-radius: 14px;
     border: 1px solid var(--tb-portal-border);
     background: rgba(8, 12, 24, 0.96);
-    padding: 0.7rem;
     box-shadow: 0 20px 36px rgba(0, 0, 0, 0.35);
   }
 
@@ -429,7 +429,7 @@
 
   .tb-portal-hero__media,
   .tb-portal-hero__media img {
-    min-height: 300px;
+    min-height: 280px;
   }
 
   .tb-portal-btn {
