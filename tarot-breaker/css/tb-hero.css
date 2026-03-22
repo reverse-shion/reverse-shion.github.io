@@ -1,3 +1,12 @@
+/* =========================================================
+   TAROT BREAKER / HERO
+   iPhone Safari 初回ズレ対策 完成版
+   - 高さ管理は .tb-hero のみ
+   - .tb-hero-inner は高さを持たない
+   - dvh 優先 / svh フォールバック
+   - 初回表示のレイアウトシフトを抑制
+========================================================= */
+
 .tb-hero {
   --hero-overlay-top: rgba(4, 7, 16, 0.16);
   --hero-overlay-mid: rgba(5, 8, 18, 0.52);
@@ -6,11 +15,21 @@
   --hero-blue: rgba(140, 170, 255, 0.18);
   --hero-glow: rgba(255, 220, 150, 0.1);
 
+  /* 共通寸法 */
+  --hero-offset-top: 5.5rem;
+  --hero-max-h: 980px;
+  --hero-min-h: 620px;
+
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  margin-top: clamp(1rem, 2.2vw, 1.8rem);
-  min-height: min(100svh - 5.5rem, 980px);
+
+  /* margin-top は初回シフトが目立ちやすいので縮小 */
+  margin-top: 1rem;
+
+  /* まずは安全な下限で確保 */
+  min-height: var(--hero-min-h);
+
   border: 1px solid rgba(214, 220, 255, 0.16);
   border-radius: 28px;
   background:
@@ -21,6 +40,28 @@
     0 28px 80px rgba(0, 0, 0, 0.42),
     0 0 0 1px rgba(255, 228, 170, 0.04) inset,
     0 0 44px rgba(255, 215, 140, 0.05);
+}
+
+/* Safari を含む比較的安定したフォールバック */
+@supports (height: 100svh) {
+  .tb-hero {
+    min-height: clamp(
+      var(--hero-min-h),
+      calc(100svh - var(--hero-offset-top)),
+      var(--hero-max-h)
+    );
+  }
+}
+
+/* 対応ブラウザでは dvh を最優先 */
+@supports (height: 100dvh) {
+  .tb-hero {
+    min-height: clamp(
+      var(--hero-min-h),
+      calc(100dvh - var(--hero-offset-top)),
+      var(--hero-max-h)
+    );
+  }
 }
 
 .tb-hero *,
@@ -45,6 +86,17 @@
   object-fit: cover;
 }
 
+/* モバイルSafariのちらつき抑制 */
+.tb-hero-video,
+.tb-hero-poster,
+.tb-hero::before,
+.tb-hero::after,
+.tb-hero-layer {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 .tb-hero-video {
   filter:
     saturate(0.98)
@@ -57,7 +109,7 @@
     saturate(0.96)
     contrast(1.05)
     brightness(0.78);
-  transform: scale(1.035);
+  transform: translateZ(0) scale(1.035);
   transform-origin: center center;
 }
 
@@ -88,7 +140,12 @@
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(to right, rgba(3, 5, 12, 0.68) 0%, rgba(3, 5, 12, 0.24) 38%, transparent 62%),
+    linear-gradient(
+      to right,
+      rgba(3, 5, 12, 0.68) 0%,
+      rgba(3, 5, 12, 0.24) 38%,
+      transparent 62%
+    ),
     radial-gradient(circle at 50% 100%, rgba(255, 214, 128, 0.08), transparent 34%);
   mix-blend-mode: normal;
 }
@@ -138,17 +195,19 @@
 }
 
 /* inner layout */
+/* ここでは高さを持たせないのが重要 */
 .tb-hero-inner {
   position: relative;
   z-index: 2;
   display: grid;
   align-content: end;
-  min-height: min(100svh - 5.5rem, 980px);
+  width: min(760px, 100%);
+  height: 100%;
+  min-height: 0;
   padding:
     clamp(2rem, 4vw, 4rem)
     clamp(1.2rem, 3vw, 3rem)
     clamp(2rem, 5vw, 3.4rem);
-  width: min(760px, 100%);
 }
 
 .tb-kicker {
@@ -312,10 +371,13 @@
   transform: scale(1.04);
 }
 
-/* mobile / tablet tuning */
+/* =========================
+   responsive
+========================= */
+
 @media (max-width: 1100px) {
   .tb-hero {
-    min-height: min(92svh, 920px);
+    --hero-max-h: 920px;
   }
 
   .tb-hero-inner {
@@ -329,18 +391,23 @@
 
 @media (max-width: 900px) {
   .tb-hero {
-    min-height: min(88svh, 860px);
+    --hero-max-h: 860px;
+    --hero-min-h: 560px;
     border-radius: 24px;
   }
 
   .tb-hero::after {
     background:
-      linear-gradient(to right, rgba(3, 5, 12, 0.44) 0%, rgba(3, 5, 12, 0.16) 48%, transparent 76%),
+      linear-gradient(
+        to right,
+        rgba(3, 5, 12, 0.44) 0%,
+        rgba(3, 5, 12, 0.16) 48%,
+        transparent 76%
+      ),
       radial-gradient(circle at 50% 100%, rgba(255, 214, 128, 0.08), transparent 36%);
   }
 
   .tb-hero-inner {
-    min-height: min(88svh, 860px);
     padding:
       clamp(1.8rem, 4vw, 2.4rem)
       clamp(1rem, 3vw, 1.5rem)
@@ -358,7 +425,8 @@
 
 @media (max-width: 700px) {
   .tb-hero {
-    min-height: min(86svh, 820px);
+    --hero-max-h: 820px;
+    --hero-min-h: 520px;
     margin-top: 0.9rem;
     border-radius: 20px;
   }
@@ -378,7 +446,13 @@
 
   .tb-hero::after {
     background:
-      linear-gradient(to bottom, transparent 0%, transparent 44%, rgba(3, 5, 10, 0.28) 60%, rgba(3, 5, 10, 0.72) 100%);
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 44%,
+        rgba(3, 5, 10, 0.28) 60%,
+        rgba(3, 5, 10, 0.72) 100%
+      );
   }
 
   .tb-hero-poster,
@@ -387,7 +461,6 @@
   }
 
   .tb-hero-inner {
-    min-height: min(86svh, 820px);
     width: 100%;
     align-content: end;
     padding: 1.15rem 1rem 1.25rem;
@@ -441,11 +514,8 @@
 
 @media (max-width: 480px) {
   .tb-hero {
-    min-height: min(84svh, 760px);
-  }
-
-  .tb-hero-inner {
-    min-height: min(84svh, 760px);
+    --hero-max-h: 760px;
+    --hero-min-h: 500px;
   }
 
   .tb-hero h1 span {
@@ -484,7 +554,7 @@
   }
 
   .tb-hero-poster {
-    transform: none;
+    transform: translateZ(0);
   }
 
   .tb-hero .tb-btn,
