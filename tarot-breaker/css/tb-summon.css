@@ -1,35 +1,10 @@
 /* =========================================================
-   TAROT BREAKER / Summon
-   現行HTML + 現行JS専用 完成版
-   - 星光 / 紋章 / ガラス感ベース
-   - 1枚のカードが裏面から表面へ捲れる演出
-   - data-phase / data-flip をJSと連動
+   TAROT BREAKER / Pamera Summon
 ========================================================= */
 
 .tb-summon-section {
-  --tb-summon-text: #f6f2ea;
-  --tb-summon-muted: rgba(232, 236, 246, 0.78);
-  --tb-summon-soft: rgba(232, 236, 246, 0.58);
-  --tb-summon-gold: #dbc18e;
-  --tb-summon-gold-soft: rgba(219, 193, 142, 0.22);
   --tb-summon-line: rgba(190, 206, 255, 0.16);
-  --tb-summon-line-strong: rgba(214, 194, 145, 0.22);
-  --tb-summon-blue: rgba(128, 152, 255, 0.22);
-  --tb-summon-blue-strong: rgba(128, 152, 255, 0.32);
-  --tb-summon-violet: rgba(176, 148, 255, 0.16);
-  --tb-summon-shadow:
-    0 24px 56px rgba(0, 0, 0, 0.34),
-    0 0 0 1px rgba(255, 240, 210, 0.03) inset;
-  --tb-summon-panel:
-    linear-gradient(180deg, rgba(8, 16, 40, 0.78), rgba(5, 10, 28, 0.9));
-  --tb-summon-card-front:
-    radial-gradient(circle at 50% 0%, rgba(213, 186, 134, 0.08), transparent 24%),
-    radial-gradient(circle at 50% 100%, rgba(125, 149, 255, 0.1), transparent 28%),
-    linear-gradient(180deg, rgba(10, 18, 42, 0.84), rgba(5, 10, 26, 0.94));
-  --tb-summon-card-back:
-    radial-gradient(circle at 50% 50%, rgba(130, 156, 255, 0.13), transparent 46%),
-    radial-gradient(circle at 50% 16%, rgba(255, 225, 170, 0.08), transparent 18%),
-    linear-gradient(180deg, rgba(8, 16, 40, 0.9), rgba(5, 10, 24, 0.97));
+  --tb-summon-gold: rgba(214, 194, 145, 0.22);
 
   position: relative;
   overflow: hidden;
@@ -41,10 +16,6 @@
     radial-gradient(circle at 50% -10%, rgba(210, 187, 133, 0.08), transparent 30%),
     radial-gradient(circle at 50% 0%, rgba(120, 145, 255, 0.10), transparent 42%),
     linear-gradient(180deg, rgba(8, 11, 22, 0.82), rgba(5, 8, 18, 0.92));
-  box-shadow:
-    0 24px 48px rgba(0, 0, 0, 0.34),
-    0 0 0 1px rgba(255, 240, 210, 0.03) inset,
-    0 0 40px rgba(114, 137, 255, 0.08);
 }
 
 .tb-summon-section::before,
@@ -56,182 +27,81 @@
 }
 
 .tb-summon-section::before {
-  z-index: 0;
   background:
-    radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.05), transparent 16%),
-    radial-gradient(circle at 20% 18%, rgba(255, 230, 176, 0.06), transparent 20%),
-    radial-gradient(circle at 80% 14%, rgba(157, 180, 255, 0.08), transparent 20%),
-    radial-gradient(circle at 50% 68%, rgba(150, 120, 255, 0.07), transparent 26%);
+    radial-gradient(circle at 20% 18%, rgba(255, 230, 176, 0.05), transparent 20%),
+    radial-gradient(circle at 80% 14%, rgba(157, 180, 255, 0.08), transparent 20%);
   mix-blend-mode: screen;
 }
 
 .tb-summon-section::after {
-  z-index: 0;
-  opacity: 0.92;
+  opacity: 0.84;
   background-image:
-    radial-gradient(circle, rgba(255, 239, 198, 0.82) 0 1.2px, transparent 1.6px),
-    radial-gradient(circle, rgba(170, 189, 255, 0.68) 0 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(255, 224, 165, 0.54) 0 0.9px, transparent 1.4px);
-  background-size:
-    140px 140px,
-    190px 190px,
-    230px 230px;
-  background-position:
-    12% 18%,
-    78% 26%,
-    48% 66%;
-  filter: blur(0.15px);
+    radial-gradient(circle, rgba(255, 239, 198, 0.8) 0 1.1px, transparent 1.6px),
+    radial-gradient(circle, rgba(170, 189, 255, 0.65) 0 1px, transparent 1.5px);
+  background-size: 150px 150px, 200px 200px;
+  background-position: 16% 22%, 74% 28%;
 }
 
-/* セクション本文を前面へ */
 .tb-summon-section > * {
   position: relative;
   z-index: 1;
 }
 
-/* =========================================================
-   STAGE
-========================================================= */
-
 .tb-summon-stage {
   position: relative;
-  z-index: 1;
-  min-height: clamp(440px, 60vw, 760px);
+  min-height: clamp(420px, 58vw, 720px);
   display: grid;
   justify-items: center;
   align-content: center;
   gap: 1.15rem;
   margin-top: clamp(1.1rem, 2vw, 1.7rem);
   padding: clamp(1rem, 2vw, 1.8rem) 0;
-  overflow: visible;
 }
 
-/* 外側の紋章光 */
-.tb-summon-stage::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  width: min(78vw, 600px);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(circle at center, rgba(132, 156, 255, 0.14), transparent 46%),
-    radial-gradient(circle at center, rgba(218, 191, 139, 0.08), transparent 62%);
-  box-shadow:
-    0 0 0 1px rgba(205, 220, 255, 0.08) inset,
-    0 0 42px rgba(120, 145, 255, 0.10),
-    0 0 92px rgba(90, 110, 220, 0.08);
-  opacity: 0.95;
-}
-
-/* 紋章リング */
+.tb-summon-stage::before,
 .tb-summon-stage::after {
   content: "";
   position: absolute;
   left: 50%;
   top: 52%;
-  width: min(64vw, 470px);
   aspect-ratio: 1;
-  transform: translate(-50%, -50%);
   border-radius: 50%;
+  transform: translate(-50%, -50%);
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.92;
-  background:
-    radial-gradient(circle at center, transparent 55%, rgba(255, 255, 255, 0.02) 56%, transparent 58%),
-    radial-gradient(circle at center, transparent 68%, rgba(214, 194, 145, 0.10) 69%, transparent 70%),
-    conic-gradient(
-      from 0deg,
-      rgba(214, 194, 145, 0.00) 0deg 14deg,
-      rgba(214, 194, 145, 0.14) 14deg 20deg,
-      rgba(214, 194, 145, 0.00) 20deg 46deg,
-      rgba(160, 184, 255, 0.10) 46deg 52deg,
-      rgba(214, 194, 145, 0.00) 52deg 88deg,
-      rgba(214, 194, 145, 0.12) 88deg 94deg,
-      rgba(214, 194, 145, 0.00) 94deg 132deg,
-      rgba(160, 184, 255, 0.08) 132deg 138deg,
-      rgba(214, 194, 145, 0.00) 138deg 180deg,
-      rgba(214, 194, 145, 0.10) 180deg 186deg,
-      rgba(214, 194, 145, 0.00) 186deg 226deg,
-      rgba(160, 184, 255, 0.08) 226deg 232deg,
-      rgba(214, 194, 145, 0.00) 232deg 272deg,
-      rgba(214, 194, 145, 0.10) 272deg 278deg,
-      rgba(214, 194, 145, 0.00) 278deg 318deg,
-      rgba(160, 184, 255, 0.08) 318deg 324deg,
-      rgba(214, 194, 145, 0.00) 324deg 360deg
-    );
-  box-shadow:
-    0 0 0 1px rgba(255, 240, 210, 0.03) inset,
-    0 0 28px rgba(214, 191, 140, 0.08);
-  filter: blur(0.1px);
 }
 
-/* =========================================================
-   TRIGGER BUTTON
-========================================================= */
+.tb-summon-stage::before {
+  width: min(78vw, 600px);
+  background:
+    radial-gradient(circle at center, rgba(132, 156, 255, 0.14), transparent 46%),
+    radial-gradient(circle at center, rgba(218, 191, 139, 0.08), transparent 62%);
+}
+
+.tb-summon-stage::after {
+  width: min(64vw, 470px);
+  background:
+    radial-gradient(circle at center, transparent 68%, rgba(214, 194, 145, 0.10) 69%, transparent 70%);
+  box-shadow: 0 0 28px rgba(214, 191, 140, 0.08);
+}
+
+.tb-summon-trigger,
+.tb-summon-status,
+.tb-card-wrap {
+  width: min(92vw, 560px);
+}
 
 .tb-summon-trigger {
+  min-width: min(92vw, 560px);
   position: relative;
   z-index: 2;
-  min-width: min(92vw, 560px);
-  overflow: hidden;
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.22),
-    0 0 0 1px rgba(255, 240, 210, 0.03) inset,
-    0 0 24px rgba(110, 134, 255, 0.10);
 }
-
-.tb-summon-trigger::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.04) 35%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.04) 65%, transparent 100%);
-  transform: translateX(-120%);
-  transition: transform 0.9s ease;
-  pointer-events: none;
-}
-
-.tb-summon-trigger:hover::before,
-.tb-summon-trigger:focus-visible::before {
-  transform: translateX(120%);
-}
-
-.tb-summon-trigger:disabled {
-  cursor: wait;
-  opacity: 0.94;
-}
-
-/* =========================================================
-   CARD WRAP / RITUAL LIGHT
-========================================================= */
 
 .tb-card-wrap {
   position: relative;
   z-index: 2;
-  width: min(92vw, 560px);
   display: grid;
   place-items: center;
   perspective: 1600px;
-  isolation: isolate;
-}
-
-.tb-card-wrap::before {
-  content: "";
-  position: absolute;
-  inset: auto 50% 8%;
-  width: min(88%, 420px);
-  height: 34px;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(95, 118, 255, 0.22), transparent 68%);
-  filter: blur(12px);
-  opacity: 0.72;
-  pointer-events: none;
 }
 
 .tb-card-wrap::after {
@@ -244,67 +114,43 @@
   transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
-  background:
-    radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 44%),
-    radial-gradient(circle at center, rgba(130, 156, 255, 0.12), transparent 58%);
-  box-shadow:
-    0 0 0 1px rgba(190, 206, 255, 0.07) inset,
-    0 0 34px rgba(128, 152, 255, 0.10);
+  background: radial-gradient(circle at center, rgba(130, 156, 255, 0.12), transparent 58%);
+  box-shadow: 0 0 34px rgba(128, 152, 255, 0.10);
   opacity: 0.92;
 }
 
-/* =========================================================
-   ARCANA CARD / FLIP
-========================================================= */
-
 .tb-arcana-card {
   position: relative;
-  width: 100%;
-  min-height: clamp(390px, 56vw, 530px);
-  border-radius: 28px;
+  width: min(72vw, 320px);
+  aspect-ratio: 2 / 3;
+  border-radius: 24px;
   transform-style: preserve-3d;
-  transition:
-    transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.45s ease,
-    box-shadow 0.45s ease;
-  will-change: transform, filter;
+  transition: transform 1.05s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
+  cursor: pointer;
+  filter: drop-shadow(0 16px 34px rgba(0, 0, 0, 0.32));
 }
 
-/* 初期状態 */
-.tb-arcana-card[data-phase="idle"] {
-  filter:
-    drop-shadow(0 0 10px rgba(95, 118, 255, 0.06))
-    drop-shadow(0 0 18px rgba(214, 194, 145, 0.04));
-}
-
-/* 接続中 */
-.tb-arcana-card[data-phase="charging"] {
-  filter:
-    drop-shadow(0 0 24px rgba(145, 168, 255, 0.30))
-    drop-shadow(0 0 50px rgba(100, 124, 255, 0.18))
-    drop-shadow(0 0 22px rgba(219, 193, 142, 0.08));
-}
-
-/* 展開完了 */
-.tb-arcana-card[data-phase="revealed"] {
-  filter:
-    drop-shadow(0 0 18px rgba(225, 205, 165, 0.18))
-    drop-shadow(0 0 34px rgba(130, 152, 255, 0.14));
-}
-
-/* ここがJSの核心連動 */
 .tb-arcana-card[data-flip="true"] {
   transform: rotateY(180deg);
 }
 
-/* =========================================================
-   CARD FACES
-========================================================= */
+.tb-arcana-card[data-phase="ready"],
+.tb-arcana-card[data-phase="charging"] {
+  filter:
+    drop-shadow(0 0 20px rgba(145, 168, 255, 0.20))
+    drop-shadow(0 0 34px rgba(110, 132, 255, 0.15));
+}
+
+.tb-arcana-card[data-phase="revealed"] {
+  filter:
+    drop-shadow(0 0 16px rgba(225, 205, 165, 0.2))
+    drop-shadow(0 0 30px rgba(130, 152, 255, 0.16));
+}
 
 .tb-arcana-face {
   position: absolute;
   inset: 0;
-  border-radius: 28px;
+  border-radius: 24px;
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -313,213 +159,70 @@
     0 18px 42px rgba(0, 0, 0, 0.28),
     0 0 0 1px rgba(255, 240, 210, 0.03) inset,
     0 0 34px rgba(100, 120, 220, 0.08);
+  background: linear-gradient(180deg, rgba(10, 18, 42, 0.84), rgba(5, 10, 26, 0.94));
 }
 
-/* 共通膜 */
 .tb-arcana-face::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.06), transparent 18%),
-    linear-gradient(135deg, transparent 0%, rgba(162,145,255,0.06) 48%, transparent 100%);
-  mix-blend-mode: screen;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 16%),
+    linear-gradient(140deg, transparent 0%, rgba(162, 145, 255, 0.06) 48%, transparent 100%);
 }
 
-/* 表面 */
 .tb-arcana-face--front {
   transform: rotateY(180deg);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 1rem;
-  padding: clamp(1.4rem, 3vw, 2rem);
-  background: var(--tb-summon-card-front);
-  color: var(--tb-summon-text);
 }
 
-.tb-arcana-face--front::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 223, 168, 0.06), transparent 18%),
-    radial-gradient(circle at 50% 100%, rgba(136, 160, 255, 0.08), transparent 22%);
-}
-
-/* 裏面 */
 .tb-arcana-face--back {
   transform: rotateY(0deg);
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 1.4rem;
-  background: var(--tb-summon-card-back);
-  color: rgba(245, 247, 252, 0.94);
 }
 
-.tb-arcana-face--back::before {
-  content: "";
-  position: absolute;
-  inset: 6%;
-  border-radius: 22px;
-  border: 1px solid rgba(214, 194, 145, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02) inset,
-    0 0 26px rgba(120, 145, 255, 0.08);
-  pointer-events: none;
-}
-
-.tb-arcana-face--back p,
-.tb-arcana-face--back small {
+.tb-pamera-card-image {
   position: relative;
   z-index: 1;
-}
-
-.tb-arcana-face--back p {
-  margin: 0;
-  font-family: "Shippori Mincho", serif;
-  font-size: clamp(1rem, 2vw, 1.16rem);
-  letter-spacing: 0.18em;
-  line-height: 1.6;
-  text-shadow:
-    0 0 16px rgba(255,255,255,0.05),
-    0 0 24px rgba(130, 156, 255, 0.08);
-}
-
-.tb-arcana-face--back small {
+  width: 100%;
+  height: 100%;
   display: block;
-  margin-top: 0.7rem;
-  color: rgba(232, 236, 246, 0.74);
-  letter-spacing: 0.14em;
+  object-fit: cover;
+  border-radius: inherit;
 }
 
-/* =========================================================
-   FRONT CONTENT
-========================================================= */
-
-.tb-card-mark,
-.tb-arcana-subtitle,
-.tb-arcana-face--front h3,
-.tb-arcana-face--front [data-arcana-theme],
-.tb-arcana-keyword,
-.tb-arcana-omen {
-  position: relative;
-  z-index: 1;
+.tb-pamera-card-image--back {
+  object-fit: cover;
 }
-
-.tb-card-mark {
-  margin: 0;
-  color: rgba(232, 236, 246, 0.82);
-  font-size: 0.8rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.tb-arcana-subtitle {
-  margin: 0;
-  color: rgba(220, 198, 150, 0.94);
-  font-size: 0.9rem;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  text-shadow: 0 0 12px rgba(219, 193, 142, 0.10);
-}
-
-.tb-arcana-face--front h3 {
-  margin: 0;
-  font-family: "Shippori Mincho", serif;
-  font-size: clamp(1.54rem, 3.2vw, 2.2rem);
-  line-height: 1.24;
-  color: #f8f4ec;
-  text-shadow:
-    0 0 16px rgba(255,255,255,0.04),
-    0 0 24px rgba(130, 156, 255, 0.05);
-}
-
-.tb-arcana-face--front [data-arcana-theme] {
-  margin: 0;
-  line-height: 1.92;
-  color: rgba(236, 240, 248, 0.84);
-}
-
-.tb-arcana-keyword {
-  margin: 0.2rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(210, 220, 255, 0.14);
-  color: rgba(255, 228, 176, 0.94);
-  letter-spacing: 0.08em;
-  font-weight: 700;
-}
-
-.tb-arcana-omen {
-  margin: 0;
-  line-height: 1.96;
-  color: rgba(240, 242, 248, 0.88);
-}
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-.tb-summon-status {
-  position: relative;
-  z-index: 2;
-  width: min(92vw, 560px);
-  margin: 0;
-  padding: 0.95rem 1rem;
-  border-radius: 14px;
-  border: 1px solid rgba(190, 206, 255, 0.12);
-  background:
-    linear-gradient(180deg, rgba(10, 18, 40, 0.42), rgba(7, 12, 28, 0.62));
-  color: rgba(233, 237, 246, 0.84);
-  line-height: 1.75;
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.14),
-    0 0 0 1px rgba(255, 240, 210, 0.02) inset;
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-}
-
-/* =========================================================
-   HOVER / FOCUS
-========================================================= */
 
 .tb-card-wrap:hover .tb-arcana-card:not([data-flip="true"]) {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.01);
 }
 
-.tb-summon-trigger:focus-visible,
-.tb-arcana-card:focus-visible {
+.tb-arcana-card:focus-visible,
+.tb-summon-trigger:focus-visible {
   outline: 2px solid rgba(214, 194, 145, 0.42);
   outline-offset: 4px;
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+.tb-summon-status {
+  z-index: 2;
+  margin: 0;
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(190, 206, 255, 0.12);
+  background: linear-gradient(180deg, rgba(10, 18, 40, 0.42), rgba(7, 12, 28, 0.62));
+  color: rgba(233, 237, 246, 0.84);
+  line-height: 1.75;
+}
+
+[data-summon-root][data-state="revealed"] .tb-summon-status {
+  border-color: var(--tb-summon-gold);
+}
 
 @media (max-width: 820px) {
   .tb-summon-section {
     padding: 1.15rem;
     border-radius: 24px;
-  }
-
-  .tb-summon-stage {
-    min-height: 520px;
-  }
-
-  .tb-summon-stage::before {
-    width: min(92vw, 500px);
-  }
-
-  .tb-summon-stage::after {
-    width: min(76vw, 400px);
-  }
-
-  .tb-arcana-card {
-    min-height: 450px;
   }
 }
 
@@ -530,17 +233,9 @@
   }
 
   .tb-summon-stage {
-    min-height: 500px;
+    min-height: 460px;
     gap: 0.95rem;
     padding: 0.7rem 0;
-  }
-
-  .tb-summon-stage::before {
-    width: min(92vw, 360px);
-  }
-
-  .tb-summon-stage::after {
-    width: min(78vw, 300px);
   }
 
   .tb-card-wrap,
@@ -551,322 +246,18 @@
   }
 
   .tb-arcana-card {
-    min-height: 430px;
+    width: min(78vw, 320px);
   }
 
   .tb-arcana-face {
-    border-radius: 22px;
-  }
-
-  .tb-arcana-face--front,
-  .tb-arcana-face--back {
-    padding: 1.1rem;
-  }
-
-  .tb-card-mark {
-    font-size: 0.74rem;
-    letter-spacing: 0.15em;
-  }
-
-  .tb-arcana-subtitle {
-    font-size: 0.82rem;
-  }
-
-  .tb-arcana-face--front h3 {
-    font-size: 1.35rem;
-  }
-
-  .tb-arcana-face--front [data-arcana-theme],
-  .tb-arcana-omen,
-  .tb-summon-status {
-    font-size: 0.95rem;
-  }
-
-  .tb-arcana-keyword {
-    font-size: 0.92rem;
-  }
-
-  .tb-arcana-face--back p {
-    font-size: 0.95rem;
-    letter-spacing: 0.14em;
-  }
-
-  .tb-arcana-face--back small {
-    font-size: 0.74rem;
+    border-radius: 20px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tb-summon-trigger::before,
   .tb-arcana-card,
-  .tb-card-wrap::before,
-  .tb-card-wrap::after,
-  .tb-summon-stage::before,
-  .tb-summon-stage::after {
+  .tb-card-wrap::after {
     transition: none !important;
-    animation: none !important;
-  }
-
-  .tb-arcana-card[data-flip="true"] {
-    transform: none;
-  }
-
-  .tb-arcana-face--front,
-  .tb-arcana-face--back {
-    transform: none;
-  }
-
-  .tb-arcana-face--back {
-    display: none;
-  }
-
-  .tb-arcana-card[data-phase="revealed"] .tb-arcana-face--back {
-    display: none;
-  }
-}
-/* =========================================================
-   TAROT BREAKER / Summon
-   追加差分：神演出強化
-   - JSの data-state / data-phase に追従
-========================================================= */
-
-/* -----------------------------------------
-   ステージ全体の微アニメーション
------------------------------------------ */
-
-@keyframes tbSummonSigilPulse {
-  0% {
-    opacity: 0.72;
-    transform: translate(-50%, -50%) scale(0.985) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.015) rotate(0.6deg);
-  }
-  100% {
-    opacity: 0.78;
-    transform: translate(-50%, -50%) scale(0.99) rotate(0deg);
-  }
-}
-
-@keyframes tbSummonHaloBreath {
-  0% {
-    opacity: 0.48;
-    transform: translate(-50%, -50%) scale(0.94);
-  }
-  50% {
-    opacity: 0.88;
-    transform: translate(-50%, -50%) scale(1.03);
-  }
-  100% {
-    opacity: 0.54;
-    transform: translate(-50%, -50%) scale(0.96);
-  }
-}
-
-@keyframes tbSummonCardGlow {
-  0% {
-    filter:
-      drop-shadow(0 0 18px rgba(145, 168, 255, 0.18))
-      drop-shadow(0 0 36px rgba(100, 124, 255, 0.10));
-  }
-  50% {
-    filter:
-      drop-shadow(0 0 28px rgba(165, 188, 255, 0.30))
-      drop-shadow(0 0 52px rgba(110, 132, 255, 0.18))
-      drop-shadow(0 0 14px rgba(219, 193, 142, 0.08));
-  }
-  100% {
-    filter:
-      drop-shadow(0 0 20px rgba(145, 168, 255, 0.20))
-      drop-shadow(0 0 40px rgba(100, 124, 255, 0.12));
-  }
-}
-
-@keyframes tbSummonButtonShine {
-  0% {
-    opacity: 0;
-    transform: translateX(-120%);
-  }
-  40% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(140%);
-  }
-}
-
-/* -----------------------------------------
-   初期状態
------------------------------------------ */
-
-[data-summon-root][data-state="idle"] .tb-summon-status {
-  border-color: rgba(190, 206, 255, 0.12);
-}
-
-/* -----------------------------------------
-   charging
------------------------------------------ */
-
-[data-summon-root][data-state="charging"] .tb-card-wrap::after {
-  opacity: 1;
-  animation: tbSummonHaloBreath 1.3s ease-in-out infinite;
-}
-
-[data-summon-root][data-state="charging"] .tb-summon-status {
-  border-color: rgba(145, 168, 255, 0.22);
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.14),
-    0 0 0 1px rgba(255, 240, 210, 0.02) inset,
-    0 0 18px rgba(110, 134, 255, 0.08);
-}
-
-[data-summon-root][data-state="charging"] ~ .tb-summon-status {
-  border-color: rgba(145, 168, 255, 0.22);
-}
-
-.tb-arcana-card[data-phase="charging"] {
-  animation: tbSummonCardGlow 1.2s ease-in-out infinite;
-}
-
-/* -----------------------------------------
-   syncing
------------------------------------------ */
-
-[data-summon-root][data-state="syncing"] .tb-card-wrap::after {
-  opacity: 1;
-  animation: tbSummonHaloBreath 0.95s ease-in-out infinite;
-}
-
-.tb-arcana-card[data-phase="syncing"] {
-  animation: tbSummonCardGlow 0.9s ease-in-out infinite;
-  filter:
-    drop-shadow(0 0 28px rgba(155, 180, 255, 0.34))
-    drop-shadow(0 0 58px rgba(110, 132, 255, 0.20))
-    drop-shadow(0 0 18px rgba(219, 193, 142, 0.10));
-}
-
-[data-summon-root][data-state="syncing"] .tb-summon-status {
-  border-color: rgba(175, 196, 255, 0.26);
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.14),
-    0 0 0 1px rgba(255, 240, 210, 0.02) inset,
-    0 0 22px rgba(140, 162, 255, 0.10);
-}
-
-/* -----------------------------------------
-   revealed
------------------------------------------ */
-
-[data-summon-root][data-state="revealed"] .tb-card-wrap::after {
-  opacity: 0.96;
-  animation: tbSummonSigilPulse 3.4s ease-in-out infinite;
-}
-
-[data-summon-root][data-state="revealed"] .tb-summon-status {
-  border-color: rgba(214, 194, 145, 0.20);
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.14),
-    0 0 0 1px rgba(255, 240, 210, 0.02) inset,
-    0 0 18px rgba(219, 193, 142, 0.08);
-}
-
-[data-summon-root][data-state="revealed"] .tb-summon-trigger {
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.22),
-    0 0 0 1px rgba(255, 240, 210, 0.03) inset,
-    0 0 28px rgba(214, 194, 145, 0.10),
-    0 0 26px rgba(110, 134, 255, 0.08);
-}
-
-/* -----------------------------------------
-   ボタンの押下演出
------------------------------------------ */
-
-[data-summon-root][data-state="charging"] .tb-summon-trigger::before,
-[data-summon-root][data-state="syncing"] .tb-summon-trigger::before {
-  animation: tbSummonButtonShine 1.05s ease forwards;
-}
-
-/* -----------------------------------------
-   カード表面の出現感
------------------------------------------ */
-
-.tb-arcana-card[data-phase="revealed"] .tb-arcana-face--front::after {
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.08), transparent 18%),
-    linear-gradient(135deg, transparent 0%, rgba(162,145,255,0.08) 48%, transparent 100%),
-    radial-gradient(circle at 50% 12%, rgba(255, 226, 180, 0.08), transparent 20%);
-}
-
-/* -----------------------------------------
-   めくれた後の静かな浮遊感
------------------------------------------ */
-
-.tb-arcana-card[data-phase="revealed"] {
-  transform-origin: center center;
-}
-
-.tb-card-wrap:hover .tb-arcana-card[data-phase="revealed"] {
-  transform: rotateY(180deg) translateY(-2px) scale(1.005);
-}
-
-/* -----------------------------------------
-   stage自体の召喚強化
------------------------------------------ */
-
-[data-summon-root][data-state="charging"]::before,
-[data-summon-root][data-state="syncing"]::before,
-[data-summon-root][data-state="revealed"]::before {
-  content: "";
-  position: absolute;
-  inset: -8%;
-  pointer-events: none;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(128, 152, 255, 0.10), transparent 42%),
-    radial-gradient(circle at 50% 22%, rgba(219, 193, 142, 0.06), transparent 18%);
-  filter: blur(22px);
-  z-index: 0;
-}
-
-[data-summon-root][data-state="syncing"]::before {
-  opacity: 1;
-}
-
-[data-summon-root][data-state="revealed"]::before {
-  opacity: 0.84;
-}
-
-/* -----------------------------------------
-   モバイル微調整
------------------------------------------ */
-
-@media (max-width: 560px) {
-  .tb-arcana-card[data-phase="charging"],
-  .tb-arcana-card[data-phase="syncing"] {
-    animation-duration: 1.05s;
-  }
-
-  [data-summon-root][data-state="charging"] .tb-card-wrap::after,
-  [data-summon-root][data-state="syncing"] .tb-card-wrap::after {
-    transform: translate(-50%, -50%) scale(0.98);
-  }
-}
-
-/* -----------------------------------------
-   reduce motion
------------------------------------------ */
-
-@media (prefers-reduced-motion: reduce) {
-  .tb-arcana-card[data-phase="charging"],
-  .tb-arcana-card[data-phase="syncing"],
-  [data-summon-root][data-state="charging"] .tb-card-wrap::after,
-  [data-summon-root][data-state="syncing"] .tb-card-wrap::after,
-  [data-summon-root][data-state="revealed"] .tb-card-wrap::after,
-  [data-summon-root][data-state="charging"] .tb-summon-trigger::before,
-  [data-summon-root][data-state="syncing"] .tb-summon-trigger::before {
     animation: none !important;
   }
 }

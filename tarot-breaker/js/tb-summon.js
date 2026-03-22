@@ -6,117 +6,104 @@ TB.ready(() => {
   const cardWrap = root.querySelector('[data-summon-card]');
   const card = cardWrap?.querySelector('.tb-arcana-card');
   const status = root.querySelector('[data-summon-status]');
+  const pameraImage = root.querySelector('[data-pamera-image]');
 
-  const nameEl = root.querySelector('[data-arcana-name]');
-  const subtitleEl = root.querySelector('[data-arcana-subtitle]');
-  const themeEl = root.querySelector('[data-arcana-theme]');
-  const keywordEl = root.querySelector('[data-arcana-keyword]');
-  const omenEl = root.querySelector('[data-arcana-omen]');
-
-  if (
-    !button || !card || !status ||
-    !nameEl || !subtitleEl || !themeEl || !keywordEl || !omenEl
-  ) {
+  if (!button || !card || !status || !pameraImage) {
     console.warn('tb-summon: required elements not found');
     return;
   }
 
-  const arcana = [
+  const PAMERA_MEMBERS = [
     {
-      name: "The Gatekeeper",
-      subtitle: "Threshold Signal",
-      message: "境界に立つ呼吸が、最初の星界接続となる。",
-      keyword: "境界 / 受容 / 始動",
-      meaning: "門前で留まり、兆しを受信する。"
+      key: 'fool',
+      name: '愚者',
+      image: './img/pamera/cards/pamera-fool.webp',
+      url: './projects/pamera/fool.html'
     },
     {
-      name: "The Resonance",
-      subtitle: "Echo Link",
-      message: "誰かの声と重なった瞬間、灯火は再起動する。",
-      keyword: "共鳴 / 再起 / 連結",
-      meaning: "今の選択は、孤立ではなく共振で開く。"
+      key: 'magician',
+      name: '魔術師',
+      image: './img/pamera/cards/pamera-magician.webp',
+      url: './projects/pamera/magician.html'
     },
     {
-      name: "The Quiet Star",
-      subtitle: "Silent Observatory",
-      message: "静かな夜ほど、徴は澄んだ輪郭を持つ。",
-      keyword: "沈黙 / 観測 / 余韻",
-      meaning: "急がず観測するほど、言葉は正確になる。"
+      key: 'high-priestess',
+      name: '女教皇',
+      image: './img/pamera/cards/pamera-high-priestess.webp',
+      url: './projects/pamera/high-priestess.html'
+    },
+    {
+      key: 'empress',
+      name: '女帝',
+      image: './img/pamera/cards/pamera-empress.webp',
+      url: './projects/pamera/empress.html'
+    },
+    {
+      key: 'emperor',
+      name: '皇帝',
+      image: './img/pamera/cards/pamera-emperor.webp',
+      url: './projects/pamera/emperor.html'
     }
   ];
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  let revealedMember = null;
 
-  const setText = (el, value) => {
-    if (el) el.textContent = value;
+  const setIdle = () => {
+    root.dataset.state = 'idle';
+    card.dataset.phase = 'idle';
+    card.dataset.flip = 'false';
+    card.dataset.linkReady = 'false';
+    status.textContent = '待機中：カードに触れると、Pameraとの接続が始まります。';
+    card.setAttribute('aria-label', 'Pamera召喚カード');
   };
 
-  const render = (cardData) => {
-    setText(subtitleEl, cardData.subtitle);
-    setText(nameEl, cardData.name);
-    setText(themeEl, cardData.message);
-    setText(keywordEl, cardData.keyword);
-    setText(omenEl, cardData.meaning);
+  const setReady = () => {
+    revealedMember = null;
+    root.dataset.state = 'ready';
+    card.dataset.phase = 'ready';
+    card.dataset.flip = 'false';
+    card.dataset.linkReady = 'false';
+    button.textContent = '再召喚する';
+    status.textContent = '接続準備完了：カードに触れてPameraを召喚してください。';
+    card.focus({ preventScroll: true });
   };
 
-  card.dataset.phase = 'idle';
-  card.dataset.flip = 'false';
-  root.dataset.state = 'idle';
+  const revealMember = () => {
+    const pick = PAMERA_MEMBERS[Math.floor(Math.random() * PAMERA_MEMBERS.length)];
+    revealedMember = pick;
 
-  let busy = false;
-  let lastIndex = -1;
+    pameraImage.src = pick.image;
+    pameraImage.alt = `Pamera ${pick.name}`;
 
-  const pickArcana = () => {
-    if (arcana.length <= 1) return arcana[0];
+    root.dataset.state = 'revealed';
+    card.dataset.phase = 'revealed';
+    card.dataset.flip = 'true';
+    card.dataset.linkReady = 'true';
+    card.setAttribute('aria-label', `Pamera ${pick.name} が応答中。再タップで個別ページへ移動`);
+    status.textContent = '接続完了：もう一度カードに触れると、その存在のページへ進みます。';
+  };
 
-    let nextIndex = lastIndex;
-    while (nextIndex === lastIndex) {
-      nextIndex = Math.floor(Math.random() * arcana.length);
+  const onCardAction = () => {
+    if (card.dataset.phase === 'idle') {
+      status.textContent = 'まず「Pamera召喚」を押して、接続を開始してください。';
+      return;
     }
-    lastIndex = nextIndex;
-    return arcana[nextIndex];
+
+    if (card.dataset.linkReady === 'true' && revealedMember) {
+      location.href = revealedMember.url;
+      return;
+    }
+
+    revealMember();
   };
 
-  button.addEventListener('click', async () => {
-    if (busy) return;
-    busy = true;
-
-    try {
-      button.disabled = true;
-      button.textContent = '星界接続中…';
-      status.textContent = '星界回路を起動しています…';
-
-      root.dataset.state = 'charging';
-      card.dataset.phase = 'charging';
-      card.dataset.flip = 'false';
-
-      await sleep(650);
-
-      root.dataset.state = 'syncing';
-      card.dataset.phase = 'syncing';
-      status.textContent = '共鳴位相を同期中…';
-
-      await sleep(780);
-
-      const pick = pickArcana();
-      render(pick);
-
-      root.dataset.state = 'revealed';
-      card.dataset.phase = 'revealed';
-      card.dataset.flip = 'true';
-
-      button.textContent = 'もう一度、展開する';
-      status.textContent = `展開完了：「${pick.name}」の徴を記録しました。`;
-    } catch (error) {
-      console.error('tb-summon error:', error);
-      root.dataset.state = 'idle';
-      status.textContent = '接続に失敗しました。少し時間をおいて、もう一度お試しください。';
-      button.textContent = '再度、星界に触れる';
-      card.dataset.phase = 'idle';
-      card.dataset.flip = 'false';
-    } finally {
-      button.disabled = false;
-      busy = false;
-    }
+  button.addEventListener('click', setReady);
+  card.addEventListener('click', onCardAction);
+  card.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    onCardAction();
   });
+
+  setIdle();
 });
