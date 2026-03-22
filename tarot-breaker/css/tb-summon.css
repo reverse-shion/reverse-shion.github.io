@@ -1,5 +1,9 @@
 /* =========================================================
    TAROT BREAKER / Pamera Summon
+   - カード直接タップで反転
+   - ボタンなし前提
+   - 画像クリック吸収対策済み
+   - hover transform競合対策済み
 ========================================================= */
 
 .tb-summon-section {
@@ -84,16 +88,9 @@
   box-shadow: 0 0 28px rgba(214, 191, 140, 0.08);
 }
 
-.tb-summon-trigger,
-.tb-summon-status,
-.tb-card-wrap {
+.tb-card-wrap,
+.tb-summon-status {
   width: min(92vw, 560px);
-}
-
-.tb-summon-trigger {
-  min-width: min(92vw, 560px);
-  position: relative;
-  z-index: 2;
 }
 
 .tb-card-wrap {
@@ -101,7 +98,12 @@
   z-index: 2;
   display: grid;
   place-items: center;
+  width: min(72vw, 320px);
+  aspect-ratio: 2 / 3;
+  min-width: 0;
+  margin: 0 auto;
   perspective: 1600px;
+  -webkit-perspective: 1600px;
 }
 
 .tb-card-wrap::after {
@@ -121,13 +123,21 @@
 
 .tb-arcana-card {
   position: relative;
-  width: min(72vw, 320px);
-  aspect-ratio: 2 / 3;
+  width: 100%;
+  height: 100%;
   border-radius: 24px;
   transform-style: preserve-3d;
-  transition: transform 1.05s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
+  -webkit-transform-style: preserve-3d;
+  transition:
+    transform 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.35s ease,
+    box-shadow 0.35s ease;
   cursor: pointer;
+  outline: none;
   filter: drop-shadow(0 16px 34px rgba(0, 0, 0, 0.32));
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .tb-arcana-card[data-flip="true"] {
@@ -150,10 +160,14 @@
 .tb-arcana-face {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 24px;
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   border: 1px solid var(--tb-summon-line);
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.28),
@@ -188,6 +202,9 @@
   display: block;
   object-fit: cover;
   border-radius: inherit;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .tb-pamera-card-image--back {
@@ -195,16 +212,18 @@
 }
 
 .tb-card-wrap:hover .tb-arcana-card:not([data-flip="true"]) {
-  transform: translateY(-2px) scale(1.01);
+  filter:
+    drop-shadow(0 18px 38px rgba(0, 0, 0, 0.34))
+    drop-shadow(0 0 18px rgba(130, 152, 255, 0.14));
 }
 
-.tb-arcana-card:focus-visible,
-.tb-summon-trigger:focus-visible {
+.tb-arcana-card:focus-visible {
   outline: 2px solid rgba(214, 194, 145, 0.42);
   outline-offset: 4px;
 }
 
 .tb-summon-status {
+  position: relative;
   z-index: 2;
   margin: 0;
   padding: 0.95rem 1rem;
@@ -213,6 +232,7 @@
   background: linear-gradient(180deg, rgba(10, 18, 40, 0.42), rgba(7, 12, 28, 0.62));
   color: rgba(233, 237, 246, 0.84);
   line-height: 1.75;
+  text-align: center;
 }
 
 [data-summon-root][data-state="revealed"] .tb-summon-status {
@@ -239,17 +259,17 @@
   }
 
   .tb-card-wrap,
-  .tb-summon-status,
-  .tb-summon-trigger {
+  .tb-summon-status {
     width: min(94vw, 100%);
     min-width: 0;
   }
 
-  .tb-arcana-card {
+  .tb-card-wrap {
     width: min(78vw, 320px);
   }
 
-  .tb-arcana-face {
+  .tb-arcana-face,
+  .tb-arcana-card {
     border-radius: 20px;
   }
 }
