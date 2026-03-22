@@ -1,159 +1,77 @@
 (() => {
-  const onReady = (fn) => {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fn, { once: true });
-      return;
-    }
-    fn();
-  };
-
-  onReady(() => {
+  document.addEventListener('DOMContentLoaded', () => {
     const root = document.querySelector('[data-summon-root]');
-    if (!root) {
-      console.warn('tb-summon: root not found');
+    const card = document.querySelector('.tb-arcana-card');
+    const status = document.querySelector('[data-summon-status]');
+    const pameraImage = document.querySelector('[data-pamera-image]');
+
+    alert('tb-summon loaded');
+
+    if (!root || !card || !status || !pameraImage) {
+      alert('required elements not found');
       return;
     }
 
-    const cardWrap = root.querySelector('[data-summon-card]');
-    const card = cardWrap?.querySelector('.tb-arcana-card');
-    const status = root.querySelector('[data-summon-status]');
-    const pameraImage = root.querySelector('[data-pamera-image]');
-
-    if (!card || !status || !pameraImage) {
-      console.warn('tb-summon: required elements not found', {
-        card: !!card,
-        status: !!status,
-        pameraImage: !!pameraImage
-      });
-      return;
-    }
-
-    const PAMERA_MEMBERS = [
+    const members = [
       {
-        key: 'fool',
         name: '愚者',
         image: './img/pamera/cards/pamera-fool.webp',
         url: './projects/pamera/fool.html'
       },
       {
-        key: 'magician',
         name: '魔術師',
         image: './img/pamera/cards/pamera-magician.webp',
         url: './projects/pamera/magician.html'
       },
       {
-        key: 'high-priestess',
         name: '女教皇',
         image: './img/pamera/cards/pamera-high-priestess.webp',
         url: './projects/pamera/high-priestess.html'
       },
       {
-        key: 'empress',
         name: '女帝',
         image: './img/pamera/cards/pamera-empress.webp',
         url: './projects/pamera/empress.html'
       },
       {
-        key: 'emperor',
         name: '皇帝',
         image: './img/pamera/cards/pamera-emperor.webp',
         url: './projects/pamera/emperor.html'
       }
     ];
 
-    let revealedMember = null;
-    let isNavigating = false;
-    let pointerLock = false;
+    let revealed = null;
 
-    const setStatus = (message) => {
-      status.textContent = message;
-    };
+    const pick = () => members[Math.floor(Math.random() * members.length)];
 
-    const setIdle = () => {
-      revealedMember = null;
-      isNavigating = false;
+    const act = () => {
+      alert('card tapped');
 
-      root.dataset.state = 'idle';
-      card.dataset.phase = 'idle';
-      card.dataset.flip = 'false';
-      card.dataset.linkReady = 'false';
-
-      card.setAttribute('aria-label', 'Pamera召喚カード');
-      setStatus('待機中：カードに触れると、Pameraとの接続が始まります。');
-    };
-
-    const pickRandomMember = () => {
-      const index = Math.floor(Math.random() * PAMERA_MEMBERS.length);
-      return PAMERA_MEMBERS[index];
-    };
-
-    const revealMember = () => {
-      const pick = pickRandomMember();
-      revealedMember = pick;
-
-      pameraImage.src = pick.image;
-      pameraImage.alt = `Pamera ${pick.name}`;
-
-      root.dataset.state = 'revealed';
-      card.dataset.phase = 'revealed';
-      card.dataset.flip = 'true';
-      card.dataset.linkReady = 'true';
-
-      card.setAttribute(
-        'aria-label',
-        `Pamera ${pick.name} が応答中。もう一度タップで個別ページへ移動`
-      );
-
-      setStatus('接続完了：もう一度カードに触れると、その存在のページへ進みます。');
-    };
-
-    const navigateToMember = () => {
-      if (!revealedMember || isNavigating) return;
-      isNavigating = true;
-      window.location.href = revealedMember.url;
-    };
-
-    const onCardAction = () => {
-      const isFlipped = card.dataset.flip === 'true';
-      const linkReady = card.dataset.linkReady === 'true';
-
-      if (!isFlipped) {
-        revealMember();
+      if (card.dataset.flip !== 'true') {
+        revealed = pick();
+        pameraImage.src = revealed.image;
+        pameraImage.alt = revealed.name;
+        card.dataset.flip = 'true';
+        card.dataset.linkReady = 'true';
+        status.textContent = '接続完了：もう一度カードに触れると、その存在のページへ進みます。';
         return;
       }
 
-      if (linkReady) {
-        navigateToMember();
+      if (revealed) {
+        window.location.href = revealed.url;
       }
     };
 
-    const safeTrigger = (event) => {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-
-      if (pointerLock) return;
-      pointerLock = true;
-
-      onCardAction();
-
-      window.setTimeout(() => {
-        pointerLock = false;
-      }, 250);
-    };
-
-    card.addEventListener('click', safeTrigger, { passive: false });
-    card.addEventListener('pointerup', safeTrigger, { passive: false });
+    card.addEventListener('click', act);
+    card.addEventListener('pointerup', act);
 
     card.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      event.preventDefault();
-      onCardAction();
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        act();
+      }
     });
 
-    setIdle();
-
-    console.log('tb-summon: initialized');
+    status.textContent = '待機中：カードに触れると、Pameraとの接続が始まります。';
   });
 })();
