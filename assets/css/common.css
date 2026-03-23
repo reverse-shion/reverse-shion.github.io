@@ -30,23 +30,36 @@
   box-sizing:border-box;
 }
 
-html{
-  scroll-behavior:smooth;
+
+
+
+/* htmlにもリセットをかける */
+html {
+  scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
 }
 
-body{
-  margin:0;
-  color:var(--site-text);
-  font-family:var(--font-body);
-  background:var(--site-bg);
-  line-height:1.82;
-  letter-spacing:.02em;
+body {
+  margin: 0;
+  padding: 0; /* 追加：念のためのパディングリセット */
+  color: var(--site-text);
+  font-family: var(--font-body);
+  background: var(--site-bg);
+  line-height: 1.82;
+  letter-spacing: .02em;
+  
+  /* iPhoneのステータスバー領域を考慮する場合（任意） */
+  /* padding-top: env(safe-area-inset-top, 0); */
 }
 
-img{
-  max-width:100%;
-  display:block;
+/* 画像の下にできる謎の隙間（3px程度）を完全に消す設定 */
+img {
+  max-width: 100%;
+  display: block;
+  height: auto; /* 追加：アスペクト比を保つため */
 }
+
 
 a{
   color:inherit;
