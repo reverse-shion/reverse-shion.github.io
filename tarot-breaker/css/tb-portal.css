@@ -8,12 +8,13 @@
   --tb-portal-border: rgba(170, 192, 255, 0.24);
   --tb-portal-border-soft: rgba(173, 193, 255, 0.18);
   --tb-portal-accent: #d8be8d;
+  --tb-portal-accent-blue: #78a1ff; /* システムブルー追加 */
   --tb-portal-text: #edf1ff;
   --tb-portal-text-muted: rgba(237, 241, 255, 0.78);
   --tb-portal-shadow: 0 20px 40px rgba(0, 0, 0, 0.26);
   --tb-portal-shadow-soft: 0 10px 22px rgba(0, 0, 0, 0.25);
   --tb-portal-radius-lg: 22px;
-  --tb-portal-radius-md: 4px; /* SAO風に鋭く設定 */
+  --tb-portal-radius-md: 4px; /* SAO風 */
   --tb-portal-radius-sm: 14px;
 }
 
@@ -22,8 +23,8 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
   background-color: var(--tb-portal-bg);
-  /* iPhoneのノッチ・ステータスバー対策 */
   padding-top: env(safe-area-inset-top, 0);
+  overflow-x: hidden;
 }
 
 .tb-portal-body {
@@ -37,7 +38,7 @@ html, body {
   position: relative;
 }
 
-/* 背景のグリッドレイヤー (SAO風) */
+/* 背景グリッドレイヤー */
 .tb-portal-body::before {
   content: "";
   position: fixed;
@@ -52,7 +53,7 @@ html, body {
 }
 
 /* =========================================
-   2. HEADER & NAVIGATION
+   2. HEADER & CYBER MENU
 ========================================= */
 .tb-portal-header {
   position: sticky;
@@ -62,7 +63,6 @@ html, body {
   backdrop-filter: blur(12px);
   background: rgba(6, 10, 20, 0.85);
   border-bottom: 1px solid rgba(173, 193, 255, 0.2);
-  /* safe-areaを考慮したパディング */
   padding-top: env(safe-area-inset-top, 0);
 }
 
@@ -82,8 +82,48 @@ html, body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-decoration: none;
+  text-shadow: 0 0 10px rgba(216, 190, 141, 0.3);
 }
 
+/* ハンバーガーボタン (サイバー・アニメーション版) */
+.tb-portal-menu-button {
+  display: none; /* デフォルト非表示、メディアクエリで表示 */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--tb-portal-border);
+  border-radius: 6px;
+  background: rgba(12, 18, 36, 0.85);
+  cursor: pointer;
+  padding: 0;
+}
+
+.tb-portal-menu-button span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--tb-portal-text);
+  margin: 3px 0;
+  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), 
+              opacity 0.3s ease;
+}
+
+/* アクティブ時のアニメーション (×印に変化) */
+.tb-portal-menu-button[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.tb-portal-menu-button[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+.tb-portal-menu-button[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* =========================================
+   3. NAVIGATION & 2-COLUMN PREVENTION
+========================================= */
 .tb-portal-nav__list {
   list-style: none;
   margin: 0;
@@ -97,21 +137,20 @@ html, body {
   color: var(--tb-portal-text);
   text-decoration: none;
   font-size: 0.94rem;
-  padding: 0.4rem 0.6rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 999px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
+  white-space: nowrap; /* 文字が2段になるのを防ぐ */
 }
 
 .tb-portal-nav a:hover,
-.tb-portal-nav a:focus-visible,
 .tb-portal-home:hover {
   color: #fff;
-  outline: none;
   background: rgba(216, 190, 141, 0.2);
 }
 
 /* =========================================
-   3. HERO SECTION
+   4. HERO & SECTION PANELS
 ========================================= */
 .tb-portal-main {
   width: min(1120px, calc(100% - 2rem));
@@ -121,13 +160,7 @@ html, body {
 
 .tb-portal-hero {
   position: relative;
-  margin-top: 0.5rem; /* ヘッダー密着用の微調整 */
-}
-
-.tb-portal-hero__inner {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .tb-portal-hero__media {
@@ -135,7 +168,6 @@ html, body {
   overflow: hidden;
   border-radius: var(--tb-portal-radius-lg);
   min-height: 320px;
-  background: #060a14;
   border: 1px solid var(--tb-portal-border-soft);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
 }
@@ -154,7 +186,7 @@ html, body {
   border-radius: var(--tb-portal-radius-lg);
   background: linear-gradient(180deg, rgba(11, 17, 34, 0.96) 0%, rgba(10, 16, 31, 0.92) 100%);
   border: 1px solid var(--tb-portal-border);
-  box-shadow: var(--tb-portal-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: var(--tb-portal-shadow);
 }
 
 .tb-portal-hero h1,
@@ -171,60 +203,26 @@ html, body {
   color: #f6f1e8;
 }
 
-/* =========================================
-   4. SECTION & SAO CUSTOMS
-========================================= */
 .tb-portal-section {
   position: relative;
   margin-top: 1.2rem;
   padding: clamp(1rem, 2.8vw, 1.8rem);
   background: var(--tb-portal-panel);
   border: 1px solid var(--tb-portal-border);
-  /* SAO風の鋭い角とカット演出 */
   border-radius: var(--tb-portal-radius-md); 
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
 }
 
-/* パネル左上のアクセントライン (観測データ風) */
 .tb-portal-section::before {
   content: "";
   position: absolute;
-  top: -1px;
-  left: 20px;
-  width: 40px;
-  height: 2px;
+  top: -1px; left: 20px; width: 40px; height: 2px;
   background: var(--tb-portal-accent);
   box-shadow: 0 0 8px var(--tb-portal-accent);
 }
 
-.tb-portal-grid {
-  display: grid;
-  gap: 0.8rem;
-}
-
-/* カード類共通 */
-.tb-portal-entry-card,
-.tb-portal-link-card,
-.tb-portal-character-card a {
-  display: block;
-  padding: 0.9rem;
-  border-radius: var(--tb-portal-radius-sm);
-  border: 1px solid rgba(173, 193, 255, 0.2);
-  background: var(--tb-portal-panel-strong);
-  color: var(--tb-portal-text);
-  text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.tb-portal-entry-card:hover,
-.tb-portal-link-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--tb-portal-shadow-soft);
-  border-color: var(--tb-portal-accent);
-}
-
 /* =========================================
-   5. BUTTONS (SAO System Style)
+   5. BUTTONS (SAO Style)
 ========================================= */
 .tb-portal-btn {
   display: inline-flex;
@@ -236,7 +234,6 @@ html, body {
   font-weight: 700;
   position: relative;
   overflow: hidden;
-  /* 角を鋭角にカット */
   clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
   transition: all 0.3s ease;
 }
@@ -248,7 +245,6 @@ html, body {
   z-index: 1;
 }
 
-/* ボタン背景のスライド演出 */
 .tb-portal-btn--primary::after {
   content: "";
   position: absolute;
@@ -262,28 +258,13 @@ html, body {
 .tb-portal-btn--primary:hover {
   color: #1a1d2a;
 }
-
 .tb-portal-btn--primary:hover::after {
   transform: translateX(0);
-}
-
-.tb-portal-btn--ghost {
-  color: var(--tb-portal-text);
-  background: rgba(14, 20, 38, 0.62);
-  border: 1px solid var(--tb-portal-border);
 }
 
 /* =========================================
    6. RESPONSIVE (BREAKPOINTS)
 ========================================= */
-@media (min-width: 700px) {
-  .tb-portal-grid--2,
-  .tb-portal-grid--3,
-  .tb-portal-grid--characters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (min-width: 980px) {
   .tb-portal-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .tb-portal-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -292,14 +273,43 @@ html, body {
 }
 
 @media (max-width: 860px) {
-  .tb-portal-menu-button { display: inline-block; }
+  .tb-portal-menu-button { display: flex; }
+
+  /* モバイルナビゲーション：SAOシステムメニュー風 */
   .tb-portal-nav {
     position: absolute;
     left: 1rem; right: 1rem; top: calc(100% + 0.5rem);
-    padding: 0.7rem;
-    border-radius: 14px;
+    padding: 0.8rem;
+    border-radius: 12px;
     background: rgba(8, 12, 24, 0.98);
     border: 1px solid var(--tb-portal-border);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
   }
+  
   .tb-portal-nav[hidden] { display: none; }
+
+  .tb-portal-nav__list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .tb-portal-nav a {
+    display: block;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 2px solid transparent;
+  }
+
+  .tb-portal-nav a:hover {
+    background: rgba(120, 161, 255, 0.1);
+    border-left-color: var(--tb-portal-accent-blue);
+    transform: translateX(5px);
+  }
+}
+
+@media (max-width: 640px) {
+  .tb-portal-main, .tb-portal-header__inner { width: calc(100% - 1.5rem); }
+  .tb-portal-btn { width: 100%; }
 }
