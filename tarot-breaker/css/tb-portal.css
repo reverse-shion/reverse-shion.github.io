@@ -8,13 +8,12 @@
   --tb-portal-border: rgba(170, 192, 255, 0.24);
   --tb-portal-border-soft: rgba(173, 193, 255, 0.18);
   --tb-portal-accent: #d8be8d;
-  --tb-portal-accent-blue: #78a1ff; /* システムブルー追加 */
   --tb-portal-text: #edf1ff;
   --tb-portal-text-muted: rgba(237, 241, 255, 0.78);
   --tb-portal-shadow: 0 20px 40px rgba(0, 0, 0, 0.26);
   --tb-portal-shadow-soft: 0 10px 22px rgba(0, 0, 0, 0.25);
   --tb-portal-radius-lg: 22px;
-  --tb-portal-radius-md: 4px; /* SAO風 */
+  --tb-portal-radius-md: 4px; /* SAO風に鋭く設定 */
   --tb-portal-radius-sm: 14px;
 }
 
@@ -23,8 +22,8 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
   background-color: var(--tb-portal-bg);
+  /* iPhoneのノッチ・ステータスバー対策 */
   padding-top: env(safe-area-inset-top, 0);
-  overflow-x: hidden;
 }
 
 .tb-portal-body {
@@ -38,7 +37,7 @@ html, body {
   position: relative;
 }
 
-/* 背景グリッドレイヤー */
+/* 背景のグリッドレイヤー (SAO風) */
 .tb-portal-body::before {
   content: "";
   position: fixed;
@@ -53,7 +52,7 @@ html, body {
 }
 
 /* =========================================
-   2. HEADER & CYBER MENU
+   2. HEADER & NAVIGATION
 ========================================= */
 .tb-portal-header {
   position: sticky;
@@ -63,6 +62,7 @@ html, body {
   backdrop-filter: blur(12px);
   background: rgba(6, 10, 20, 0.85);
   border-bottom: 1px solid rgba(173, 193, 255, 0.2);
+  /* safe-areaを考慮したパディング */
   padding-top: env(safe-area-inset-top, 0);
 }
 
@@ -82,48 +82,8 @@ html, body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-decoration: none;
-  text-shadow: 0 0 10px rgba(216, 190, 141, 0.3);
 }
 
-/* ハンバーガーボタン (サイバー・アニメーション版) */
-.tb-portal-menu-button {
-  display: none; /* デフォルト非表示、メディアクエリで表示 */
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--tb-portal-border);
-  border-radius: 6px;
-  background: rgba(12, 18, 36, 0.85);
-  cursor: pointer;
-  padding: 0;
-}
-
-.tb-portal-menu-button span {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--tb-portal-text);
-  margin: 3px 0;
-  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), 
-              opacity 0.3s ease;
-}
-
-/* アクティブ時のアニメーション (×印に変化) */
-.tb-portal-menu-button[aria-expanded="true"] span:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
-}
-.tb-portal-menu-button[aria-expanded="true"] span:nth-child(2) {
-  opacity: 0;
-}
-.tb-portal-menu-button[aria-expanded="true"] span:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
-}
-
-/* =========================================
-   3. NAVIGATION & 2-COLUMN PREVENTION
-========================================= */
 .tb-portal-nav__list {
   list-style: none;
   margin: 0;
@@ -137,20 +97,21 @@ html, body {
   color: var(--tb-portal-text);
   text-decoration: none;
   font-size: 0.94rem;
-  padding: 0.4rem 0.8rem;
+  padding: 0.4rem 0.6rem;
   border-radius: 999px;
-  transition: all 0.2s ease;
-  white-space: nowrap; /* 文字が2段になるのを防ぐ */
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .tb-portal-nav a:hover,
+.tb-portal-nav a:focus-visible,
 .tb-portal-home:hover {
   color: #fff;
+  outline: none;
   background: rgba(216, 190, 141, 0.2);
 }
 
 /* =========================================
-   4. HERO & SECTION PANELS
+   3. HERO SECTION
 ========================================= */
 .tb-portal-main {
   width: min(1120px, calc(100% - 2rem));
@@ -160,7 +121,13 @@ html, body {
 
 .tb-portal-hero {
   position: relative;
-  margin-top: 0.5rem;
+  margin-top: 0.5rem; /* ヘッダー密着用の微調整 */
+}
+
+.tb-portal-hero__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
 .tb-portal-hero__media {
@@ -168,6 +135,7 @@ html, body {
   overflow: hidden;
   border-radius: var(--tb-portal-radius-lg);
   min-height: 320px;
+  background: #060a14;
   border: 1px solid var(--tb-portal-border-soft);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
 }
@@ -186,7 +154,7 @@ html, body {
   border-radius: var(--tb-portal-radius-lg);
   background: linear-gradient(180deg, rgba(11, 17, 34, 0.96) 0%, rgba(10, 16, 31, 0.92) 100%);
   border: 1px solid var(--tb-portal-border);
-  box-shadow: var(--tb-portal-shadow);
+  box-shadow: var(--tb-portal-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .tb-portal-hero h1,
@@ -203,26 +171,60 @@ html, body {
   color: #f6f1e8;
 }
 
+/* =========================================
+   4. SECTION & SAO CUSTOMS
+========================================= */
 .tb-portal-section {
   position: relative;
   margin-top: 1.2rem;
   padding: clamp(1rem, 2.8vw, 1.8rem);
   background: var(--tb-portal-panel);
   border: 1px solid var(--tb-portal-border);
+  /* SAO風の鋭い角とカット演出 */
   border-radius: var(--tb-portal-radius-md); 
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
 }
 
+/* パネル左上のアクセントライン (観測データ風) */
 .tb-portal-section::before {
   content: "";
   position: absolute;
-  top: -1px; left: 20px; width: 40px; height: 2px;
+  top: -1px;
+  left: 20px;
+  width: 40px;
+  height: 2px;
   background: var(--tb-portal-accent);
   box-shadow: 0 0 8px var(--tb-portal-accent);
 }
 
+.tb-portal-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+/* カード類共通 */
+.tb-portal-entry-card,
+.tb-portal-link-card,
+.tb-portal-character-card a {
+  display: block;
+  padding: 0.9rem;
+  border-radius: var(--tb-portal-radius-sm);
+  border: 1px solid rgba(173, 193, 255, 0.2);
+  background: var(--tb-portal-panel-strong);
+  color: var(--tb-portal-text);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tb-portal-entry-card:hover,
+.tb-portal-link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--tb-portal-shadow-soft);
+  border-color: var(--tb-portal-accent);
+}
+
 /* =========================================
-   5. BUTTONS (SAO Style)
+   5. BUTTONS (SAO System Style)
 ========================================= */
 .tb-portal-btn {
   display: inline-flex;
@@ -234,6 +236,7 @@ html, body {
   font-weight: 700;
   position: relative;
   overflow: hidden;
+  /* 角を鋭角にカット */
   clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
   transition: all 0.3s ease;
 }
@@ -245,6 +248,7 @@ html, body {
   z-index: 1;
 }
 
+/* ボタン背景のスライド演出 */
 .tb-portal-btn--primary::after {
   content: "";
   position: absolute;
@@ -258,13 +262,28 @@ html, body {
 .tb-portal-btn--primary:hover {
   color: #1a1d2a;
 }
+
 .tb-portal-btn--primary:hover::after {
   transform: translateX(0);
+}
+
+.tb-portal-btn--ghost {
+  color: var(--tb-portal-text);
+  background: rgba(14, 20, 38, 0.62);
+  border: 1px solid var(--tb-portal-border);
 }
 
 /* =========================================
    6. RESPONSIVE (BREAKPOINTS)
 ========================================= */
+@media (min-width: 700px) {
+  .tb-portal-grid--2,
+  .tb-portal-grid--3,
+  .tb-portal-grid--characters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 980px) {
   .tb-portal-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .tb-portal-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -273,43 +292,356 @@ html, body {
 }
 
 @media (max-width: 860px) {
-  .tb-portal-menu-button { display: flex; }
-
-  /* モバイルナビゲーション：SAOシステムメニュー風 */
+  .tb-portal-menu-button { display: inline-block; }
   .tb-portal-nav {
     position: absolute;
     left: 1rem; right: 1rem; top: calc(100% + 0.5rem);
-    padding: 0.8rem;
-    border-radius: 12px;
+    padding: 0.7rem;
+    border-radius: 14px;
     background: rgba(8, 12, 24, 0.98);
     border: 1px solid var(--tb-portal-border);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
   }
-  
   .tb-portal-nav[hidden] { display: none; }
-
-  .tb-portal-nav__list {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.4rem;
-  }
-
-  .tb-portal-nav a {
-    display: block;
-    border-radius: 8px;
-    padding: 0.8rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-left: 2px solid transparent;
-  }
-
-  .tb-portal-nav a:hover {
-    background: rgba(120, 161, 255, 0.1);
-    border-left-color: var(--tb-portal-accent-blue);
-    transform: translateX(5px);
-  }
 }
 
-@media (max-width: 640px) {
-  .tb-portal-main, .tb-portal-header__inner { width: calc(100% - 1.5rem); }
-  .tb-portal-btn { width: 100%; }
+/* =========================================================
+   1. VARIABLES & SYSTEM-ASTRAL CORE
+   - 角を鋭く(Radius: 4px)、ブルーとゴールドの発光を統合
+========================================================= */
+:root {
+  /* 背景・パネル（統合・深化） */
+  --tb-portal-bg: #050812; /* より深い夜へ */
+  --tb-portal-panel: rgba(10, 15, 32, 0.82); /* 透明感向上 */
+  --tb-portal-panel-strong: rgba(7, 10, 22, 0.95);
+  
+  /* ボーダー・発光（SAO風ブルーとゴールドを融合） */
+  --tb-portal-border: rgba(120, 161, 255, 0.25); /* システムブルー */
+  --tb-portal-border-soft: rgba(120, 161, 255, 0.15);
+  
+  /* アクセント（タロブレゴールドを維持） */
+  --tb-portal-accent: #d8be8d; 
+  --tb-portal-accent-blue: #78a1ff; /* 純粋システムブルー */
+  
+  /* テキスト */
+  --tb-portal-text: #edf1ff;
+  --tb-portal-text-muted: rgba(237, 241, 255, 0.65);
+  
+  /* シャドウ・アストラルグロウ */
+  --tb-portal-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 0 0 10px rgba(120, 161, 255, 0.15);
+  
+  /* SAO Style Grids */
+  --system-grid: radial-gradient(circle, rgba(120, 161, 255, 0.05) 1px, transparent 1px);
+
+  /* Radius (SAO風に鋭く) */
+  --tb-portal-radius-lg: 12px;
+  --tb-portal-radius-md: 4px; /* ここがSAO UIの鍵 */
+  --tb-portal-radius-sm: 4px;
+}
+
+/* --- Global Reset & Astral Body --- */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: var(--tb-portal-bg);
+  overflow-x: hidden;
+  padding-top: env(safe-area-inset-top, 0);
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+/* 背景にデジタル・グリッドレイヤーを配置 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--system-grid);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.4;
+}
+
+/* =========================================================
+   2. HEADER (Floating Menu & SAO Integration)
+========================================================= */
+.tb-portal-header {
+  position: sticky;
+  top: 0;
+  margin-top: 0 !important;
+  z-index: 1200;
+  /* 透明度とブラーを統合 */
+  backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(5, 8, 18, 0.75);
+  border-bottom: 1px solid var(--tb-portal-border);
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.tb-portal-header__inner {
+  width: min(1200px, calc(100% - 1rem)); /* スマホ用に隙間を微調整 */
+  margin: 0 auto;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tb-portal-home {
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  color: var(--tb-portal-accent);
+  text-shadow: 0 0 10px rgba(216, 190, 141, 0.5);
+}
+
+/* --- メニューボタン（3本線から変化・サイバー統合） --- */
+.tb-portal-menu-button {
+  display: flex; /* ブロックからフレックスへ */
+  flex-direction: column;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--tb-portal-border);
+  border-radius: 6px; /* 鋭い角に */
+  background: rgba(12, 18, 36, 0.9);
+  padding: 8px;
+  cursor: pointer;
+}
+
+.tb-portal-menu-button span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: 6px 0; /* 線の間隔を均等に */
+  background: var(--tb-portal-text);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+/* アニメーション：×印へ変化（右のデザイン） */
+.tb-portal-menu-button[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.tb-portal-menu-button[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.tb-portal-menu-button[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* =========================================================
+   3. NAVIGATION MENU (SAO Style & Reading Problem Solver)
+========================================================= */
+.tb-portal-nav {
+  position: absolute;
+  /* SAO UIのような配置 */
+  left: 1rem;
+  right: 1rem;
+  top: calc(100% + 0.5rem);
+  padding: 0.7rem;
+  background: rgba(8, 12, 24, 0.98); /* 透過度を下げて視認性確保 */
+  border: 1px solid var(--tb-portal-border);
+  border-radius: var(--tb-portal-radius-lg);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  z-index: 100;
+}
+
+.tb-portal-nav[hidden] {
+  display: none;
+}
+
+/* --- 文字が2段になるのを解消する修正 --- */
+.tb-portal-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column; /* スマホでは縦並び */
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.tb-portal-nav a {
+  display: block;
+  padding: 0.8rem 1rem; /* パディングを縦に広く、横を調整 */
+  color: var(--tb-portal-text);
+  text-decoration: none;
+  font-size: 0.94rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03); /* かすかに背景 */
+  border-left: 2px solid transparent; /* 初期は透明 */
+  transition: background 0.2s, transform 0.2s, border-color 0.2s;
+  
+  /* 2段問題を解消する鍵：テキストを折り返させない */
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis; /* もし溢れたら「...」にする保険 */
+}
+
+/* SAO UI風のサイドバーホバー */
+.tb-portal-nav a:hover,
+.tb-portal-nav a:focus-visible {
+  color: #fff;
+  background: rgba(120, 161, 255, 0.1); /* システムブルー */
+  border-left-color: var(--tb-portal-accent-blue);
+  transform: translateX(5px); /* 少し右へ移動 */
+}
+
+/* =========================================
+   4. SECTION panels &ustoms (完璧に統合)
+========================================= */
+.tb-portal-section {
+  position: relative;
+  margin-top: 1.2rem;
+  padding: 1.5rem;
+  background: var(--tb-portal-panel);
+  border: 1px solid var(--tb-portal-border);
+  border-radius: var(--tb-portal-radius-md); /* 鋭い角丸 */
+  /* SAO風の斜めカット */
+  clip-path: polygon(
+    0 0, 
+    calc(100% - 20px) 0, 100% 20px, 
+    100% 100%, 
+    20px 100%, 0 calc(100% - 20px)
+  );
+  box-shadow: var(--tb-portal-shadow);
+}
+
+/* パネル左上のSAO風データライン装飾 */
+.tb-portal-section::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 20px;
+  width: 40px;
+  height: 2px;
+  background: var(--tb-portal-accent);
+  box-shadow: 0 0 8px var(--tb-portal-accent);
+}
+
+/* =========================================
+   5. BUTTONS (System Activation)
+========================================= */
+.tb-portal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: var(--tb-portal-radius-md);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+/* プライマリーボタン（塗りから枠線ホバーへ進化） */
+.tb-portal-btn--primary {
+  background: transparent;
+  border: 1px solid var(--tb-portal-accent);
+  color: var(--tb-portal-accent);
+  z-index: 1;
+}
+
+.tb-portal-btn--primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tb-portal-accent);
+  transform: skewX(-20deg) translateX(-110%);
+  transition: 0.4s;
+  z-index: -1;
+}
+
+.tb-portal-btn--primary:hover {
+  color: var(--tb-portal-bg);
+}
+
+.tb-portal-btn--primary:hover::after {
+  transform: skewX(-20deg) translateX(-10%);
+}
+
+.tb-portal-btn--ghost {
+  color: var(--tb-portal-text);
+  background: rgba(14, 20, 38, 0.62);
+  border: 1px solid var(--tb-portal-border);
+}
+
+/* =========================================
+   6. TYPOGRAPHY & HERO
+========================================= */
+.tb-portal-main {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding-bottom: 4.5rem;
+}
+
+.tb-portal-title, h1, h2 {
+  margin: 0;
+  font-family: "Shippori Mincho", serif;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.tb-portal-kicker {
+  font-family: monospace; /* SAO風観測データ */
+  color: var(--tb-portal-accent-blue);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+}
+
+.tb-portal-hero__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--tb-portal-radius-md);
+  min-height: 320px;
+  border: 1px solid var(--tb-portal-border-soft);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+}
+
+.tb-portal-link-card {
+  position: relative;
+  display: block;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid transparent;
+  transition: 0.3s;
+}
+
+.tb-portal-link-card:hover {
+  border-left-color: var(--tb-portal-accent-blue);
+  transform: translateX(5px);
+  background: rgba(120, 161, 255, 0.1);
+}
+
+/* =========================================
+   7. BREAKPOINTS (完璧なレスポンシブ)
+========================================= */
+@media (min-width: 980px) {
+  /* PCでは横並び */
+  .tb-portal-nav {
+    position: static;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+  .tb-portal-nav__list {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+  .tb-portal-nav a {
+    border-radius: 999px; /* PCでは丸いボタンに */
+    background: transparent;
+    padding: 0.4rem 1.2rem;
+    border: none;
+  }
+  .tb-portal-nav a:hover {
+    background: rgba(216, 190, 141, 0.2); /* ゴールドホバーに戻す */
+    transform: none;
+  }
+  .tb-portal-menu-button { display: none; }
 }
