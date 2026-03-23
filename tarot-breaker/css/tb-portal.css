@@ -14,6 +14,34 @@
   --tb-portal-radius-sm: 14px;
 }
 
+/* 1. 強力なリセットを追加 */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  /* iPhoneのノッチ・ステータスバー対策 */
+  padding-top: env(safe-area-inset-top, 0); 
+}
+
+/* 2. ヘッダーを完全に上端へ密着させる */
+.tb-portal-header {
+  position: sticky;
+  top: 0;
+  margin-top: 0 !important; /* 絶対に上に隙間を作らない */
+  /* safe-areaを考慮した背景の塗りつぶし */
+  padding-top: env(safe-area-inset-top, 0);
+  z-index: 1200;
+  backdrop-filter: blur(12px);
+  background: rgba(6, 10, 20, 0.85);
+  border-bottom: 1px solid rgba(173, 193, 255, 0.2);
+}
+
+/* 3. Heroセクションの上の隙間を微調整 */
+.tb-portal-hero {
+  position: relative;
+  /* ヘッダーとの間の隙間が気になる場合はここを 0 にする */
+  margin-top: 0.5rem; 
+}
+
 .tb-portal-body {
   margin: 0;
   color: var(--tb-portal-text);
