@@ -1,9 +1,7 @@
 /* =========================================================
-   TAROT BREAKER PORTAL / INTEGRATED FINAL CSS
-   - SAO風のシステム感 + タロブレの星詠・儀式感を統合
-   - 重複定義を整理
-   - スマホ / iPhone safe-area 対応
-   - 品格あるダークUI + ゴールドアクセント + アストラルブルー
+   TAROT BREAKER PORTAL / INTEGRATED FINAL READABILITY EDITION
+   - タロブレらしい星詠・儀式感 + 読みやすさ最適化
+   - 変数統一 / 余白設計 / タイポ整理 / スマホ最適化
 ========================================================= */
 
 /* =========================================
@@ -13,7 +11,7 @@
   /* Color system */
   --tb-portal-bg: #050812;
   --tb-portal-bg-2: #0a1020;
-  --tb-portal-panel: rgba(10, 15, 32, 0.82);
+  --tb-portal-panel: rgba(10, 15, 32, 0.85);
   --tb-portal-panel-strong: rgba(7, 10, 22, 0.94);
   --tb-portal-panel-soft: rgba(255, 255, 255, 0.03);
 
@@ -27,8 +25,8 @@
   --tb-portal-accent-blue-soft: rgba(120, 161, 255, 0.18);
 
   --tb-portal-text: #edf1ff;
-  --tb-portal-text-soft: rgba(237, 241, 255, 0.86);
-  --tb-portal-text-muted: rgba(237, 241, 255, 0.66);
+  --tb-portal-text-soft: rgba(237, 241, 255, 0.90);
+  --tb-portal-text-muted: rgba(237, 241, 255, 0.60);
 
   /* Effects */
   --tb-portal-shadow-lg:
@@ -45,11 +43,11 @@
 
   /* Radius */
   --tb-portal-radius-lg: 18px;
-  --tb-portal-radius-md: 10px;
+  --tb-portal-radius-md: 12px;
   --tb-portal-radius-sm: 8px;
 
   /* Layout */
-  --tb-portal-container: min(1120px, calc(100% - 2rem));
+  --tb-portal-container: min(1080px, calc(100% - 2.5rem));
   --tb-portal-header-height: 64px;
 
   /* Typography */
@@ -64,6 +62,13 @@
     linear-gradient(var(--tb-portal-border-soft) 1px, transparent 1px),
     linear-gradient(90deg, var(--tb-portal-border-soft) 1px, transparent 1px);
   --tb-portal-grid-size: 42px 42px;
+
+  /* Spacing system */
+  --tb-space-xs: 0.5rem;
+  --tb-space-sm: 1rem;
+  --tb-space-md: 1.5rem;
+  --tb-space-lg: 2.5rem;
+  --tb-space-xl: 4rem;
 }
 
 /* =========================================
@@ -89,7 +94,9 @@ body,
   min-height: 100%;
   color: var(--tb-portal-text);
   font-family: var(--tb-font-body);
-  line-height: 1.7;
+  line-height: 1.85;
+  letter-spacing: 0.03em;
+  -webkit-font-smoothing: antialiased;
   background:
     radial-gradient(circle at 18% -8%, rgba(120, 161, 255, 0.14), transparent 34%),
     radial-gradient(circle at 88% 10%, rgba(216, 190, 141, 0.10), transparent 28%),
@@ -113,7 +120,7 @@ body.tb-portal-body::before {
   z-index: -2;
 }
 
-/* Faint cosmic veil */
+/* Cosmic veil */
 .tb-portal-body::after,
 body.tb-portal-body::after {
   content: "";
@@ -150,16 +157,21 @@ h1,
 h2,
 h3,
 .tb-portal-title {
-  margin: 0;
+  margin: 0 0 var(--tb-space-sm);
   font-family: var(--tb-font-title);
   font-weight: 700;
   color: #f7f4ee;
-  letter-spacing: 0.03em;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
 }
 
 p {
   margin: 0;
   color: var(--tb-portal-text-soft);
+}
+
+.tb-portal-text {
+  margin-bottom: var(--tb-space-sm);
 }
 
 .tb-portal-kicker {
@@ -185,6 +197,9 @@ p {
 .tb-portal-lead {
   color: var(--tb-portal-text-soft);
   font-size: clamp(1rem, 1.6vw, 1.08rem);
+  line-height: 1.9;
+  margin-top: var(--tb-space-md);
+  margin-bottom: var(--tb-space-md);
 }
 
 .tb-portal-muted {
@@ -197,12 +212,12 @@ p {
 .tb-portal-main {
   width: var(--tb-portal-container);
   margin: 0 auto;
-  padding: 1rem 0 4.5rem;
+  padding: var(--tb-space-md) 0 var(--tb-space-xl);
 }
 
 .tb-portal-grid {
   display: grid;
-  gap: 0.95rem;
+  gap: 1.25rem;
 }
 
 .tb-portal-stack {
@@ -340,10 +355,12 @@ p {
 
 .tb-portal-nav a {
   display: block;
-  padding: 0.8rem 1rem;
+  padding: 0.9rem 1.2rem;
   color: var(--tb-portal-text);
   text-decoration: none;
   font-size: 0.94rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid transparent;
@@ -411,7 +428,7 @@ p {
 .tb-portal-hero__content {
   position: relative;
   z-index: 1;
-  padding: clamp(1.25rem, 3vw, 2.2rem);
+  padding: clamp(1.5rem, 5vw, 3rem);
   border-radius: var(--tb-portal-radius-lg);
   background:
     linear-gradient(180deg, rgba(11, 17, 34, 0.96) 0%, rgba(8, 12, 25, 0.94) 100%);
@@ -435,7 +452,11 @@ p {
 .tb-portal-hero h1,
 .tb-portal-title {
   font-size: clamp(2.15rem, 7vw, 4.2rem);
-  line-height: 0.98;
+  line-height: 1.15;
+}
+
+.tb-portal-hero h1 {
+  margin-bottom: 0.5rem;
 }
 
 .tb-portal-hero__text {
@@ -445,10 +466,10 @@ p {
 }
 
 .tb-portal-hero__actions {
-  margin-top: 1.2rem;
+  margin-top: 2rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 /* =========================================
@@ -456,11 +477,11 @@ p {
 ========================================= */
 .tb-portal-section {
   position: relative;
-  margin-top: 1.2rem;
-  padding: clamp(1rem, 2.6vw, 1.6rem);
+  margin-top: var(--tb-space-lg);
+  padding: var(--tb-space-md);
   background: var(--tb-portal-panel);
   border: 1px solid var(--tb-portal-border);
-  border-radius: 14px;
+  border-radius: var(--tb-portal-radius-md);
   box-shadow: var(--tb-portal-shadow-md);
   overflow: hidden;
 }
@@ -474,6 +495,7 @@ p {
   height: 2px;
   background: linear-gradient(90deg, var(--tb-portal-accent), transparent);
   box-shadow: var(--tb-portal-glow-gold);
+  opacity: 0.6;
 }
 
 .tb-portal-section::after {
@@ -491,7 +513,6 @@ p {
   z-index: 1;
 }
 
-/* section title row */
 .tb-portal-section__head {
   display: grid;
   gap: 0.4rem;
@@ -514,8 +535,10 @@ p {
 .tb-portal-link-card,
 .tb-portal-character-card a {
   position: relative;
-  display: block;
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.4rem;
   border-radius: 12px;
   border: 1px solid rgba(120, 161, 255, 0.18);
   background:
@@ -574,14 +597,16 @@ p {
 
 .tb-portal-card-title {
   font-family: var(--tb-font-title);
-  font-size: 1.06rem;
+  font-size: 1.15rem;
+  line-height: 1.4;
   color: #f6f1e8;
 }
 
 .tb-portal-card-text {
-  margin-top: 0.45rem;
+  margin-top: 0.2rem;
   color: var(--tb-portal-text-muted);
   font-size: 0.94rem;
+  line-height: 1.7;
 }
 
 /* =========================================
@@ -593,11 +618,12 @@ p {
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  padding: 0.82rem 1.5rem;
+  min-width: 180px;
+  padding: 1rem 2rem;
   border-radius: 999px;
   font-weight: 700;
   font-size: 0.94rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-decoration: none;
   overflow: hidden;
   transition:
@@ -776,9 +802,18 @@ p {
 }
 
 @media (max-width: 699px) {
+  :root {
+    --tb-portal-container: calc(100% - 2rem);
+    --tb-space-lg: 2rem;
+  }
+
   .tb-portal-main,
   .tb-portal-header__inner {
-    width: min(1120px, calc(100% - 1rem));
+    width: var(--tb-portal-container);
+  }
+
+  .tb-portal-main {
+    padding-top: var(--tb-space-sm);
   }
 
   .tb-portal-hero__media {
@@ -786,16 +821,17 @@ p {
   }
 
   .tb-portal-section {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .tb-portal-hero__actions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
   }
 
   .tb-portal-btn {
     width: 100%;
+    min-width: 0;
   }
 }
 
