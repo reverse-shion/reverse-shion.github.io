@@ -10,14 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pameraImage = root.querySelector('[data-pamera-image]');
 
   if (!card || !status || !pameraImage) {
-    alert(
-      [
-        `card: ${!!card}`,
-        `status: ${!!status}`,
-        `pameraImage: ${!!pameraImage}`,
-        `url: ${location.href}`
-      ].join('\n')
-    );
+    alert('必要な要素が見つかりませんでした。');
     return;
   }
 
@@ -54,6 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
+  // --- 追加: 画像のプリロード（遅延防止） ---
+  PAMERA_MEMBERS.forEach(member => {
+    const img = new Image();
+    img.src = member.image;
+  });
+
   let revealedMember = null;
   let locked = false;
 
@@ -70,9 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const pick = pickRandomMember();
     revealedMember = pick;
 
+    // 1. 画像情報をセットし、透明度を戻す
     pameraImage.src = pick.image;
     pameraImage.alt = `Pamera ${pick.name}`;
+    pameraImage.style.opacity = '1';
 
+    // 2. セットが完了してからめくるアニメーションを開始
     root.dataset.state = 'revealed';
     card.dataset.phase = 'revealed';
     card.dataset.flip = 'true';
@@ -102,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
       revealMember();
       window.setTimeout(() => {
         locked = false;
-      }, 300);
+      }, 500); // めくる時間に合わせて調整
       return;
     }
 
@@ -114,11 +116,18 @@ document.addEventListener('DOMContentLoaded', () => {
     locked = false;
   };
 
+  // --- 初期化処理 ---
+  // HTML側で書かれている可能性のある初期画像をクリアして隠す
+  pameraImage.src = ''; 
+  pameraImage.style.opacity = '0'; 
+  pameraImage.style.transition = 'opacity 0.2s ease'; // 出現時になめらかにする場合
+
   card.dataset.phase = 'idle';
   card.dataset.flip = 'false';
   card.dataset.linkReady = 'false';
   setStatus('待機中：カードに触れると、Pameraとの接続が始まります。');
 
+  // イベント登録
   card.addEventListener('click', onCardAction, { passive: false });
   card.addEventListener('pointerup', onCardAction, { passive: false });
 
