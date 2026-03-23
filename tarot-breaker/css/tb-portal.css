@@ -1,466 +1,193 @@
+/* =========================================================
+   TAROT BREAKER / System-Astral Core UI
+   - SAO-inspired functional beauty
+   - Astral mysticism integration
+========================================================= */
+
 :root {
-  --tb-portal-bg: #070b16;
-  --tb-portal-panel: rgba(15, 22, 42, 0.78);
-  --tb-portal-panel-strong: rgba(11, 17, 34, 0.92);
-  --tb-portal-border: rgba(170, 192, 255, 0.24);
-  --tb-portal-border-soft: rgba(173, 193, 255, 0.18);
-  --tb-portal-accent: #d8be8d;
+  /* Colors - 深化させた色彩設計 */
+  --tb-portal-bg: #050812;
+  --tb-portal-panel: rgba(10, 15, 32, 0.82);
+  --tb-portal-panel-strong: rgba(7, 10, 22, 0.95);
+  --tb-portal-accent: #d8be8d; /* Gold */
+  --tb-portal-accent-blue: #78a1ff; /* System Blue */
+  --tb-portal-border: rgba(120, 161, 255, 0.25);
   --tb-portal-text: #edf1ff;
-  --tb-portal-text-muted: rgba(237, 241, 255, 0.78);
-  --tb-portal-shadow: 0 20px 40px rgba(0, 0, 0, 0.26);
-  --tb-portal-shadow-soft: 0 10px 22px rgba(0, 0, 0, 0.25);
-  --tb-portal-radius-lg: 22px;
-  --tb-portal-radius-md: 18px;
-  --tb-portal-radius-sm: 14px;
+  --tb-portal-text-muted: rgba(237, 241, 255, 0.65);
+  
+  /* SAO Style Grids & Lines */
+  --system-grid: radial-gradient(circle, rgba(120, 161, 255, 0.05) 1px, transparent 1px);
+  
+  /* Spacing & Radius */
+  --tb-portal-radius-md: 4px; /* SAO風に角丸を鋭く */
+  --tb-portal-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 0 0 10px rgba(120, 161, 255, 0.1);
 }
 
-/* 1. 強力なリセットを追加 */
+/* 1. Reset & Global (余白の完全抹殺) */
 html, body {
   margin: 0 !important;
   padding: 0 !important;
-  /* iPhoneのノッチ・ステータスバー対策 */
-  padding-top: env(safe-area-inset-top, 0); 
-}
-
-/* 2. ヘッダーを完全に上端へ密着させる */
-.tb-portal-header {
-  position: sticky;
-  top: 0;
-  margin-top: 0 !important; /* 絶対に上に隙間を作らない */
-  /* safe-areaを考慮した背景の塗りつぶし */
-  padding-top: env(safe-area-inset-top, 0);
-  z-index: 1200;
-  backdrop-filter: blur(12px);
-  background: rgba(6, 10, 20, 0.85);
-  border-bottom: 1px solid rgba(173, 193, 255, 0.2);
-}
-
-/* 3. Heroセクションの上の隙間を微調整 */
-.tb-portal-hero {
-  position: relative;
-  /* ヘッダーとの間の隙間が気になる場合はここを 0 にする */
-  margin-top: 0.5rem; 
-}
-
-.tb-portal-body {
-  margin: 0;
+  background-color: var(--tb-portal-bg);
   color: var(--tb-portal-text);
-  background:
-    radial-gradient(circle at 20% -10%, rgba(140, 164, 255, 0.16), transparent 35%),
-    radial-gradient(circle at 90% 10%, rgba(216, 190, 141, 0.12), transparent 30%),
-    var(--tb-portal-bg);
+  font-family: "Noto Sans JP", sans-serif;
+  overflow-x: hidden;
+  padding-top: env(safe-area-inset-top, 0);
 }
 
-.tb-portal-main {
-  width: min(1120px, calc(100% - 2rem));
-  margin: 0 auto;
-  padding-bottom: 4.5rem;
+/* 背景にデジタル・アストラル・グリッドを配置 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--system-grid);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.4;
 }
 
+/* 2. Header (SAO Floating Menu Style) */
 .tb-portal-header {
   position: sticky;
   top: 0;
   z-index: 1200;
-  backdrop-filter: blur(12px);
-  background: rgba(6, 10, 20, 0.85);
-  border-bottom: 1px solid rgba(173, 193, 255, 0.2);
+  backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(5, 8, 18, 0.75);
+  border-bottom: 1px solid var(--tb-portal-border);
+  padding-top: env(safe-area-inset-top, 0);
 }
 
 .tb-portal-header__inner {
-  width: min(1120px, calc(100% - 2rem));
+  width: min(1200px, calc(100% - 2rem));
   margin: 0 auto;
-  min-height: 64px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
 }
 
 .tb-portal-home {
-  color: var(--tb-portal-text);
-  font-size: 0.9rem;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   text-decoration: none;
+  color: var(--tb-portal-accent);
+  text-shadow: 0 0 10px rgba(216, 190, 141, 0.5);
 }
 
-.tb-portal-nav__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.tb-portal-nav a {
-  color: var(--tb-portal-text);
-  text-decoration: none;
-  font-size: 0.94rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 999px;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.tb-portal-nav a:hover,
-.tb-portal-nav a:focus-visible,
-.tb-portal-home:hover,
-.tb-portal-home:focus-visible {
-  color: #fff;
-  outline: none;
-  background: rgba(216, 190, 141, 0.2);
-}
-
-.tb-portal-menu-button {
-  display: none;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--tb-portal-border);
-  border-radius: 10px;
-  background: rgba(12, 18, 36, 0.85);
-  padding: 8px;
-  cursor: pointer;
-}
-
-.tb-portal-menu-button span {
-  display: block;
-  width: 100%;
-  height: 2px;
-  margin: 6px 0;
-  background: var(--tb-portal-text);
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-
-.tb-portal-menu-button[aria-expanded="true"] span:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
-}
-
-.tb-portal-menu-button[aria-expanded="true"] span:nth-child(2) {
-  opacity: 0;
-}
-
-.tb-portal-menu-button[aria-expanded="true"] span:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
-}
-
-/* =========================================
-   HERO
-========================================= */
-
+/* 3. Hero Section (Visual Focus) */
 .tb-portal-hero {
-  position: relative;
-  margin-top: 1.2rem;
-}
-
-.tb-portal-hero__inner {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  align-items: stretch;
-}
-
-.tb-portal-hero__visual {
-  order: 1;
-  position: relative;
+  margin-top: 1rem;
 }
 
 .tb-portal-hero__media {
   position: relative;
-  overflow: hidden;
-  border-radius: var(--tb-portal-radius-lg);
-  min-height: 320px;
-  background: #060a14;
-  border: 1px solid var(--tb-portal-border-soft);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
-}
-
-.tb-portal-hero__media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 320px;
-  object-fit: cover;
-  object-position: center center;
-}
-
-.tb-portal-hero__content {
-  order: 2;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(1.2rem, 4vw, 2.2rem);
-  border-radius: var(--tb-portal-radius-lg);
-  background:
-    linear-gradient(180deg, rgba(11, 17, 34, 0.96) 0%, rgba(10, 16, 31, 0.92) 100%);
+  border-radius: var(--tb-portal-radius-md);
   border: 1px solid var(--tb-portal-border);
-  box-shadow:
-    var(--tb-portal-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  box-shadow: var(--tb-portal-shadow);
 }
 
-.tb-portal-hero__overlay {
-  display: none !important;
+/* 4. SAO-Style Section Panels */
+.tb-portal-section {
+  position: relative;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: var(--tb-portal-panel);
+  border: 1px solid var(--tb-portal-border);
+  border-radius: var(--tb-portal-radius-md);
+  /* 斜めカットの装飾 */
+  clip-path: polygon(
+    0 0, 
+    calc(100% - 20px) 0, 100% 20px, 
+    100% 100%, 
+    20px 100%, 0 calc(100% - 20px)
+  );
+}
+
+/* 装飾用のコーナーブラケット */
+.tb-portal-section::before {
+  content: "OBSERVATION MODE";
+  position: absolute;
+  top: 0;
+  right: 40px;
+  font-size: 10px;
+  color: var(--tb-portal-accent-blue);
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  background: rgba(120, 161, 255, 0.1);
+  border: 1px solid var(--tb-portal-border);
+  border-top: none;
+}
+
+/* 5. Interactive Cards (SAO Menu Items) */
+.tb-portal-link-card {
+  position: relative;
+  display: block;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--tb-portal-accent-blue);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.tb-portal-link-card:hover {
+  background: rgba(120, 161, 255, 0.1);
+  transform: translateX(8px);
+  box-shadow: -5px 0 15px rgba(120, 161, 255, 0.2);
+}
+
+/* 6. Buttons (High-Tech Style) */
+.tb-portal-btn {
+  position: relative;
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--tb-portal-accent);
+  background: transparent;
+  color: var(--tb-portal-accent);
+  cursor: pointer;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.tb-portal-btn--primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tb-portal-accent);
+  transform: skewX(-20deg) translateX(-110%);
+  transition: 0.4s;
+  z-index: -1;
+}
+
+.tb-portal-btn--primary:hover {
+  color: var(--tb-portal-bg);
+}
+
+.tb-portal-btn--primary:hover::after {
+  transform: skewX(-20deg) translateX(-10%);
+}
+
+/* 7. Typography */
+h1, h2, .tb-portal-title {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .tb-portal-kicker {
-  margin: 0 0 0.6rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  color: var(--tb-portal-text-muted);
+  font-family: monospace; /* システムデータ感を出すため */
+  color: var(--tb-portal-accent-blue);
+  font-size: 0.75rem;
 }
 
-.tb-portal-hero h1,
-.tb-portal-title {
-  margin: 0;
-  font-family: "Shippori Mincho", serif;
-}
-
-.tb-portal-hero h1 {
-  font-size: clamp(2.2rem, 7.2vw, 4.2rem);
-  line-height: 0.96;
-  letter-spacing: 0.04em;
-  color: #f6f1e8;
-}
-
-.tb-portal-subtitle {
-  margin: 0.75rem 0 0;
-  font-size: clamp(1rem, 2.8vw, 1.35rem);
-  line-height: 1.8;
-  color: var(--tb-portal-text-muted);
-}
-
-.tb-portal-lead,
-.tb-portal-text {
-  line-height: 1.8;
-  color: var(--tb-portal-text-muted);
-}
-
-.tb-portal-lead {
-  margin-top: 1rem;
-  max-width: 34em;
-}
-
-.tb-portal-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
-  margin-top: 1.2rem;
-}
-
-.tb-portal-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 0.82rem 1.2rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  text-decoration: none;
-  font-weight: 700;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
-}
-
-.tb-portal-btn--primary {
-  background: linear-gradient(135deg, #f0d59f, #c6a05d);
-  color: #1a1d2a;
-}
-
-.tb-portal-btn--ghost {
-  color: var(--tb-portal-text);
-  background: rgba(14, 20, 38, 0.62);
-  border-color: var(--tb-portal-border);
-}
-
-.tb-portal-btn:hover,
-.tb-portal-btn:focus-visible,
-.tb-portal-link-card:hover,
-.tb-portal-link-card:focus-visible,
-.tb-portal-entry-card:hover,
-.tb-portal-entry-card:focus-visible,
-.tb-portal-character-card a:hover,
-.tb-portal-character-card a:focus-visible {
-  outline: none;
-  transform: translateY(-2px);
-  box-shadow: var(--tb-portal-shadow-soft);
-}
-
-/* =========================================
-   SECTION
-========================================= */
-
-.tb-portal-section {
-  margin-top: 1.2rem;
-  padding: clamp(1rem, 2.8vw, 1.8rem);
-  border: 1px solid var(--tb-portal-border);
-  border-radius: var(--tb-portal-radius-md);
-  background: var(--tb-portal-panel);
-}
-
-.tb-portal-grid {
-  display: grid;
-  gap: 0.8rem;
-}
-
-.tb-portal-grid--4 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.tb-portal-grid--2,
-.tb-portal-grid--3,
-.tb-portal-grid--characters {
-  grid-template-columns: 1fr;
-}
-
-.tb-portal-entry-card,
-.tb-portal-link-card,
-.tb-portal-character-card a {
-  display: block;
-  padding: 0.9rem;
-  border-radius: var(--tb-portal-radius-sm);
-  border: 1px solid rgba(173, 193, 255, 0.2);
-  background: var(--tb-portal-panel-strong);
-  color: var(--tb-portal-text);
-  text-decoration: none;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.tb-portal-entry-card strong,
-.tb-portal-link-card strong {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-  color: var(--tb-portal-accent);
-}
-
-.tb-portal-entry-card span,
-.tb-portal-link-card span,
-.tb-portal-character-card p {
-  color: var(--tb-portal-text-muted);
-}
-
-.tb-portal-character-card img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.tb-portal-character-card h3 {
-  margin: 0.75rem 0 0.4rem;
-}
-
-.tb-portal-sub-link {
-  margin-top: 1rem;
-}
-
-.tb-portal-sub-link a {
-  color: var(--tb-portal-accent);
-}
-
-.tb-portal-final {
-  text-align: center;
-}
-
-/* =========================================
-   BREAKPOINTS
-========================================= */
-
-@media (min-width: 700px) {
-  .tb-portal-grid--2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .tb-portal-grid--3,
-  .tb-portal-grid--characters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .tb-portal-hero__media,
-  .tb-portal-hero__media img {
-    min-height: 420px;
-  }
-}
-
-@media (min-width: 980px) {
-  .tb-portal-grid--4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .tb-portal-grid--3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .tb-portal-grid--characters {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .tb-portal-hero__media,
-  .tb-portal-hero__media img {
-    min-height: 560px;
-  }
-
-  .tb-portal-hero__content {
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 860px) {
-  .tb-portal-menu-button {
-    display: inline-block;
-  }
-
-  .tb-portal-nav {
-    position: absolute;
-    left: 1rem;
-    right: 1rem;
-    top: calc(100% + 0.5rem);
-    padding: 0.7rem;
-    border-radius: 14px;
-    border: 1px solid var(--tb-portal-border);
-    background: rgba(8, 12, 24, 0.96);
-    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.35);
-  }
-
-  .tb-portal-nav[hidden] {
-    display: none;
-  }
-
-  .tb-portal-nav__list {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.4rem;
-  }
-
-  .tb-portal-nav a {
-    display: block;
-    border-radius: 10px;
-  }
-}
-
-@media (max-width: 640px) {
-  .tb-portal-main {
-    width: min(1120px, calc(100% - 1rem));
-  }
-
-  .tb-portal-header__inner {
-    width: min(1120px, calc(100% - 1rem));
-  }
-
-  .tb-portal-hero__media,
-  .tb-portal-hero__media img {
-    min-height: 280px;
-  }
-
-  .tb-portal-btn {
-    width: 100%;
+/* 8. Mobile Optimization */
+@media (max-width: 768px) {
+  .tb-portal-section {
+    padding: 1rem;
+    clip-path: none; /* スマホでは視認性優先 */
+    border-radius: 8px;
   }
 }
