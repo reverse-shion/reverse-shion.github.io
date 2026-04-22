@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f8f3ee" />
+  <meta name="theme-color" content="#f7efee" />
   <title>Re:Verse Shion — 恋愛の星詠ワンカード（無料）</title>
   <meta name="description" content="あの人の気持ち、既読無視、片想い、復縁、曖昧な関係。恋愛の悩みを一枚のカードからやさしく読み解く、詩韻の無料恋愛占い。" />
 
@@ -15,275 +15,511 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f9f4ee;
-      --ink: #211a18;
-      --ink-soft: rgba(0, 0, 0, 0.72);
-      --ink-muted: rgba(0, 0, 0, 0.56);
-      --line: rgba(83, 52, 28, 0.14);
-      --gold: #cb9e57;
-      --gold-deep: #ad7e34;
-      --rose: #9a6d7d;
-      --lavender: #8f7ba5;
-      --panel: rgba(255, 255, 255, 0.92);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
+      --bg: #f8f0ee;
+      --bg-deep: #f1e5e5;
+      --ink: #251f20;
+      --ink-soft: rgba(37, 31, 32, 0.78);
+      --ink-muted: rgba(37, 31, 32, 0.58);
+
+      --line: rgba(118, 84, 97, 0.16);
+      --line-soft: rgba(118, 84, 97, 0.10);
+
+      --gold: #c5a062;
+      --gold-deep: #a57a44;
+      --rose: #9e7382;
+      --rose-deep: #845c6a;
+      --rose-soft: #f0e1e7;
+      --lavender: #8a7aa6;
+      --lavender-soft: #ece8f3;
+      --wine: #5f454f;
+      --plum: #6e5460;
+      --ivory: #fffaf8;
+
+      --panel: rgba(255,255,255,0.92);
+      --panel-strong: rgba(255,255,255,0.96);
+
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
       --radius-pill: 999px;
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.08);
-      --shadow-card: 0 14px 32px rgba(0, 0, 0, 0.15);
+
+      --shadow-page: 0 18px 50px rgba(82, 56, 66, 0.08);
+      --shadow-panel: 0 14px 30px rgba(78, 50, 62, 0.05);
+      --shadow-card: 0 16px 34px rgba(65, 43, 52, 0.14);
+      --shadow-cta: 0 18px 34px rgba(104, 73, 85, 0.18);
+
       --font-main: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, 'Yu Mincho', serif;
       --font-hero: 'Cormorant Garamond', 'Times New Roman', serif;
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
       min-height: 100vh;
       font-family: var(--font-main);
       color: var(--ink);
       background:
-        radial-gradient(circle at 0% 0%, #fff 0, #f9f4ee 55%, #f1e5de 100%);
-      padding: 16px 12px 28px;
+        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.98) 0, rgba(248,240,238,0.96) 46%, rgba(242,231,233,0.98) 100%);
+      padding: 16px 12px 34px;
+      letter-spacing: 0.01em;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     .page {
       position: relative;
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
       border-radius: var(--radius-xl);
-      border: 1px solid rgba(255, 255, 255, 0.92);
-      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255,255,255,0.92);
+      box-shadow: var(--shadow-page);
       background:
-        radial-gradient(circle at 12% 0%, rgba(255,255,255,0.95) 0, rgba(255,255,255,0.98) 58%, #f8eee6 100%);
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.99) 0, rgba(255,255,255,0.97) 42%, rgba(251,243,241,0.98) 72%, rgba(244,232,232,0.98) 100%);
       overflow: hidden;
-      padding: 18px 14px 22px;
+      padding: 20px 14px 26px;
+      backdrop-filter: blur(10px);
     }
 
     .page::before {
       content: "";
       position: absolute;
-      inset: -30%;
+      inset: -26%;
       background:
-        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.62) 0, transparent 50%),
-        radial-gradient(circle at 85% 0%, rgba(171, 138, 156, 0.15) 0, transparent 46%),
-        repeating-linear-gradient(135deg, rgba(203,158,87,0.0) 0, rgba(203,158,87,0.08) 1px, rgba(203,158,87,0) 4px, rgba(203,158,87,0) 10px);
+        radial-gradient(circle at 8% 12%, rgba(255,255,255,0.72) 0, transparent 46%),
+        radial-gradient(circle at 88% 3%, rgba(158,115,130,0.16) 0, transparent 40%),
+        radial-gradient(circle at 82% 24%, rgba(138,122,166,0.11) 0, transparent 26%),
+        repeating-linear-gradient(
+          135deg,
+          rgba(197,160,98,0.00) 0,
+          rgba(197,160,98,0.07) 1px,
+          rgba(197,160,98,0.00) 4px,
+          rgba(197,160,98,0.00) 11px
+        );
       pointer-events: none;
-      opacity: 0.35;
+      opacity: 0.48;
     }
 
     .hero, .content, .trust, footer { position: relative; z-index: 1; }
 
-    .hero { text-align: center; margin-bottom: 14px; }
+    .hero {
+      text-align: center;
+      margin-bottom: 18px;
+      padding: 2px 4px 4px;
+    }
 
     .hero-top {
+      display: inline-block;
       font-family: var(--font-hero);
-      letter-spacing: 0.16em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      font-size: 0.78rem;
-      color: rgba(0,0,0,0.5);
-      margin-bottom: 6px;
+      font-size: 0.75rem;
+      color: rgba(95, 69, 79, 0.60);
+      margin-bottom: 10px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.74), rgba(244,233,238,0.74));
+      border: 1px solid rgba(158,115,130,0.12);
     }
 
     .hero h1 {
       font-family: var(--font-hero);
-      font-size: clamp(1.9rem, 7.8vw, 2.7rem);
-      line-height: 1.14;
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
+      font-size: clamp(2.1rem, 8.2vw, 3.05rem);
+      line-height: 1.1;
+      letter-spacing: 0.045em;
+      font-weight: 600;
+      margin-bottom: 12px;
     }
 
     .hero h1 span {
-      background: linear-gradient(120deg, #9a6d7d, #cb9e57 48%, #8d78a7);
+      background: linear-gradient(120deg, #845c6a 0%, #c5a062 48%, #8a7aa6 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
 
     .hero-copy {
-      font-size: 0.93rem;
-      line-height: 1.78;
+      max-width: 700px;
+      margin: 0 auto 10px;
+      font-size: 0.96rem;
+      line-height: 1.98;
       color: var(--ink-soft);
-      margin-bottom: 10px;
     }
 
-    .hero-copy strong { color: var(--ink); }
+    .hero-copy strong {
+      color: var(--wine);
+      font-weight: 700;
+    }
 
     .hero-sub {
-      font-size: 0.82rem;
+      max-width: 650px;
+      margin: 0 auto 14px;
+      font-size: 0.84rem;
+      line-height: 1.9;
       color: var(--ink-muted);
-      line-height: 1.7;
-      margin-bottom: 12px;
+    }
+
+    .hero-note {
+      max-width: 700px;
+      margin: 0 auto 14px;
+      font-size: 0.8rem;
+      line-height: 1.84;
+      color: rgba(95, 69, 79, 0.62);
+      background: linear-gradient(135deg, rgba(255,255,255,0.76), rgba(246,236,241,0.62));
+      border: 1px solid rgba(158,115,130,0.10);
+      border-radius: 14px;
+      padding: 10px 12px;
     }
 
     .return-link {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      color: rgba(0,0,0,0.58);
-      font-size: 0.76rem;
-      text-underline-offset: 2px;
+      gap: 5px;
+      color: rgba(95, 69, 79, 0.64);
+      font-size: 0.77rem;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(158,115,130,0.18);
+      padding-bottom: 1px;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .return-link:hover {
+      opacity: 0.86;
+      transform: translateY(-1px);
     }
 
     .content {
       display: grid;
-      gap: 12px;
+      gap: 15px;
     }
 
     .panel {
+      position: relative;
+      overflow: hidden;
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255,255,255,0.9);
-      background: var(--panel);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.05);
-      padding: 14px 12px;
+      border: 1px solid rgba(255,255,255,0.92);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,248,251,0.91) 44%, rgba(249,241,238,0.95));
+      box-shadow: var(--shadow-panel);
+      padding: 17px 14px;
     }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(240,225,231,0.36) 0, transparent 26%),
+        radial-gradient(circle at 0% 100%, rgba(236,232,243,0.30) 0, transparent 24%);
+      pointer-events: none;
+    }
+
+    .panel > * { position: relative; z-index: 1; }
 
     .label {
-      font-size: 0.72rem;
-      letter-spacing: 0.13em;
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.52);
-      margin-bottom: 6px;
-    }
-
-    .title {
-      font-size: 1rem;
-      font-weight: 600;
+      color: rgba(95, 69, 79, 0.48);
       margin-bottom: 8px;
     }
 
-    .lead { font-size: 0.88rem; line-height: 1.76; color: var(--ink-soft); }
+    .title {
+      font-size: 1.08rem;
+      line-height: 1.55;
+      font-weight: 600;
+      color: var(--wine);
+      margin-bottom: 10px;
+    }
 
-    .btn-row { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .lead {
+      font-size: 0.9rem;
+      line-height: 1.92;
+      color: var(--ink-soft);
+    }
+
+    .micro-copy {
+      margin-top: 10px;
+      font-size: 0.79rem;
+      line-height: 1.8;
+      color: rgba(95, 69, 79, 0.58);
+    }
+
+    .btn-row {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 7px;
       border: 1px solid transparent;
       border-radius: var(--radius-pill);
-      padding: 11px 17px;
+      padding: 13px 20px;
       font-family: inherit;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
       text-decoration: none;
       cursor: pointer;
       transition: all 220ms ease;
       white-space: nowrap;
+      min-height: 50px;
     }
 
-    .btn:hover { transform: translateY(-1px); }
+    .btn:hover {
+      transform: translateY(-1px);
+    }
 
     .btn-primary {
-      background: linear-gradient(135deg, #1f1a18, #3b2e29);
-      color: #fff;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.18);
+      background:
+        linear-gradient(135deg, #6a4b57 0%, #845c6a 48%, #a47988 100%);
+      color: #fffafb;
+      border: 1px solid rgba(255,255,255,0.20);
+      box-shadow: var(--shadow-cta);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.03);
+      box-shadow: 0 20px 36px rgba(104, 73, 85, 0.22);
     }
 
     .btn-secondary {
-      background: linear-gradient(135deg, #fff, #f7ecdf);
-      color: rgba(0,0,0,0.82);
-      border-color: rgba(203,158,87,0.35);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+      background:
+        linear-gradient(135deg, #7b5968 0%, #946978 48%, #b08291 100%);
+      color: var(--ivory);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 16px 30px rgba(109, 77, 90, 0.18);
+      font-weight: 600;
+      letter-spacing: 0.015em;
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(1.03);
+      box-shadow: 0 18px 32px rgba(109, 77, 90, 0.22);
     }
 
     .btn-ghost {
-      background: rgba(255,255,255,0.65);
-      color: rgba(0,0,0,0.68);
-      border-color: rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.64);
+      color: rgba(95, 69, 79, 0.72);
+      border-color: rgba(118,84,97,0.12);
+      box-shadow: 0 6px 14px rgba(79, 50, 62, 0.04);
     }
 
-    .hint { margin-top: 8px; font-size: 0.75rem; line-height: 1.65; color: rgba(0,0,0,0.53); }
+    .hint {
+      margin-top: 10px;
+      font-size: 0.76rem;
+      line-height: 1.8;
+      color: rgba(95, 69, 79, 0.56);
+    }
 
-    .card-shell { display: grid; justify-items: center; gap: 10px; }
+    .card-shell {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+    }
 
     .card-frame {
-      width: min(70vw, 255px);
-      aspect-ratio: 2/3;
-      border-radius: 16px;
+      width: min(70vw, 262px);
+      aspect-ratio: 2 / 3;
+      border-radius: 18px;
       padding: 6px;
       perspective: 1200px;
-      background: radial-gradient(circle at 20% 0%, #fff, #efe1d6 80%);
+      background:
+        radial-gradient(circle at 24% 0%, rgba(255,255,255,1), rgba(244,232,236,0.95) 58%, rgba(235,221,224,0.98) 100%);
       box-shadow: var(--shadow-card);
+      border: 1px solid rgba(255,255,255,0.70);
     }
 
     .card-inner {
-      width: 100%; height: 100%; position: relative; border-radius: 12px;
-      transform-style: preserve-3d; transition: transform 720ms cubic-bezier(0.19, 1, 0.22, 1);
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 13px;
+      transform-style: preserve-3d;
+      transition: transform 720ms cubic-bezier(0.19, 1, 0.22, 1);
       overflow: hidden;
     }
 
-    .card-frame.is-flipped .card-inner { transform: rotateY(180deg); }
+    .card-frame.is-flipped .card-inner {
+      transform: rotateY(180deg);
+    }
 
     .card-face {
-      position: absolute; inset: 0; backface-visibility: hidden;
-      display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(circle at 30% 0%, #fff, #f5ecdf 78%, #e7d7c9 100%);
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 32% 0%, rgba(255,255,255,1), rgba(249,240,243,0.97) 76%, rgba(233,220,223,0.98) 100%);
     }
 
     .card-front { transform: rotateY(180deg); }
 
-    .card-img { width: 100%; height: 100%; object-fit: cover; }
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    .card-meta { text-align: center; min-height: 58px; }
-    .card-name { font-size: 0.96rem; margin-bottom: 2px; font-weight: 600; }
-    .card-key { font-size: 0.78rem; color: rgba(0,0,0,0.6); letter-spacing: 0.08em; text-transform: uppercase; }
+    .card-meta {
+      text-align: center;
+      min-height: 66px;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      margin-bottom: 4px;
+      font-weight: 600;
+      line-height: 1.58;
+      color: var(--wine);
+    }
+
+    .card-key {
+      font-size: 0.77rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: rgba(95, 69, 79, 0.58);
+    }
 
     .result {
       width: 100%;
       border-radius: var(--radius-md);
-      border: 1px solid rgba(203,158,87,0.32);
-      background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(251,243,235,0.96));
-      padding: 11px 11px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      border: 1px solid rgba(197,160,98,0.24);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.99), rgba(252,244,247,0.97) 42%, rgba(251,244,238,0.97));
+      padding: 14px 13px;
+      box-shadow: 0 12px 28px rgba(85, 56, 68, 0.08);
       opacity: 0;
       transform: translateY(8px);
       transition: all 260ms ease;
     }
 
     .result[hidden] { display: none !important; }
-    .result.is-show { opacity: 1; transform: translateY(0); }
 
-    .result-main { font-size: 0.88rem; line-height: 1.82; color: rgba(0,0,0,0.82); margin-bottom: 6px; }
-    .result-sub { font-size: 0.82rem; line-height: 1.78; color: rgba(0,0,0,0.67); }
+    .result.is-show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result-lead {
+      font-size: 0.73rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(95, 69, 79, 0.48);
+      margin-bottom: 8px;
+    }
+
+    .result-main {
+      font-size: 0.91rem;
+      line-height: 1.95;
+      color: rgba(48, 35, 39, 0.87);
+      margin-bottom: 8px;
+    }
+
+    .result-sub {
+      font-size: 0.84rem;
+      line-height: 1.9;
+      color: rgba(56, 42, 47, 0.72);
+    }
 
     .bridge {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(203,158,87,0.24);
-      background: rgba(255,255,255,0.7);
+      margin-top: 13px;
+      padding: 12px 11px;
+      border-radius: 13px;
+      border: 1px solid rgba(158,115,130,0.16);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.78), rgba(246,236,242,0.64));
     }
 
     .bridge-title {
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
+      font-size: 0.71rem;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.52);
-      margin-bottom: 6px;
+      color: rgba(95, 69, 79, 0.5);
+      margin-bottom: 7px;
     }
 
-    .bridge p { font-size: 0.8rem; line-height: 1.75; color: rgba(0,0,0,0.68); }
+    .bridge p {
+      font-size: 0.81rem;
+      line-height: 1.84;
+      color: rgba(60, 44, 49, 0.72);
+    }
 
-    .safe-note { margin-top: 7px; font-size: 0.75rem; line-height: 1.68; color: rgba(0,0,0,0.55); }
+    .cta-wrap {
+      margin-top: 14px;
+      padding: 14px 13px;
+      border-radius: 16px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.84), rgba(248,236,242,0.84) 46%, rgba(245,236,229,0.82));
+      border: 1px solid rgba(197,160,98,0.18);
+      box-shadow: 0 12px 24px rgba(95, 69, 79, 0.06);
+    }
+
+    .cta-heading {
+      font-size: 0.94rem;
+      line-height: 1.7;
+      color: var(--plum);
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
+
+    .cta-text {
+      font-size: 0.8rem;
+      line-height: 1.84;
+      color: rgba(95, 69, 79, 0.68);
+      margin-bottom: 10px;
+    }
+
+    .safe-note {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      line-height: 1.72;
+      color: rgba(95, 69, 79, 0.58);
+    }
 
     .trust {
-      margin-top: 12px;
+      margin-top: 14px;
       border-radius: var(--radius-md);
       border: 1px solid var(--line);
-      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,236,243,0.72));
-      padding: 12px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,239,244,0.82) 44%, rgba(241,236,247,0.70));
+      padding: 14px 12px;
+      box-shadow: 0 8px 18px rgba(85, 56, 68, 0.04);
     }
 
-    .trust p { font-size: 0.82rem; line-height: 1.76; color: rgba(0,0,0,0.72); }
+    .trust p {
+      font-size: 0.83rem;
+      line-height: 1.9;
+      color: rgba(58, 43, 48, 0.76);
+    }
 
     footer {
-      margin-top: 16px;
+      margin-top: 18px;
       text-align: center;
       font-size: 0.74rem;
-      color: rgba(0,0,0,0.5);
+      color: rgba(95, 69, 79, 0.48);
+    }
+
+    @media (max-width: 480px) {
+      .hero-copy { font-size: 0.93rem; }
+      .hero-sub { font-size: 0.8rem; }
+      .title { font-size: 1.03rem; }
+      .btn { width: 100%; }
+      .hero-note { text-align: left; }
     }
 
     @media (min-width: 900px) {
-      body { padding: 22px 16px 34px; }
-      .page { padding: 22px 20px 26px; }
+      body { padding: 24px 16px 38px; }
+      .page { padding: 24px 20px 30px; }
+      .panel { padding: 18px 16px; }
     }
   </style>
 </head>
@@ -293,28 +529,45 @@
       <div class="hero-top">LOVE ONE-CARD READING</div>
       <h1><span>恋愛の星詠ワンカード</span></h1>
       <p class="hero-copy">
-        <strong>あの人の気持ちを、一枚のカードから無料で読み解く。</strong><br>
-        片想い、既読無視、復縁、曖昧な関係。今のあなたに必要な言葉を、やさしく受け取るページです。
+        <strong>あの人の気持ちを、一枚のカードからそっと読み解く。</strong><br>
+        片想い、既読無視、復縁、曖昧な関係。恋で揺れる心に、やわらかな言葉を受け取るための無料ページです。
       </p>
-      <p class="hero-sub">恋で心が揺れる日に。詩韻の言葉で、気持ちをほどく小さな星詠を。</p>
+      <p class="hero-sub">
+        ただ当てるためではなく、相手の気持ちとあなた自身の本音を静かにほどくために。
+        恋が苦しい日に、少し深く呼吸できるような入口をここに。
+      </p>
+      <p class="hero-note">
+        こんな気持ちがある日に向いています。  
+        返事が来ない理由が知りたい。まだ脈があるのか確かめたい。動くべきか待つべきか迷っている。気持ちを手放すべきか決めきれない。
+      </p>
       <a class="return-link" href="tarot369.html">← 総合無料占いへ戻る</a>
     </header>
 
     <main class="content">
       <section class="panel" aria-labelledby="start-title">
         <div class="label">STEP 1</div>
-        <h2 id="start-title" class="title">無料で恋愛の星詠を受け取る</h2>
-        <p class="lead">あの人を思い浮かべてください。今いちばん気になっている恋を心に浮かべたら、ボタンを押してください。</p>
+        <h2 id="start-title" class="title">今いちばん気になる恋を、心にひとつ置いてください</h2>
+        <p class="lead">
+          あの人の顔や名前、最後のやり取り、いま不安になっていることを静かに思い浮かべてください。
+          準備ができたら、下のボタンからこの恋に届いているメッセージを開けます。
+        </p>
+
         <div class="btn-row">
-          <button id="startBtn" class="btn btn-primary" type="button">💗 あの人の気持ちを占う（無料）</button>
-          <button id="resetBtn" class="btn btn-ghost" type="button" disabled>もう一度占う</button>
+          <button id="startBtn" class="btn btn-primary" type="button">この恋に届いている言葉を受け取る</button>
+          <button id="resetBtn" class="btn btn-ghost" type="button" disabled>もう一度ひらく</button>
         </div>
-        <p class="hint">※無料結果は「今もっとも強いメッセージ」を映します。状況の全体像は個人鑑定でより丁寧に読み解けます。</p>
+
+        <p class="micro-copy">
+          まずは無料で、今の恋にもっとも強く出ている気配をひとつ受け取れます。
+        </p>
+        <p class="hint">
+          ※無料結果では「いま強く届いている核心」を映します。相手の本音、時期、今後の流れまで丁寧に読みたい場合は、個人鑑定でさらに深く見ることができます。
+        </p>
       </section>
 
       <section class="panel" aria-labelledby="result-title">
         <div class="label">STEP 2</div>
-        <h2 id="result-title" class="title">恋に届く、今日の一枚</h2>
+        <h2 id="result-title" class="title">今日、この恋に届いた一枚</h2>
 
         <div class="card-shell" aria-live="polite">
           <div id="cardFrame" class="card-frame">
@@ -329,23 +582,32 @@
           </div>
 
           <div class="card-meta">
-            <div id="cardName" class="card-name">カードはまだ伏せられています</div>
+            <div id="cardName" class="card-name">カードはまだ静かに伏せられています</div>
             <div id="cardKeyword" class="card-key">恋愛の星詠を始めてください</div>
           </div>
 
           <article id="resultBox" class="result" hidden>
+            <div class="result-lead">message for your love</div>
             <p id="mainText" class="result-main"></p>
             <p id="subText" class="result-sub"></p>
 
             <div class="bridge">
-              <div class="bridge-title">この先をもっと知るなら</div>
+              <div class="bridge-title">ここから先をもっと知るなら</div>
               <p id="bridgeText"></p>
             </div>
 
-            <div class="btn-row" style="margin-top: 10px;">
-              <a id="ctaBtn" class="btn btn-secondary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">この恋の今後を、個人鑑定で詳しく見る</a>
+            <div class="cta-wrap">
+              <div class="cta-heading">相手の本音や、この先の流れまで丁寧に知りたいときは</div>
+              <p class="cta-text">
+                無料版では、いま強く届いている恋の核心を一枚で映しています。  
+                ただ、曖昧な関係や返事のない恋ほど、一部分だけでは判断しきれません。  
+                個人鑑定では、相手の気持ち、動く時期、待つべきか進むべきかまで、あなたの状況に合わせて丁寧に読み解きます。
+              </p>
+              <div class="btn-row" style="margin-top: 0;">
+                <a id="ctaBtn" class="btn btn-secondary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">この恋を、個人鑑定で丁寧に読み解く</a>
+              </div>
+              <p id="safeNote" class="safe-note">LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。</p>
             </div>
-            <p id="safeNote" class="safe-note">LINEから気軽にご相談いただけます。無理な勧誘はありません。</p>
           </article>
         </div>
       </section>
@@ -353,9 +615,9 @@
 
     <section class="trust" aria-label="詩韻の恋愛鑑定スタンス">
       <p>
-        詩韻の恋愛鑑定は、ただ結果を断定するためのものではありません。
-        不安を煽らず、相手の気持ちと流れ、そしてあなたの本音をやさしく言語化しながら、
-        最後は「大丈夫だよ」と思える余白へ着地することを大切にしています。
+        詩韻の恋愛鑑定は、ただ結果を強く言い切るためのものではありません。
+        不安を煽らず、相手の気持ちや関係の流れ、そしてあなた自身の本音をやさしく言葉にしながら、
+        最後は少しでも「大丈夫だよ」と思える場所へ着地することを大切にしています。
       </p>
     </section>
 
@@ -369,17 +631,14 @@
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    // カード追加はこの配列にオブジェクトを足すだけでOK。
-    // 各配列（main/sub/bridge/cta/safe）は最低3つ以上あると結果の重複感を抑えやすいです。
     const cards = [
       {
         id: 'fool',
         name: '愚者 - The Fool',
         keyword: '始まり／ためらいと一歩',
-        consultType: 'love_new_flow',
         image: 'tarot-breaker/img/pamera/cards/pamera-fool.webp',
         mainPatterns: [
-          'あの人との関係は、まだ「名前のない段階」にいるのかもしれません。だからこそ、期待と不安が同時に膨らみやすい時期です。',
+          'あの人との関係は、まだ「名前のない段階」にいるのかもしれません。だからこそ、期待と不安が同時にふくらみやすい時期です。',
           '返事の遅さや温度差に揺れてしまうのは、あなたが軽い気持ちで見ていない証拠。真剣だからこそ、心が先に疲れてしまうことがあります。',
           'このカードは、恋の可能性が消えたのではなく、形になる前の余白がまだ大きいことを示しています。'
         ],
@@ -394,21 +653,20 @@
           '気持ちの温度差がある恋ほど、表面だけでは判断を誤りやすいもの。相手の行動の裏にある心理は、その先で丁寧に読み解けます。'
         ],
         ctaPatterns: [
-          'あの人の気持ちを、個人鑑定で詳しく見る',
-          'この恋の今後を、もっと深く読み解く',
+          'この恋を、個人鑑定で丁寧に読み解く',
+          'あの人の気持ちと今後を、個人鑑定で見る',
           '曖昧な関係の流れを、個人鑑定で受け取る'
         ],
         safePatterns: [
           '恋愛のご相談も、やさしく丁寧に読み解きます。',
-          '一人では整理しきれない想いも安心してご相談ください。',
-          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+          '一人では整理しきれない想いも、安心してご相談ください。',
+          'LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。'
         ]
       },
       {
         id: 'magician',
         name: '魔術師 - The Magician',
         keyword: '言葉／きっかけづくり',
-        consultType: 'communication',
         image: 'tarot-breaker/img/pamera/cards/pamera-magician.webp',
         mainPatterns: [
           '止まって見える恋でも、実は「言葉ひとつ」で空気が変わる余地があります。いまは可能性が閉じた時期ではありません。',
@@ -433,14 +691,13 @@
         safePatterns: [
           '無理に急がせることはありません。あなたのペースで進めます。',
           '言葉にしづらい恋の事情も、やさしく受け止めます。',
-          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+          'LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。'
         ]
       },
       {
         id: 'high-priestess',
         name: '女教皇 - The High Priestess',
         keyword: '静かな本音／見えない温度差',
-        consultType: 'uncertain_love',
         image: 'tarot-breaker/img/pamera/cards/pamera-high-priestess.webp',
         mainPatterns: [
           '「嫌われたのかな」と不安になる一方で、「でも完全に終わった感じもしない」。その揺れ自体が、いまの恋のリアルです。',
@@ -465,14 +722,13 @@
         safePatterns: [
           '責められることなく、今の気持ちをそのまま話せます。',
           '不安な恋ほど、静かに整理することを大切にしています。',
-          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+          'LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。'
         ]
       },
       {
         id: 'empress',
         name: '女帝 - The Empress',
         keyword: '受け取る愛／自己価値',
-        consultType: 'self-worth',
         image: 'tarot-breaker/img/pamera/cards/pamera-empress.webp',
         mainPatterns: [
           'あなたは、待つだけの恋をしているつもりでも、実はずっと関係を支えてきた人です。まずその事実を忘れないでください。',
@@ -497,14 +753,13 @@
         safePatterns: [
           'あなたの価値を下げる前提では読みません。安心してご相談ください。',
           '恋愛の痛みを責めず、あなたの心を守る視点で読み解きます。',
-          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+          'LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。'
         ]
       },
       {
         id: 'emperor',
         name: '皇帝 - The Emperor',
         keyword: '現実性／関係の定義',
-        consultType: 'reconciliation',
         image: 'tarot-breaker/img/pamera/cards/pamera-emperor.webp',
         mainPatterns: [
           '復縁や関係修復を望むとき、気持ちだけでは進みにくい局面があります。今は「現実の整え方」が鍵です。',
@@ -529,7 +784,7 @@
         safePatterns: [
           '復縁のご相談も、不安を煽らず丁寧に読み解きます。',
           '焦りの強い時期こそ、落ち着いて整理できるよう伴走します。',
-          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+          'LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。'
         ]
       }
     ];
@@ -566,17 +821,17 @@
       cardFrame.classList.remove('is-flipped');
       setTimeout(() => cardFrame.classList.add('is-flipped'), 80);
 
-      startBtn.textContent = '🌙 もう一度、恋愛の星詠をする（無料）';
+      startBtn.textContent = 'もう一度、この恋の言葉を受け取る';
       resetBtn.disabled = false;
     }
 
     function resetReading() {
       cardFrame.classList.remove('is-flipped');
-      cardName.textContent = 'カードはまだ伏せられています';
+      cardName.textContent = 'カードはまだ静かに伏せられています';
       cardKeyword.textContent = '恋愛の星詠を始めてください';
       resultBox.classList.remove('is-show');
       resultBox.hidden = true;
-      startBtn.textContent = '💗 あの人の気持ちを占う（無料）';
+      startBtn.textContent = 'この恋に届いている言葉を受け取る';
       resetBtn.disabled = true;
     }
 
