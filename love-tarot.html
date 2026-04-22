@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f8f3ee" />
+  <title>Re:Verse Shion — 恋愛の星詠ワンカード（無料）</title>
+  <meta name="description" content="あの人の気持ち、既読無視、片想い、復縁、曖昧な関係。恋愛の悩みを一枚のカードからやさしく読み解く、詩韻の無料恋愛占い。" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f4ee;
+      --ink: #211a18;
+      --ink-soft: rgba(0, 0, 0, 0.72);
+      --ink-muted: rgba(0, 0, 0, 0.56);
+      --line: rgba(83, 52, 28, 0.14);
+      --gold: #cb9e57;
+      --gold-deep: #ad7e34;
+      --rose: #9a6d7d;
+      --lavender: #8f7ba5;
+      --panel: rgba(255, 255, 255, 0.92);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.08);
+      --shadow-card: 0 14px 32px rgba(0, 0, 0, 0.15);
+      --font-main: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, 'Yu Mincho', serif;
+      --font-hero: 'Cormorant Garamond', 'Times New Roman', serif;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font-main);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 0% 0%, #fff 0, #f9f4ee 55%, #f1e5de 100%);
+      padding: 16px 12px 28px;
+    }
+
+    .page {
+      position: relative;
+      max-width: 860px;
+      margin: 0 auto;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow-soft);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(255,255,255,0.95) 0, rgba(255,255,255,0.98) 58%, #f8eee6 100%);
+      overflow: hidden;
+      padding: 18px 14px 22px;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.62) 0, transparent 50%),
+        radial-gradient(circle at 85% 0%, rgba(171, 138, 156, 0.15) 0, transparent 46%),
+        repeating-linear-gradient(135deg, rgba(203,158,87,0.0) 0, rgba(203,158,87,0.08) 1px, rgba(203,158,87,0) 4px, rgba(203,158,87,0) 10px);
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    .hero, .content, .trust, footer { position: relative; z-index: 1; }
+
+    .hero { text-align: center; margin-bottom: 14px; }
+
+    .hero-top {
+      font-family: var(--font-hero);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: rgba(0,0,0,0.5);
+      margin-bottom: 6px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-hero);
+      font-size: clamp(1.9rem, 7.8vw, 2.7rem);
+      line-height: 1.14;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(120deg, #9a6d7d, #cb9e57 48%, #8d78a7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy {
+      font-size: 0.93rem;
+      line-height: 1.78;
+      color: var(--ink-soft);
+      margin-bottom: 10px;
+    }
+
+    .hero-copy strong { color: var(--ink); }
+
+    .hero-sub {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: rgba(0,0,0,0.58);
+      font-size: 0.76rem;
+      text-underline-offset: 2px;
+    }
+
+    .content {
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.9);
+      background: var(--panel);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+      padding: 14px 12px;
+    }
+
+    .label {
+      font-size: 0.72rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.52);
+      margin-bottom: 6px;
+    }
+
+    .title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .lead { font-size: 0.88rem; line-height: 1.76; color: var(--ink-soft); }
+
+    .btn-row { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-pill);
+      padding: 11px 17px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 220ms ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1f1a18, #3b2e29);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.18);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #fff, #f7ecdf);
+      color: rgba(0,0,0,0.82);
+      border-color: rgba(203,158,87,0.35);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.65);
+      color: rgba(0,0,0,0.68);
+      border-color: rgba(0,0,0,0.08);
+    }
+
+    .hint { margin-top: 8px; font-size: 0.75rem; line-height: 1.65; color: rgba(0,0,0,0.53); }
+
+    .card-shell { display: grid; justify-items: center; gap: 10px; }
+
+    .card-frame {
+      width: min(70vw, 255px);
+      aspect-ratio: 2/3;
+      border-radius: 16px;
+      padding: 6px;
+      perspective: 1200px;
+      background: radial-gradient(circle at 20% 0%, #fff, #efe1d6 80%);
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-inner {
+      width: 100%; height: 100%; position: relative; border-radius: 12px;
+      transform-style: preserve-3d; transition: transform 720ms cubic-bezier(0.19, 1, 0.22, 1);
+      overflow: hidden;
+    }
+
+    .card-frame.is-flipped .card-inner { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute; inset: 0; backface-visibility: hidden;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 30% 0%, #fff, #f5ecdf 78%, #e7d7c9 100%);
+    }
+
+    .card-front { transform: rotateY(180deg); }
+
+    .card-img { width: 100%; height: 100%; object-fit: cover; }
+
+    .card-meta { text-align: center; min-height: 58px; }
+    .card-name { font-size: 0.96rem; margin-bottom: 2px; font-weight: 600; }
+    .card-key { font-size: 0.78rem; color: rgba(0,0,0,0.6); letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .result {
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(203,158,87,0.32);
+      background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(251,243,235,0.96));
+      padding: 11px 11px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 260ms ease;
+    }
+
+    .result[hidden] { display: none !important; }
+    .result.is-show { opacity: 1; transform: translateY(0); }
+
+    .result-main { font-size: 0.88rem; line-height: 1.82; color: rgba(0,0,0,0.82); margin-bottom: 6px; }
+    .result-sub { font-size: 0.82rem; line-height: 1.78; color: rgba(0,0,0,0.67); }
+
+    .bridge {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(203,158,87,0.24);
+      background: rgba(255,255,255,0.7);
+    }
+
+    .bridge-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.52);
+      margin-bottom: 6px;
+    }
+
+    .bridge p { font-size: 0.8rem; line-height: 1.75; color: rgba(0,0,0,0.68); }
+
+    .safe-note { margin-top: 7px; font-size: 0.75rem; line-height: 1.68; color: rgba(0,0,0,0.55); }
+
+    .trust {
+      margin-top: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,236,243,0.72));
+      padding: 12px;
+    }
+
+    .trust p { font-size: 0.82rem; line-height: 1.76; color: rgba(0,0,0,0.72); }
+
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 0.74rem;
+      color: rgba(0,0,0,0.5);
+    }
+
+    @media (min-width: 900px) {
+      body { padding: 22px 16px 34px; }
+      .page { padding: 22px 20px 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-top">LOVE ONE-CARD READING</div>
+      <h1><span>恋愛の星詠ワンカード</span></h1>
+      <p class="hero-copy">
+        <strong>あの人の気持ちを、一枚のカードから無料で読み解く。</strong><br>
+        片想い、既読無視、復縁、曖昧な関係。今のあなたに必要な言葉を、やさしく受け取るページです。
+      </p>
+      <p class="hero-sub">恋で心が揺れる日に。詩韻の言葉で、気持ちをほどく小さな星詠を。</p>
+      <a class="return-link" href="tarot369.html">← 総合無料占いへ戻る</a>
+    </header>
+
+    <main class="content">
+      <section class="panel" aria-labelledby="start-title">
+        <div class="label">STEP 1</div>
+        <h2 id="start-title" class="title">無料で恋愛の星詠を受け取る</h2>
+        <p class="lead">あの人を思い浮かべてください。今いちばん気になっている恋を心に浮かべたら、ボタンを押してください。</p>
+        <div class="btn-row">
+          <button id="startBtn" class="btn btn-primary" type="button">💗 あの人の気持ちを占う（無料）</button>
+          <button id="resetBtn" class="btn btn-ghost" type="button" disabled>もう一度占う</button>
+        </div>
+        <p class="hint">※無料結果は「今もっとも強いメッセージ」を映します。状況の全体像は個人鑑定でより丁寧に読み解けます。</p>
+      </section>
+
+      <section class="panel" aria-labelledby="result-title">
+        <div class="label">STEP 2</div>
+        <h2 id="result-title" class="title">恋に届く、今日の一枚</h2>
+
+        <div class="card-shell" aria-live="polite">
+          <div id="cardFrame" class="card-frame">
+            <div class="card-inner">
+              <div class="card-face card-back">
+                <img class="card-img" src="tarot-breaker/img/pamera/cards/pamera-card-back.webp" alt="カード裏面" />
+              </div>
+              <div class="card-face card-front">
+                <img id="cardImage" class="card-img" src="" alt="引いたカード" />
+              </div>
+            </div>
+          </div>
+
+          <div class="card-meta">
+            <div id="cardName" class="card-name">カードはまだ伏せられています</div>
+            <div id="cardKeyword" class="card-key">恋愛の星詠を始めてください</div>
+          </div>
+
+          <article id="resultBox" class="result" hidden>
+            <p id="mainText" class="result-main"></p>
+            <p id="subText" class="result-sub"></p>
+
+            <div class="bridge">
+              <div class="bridge-title">この先をもっと知るなら</div>
+              <p id="bridgeText"></p>
+            </div>
+
+            <div class="btn-row" style="margin-top: 10px;">
+              <a id="ctaBtn" class="btn btn-secondary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener">この恋の今後を、個人鑑定で詳しく見る</a>
+            </div>
+            <p id="safeNote" class="safe-note">LINEから気軽にご相談いただけます。無理な勧誘はありません。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <section class="trust" aria-label="詩韻の恋愛鑑定スタンス">
+      <p>
+        詩韻の恋愛鑑定は、ただ結果を断定するためのものではありません。
+        不安を煽らず、相手の気持ちと流れ、そしてあなたの本音をやさしく言語化しながら、
+        最後は「大丈夫だよ」と思える余白へ着地することを大切にしています。
+      </p>
+    </section>
+
+    <footer>&copy; <span id="year"></span> Re:Verse Shion</footer>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function pick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // カード追加はこの配列にオブジェクトを足すだけでOK。
+    // 各配列（main/sub/bridge/cta/safe）は最低3つ以上あると結果の重複感を抑えやすいです。
+    const cards = [
+      {
+        id: 'fool',
+        name: '愚者 - The Fool',
+        keyword: '始まり／ためらいと一歩',
+        consultType: 'love_new_flow',
+        image: 'tarot-breaker/img/pamera/cards/pamera-fool.webp',
+        mainPatterns: [
+          'あの人との関係は、まだ「名前のない段階」にいるのかもしれません。だからこそ、期待と不安が同時に膨らみやすい時期です。',
+          '返事の遅さや温度差に揺れてしまうのは、あなたが軽い気持ちで見ていない証拠。真剣だからこそ、心が先に疲れてしまうことがあります。',
+          'このカードは、恋の可能性が消えたのではなく、形になる前の余白がまだ大きいことを示しています。'
+        ],
+        subPatterns: [
+          '今は結論を急ぐより、あなた自身の気持ちを整えることが先。連絡の頻度よりも、会えた時にどんな空気を作れるかが鍵になります。',
+          '「追うか、引くか」の二択にしないで大丈夫。まずは無理のない距離で、やわらかな接点を保つことが流れを守ります。',
+          '不安になる日ほど、自分を責めないで。あなたの想いは重いのではなく、ちゃんと誰かを大切にできる強さです。'
+        ],
+        bridgePatterns: [
+          '無料版で見えているのは、いま最も強い恋のメッセージです。相手の本音がどこで揺れているか、今後どう動くかはさらに深く読むことで輪郭がはっきりしてきます。',
+          'この恋は「まだ始まりきっていない流れ」が鍵です。待つべき時期か、動くべき時期かまで知るには、個人鑑定で時間軸を重ねて読むのが有効です。',
+          '気持ちの温度差がある恋ほど、表面だけでは判断を誤りやすいもの。相手の行動の裏にある心理は、その先で丁寧に読み解けます。'
+        ],
+        ctaPatterns: [
+          'あの人の気持ちを、個人鑑定で詳しく見る',
+          'この恋の今後を、もっと深く読み解く',
+          '曖昧な関係の流れを、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '恋愛のご相談も、やさしく丁寧に読み解きます。',
+          '一人では整理しきれない想いも安心してご相談ください。',
+          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+        ]
+      },
+      {
+        id: 'magician',
+        name: '魔術師 - The Magician',
+        keyword: '言葉／きっかけづくり',
+        consultType: 'communication',
+        image: 'tarot-breaker/img/pamera/cards/pamera-magician.webp',
+        mainPatterns: [
+          '止まって見える恋でも、実は「言葉ひとつ」で空気が変わる余地があります。いまは可能性が閉じた時期ではありません。',
+          '既読無視や連絡待ちで苦しいときほど、相手の事情を想像しすぎて自分の本音が置き去りになりがちです。',
+          'このカードは、恋の主導権を奪い返すというより、あなたがあなたの言葉を取り戻す時期だと告げています。'
+        ],
+        subPatterns: [
+          '重い文章でなくて大丈夫。短くても、あなたらしい温度がある言葉が流れを動かします。',
+          '焦って答えを迫るより、相手が返しやすい問いかけを一つだけ置く。小さな工夫が関係の呼吸を戻します。',
+          '相手の反応だけで自己評価を決めないで。あなたには、恋の空気を整える力がちゃんとあります。'
+        ],
+        bridgePatterns: [
+          '無料リーディングは「入口」のメッセージです。送るべきタイミングや、相手が返しやすい伝え方の細部までは、個人鑑定で具体化できます。',
+          '連絡の有無だけでは読み切れない相手の心理があります。反応の裏にある迷いを深く知るには、その先の読み解きが有効です。',
+          'この恋であなたが主導すべき場面と待つべき場面は分かれます。行動設計まで落とし込むなら、個人鑑定が力になります。'
+        ],
+        ctaPatterns: [
+          '相手の本音とこれからを、個人鑑定で受け取る',
+          '連絡の流れを、個人鑑定で丁寧に読む',
+          'この恋の動き方を、個人鑑定で整理する'
+        ],
+        safePatterns: [
+          '無理に急がせることはありません。あなたのペースで進めます。',
+          '言葉にしづらい恋の事情も、やさしく受け止めます。',
+          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+        ]
+      },
+      {
+        id: 'high-priestess',
+        name: '女教皇 - The High Priestess',
+        keyword: '静かな本音／見えない温度差',
+        consultType: 'uncertain_love',
+        image: 'tarot-breaker/img/pamera/cards/pamera-high-priestess.webp',
+        mainPatterns: [
+          '「嫌われたのかな」と不安になる一方で、「でも完全に終わった感じもしない」。その揺れ自体が、いまの恋のリアルです。',
+          '曖昧な関係ほど、白黒を急ぐと心が削れます。いま必要なのは、答え探しよりも違和感の正体を丁寧に見ること。',
+          'このカードは、あなたが薄々感じている気配は間違いではないと伝えています。'
+        ],
+        subPatterns: [
+          '不安なときほど連絡履歴を何度も見返してしまうもの。今日はまず、自分の心を落ち着かせる時間を優先してみてください。',
+          '「待つ」ことは、何もしないことではありません。気持ちの軸を整えることで、次の一手の精度が上がります。',
+          'あなたは弱いから揺れるのではなく、大切にしたい恋だから揺れるのです。'
+        ],
+        bridgePatterns: [
+          '無料版で映るのは「いま強く出ているサイン」。相手が本当は何に迷っているのか、いつ流れが変わるかはもう一段深い読み解きで見えてきます。',
+          '曖昧さが長引く恋は、相手の事情とあなたの心の余白を同時に見る必要があります。個人鑑定ではその重なりを丁寧に読めます。',
+          '表面の態度より、沈黙の意味を読みたいとき。ここから先は、状況を重ねて読むことで輪郭が明確になります。'
+        ],
+        ctaPatterns: [
+          'あの人の沈黙の意味を、個人鑑定で深く読む',
+          '曖昧な恋の本音を、個人鑑定で読み解く',
+          'この先の流れを、個人鑑定で丁寧に見る'
+        ],
+        safePatterns: [
+          '責められることなく、今の気持ちをそのまま話せます。',
+          '不安な恋ほど、静かに整理することを大切にしています。',
+          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+        ]
+      },
+      {
+        id: 'empress',
+        name: '女帝 - The Empress',
+        keyword: '受け取る愛／自己価値',
+        consultType: 'self-worth',
+        image: 'tarot-breaker/img/pamera/cards/pamera-empress.webp',
+        mainPatterns: [
+          'あなたは、待つだけの恋をしているつもりでも、実はずっと関係を支えてきた人です。まずその事実を忘れないでください。',
+          '尽くしすぎて疲れてしまう恋には、「私も満たされていい」という許可が必要です。',
+          'このカードは、愛される価値を証明する段階はもう終わりにしていいと伝えています。'
+        ],
+        subPatterns: [
+          '相手の都合に合わせるだけでなく、あなたが安心できる関係の条件を言葉にしてみましょう。',
+          '「嫌われたくない」より「大切にされたい」を基準にすると、恋の選択が少しずつ変わります。',
+          '優しさは我慢とは違います。あなたが心地よくいられる恋を選んでいいのです。'
+        ],
+        bridgePatterns: [
+          '無料版では、あなたに必要な核のメッセージが届いています。この先は、相手との相性や関係の育て方を具体的に読む段階です。',
+          '「続ける恋」か「手放す恋」かで迷うときは、感情だけでなく流れの現実面も合わせて見ることが大切です。',
+          'あなたの魅力が伝わる関わり方、境界線の引き方は個別状況で変わります。個人鑑定で具体化できます。'
+        ],
+        ctaPatterns: [
+          'この恋で大切にされる流れを、個人鑑定で読む',
+          '相手との相性と今後を、個人鑑定で詳しく見る',
+          '私らしい恋の選択を、個人鑑定で整理する'
+        ],
+        safePatterns: [
+          'あなたの価値を下げる前提では読みません。安心してご相談ください。',
+          '恋愛の痛みを責めず、あなたの心を守る視点で読み解きます。',
+          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+        ]
+      },
+      {
+        id: 'emperor',
+        name: '皇帝 - The Emperor',
+        keyword: '現実性／関係の定義',
+        consultType: 'reconciliation',
+        image: 'tarot-breaker/img/pamera/cards/pamera-emperor.webp',
+        mainPatterns: [
+          '復縁や関係修復を望むとき、気持ちだけでは進みにくい局面があります。今は「現実の整え方」が鍵です。',
+          '好きという想いがあるほど、相手の態度に一喜一憂しやすくなります。だからこそ、冷静な軸が必要な時期です。',
+          'このカードは、感情を否定するのではなく、恋を守るための土台づくりを促しています。'
+        ],
+        subPatterns: [
+          '会話の目的を一つに絞る、連絡の頻度を整えるなど、小さなルールが関係を安定させます。',
+          '「戻りたい」だけでなく「戻ってからどうしたいか」まで描けると、復縁の現実味が増していきます。',
+          'あなたが悪いわけではありません。ただ、今は優しさに加えて戦略が必要です。'
+        ],
+        bridgePatterns: [
+          '無料版では恋の核を示しました。復縁の可能性や時期、どこで関係を立て直せるかは、個別の状況を重ねることで精度が上がります。',
+          '相手の気持ちが残っているかどうかだけでなく、「動ける状態か」を見ることが復縁では重要です。そこまで丁寧に読むなら個人鑑定が適しています。',
+          '関係を建て直す恋は、タイミングと距離感がすべてです。あなたに合う順番を個人鑑定で具体的に整理できます。'
+        ],
+        ctaPatterns: [
+          '復縁の可能性や流れを、個人鑑定で丁寧に見る',
+          'この恋の現実的な進め方を、個人鑑定で受け取る',
+          '相手の本音と再接近の時期を、個人鑑定で深く読む'
+        ],
+        safePatterns: [
+          '復縁のご相談も、不安を煽らず丁寧に読み解きます。',
+          '焦りの強い時期こそ、落ち着いて整理できるよう伴走します。',
+          'LINEから気軽にご相談いただけます。無理な勧誘はありません。'
+        ]
+      }
+    ];
+
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const cardFrame = document.getElementById('cardFrame');
+    const cardImage = document.getElementById('cardImage');
+    const cardName = document.getElementById('cardName');
+    const cardKeyword = document.getElementById('cardKeyword');
+    const resultBox = document.getElementById('resultBox');
+    const mainText = document.getElementById('mainText');
+    const subText = document.getElementById('subText');
+    const bridgeText = document.getElementById('bridgeText');
+    const ctaBtn = document.getElementById('ctaBtn');
+    const safeNote = document.getElementById('safeNote');
+
+    function renderReading() {
+      const card = pick(cards);
+
+      cardImage.src = card.image;
+      cardImage.alt = card.name;
+      cardName.textContent = card.name;
+      cardKeyword.textContent = card.keyword;
+
+      mainText.textContent = pick(card.mainPatterns);
+      subText.textContent = pick(card.subPatterns);
+      bridgeText.textContent = pick(card.bridgePatterns);
+      ctaBtn.textContent = pick(card.ctaPatterns);
+      safeNote.textContent = pick(card.safePatterns);
+
+      resultBox.hidden = false;
+      requestAnimationFrame(() => resultBox.classList.add('is-show'));
+      cardFrame.classList.remove('is-flipped');
+      setTimeout(() => cardFrame.classList.add('is-flipped'), 80);
+
+      startBtn.textContent = '🌙 もう一度、恋愛の星詠をする（無料）';
+      resetBtn.disabled = false;
+    }
+
+    function resetReading() {
+      cardFrame.classList.remove('is-flipped');
+      cardName.textContent = 'カードはまだ伏せられています';
+      cardKeyword.textContent = '恋愛の星詠を始めてください';
+      resultBox.classList.remove('is-show');
+      resultBox.hidden = true;
+      startBtn.textContent = '💗 あの人の気持ちを占う（無料）';
+      resetBtn.disabled = true;
+    }
+
+    startBtn.addEventListener('click', renderReading);
+    resetBtn.addEventListener('click', resetReading);
+  </script>
+</body>
+</html>
