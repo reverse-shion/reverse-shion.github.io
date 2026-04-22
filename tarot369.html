@@ -56,6 +56,7 @@
 
     html {
       scroll-behavior: smooth;
+      overflow-x: hidden;
     }
 
     body {
@@ -277,9 +278,10 @@
         color var(--dur) ease,
         opacity var(--dur) ease;
       text-decoration: none;
-      white-space: nowrap;
+      white-space: normal;
       font-family: inherit;
       flex-shrink: 0;
+      text-align: center;
     }
 
     .btn-primary {
@@ -455,7 +457,6 @@
       transition: opacity 260ms ease, transform 260ms ease;
       user-select: none;
       -webkit-user-drag: none;
-      background: radial-gradient(circle at 30% 0%, #fff 0, #f5f0e6 50%, #e9dfd4 100%);
     }
 
     .card-img.is-visible {
@@ -889,11 +890,6 @@
         font-size: 0.92rem;
       }
 
-      .btn {
-        white-space: normal;
-        text-align: center;
-      }
-
       .card-frame {
         width: min(72vw, 260px);
       }
@@ -903,7 +899,8 @@
       }
 
       .cta-primary-btn,
-      .love-cta-btn {
+      .love-cta-btn,
+      .btn {
         font-size: 0.92rem;
       }
     }
@@ -948,20 +945,20 @@
           </div>
 
           <p class="helper-note">
-            ※いまのあなたに届いている一枚を、そのまま受け取れます。
+            いまの自分にいちばん必要な言葉が、一枚のカードとして届きます。
           </p>
 
           <div class="mini-card">
             <div class="mini-title">詩韻の星詠</div>
             <p>
-              ただ当てるためではなく、<strong>今のあなたの本音をほどくため</strong>のリーディングです。  
+              ただ当てるためではなく、<strong>今のあなたの本音をほどくため</strong>のリーディングです。
               結果に少しでも心が動いたなら、その先にはもっと深く読める続きがあります。
             </p>
           </div>
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="result-title">
+      <section class="panel" id="readingPanel" aria-labelledby="result-title">
         <div class="panel-inner">
           <div class="section-label">STEP 2</div>
           <h2 id="result-title" class="section-title">
@@ -1011,7 +1008,7 @@
               <div class="result-bridge">
                 <div class="result-bridge-title">この先を深く見るなら</div>
                 <p id="resultBridgeText" class="result-bridge-text">
-                  この一枚が伝えているのは、今のあなたに最も強く届いているメッセージです。  
+                  この一枚が伝えているのは、今のあなたに最も強く届いているメッセージです。
                   ただ、<strong>相手の気持ち、今後の流れ、どう動けばいいか</strong>まで知りたいときは、個人鑑定でさらに丁寧に読み解けます。
                 </p>
               </div>
@@ -1053,7 +1050,7 @@
       <div class="mini-card">
         <div class="mini-title">もっと深く見たいときに</div>
         <p class="bottom-lead">
-          無料ワンカードは、あなたの心の入口をひらく最初の一枚。  
+          無料ワンカードは、あなたの心の入口をひらく最初の一枚。
           もし「当たっているかも」「続きを知りたい」と感じたなら、個人鑑定では
           <strong>相手の気持ち、今後、選択、あなた自身の本音</strong>まで、より丁寧にほどいていきます。
         </p>
@@ -1067,7 +1064,7 @@
         </p>
 
         <div class="link-emotion">
-          気になるのに聞けない気持ち。  
+          気になるのに聞けない気持ち。
           <strong>その続きを、恋愛に特化した星詠で受け取ってみてください。</strong>
         </div>
 
@@ -1719,4 +1716,212 @@
       {
         id: 20,
         name: '審判 - Judgement',
-        keyword: '再
+        keyword: '再スタート／呼びかけ',
+        mainPatterns: [
+          '過去に一度あきらめたこと、封印した気持ちが、もう一度あなたを呼び起こそうとしています。',
+          'このカードは、「もう終わったと思っていたもの」に再び意味が戻る可能性を伝えています。',
+          '諦めたはずなのに、まだ心が動くなら、それにはまだ何か受け取るべきものがあるのかもしれません。'
+        ],
+        subPatterns: [
+          '「もう遅い」と切り捨てた夢に、もう一度だけ光を当ててみて。<strong>今のあなたなら、違う形で叶えられる</strong>可能性があります。',
+          '再び向き合うことは、過去に戻ることではありません。<strong>今の自分で、もう一度選び直すこと</strong>なのだと思います。',
+          '一度閉じた気持ちにも、まだ生きている想いがあるなら、それを雑に扱わなくて大丈夫です。'
+        ],
+        bridgePatterns: [
+          'このカードは、再スタートや再接続の流れが出ているときに出やすい一枚です。<strong>復縁、再挑戦、もう一度向き合うべきこと</strong>を深く見たい方は、個人鑑定が向いています。',
+          '恋愛では特に、「また動くかもしれない流れ」が気になる時に出やすい一枚です。<strong>相手の気持ちや再接続の可能性</strong>を丁寧に見ていけます。',
+          'もう一度向き合うなら、ちゃんと知っておきたいことがあります。<strong>今後どう動くか</strong>を深く受け取りたい方に向いています。'
+        ],
+        ctaCopies: [
+          'もう一度だけ信じたい気持ちを、丁寧に見つめてあげる。',
+          '復縁や再接続の可能性を、ひとりで抱えなくて大丈夫。',
+          '動き出すかもしれないこの流れを、深く受け取ってみる。'
+        ],
+        safePatterns: [
+          '過去を責めるのではなく、これからを丁寧に見ていく鑑定です。',
+          '復縁や再接続のご相談も、やさしく読み解きます。',
+          'もう一度向き合いたい想いも、安心してご相談ください。'
+        ]
+      },
+      {
+        id: 21,
+        name: '世界 - The World',
+        keyword: '完成／次のステージへ',
+        mainPatterns: [
+          'ひとつのサイクルが静かにまとまり、あなたは次の段階へ進む準備が整いつつあります。',
+          'このカードは、ここまで歩いてきた流れがちゃんと一つの形になろうとしていることを伝えています。',
+          '終わりではなく、完成。いまは一区切りのあとに来る新しい扉の前なのかもしれません。'
+        ],
+        subPatterns: [
+          'ここまで歩いてきた自分を、ちゃんと労ってあげてください。<strong>「がんばったね」と自分に言うこと</strong>が、新しい世界への扉をひらく合図になります。',
+          '次へ進む前に、まずは今の自分を認めてあげてください。<strong>一区切りを受け入れること</strong>が、新しい流れを呼び込みます。',
+          'まだ途中に見えても、すでに終わっているものもあります。いまは「締めくくること」が大切な時期かもしれません。'
+        ],
+        bridgePatterns: [
+          'このカードは、一区切りと次のステージの入り口で出やすい一枚です。<strong>ここからどこへ進むべきか、次に何を選ぶべきか</strong>を知りたいときは、個人鑑定で深く整理できます。',
+          '完成のあとには、また新しい始まりが来ます。<strong>次の流れをどう迎えるか</strong>を深く見たい方に向いています。',
+          'いま必要なのは、達成感だけで終わらせないことかもしれません。<strong>この先の方向性</strong>を丁寧に読み解けます。'
+        ],
+        ctaCopies: [
+          'ここまで歩いてきたからこそ、次の扉を丁寧に選びたい。',
+          '一区切りの先にある新しい流れを、深く見てみる。',
+          '完成のあとに来る次のステージを、やさしく迎える。'
+        ],
+        safePatterns: [
+          '一区切りのあとに必要な選択も、丁寧に読み解いていきます。',
+          'ここまで頑張ってきた気持ちも、大切に受け止めます。',
+          '次へ進む準備を、安心して整えていけるよう寄り添います。'
+        ]
+      }
+    ];
+
+    const startBtn = document.getElementById('startReadingBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const readingPanel = document.getElementById('readingPanel');
+    const cardFrame = document.getElementById('cardFrame');
+    const cardBackImg = document.getElementById('cardBackImage');
+    const cardFrontImg = document.getElementById('cardFrontImage');
+    const cardPlaceholder = document.getElementById('cardPlaceholder');
+
+    const cardName = document.getElementById('cardName');
+    const cardKeyword = document.getElementById('cardKeyword');
+    const resultBlock = document.getElementById('resultBlock');
+    const resultMain = document.getElementById('resultMain');
+    const resultSub = document.getElementById('resultSub');
+    const resultBridgeText = document.getElementById('resultBridgeText');
+    const consultBtnText = document.getElementById('consultBtnText');
+    const consultSafeNote = document.getElementById('consultSafeNote');
+    const ctaCopyText = document.getElementById('ctaCopyText');
+
+    let flipTimer = null;
+    let hideTimer = null;
+    let scrollTimer = null;
+
+    function clearTimers() {
+      if (flipTimer) {
+        clearTimeout(flipTimer);
+        flipTimer = null;
+      }
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+      if (scrollTimer) {
+        clearTimeout(scrollTimer);
+        scrollTimer = null;
+      }
+    }
+
+    function buildCardState(card) {
+      return {
+        main: pickOne(card.mainPatterns),
+        sub: pickOne(card.subPatterns),
+        bridge: pickOne(card.bridgePatterns),
+        ctaCopy: pickOne(card.ctaCopies),
+        safe: pickOne(card.safePatterns)
+      };
+    }
+
+    function revealCard(card) {
+      clearTimers();
+
+      const state = buildCardState(card);
+
+      cardFrame.classList.remove('is-flipped', 'card-glow');
+      resultBlock.classList.remove('is-visible');
+
+      cardPlaceholder.style.display = 'none';
+
+      cardFrontImg.onload = () => {
+        cardFrontImg.classList.add('is-visible');
+      };
+      cardFrontImg.onerror = () => {
+        cardFrontImg.classList.remove('is-visible');
+      };
+
+      cardFrontImg.classList.remove('is-visible');
+      cardFrontImg.src = `images/card${card.id}.png`;
+      cardFrontImg.alt = `${card.name} のカード画像`;
+
+      cardName.textContent = card.name;
+      cardKeyword.textContent = card.keyword;
+
+      resultMain.textContent = state.main;
+      resultSub.innerHTML = state.sub;
+      resultBridgeText.innerHTML = state.bridge;
+      ctaCopyText.innerHTML = state.ctaCopy;
+      consultBtnText.textContent = 'LINEで個人鑑定へ進む';
+      consultSafeNote.textContent = state.safe;
+
+      resultBlock.hidden = false;
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resultBlock.classList.add('is-visible');
+        });
+      });
+
+      flipTimer = setTimeout(() => {
+        cardFrame.classList.add('is-flipped', 'card-glow');
+      }, 500);
+
+      startBtn.disabled = true;
+      resetBtn.disabled = false;
+
+      scrollTimer = setTimeout(() => {
+        readingPanel.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 220);
+    }
+
+    function drawCard() {
+      const index = Math.floor(Math.random() * cards.length);
+      revealCard(cards[index]);
+    }
+
+    function resetReading() {
+      clearTimers();
+
+      cardFrame.classList.remove('is-flipped', 'card-glow');
+
+      cardFrontImg.onload = null;
+      cardFrontImg.onerror = null;
+      cardFrontImg.classList.remove('is-visible');
+      cardFrontImg.src = '';
+      cardFrontImg.alt = 'タロットカードの表面';
+
+      cardBackImg.classList.add('is-visible');
+      cardPlaceholder.style.display = 'flex';
+
+      cardName.textContent = 'カードはまだ伏せられています';
+      cardKeyword.textContent = '「星詠を始める」を押してください';
+
+      resultBlock.classList.remove('is-visible');
+
+      hideTimer = setTimeout(() => {
+        resultBlock.hidden = true;
+        resultMain.textContent = '';
+        resultSub.innerHTML = '';
+        resultBridgeText.innerHTML = '';
+        ctaCopyText.innerHTML = 'もう少しだけ深く、<strong>本音の奥</strong>まで受け取りたい方へ。';
+        consultBtnText.textContent = 'LINEで個人鑑定へ進む';
+        consultSafeNote.textContent = 'はじめての方も安心してご相談いただけます。無理な勧誘はありません。';
+      }, 220);
+
+      startBtn.disabled = false;
+      resetBtn.disabled = true;
+
+      readingPanel.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+
+    startBtn.addEventListener('click', drawCard);
+    resetBtn.addEventListener('click', resetReading);
+  </script>
+</body>
+</html>
