@@ -12,7 +12,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
       --bg: #f8f0ee;
@@ -53,7 +57,10 @@
       --font-hero: 'Cormorant Garamond', 'Times New Roman', serif;
     }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
 
     body {
       min-height: 100vh;
@@ -65,11 +72,17 @@
       letter-spacing: 0.01em;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
     }
 
     .page {
       position: relative;
-      max-width: 900px;
+      width: min(100%, 900px);
       margin: 0 auto;
       border-radius: var(--radius-xl);
       border: 1px solid rgba(255,255,255,0.92);
@@ -100,7 +113,10 @@
       opacity: 0.48;
     }
 
-    .hero, .content, .trust, footer { position: relative; z-index: 1; }
+    .hero, .content, .trust, footer {
+      position: relative;
+      z-index: 1;
+    }
 
     .hero {
       text-align: center;
@@ -128,7 +144,8 @@
       line-height: 1.1;
       letter-spacing: 0.045em;
       font-weight: 600;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      text-wrap: balance;
     }
 
     .hero h1 span {
@@ -138,37 +155,46 @@
       color: transparent;
     }
 
+    .hero-copy,
+    .hero-sub,
+    .hero-note {
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
     .hero-copy {
-      max-width: 700px;
-      margin: 0 auto 10px;
-      font-size: 0.96rem;
-      line-height: 1.98;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      line-height: 1.95;
       color: var(--ink-soft);
     }
 
     .hero-copy strong {
+      display: block;
       color: var(--wine);
       font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.7;
     }
 
     .hero-sub {
-      max-width: 650px;
-      margin: 0 auto 14px;
-      font-size: 0.84rem;
-      line-height: 1.9;
+      margin-bottom: 14px;
+      font-size: 0.88rem;
+      line-height: 1.95;
       color: var(--ink-muted);
     }
 
     .hero-note {
-      max-width: 700px;
-      margin: 0 auto 14px;
-      font-size: 0.8rem;
-      line-height: 1.84;
+      margin-bottom: 14px;
+      font-size: 0.82rem;
+      line-height: 1.92;
       color: rgba(95, 69, 79, 0.62);
       background: linear-gradient(135deg, rgba(255,255,255,0.76), rgba(246,236,241,0.62));
       border: 1px solid rgba(158,115,130,0.10);
       border-radius: 14px;
-      padding: 10px 12px;
+      padding: 12px 14px;
     }
 
     .return-link {
@@ -214,7 +240,10 @@
       pointer-events: none;
     }
 
-    .panel > * { position: relative; z-index: 1; }
+    .panel > * {
+      position: relative;
+      z-index: 1;
+    }
 
     .label {
       font-size: 0.7rem;
@@ -230,12 +259,15 @@
       font-weight: 600;
       color: var(--wine);
       margin-bottom: 10px;
+      text-align: left;
+      text-wrap: pretty;
     }
 
     .lead {
-      font-size: 0.9rem;
-      line-height: 1.92;
+      font-size: 0.92rem;
+      line-height: 1.95;
       color: var(--ink-soft);
+      text-align: left;
     }
 
     .micro-copy {
@@ -243,6 +275,7 @@
       font-size: 0.79rem;
       line-height: 1.8;
       color: rgba(95, 69, 79, 0.58);
+      text-align: left;
     }
 
     .btn-row {
@@ -266,8 +299,8 @@
       text-decoration: none;
       cursor: pointer;
       transition: all 220ms ease;
-      white-space: nowrap;
       min-height: 50px;
+      text-align: center;
     }
 
     .btn:hover {
@@ -316,16 +349,19 @@
       font-size: 0.76rem;
       line-height: 1.8;
       color: rgba(95, 69, 79, 0.56);
+      text-align: left;
     }
 
     .card-shell {
       display: grid;
-      justify-items: center;
       gap: 12px;
+      width: 100%;
+      justify-items: center;
     }
 
     .card-frame {
       width: min(70vw, 262px);
+      max-width: 100%;
       aspect-ratio: 2 / 3;
       border-radius: 18px;
       padding: 6px;
@@ -334,6 +370,7 @@
         radial-gradient(circle at 24% 0%, rgba(255,255,255,1), rgba(244,232,236,0.95) 58%, rgba(235,221,224,0.98) 100%);
       box-shadow: var(--shadow-card);
       border: 1px solid rgba(255,255,255,0.70);
+      margin-inline: auto;
     }
 
     .card-inner {
@@ -361,7 +398,9 @@
         radial-gradient(circle at 32% 0%, rgba(255,255,255,1), rgba(249,240,243,0.97) 76%, rgba(233,220,223,0.98) 100%);
     }
 
-    .card-front { transform: rotateY(180deg); }
+    .card-front {
+      transform: rotateY(180deg);
+    }
 
     .card-img {
       width: 100%;
@@ -370,27 +409,37 @@
     }
 
     .card-meta {
-      text-align: center;
+      width: 100%;
+      max-width: 680px;
       min-height: 66px;
+      margin: 0 auto;
+      text-align: center;
     }
 
     .card-name {
-      font-size: 1rem;
+      font-size: clamp(0.95rem, 4.6vw, 1.05rem);
       margin-bottom: 4px;
       font-weight: 600;
-      line-height: 1.58;
+      line-height: 1.65;
       color: var(--wine);
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      text-wrap: pretty;
     }
 
     .card-key {
       font-size: 0.77rem;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
+      letter-spacing: 0.05em;
       color: rgba(95, 69, 79, 0.58);
+      line-height: 1.7;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
     }
 
     .result {
       width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
       border-radius: var(--radius-md);
       border: 1px solid rgba(197,160,98,0.24);
       background:
@@ -400,9 +449,12 @@
       opacity: 0;
       transform: translateY(8px);
       transition: all 260ms ease;
+      text-align: left;
     }
 
-    .result[hidden] { display: none !important; }
+    .result[hidden] {
+      display: none !important;
+    }
 
     .result.is-show {
       opacity: 1;
@@ -418,16 +470,20 @@
     }
 
     .result-main {
-      font-size: 0.91rem;
+      font-size: 0.94rem;
       line-height: 1.95;
       color: rgba(48, 35, 39, 0.87);
       margin-bottom: 8px;
+      text-align: left;
+      text-wrap: pretty;
     }
 
     .result-sub {
-      font-size: 0.84rem;
+      font-size: 0.86rem;
       line-height: 1.9;
       color: rgba(56, 42, 47, 0.72);
+      text-align: left;
+      text-wrap: pretty;
     }
 
     .bridge {
@@ -451,6 +507,8 @@
       font-size: 0.81rem;
       line-height: 1.84;
       color: rgba(60, 44, 49, 0.72);
+      text-align: left;
+      text-wrap: pretty;
     }
 
     .cta-wrap {
@@ -469,6 +527,7 @@
       color: var(--plum);
       font-weight: 600;
       margin-bottom: 7px;
+      text-align: left;
     }
 
     .cta-text {
@@ -476,6 +535,8 @@
       line-height: 1.84;
       color: rgba(95, 69, 79, 0.68);
       margin-bottom: 10px;
+      text-align: left;
+      text-wrap: pretty;
     }
 
     .safe-note {
@@ -483,6 +544,7 @@
       font-size: 0.75rem;
       line-height: 1.72;
       color: rgba(95, 69, 79, 0.58);
+      text-align: left;
     }
 
     .trust {
@@ -499,6 +561,8 @@
       font-size: 0.83rem;
       line-height: 1.9;
       color: rgba(58, 43, 48, 0.76);
+      text-align: left;
+      text-wrap: pretty;
     }
 
     footer {
@@ -509,17 +573,47 @@
     }
 
     @media (max-width: 480px) {
-      .hero-copy { font-size: 0.93rem; }
-      .hero-sub { font-size: 0.8rem; }
-      .title { font-size: 1.03rem; }
-      .btn { width: 100%; }
-      .hero-note { text-align: left; }
+      body {
+        padding: 14px 10px 28px;
+      }
+
+      .page {
+        padding: 18px 12px 24px;
+      }
+
+      .hero-copy {
+        font-size: 0.94rem;
+      }
+
+      .hero-sub {
+        font-size: 0.82rem;
+      }
+
+      .title {
+        font-size: 1.03rem;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .card-frame {
+        width: min(76vw, 282px);
+      }
     }
 
     @media (min-width: 900px) {
-      body { padding: 24px 16px 38px; }
-      .page { padding: 24px 20px 30px; }
-      .panel { padding: 18px 16px; }
+      body {
+        padding: 24px 16px 38px;
+      }
+
+      .page {
+        padding: 24px 20px 30px;
+      }
+
+      .panel {
+        padding: 18px 16px;
+      }
     }
   </style>
 </head>
@@ -528,18 +622,22 @@
     <header class="hero">
       <div class="hero-top">LOVE ONE-CARD READING</div>
       <h1><span>恋愛の星詠ワンカード</span></h1>
+
       <p class="hero-copy">
-        <strong>あの人の気持ちを、一枚のカードからそっと読み解く。</strong><br>
+        <strong>あの人の気持ちを、一枚のカードからそっと読み解く。</strong>
         片想い、既読無視、復縁、曖昧な関係。恋で揺れる心に、やわらかな言葉を受け取るための無料ページです。
       </p>
+
       <p class="hero-sub">
         ただ当てるためではなく、相手の気持ちとあなた自身の本音を静かにほどくために。
         恋が苦しい日に、少し深く呼吸できるような入口をここに。
       </p>
+
       <p class="hero-note">
-        こんな気持ちがある日に向いています。  
-        返事が来ない理由が知りたい。まだ脈があるのか確かめたい。動くべきか待つべきか迷っている。気持ちを手放すべきか決めきれない。
+        こんな気持ちがある日に向いています。返事が来ない理由が知りたい。まだ脈があるのか確かめたい。
+        動くべきか待つべきか迷っている。気持ちを手放すべきか決めきれない。
       </p>
+
       <a class="return-link" href="tarot369.html">← 総合無料占いへ戻る</a>
     </header>
 
@@ -560,12 +658,13 @@
         <p class="micro-copy">
           まずは無料で、今の恋にもっとも強く出ている気配をひとつ受け取れます。
         </p>
+
         <p class="hint">
           ※無料結果では「いま強く届いている核心」を映します。相手の本音、時期、今後の流れまで丁寧に読みたい場合は、個人鑑定でさらに深く見ることができます。
         </p>
       </section>
 
-      <section class="panel" aria-labelledby="result-title">
+      <section class="panel" id="readingSection" aria-labelledby="result-title">
         <div class="label">STEP 2</div>
         <h2 id="result-title" class="title">今日、この恋に届いた一枚</h2>
 
@@ -599,8 +698,8 @@
             <div class="cta-wrap">
               <div class="cta-heading">相手の本音や、この先の流れまで丁寧に知りたいときは</div>
               <p class="cta-text">
-                無料版では、いま強く届いている恋の核心を一枚で映しています。  
-                ただ、曖昧な関係や返事のない恋ほど、一部分だけでは判断しきれません。  
+                無料版では、いま強く届いている恋の核心を一枚で映しています。
+                ただ、曖昧な関係や返事のない恋ほど、一部分だけでは判断しきれません。
                 個人鑑定では、相手の気持ち、動く時期、待つべきか進むべきかまで、あなたの状況に合わせて丁寧に読み解きます。
               </p>
               <div class="btn-row" style="margin-top: 0;">
@@ -801,9 +900,23 @@
     const bridgeText = document.getElementById('bridgeText');
     const ctaBtn = document.getElementById('ctaBtn');
     const safeNote = document.getElementById('safeNote');
+    const readingSection = document.getElementById('readingSection');
+
+    let flipTimer = null;
+    let scrollTimer = null;
+
+    function scrollToResult() {
+      readingSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
 
     function renderReading() {
       const card = pick(cards);
+
+      if (flipTimer) clearTimeout(flipTimer);
+      if (scrollTimer) clearTimeout(scrollTimer);
 
       cardImage.src = card.image;
       cardImage.alt = card.name;
@@ -817,22 +930,45 @@
       safeNote.textContent = pick(card.safePatterns);
 
       resultBox.hidden = false;
-      requestAnimationFrame(() => resultBox.classList.add('is-show'));
+      resultBox.classList.remove('is-show');
+
+      requestAnimationFrame(() => {
+        resultBox.classList.add('is-show');
+      });
+
       cardFrame.classList.remove('is-flipped');
-      setTimeout(() => cardFrame.classList.add('is-flipped'), 80);
+      flipTimer = setTimeout(() => {
+        cardFrame.classList.add('is-flipped');
+      }, 80);
 
       startBtn.textContent = 'もう一度、この恋の言葉を受け取る';
       resetBtn.disabled = false;
+
+      scrollTimer = setTimeout(() => {
+        scrollToResult();
+      }, 220);
     }
 
     function resetReading() {
+      if (flipTimer) clearTimeout(flipTimer);
+      if (scrollTimer) clearTimeout(scrollTimer);
+
       cardFrame.classList.remove('is-flipped');
+      cardImage.src = '';
+      cardImage.alt = '引いたカード';
       cardName.textContent = 'カードはまだ静かに伏せられています';
       cardKeyword.textContent = '恋愛の星詠を始めてください';
+
       resultBox.classList.remove('is-show');
       resultBox.hidden = true;
+
       startBtn.textContent = 'この恋に届いている言葉を受け取る';
       resetBtn.disabled = true;
+
+      readingSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
     }
 
     startBtn.addEventListener('click', renderReading);
