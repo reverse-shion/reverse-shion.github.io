@@ -70,6 +70,7 @@
       justify-content: center;
       align-items: stretch;
       padding: 24px 16px 32px;
+      overflow-x: hidden;
     }
 
     .page {
@@ -299,13 +300,6 @@
       pointer-events: none;
     }
 
-    .btn-secondary {
-      background: rgba(255,255,255,0.88);
-      color: rgba(31,29,41,0.8);
-      border-color: rgba(44,36,67,0.11);
-      box-shadow: 0 8px 18px rgba(20,18,32,0.06);
-    }
-
     .btn-ghost {
       background: transparent;
       color: rgba(31,29,41,0.66);
@@ -337,11 +331,6 @@
 
     .btn-icon {
       font-size: 1rem;
-    }
-
-    .btn-sample {
-      font-size: 0.82rem;
-      padding-inline: 14px;
     }
 
     .helper-note {
@@ -431,6 +420,7 @@
       justify-content: center;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
+      background: radial-gradient(circle at 30% 0%, #fff 0, #f5f0e6 50%, #e9dfd4 100%);
     }
 
     .card-face--front {
@@ -458,13 +448,14 @@
     .card-img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
       opacity: 0;
       transform: translateY(8px) scale(1.02);
       transition: opacity 260ms ease, transform 260ms ease;
       user-select: none;
       -webkit-user-drag: none;
+      background: radial-gradient(circle at 30% 0%, #fff 0, #f5f0e6 50%, #e9dfd4 100%);
     }
 
     .card-img.is-visible {
@@ -954,13 +945,10 @@
             <button id="resetBtn" class="btn btn-ghost" type="button" disabled>
               もう一度占う
             </button>
-            <button id="sampleBtn" class="btn btn-secondary btn-sample" type="button">
-              サンプルを見る
-            </button>
           </div>
 
           <p class="helper-note">
-            ※サンプルは結果イメージの確認用です。本番は「星詠を始める」からどうぞ。
+            ※いまのあなたに届いている一枚を、そのまま受け取れます。
           </p>
 
           <div class="mini-card">
@@ -1132,7 +1120,6 @@
         id: 0,
         name: '愚者 - The Fool',
         keyword: '始まり／自由な一歩',
-        consultType: 'turning_point',
         mainPatterns: [
           '「今のままではいられない」と感じているなら、それは失敗の予感ではなく、新しい物語の“序章”です。',
           '迷いがあるのは、間違っているからではなく、まだ踏み出していない未来があなたを呼んでいるからかもしれません。',
@@ -1163,7 +1150,6 @@
         id: 1,
         name: '魔術師 - The Magician',
         keyword: '意思／創造',
-        consultType: 'turning_point',
         mainPatterns: [
           'あなたはすでに、必要な「材料」を全部持っています。足りないのは才能ではなく、はじめの宣言だけ。',
           'このカードは、「できるかどうか」ではなく「やると決めるかどうか」が問われていることを伝えています。',
@@ -1194,7 +1180,6 @@
         id: 2,
         name: '女教皇 - The High Priestess',
         keyword: '直感／静かな確信',
-        consultType: 'healing',
         mainPatterns: [
           '本当は、もう気づいているはず。「この人」「この場所」「この働き方は、少し違うかもしれない」と。',
           'このカードは、まだ口にできていない直感が、静かにあなたの中で答えを持っていることを伝えています。',
@@ -1225,7 +1210,6 @@
         id: 3,
         name: '女帝 - The Empress',
         keyword: '愛／受け取ること',
-        consultType: 'love',
         mainPatterns: [
           '「与えること」に慣れすぎて、自分が受け取ることに遠慮していませんか？',
           'このカードは、愛されることや満たされることを、あなたがもっと許していいと伝えています。',
@@ -1256,7 +1240,6 @@
         id: 4,
         name: '皇帝 - The Emperor',
         keyword: '責任／軸を立てる',
-        consultType: 'turning_point',
         mainPatterns: [
           '誰かの期待やルールの中でがんばりすぎて、「自分のルール」を見失っていませんか？',
           'このカードは、外に合わせることより、自分の基準を立て直す時期に来ていることを伝えています。',
@@ -1287,7 +1270,6 @@
         id: 5,
         name: '法王 - The Hierophant',
         keyword: '学び／信頼できるつながり',
-        consultType: 'default',
         mainPatterns: [
           '一人で抱え込んでいる悩みは、「分かち合うこと」でやわらいでいきます。',
           'このカードは、いま必要な答えが「ひとりで全部出すこと」の外にあるかもしれないと伝えています。',
@@ -1318,7 +1300,6 @@
         id: 6,
         name: '恋人 - The Lovers',
         keyword: '選択／心が震えるほう',
-        consultType: 'love',
         mainPatterns: [
           'どちらも捨てがたい選択肢。けれど、本当は心のどこかでもう答えは出ているのかもしれません。',
           'このカードは、恋愛でも人生でも「正しさ」より「本音」が問われる場面に出やすい一枚です。',
@@ -1349,7 +1330,6 @@
         id: 7,
         name: '戦車 - The Chariot',
         keyword: '前進／突破',
-        consultType: 'turning_point',
         mainPatterns: [
           '今のあなたには、もう十分な勢いがあります。あとは、迷いを“燃料”に変えるだけ。',
           'このカードは、流れを動かす力があなたの中にあることをはっきり示しています。',
@@ -1380,7 +1360,6 @@
         id: 8,
         name: '力 - Strength',
         keyword: '優しさの強さ／自分を責めない力',
-        consultType: 'healing',
         mainPatterns: [
           'あなたの強さは、歯を食いしばることではなく「弱さを抱きしめてあげられる優しさ」にあります。',
           'このカードは、いま必要なのが無理に強くなることではなく、自分にやさしく戻ることだと伝えています。',
@@ -1411,7 +1390,6 @@
         id: 9,
         name: '隠者 - The Hermit',
         keyword: '内省／ひとりの時間',
-        consultType: 'healing',
         mainPatterns: [
           '人とのつながりの中で、少し疲れが溜まっていませんか？',
           'このカードは、いま無理に外へ答えを探すより、自分の内側を静かに見つめる時間が必要だと伝えています。',
@@ -1442,7 +1420,6 @@
         id: 10,
         name: '運命の輪 - Wheel of Fortune',
         keyword: '転機／流れの変化',
-        consultType: 'turning_point',
         mainPatterns: [
           '最近起きた「予定外のこと」は、ただのトラブルではなく、運命の方向転換かもしれません。',
           'このカードは、いま流れが変わりつつあること、そしてその変化には意味があることを伝えています。',
@@ -1473,7 +1450,6 @@
         id: 11,
         name: '正義 - Justice',
         keyword: 'バランス／決断',
-        consultType: 'turning_point',
         mainPatterns: [
           'どこかで「自分ばかり損している」と感じていませんか？',
           'このカードは、いま必要なのが「我慢」より「整えること」だと伝えています。',
@@ -1504,7 +1480,6 @@
         id: 12,
         name: '吊るされた男 - The Hanged Man',
         keyword: '一時停止／視点の反転',
-        consultType: 'anxiety',
         mainPatterns: [
           '今の停滞は、宇宙からの「小休止」のサインかもしれません。',
           'このカードは、動けないことにも意味があり、いまは急がなくていい時期だと伝えています。',
@@ -1535,7 +1510,6 @@
         id: 13,
         name: '死神 - Death',
         keyword: '終わりと始まり／手放し',
-        consultType: 'turning_point',
         mainPatterns: [
           '終わりは、罰ではなく「更新通知」です。古いページを閉じるからこそ、新しい物語が開きます。',
           'このカードは、苦しい変化の中にも再生の入口があることを伝えています。',
@@ -1566,7 +1540,6 @@
         id: 14,
         name: '節制 - Temperance',
         keyword: '調和／ちょうどよさ',
-        consultType: 'healing',
         mainPatterns: [
           'がんばりすぎと、なまけすぎ。その真ん中に、あなたの心地よいリズムがあります。',
           'このカードは、いま必要なのが「もっと頑張る」ことではなく、整えることだと伝えています。',
@@ -1597,7 +1570,6 @@
         id: 15,
         name: '悪魔 - The Devil',
         keyword: '執着／やめられないもの',
-        consultType: 'anxiety',
         mainPatterns: [
           '頭では分かっているのに、やめられない。それはあなたの意思が弱いからではありません。',
           'このカードは、いまの苦しさの奥に「本当は満たしたいもの」が隠れていることを伝えています。',
@@ -1628,7 +1600,6 @@
         id: 16,
         name: '塔 - The Tower',
         keyword: '崩壊／リセット',
-        consultType: 'anxiety',
         mainPatterns: [
           '突然の出来事で、足元がぐらついているかもしれません。でも、崩れたのは「本当に必要な土台」ではないはずです。',
           'このカードは、こわい変化の中にも「本当に残るもの」が見えてくることを伝えています。',
@@ -1659,7 +1630,6 @@
         id: 17,
         name: '星 - The Star',
         keyword: '希望／静かな光',
-        consultType: 'healing',
         mainPatterns: [
           '今はまだ現実が追いついていなくても、心のどこかで「きっと大丈夫」と感じていませんか？',
           'このカードは、すぐに形にならなくても、希望の灯りがちゃんと残っていることを伝えています。',
@@ -1690,7 +1660,6 @@
         id: 18,
         name: '月 - The Moon',
         keyword: '不安／揺れる心',
-        consultType: 'anxiety',
         mainPatterns: [
           '答えの見えない夜道を歩いているような、不安と迷いの中にいるのかもしれません。',
           'このカードは、いま感じている不安が、まだ言葉になっていない何かを教えようとしていることを伝えています。',
@@ -1721,7 +1690,6 @@
         id: 19,
         name: '太陽 - The Sun',
         keyword: '喜び／祝福',
-        consultType: 'love',
         mainPatterns: [
           'あなたの中の「子どものような無邪気さ」が、もう一度世界を信じてみたいと願っています。',
           'このカードは、いまの流れの中にちゃんと明るさや祝福があることを伝えています。',
@@ -1751,222 +1719,4 @@
       {
         id: 20,
         name: '審判 - Judgement',
-        keyword: '再スタート／呼びかけ',
-        consultType: 'love',
-        mainPatterns: [
-          '過去に一度あきらめたこと、封印した気持ちが、もう一度あなたを呼び起こそうとしています。',
-          'このカードは、「もう終わったと思っていたもの」に再び意味が戻る可能性を伝えています。',
-          '諦めたはずなのに、まだ心が動くなら、それにはまだ何か受け取るべきものがあるのかもしれません。'
-        ],
-        subPatterns: [
-          '「もう遅い」と切り捨てた夢に、もう一度だけ光を当ててみて。<strong>今のあなたなら、違う形で叶えられる</strong>可能性があります。',
-          '再び向き合うことは、過去に戻ることではありません。<strong>今の自分で、もう一度選び直すこと</strong>なのだと思います。',
-          '一度閉じた気持ちにも、まだ生きている想いがあるなら、それを雑に扱わなくて大丈夫です。'
-        ],
-        bridgePatterns: [
-          'このカードは、再スタートや再接続の流れが出ているときに出やすい一枚です。<strong>復縁、再挑戦、もう一度向き合うべきこと</strong>を深く見たい方は、個人鑑定が向いています。',
-          '恋愛では特に、「また動くかもしれない流れ」が気になる時に出やすい一枚です。<strong>相手の気持ちや再接続の可能性</strong>を丁寧に見ていけます。',
-          'もう一度向き合うなら、ちゃんと知っておきたいことがあります。<strong>今後どう動くか</strong>を深く受け取りたい方に向いています。'
-        ],
-        ctaCopies: [
-          'もう一度だけ信じたい気持ちを、丁寧に見つめてあげる。',
-          '復縁や再接続の可能性を、ひとりで抱えなくて大丈夫。',
-          '動き出すかもしれないこの流れを、深く受け取ってみる。'
-        ],
-        safePatterns: [
-          '過去を責めるのではなく、これからを丁寧に見ていく鑑定です。',
-          '復縁や再接続のご相談も、やさしく読み解きます。',
-          'もう一度向き合いたい想いも、安心してご相談ください。'
-        ]
-      },
-      {
-        id: 21,
-        name: '世界 - The World',
-        keyword: '完成／次のステージへ',
-        consultType: 'turning_point',
-        mainPatterns: [
-          'ひとつのサイクルが静かにまとまり、あなたは次の段階へ進む準備が整いつつあります。',
-          'このカードは、ここまで歩いてきた流れがちゃんと一つの形になろうとしていることを伝えています。',
-          '終わりではなく、完成。いまは一区切りのあとに来る新しい扉の前なのかもしれません。'
-        ],
-        subPatterns: [
-          'ここまで歩いてきた自分を、ちゃんと労ってあげてください。<strong>「がんばったね」と自分に言うこと</strong>が、新しい世界への扉をひらく合図になります。',
-          '次へ進む前に、まずは今の自分を認めてあげてください。<strong>一区切りを受け入れること</strong>が、新しい流れを呼び込みます。',
-          'まだ途中に見えても、すでに終わっているものもあります。いまは「締めくくること」が大切な時期かもしれません。'
-        ],
-        bridgePatterns: [
-          'このカードは、一区切りと次のステージの入り口で出やすい一枚です。<strong>ここからどこへ進むべきか、次に何を選ぶべきか</strong>を知りたいときは、個人鑑定で深く整理できます。',
-          '完成のあとには、また新しい始まりが来ます。<strong>次の流れをどう迎えるか</strong>を深く見たい方に向いています。',
-          'いま必要なのは、達成感だけで終わらせないことかもしれません。<strong>この先の方向性</strong>を丁寧に読み解けます。'
-        ],
-        ctaCopies: [
-          'ここまで歩いてきたからこそ、次の扉を丁寧に選びたい。',
-          '一区切りの先にある新しい流れを、深く見てみる。',
-          '完成のあとに来る次のステージを、やさしく迎える。'
-        ],
-        safePatterns: [
-          '一区切りのあとに必要な選択も、丁寧に読み解いていきます。',
-          'ここまで頑張ってきた気持ちも、大切に受け止めます。',
-          '次へ進む準備を、安心して整えていけるよう寄り添います。'
-        ]
-      }
-    ];
-
-    const startBtn = document.getElementById('startReadingBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const sampleBtn = document.getElementById('sampleBtn');
-
-    const cardFrame = document.getElementById('cardFrame');
-    const cardBackImg = document.getElementById('cardBackImage');
-    const cardFrontImg = document.getElementById('cardFrontImage');
-    const cardPlaceholder = document.getElementById('cardPlaceholder');
-
-    const cardName = document.getElementById('cardName');
-    const cardKeyword = document.getElementById('cardKeyword');
-    const resultBlock = document.getElementById('resultBlock');
-    const resultMain = document.getElementById('resultMain');
-    const resultSub = document.getElementById('resultSub');
-    const resultBridgeText = document.getElementById('resultBridgeText');
-    const consultBtnText = document.getElementById('consultBtnText');
-    const consultSafeNote = document.getElementById('consultSafeNote');
-    const ctaCopyText = document.getElementById('ctaCopyText');
-
-    let flipTimer = null;
-    let hideTimer = null;
-
-    function clearTimers() {
-      if (flipTimer) {
-        clearTimeout(flipTimer);
-        flipTimer = null;
-      }
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-    }
-
-    function buildCardState(card) {
-      return {
-        main: pickOne(card.mainPatterns),
-        sub: pickOne(card.subPatterns),
-        bridge: pickOne(card.bridgePatterns),
-        ctaCopy: pickOne(card.ctaCopies),
-        safe: pickOne(card.safePatterns)
-      };
-    }
-
-    function revealCard(card, options = {}) {
-      const opts = Object.assign({ isSample: false }, options);
-
-      clearTimers();
-
-      cardFrame.classList.remove('is-flipped', 'card-glow');
-      resultBlock.classList.remove('is-visible');
-
-      cardPlaceholder.style.display = 'none';
-
-      cardFrontImg.classList.remove('is-visible');
-      cardFrontImg.onload = () => {
-        cardFrontImg.classList.add('is-visible');
-      };
-      cardFrontImg.onerror = () => {
-        cardFrontImg.classList.remove('is-visible');
-      };
-      cardFrontImg.src = `images/card${card.id}.png`;
-      cardFrontImg.alt = `${card.name} のカード画像`;
-
-      cardName.textContent = card.name;
-      cardKeyword.textContent = card.keyword;
-
-      if (opts.isSample) {
-        const state = buildCardState(card);
-        resultMain.textContent = state.main;
-        resultSub.innerHTML =
-          state.sub +
-          '<br><br><strong style="font-size:0.78rem;">※これはサンプルです。実際の星詠では、毎回その時のあなたに合う言葉が届きます。</strong>';
-        resultBridgeText.innerHTML = 'この結果に少しでも心が動いたなら、その先にはもっと深く読める続きがあります。<strong>相手の気持ち、今後の流れ、どう動けばいいか</strong>まで知りたい方は、個人鑑定で丁寧に読み解けます。';
-        ctaCopyText.innerHTML = 'もう少しだけ深く、<strong>本音の奥</strong>まで受け取りたい方へ。';
-        consultBtnText.textContent = 'LINEで個人鑑定へ進む';
-        consultSafeNote.textContent = 'はじめての方も安心してご相談いただけます。無理な勧誘はありません。';
-      } else {
-        const state = buildCardState(card);
-        resultMain.textContent = state.main;
-        resultSub.innerHTML = state.sub;
-        resultBridgeText.innerHTML = state.bridge;
-        ctaCopyText.innerHTML = state.ctaCopy;
-        consultBtnText.textContent = 'LINEで個人鑑定へ進む';
-        consultSafeNote.textContent = state.safe;
-      }
-
-      resultBlock.hidden = false;
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          resultBlock.classList.add('is-visible');
-        });
-      });
-
-      flipTimer = setTimeout(() => {
-        cardFrame.classList.add('is-flipped', 'card-glow');
-      }, 500);
-
-      requestAnimationFrame(() => {
-        cardFrame.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
-
-      if (!opts.isSample) {
-        startBtn.disabled = true;
-      }
-      resetBtn.disabled = false;
-    }
-
-    function drawCard() {
-      const index = Math.floor(Math.random() * cards.length);
-      const card = cards[index];
-      revealCard(card, { isSample: false });
-    }
-
-    function showSample() {
-      const sampleCard = cards.find(c => c.id === 17) || cards[0];
-      revealCard(sampleCard, { isSample: true });
-    }
-
-    function resetReading() {
-      clearTimers();
-
-      cardFrame.classList.remove('is-flipped', 'card-glow');
-
-      cardFrontImg.onload = null;
-      cardFrontImg.onerror = null;
-      cardFrontImg.classList.remove('is-visible');
-      cardFrontImg.src = '';
-      cardFrontImg.alt = 'タロットカードの表面';
-
-      cardBackImg.classList.add('is-visible');
-      cardPlaceholder.style.display = 'flex';
-
-      cardName.textContent = 'カードはまだ伏せられています';
-      cardKeyword.textContent = '「星詠を始める」を押してください';
-
-      resultBlock.classList.remove('is-visible');
-
-      hideTimer = setTimeout(() => {
-        resultBlock.hidden = true;
-        resultMain.textContent = '';
-        resultSub.innerHTML = '';
-        resultBridgeText.innerHTML = '';
-        ctaCopyText.innerHTML = 'もう少しだけ深く、<strong>本音の奥</strong>まで受け取りたい方へ。';
-        consultBtnText.textContent = 'LINEで個人鑑定へ進む';
-        consultSafeNote.textContent = 'はじめての方も安心してご相談いただけます。無理な勧誘はありません。';
-      }, 220);
-
-      startBtn.disabled = false;
-      resetBtn.disabled = true;
-    }
-
-    startBtn.addEventListener('click', drawCard);
-    resetBtn.addEventListener('click', resetReading);
-    sampleBtn.addEventListener('click', showSample);
-  </script>
-</body>
-</html>
+        keyword: '再
