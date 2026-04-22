@@ -5,12 +5,11 @@
   <title>Re:Verse Shion — 星詠ワンカード無料タロット</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#faf7f0" />
-  <meta name="description" content="Re:Verse Shion（詩韻）による無料ワンカードタロット。星とことばで、いまのあなたの物語を一枚のカードからほどきます。" />
+  <meta name="description" content="Re:Verse Shion（詩韻）による無料ワンカードタロット。いまのあなたに必要な言葉を、一枚のカードから読み解きます。" />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after {
@@ -21,17 +20,26 @@
 
     :root {
       --bg: #fdfaf4;
-      --bg-soft: #f7f1e4;
       --ink: #1f1712;
+      --ink-soft: rgba(0,0,0,0.72);
+      --ink-muted: rgba(0,0,0,0.56);
       --accent: #d6a94b;
-      --accent-soft: rgba(214,169,75,0.16);
+      --accent-deep: #b9882e;
+      --panel: rgba(255,255,255,0.93);
       --border-soft: rgba(0,0,0,0.06);
       --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.08);
+      --shadow-card: 0 12px 28px rgba(0,0,0,0.16);
+      --radius-xl: 24px;
       --radius-lg: 18px;
+      --radius-md: 14px;
       --radius-pill: 999px;
       --dur: 220ms;
       --font-main: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, 'Yu Mincho', '游明朝', serif;
       --font-hero: 'Cormorant Garamond', 'Times New Roman', serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -43,19 +51,19 @@
       display: flex;
       justify-content: center;
       align-items: stretch;
-      padding: 24px 16px;
+      padding: 24px 16px 32px;
     }
 
     .page {
       width: 100%;
-      max-width: 960px;
+      max-width: 980px;
       margin: 0 auto;
       background:
-        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.9) 0, rgba(255,255,255,0.98) 55%, #f9f4ea 100%);
-      border-radius: 24px;
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.92) 0, rgba(255,255,255,0.98) 55%, #f9f4ea 100%);
+      border-radius: var(--radius-xl);
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--border-soft);
-      padding: 20px 18px 24px;
+      padding: 24px 20px 28px;
       position: relative;
       overflow: hidden;
     }
@@ -70,36 +78,38 @@
         repeating-linear-gradient(
           135deg,
           rgba(214,169,75,0.0) 0,
-          rgba(214,169,75,0.12) 1px,
+          rgba(214,169,75,0.10) 1px,
           rgba(214,169,75,0.0) 3px,
           rgba(214,169,75,0.0) 8px
         );
-      opacity: 0.28;
+      opacity: 0.22;
       pointer-events: none;
     }
 
-    header {
+    .hero {
       position: relative;
       z-index: 1;
-      margin-bottom: 18px;
       text-align: center;
+      margin-bottom: 18px;
+      padding-top: 4px;
     }
 
     .logo-sub {
       font-family: var(--font-hero);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: rgba(0,0,0,0.55);
       margin-bottom: 6px;
     }
 
     .logo-main {
       font-family: var(--font-hero);
-      font-size: clamp(1.9rem, 4vw, 2.4rem);
+      font-size: clamp(2rem, 4.6vw, 2.8rem);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      line-height: 1.12;
+      margin-bottom: 10px;
     }
 
     .logo-main span {
@@ -109,42 +119,44 @@
       color: transparent;
     }
 
-    .tagline {
-      font-size: 0.92rem;
-      color: rgba(0,0,0,0.7);
-      line-height: 1.6;
+    .hero-copy {
+      max-width: 680px;
+      margin: 0 auto 14px;
+      font-size: 0.96rem;
+      color: var(--ink-soft);
+      line-height: 1.82;
     }
 
-    .tagline strong {
-      font-weight: 600;
+    .hero-copy strong {
+      color: var(--ink);
+      font-weight: 700;
     }
 
-    main {
+    .hero-mini {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .layout {
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 22px;
+      align-items: start;
       margin-top: 20px;
     }
 
-    @media (max-width: 768px) {
-      main {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .page {
-        padding: 18px 14px 22px;
-      }
-    }
-
     .panel {
-      background: rgba(255,255,255,0.9);
+      background: var(--panel);
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.84);
       box-shadow: 0 10px 28px rgba(0,0,0,0.04);
-      padding: 16px 16px 18px;
+      padding: 18px 16px 18px;
       position: relative;
       overflow: hidden;
+      min-width: 0;
     }
 
     .panel::before {
@@ -152,71 +164,74 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.8) 0, transparent 50%),
-        radial-gradient(circle at 100% 100%, rgba(246,225,174,0.28) 0, transparent 60%);
-      opacity: 0.9;
+        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.78) 0, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(246,225,174,0.24) 0, transparent 60%);
       pointer-events: none;
     }
 
     .panel-inner {
       position: relative;
       z-index: 1;
+      min-width: 0;
     }
 
-    .panel-heading {
-      font-size: 0.86rem;
-      letter-spacing: 0.15em;
+    .section-label {
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.55);
+      color: rgba(0,0,0,0.52);
       margin-bottom: 6px;
     }
 
-    .panel-title {
-      font-size: 1.1rem;
+    .section-title {
+      font-size: 1.08rem;
       font-weight: 600;
-      margin-bottom: 6px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
     }
 
-    .panel-title-icon {
+    .section-title-icon {
       width: 18px;
       height: 18px;
       border-radius: 6px;
-      border: 1px solid rgba(214,169,75,0.7);
+      border: 1px solid rgba(214,169,75,0.72);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-size: 0.75rem;
       background: radial-gradient(circle at 30% 0%, #fffbe9 0, #f3e3bc 65%, #f0e7ce 100%);
       box-shadow: 0 0 0 1px rgba(255,255,255,0.85);
+      flex-shrink: 0;
     }
 
-    .panel-lead {
+    .lead-text {
       font-size: 0.9rem;
-      color: rgba(0,0,0,0.7);
-      line-height: 1.7;
-      margin-bottom: 14px;
+      color: var(--ink-soft);
+      line-height: 1.82;
+      margin-bottom: 12px;
     }
 
-    .panel-lead strong {
-      font-weight: 600;
+    .lead-text strong {
+      color: var(--ink);
+      font-weight: 700;
     }
 
     .hint {
       font-size: 0.78rem;
-      color: rgba(0,0,0,0.55);
-      line-height: 1.6;
-      margin-top: -4px;
+      color: var(--ink-muted);
+      line-height: 1.7;
       margin-bottom: 14px;
     }
 
     .btn-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 9px;
       align-items: center;
+      margin-bottom: 10px;
     }
 
     .btn {
@@ -225,15 +240,22 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 10px 18px;
+      padding: 11px 18px;
       border-radius: var(--radius-pill);
       border: 1px solid transparent;
       font-size: 0.9rem;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       cursor: pointer;
-      transition: transform var(--dur) ease, box-shadow var(--dur) ease, background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease;
+      transition:
+        transform var(--dur) ease,
+        box-shadow var(--dur) ease,
+        background-color var(--dur) ease,
+        border-color var(--dur) ease,
+        color var(--dur) ease,
+        opacity var(--dur) ease;
       text-decoration: none;
       white-space: nowrap;
+      font-family: inherit;
       flex-shrink: 0;
     }
 
@@ -251,28 +273,28 @@
       position: absolute;
       inset: -2px;
       border-radius: inherit;
-      border: 1px solid rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.72);
       pointer-events: none;
     }
 
     .btn-secondary {
-      background: rgba(255,255,255,0.85);
-      color: rgba(0,0,0,0.75);
+      background: rgba(255,255,255,0.86);
+      color: rgba(0,0,0,0.76);
       border-color: rgba(0,0,0,0.09);
       box-shadow: 0 8px 18px rgba(0,0,0,0.06);
     }
 
     .btn-ghost {
       background: transparent;
-      color: rgba(0,0,0,0.6);
-      border-color: rgba(0,0,0,0.15);
+      color: rgba(0,0,0,0.62);
+      border-color: rgba(0,0,0,0.14);
     }
 
     .btn span.badge {
       font-size: 0.7rem;
       padding: 2px 8px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
       border: 1px solid rgba(214,169,75,0.8);
     }
 
@@ -286,7 +308,7 @@
     .btn:not(:disabled):hover {
       transform: translateY(-1px);
       box-shadow:
-        0 18px 32px rgba(0,0,0,0.12),
+        0 18px 32px rgba(0,0,0,0.11),
         0 0 0 1px rgba(255,255,255,0.7);
     }
 
@@ -295,8 +317,43 @@
     }
 
     .btn-sample {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       padding-inline: 14px;
+    }
+
+    .helper-note {
+      font-size: 0.75rem;
+      color: rgba(0,0,0,0.55);
+      line-height: 1.68;
+      margin-top: 2px;
+    }
+
+    .mini-card {
+      margin-top: 14px;
+      padding: 12px 13px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(251,245,232,0.94));
+      border: 1px solid rgba(214,169,75,0.24);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+    }
+
+    .mini-title {
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.54);
+      margin-bottom: 7px;
+    }
+
+    .mini-card p {
+      font-size: 0.82rem;
+      color: rgba(0,0,0,0.68);
+      line-height: 1.78;
+    }
+
+    .mini-card strong {
+      color: rgba(0,0,0,0.84);
+      font-weight: 700;
     }
 
     .card-shell {
@@ -304,144 +361,146 @@
       flex-direction: column;
       align-items: center;
       gap: 10px;
+      width: 100%;
+      min-height: 610px;
     }
 
     .card-frame {
-  width: min(70vw, 260px);
-  aspect-ratio: 2 / 3;
-  border-radius: 16px;
-  padding: 6px;
-  background:
-    radial-gradient(circle at 0% 0%, #fffaf0 0, #f8ecd4 45%, #f0e0c0 100%);
-  box-shadow:
-    0 12px 28px rgba(0,0,0,0.16),
-    0 0 0 1px rgba(255,255,255,0.95);
-  position: relative;
-  overflow: hidden;
-  /* ★ フリップ用 */
-  perspective: 1200px;
-}
+      width: min(70vw, 264px);
+      aspect-ratio: 2 / 3;
+      border-radius: 16px;
+      padding: 6px;
+      background:
+        radial-gradient(circle at 0% 0%, #fffaf0 0, #f8ecd4 45%, #f0e0c0 100%);
+      box-shadow:
+        var(--shadow-card),
+        0 0 0 1px rgba(255,255,255,0.95);
+      position: relative;
+      overflow: hidden;
+      perspective: 1200px;
+      flex-shrink: 0;
+    }
 
-.card-img-wrap {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  background: radial-gradient(circle at 30% 0%, #fff 0, #f6f0e2 50%, #e8decf 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* ★ 3Dフリップ用 */
-  transform-style: preserve-3d;
-  transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-}
+    .card-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: radial-gradient(circle at 30% 0%, #fff 0, #f6f0e2 50%, #e8decf 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+    }
 
-.card-frame.is-flipped .card-img-wrap {
-  transform: rotateY(180deg);
-}
+    .card-frame.is-flipped .card-img-wrap {
+      transform: rotateY(180deg);
+    }
 
-/* 裏面・表面の共通スタイル */
-.card-face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-}
+    .card-face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
 
-/* 表面は180度回転させておく（親が回転したら見える） */
-.card-face--front {
-  transform: rotateY(180deg);
-}
+    .card-face--front {
+      transform: rotateY(180deg);
+    }
 
-/* プレースホルダーをカード中央に重ねる */
-.card-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 2;
-  font-family: var(--font-hero);
-  font-size: 1.1rem;
-  letter-spacing: 0.12em;
-  color: rgba(0,0,0,0.6);
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.5;
-}
+    .card-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 2;
+      font-family: var(--font-hero);
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      color: rgba(0,0,0,0.6);
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.5;
+    }
 
-/* 既存の .card-img アニメーションはそのまま使える */
-.card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0;
-  transform: translateY(8px) scale(1.02);
-  transition: opacity 260ms ease, transform 260ms ease;
-}
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transform: translateY(8px) scale(1.02);
+      transition: opacity 260ms ease, transform 260ms ease;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
 
-.card-img.is-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
+    .card-img.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
 
-/* ★ カードが光る演出 */
-.card-frame.card-glow::after {
-  content: "";
-  position: absolute;
-  inset: -8%;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.9) 0, transparent 55%),
-    radial-gradient(circle at 50% 100%, rgba(214,169,75,0.45) 0, transparent 60%);
-  mix-blend-mode: screen;
-  opacity: 0;
-  animation: cardGlow 1s ease-out 1;
-}
+    .card-frame.card-glow::after {
+      content: "";
+      position: absolute;
+      inset: -8%;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.9) 0, transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(214,169,75,0.45) 0, transparent 60%);
+      mix-blend-mode: screen;
+      opacity: 0;
+      animation: cardGlow 1s ease-out 1;
+    }
 
-@keyframes cardGlow {
-  0% { opacity: 0; }
-  30% { opacity: 1; }
-  100% { opacity: 0; }
-}
+    @keyframes cardGlow {
+      0% { opacity: 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0; }
+    }
 
-/* ★ 個人鑑定ボタンが一度だけ「キラッ」と光る */
-.result-block.is-visible .consult-row .btn-secondary {
-  animation: consultGlow 1.4s ease-out 1 0.8s;
-}
+    .result-block.is-visible .consult-row .btn-secondary {
+      animation: consultGlow 1.4s ease-out 1 0.7s;
+    }
 
-@keyframes consultGlow {
-  0% {
-    box-shadow: 0 8px 18px rgba(0,0,0,0.06);
-    transform: translateY(0);
-  }
-  40% {
-    box-shadow:
-      0 0 0 3px rgba(214,169,75,0.4),
-      0 0 24px rgba(214,169,75,0.9);
-    transform: translateY(-1px);
-  }
-  100% {
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-    transform: translateY(0);
-  }
+    @keyframes consultGlow {
+      0% {
+        box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+        transform: translateY(0);
+      }
+      40% {
+        box-shadow:
+          0 0 0 3px rgba(214,169,75,0.4),
+          0 0 24px rgba(214,169,75,0.9);
+        transform: translateY(-1px);
+      }
+      100% {
+        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        transform: translateY(0);
+      }
+    }
 
     .card-meta {
       text-align: center;
       margin-top: 6px;
+      width: 100%;
+      min-height: 64px;
     }
 
     .card-name {
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 2px;
+      line-height: 1.55;
     }
 
     .card-keyword {
@@ -449,22 +508,28 @@
       color: rgba(0,0,0,0.6);
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      line-height: 1.55;
     }
 
     .result-block {
       margin-top: 10px;
       width: 100%;
-      padding: 10px 12px;
+      padding: 12px 13px;
       border-radius: 14px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(252,243,221,0.96));
+      background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(252,243,221,0.96));
       border: 1px solid rgba(214,169,75,0.35);
       box-shadow: 0 12px 28px rgba(0,0,0,0.08);
       font-size: 0.88rem;
       color: rgba(0,0,0,0.8);
-      line-height: 1.7;
+      line-height: 1.75;
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 260ms ease, transform 260ms ease;
+      overflow-wrap: anywhere;
+    }
+
+    .result-block[hidden] {
+      display: none !important;
     }
 
     .result-block.is-visible {
@@ -477,34 +542,85 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: rgba(0,0,0,0.55);
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
 
     .result-text-main {
-      margin-bottom: 4px;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: rgba(0,0,0,0.82);
     }
 
     .result-text-sub {
-      font-size: 0.8rem;
-      color: rgba(0,0,0,0.64);
+      font-size: 0.82rem;
+      color: rgba(0,0,0,0.66);
     }
 
     .result-text-sub strong {
-      font-weight: 600;
+      font-weight: 700;
+      color: rgba(0,0,0,0.82);
+    }
+
+    .result-bridge {
+      margin-top: 12px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.76);
+      border: 1px solid rgba(214,169,75,0.22);
+    }
+
+    .result-bridge-title {
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.54);
+      margin-bottom: 6px;
+    }
+
+    .result-bridge-text {
+      font-size: 0.8rem;
+      color: rgba(0,0,0,0.68);
+      line-height: 1.76;
+    }
+
+    .result-bridge-text strong {
+      color: rgba(0,0,0,0.84);
+      font-weight: 700;
     }
 
     .consult-row {
-      margin-top: 10px;
+      margin-top: 12px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       justify-content: flex-start;
     }
 
-    .note {
+    .consult-safe-note {
+      margin-top: 8px;
+      font-size: 0.74rem;
+      color: rgba(0,0,0,0.54);
+      line-height: 1.7;
+    }
+
+    .bottom-note {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+    }
+
+    .bottom-note .mini-card {
+      margin-top: 0;
+    }
+
+    footer {
+      margin-top: 18px;
+      text-align: center;
       font-size: 0.75rem;
-      color: rgba(0,0,0,0.55);
-      margin-top: 4px;
+      color: rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+      line-height: 1.7;
     }
 
     .stardust {
@@ -542,43 +658,69 @@
       }
     }
 
-    footer {
-      margin-top: 18px;
-      text-align: center;
-      font-size: 0.75rem;
-      color: rgba(0,0,0,0.5);
-      position: relative;
-      z-index: 1;
+    @media (max-width: 860px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .card-shell {
+        min-height: 580px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 18px 12px 26px;
+      }
+
+      .page {
+        padding: 18px 14px 22px;
+      }
+
+      .hero-copy {
+        font-size: 0.92rem;
+      }
+
+      .btn {
+        white-space: normal;
+        text-align: center;
+      }
+
+      .card-frame {
+        width: min(72vw, 260px);
+      }
+
+      .card-shell {
+        min-height: 550px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <header>
+    <header class="hero">
       <div class="logo-sub">FREE ONE-CARD READING</div>
-      <h1 class="logo-main"><span>Re:Verse Shion</span> <br>星詠システム</h1>
-      <p class="tagline">
-        <strong>言葉が魂を救う。</strong><br>
-        いまのあなたの「本音」を、一枚のカードと詩（ことば）からそっと読み解きます。
+      <h1 class="logo-main"><span>Re:Verse Shion</span><br>星詠システム</h1>
+      <p class="hero-copy">
+        <strong>いまのあなたに必要な言葉を、一枚のカードから。</strong><br>
+        無料で受け取れる、詩韻の星詠ワンカードです。
+      </p>
+      <p class="hero-mini">
+        恋愛・人間関係・仕事など、今の心に必要なメッセージをそっと読み解きます。
       </p>
     </header>
 
-    <main>
-      <!-- 左：説明＆スタートパネル -->
+    <main class="layout">
       <section class="panel" aria-labelledby="intro-title">
         <div class="panel-inner">
-          <div class="panel-heading">STEP 1</div>
-          <h2 id="intro-title" class="panel-title">
-            <span class="panel-title-icon">✶</span>
-            星詠を始める前に
+          <div class="section-label">STEP 1</div>
+          <h2 id="intro-title" class="section-title">
+            <span class="section-title-icon">✶</span>
+            無料で星詠してみる
           </h2>
-          <p class="panel-lead">
-            この無料ワンカードは、<strong>「今いちばん大事なメッセージ」</strong>だけを一枚に凝縮して届けるための星詠リーディングです。<br>
-            恋愛、仕事、人間関係、テーマは決めても決めなくてもかまいません。
-          </p>
-          <p class="hint">
-            目を閉じて、ゆっくり深呼吸をひとつ。<br>
-            「いまの私に必要なメッセージを見せてください」と心の中でそっと唱えてから、ボタンを押してください。
+
+          <p class="lead-text">
+            深呼吸をひとつして、<strong>「今の私に必要なメッセージ」</strong>を心の中で唱えてから、ボタンを押してください。
           </p>
 
           <div class="btn-row">
@@ -595,98 +737,122 @@
             </button>
           </div>
 
-          <p class="note">
-            ※「サンプルを見る」は、実際の結果イメージを確認したい方向けのおためし表示です。<br>
-            本番の星詠は「星詠を始める」からどうぞ。
+          <p class="helper-note">
+            ※サンプルは結果イメージの確認用です。本番は「星詠を始める」からどうぞ。
           </p>
+
+          <div class="mini-card">
+            <div class="mini-title">詩韻の星詠</div>
+            <p>
+              ただ当てるためではなく、<strong>今のあなたの本音をほどくため</strong>のリーディングです。  
+              結果に少しでも心が動いたなら、その先にはもっと深く読める続きがあります。
+            </p>
+          </div>
         </div>
       </section>
 
-      <!-- 右：カード＆結果パネル -->
       <section class="panel" aria-labelledby="result-title">
         <div class="panel-inner">
-          <div class="panel-heading">STEP 2</div>
-          <h2 id="result-title" class="panel-title">
-            <span class="panel-title-icon">✧</span>
+          <div class="section-label">STEP 2</div>
+          <h2 id="result-title" class="section-title">
+            <span class="section-title-icon">✧</span>
             今日あなたに降りるカード
           </h2>
 
-        <div class="card-shell" aria-live="polite">
-  <div class="card-frame" id="cardFrame">
-    <div class="card-img-wrap">
-      <!-- 裏面 -->
-      <div class="card-face card-face--back">
-        <img
-          id="cardBackImage"
-          class="card-img"
-          src="images/card-back.png"
-          alt="タロットカードの裏面"
-        >
-      </div>
+          <div class="card-shell" aria-live="polite">
+            <div class="card-frame" id="cardFrame">
+              <div class="card-img-wrap">
+                <div class="card-face card-face--back">
+                  <img
+                    id="cardBackImage"
+                    class="card-img is-visible"
+                    src="images/card-back.png"
+                    alt="タロットカードの裏面"
+                  >
+                </div>
 
-      <!-- 表面（占い結果で差し替え） -->
-      <div class="card-face card-face--front">
-        <img
-          id="cardFrontImage"
-          class="card-img"
-          src=""
-          alt="タロットカードの表面"
-        >
-      </div>
+                <div class="card-face card-face--front">
+                  <img
+                    id="cardFrontImage"
+                    class="card-img"
+                    src=""
+                    alt="タロットカードの表面"
+                  >
+                </div>
 
-      <!-- 初期の「星詠待機中」表示 -->
-      <div id="cardPlaceholder" class="card-placeholder">
-        星詠<br>待機中…
-      </div>
-    </div>
-  </div>
+                <div id="cardPlaceholder" class="card-placeholder">
+                  星詠<br>待機中…
+                </div>
+              </div>
+            </div>
 
-  <div class="card-meta">
-    <div id="cardName" class="card-name">カードはまだ伏せられています</div>
-    <div id="cardKeyword" class="card-keyword">
-      深呼吸をして「星詠を始める」を押してください
-    </div>
-  </div>
+            <div class="card-meta">
+              <div id="cardName" class="card-name">カードはまだ伏せられています</div>
+              <div id="cardKeyword" class="card-keyword">
+                「星詠を始める」を押してください
+              </div>
+            </div>
 
-  <div id="resultBlock" class="result-block" hidden>
-    <div class="result-label">SHION READING</div>
-    <div id="resultMain" class="result-text-main"></div>
-    <div id="resultSub" class="result-text-sub"></div>
+            <div id="resultBlock" class="result-block" hidden>
+              <div class="result-label">SHION READING</div>
+              <div id="resultMain" class="result-text-main"></div>
+              <div id="resultSub" class="result-text-sub"></div>
 
-    <div class="consult-row">
-      <a
-        id="consultBtn"
-        class="btn btn-secondary"
-        href="https://lin.ee/LYnlU0f"
-        target="_blank"
-        rel="noopener"
-      >
-        <span class="btn-icon">🌙</span>
-        <span>この続きは個人鑑定で受け取る</span>
-      </a>
-    </div>
-    <p class="note">
-      「大丈夫だよ。」——最後は、あなた自身の選択がすべてを決めていきます。
-    </p>
-  </div>
-</div>
+              <div class="result-bridge">
+                <div class="result-bridge-title">この先を深く見るなら</div>
+                <p id="resultBridgeText" class="result-bridge-text">
+                  この一枚が伝えているのは、今のあなたに最も強く届いているメッセージです。  
+                  ただ、<strong>相手の気持ち、今後の流れ、どう動けばいいか</strong>まで知りたいときは、個人鑑定でさらに丁寧に読み解けます。
+                </p>
+              </div>
+
+              <div class="consult-row">
+                <a
+                  id="consultBtn"
+                  class="btn btn-secondary"
+                  href="https://lin.ee/LYnlU0f"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span class="btn-icon">🌙</span>
+                  <span id="consultBtnText">あなたの状況を、個人鑑定で詳しく読む</span>
+                </a>
+              </div>
+
+              <p id="consultSafeNote" class="consult-safe-note">
+                LINEから気軽にご相談いただけます。無理な勧誘はありません。
+              </p>
+
+              <p class="helper-note" style="margin-top:8px;">
+                「大丈夫だよ。」——最後は、あなた自身の選択が未来をひらいていきます。
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </main>
+
+    <section class="bottom-note" aria-label="詩韻の鑑定について">
+      <div class="mini-card">
+        <div class="mini-title">もっと深く見たいときに</div>
+        <p>
+          無料ワンカードは、あなたの心の入口をひらく最初の一枚。  
+          もし「当たっているかも」「続きを知りたい」と感じたなら、個人鑑定では
+          <strong>相手の気持ち、今後、選択、あなた自身の本音</strong>まで、より丁寧にほどいていきます。
+        </p>
+      </div>
+    </section>
 
     <footer>
       &copy; <span id="year"></span> Re:Verse Shion — 言葉が魂を救う世界へ
     </footer>
   </div>
 
-  <!-- シンプルな星砂パーティクル -->
   <div class="stardust" aria-hidden="true"></div>
 
   <script>
-    // 年号
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // 星砂の簡易生成
     (function spawnStardust() {
       const container = document.querySelector('.stardust');
       const COUNT = 24;
@@ -696,6 +862,7 @@
         const duration = 10 + Math.random() * 12;
         const left = Math.random() * 100;
         const top = 60 + Math.random() * 40;
+
         s.style.left = left + 'vw';
         s.style.top = top + 'vh';
         s.style.animationDuration = duration + 's';
@@ -704,279 +871,846 @@
       }
     })();
 
-    // === タロットデータ（詩韻版） ===
+    function pickOne(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
     const cards = [
       {
         id: 0,
         name: '愚者 - The Fool',
         keyword: '始まり／自由な一歩',
-        main: '「今のままではいられない」と感じているなら、それは失敗の予感ではなく、新しい物語の“序章”です。',
-        sub: '完璧さよりも「動き出すこと」。小さな選択でかまいません。<strong>今、心が少しだけワクっとする方向</strong>に一歩だけ動いてみて。そこから、流れが変わっていきます。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          '「今のままではいられない」と感じているなら、それは失敗の予感ではなく、新しい物語の“序章”です。',
+          '迷いがあるのは、間違っているからではなく、まだ踏み出していない未来があなたを呼んでいるからかもしれません。',
+          'このカードは、止まっているように見えても、内側ではもう次の旅が始まっていることを告げています。'
+        ],
+        subPatterns: [
+          '完璧さよりも「動き出すこと」。小さな選択でかまいません。<strong>今、心が少しだけワクっとする方向</strong>に一歩だけ動いてみて。そこから、流れが変わっていきます。',
+          '大きな覚悟はまだいりません。まずは、<strong>少しだけ気持ちが軽くなる選択</strong>をひとつ。未来は、その一歩から育っていきます。',
+          '「ちゃんとしなきゃ」よりも、「本当はどうしたい？」を優先してみてください。あなたの新しい流れは、そこから始まります。'
+        ],
+        bridgePatterns: [
+          'このカードは「始まり」のサイン。新しい流れに入る前ほど迷いが出やすいものです。<strong>どこへ向かうべきか、今の選択が合っているか</strong>を深く見たいときは、個人鑑定で整理できます。',
+          'いま必要なのは、勢いよりも方向です。<strong>この先どこへ進むと自分らしいか</strong>を見たいときは、個人鑑定で丁寧に読み解けます。',
+          '始まりの前は、可能性が広いぶん迷いも生まれます。<strong>今の流れをどう育てるか</strong>を知りたい方は、その先を個人鑑定で受け取れます。'
+        ],
+        ctaPatterns: [
+          'これからの流れを、個人鑑定で詳しく見る',
+          '今の選択が合っているか、個人鑑定で深く読む',
+          '新しい流れの方向を、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '新しい一歩に迷うときも、焦らず丁寧に読み解きます。',
+          'はじめての変化でも、安心してご相談いただけます。',
+          '迷いを責めず、あなたに合う進み方を一緒に整理します。'
+        ]
       },
       {
         id: 1,
         name: '魔術師 - The Magician',
         keyword: '意思／創造',
-        main: 'あなたはすでに、必要な「材料」を全部持っています。足りないのは才能ではなく、はじめの宣言だけ。',
-        sub: '頭の中にあるアイデアを、言葉にしてみてください。ノートでも、SNSでも、誰かへの一通のメッセージでもいい。<strong>「こうなりたい」を一文にする</strong>ことが、魔法の最初のトリガーになります。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          'あなたはすでに、必要な「材料」を全部持っています。足りないのは才能ではなく、はじめの宣言だけ。',
+          'このカードは、「できるかどうか」ではなく「やると決めるかどうか」が問われていることを伝えています。',
+          '今のあなたには、まだ形になっていない力があります。あとはそれを、自分で認めて動かすだけです。'
+        ],
+        subPatterns: [
+          '頭の中にあるアイデアを、言葉にしてみてください。ノートでも、SNSでも、誰かへの一通のメッセージでもいい。<strong>「こうなりたい」を一文にする</strong>ことが、魔法の最初のトリガーになります。',
+          '迷っていることがあるなら、まずは小さく表現してみて。<strong>外に出した瞬間に、流れは少しずつ動き始めます。</strong>',
+          '今のあなたに必要なのは、準備を完璧にすることではなく、<strong>最初の合図を自分で出すこと</strong>かもしれません。'
+        ],
+        bridgePatterns: [
+          'このカードは「動かす力」を示しています。<strong>今の行動が正しいか、どう形にしていくか</strong>まで知りたいときは、個人鑑定で具体的に読み解けます。',
+          'やる気はあるのに迷いがあるなら、その原因を言葉にすると進みやすくなります。<strong>何をどう始めるべきか</strong>を深く見ることができます。',
+          '可能性は見えているのに、最後の一歩が難しいこともあります。<strong>今の流れをどう現実にするか</strong>を個人鑑定で丁寧に整理できます。'
+        ],
+        ctaPatterns: [
+          '今の流れと動き方を、個人鑑定で詳しく読む',
+          '形にするための一歩を、個人鑑定で整理する',
+          'これからの進め方を、個人鑑定で深く見る'
+        ],
+        safePatterns: [
+          'やりたいことや選択の整理も、LINEから気軽にご相談いただけます。',
+          'まだ言葉になっていない想いも、丁寧に受け止めます。',
+          '焦らず、あなたらしい形に整えていけるよう読み解きます。'
+        ]
       },
       {
         id: 2,
         name: '女教皇 - The High Priestess',
         keyword: '直感／静かな確信',
-        main: '本当は、もう気づいているはず。「この人」「この場所」「この働き方は、少し違うかもしれない」と。',
-        sub: '表面の正しさよりも、心のざわつきを大切に。今日は少しだけ静かな時間をつくって、<strong>「本当はどうしたい？」と自分に問いかける</strong>ことから始めてみてください。'
+        consultType: 'healing',
+        mainPatterns: [
+          '本当は、もう気づいているはず。「この人」「この場所」「この働き方は、少し違うかもしれない」と。',
+          'このカードは、まだ口にできていない直感が、静かにあなたの中で答えを持っていることを伝えています。',
+          '今のあなたに必要なのは、外の声よりも、心の奥の小さな違和感を見逃さないことかもしれません。'
+        ],
+        subPatterns: [
+          '表面の正しさよりも、心のざわつきを大切に。今日は少しだけ静かな時間をつくって、<strong>「本当はどうしたい？」と自分に問いかける</strong>ことから始めてみてください。',
+          '急いで答えを出さなくても大丈夫。<strong>違和感を無視しないこと</strong>が、次の正しい選択につながっていきます。',
+          '誰かの期待より、自分の静かな本音に耳を澄ませてみてください。いま必要な答えは、もう内側にあります。'
+        ],
+        bridgePatterns: [
+          'このカードは、本音がまだ言葉になりきっていないときに出やすい一枚です。<strong>自分の本音や相手の本心</strong>をもっと深く整理したいときは、個人鑑定が向いています。',
+          '見えていないようで、実は感じ取っていることがあるはずです。<strong>本当に大切な気持ち</strong>を言葉にしたいときに、個人鑑定で丁寧にほどけます。',
+          'いま必要なのは、派手な答えではなく静かな確信かもしれません。<strong>心の奥の答え</strong>を一緒に読み解いていけます。'
+        ],
+        ctaPatterns: [
+          '心の奥の本音を、個人鑑定で丁寧に読み解く',
+          '見えていない本心を、個人鑑定で受け取る',
+          '今の違和感の正体を、個人鑑定で深く読む'
+        ],
+        safePatterns: [
+          '言葉にならない気持ちも、急かさず丁寧に受け取ります。',
+          '静かな迷いも、安心してご相談ください。',
+          'あなたの本音を、否定せずやさしく整理していきます。'
+        ]
       },
       {
         id: 3,
         name: '女帝 - The Empress',
         keyword: '愛／受け取ること',
-        main: '「与えること」に慣れすぎて、自分が受け取ることに遠慮していませんか？',
-        sub: '優しさを配るだけでなく、<strong>あなた自身も大切にされていい存在</strong>です。今日は「ありがとう」と言われたとき、否定せずにそのまま受け取ってみて。そこから関係性が少しずつ変わります。'
+        consultType: 'love',
+        mainPatterns: [
+          '「与えること」に慣れすぎて、自分が受け取ることに遠慮していませんか？',
+          'このカードは、愛されることや満たされることを、あなたがもっと許していいと伝えています。',
+          'いま必要なのは、がんばって愛を作ることより、すでにあるやさしさをちゃんと受け取ることかもしれません。'
+        ],
+        subPatterns: [
+          '優しさを配るだけでなく、<strong>あなた自身も大切にされていい存在</strong>です。今日は「ありがとう」と言われたとき、否定せずにそのまま受け取ってみて。そこから関係性が少しずつ変わります。',
+          '愛を与えることは得意でも、受け取ることには遠慮していない？ <strong>大切にされることを拒まないこと</strong>が、流れを変える鍵になります。',
+          'あなたがやさしい分だけ、自分にもやさしくしてあげてください。その余白が、愛の循環を整えていきます。'
+        ],
+        bridgePatterns: [
+          'このカードは、愛情や関係性のテーマが濃いときに出やすい一枚です。<strong>相手の気持ちや、この関係の先</strong>まで知りたいなら、個人鑑定でさらに深く見られます。',
+          '恋愛や人間関係では、受け取る勇気も大切です。<strong>この関係がどう育っていくか</strong>を知りたいときは、その先を深く読めます。',
+          '「好き」だけでは整理しきれない想いもあります。<strong>相手の本音や今後の流れ</strong>を見たい方に、個人鑑定は向いています。'
+        ],
+        ctaPatterns: [
+          '相手の気持ちと恋愛の流れを、個人鑑定で詳しく見る',
+          'この関係の先を、個人鑑定で丁寧に読む',
+          '恋愛の本音を、個人鑑定で深く受け取る'
+        ],
+        safePatterns: [
+          '恋愛のご相談も、やさしく丁寧に読み解きます。',
+          '片想いや関係の迷いも、安心してご相談ください。',
+          '不安を煽らず、あなたに必要な言葉を大切に届けます。'
+        ]
       },
       {
         id: 4,
         name: '皇帝 - The Emperor',
         keyword: '責任／軸を立てる',
-        main: '誰かの期待やルールの中でがんばりすぎて、「自分のルール」を見失っていませんか？',
-        sub: '今、必要なのは反抗ではなく、<strong>あなた自身の基準を決め直すこと</strong>です。「これはイヤ」「これは大事」を書き出してみて。そこから、あなたの王国が始まります。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          '誰かの期待やルールの中でがんばりすぎて、「自分のルール」を見失っていませんか？',
+          'このカードは、外に合わせることより、自分の基準を立て直す時期に来ていることを伝えています。',
+          'いま必要なのは、守られることではなく、自分で自分の軸を選び直すことかもしれません。'
+        ],
+        subPatterns: [
+          '今、必要なのは反抗ではなく、<strong>あなた自身の基準を決め直すこと</strong>です。「これはイヤ」「これは大事」を書き出してみて。そこから、あなたの王国が始まります。',
+          '優先順位が曖昧なままだと、心も揺れやすくなります。<strong>自分が守りたいもの</strong>を言葉にしてみてください。',
+          '強くあることは、無理を続けることではありません。自分の軸に戻ることが、いま一番の安定になります。'
+        ],
+        bridgePatterns: [
+          'このカードは、自分の軸や立ち位置を整えるタイミングに出やすい一枚です。<strong>どう決めるべきか、どこまで守るべきか</strong>を深く見たい方は、個人鑑定で整理できます。',
+          '誰かに合わせるほど、自分の本音は見えにくくなることがあります。<strong>今の選択をどう整えるか</strong>を一緒に読み解けます。',
+          'この先ぶれないために、いま整理しておくべきことがあります。<strong>自分の軸と判断</strong>を深く見たいときに向いています。'
+        ],
+        ctaPatterns: [
+          '今の選択と軸を、個人鑑定で詳しく読む',
+          '自分に合う判断を、個人鑑定で整理する',
+          'これからの立ち位置を、個人鑑定で深く見る'
+        ],
+        safePatterns: [
+          '迷いの多い時期でも、必要な判断を丁寧に整理します。',
+          '抱え込みすぎている気持ちも、安心してご相談ください。',
+          'あなたのペースを尊重しながら、進む方向を整えていきます。'
+        ]
       },
       {
         id: 5,
         name: '法王 - The Hierophant',
         keyword: '学び／信頼できるつながり',
-        main: '一人で抱え込んでいる悩みは、「分かち合うこと」でやわらいでいきます。',
-        sub: '信頼できる人に相談する、本や講座で学ぶ。どんな形でもかまいません。<strong>あなたの心に灯りをともしてくれる言葉</strong>を探しに行ってみてください。'
+        consultType: 'default',
+        mainPatterns: [
+          '一人で抱え込んでいる悩みは、「分かち合うこと」でやわらいでいきます。',
+          'このカードは、いま必要な答えが「ひとりで全部出すこと」の外にあるかもしれないと伝えています。',
+          '頼ることは弱さではなく、心に灯りを戻すための大事な選択です。'
+        ],
+        subPatterns: [
+          '信頼できる人に相談する、本や講座で学ぶ。どんな形でもかまいません。<strong>あなたの心に灯りをともしてくれる言葉</strong>を探しに行ってみてください。',
+          'あなたが抱えているものは、言葉にするだけでも少し軽くなるかもしれません。<strong>ちゃんと受け止めてくれる場所</strong>を選んでみてください。',
+          '遠回りに見えても、学び直すことや相談することが、いまのあなたには大きな助けになります。'
+        ],
+        bridgePatterns: [
+          'このカードは、一人で答えを出しきれないときに出やすい一枚です。<strong>今の悩みの本質や、進み方のヒント</strong>を受け取りたいときは、個人鑑定が向いています。',
+          'ひとりで抱えるほど、見えなくなるものがあります。<strong>今の悩みを言葉にして整理したい方</strong>は、その先を深く読めます。',
+          '答えを急がなくていいからこそ、ちゃんと整理して受け取りたい。そんな時に個人鑑定は力になります。'
+        ],
+        ctaPatterns: [
+          '今の悩みを、個人鑑定で丁寧に読み解く',
+          'これからの進み方を、個人鑑定で深く見る',
+          '悩みの本質を、個人鑑定で整理する'
+        ],
+        safePatterns: [
+          'はじめての方も、安心してご相談いただけます。',
+          'どこから話せばいいか分からなくても大丈夫です。',
+          'ひとりで抱えた気持ちを、無理なくほどいていきます。'
+        ]
       },
       {
         id: 6,
         name: '恋人 - The Lovers',
         keyword: '選択／心が震えるほう',
-        main: 'どちらも捨てがたい選択肢。けれど、本当は心のどこかでもう答えは出ているのかもしれません。',
-        sub: '「正しいほう」ではなく、<strong>長く続けたときに、自分を誇れるほう</strong>を選んでみて。恋も、仕事も、あなたの魂が喜ぶ選択が、未来のあなたを助けます。'
+        consultType: 'love',
+        mainPatterns: [
+          'どちらも捨てがたい選択肢。けれど、本当は心のどこかでもう答えは出ているのかもしれません。',
+          'このカードは、恋愛でも人生でも「正しさ」より「本音」が問われる場面に出やすい一枚です。',
+          '迷っているのは弱さではなく、それだけ大切な想いがあるから。だからこそ、ちゃんと選びたいのだと思います。'
+        ],
+        subPatterns: [
+          '「正しいほう」ではなく、<strong>長く続けたときに、自分を誇れるほう</strong>を選んでみて。恋も、仕事も、あなたの魂が喜ぶ選択が、未来のあなたを助けます。',
+          '誰かに納得される道より、自分がちゃんと納得できる道を。<strong>心が震える方</strong>を見逃さないでください。',
+          '恋でも選択でも、本当に大事なのは「どちらが不安じゃないか」ではなく、「どちらが自分らしいか」かもしれません。'
+        ],
+        bridgePatterns: [
+          'このカードは、恋愛や大切な選択の岐路で出やすい一枚です。<strong>相手の気持ち、関係の今後、どちらを選ぶべきか</strong>まで見たいときは、個人鑑定でより深く読めます。',
+          '「好き」だけでは整理できないこともあります。<strong>相手の本音や、これからの流れ</strong>を知ると迷いが軽くなるかもしれません。',
+          '選ぶ前に、ちゃんと知っておきたいことがあるはずです。<strong>この恋の先や、気持ちの行方</strong>を深く見たい方に向いています。'
+        ],
+        ctaPatterns: [
+          '恋愛の流れと相手の気持ちを、個人鑑定で深く見る',
+          'この恋の先を、個人鑑定で丁寧に読む',
+          '選ぶべき方向を、個人鑑定で詳しく受け取る'
+        ],
+        safePatterns: [
+          '恋愛や選択の迷いも、焦らせず丁寧に読み解きます。',
+          '相手の気持ちが気になる時も、やさしく整理していきます。',
+          '心が揺れる時ほど、安心してご相談ください。'
+        ]
       },
       {
         id: 7,
         name: '戦車 - The Chariot',
         keyword: '前進／突破',
-        main: '今のあなたには、もう十分な勢いがあります。あとは、迷いを“燃料”に変えるだけ。',
-        sub: '「どうせ無理」と思ったときこそ、<strong>小さな行動を1つだけ追加</strong>してみてください。その一歩が、止まって見えた現状を一気に動かします。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          '今のあなたには、もう十分な勢いがあります。あとは、迷いを“燃料”に変えるだけ。',
+          'このカードは、流れを動かす力があなたの中にあることをはっきり示しています。',
+          '止まって見えても、心の奥ではもう「進みたい」が動き始めているのかもしれません。'
+        ],
+        subPatterns: [
+          '「どうせ無理」と思ったときこそ、<strong>小さな行動を1つだけ追加</strong>してみてください。その一歩が、止まって見えた現状を一気に動かします。',
+          '勢いはあるのに、進む方向が定まらない時もあります。<strong>まずはひとつ、迷わずできる行動</strong>を選んでみてください。',
+          '全部を一気に変えなくても大丈夫。今のあなたに必要なのは、進む証拠になる小さな前進です。'
+        ],
+        bridgePatterns: [
+          'このカードは、流れを動かす力が強まる時期に出やすい一枚です。<strong>今動くべきか、どう進めばいいか</strong>を知りたいときは、個人鑑定で具体的に見られます。',
+          '勢いがある時ほど、方向が大切になります。<strong>いま進むべき道や、タイミング</strong>を深く読み解けます。',
+          '動きたいのに迷いがあるなら、その理由にも意味があります。<strong>どこへ進むといいか</strong>を整理したい方に向いています。'
+        ],
+        ctaPatterns: [
+          '今後の流れと動き方を、個人鑑定で詳しく見る',
+          '進むべき方向を、個人鑑定で深く読む',
+          '動くタイミングを、個人鑑定で整理する'
+        ],
+        safePatterns: [
+          '行動のタイミングに迷うときも、無理なく整理してお伝えします。',
+          '焦って動かなくても大丈夫。必要な流れを丁寧に見ていきます。',
+          '前進したい気持ちを、安心してご相談ください。'
+        ]
       },
       {
         id: 8,
         name: '力 - Strength',
         keyword: '優しさの強さ／自分を責めない力',
-        main: 'あなたの強さは、歯を食いしばることではなく「弱さを抱きしめてあげられる優しさ」にあります。',
-        sub: 'できなかったことよりも、<strong>今日できた小さなことを褒めてあげて</strong>ください。その積み重ねが、静かな自信になっていきます。'
+        consultType: 'healing',
+        mainPatterns: [
+          'あなたの強さは、歯を食いしばることではなく「弱さを抱きしめてあげられる優しさ」にあります。',
+          'このカードは、いま必要なのが無理に強くなることではなく、自分にやさしく戻ることだと伝えています。',
+          '強さとは、平気なふりをすることではありません。揺れる自分を受け止めることも、立派な力です。'
+        ],
+        subPatterns: [
+          'できなかったことよりも、<strong>今日できた小さなことを褒めてあげて</strong>ください。その積み重ねが、静かな自信になっていきます。',
+          '自分を責める声より、少しだけやさしい言葉を選んでみてください。<strong>回復は、自分への態度から始まります。</strong>',
+          '頑張ってきた分だけ、いまは心を追い込まないで。あなたのペースで立て直せば大丈夫です。'
+        ],
+        bridgePatterns: [
+          'このカードは、心を立て直す途中や、静かな強さが必要なときに出やすい一枚です。<strong>ここからどう回復していくか</strong>を深く見たい方は、個人鑑定が向いています。',
+          'いま必要なのは「もっと頑張る」ことではなく、ちゃんと回復することかもしれません。<strong>心の整え方</strong>を丁寧に見ていけます。',
+          '傷ついたままでは進みにくい時期もあります。<strong>自分を責めずに戻る方法</strong>を受け取りたい方に向いています。'
+        ],
+        ctaPatterns: [
+          '今のあなたに必要な回復の流れを、個人鑑定で受け取る',
+          '心の整え方を、個人鑑定で丁寧に読む',
+          '自分を責めないための流れを、個人鑑定で見る'
+        ],
+        safePatterns: [
+          'つらさを否定せず、今のあなたに必要な言葉を丁寧に届けます。',
+          'しんどい時期も、安心してご相談いただけます。',
+          '無理を増やさず、やさしく立て直すための鑑定です。'
+        ]
       },
       {
         id: 9,
         name: '隠者 - The Hermit',
         keyword: '内省／ひとりの時間',
-        main: '人とのつながりの中で、少し疲れが溜まっていませんか？',
-        sub: '今日は少しだけ、スマホと距離を置いてみてもいいかもしれません。静かな時間の中で、<strong>「本当は何に傷ついていたのか」</strong>を見つめることが、次の一歩のヒントになります。'
+        consultType: 'healing',
+        mainPatterns: [
+          '人とのつながりの中で、少し疲れが溜まっていませんか？',
+          'このカードは、いま無理に外へ答えを探すより、自分の内側を静かに見つめる時間が必要だと伝えています。',
+          'にぎやかな中では見えない答えが、静かな時間の中で少しずつ浮かび上がってくるかもしれません。'
+        ],
+        subPatterns: [
+          '今日は少しだけ、スマホと距離を置いてみてもいいかもしれません。静かな時間の中で、<strong>「本当は何に傷ついていたのか」</strong>を見つめることが、次の一歩のヒントになります。',
+          'ひとりになることは孤独ではなく、気持ちを整え直すための大切な時間です。<strong>疲れた心を休ませて</strong>あげてください。',
+          '答えを急がなくていいからこそ、自分にしか分からない本音を見逃さないで。いまはそれが大事な時期です。'
+        ],
+        bridgePatterns: [
+          'このカードは、気持ちを整理したいときや、心をひとつずつほどきたいときに出やすい一枚です。<strong>本音の整理や、これからの方向</strong>を見たいなら、個人鑑定で丁寧に読めます。',
+          '誰にも言えない気持ちほど、自分の中で重くなりやすいものです。<strong>本音を言葉にしたい方</strong>に向いています。',
+          'いま必要なのは、派手な答えではなく静かな整理かもしれません。<strong>心の奥の気持ち</strong>をほどいていけます。'
+        ],
+        ctaPatterns: [
+          '心の整理とこれからを、個人鑑定で丁寧に読む',
+          '本音を言葉にするために、個人鑑定で深く見る',
+          '今の気持ちを整理する流れを、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '誰にも言えない気持ちも、静かに受け止めながら読み解きます。',
+          'ひとりで抱えたままの想いも、安心してご相談ください。',
+          '無理に明るくならなくて大丈夫。今の心に合わせて丁寧に見ていきます。'
+        ]
       },
       {
         id: 10,
         name: '運命の輪 - Wheel of Fortune',
         keyword: '転機／流れの変化',
-        main: '最近起きた「予定外のこと」は、ただのトラブルではなく、運命の方向転換かもしれません。',
-        sub: 'うまくいかなかったことも、あとから振り返れば必要なズレだったと気づくはず。<strong>「この変化から何を学べる？」</strong>と問いかけてみてください。そこにチャンスが隠れています。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          '最近起きた「予定外のこと」は、ただのトラブルではなく、運命の方向転換かもしれません。',
+          'このカードは、いま流れが変わりつつあること、そしてその変化には意味があることを伝えています。',
+          '思い通りにいかないことも、あとから見れば必要なズレだったと分かることがあります。'
+        ],
+        subPatterns: [
+          'うまくいかなかったことも、あとから振り返れば必要なズレだったと気づくはず。<strong>「この変化から何を学べる？」</strong>と問いかけてみてください。そこにチャンスが隠れています。',
+          'いまはコントロールするより、流れの意味を受け取る時期かもしれません。<strong>変化を怖がりすぎなくて大丈夫</strong>です。',
+          '運命の流れは、予告なく向きを変えることがあります。でもその変化は、あなたを違う場所へ運ぶために来ています。'
+        ],
+        bridgePatterns: [
+          'このカードは、流れの変わり目や転機の前後に出やすい一枚です。<strong>今後どう変わるか、いつ動くべきか</strong>まで見たいときは、個人鑑定でより具体的に読めます。',
+          '変化の途中では、何を信じればいいか分からなくなることもあります。<strong>いま来ている流れの意味</strong>を深く見ていけます。',
+          'いまはただの偶然ではなく、何かが切り替わるサインかもしれません。<strong>この先の転機</strong>を詳しく受け取りたい方に向いています。'
+        ],
+        ctaPatterns: [
+          'これからの流れと転機を、個人鑑定で詳しく見る',
+          '今後の変化の意味を、個人鑑定で深く読む',
+          '動くべき時期を、個人鑑定で整理する'
+        ],
+        safePatterns: [
+          '焦らず、今の変化の意味を丁寧に整理していきます。',
+          '流れが読めない時こそ、安心してご相談ください。',
+          '変化に飲まれず進めるよう、やさしく読み解きます。'
+        ]
       },
       {
         id: 11,
         name: '正義 - Justice',
         keyword: 'バランス／決断',
-        main: 'どこかで「自分ばかり損している」と感じていませんか？',
-        sub: '天秤を取り戻すためには、<strong>NOと言う勇気</strong>も必要です。丁寧に、でもはっきりと。あなたの心を守ることは、わがままではありません。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          'どこかで「自分ばかり損している」と感じていませんか？',
+          'このカードは、いま必要なのが「我慢」より「整えること」だと伝えています。',
+          'あなたが苦しいのは弱いからではなく、天秤が少し偏りすぎているからかもしれません。'
+        ],
+        subPatterns: [
+          '天秤を取り戻すためには、<strong>NOと言う勇気</strong>も必要です。丁寧に、でもはっきりと。あなたの心を守ることは、わがままではありません。',
+          '優しさと我慢は、同じではありません。<strong>どこで線を引くか</strong>を見直すことが、いまのあなたには必要そうです。',
+          'いま感じている違和感は、心が「そのままでは偏る」と教えているサインかもしれません。'
+        ],
+        bridgePatterns: [
+          'このカードは、決断や境界線の見直しが必要なときに出やすい一枚です。<strong>どこで線を引くべきか、どう選ぶべきか</strong>を深く見たい方は、個人鑑定が向いています。',
+          '本当はもう、何が苦しいか気づいているのかもしれません。<strong>今の関係や選択のバランス</strong>を整理したい時に深く読めます。',
+          'やさしさを守りながら、自分も守る。<strong>その選び方</strong>を知りたい方に個人鑑定は向いています。'
+        ],
+        ctaPatterns: [
+          '今の選択と判断を、個人鑑定で詳しく読む',
+          '境界線の整え方を、個人鑑定で深く見る',
+          '関係のバランスを、個人鑑定で整理する'
+        ],
+        safePatterns: [
+          '決断に迷うときも、あなたに合う形で丁寧に整理します。',
+          '言いにくいことがある時も、安心してご相談ください。',
+          '無理を続けなくていいように、やさしく読み解きます。'
+        ]
       },
       {
         id: 12,
         name: '吊るされた男 - The Hanged Man',
         keyword: '一時停止／視点の反転',
-        main: '今の停滞は、宇宙からの「小休止」のサインかもしれません。',
-        sub: '動けない時期は、<strong>見方を変えるための準備期間</strong>です。「なぜ止められているのか？」ではなく、「今だからこそできることは？」と考えてみてください。'
+        consultType: 'anxiety',
+        mainPatterns: [
+          '今の停滞は、宇宙からの「小休止」のサインかもしれません。',
+          'このカードは、動けないことにも意味があり、いまは急がなくていい時期だと伝えています。',
+          '止められているように感じる時ほど、まだ見えていない視点があることがあります。'
+        ],
+        subPatterns: [
+          '動けない時期は、<strong>見方を変えるための準備期間</strong>です。「なぜ止められているのか？」ではなく、「今だからこそできることは？」と考えてみてください。',
+          '進めない自分を責めなくて大丈夫。<strong>止まることも流れの一部</strong>です。いまは意味のある静けさかもしれません。',
+          '急いで答えを出すより、今の状態を少し違う角度から見てみてください。そこにヒントが隠れています。'
+        ],
+        bridgePatterns: [
+          'このカードは、答えが出にくい停滞期に出やすい一枚です。<strong>待つべきか、見方を変えるべきか</strong>まで整理したいときは、個人鑑定で深く読み解けます。',
+          '動けない時ほど、不安だけが大きくなることがあります。<strong>今の停滞の意味</strong>を知りたい方に向いています。',
+          '待つことが正しいのか不安な時こそ、<strong>いま見るべき視点</strong>を整理すると気持ちが軽くなるかもしれません。'
+        ],
+        ctaPatterns: [
+          '停滞の意味と次の一歩を、個人鑑定で丁寧に見る',
+          '今は待つべきかを、個人鑑定で深く読む',
+          '止まっている理由を、個人鑑定で整理する'
+        ],
+        safePatterns: [
+          '動けない時期の不安も、急かさずやさしく読み解きます。',
+          'いま進めなくても大丈夫。安心してご相談ください。',
+          '停滞の中にもある意味を、丁寧に受け取れるようお手伝いします。'
+        ]
       },
       {
         id: 13,
         name: '死神 - Death',
         keyword: '終わりと始まり／手放し',
-        main: '終わりは、罰ではなく「更新通知」です。古いページを閉じるからこそ、新しい物語が開きます。',
-        sub: 'つらい出来事の中でも、<strong>もう自分には合わなくなったもの</strong>が見えてくるはず。そこに気づけたあなたは、すでに再生のステージに立っています。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          '終わりは、罰ではなく「更新通知」です。古いページを閉じるからこそ、新しい物語が開きます。',
+          'このカードは、苦しい変化の中にも再生の入口があることを伝えています。',
+          'いま終わろうとしているものは、あなたを壊すためではなく、次の段階へ進めるためにあるのかもしれません。'
+        ],
+        subPatterns: [
+          'つらい出来事の中でも、<strong>もう自分には合わなくなったもの</strong>が見えてくるはず。そこに気づけたあなたは、すでに再生のステージに立っています。',
+          '手放しは寂しいけれど、ずっと持ち続けることが優しさとは限りません。<strong>今の自分に合うもの</strong>を選び直す時です。',
+          '終わりを認めることは敗北ではありません。そこからしか始まらない新しい流れもあります。'
+        ],
+        bridgePatterns: [
+          'このカードは、大きな切り替わりや再生の入り口で出やすい一枚です。<strong>何を手放し、どこへ向かうか</strong>を深く知りたい方は、個人鑑定でさらに整理できます。',
+          '変化の最中は、何を信じればいいか分からなくなりやすいものです。<strong>ここから先の再生の流れ</strong>を丁寧に読めます。',
+          '終わりの中にも、ちゃんと次があります。<strong>これからどう立て直していくか</strong>を見たい方に向いています。'
+        ],
+        ctaPatterns: [
+          'これからの再生の流れを、個人鑑定で詳しく読む',
+          '手放した先の未来を、個人鑑定で深く見る',
+          '次のステージへの流れを、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '終わりの痛みも、次の始まりに変えていけるよう丁寧に見ていきます。',
+          '変化がこわい時期も、安心してご相談ください。',
+          '無理に前向きにしなくても大丈夫。今の気持ちから丁寧に見ていきます。'
+        ]
       },
       {
         id: 14,
         name: '節制 - Temperance',
         keyword: '調和／ちょうどよさ',
-        main: 'がんばりすぎと、なまけすぎ。その真ん中に、あなたの心地よいリズムがあります。',
-        sub: '今日は「やること」と同じくらい、<strong>「やらないこと」を決めてみて</strong>ください。心と体のペースを整えることで、運もゆっくり整っていきます。'
+        consultType: 'healing',
+        mainPatterns: [
+          'がんばりすぎと、なまけすぎ。その真ん中に、あなたの心地よいリズムがあります。',
+          'このカードは、いま必要なのが「もっと頑張る」ことではなく、整えることだと伝えています。',
+          '心も体も、少しずつ自分にちょうどいい温度へ戻そうとしているのかもしれません。'
+        ],
+        subPatterns: [
+          '今日は「やること」と同じくらい、<strong>「やらないこと」を決めてみて</strong>ください。心と体のペースを整えることで、運もゆっくり整っていきます。',
+          '極端になりやすい時ほど、ちょうどよさは大切です。<strong>少し足りないくらいが、いまはちょうどいい</strong>のかもしれません。',
+          '回復は一気に起きるものではなく、日々のバランスの中で育っていきます。まずは整えることを意識してみて。'
+        ],
+        bridgePatterns: [
+          'このカードは、整え直しや回復の流れに入るときに出やすい一枚です。<strong>今の自分に合うペースや、立て直し方</strong>を知りたいときは、個人鑑定でより丁寧に読めます。',
+          'がんばることには慣れていても、整えることは意外と難しいものです。<strong>今のあなたに合う流れ</strong>を一緒に見ていけます。',
+          'いま必要なのは気合いではなく調整かもしれません。<strong>心と現実のバランス</strong>を深く整理したい方に向いています。'
+        ],
+        ctaPatterns: [
+          '今の自分に合う流れを、個人鑑定で丁寧に見る',
+          '立て直し方を、個人鑑定で深く読む',
+          '心と現実の整え方を、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '無理を増やすのではなく、整えるための鑑定を大切にしています。',
+          '頑張りすぎてしまう方も、安心してご相談ください。',
+          '今のあなたに合うペースで、やさしく整理していきます。'
+        ]
       },
       {
         id: 15,
         name: '悪魔 - The Devil',
         keyword: '執着／やめられないもの',
-        main: '頭では分かっているのに、やめられない。それはあなたの意思が弱いからではありません。',
-        sub: 'その行動は、何かの「代わり」になっているのかもしれません。<strong>本当に満たしたいのは何か</strong>を見つめることが、鎖をほどく第一歩です。'
+        consultType: 'anxiety',
+        mainPatterns: [
+          '頭では分かっているのに、やめられない。それはあなたの意思が弱いからではありません。',
+          'このカードは、いまの苦しさの奥に「本当は満たしたいもの」が隠れていることを伝えています。',
+          '離れたいのに離れられない時、そこには意志の弱さではなく、深い寂しさや不足感があることもあります。'
+        ],
+        subPatterns: [
+          'その行動は、何かの「代わり」になっているのかもしれません。<strong>本当に満たしたいのは何か</strong>を見つめることが、鎖をほどく第一歩です。',
+          '執着は悪いものではなく、心が何かを必死に守ろうとしているサインかもしれません。<strong>本当の不足感</strong>を見つめてみてください。',
+          '苦しさの正体が分かるだけでも、心の鎖は少しゆるみます。今はまず、自分を責めないことから始めて。'
+        ],
+        bridgePatterns: [
+          'このカードは、執着や苦しさの正体がまだ整理しきれていないときに出やすい一枚です。<strong>相手への執着、不安、本当に満たしたいもの</strong>を深く見たいなら、個人鑑定が向いています。',
+          '恋愛でも人間関係でも、離れられない理由には意味があります。<strong>その本音を丁寧に言葉にしたい方</strong>に向いています。',
+          '「分かってるのにやめられない」には、ちゃんと背景があります。<strong>その背景を整理すること</strong>で流れが変わることもあります。'
+        ],
+        ctaPatterns: [
+          '執着や不安の正体を、個人鑑定で丁寧に読み解く',
+          '離れられない理由を、個人鑑定で深く見る',
+          '本当に満たしたいものを、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          'つらい気持ちを責めずに、少しずつ整理できるよう寄り添います。',
+          '恋愛の苦しさや執着も、安心してご相談ください。',
+          'こわさを増やすのではなく、気持ちをほどくための鑑定です。'
+        ]
       },
       {
         id: 16,
         name: '塔 - The Tower',
         keyword: '崩壊／リセット',
-        main: '突然の出来事で、足元がぐらついているかもしれません。でも、崩れたのは「本当に必要な土台」ではないはずです。',
-        sub: 'ショックの中にこそ、<strong>本当は守りたかったもの</strong>がはっきりと浮かび上がります。そこから、あなたの新しい塔を建て直すことができます。'
+        consultType: 'anxiety',
+        mainPatterns: [
+          '突然の出来事で、足元がぐらついているかもしれません。でも、崩れたのは「本当に必要な土台」ではないはずです。',
+          'このカードは、こわい変化の中にも「本当に残るもの」が見えてくることを伝えています。',
+          'いまの揺れはつらいけれど、それによって本当の優先順位がはっきりすることもあります。'
+        ],
+        subPatterns: [
+          'ショックの中にこそ、<strong>本当は守りたかったもの</strong>がはっきりと浮かび上がります。そこから、あなたの新しい塔を建て直すことができます。',
+          '崩れることは失敗ではなく、合わなくなった土台から降りることでもあります。<strong>建て直せるものはちゃんと残ります。</strong>',
+          'いまはまだ痛みが先にあるかもしれません。でも、この出来事が何を教えているのかは、少しずつ見えてきます。'
+        ],
+        bridgePatterns: [
+          'このカードは、強い揺れやショックの後に出やすい一枚です。<strong>この出来事の意味や、ここからどう立て直すか</strong>まで見たいときは、個人鑑定でより深く整理できます。',
+          'つらい変化の最中では、先のことを考える余裕がなくなることもあります。<strong>ここから先の整え方</strong>を一緒に見ていけます。',
+          'いま必要なのは「大丈夫なふり」ではなく、ちゃんと整理することかもしれません。<strong>立て直しの流れ</strong>を丁寧に読めます。'
+        ],
+        ctaPatterns: [
+          'ここからの立て直し方を、個人鑑定で詳しく見る',
+          '揺れの意味と次の流れを、個人鑑定で読む',
+          'この出来事の先を、個人鑑定で丁寧に整理する'
+        ],
+        safePatterns: [
+          '揺れの大きい時期も、不安を煽らず丁寧に読み解きます。',
+          '突然の変化に疲れている時も、安心してご相談ください。',
+          '今の気持ちから無理なく整理していけるよう寄り添います。'
+        ]
       },
       {
         id: 17,
         name: '星 - The Star',
         keyword: '希望／静かな光',
-        main: '今はまだ現実が追いついていなくても、心のどこかで「きっと大丈夫」と感じていませんか？',
-        sub: 'その感覚こそが、あなたの星から届いているサインです。すぐに結果が出なくても、<strong>少しだけ信じ続けること</strong>が、未来の光をつなぎます。'
+        consultType: 'healing',
+        mainPatterns: [
+          '今はまだ現実が追いついていなくても、心のどこかで「きっと大丈夫」と感じていませんか？',
+          'このカードは、すぐに形にならなくても、希望の灯りがちゃんと残っていることを伝えています。',
+          'まだ不安はあるかもしれないけれど、その奥ではもう光が戻り始めているのだと思います。'
+        ],
+        subPatterns: [
+          'その感覚こそが、あなたの星から届いているサインです。すぐに結果が出なくても、<strong>少しだけ信じ続けること</strong>が、未来の光をつなぎます。',
+          '希望は、大きな確信じゃなくていいのです。<strong>ほんの少し「大丈夫かも」</strong>と思えるなら、それはちゃんと意味があります。',
+          'いま必要なのは、完璧な答えではなく、自分の中に戻ってきた小さな光を見失わないことかもしれません。'
+        ],
+        bridgePatterns: [
+          'このカードは、回復や希望の灯りが戻ってくるときに出やすい一枚です。<strong>この先の流れや、希望を形にする道筋</strong>をもっと知りたい方は、個人鑑定で深く読めます。',
+          '希望があるからこそ、その先をちゃんと知りたくなることもあります。<strong>これからどう進んでいくか</strong>を丁寧に見ていけます。',
+          'いま戻ってきた光を、現実の安心につなげたい時に。<strong>今後の流れ</strong>を深く見たい方に向いています。'
+        ],
+        ctaPatterns: [
+          'これからの希望の流れを、個人鑑定で受け取る',
+          '今後の明るい流れを、個人鑑定で詳しく見る',
+          '希望を現実につなぐ道筋を、個人鑑定で読む'
+        ],
+        safePatterns: [
+          'やさしい光を現実の一歩に変えていけるよう、丁寧にお手伝いします。',
+          '不安のあとに見えてきた希望も、大切に読み解きます。',
+          '安心できる言葉を受け取りたい時に、気軽にご相談ください。'
+        ]
       },
       {
         id: 18,
         name: '月 - The Moon',
         keyword: '不安／揺れる心',
-        main: '答えの見えない夜道を歩いているような、不安と迷いの中にいるのかもしれません。',
-        sub: '不安は、あなたを守ろうとする心のアラームでもあります。<strong>「いま、何がいちばん怖い？」</strong>と紙に書き出してみて。言葉にした瞬間、影は少しだけ小さくなります。'
+        consultType: 'anxiety',
+        mainPatterns: [
+          '答えの見えない夜道を歩いているような、不安と迷いの中にいるのかもしれません。',
+          'このカードは、いま感じている不安が、まだ言葉になっていない何かを教えようとしていることを伝えています。',
+          '見えないからこそ怖くなるものがあります。でもその怖さにも、ちゃんと理由があります。'
+        ],
+        subPatterns: [
+          '不安は、あなたを守ろうとする心のアラームでもあります。<strong>「いま、何がいちばん怖い？」</strong>と紙に書き出してみて。言葉にした瞬間、影は少しだけ小さくなります。',
+          '今は無理に「大丈夫」と思わなくていいのです。まずは、<strong>何に揺れているのか</strong>を自分で知ることから始めてみてください。',
+          '相手の態度や空気、未来への曖昧さ。いろいろなものが混ざって不安になっているのかもしれません。だからこそ、まずは分けて見ていくことが大切です。'
+        ],
+        bridgePatterns: [
+          'このカードは、不安の正体がまだ見えないときに出やすい一枚です。<strong>相手の本音なのか、思い込みなのか、今後どう動くべきか</strong>まで深く見たいときは、個人鑑定が向いています。',
+          '恋愛でも人間関係でも、見えないものほど心を揺らします。<strong>その不安の正体</strong>を丁寧に読み解いていけます。',
+          'いま必要なのは「気にしないこと」ではなく、ちゃんと見分けることかもしれません。<strong>本当の原因</strong>を知りたい方に向いています。'
+        ],
+        ctaPatterns: [
+          '不安の正体と相手の本音を、個人鑑定で丁寧に見る',
+          '今の迷いを、個人鑑定で深く整理する',
+          '見えない不安の原因を、個人鑑定で読み解く'
+        ],
+        safePatterns: [
+          '不安を大きくするためではなく、気持ちを整理するための鑑定です。',
+          '答えが見えず苦しい時も、安心してご相談ください。',
+          '相手の気持ちが読めず揺れる時も、丁寧に見ていきます。'
+        ]
       },
       {
         id: 19,
         name: '太陽 - The Sun',
         keyword: '喜び／祝福',
-        main: 'あなたの中の「子どものような無邪気さ」が、もう一度世界を信じてみたいと願っています。',
-        sub: '遠慮せずに、<strong>やってみたいことを一つだけ選んで</strong>みてください。それが小さくても、心から楽しいと思えるなら、その選択はきっと正解です。'
+        consultType: 'love',
+        mainPatterns: [
+          'あなたの中の「子どものような無邪気さ」が、もう一度世界を信じてみたいと願っています。',
+          'このカードは、いまの流れの中にちゃんと明るさや祝福があることを伝えています。',
+          '遠慮や不安の奥で、本当はもう少し素直に笑いたい気持ちが戻ってきているのかもしれません。'
+        ],
+        subPatterns: [
+          '遠慮せずに、<strong>やってみたいことを一つだけ選んで</strong>みてください。それが小さくても、心から楽しいと思えるなら、その選択はきっと正解です。',
+          '「ちゃんとしなきゃ」より「ちょっと楽しいかも」を大事にしてみて。そこに、今のあなたの明るい流れがあります。',
+          '嬉しい気持ちを後回しにしなくて大丈夫。素直な喜びは、ちゃんと未来をひらいてくれます。'
+        ],
+        bridgePatterns: [
+          'このカードは、流れが明るく開きやすいときに出やすい一枚です。<strong>その光をどう現実につなげるか、恋愛や未来がどう進むか</strong>を見たいなら、個人鑑定でより具体的に読めます。',
+          'いい流れが見えている時こそ、その先を整えておくと安心です。<strong>恋愛や今後の展開</strong>を深く見ていけます。',
+          '明るい流れの中でも、ちゃんと知っておきたいことはあります。<strong>この先どう開いていくか</strong>を見たい方に向いています。'
+        ],
+        ctaPatterns: [
+          'これからの明るい流れを、個人鑑定で詳しく見る',
+          '恋愛のこの先を、個人鑑定で深く読む',
+          'いま来ている祝福の流れを、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '前向きな流れを現実に活かせるよう、やさしく整理してお伝えします。',
+          '嬉しい流れも、もっと安心できる形で受け取れます。',
+          'これからの恋や未来が気になる時も、気軽にご相談ください。'
+        ]
       },
       {
         id: 20,
         name: '審判 - Judgement',
         keyword: '再スタート／呼びかけ',
-        main: '過去に一度あきらめたこと、封印した気持ちが、もう一度あなたを呼び起こそうとしています。',
-        sub: '「もう遅い」と切り捨てた夢に、もう一度だけ光を当ててみて。<strong>今のあなたなら、違う形で叶えられる</strong>可能性があります。'
+        consultType: 'love',
+        mainPatterns: [
+          '過去に一度あきらめたこと、封印した気持ちが、もう一度あなたを呼び起こそうとしています。',
+          'このカードは、「もう終わったと思っていたもの」に再び意味が戻る可能性を伝えています。',
+          '諦めたはずなのに、まだ心が動くなら、それにはまだ何か受け取るべきものがあるのかもしれません。'
+        ],
+        subPatterns: [
+          '「もう遅い」と切り捨てた夢に、もう一度だけ光を当ててみて。<strong>今のあなたなら、違う形で叶えられる</strong>可能性があります。',
+          '再び向き合うことは、過去に戻ることではありません。<strong>今の自分で、もう一度選び直すこと</strong>なのだと思います。',
+          '一度閉じた気持ちにも、まだ生きている想いがあるなら、それを雑に扱わなくて大丈夫です。'
+        ],
+        bridgePatterns: [
+          'このカードは、再スタートや再接続の流れが出ているときに出やすい一枚です。<strong>復縁、再挑戦、もう一度向き合うべきこと</strong>を深く見たい方は、個人鑑定が向いています。',
+          '恋愛では特に、「また動くかもしれない流れ」が気になる時に出やすい一枚です。<strong>相手の気持ちや再接続の可能性</strong>を丁寧に見ていけます。',
+          'もう一度向き合うなら、ちゃんと知っておきたいことがあります。<strong>今後どう動くか</strong>を深く受け取りたい方に向いています。'
+        ],
+        ctaPatterns: [
+          '再スタートの流れを、個人鑑定で詳しく読む',
+          '復縁や再接続の可能性を、個人鑑定で深く見る',
+          'もう一度向き合うべきことを、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '過去を責めるのではなく、これからを丁寧に見ていく鑑定です。',
+          '復縁や再接続のご相談も、やさしく読み解きます。',
+          'もう一度向き合いたい想いも、安心してご相談ください。'
+        ]
       },
       {
         id: 21,
         name: '世界 - The World',
         keyword: '完成／次のステージへ',
-        main: 'ひとつのサイクルが静かにまとまり、あなたは次の段階へ進む準備が整いつつあります。',
-        sub: 'ここまで歩いてきた自分を、ちゃんと労ってあげてください。<strong>「がんばったね」と自分に言うこと</strong>が、新しい世界への扉をひらく合図になります。'
+        consultType: 'turning_point',
+        mainPatterns: [
+          'ひとつのサイクルが静かにまとまり、あなたは次の段階へ進む準備が整いつつあります。',
+          'このカードは、ここまで歩いてきた流れがちゃんと一つの形になろうとしていることを伝えています。',
+          '終わりではなく、完成。いまは一区切りのあとに来る新しい扉の前なのかもしれません。'
+        ],
+        subPatterns: [
+          'ここまで歩いてきた自分を、ちゃんと労ってあげてください。<strong>「がんばったね」と自分に言うこと</strong>が、新しい世界への扉をひらく合図になります。',
+          '次へ進む前に、まずは今の自分を認めてあげてください。<strong>一区切りを受け入れること</strong>が、新しい流れを呼び込みます。',
+          'まだ途中に見えても、すでに終わっているものもあります。いまは「締めくくること」が大切な時期かもしれません。'
+        ],
+        bridgePatterns: [
+          'このカードは、一区切りと次のステージの入り口で出やすい一枚です。<strong>ここからどこへ進むべきか、次に何を選ぶべきか</strong>を知りたいときは、個人鑑定で深く整理できます。',
+          '完成のあとには、また新しい始まりが来ます。<strong>次の流れをどう迎えるか</strong>を深く見たい方に向いています。',
+          'いま必要なのは、達成感だけで終わらせないことかもしれません。<strong>この先の方向性</strong>を丁寧に読み解けます。'
+        ],
+        ctaPatterns: [
+          '次のステージへの流れを、個人鑑定で詳しく見る',
+          'ここから先の方向を、個人鑑定で深く読む',
+          '一区切りの次に来る流れを、個人鑑定で受け取る'
+        ],
+        safePatterns: [
+          '一区切りのあとに必要な選択も、丁寧に読み解いていきます。',
+          'ここまで頑張ってきた気持ちも、大切に受け止めます。',
+          '次へ進む準備を、安心して整えていけるよう寄り添います。'
+        ]
       }
     ];
 
     const startBtn = document.getElementById('startReadingBtn');
-const resetBtn = document.getElementById('resetBtn');
-const sampleBtn = document.getElementById('sampleBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
 
-const cardFrame = document.getElementById('cardFrame');
-const cardBackImg = document.getElementById('cardBackImage');
-const cardFrontImg = document.getElementById('cardFrontImage');
-const cardPlaceholder = document.getElementById('cardPlaceholder');
+    const cardFrame = document.getElementById('cardFrame');
+    const cardBackImg = document.getElementById('cardBackImage');
+    const cardFrontImg = document.getElementById('cardFrontImage');
+    const cardPlaceholder = document.getElementById('cardPlaceholder');
 
-const cardName = document.getElementById('cardName');
-const cardKeyword = document.getElementById('cardKeyword');
-const resultBlock = document.getElementById('resultBlock');
-const resultMain = document.getElementById('resultMain');
-const resultSub = document.getElementById('resultSub');
-const consultBtn = document.getElementById('consultBtn');
+    const cardName = document.getElementById('cardName');
+    const cardKeyword = document.getElementById('cardKeyword');
+    const resultBlock = document.getElementById('resultBlock');
+    const resultMain = document.getElementById('resultMain');
+    const resultSub = document.getElementById('resultSub');
+    const resultBridgeText = document.getElementById('resultBridgeText');
+    const consultBtnText = document.getElementById('consultBtnText');
+    const consultSafeNote = document.getElementById('consultSafeNote');
 
-/**
- * カードを実際に表示する処理
- * card: cards配列の1要素
- * options.isSample: サンプル表示かどうか
- */
-function revealCard(card, options) {
-  const opts = Object.assign({ isSample: false }, options || {});
+    let flipTimer = null;
+    let hideTimer = null;
 
-  // STEP2へ自動スクロール
-  cardFrame.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    function clearTimers() {
+      if (flipTimer) {
+        clearTimeout(flipTimer);
+        flipTimer = null;
+      }
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+    }
 
-  // フリップ初期化（いったん裏面に戻す）
-  cardFrame.classList.remove('is-flipped', 'card-glow');
-  cardPlaceholder.style.display = 'none';
+    function buildCardState(card) {
+      return {
+        main: pickOne(card.mainPatterns),
+        sub: pickOne(card.subPatterns),
+        bridge: pickOne(card.bridgePatterns),
+        cta: pickOne(card.ctaPatterns),
+        safe: pickOne(card.safePatterns)
+      };
+    }
 
-  // 表面画像の読み込み
-  cardFrontImg.classList.remove('is-visible');
-  cardFrontImg.onload = () => {
-    cardFrontImg.classList.add('is-visible');
-  };
-  cardFrontImg.onerror = () => {
-    cardFrontImg.classList.remove('is-visible');
-  };
-  cardFrontImg.src = `images/card${card.id}.png`;
-  cardFrontImg.alt = `${card.name} のカード画像`;
+    function revealCard(card, options = {}) {
+      const opts = Object.assign({ isSample: false }, options);
 
-  // 少し間をおいてからフリップ＆光演出
-  setTimeout(() => {
-    cardFrame.classList.add('is-flipped', 'card-glow');
-  }, 500);
+      clearTimers();
 
-  // テキスト類
-  cardName.textContent = card.name;
-  cardKeyword.textContent = card.keyword;
-  resultMain.textContent = card.main;
+      cardFrame.classList.remove('is-flipped', 'card-glow');
+      resultBlock.classList.remove('is-visible');
 
-  if (opts.isSample) {
-    resultSub.innerHTML = card.sub +
-      '<br><br><strong style="font-size:0.78rem;">※これはサンプルです。実際の星詠は「星詠を始める」から行ってください。</strong>';
-  } else {
-    resultSub.innerHTML = card.sub;
-  }
+      cardPlaceholder.style.display = 'none';
 
-  // 結果ブロック表示
-  resultBlock.hidden = false;
-  requestAnimationFrame(() => {
-    resultBlock.classList.add('is-visible');
-  });
+      cardFrontImg.classList.remove('is-visible');
+      cardFrontImg.onload = () => {
+        cardFrontImg.classList.add('is-visible');
+      };
+      cardFrontImg.onerror = () => {
+        cardFrontImg.classList.remove('is-visible');
+      };
+      cardFrontImg.src = `images/card${card.id}.png`;
+      cardFrontImg.alt = `${card.name} のカード画像`;
 
-  // ボタン状態
-  if (!opts.isSample) {
-    startBtn.disabled = true;
-  }
-  resetBtn.disabled = false;
-}
+      cardName.textContent = card.name;
+      cardKeyword.textContent = card.keyword;
 
-/** ランダムに1枚引く（本番） */
-function drawCard() {
-  const index = Math.floor(Math.random() * cards.length);
-  const card = cards[index];
-  revealCard(card, { isSample: false });
-}
+      if (opts.isSample) {
+        const state = buildCardState(card);
+        resultMain.textContent = state.main;
+        resultSub.innerHTML =
+          state.sub +
+          '<br><br><strong style="font-size:0.78rem;">※これはサンプルです。実際の星詠では、毎回その時のあなたに合う言葉が届きます。</strong>';
+        resultBridgeText.innerHTML = 'この結果に少しでも心が動いたなら、その先にはもっと深く読める続きがあります。<strong>相手の気持ち、今後の流れ、どう動けばいいか</strong>まで知りたい方は、個人鑑定で丁寧に読み解けます。';
+        consultBtnText.textContent = 'あなたの状況を、個人鑑定で詳しく読む';
+        consultSafeNote.textContent = 'LINEから気軽にご相談いただけます。無理な勧誘はありません。';
+      } else {
+        const state = buildCardState(card);
+        resultMain.textContent = state.main;
+        resultSub.innerHTML = state.sub;
+        resultBridgeText.innerHTML = state.bridge;
+        consultBtnText.textContent = state.cta;
+        consultSafeNote.textContent = state.safe;
+      }
 
-/** 星のカード固定でサンプル表示 */
-function showSample() {
-  const sampleCard = cards.find(c => c.id === 17) || cards[0]; // STAR優先
-  revealCard(sampleCard, { isSample: true });
-}
+      resultBlock.hidden = false;
 
-/** リセットして裏面＋「待機中」に戻す */
-function resetReading() {
-  // カードを裏面に戻す
-  cardFrame.classList.remove('is-flipped', 'card-glow');
-  cardFrontImg.classList.remove('is-visible');
-  cardFrontImg.removeAttribute('src');
-  cardFrontImg.alt = 'タロットカードの表面';
-  cardPlaceholder.style.display = 'block';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resultBlock.classList.add('is-visible');
+        });
+      });
 
-  // テキストをリセット
-  cardName.textContent = 'カードはまだ伏せられています';
-  cardKeyword.textContent = '深呼吸をして「星詠を始める」を押してください';
+      flipTimer = setTimeout(() => {
+        cardFrame.classList.add('is-flipped', 'card-glow');
+      }, 500);
 
-  // 結果ブロックを隠す
-  resultBlock.classList.remove('is-visible');
-  setTimeout(() => {
-    resultBlock.hidden = true;
-    resultMain.textContent = '';
-    resultSub.textContent = '';
-  }, 200);
+      requestAnimationFrame(() => {
+        cardFrame.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
 
-  // ボタン状態
-  startBtn.disabled = false;
-  resetBtn.disabled = true;
-}
+      if (!opts.isSample) {
+        startBtn.disabled = true;
+      }
+      resetBtn.disabled = false;
+    }
 
-// イベント登録
-startBtn.addEventListener('click', drawCard);
-resetBtn.addEventListener('click', resetReading);
-sampleBtn.addEventListener('click', showSample);
+    function drawCard() {
+      const index = Math.floor(Math.random() * cards.length);
+      const card = cards[index];
+      revealCard(card, { isSample: false });
+    }
+
+    function showSample() {
+      const sampleCard = cards.find(c => c.id === 17) || cards[0];
+      revealCard(sampleCard, { isSample: true });
+    }
+
+    function resetReading() {
+      clearTimers();
+
+      cardFrame.classList.remove('is-flipped', 'card-glow');
+
+      cardFrontImg.onload = null;
+      cardFrontImg.onerror = null;
+      cardFrontImg.classList.remove('is-visible');
+      cardFrontImg.src = '';
+      cardFrontImg.alt = 'タロットカードの表面';
+
+      cardBackImg.classList.add('is-visible');
+      cardPlaceholder.style.display = 'flex';
+
+      cardName.textContent = 'カードはまだ伏せられています';
+      cardKeyword.textContent = '「星詠を始める」を押してください';
+
+      resultBlock.classList.remove('is-visible');
+
+      hideTimer = setTimeout(() => {
+        resultBlock.hidden = true;
+        resultMain.textContent = '';
+        resultSub.innerHTML = '';
+        resultBridgeText.innerHTML = '';
+        consultBtnText.textContent = 'あなたの状況を、個人鑑定で詳しく読む';
+        consultSafeNote.textContent = 'LINEから気軽にご相談いただけます。無理な勧誘はありません。';
+      }, 220);
+
+      startBtn.disabled = false;
+      resetBtn.disabled = true;
+    }
+
+    startBtn.addEventListener('click', drawCard);
+    resetBtn.addEventListener('click', resetReading);
+    sampleBtn.addEventListener('click', showSample);
   </script>
 </body>
 </html>
