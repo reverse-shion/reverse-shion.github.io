@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Re:Verse Shion — 星詠ワンカード無料タロット</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#faf7f0" />
+  <meta name="theme-color" content="#16182a" />
   <meta name="description" content="Re:Verse Shion（詩韻）による無料ワンカードタロット。いまのあなたに必要な言葉を、一枚のカードから読み解きます。" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -19,21 +19,37 @@
     }
 
     :root {
-      --bg: #fdfaf4;
-      --ink: #1f1712;
-      --ink-soft: rgba(0,0,0,0.72);
-      --ink-muted: rgba(0,0,0,0.56);
-      --accent: #d6a94b;
-      --accent-deep: #b9882e;
-      --panel: rgba(255,255,255,0.93);
-      --border-soft: rgba(0,0,0,0.06);
-      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.08);
-      --shadow-card: 0 12px 28px rgba(0,0,0,0.16);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
+      --bg: #f6f1e8;
+      --bg-deep: #ece4d7;
+      --ink: #1f1d29;
+      --ink-soft: rgba(31, 29, 41, 0.78);
+      --ink-muted: rgba(31, 29, 41, 0.56);
+
+      --shion-navy: #1c2238;
+      --shion-indigo: #252c4a;
+      --shion-lavender: #6f678f;
+      --shion-lavender-soft: #ece7f5;
+      --shion-gold: #c7a55d;
+      --shion-gold-deep: #a88335;
+      --shion-ivory: #fffdfa;
+      --shion-rose: #b97d92;
+
+      --panel: rgba(255, 252, 247, 0.92);
+      --panel-strong: rgba(255, 252, 247, 0.97);
+      --border-soft: rgba(44, 36, 67, 0.08);
+      --border-gold: rgba(199, 165, 93, 0.34);
+
+      --shadow-soft: 0 20px 48px rgba(25, 22, 38, 0.09);
+      --shadow-card: 0 12px 28px rgba(18, 16, 28, 0.14);
+
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 15px;
+      --radius-sm: 12px;
       --radius-pill: 999px;
+
       --dur: 220ms;
+
       --font-main: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, 'Yu Mincho', '游明朝', serif;
       --font-hero: 'Cormorant Garamond', 'Times New Roman', serif;
     }
@@ -47,7 +63,9 @@
       font-family: var(--font-main);
       color: var(--ink);
       background:
-        radial-gradient(circle at 0% 0%, #ffffff 0, #fdfaf4 50%, #f4ecde 100%);
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.95) 0, transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(236,231,245,0.9) 0, transparent 24%),
+        linear-gradient(180deg, #f8f4ec 0%, #f3ede2 42%, #ebe2d4 100%);
       display: flex;
       justify-content: center;
       align-items: stretch;
@@ -59,11 +77,11 @@
       max-width: 980px;
       margin: 0 auto;
       background:
-        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.92) 0, rgba(255,255,255,0.98) 55%, #f9f4ea 100%);
+        radial-gradient(circle at 12% 0%, rgba(255,255,255,0.98) 0, rgba(255,252,247,0.98) 44%, rgba(249,242,230,0.98) 100%);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-soft);
-      border: 1px solid var(--border-soft);
-      padding: 24px 20px 28px;
+      border: 1px solid rgba(255,255,255,0.7);
+      padding: 24px 20px 30px;
       position: relative;
       overflow: hidden;
     }
@@ -73,14 +91,14 @@
       position: absolute;
       inset: -40%;
       background:
-        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.6) 0, transparent 55%),
-        radial-gradient(circle at 80% 0%, rgba(255,255,255,0.4) 0, transparent 55%),
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.66) 0, transparent 55%),
+        radial-gradient(circle at 90% 0%, rgba(236,231,245,0.4) 0, transparent 50%),
         repeating-linear-gradient(
           135deg,
-          rgba(214,169,75,0.0) 0,
-          rgba(214,169,75,0.10) 1px,
-          rgba(214,169,75,0.0) 3px,
-          rgba(214,169,75,0.0) 8px
+          rgba(199,165,93,0.00) 0,
+          rgba(199,165,93,0.08) 1px,
+          rgba(199,165,93,0.00) 3px,
+          rgba(199,165,93,0.00) 8px
         );
       opacity: 0.22;
       pointer-events: none;
@@ -99,7 +117,7 @@
       letter-spacing: 0.18em;
       text-transform: uppercase;
       font-size: 0.8rem;
-      color: rgba(0,0,0,0.55);
+      color: rgba(37, 44, 74, 0.65);
       margin-bottom: 6px;
     }
 
@@ -110,10 +128,11 @@
       text-transform: uppercase;
       line-height: 1.12;
       margin-bottom: 10px;
+      color: var(--shion-navy);
     }
 
     .logo-main span {
-      background: linear-gradient(120deg, #b98b34, #e2c470, #b68b40);
+      background: linear-gradient(120deg, #1d2340 0%, #6d658d 38%, #d0b06c 68%, #8a6a2f 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -124,7 +143,7 @@
       margin: 0 auto 14px;
       font-size: 0.96rem;
       color: var(--ink-soft);
-      line-height: 1.82;
+      line-height: 1.85;
     }
 
     .hero-copy strong {
@@ -135,7 +154,7 @@
     .hero-mini {
       font-size: 0.8rem;
       color: var(--ink-muted);
-      line-height: 1.7;
+      line-height: 1.75;
     }
 
     .layout {
@@ -151,8 +170,8 @@
     .panel {
       background: var(--panel);
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255,255,255,0.84);
-      box-shadow: 0 10px 28px rgba(0,0,0,0.04);
+      border: 1px solid rgba(255,255,255,0.82);
+      box-shadow: 0 10px 28px rgba(20, 18, 32, 0.05);
       padding: 18px 16px 18px;
       position: relative;
       overflow: hidden;
@@ -164,8 +183,9 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.78) 0, transparent 50%),
-        radial-gradient(circle at 100% 100%, rgba(246,225,174,0.24) 0, transparent 60%);
+        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.82) 0, transparent 48%),
+        radial-gradient(circle at 100% 100%, rgba(236,231,245,0.34) 0, transparent 56%),
+        radial-gradient(circle at 50% 100%, rgba(231,213,173,0.18) 0, transparent 58%);
       pointer-events: none;
     }
 
@@ -179,7 +199,7 @@
       font-size: 0.78rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.52);
+      color: rgba(37, 44, 74, 0.56);
       margin-bottom: 6px;
     }
 
@@ -191,26 +211,28 @@
       gap: 8px;
       margin-bottom: 8px;
       flex-wrap: wrap;
+      color: var(--shion-navy);
     }
 
     .section-title-icon {
       width: 18px;
       height: 18px;
       border-radius: 6px;
-      border: 1px solid rgba(214,169,75,0.72);
+      border: 1px solid rgba(199,165,93,0.72);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-size: 0.75rem;
-      background: radial-gradient(circle at 30% 0%, #fffbe9 0, #f3e3bc 65%, #f0e7ce 100%);
+      background: radial-gradient(circle at 30% 0%, #fffef8 0, #f5ead1 65%, #f2e6cb 100%);
       box-shadow: 0 0 0 1px rgba(255,255,255,0.85);
       flex-shrink: 0;
+      color: var(--shion-gold-deep);
     }
 
     .lead-text {
       font-size: 0.9rem;
       color: var(--ink-soft);
-      line-height: 1.82;
+      line-height: 1.85;
       margin-bottom: 12px;
     }
 
@@ -260,12 +282,12 @@
     }
 
     .btn-primary {
-      background: radial-gradient(circle at 30% 0%, #fff9e6 0, #f0d48d 40%, #dfb45c 100%);
-      color: #341d07;
+      background: linear-gradient(135deg, #232b49 0%, #3a3458 50%, #6f678f 100%);
+      color: #fffdf8;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,0.9),
-        0 14px 28px rgba(182,131,34,0.35);
-      border-color: rgba(199,152,63,0.9);
+        0 0 0 1px rgba(255,255,255,0.18),
+        0 16px 30px rgba(40, 37, 69, 0.34);
+      border-color: rgba(199,165,93,0.42);
     }
 
     .btn-primary::after {
@@ -273,29 +295,30 @@
       position: absolute;
       inset: -2px;
       border-radius: inherit;
-      border: 1px solid rgba(255,255,255,0.72);
+      border: 1px solid rgba(255,255,255,0.22);
       pointer-events: none;
     }
 
     .btn-secondary {
-      background: rgba(255,255,255,0.86);
-      color: rgba(0,0,0,0.76);
-      border-color: rgba(0,0,0,0.09);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.88);
+      color: rgba(31,29,41,0.8);
+      border-color: rgba(44,36,67,0.11);
+      box-shadow: 0 8px 18px rgba(20,18,32,0.06);
     }
 
     .btn-ghost {
       background: transparent;
-      color: rgba(0,0,0,0.62);
-      border-color: rgba(0,0,0,0.14);
+      color: rgba(31,29,41,0.66);
+      border-color: rgba(44,36,67,0.14);
     }
 
     .btn span.badge {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       padding: 2px 8px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(214,169,75,0.8);
+      background: rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.96);
+      border: 1px solid rgba(255,255,255,0.14);
     }
 
     .btn:disabled {
@@ -308,8 +331,8 @@
     .btn:not(:disabled):hover {
       transform: translateY(-1px);
       box-shadow:
-        0 18px 32px rgba(0,0,0,0.11),
-        0 0 0 1px rgba(255,255,255,0.7);
+        0 18px 34px rgba(20,18,32,0.12),
+        0 0 0 1px rgba(255,255,255,0.16);
     }
 
     .btn-icon {
@@ -323,36 +346,37 @@
 
     .helper-note {
       font-size: 0.75rem;
-      color: rgba(0,0,0,0.55);
-      line-height: 1.68;
+      color: rgba(31,29,41,0.56);
+      line-height: 1.72;
       margin-top: 2px;
     }
 
     .mini-card {
       margin-top: 14px;
-      padding: 12px 13px;
+      padding: 14px 14px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(251,245,232,0.94));
-      border: 1px solid rgba(214,169,75,0.24);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.97), rgba(248,243,234,0.95));
+      border: 1px solid rgba(199,165,93,0.20);
+      box-shadow: 0 10px 20px rgba(20,18,32,0.04);
     }
 
     .mini-title {
       font-size: 0.76rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.54);
-      margin-bottom: 7px;
+      color: rgba(37,44,74,0.58);
+      margin-bottom: 8px;
     }
 
     .mini-card p {
-      font-size: 0.82rem;
-      color: rgba(0,0,0,0.68);
-      line-height: 1.78;
+      font-size: 0.83rem;
+      color: rgba(31,29,41,0.74);
+      line-height: 1.8;
     }
 
     .mini-card strong {
-      color: rgba(0,0,0,0.84);
+      color: rgba(31,29,41,0.92);
       font-weight: 700;
     }
 
@@ -371,7 +395,7 @@
       border-radius: 16px;
       padding: 6px;
       background:
-        radial-gradient(circle at 0% 0%, #fffaf0 0, #f8ecd4 45%, #f0e0c0 100%);
+        radial-gradient(circle at 0% 0%, #fffef8 0, #f6ecd8 45%, #efe1c7 100%);
       box-shadow:
         var(--shadow-card),
         0 0 0 1px rgba(255,255,255,0.95);
@@ -387,7 +411,7 @@
       height: 100%;
       border-radius: 12px;
       overflow: hidden;
-      background: radial-gradient(circle at 30% 0%, #fff 0, #f6f0e2 50%, #e8decf 100%);
+      background: radial-gradient(circle at 30% 0%, #fff 0, #f5f0e6 50%, #e9dfd4 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -425,7 +449,7 @@
       font-family: var(--font-hero);
       font-size: 1.1rem;
       letter-spacing: 0.12em;
-      color: rgba(0,0,0,0.6);
+      color: rgba(31,29,41,0.62);
       text-transform: uppercase;
       text-align: center;
       line-height: 1.5;
@@ -456,7 +480,7 @@
       pointer-events: none;
       background:
         radial-gradient(circle at 50% 0%, rgba(255,255,255,0.9) 0, transparent 55%),
-        radial-gradient(circle at 50% 100%, rgba(214,169,75,0.45) 0, transparent 60%);
+        radial-gradient(circle at 50% 100%, rgba(199,165,93,0.42) 0, transparent 60%);
       mix-blend-mode: screen;
       opacity: 0;
       animation: cardGlow 1s ease-out 1;
@@ -468,23 +492,28 @@
       100% { opacity: 0; }
     }
 
-    .result-block.is-visible .consult-row .btn-secondary {
-      animation: consultGlow 1.4s ease-out 1 0.7s;
+    .result-block.is-visible .cta-primary-btn {
+      animation: consultGlow 1.5s ease-out 1 0.75s;
     }
 
     @keyframes consultGlow {
       0% {
-        box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+        box-shadow:
+          0 14px 32px rgba(40,37,69,0.18),
+          inset 0 1px 0 rgba(255,255,255,0.22);
         transform: translateY(0);
       }
-      40% {
+      38% {
         box-shadow:
-          0 0 0 3px rgba(214,169,75,0.4),
-          0 0 24px rgba(214,169,75,0.9);
+          0 0 0 4px rgba(199,165,93,0.24),
+          0 0 28px rgba(199,165,93,0.52),
+          0 18px 38px rgba(40,37,69,0.24);
         transform: translateY(-1px);
       }
       100% {
-        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        box-shadow:
+          0 14px 32px rgba(40,37,69,0.18),
+          inset 0 1px 0 rgba(255,255,255,0.22);
         transform: translateY(0);
       }
     }
@@ -501,11 +530,12 @@
       font-weight: 600;
       margin-bottom: 2px;
       line-height: 1.55;
+      color: var(--shion-navy);
     }
 
     .card-keyword {
       font-size: 0.8rem;
-      color: rgba(0,0,0,0.6);
+      color: rgba(37,44,74,0.62);
       letter-spacing: 0.08em;
       text-transform: uppercase;
       line-height: 1.55;
@@ -514,14 +544,14 @@
     .result-block {
       margin-top: 10px;
       width: 100%;
-      padding: 12px 13px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(252,243,221,0.96));
-      border: 1px solid rgba(214,169,75,0.35);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(250,244,232,0.98));
+      border: 1px solid rgba(199,165,93,0.30);
+      box-shadow: 0 12px 28px rgba(20,18,32,0.08);
       font-size: 0.88rem;
-      color: rgba(0,0,0,0.8);
-      line-height: 1.75;
+      color: rgba(31,29,41,0.82);
+      line-height: 1.78;
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 260ms ease, transform 260ms ease;
@@ -541,66 +571,135 @@
       font-size: 0.75rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.55);
-      margin-bottom: 5px;
+      color: rgba(37,44,74,0.56);
+      margin-bottom: 6px;
     }
 
     .result-text-main {
-      margin-bottom: 5px;
-      font-size: 0.9rem;
-      color: rgba(0,0,0,0.82);
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+      color: rgba(31,29,41,0.86);
     }
 
     .result-text-sub {
-      font-size: 0.82rem;
-      color: rgba(0,0,0,0.66);
+      font-size: 0.83rem;
+      color: rgba(31,29,41,0.70);
     }
 
     .result-text-sub strong {
       font-weight: 700;
-      color: rgba(0,0,0,0.82);
+      color: rgba(31,29,41,0.86);
     }
 
     .result-bridge {
-      margin-top: 12px;
-      padding: 11px 12px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.76);
-      border: 1px solid rgba(214,169,75,0.22);
+      margin-top: 13px;
+      padding: 12px 12px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(243,238,248,0.68));
+      border: 1px solid rgba(111,103,143,0.12);
     }
 
     .result-bridge-title {
       font-size: 0.76rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.54);
+      color: rgba(37,44,74,0.56);
       margin-bottom: 6px;
     }
 
     .result-bridge-text {
-      font-size: 0.8rem;
-      color: rgba(0,0,0,0.68);
+      font-size: 0.81rem;
+      color: rgba(31,29,41,0.72);
       line-height: 1.76;
     }
 
     .result-bridge-text strong {
-      color: rgba(0,0,0,0.84);
+      color: rgba(31,29,41,0.88);
+      font-weight: 700;
+    }
+
+    .cta-copy {
+      margin-top: 14px;
+      padding: 12px 12px 11px;
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.92), rgba(245,238,224,0.90));
+      border: 1px solid rgba(199,165,93,0.18);
+    }
+
+    .cta-copy-label {
+      font-size: 0.73rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(37,44,74,0.54);
+      margin-bottom: 5px;
+    }
+
+    .cta-copy-text {
+      font-size: 0.84rem;
+      line-height: 1.75;
+      color: rgba(31,29,41,0.76);
+    }
+
+    .cta-copy-text strong {
+      color: rgba(31,29,41,0.9);
       font-weight: 700;
     }
 
     .consult-row {
-      margin-top: 12px;
+      margin-top: 14px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: flex-start;
+      width: 100%;
+    }
+
+    .cta-primary-btn {
+      width: 100%;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 15px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 0.96rem;
+      font-weight: 600;
+      line-height: 1.52;
+      letter-spacing: 0.04em;
+      color: #fffdf8;
+      background:
+        linear-gradient(135deg, #202846 0%, #3a3659 52%, #6c658a 100%);
+      border: 1px solid rgba(199,165,93,0.34);
+      box-shadow:
+        0 14px 32px rgba(40,37,69,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+      transition:
+        transform 220ms ease,
+        box-shadow 220ms ease,
+        border-color 220ms ease,
+        filter 220ms ease;
+    }
+
+    .cta-primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 18px 36px rgba(40,37,69,0.24),
+        0 0 0 1px rgba(255,255,255,0.12);
+      filter: brightness(1.03);
+      border-color: rgba(199,165,93,0.48);
+    }
+
+    .cta-primary-btn:active {
+      transform: translateY(0);
     }
 
     .consult-safe-note {
-      margin-top: 8px;
+      margin-top: 9px;
       font-size: 0.74rem;
-      color: rgba(0,0,0,0.54);
-      line-height: 1.7;
+      color: rgba(31,29,41,0.56);
+      line-height: 1.72;
+      text-align: center;
     }
 
     .bottom-note {
@@ -613,11 +712,129 @@
       margin-top: 0;
     }
 
+    .bottom-lead {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: rgba(31,29,41,0.72);
+      line-height: 1.8;
+    }
+
+    .bottom-lead strong {
+      color: rgba(31,29,41,0.88);
+      font-weight: 700;
+    }
+
+    .link-card {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.98), rgba(249,242,231,0.96));
+      border: 1px solid rgba(199,165,93,0.20);
+      box-shadow: 0 12px 22px rgba(20,18,32,0.04);
+    }
+
+    .link-card-title {
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(37,44,74,0.56);
+      margin-bottom: 8px;
+    }
+
+    .link-card p {
+      font-size: 0.84rem;
+      color: rgba(31,29,41,0.74);
+      line-height: 1.82;
+    }
+
+    .link-card strong {
+      color: rgba(31,29,41,0.9);
+      font-weight: 700;
+    }
+
+    .link-emotion {
+      margin-top: 10px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(243,238,248,0.82), rgba(255,255,255,0.76));
+      border: 1px solid rgba(111,103,143,0.12);
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: rgba(31,29,41,0.74);
+    }
+
+    .love-cta-wrap {
+      margin-top: 12px;
+      display: flex;
+      width: 100%;
+    }
+
+    .love-cta-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      text-decoration: none;
+      min-height: 62px;
+      padding: 15px 18px;
+      border-radius: 18px;
+      color: #fffdf8;
+      font-size: 0.96rem;
+      font-weight: 600;
+      line-height: 1.5;
+      letter-spacing: 0.03em;
+      background:
+        linear-gradient(135deg, #5b3850 0%, #7a4d67 48%, #b07b8f 100%);
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow:
+        0 14px 30px rgba(122,77,103,0.20),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+      transition:
+        transform 220ms ease,
+        box-shadow 220ms ease,
+        filter 220ms ease;
+    }
+
+    .love-cta-btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 18px 36px rgba(122,77,103,0.26),
+        0 0 0 1px rgba(255,255,255,0.10);
+      filter: brightness(1.03);
+    }
+
+    .love-cta-icon {
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+
+    .love-cta-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .love-cta-kicker {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.88;
+    }
+
+    .love-cta-main {
+      font-size: 0.96rem;
+    }
+
     footer {
       margin-top: 18px;
       text-align: center;
       font-size: 0.75rem;
-      color: rgba(0,0,0,0.5);
+      color: rgba(37,44,74,0.50);
       position: relative;
       z-index: 1;
       line-height: 1.7;
@@ -635,7 +852,7 @@
       position: absolute;
       width: 2px;
       height: 2px;
-      background: radial-gradient(circle, #ffe9a8 0, rgba(255,233,168,0.1) 60%, transparent 100%);
+      background: radial-gradient(circle, #f3db9c 0, rgba(243,219,156,0.14) 60%, transparent 100%);
       border-radius: 50%;
       opacity: 0.7;
       animation: floatDust linear infinite;
@@ -692,6 +909,11 @@
 
       .card-shell {
         min-height: 550px;
+      }
+
+      .cta-primary-btn,
+      .love-cta-btn {
+        font-size: 0.92rem;
       }
     }
   </style>
@@ -806,21 +1028,28 @@
                 </p>
               </div>
 
+              <div class="cta-copy">
+                <div class="cta-copy-label">NEXT READING</div>
+                <p id="ctaCopyText" class="cta-copy-text">
+                  もう少しだけ深く、<strong>本音の奥</strong>まで受け取りたい方へ。
+                </p>
+              </div>
+
               <div class="consult-row">
                 <a
                   id="consultBtn"
-                  class="btn btn-secondary"
+                  class="cta-primary-btn"
                   href="https://lin.ee/LYnlU0f"
                   target="_blank"
                   rel="noopener"
+                  aria-label="LINEで個人鑑定へ進む"
                 >
-                  <span class="btn-icon">🌙</span>
-                  <span id="consultBtnText">あなたの状況を、個人鑑定で詳しく読む</span>
+                  <span id="consultBtnText">LINEで個人鑑定へ進む</span>
                 </a>
               </div>
 
               <p id="consultSafeNote" class="consult-safe-note">
-                LINEから気軽にご相談いただけます。無理な勧誘はありません。
+                はじめての方も安心してご相談いただけます。無理な勧誘はありません。
               </p>
 
               <p class="helper-note" style="margin-top:8px;">
@@ -835,23 +1064,32 @@
     <section class="bottom-note" aria-label="詩韻の鑑定について">
       <div class="mini-card">
         <div class="mini-title">もっと深く見たいときに</div>
-        <p>
+        <p class="bottom-lead">
           無料ワンカードは、あなたの心の入口をひらく最初の一枚。  
           もし「当たっているかも」「続きを知りたい」と感じたなら、個人鑑定では
           <strong>相手の気持ち、今後、選択、あなた自身の本音</strong>まで、より丁寧にほどいていきます。
         </p>
       </div>
 
-      <div class="mini-card" style="margin-top:10px;" aria-label="恋愛特化ページへのご案内">
-        <div class="mini-title">恋愛の悩みを見たい方へ</div>
+      <div class="link-card" style="margin-top:12px;" aria-label="恋愛特化ページへのご案内">
+        <div class="link-card-title">恋愛の悩みを見たい方へ</div>
         <p>
           あの人の気持ち、既読無視、片想い、復縁など、恋愛の悩みをより深く見たい方のために
           <strong>恋愛特化の無料星詠ページ</strong>もご用意しています。
         </p>
-        <div class="consult-row" style="margin-top:10px;">
-          <a class="btn btn-secondary" href="love-tarot.html">
-            <span class="btn-icon">💗</span>
-            <span>恋愛特化の無料占いへ</span>
+
+        <div class="link-emotion">
+          気になるのに聞けない気持ち。  
+          <strong>その続きを、恋愛に特化した星詠で受け取ってみてください。</strong>
+        </div>
+
+        <div class="love-cta-wrap">
+          <a class="love-cta-btn" href="love-tarot.html" aria-label="恋愛特化の無料占いへ進む">
+            <span class="love-cta-icon">❤</span>
+            <span class="love-cta-text">
+              <span class="love-cta-kicker">LOVE READING</span>
+              <span class="love-cta-main">恋愛特化の無料占いを見る</span>
+            </span>
           </a>
         </div>
       </div>
@@ -910,10 +1148,10 @@
           'いま必要なのは、勢いよりも方向です。<strong>この先どこへ進むと自分らしいか</strong>を見たいときは、個人鑑定で丁寧に読み解けます。',
           '始まりの前は、可能性が広いぶん迷いも生まれます。<strong>今の流れをどう育てるか</strong>を知りたい方は、その先を個人鑑定で受け取れます。'
         ],
-        ctaPatterns: [
-          'これからの流れを、個人鑑定で詳しく見る',
-          '今の選択が合っているか、個人鑑定で深く読む',
-          '新しい流れの方向を、個人鑑定で受け取る'
+        ctaCopies: [
+          '新しい流れが気になるなら、次の一歩を一緒に整えてみませんか。',
+          'はじまりの前の迷いほど、言葉にすると進みやすくなります。',
+          '今の選択が未来にどうつながるか、もう少し深く見てみる。'
         ],
         safePatterns: [
           '新しい一歩に迷うときも、焦らず丁寧に読み解きます。',
@@ -941,10 +1179,10 @@
           'やる気はあるのに迷いがあるなら、その原因を言葉にすると進みやすくなります。<strong>何をどう始めるべきか</strong>を深く見ることができます。',
           '可能性は見えているのに、最後の一歩が難しいこともあります。<strong>今の流れをどう現実にするか</strong>を個人鑑定で丁寧に整理できます。'
         ],
-        ctaPatterns: [
-          '今の流れと動き方を、個人鑑定で詳しく読む',
-          '形にするための一歩を、個人鑑定で整理する',
-          'これからの進め方を、個人鑑定で深く見る'
+        ctaCopies: [
+          '形にしたい想いがあるなら、その流れをもっとはっきり見てみる。',
+          'あと一歩の迷いを、言葉にすると現実は動きやすくなります。',
+          '今ある力をどう使うか、深く受け取りたい方へ。'
         ],
         safePatterns: [
           'やりたいことや選択の整理も、LINEから気軽にご相談いただけます。',
@@ -972,10 +1210,10 @@
           '見えていないようで、実は感じ取っていることがあるはずです。<strong>本当に大切な気持ち</strong>を言葉にしたいときに、個人鑑定で丁寧にほどけます。',
           'いま必要なのは、派手な答えではなく静かな確信かもしれません。<strong>心の奥の答え</strong>を一緒に読み解いていけます。'
         ],
-        ctaPatterns: [
-          '心の奥の本音を、個人鑑定で丁寧に読み解く',
-          '見えていない本心を、個人鑑定で受け取る',
-          '今の違和感の正体を、個人鑑定で深く読む'
+        ctaCopies: [
+          '言葉にならない本音ほど、やさしくほどいてあげてください。',
+          '静かな違和感の正体を、もう少し深く受け取りたいときに。',
+          '自分でもまだ言えていない気持ちを、丁寧に見つめる。'
         ],
         safePatterns: [
           '言葉にならない気持ちも、急かさず丁寧に受け取ります。',
@@ -1003,10 +1241,10 @@
           '恋愛や人間関係では、受け取る勇気も大切です。<strong>この関係がどう育っていくか</strong>を知りたいときは、その先を深く読めます。',
           '「好き」だけでは整理しきれない想いもあります。<strong>相手の本音や今後の流れ</strong>を見たい方に、個人鑑定は向いています。'
         ],
-        ctaPatterns: [
-          '相手の気持ちと恋愛の流れを、個人鑑定で詳しく見る',
-          'この関係の先を、個人鑑定で丁寧に読む',
-          '恋愛の本音を、個人鑑定で深く受け取る'
+        ctaCopies: [
+          '恋の続きを知りたいなら、相手の気持ちをもう少し深く。',
+          'やさしさの裏にある本音まで、丁寧に受け取ってみる。',
+          'この関係がどう育つのか、先の流れを見てみませんか。'
         ],
         safePatterns: [
           '恋愛のご相談も、やさしく丁寧に読み解きます。',
@@ -1034,10 +1272,10 @@
           '誰かに合わせるほど、自分の本音は見えにくくなることがあります。<strong>今の選択をどう整えるか</strong>を一緒に読み解けます。',
           'この先ぶれないために、いま整理しておくべきことがあります。<strong>自分の軸と判断</strong>を深く見たいときに向いています。'
         ],
-        ctaPatterns: [
-          '今の選択と軸を、個人鑑定で詳しく読む',
-          '自分に合う判断を、個人鑑定で整理する',
-          'これからの立ち位置を、個人鑑定で深く見る'
+        ctaCopies: [
+          '自分の軸を取り戻したいときほど、言葉の整理が力になります。',
+          'この先ぶれないために、今の選択を深く見つめてみる。',
+          '心の基準を整えたい方へ、次の一歩を丁寧に。'
         ],
         safePatterns: [
           '迷いの多い時期でも、必要な判断を丁寧に整理します。',
@@ -1065,10 +1303,10 @@
           'ひとりで抱えるほど、見えなくなるものがあります。<strong>今の悩みを言葉にして整理したい方</strong>は、その先を深く読めます。',
           '答えを急がなくていいからこそ、ちゃんと整理して受け取りたい。そんな時に個人鑑定は力になります。'
         ],
-        ctaPatterns: [
-          '今の悩みを、個人鑑定で丁寧に読み解く',
-          'これからの進み方を、個人鑑定で深く見る',
-          '悩みの本質を、個人鑑定で整理する'
+        ctaCopies: [
+          'ひとりで抱えてきた気持ちを、ここで少しほどいてみませんか。',
+          '悩みの本質をちゃんと受け取りたい方へ、次の言葉を。',
+          '頼ることもまた、未来をひらく選択のひとつです。'
         ],
         safePatterns: [
           'はじめての方も、安心してご相談いただけます。',
@@ -1096,10 +1334,10 @@
           '「好き」だけでは整理できないこともあります。<strong>相手の本音や、これからの流れ</strong>を知ると迷いが軽くなるかもしれません。',
           '選ぶ前に、ちゃんと知っておきたいことがあるはずです。<strong>この恋の先や、気持ちの行方</strong>を深く見たい方に向いています。'
         ],
-        ctaPatterns: [
-          '恋愛の流れと相手の気持ちを、個人鑑定で深く見る',
-          'この恋の先を、個人鑑定で丁寧に読む',
-          '選ぶべき方向を、個人鑑定で詳しく受け取る'
+        ctaCopies: [
+          'この恋を選んでいいのか、心の震えの先を見てみる。',
+          '好きだけでは足りない不安も、丁寧に整理できます。',
+          '相手の気持ちと、この先の流れを深く知りたい方へ。'
         ],
         safePatterns: [
           '恋愛や選択の迷いも、焦らせず丁寧に読み解きます。',
@@ -1127,10 +1365,10 @@
           '勢いがある時ほど、方向が大切になります。<strong>いま進むべき道や、タイミング</strong>を深く読み解けます。',
           '動きたいのに迷いがあるなら、その理由にも意味があります。<strong>どこへ進むといいか</strong>を整理したい方に向いています。'
         ],
-        ctaPatterns: [
-          '今後の流れと動き方を、個人鑑定で詳しく見る',
-          '進むべき方向を、個人鑑定で深く読む',
-          '動くタイミングを、個人鑑定で整理する'
+        ctaCopies: [
+          '進みたい気持ちがあるなら、その方向をはっきりさせてみる。',
+          '勢いのある時ほど、次の一手は丁寧に選びたいものです。',
+          '前進したいのに迷うとき、流れを深く見てみませんか。'
         ],
         safePatterns: [
           '行動のタイミングに迷うときも、無理なく整理してお伝えします。',
@@ -1158,10 +1396,10 @@
           'いま必要なのは「もっと頑張る」ことではなく、ちゃんと回復することかもしれません。<strong>心の整え方</strong>を丁寧に見ていけます。',
           '傷ついたままでは進みにくい時期もあります。<strong>自分を責めずに戻る方法</strong>を受け取りたい方に向いています。'
         ],
-        ctaPatterns: [
-          '今のあなたに必要な回復の流れを、個人鑑定で受け取る',
-          '心の整え方を、個人鑑定で丁寧に読む',
-          '自分を責めないための流れを、個人鑑定で見る'
+        ctaCopies: [
+          'つよくなる前に、まず自分をやさしく抱きしめてあげる。',
+          'しんどさの奥にある本音を、少しずつ整えていきませんか。',
+          '回復の流れを、あなたに合う形で深く受け取る。'
         ],
         safePatterns: [
           'つらさを否定せず、今のあなたに必要な言葉を丁寧に届けます。',
@@ -1189,10 +1427,10 @@
           '誰にも言えない気持ちほど、自分の中で重くなりやすいものです。<strong>本音を言葉にしたい方</strong>に向いています。',
           'いま必要なのは、派手な答えではなく静かな整理かもしれません。<strong>心の奥の気持ち</strong>をほどいていけます。'
         ],
-        ctaPatterns: [
-          '心の整理とこれからを、個人鑑定で丁寧に読む',
-          '本音を言葉にするために、個人鑑定で深く見る',
-          '今の気持ちを整理する流れを、個人鑑定で受け取る'
+        ctaCopies: [
+          '誰にも言えない想いほど、静かに言葉へ変えてあげたい。',
+          'ひとりで抱えてきた本音を、そっとほどく時間を。',
+          '心の奥の整理を、もう少し深く進めてみませんか。'
         ],
         safePatterns: [
           '誰にも言えない気持ちも、静かに受け止めながら読み解きます。',
@@ -1220,10 +1458,10 @@
           '変化の途中では、何を信じればいいか分からなくなることもあります。<strong>いま来ている流れの意味</strong>を深く見ていけます。',
           'いまはただの偶然ではなく、何かが切り替わるサインかもしれません。<strong>この先の転機</strong>を詳しく受け取りたい方に向いています。'
         ],
-        ctaPatterns: [
-          'これからの流れと転機を、個人鑑定で詳しく見る',
-          '今後の変化の意味を、個人鑑定で深く読む',
-          '動くべき時期を、個人鑑定で整理する'
+        ctaCopies: [
+          '流れが変わる前後ほど、言葉はあなたの道しるべになります。',
+          'この転機の意味を、もう少し深く知りたいときに。',
+          '偶然に見える揺れの先を、丁寧に受け取ってみる。'
         ],
         safePatterns: [
           '焦らず、今の変化の意味を丁寧に整理していきます。',
@@ -1251,10 +1489,10 @@
           '本当はもう、何が苦しいか気づいているのかもしれません。<strong>今の関係や選択のバランス</strong>を整理したい時に深く読めます。',
           'やさしさを守りながら、自分も守る。<strong>その選び方</strong>を知りたい方に個人鑑定は向いています。'
         ],
-        ctaPatterns: [
-          '今の選択と判断を、個人鑑定で詳しく読む',
-          '境界線の整え方を、個人鑑定で深く見る',
-          '関係のバランスを、個人鑑定で整理する'
+        ctaCopies: [
+          '我慢ではなく整えるために、今の天秤を見直してみる。',
+          'やさしさを守りながら自分も守る、その方法を深く。',
+          '苦しさの理由が見えたなら、次は選び方を整える番です。'
         ],
         safePatterns: [
           '決断に迷うときも、あなたに合う形で丁寧に整理します。',
@@ -1282,10 +1520,10 @@
           '動けない時ほど、不安だけが大きくなることがあります。<strong>今の停滞の意味</strong>を知りたい方に向いています。',
           '待つことが正しいのか不安な時こそ、<strong>いま見るべき視点</strong>を整理すると気持ちが軽くなるかもしれません。'
         ],
-        ctaPatterns: [
-          '停滞の意味と次の一歩を、個人鑑定で丁寧に見る',
-          '今は待つべきかを、個人鑑定で深く読む',
-          '止まっている理由を、個人鑑定で整理する'
+        ctaCopies: [
+          '動けない夜ほど、いま見るべき景色を整えてあげたい。',
+          '停滞の意味がわかるだけで、心は少し軽くなります。',
+          'この止まっている時間にある答えを、深く受け取る。'
         ],
         safePatterns: [
           '動けない時期の不安も、急かさずやさしく読み解きます。',
@@ -1313,10 +1551,10 @@
           '変化の最中は、何を信じればいいか分からなくなりやすいものです。<strong>ここから先の再生の流れ</strong>を丁寧に読めます。',
           '終わりの中にも、ちゃんと次があります。<strong>これからどう立て直していくか</strong>を見たい方に向いています。'
         ],
-        ctaPatterns: [
-          'これからの再生の流れを、個人鑑定で詳しく読む',
-          '手放した先の未来を、個人鑑定で深く見る',
-          '次のステージへの流れを、個人鑑定で受け取る'
+        ctaCopies: [
+          '終わりの先にある再生を、言葉でちゃんと迎えにいく。',
+          '手放したほうがいいものを、ひとりで決めなくて大丈夫です。',
+          'ここから始まる新しい流れを、深く見てみませんか。'
         ],
         safePatterns: [
           '終わりの痛みも、次の始まりに変えていけるよう丁寧に見ていきます。',
@@ -1344,10 +1582,10 @@
           'がんばることには慣れていても、整えることは意外と難しいものです。<strong>今のあなたに合う流れ</strong>を一緒に見ていけます。',
           'いま必要なのは気合いではなく調整かもしれません。<strong>心と現実のバランス</strong>を深く整理したい方に向いています。'
         ],
-        ctaPatterns: [
-          '今の自分に合う流れを、個人鑑定で丁寧に見る',
-          '立て直し方を、個人鑑定で深く読む',
-          '心と現実の整え方を、個人鑑定で受け取る'
+        ctaCopies: [
+          'がんばるより整える、その感覚を大切にしたいときに。',
+          '今のあなたにちょうどいい流れを、深く見つけていく。',
+          '心と現実の温度差を、少しずつやさしく揃えていく。'
         ],
         safePatterns: [
           '無理を増やすのではなく、整えるための鑑定を大切にしています。',
@@ -1375,10 +1613,10 @@
           '恋愛でも人間関係でも、離れられない理由には意味があります。<strong>その本音を丁寧に言葉にしたい方</strong>に向いています。',
           '「分かってるのにやめられない」には、ちゃんと背景があります。<strong>その背景を整理すること</strong>で流れが変わることもあります。'
         ],
-        ctaPatterns: [
-          '執着や不安の正体を、個人鑑定で丁寧に読み解く',
-          '離れられない理由を、個人鑑定で深く見る',
-          '本当に満たしたいものを、個人鑑定で受け取る'
+        ctaCopies: [
+          '離れられない理由を責めずに、そっと見つめてあげる。',
+          '苦しさの奥にある本音を、ひとつずつ言葉へ変える。',
+          'その執着の背景を、もう少し深く整理してみませんか。'
         ],
         safePatterns: [
           'つらい気持ちを責めずに、少しずつ整理できるよう寄り添います。',
@@ -1406,10 +1644,10 @@
           'つらい変化の最中では、先のことを考える余裕がなくなることもあります。<strong>ここから先の整え方</strong>を一緒に見ていけます。',
           'いま必要なのは「大丈夫なふり」ではなく、ちゃんと整理することかもしれません。<strong>立て直しの流れ</strong>を丁寧に読めます。'
         ],
-        ctaPatterns: [
-          'ここからの立て直し方を、個人鑑定で詳しく見る',
-          '揺れの意味と次の流れを、個人鑑定で読む',
-          'この出来事の先を、個人鑑定で丁寧に整理する'
+        ctaCopies: [
+          '揺れた心を、そのままにせず丁寧に立て直していく。',
+          '痛みのあとに残る本当の答えを、深く受け取る。',
+          '崩れた今だからこそ、次の土台を見つけてみませんか。'
         ],
         safePatterns: [
           '揺れの大きい時期も、不安を煽らず丁寧に読み解きます。',
@@ -1437,10 +1675,10 @@
           '希望があるからこそ、その先をちゃんと知りたくなることもあります。<strong>これからどう進んでいくか</strong>を丁寧に見ていけます。',
           'いま戻ってきた光を、現実の安心につなげたい時に。<strong>今後の流れ</strong>を深く見たい方に向いています。'
         ],
-        ctaPatterns: [
-          'これからの希望の流れを、個人鑑定で受け取る',
-          '今後の明るい流れを、個人鑑定で詳しく見る',
-          '希望を現実につなぐ道筋を、個人鑑定で読む'
+        ctaCopies: [
+          '小さく戻ってきた光を、ちゃんと未来へつないでいく。',
+          '希望の先にある現実を、もう少し深く見てみる。',
+          '大丈夫かもと思えた今だからこそ、その続きを受け取る。'
         ],
         safePatterns: [
           'やさしい光を現実の一歩に変えていけるよう、丁寧にお手伝いします。',
@@ -1468,10 +1706,10 @@
           '恋愛でも人間関係でも、見えないものほど心を揺らします。<strong>その不安の正体</strong>を丁寧に読み解いていけます。',
           'いま必要なのは「気にしないこと」ではなく、ちゃんと見分けることかもしれません。<strong>本当の原因</strong>を知りたい方に向いています。'
         ],
-        ctaPatterns: [
-          '不安の正体と相手の本音を、個人鑑定で丁寧に見る',
-          '今の迷いを、個人鑑定で深く整理する',
-          '見えない不安の原因を、個人鑑定で読み解く'
+        ctaCopies: [
+          '揺れている心を、そのままにせず丁寧に整理していく。',
+          '見えない不安ほど、正体がわかると呼吸しやすくなります。',
+          'この迷いの奥にある本音を、深く見つめてみませんか。'
         ],
         safePatterns: [
           '不安を大きくするためではなく、気持ちを整理するための鑑定です。',
@@ -1499,10 +1737,10 @@
           'いい流れが見えている時こそ、その先を整えておくと安心です。<strong>恋愛や今後の展開</strong>を深く見ていけます。',
           '明るい流れの中でも、ちゃんと知っておきたいことはあります。<strong>この先どう開いていくか</strong>を見たい方に向いています。'
         ],
-        ctaPatterns: [
-          'これからの明るい流れを、個人鑑定で詳しく見る',
-          '恋愛のこの先を、個人鑑定で深く読む',
-          'いま来ている祝福の流れを、個人鑑定で受け取る'
+        ctaCopies: [
+          '嬉しい流れが見えてきたなら、その先まで受け取ってみる。',
+          '明るい未来を、ちゃんと現実へつなげたい方へ。',
+          '祝福の気配がある今だからこそ、続きを深く見てみませんか。'
         ],
         safePatterns: [
           '前向きな流れを現実に活かせるよう、やさしく整理してお伝えします。',
@@ -1530,10 +1768,10 @@
           '恋愛では特に、「また動くかもしれない流れ」が気になる時に出やすい一枚です。<strong>相手の気持ちや再接続の可能性</strong>を丁寧に見ていけます。',
           'もう一度向き合うなら、ちゃんと知っておきたいことがあります。<strong>今後どう動くか</strong>を深く受け取りたい方に向いています。'
         ],
-        ctaPatterns: [
-          '再スタートの流れを、個人鑑定で詳しく読む',
-          '復縁や再接続の可能性を、個人鑑定で深く見る',
-          'もう一度向き合うべきことを、個人鑑定で受け取る'
+        ctaCopies: [
+          'もう一度だけ信じたい気持ちを、丁寧に見つめてあげる。',
+          '復縁や再接続の可能性を、ひとりで抱えなくて大丈夫。',
+          '動き出すかもしれないこの流れを、深く受け取ってみる。'
         ],
         safePatterns: [
           '過去を責めるのではなく、これからを丁寧に見ていく鑑定です。',
@@ -1561,10 +1799,10 @@
           '完成のあとには、また新しい始まりが来ます。<strong>次の流れをどう迎えるか</strong>を深く見たい方に向いています。',
           'いま必要なのは、達成感だけで終わらせないことかもしれません。<strong>この先の方向性</strong>を丁寧に読み解けます。'
         ],
-        ctaPatterns: [
-          '次のステージへの流れを、個人鑑定で詳しく見る',
-          'ここから先の方向を、個人鑑定で深く読む',
-          '一区切りの次に来る流れを、個人鑑定で受け取る'
+        ctaCopies: [
+          'ここまで歩いてきたからこそ、次の扉を丁寧に選びたい。',
+          '一区切りの先にある新しい流れを、深く見てみる。',
+          '完成のあとに来る次のステージを、やさしく迎える。'
         ],
         safePatterns: [
           '一区切りのあとに必要な選択も、丁寧に読み解いていきます。',
@@ -1591,6 +1829,7 @@
     const resultBridgeText = document.getElementById('resultBridgeText');
     const consultBtnText = document.getElementById('consultBtnText');
     const consultSafeNote = document.getElementById('consultSafeNote');
+    const ctaCopyText = document.getElementById('ctaCopyText');
 
     let flipTimer = null;
     let hideTimer = null;
@@ -1611,7 +1850,7 @@
         main: pickOne(card.mainPatterns),
         sub: pickOne(card.subPatterns),
         bridge: pickOne(card.bridgePatterns),
-        cta: pickOne(card.ctaPatterns),
+        ctaCopy: pickOne(card.ctaCopies),
         safe: pickOne(card.safePatterns)
       };
     }
@@ -1646,14 +1885,16 @@
           state.sub +
           '<br><br><strong style="font-size:0.78rem;">※これはサンプルです。実際の星詠では、毎回その時のあなたに合う言葉が届きます。</strong>';
         resultBridgeText.innerHTML = 'この結果に少しでも心が動いたなら、その先にはもっと深く読める続きがあります。<strong>相手の気持ち、今後の流れ、どう動けばいいか</strong>まで知りたい方は、個人鑑定で丁寧に読み解けます。';
-        consultBtnText.textContent = 'あなたの状況を、個人鑑定で詳しく読む';
-        consultSafeNote.textContent = 'LINEから気軽にご相談いただけます。無理な勧誘はありません。';
+        ctaCopyText.innerHTML = 'もう少しだけ深く、<strong>本音の奥</strong>まで受け取りたい方へ。';
+        consultBtnText.textContent = 'LINEで個人鑑定へ進む';
+        consultSafeNote.textContent = 'はじめての方も安心してご相談いただけます。無理な勧誘はありません。';
       } else {
         const state = buildCardState(card);
         resultMain.textContent = state.main;
         resultSub.innerHTML = state.sub;
         resultBridgeText.innerHTML = state.bridge;
-        consultBtnText.textContent = state.cta;
+        ctaCopyText.innerHTML = state.ctaCopy;
+        consultBtnText.textContent = 'LINEで個人鑑定へ進む';
         consultSafeNote.textContent = state.safe;
       }
 
@@ -1714,8 +1955,9 @@
         resultMain.textContent = '';
         resultSub.innerHTML = '';
         resultBridgeText.innerHTML = '';
-        consultBtnText.textContent = 'あなたの状況を、個人鑑定で詳しく読む';
-        consultSafeNote.textContent = 'LINEから気軽にご相談いただけます。無理な勧誘はありません。';
+        ctaCopyText.innerHTML = 'もう少しだけ深く、<strong>本音の奥</strong>まで受け取りたい方へ。';
+        consultBtnText.textContent = 'LINEで個人鑑定へ進む';
+        consultSafeNote.textContent = 'はじめての方も安心してご相談いただけます。無理な勧誘はありません。';
       }, 220);
 
       startBtn.disabled = false;
