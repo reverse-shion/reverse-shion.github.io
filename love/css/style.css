@@ -862,3 +862,129 @@ button {
     transition: none !important;
   }
 }
+.music-box {
+  margin-top: 26px;
+  padding: 24px 20px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(249,244,246,0.96) 100%);
+  border: 1px solid rgba(126, 98, 114, 0.12);
+  box-shadow:
+    0 14px 34px rgba(100, 76, 89, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.72);
+}
+
+.music-label {
+  margin: 0 0 10px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: #a2919b;
+}
+
+.music-title {
+  margin: 0;
+  font-size: clamp(1.45rem, 1.15rem + 1vw, 2rem);
+  line-height: 1.6;
+  color: #5e4754;
+  font-weight: 600;
+}
+
+.music-text {
+  margin: 14px 0 0;
+  font-size: 1rem;
+  line-height: 2;
+  color: #7a6872;
+}
+
+.music-status-wrap {
+  margin-top: 16px;
+}
+
+.music-status {
+  margin: 0;
+  font-size: 0.93rem;
+  color: #8d7883;
+}
+
+.music-action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.btn-music,
+.btn-music-stop {
+  appearance: none;
+  border-radius: 999px;
+  min-height: 56px;
+  padding: 14px 22px;
+  font-weight: 600;
+  line-height: 1.45;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-music:hover,
+.btn-music-stop:hover {
+  transform: translateY(-1px);
+}
+
+.btn-music {
+  border: 1px solid rgba(141, 108, 124, 0.16);
+  background: linear-gradient(135deg, #fffdfa 0%, #f7efee 100%);
+  color: #5d4653;
+  box-shadow:
+    0 10px 24px rgba(115, 88, 102, 0.10),
+    inset 0 1px 0 rgba(255,255,255,0.92);
+}
+
+.btn-music.is-playing {
+  background: linear-gradient(135deg, #8d6c7d 0%, #a57e90 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 14px 28px rgba(127, 92, 109, 0.22);
+}
+
+.btn-music-stop {
+  border: 1px solid rgba(126, 98, 114, 0.18);
+  background: #ffffff;
+  color: #6f5663;
+  box-shadow:
+    0 8px 20px rgba(100, 76, 89, 0.06),
+    inset 0 1px 0 rgba(255,255,255,0.94);
+}
+
+.music-note {
+  margin: 14px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: #9a8891;
+}
+
+#loveThemeAudio {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .music-box {
+    padding: 20px 16px;
+    border-radius: 24px;
+  }
+
+  .music-action-row {
+    flex-direction: column;
+  }
+
+  .btn-music,
+  .btn-music-stop {
+    width: 100%;
+    justify-content: center;
+  }
+}
