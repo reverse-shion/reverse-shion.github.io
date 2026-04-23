@@ -1,7 +1,7 @@
 /* =========================================
    Re:Verse Shion - Love One Card Reading
    love/css/style.css
-   詩韻思想 / 高級感 / 安心感 / 恋愛導線 最終版
+   詩韻思想 / 高級感 / 安心感 / 恋愛導線 完成版
 ========================================= */
 
 :root {
@@ -10,10 +10,10 @@
   --bg-3: #f1e8eb;
   --bg-4: #ece5ea;
 
-  --surface: rgba(255, 252, 251, 0.88);
-  --surface-strong: rgba(255, 255, 255, 0.94);
-  --surface-soft: rgba(252, 246, 248, 0.9);
-  --surface-deep: rgba(248, 240, 243, 0.92);
+  --surface: rgba(255, 252, 251, 0.9);
+  --surface-strong: rgba(255, 255, 255, 0.95);
+  --surface-soft: rgba(252, 246, 248, 0.92);
+  --surface-deep: rgba(248, 240, 243, 0.93);
 
   --text: #2f2629;
   --text-soft: rgba(47, 38, 41, 0.84);
@@ -27,13 +27,10 @@
 
   --rose: #8b6774;
   --rose-deep: #694a56;
-  --rose-shadow: rgba(105, 74, 86, 0.18);
   --lavender: #8f85aa;
   --plum: #58424c;
   --gold: #c5a36b;
-  --gold-soft: rgba(197, 163, 107, 0.18);
-  --ivory: #fffdfb;
-  --glow: rgba(255, 255, 255, 0.66);
+  --glow: rgba(255, 255, 255, 0.68);
 
   --shadow-page:
     0 24px 60px rgba(88, 61, 72, 0.08),
@@ -87,10 +84,15 @@ html {
   scroll-behavior: smooth;
   overflow-x: hidden;
   background: var(--bg-1);
+  min-height: auto;
+  height: auto;
 }
 
 body {
   margin: 0;
+  min-height: auto;
+  height: auto;
+  display: block;
   color: var(--text);
   font-family: var(--font-main);
   letter-spacing: 0.01em;
@@ -122,14 +124,18 @@ button {
 .site-shell {
   width: min(calc(100% - 24px), var(--container));
   margin: 16px auto 20px;
+  min-height: auto;
+  height: auto;
 }
 
 .page {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  min-height: 0;
+  height: auto;
   border-radius: var(--radius-page);
-  padding: 20px 14px 22px;
+  padding: 20px 14px 20px;
   border: 1px solid rgba(255, 255, 255, 0.78);
   background:
     linear-gradient(
@@ -149,18 +155,18 @@ button {
   inset: -18%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.48;
+  opacity: 0.52;
   background:
-    radial-gradient(circle at 10% 8%, rgba(255, 255, 255, 0.8) 0%, transparent 28%),
+    radial-gradient(circle at 10% 8%, rgba(255, 255, 255, 0.82) 0%, transparent 28%),
     radial-gradient(circle at 92% 6%, rgba(139, 103, 116, 0.12) 0%, transparent 22%),
-    radial-gradient(circle at 84% 20%, rgba(143, 133, 170, 0.1) 0%, transparent 18%),
-    radial-gradient(circle at 16% 100%, rgba(197, 163, 107, 0.08) 0%, transparent 20%),
+    radial-gradient(circle at 84% 20%, rgba(143, 133, 170, 0.11) 0%, transparent 18%),
+    radial-gradient(circle at 18% 84%, rgba(197, 163, 107, 0.06) 0%, transparent 18%),
     repeating-linear-gradient(
       135deg,
       rgba(197, 163, 107, 0) 0,
-      rgba(197, 163, 107, 0.045) 1px,
+      rgba(197, 163, 107, 0.035) 1px,
       rgba(197, 163, 107, 0) 4px,
-      rgba(197, 163, 107, 0) 14px
+      rgba(197, 163, 107, 0) 15px
     );
 }
 
@@ -293,6 +299,7 @@ button {
 .content-stack {
   display: grid;
   gap: var(--content-gap);
+  margin-bottom: 0;
 }
 
 .panel {
@@ -651,10 +658,12 @@ button {
 
 .cta-box {
   padding: 15px 12px;
-  border: 1px solid rgba(197, 163, 107, 0.18);
+  border: 1px solid rgba(197, 163, 107, 0.2);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(248, 238, 242, 0.86) 44%, rgba(245, 237, 230, 0.86));
-  box-shadow: 0 12px 24px rgba(83, 58, 67, 0.06);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(249, 240, 244, 0.88) 44%, rgba(246, 238, 232, 0.88));
+  box-shadow:
+    0 12px 24px rgba(83, 58, 67, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .cta-title {
@@ -705,11 +714,11 @@ button {
 }
 
 .trust-box {
-  padding: 15px 12px;
-  border: 1px solid var(--line);
+  padding: 16px 13px;
+  border: 1px solid rgba(121, 89, 101, 0.14);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(248, 240, 244, 0.82) 44%, rgba(242, 236, 246, 0.72));
-  box-shadow: 0 8px 18px rgba(83, 58, 67, 0.04);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(248, 240, 244, 0.84) 44%, rgba(242, 236, 246, 0.76));
+  box-shadow: 0 10px 22px rgba(83, 58, 67, 0.05);
 }
 
 .trust-text {
@@ -720,6 +729,8 @@ button {
 
 .footer {
   margin-top: 16px;
+  margin-bottom: 0;
+  padding-bottom: 0;
   text-align: center;
   color: rgba(88, 66, 76, 0.48);
   font-size: 0.74rem;
@@ -804,7 +815,7 @@ button {
 
 @media (min-width: 768px) {
   .page {
-    padding: 24px 22px 24px;
+    padding: 24px 22px 22px;
   }
 
   .panel {
@@ -823,7 +834,7 @@ button {
 
 @media (min-width: 980px) {
   .page {
-    padding: 26px 24px 26px;
+    padding: 26px 24px 24px;
   }
 
   .hero {
