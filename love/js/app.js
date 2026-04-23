@@ -335,3 +335,91 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error(error);
   }
 });
+
+(function () {
+  const audio = document.getElementById("loveThemeAudio");
+  const playBtn = document.getElementById("musicPlayBtn");
+  const stopBtn = document.getElementById("musicStopBtn");
+  const status = document.getElementById("musicStatus");
+
+  if (!audio || !playBtn || !stopBtn) return;
+
+  const DEFAULT_LABEL = "今夜の気持ちに、そっとこの曲を聴く";
+  const PLAYING_LABEL = "静かに再生しています";
+  const PAUSED_LABEL = "もう一度聴く";
+  let manualStop = false;
+
+  function updateState(mode) {
+    if (mode === "playing") {
+      playBtn.classList.add("is-playing");
+      playBtn.setAttribute("aria-pressed", "true");
+      playBtn.textContent = PLAYING_LABEL;
+      if (status) status.textContent = "再生中です";
+      return;
+    }
+
+    if (mode === "paused") {
+      playBtn.classList.remove("is-playing");
+      playBtn.setAttribute("aria-pressed", "false");
+      playBtn.textContent = PAUSED_LABEL;
+      if (status) status.textContent = "一時停止しています";
+      return;
+    }
+
+    playBtn.classList.remove("is-playing");
+    playBtn.setAttribute("aria-pressed", "false");
+    playBtn.textContent = DEFAULT_LABEL;
+    if (status) status.textContent = "まだ再生していません";
+  }
+
+  playBtn.addEventListener("click", async function () {
+    try {
+      if (audio.paused) {
+        manualStop = false;
+        await audio.play();
+        updateState("playing");
+      } else {
+        audio.pause();
+        updateState("paused");
+      }
+    } catch (error) {
+      console.error("Audio playback failed:", error);
+      if (status) {
+        status.textContent = "再生できませんでした。時間をおいてもう一度お試しください。";
+      }
+    }
+  });
+
+  stopBtn.addEventListener("click", function () {
+    manualStop = true;
+    audio.pause();
+    audio.currentTime = 0;
+    updateState("stopped");
+  });
+
+  audio.addEventListener("play", function () {
+    updateState("playing");
+  });
+
+  audio.addEventListener("pause", function () {
+    if (manualStop || audio.currentTime === 0) {
+      updateState("stopped");
+      manualStop = false;
+    } else if (!audio.ended) {
+      updateState("paused");
+    }
+  });
+
+  audio.addEventListener("ended", function () {
+    manualStop = false;
+    audio.currentTime = 0;
+    updateState("stopped");
+  });
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && !audio.paused) {
+      audio.pause();
+      updateState("paused");
+    }
+  });
+})();
