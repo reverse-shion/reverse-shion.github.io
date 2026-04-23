@@ -156,30 +156,60 @@
                 </div>
 
                 <p id="safeNote" class="safe-note">
-                  LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。
+                  LINEからご相談いただけます。気持ちがまだ整理しきれていない段階でも大丈夫です。不安を煽るような読み方や、無理な勧誘は行っていません。
                 </p>
               </div>
 
               <div id="musicSection" class="music-box" hidden aria-labelledby="musicTitle">
-                <p class="music-label">for a quiet night</p>
+                <p class="music-label">FOR A QUIET NIGHT</p>
+
                 <h3 id="musicTitle" class="music-title">
                   心が少し重たい夜に、そっと置いておきたい曲
                 </h3>
+
                 <p id="musicText" class="music-text">
-                  言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。
+                  言葉にならない気持ちを抱えたままでも聴けるように。
+                  少し切ないけれど、静かに心へ沈んでいく一曲です。
                 </p>
 
-                <div class="action-row">
-                  <a
-                    id="musicBtn"
+                <div class="music-status-wrap" aria-live="polite">
+                  <p id="musicStatus" class="music-status">まだ再生していません</p>
+                </div>
+
+                <div class="action-row music-action-row">
+                  <button
+                    id="musicPlayBtn"
                     class="btn btn-music"
-                    href="#"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    type="button"
+                    aria-label="音楽を再生"
+                    aria-pressed="false"
                   >
                     今夜の気持ちに、そっとこの曲を聴く
-                  </a>
+                  </button>
+
+                  <button
+                    id="musicStopBtn"
+                    class="btn btn-music-stop"
+                    type="button"
+                    aria-label="音楽を停止"
+                  >
+                    停止する
+                  </button>
                 </div>
+
+                <audio
+                  id="loveThemeAudio"
+                  preload="none"
+                  playsinline
+                  controlsList="nodownload noplaybackrate"
+                  disablePictureInPicture
+                >
+                  <source src="./music/tracks/love-theme.mp3" type="audio/mpeg" />
+                </audio>
+
+                <p class="music-note">
+                  ※ページ内でそのまま再生されます。別画面には移動しません。
+                </p>
               </div>
             </article>
           </div>
