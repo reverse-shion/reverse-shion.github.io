@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7efee" />
+  <title>Re:Verse Shion — 恋愛の星詠ワンカード（無料）</title>
+  <meta
+    name="description"
+    content="あの人の気持ち、既読無視、片想い、復縁、曖昧な関係。恋愛の悩みを一枚のカードからやさしく読み解く、詩韻の無料恋愛占い。"
+  />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="site-shell">
+    <div class="page">
+      <a id="returnLink" class="return-link" href="../tarot369.html">← 総合無料占いへ戻る</a>
+
+      <header class="hero">
+        <div class="eyebrow">LOVE ONE-CARD READING</div>
+        <h1 class="hero-title"><span>恋愛の星詠ワンカード</span></h1>
+
+        <p class="hero-lead">
+          <strong>あの人の気持ちを、一枚のカードからそっと読み解く。</strong>
+          片想い、既読無視、復縁、曖昧な関係。恋で揺れる心に、やわらかな言葉を受け取るための無料ページです。
+        </p>
+
+        <p class="hero-sub">
+          ただ当てるためではなく、相手の気持ちとあなた自身の本音を静かにほどくために。
+          恋が苦しい日に、少し深く呼吸できるような入口をここに置いています。
+        </p>
+
+        <p class="hero-note">
+          こんな気持ちがある日に向いています。返事が来ない理由が知りたい。まだ脈があるのか確かめたい。
+          動くべきか待つべきか迷っている。気持ちを手放すべきか決めきれない。
+        </p>
+      </header>
+
+      <main class="content-stack">
+        <section class="panel" aria-labelledby="startTitle">
+          <div class="panel-label">STEP 1</div>
+          <h2 id="startTitle" class="panel-title">
+            今いちばん気になる恋を、心にひとつ置いてください
+          </h2>
+          <p class="panel-text">
+            あの人の顔や名前、最後のやり取り、今いちばん不安になっていることを静かに思い浮かべてください。
+            準備ができたら、下のボタンからこの恋に届いているメッセージを開けます。
+          </p>
+
+          <div class="action-row">
+            <button id="startBtn" class="btn btn-primary" type="button">
+              この恋に届いている言葉を受け取る
+            </button>
+            <button id="resetBtn" class="btn btn-ghost" type="button" disabled>
+              もう一度ひらく前に戻す
+            </button>
+          </div>
+
+          <p class="micro-copy">
+            無料版でも、今の恋にもっとも強く出ている核心をひとつ受け取れます。
+          </p>
+
+          <p class="hint">
+            ※無料結果では、今の恋に流れている大きな気配を一枚で映します。相手の本音、動く時期、
+            待つべきか進むべきかまで状況に合わせて見たいときは、個人鑑定でさらに深く読み解けます。
+          </p>
+        </section>
+
+        <section id="readingPanel" class="panel" aria-labelledby="readingTitle">
+          <div class="panel-label">STEP 2</div>
+          <h2 id="readingTitle" class="panel-title">今日、この恋に届いた一枚</h2>
+
+          <div class="reading-shell" aria-live="polite">
+            <div id="cardWrap" class="card-wrap">
+              <div class="card">
+                <div class="card-face card-back">
+                  <img
+                    id="cardImage"
+                    class="card-image"
+                    src="../tarot/card-back.webp"
+                    alt="カード裏面"
+                  />
+                </div>
+                <div class="card-face card-front">
+                  <img
+                    class="card-image"
+                    src="../tarot/card-back.webp"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="card-meta">
+              <p id="cardName" class="card-name">カードはまだ静かに伏せられています</p>
+              <p id="cardKeyword" class="card-keyword">恋愛の星詠を始めてください</p>
+            </div>
+
+            <article id="resultCard" class="result-card" hidden>
+              <p class="result-lead">message for your love</p>
+              <p id="mainText" class="result-main"></p>
+              <p id="subText" class="result-sub"></p>
+
+              <div class="bridge-box">
+                <p class="bridge-title">ここから先をもっと知るなら</p>
+                <p id="bridgeText" class="bridge-text"></p>
+              </div>
+
+              <div class="cta-box">
+                <h3 id="ctaTitle" class="cta-title">
+                  相手の本音や、この恋をどう扱えばいいかまで丁寧に知りたいときは
+                </h3>
+                <p class="cta-text">
+                  無料版では、今の恋にもっとも強く届いている核心を一枚で映しています。
+                  ただ、曖昧な関係や返事のない恋ほど、一部分だけでは整理しきれないことがあります。
+                  個人鑑定では、相手の気持ち、流れの変わり目、待つべきか進むべきかまで、
+                  あなたの状況に合わせて丁寧に読み解きます。
+                </p>
+
+                <div class="action-row">
+                  <a
+                    id="ctaBtn"
+                    class="btn btn-secondary"
+                    href="https://lin.ee/LYnlU0f"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    この恋を、個人鑑定で丁寧に読み解く
+                  </a>
+                </div>
+
+                <p id="safeNote" class="safe-note">
+                  LINEからご相談いただけます。不安を煽るような読み方や、無理な勧誘は行っていません。
+                </p>
+              </div>
+
+              <div id="musicSection" class="music-box" hidden>
+                <p class="music-label">for a quiet night</p>
+                <h3 id="musicTitle" class="music-title">
+                  心が少し重たい夜に、そっと置いておきたい曲
+                </h3>
+                <p id="musicText" class="music-text">
+                  言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。
+                </p>
+
+                <div class="action-row">
+                  <a
+                    id="musicBtn"
+                    class="btn btn-music"
+                    href="#"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    今夜の気持ちに、そっとこの曲を聴く
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="trust-box" aria-label="詩韻の恋愛鑑定スタンス">
+          <p class="trust-text">
+            詩韻の恋愛鑑定は、ただ結果を強く言い切るためのものではありません。
+            不安を煽らず、相手の気持ちや関係の流れ、そしてあなた自身の本音をやさしく言葉にしながら、
+            最後は少しでも「大丈夫だよ」と思える場所へ着地することを大切にしています。
+          </p>
+        </section>
+      </main>
+
+      <footer class="footer">
+        &copy; <span id="year"></span> Re:Verse Shion
+      </footer>
+    </div>
+  </div>
+
+  <script src="./data/cards.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
