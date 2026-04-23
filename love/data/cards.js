@@ -1,16 +1,16 @@
-const COMMON_CTA_PATTERNS = [
+window.COMMON_CTA_PATTERNS = [
   "この恋を、個人鑑定で丁寧に見てもらう",
   "あの人の本音と今後を、自分の状況に合わせて相談する",
   "曖昧な関係を、このまま抱えず一度きちんと整理してみる"
 ];
 
-const COMMON_SAFE_PATTERNS = [
+window.COMMON_SAFE_PATTERNS = [
   "LINEからご相談いただけます。まだ相談するか迷っている段階でも大丈夫です。",
   "気持ちがうまくまとまっていなくても大丈夫です。不安を煽るような読み方や、無理な勧誘は行っていません。",
   "一人で抱えてきた気持ちも、そのまま話せます。安心してご相談ください。"
 ];
 
-const BRIDGE_PATTERNS = {
+window.BRIDGE_PATTERNS = {
   ambiguous: [
     "今見えているのは、この恋に今いちばん強く出ているテーマです。ただ、相手の本音や、この先どう動くべきかまで含めると、一枚だけでは見えきらないこともあります。個人鑑定では、あなたの状況に合わせて順番に整理していけます。",
     "曖昧な恋ほど、表面の態度だけでは判断しきれません。背景まで丁寧に見ていくことで、苦しさの正体が少しずつ分かりやすくなります。",
@@ -55,8 +55,8 @@ window.LOVE_CARDS = [
       "追うか離れるかの二択にせず、無理のない接点を残しておくことで、関係は少しずつ育ちやすくなります。",
       "揺れる自分を責めなくて大丈夫です。あなたの想いは重いのではなく、まっすぐです。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "magician",
@@ -74,8 +74,8 @@ window.LOVE_CARDS = [
       "答えを急がせるより、相手が返しやすい一言を置くことが、関係の呼吸を整えます。",
       "相手の反応だけで、自分の価値を決めなくて大丈夫です。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "high-priestess",
@@ -93,8 +93,8 @@ window.LOVE_CARDS = [
       "待つことは何もしないことではありません。心の軸を整えることで、次の一手は変わります。",
       "大切にしたい恋だから揺れるのであって、あなたが弱いからではありません。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "empress",
@@ -112,8 +112,8 @@ window.LOVE_CARDS = [
       "嫌われたくないより、大切にされたいを基準にすると、恋の見え方は少しずつ変わります。",
       "優しさは我慢とは違います。あなたが心地よくいられる恋を選んで大丈夫です。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "emperor",
@@ -131,8 +131,8 @@ window.LOVE_CARDS = [
       "戻りたいだけでなく、戻ってからどうしたいかまで描けると、流れは変わります。",
       "あなたが悪いのではなく、今は優しさに加えて、落ち着いた見極めが必要なだけです。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "hierophant",
@@ -150,8 +150,8 @@ window.LOVE_CARDS = [
       "安心できるやり取りが増えるほど、恋の温度は自然に安定していきます。",
       "派手な愛情表現がなくても、誠実さは別の形で表れることがあります。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "lovers",
@@ -169,8 +169,8 @@ window.LOVE_CARDS = [
       "相手の好意を確かめたい気持ちが強いときほど、自分がどうしたいかも忘れないでください。",
       "心が動いている恋だからこそ、丁寧に育てる価値があります。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "chariot",
@@ -188,8 +188,8 @@ window.LOVE_CARDS = [
       "勢いのある恋ほど、タイミングを見誤ると空回りしやすくなります。",
       "あなたの気持ちが強いこと自体は悪くありません。大切なのは、その力の向け方です。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "strength",
@@ -207,8 +207,8 @@ window.LOVE_CARDS = [
       "あなたが我慢し続けるべきという意味ではなく、感情の扱い方に力があるということです。",
       "揺れながらも相手を思えることは、弱さではなく強さです。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "hermit",
@@ -226,8 +226,8 @@ window.LOVE_CARDS = [
       "今は自分の本音を整理することで、この恋に必要な距離感が分かってきます。",
       "静かな時間は、不安だけでできているわけではありません。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "wheel-of-fortune",
@@ -245,8 +245,8 @@ window.LOVE_CARDS = [
       "今は無理に結果を掴みにいくより、流れが動いたときに受け取れるよう整えておくことが大切です。",
       "悪い流れが続いたからといって、これからも同じとは限りません。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "justice",
@@ -264,8 +264,8 @@ window.LOVE_CARDS = [
       "苦しいのに我慢し続ける関係なら、一度立ち止まる勇気も必要です。",
       "あなたが安心できる恋であっていい。その視点を忘れないでください。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "hanged-man",
@@ -283,8 +283,8 @@ window.LOVE_CARDS = [
       "苦しいのに手放せない恋は、執着ではなく、未消化の想いが残っていることもあります。",
       "あなたが尽くしてきたこと自体は、決して無意味ではありません。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "death",
@@ -302,8 +302,8 @@ window.LOVE_CARDS = [
       "復縁を望む場合も、一度関係の古い痛みを整理することが必要です。",
       "何かが終わるからこそ、あなたが本当に欲しい愛が見えてきます。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "temperance",
@@ -321,8 +321,8 @@ window.LOVE_CARDS = [
       "無理に近づきすぎることも、急に引いてしまうことも、今は避けたいところです。",
       "あなたに必要なのは、完璧な答えではなく、心地よいバランスです。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "devil",
@@ -340,8 +340,8 @@ window.LOVE_CARDS = [
       "執着しているからダメなのではなく、それだけ未消化の想いが深いのかもしれません。",
       "今必要なのは、自分を責めることではなく、絡まった気持ちをほどくことです。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "tower",
@@ -359,8 +359,8 @@ window.LOVE_CARDS = [
       "ショックを受けた直後ほど、相手の言動をひとつの答えとして決めつけすぎないことが大切です。",
       "苦しい出来事が起きたとしても、そこからしか始まらない整理があります。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "star",
@@ -378,8 +378,8 @@ window.LOVE_CARDS = [
       "あなたが信じたいと思える気持ちは、無理に否定しなくて大丈夫です。",
       "希望は依存ではなく、前を向くための灯りになることがあります。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "moon",
@@ -397,8 +397,8 @@ window.LOVE_CARDS = [
       "怖さがあるときほど、自分の不安と相手の本音を分けて考える必要があります。",
       "揺れるのは、あなたがちゃんと傷つくほど大切にしているからです。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "sun",
@@ -416,8 +416,8 @@ window.LOVE_CARDS = [
       "嬉しい流れが出ているときほど、構えすぎないことが大切です。",
       "あなたが笑える恋は、それだけで大切にする価値があります。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "judgement",
@@ -435,8 +435,8 @@ window.LOVE_CARDS = [
       "相手からの反応が来たとき、どう受け取るかで未来が変わります。",
       "あなたの中にも、もう一度向き合いたい気持ちが残っているのかもしれません。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   },
   {
     id: "world",
@@ -454,7 +454,7 @@ window.LOVE_CARDS = [
       "ただし完成とは、必ずしも理想通りになることだけではなく、納得できる着地点を得ることでもあります。",
       "あなたがこの恋から受け取るべきものは、もう近くまで来ています。"
     ],
-    ctaPatterns: COMMON_CTA_PATTERNS,
-    safePatterns: COMMON_SAFE_PATTERNS
+    ctaPatterns: window.COMMON_CTA_PATTERNS,
+    safePatterns: window.COMMON_SAFE_PATTERNS
   }
 ];
