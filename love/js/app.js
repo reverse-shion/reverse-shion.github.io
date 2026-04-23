@@ -1,8 +1,8 @@
 const LOVE_PAGE_CONFIG = {
   consultationUrl: "https://lin.ee/LYnlU0f",
   returnUrl: "../tarot369.html",
-  cardBackImage: "../tarot/card-back.webp",
-  musicIndexUrl: "../music/index.json",
+  cardBackImage: "./tarot/card-back.webp",
+  musicIndexUrl: "./music/index.json",
   fallbackBridgeType: "ambiguous",
 
   defaultCtaTitle: "相手の本音や、この恋をどう扱えばいいかまで丁寧に知りたいときは",
@@ -27,14 +27,14 @@ const LOVE_PAGE_CONFIG = {
   },
 
   fallbackMusicTrack: {
-  slug: "love-theme",
-  title: "心が少し重たい夜に、そっと置いておきたい曲",
-  description:
-    "言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。",
-  src: "../music/tracks/love-theme.mp3",
-  buttonLabel: "今夜の気持ちに、そっとこの曲を聴く",
-  mood: "quiet-night"
-}
+    slug: "love-theme",
+    title: "心が少し重たい夜に、そっと置いておきたい曲",
+    description:
+      "言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。",
+    src: "./music/tracks/love-theme.mp3",
+    buttonLabel: "今夜の気持ちに、そっとこの曲を聴く",
+    mood: "quiet-night"
+  }
 };
 
 function byId(id) {
@@ -151,7 +151,7 @@ function resolveCardImage(card) {
     throw new Error("カード画像パスを解決できません。slug が不足しています。");
   }
 
-  return `../tarot/${card.slug}.webp`;
+  return `./tarot/${card.slug}.webp`;
 }
 
 function clearTimers() {
@@ -358,8 +358,10 @@ function renderReadingContent(card) {
   elements.mainText.textContent = pickRandom(card.mainPatterns);
   elements.subText.textContent = pickRandom(card.subPatterns);
   elements.bridgeText.textContent = pickRandom(bridgePatterns);
-  elements.ctaBtn.textContent = pickRandom(card.ctaPatterns) || LOVE_PAGE_CONFIG.defaultCtaButtonLabel;
-  elements.safeNote.textContent = pickRandom(card.safePatterns) || LOVE_PAGE_CONFIG.defaultSafeNote;
+  elements.ctaBtn.textContent =
+    pickRandom(card.ctaPatterns) || LOVE_PAGE_CONFIG.defaultCtaButtonLabel;
+  elements.safeNote.textContent =
+    pickRandom(card.safePatterns) || LOVE_PAGE_CONFIG.defaultSafeNote;
   elements.ctaTitle.textContent = LOVE_PAGE_CONFIG.defaultCtaTitle;
 }
 
