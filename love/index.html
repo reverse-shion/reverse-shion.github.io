@@ -9,6 +9,8 @@
     name="description"
     content="あの人の気持ち、既読無視、片想い、復縁、曖昧な関係。恋愛の悩みを一枚のカードからやさしく読み解く、詩韻の無料恋愛占い。"
   />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="color-scheme" content="light" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,9 +26,11 @@
     <div class="page">
       <a id="returnLink" class="return-link" href="../tarot369.html">← 総合無料占いへ戻る</a>
 
-      <header class="hero">
+      <header class="hero" aria-labelledby="pageTitle">
         <div class="eyebrow">LOVE ONE-CARD READING</div>
-        <h1 class="hero-title"><span>恋愛の星詠ワンカード</span></h1>
+        <h1 id="pageTitle" class="hero-title">
+          <span>恋愛の星詠ワンカード</span>
+        </h1>
 
         <p class="hero-lead">
           <strong>あの人の気持ちを、一枚のカードからそっと読み解く。</strong>
@@ -44,7 +48,7 @@
         </p>
       </header>
 
-      <main class="content-stack">
+      <main id="mainContent" class="content-stack">
         <section class="panel" aria-labelledby="startTitle">
           <div class="panel-label">STEP 1</div>
           <h2 id="startTitle" class="panel-title">
@@ -55,11 +59,22 @@
             準備ができたら、下のボタンからこの恋に届いているメッセージを開けます。
           </p>
 
-          <div class="action-row">
-            <button id="startBtn" class="btn btn-primary" type="button">
+          <div class="action-row" role="group" aria-label="カードを開く操作">
+            <button
+              id="startBtn"
+              class="btn btn-primary"
+              type="button"
+              aria-controls="resultCard"
+            >
               この恋に届いている言葉を受け取る
             </button>
-            <button id="resetBtn" class="btn btn-ghost" type="button" disabled>
+            <button
+              id="resetBtn"
+              class="btn btn-ghost"
+              type="button"
+              disabled
+              aria-controls="resultCard"
+            >
               もう一度ひらく前に戻す
             </button>
           </div>
@@ -78,10 +93,22 @@
           <div class="panel-label">STEP 2</div>
           <h2 id="readingTitle" class="panel-title">今日、この恋に届いた一枚</h2>
 
-          <div class="reading-shell" aria-live="polite">
-            <div id="cardWrap" class="card-wrap">
+          <div class="reading-shell">
+            <div
+              id="cardWrap"
+              class="card-wrap"
+              aria-live="polite"
+              aria-label="引かれたカード"
+            >
               <div class="card">
-                <div class="card-face card-back">
+                <div class="card-face card-back" aria-hidden="true">
+                  <img
+                    class="card-image"
+                    src="../tarot/card-back.webp"
+                    alt=""
+                  />
+                </div>
+                <div class="card-face card-front">
                   <img
                     id="cardImage"
                     class="card-image"
@@ -89,24 +116,22 @@
                     alt="カード裏面"
                   />
                 </div>
-                <div class="card-face card-front">
-                  <img
-                    class="card-image"
-                    src="../tarot/card-back.webp"
-                    alt=""
-                    aria-hidden="true"
-                  />
-                </div>
               </div>
             </div>
 
-            <div class="card-meta">
+            <div class="card-meta" aria-live="polite">
               <p id="cardName" class="card-name">カードはまだ静かに伏せられています</p>
               <p id="cardKeyword" class="card-keyword">恋愛の星詠を始めてください</p>
             </div>
 
-            <article id="resultCard" class="result-card" hidden>
-              <p class="result-lead">message for your love</p>
+            <article
+              id="resultCard"
+              class="result-card"
+              hidden
+              aria-live="polite"
+              aria-labelledby="resultLead"
+            >
+              <p id="resultLead" class="result-lead">message for your love</p>
               <p id="mainText" class="result-main"></p>
               <p id="subText" class="result-sub"></p>
 
@@ -115,7 +140,7 @@
                 <p id="bridgeText" class="bridge-text"></p>
               </div>
 
-              <div class="cta-box">
+              <div class="cta-box" aria-labelledby="ctaTitle">
                 <h3 id="ctaTitle" class="cta-title">
                   相手の本音や、この恋をどう扱えばいいかまで丁寧に知りたいときは
                 </h3>
@@ -132,7 +157,7 @@
                     class="btn btn-secondary"
                     href="https://lin.ee/LYnlU0f"
                     target="_blank"
-                    rel="noopener"
+                    rel="noopener noreferrer"
                   >
                     この恋を、個人鑑定で丁寧に読み解く
                   </a>
@@ -143,7 +168,7 @@
                 </p>
               </div>
 
-              <div id="musicSection" class="music-box" hidden>
+              <div id="musicSection" class="music-box" hidden aria-labelledby="musicTitle">
                 <p class="music-label">for a quiet night</p>
                 <h3 id="musicTitle" class="music-title">
                   心が少し重たい夜に、そっと置いておきたい曲
@@ -158,7 +183,7 @@
                     class="btn btn-music"
                     href="#"
                     target="_blank"
-                    rel="noopener"
+                    rel="noopener noreferrer"
                   >
                     今夜の気持ちに、そっとこの曲を聴く
                   </a>
@@ -182,6 +207,12 @@
       </footer>
     </div>
   </div>
+
+  <noscript>
+    <div style="max-width: 720px; margin: 16px auto; padding: 12px 14px; font-size: 14px; line-height: 1.8; color: #5a434d;">
+      このページのワンカード表示には JavaScript を使用しています。読み込みできない場合は、時間をおいて再度開いてみてください。
+    </div>
+  </noscript>
 
   <script src="./data/cards.js"></script>
   <script src="./js/app.js"></script>
