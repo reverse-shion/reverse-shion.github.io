@@ -2,7 +2,9 @@ const LOVE_PAGE_CONFIG = {
   consultationUrl: "https://lin.ee/LYnlU0f",
   returnUrl: "../tarot369.html",
   cardBackImage: "../tarot/card-back.webp",
+  musicIndexUrl: "../music/index.json",
   fallbackBridgeType: "ambiguous",
+
   defaultCtaTitle: "相手の本音や、この恋をどう扱えばいいかまで丁寧に知りたいときは",
   defaultCardName: "カードはまだ静かに伏せられています",
   defaultCardKeyword: "恋愛の星詠を始めてください",
@@ -10,17 +12,16 @@ const LOVE_PAGE_CONFIG = {
   redrawButtonLabel: "もう一度、この恋の言葉を受け取る",
   defaultCtaButtonLabel: "この恋を、個人鑑定で丁寧に見てもらう",
   defaultSafeNote: "LINEからご相談いただけます。まだ相談するか迷っている段階でも大丈夫です。",
-  music: [
-    {
-      slug: "love-theme",
-      title: "心が少し重たい夜に、そっと置いておきたい曲",
-      description:
-        "言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。",
-      href: "#",
-      buttonLabel: "今夜の気持ちに、そっとこの曲を聴く",
-      mood: "quiet-night"
-    }
-  ]
+
+  fallbackMusicTrack: {
+    slug: "love-theme",
+    title: "心が少し重たい夜に、そっと置いておきたい曲",
+    description:
+      "言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。",
+    href: "../music/tracks/love-theme.mp3",
+    buttonLabel: "今夜の気持ちに、そっとこの曲を聴く",
+    mood: "quiet-night"
+  }
 };
 
 function byId(id) {
@@ -40,14 +41,14 @@ const state = {
   flipTimerId: null,
   scrollTimerId: null,
   lastCardSlug: null,
-  hasDrawn: false
+  hasDrawn: false,
+  musicTracks: []
 };
 
 const elements = {
   year: byId("year"),
   returnLink: byId("returnLink"),
   startBtn: byId("startBtn"),
-  resetBtn: byId("resetBtn"),
   cardWrap: byId("cardWrap"),
   cardImage: byId("cardImage"),
   cardName: byId("cardName"),
@@ -85,17 +86,22 @@ function getCards() {
 }
 
 function getBridgePatternSet(type) {
-  if (typeof window.BRIDGE_PATTERNS === "undefined" || !window.BRIDGE_PATTERNS) {
+  if (!window.BRIDGE_PATTERNS || typeof window.BRIDGE_PATTERNS !== "object") {
     throw new Error("cards.js 内の BRIDGE_PATTERNS が読み込まれていません。");
   }
 
   const bridgeType = type || LOVE_PAGE_CONFIG.fallbackBridgeType;
   const patterns = window.BRIDGE_PATTERNS[bridgeType];
 
-  if (isNonEmptyArray(patterns)) return patterns;
+  if (isNonEmptyArray(patterns)) {
+    return patterns;
+  }
 
   const fallbackPatterns = window.BRIDGE_PATTERNS[LOVE_PAGE_CONFIG.fallbackBridgeType];
-  if (isNonEmptyArray(fallbackPatterns)) return fallbackPatterns;
+
+  if (isNonEmptyArray(fallbackPatterns)) {
+    return fallbackPatterns;
+  }
 
   throw new Error("BRIDGE_PATTERNS の設定が不足しています。");
 }
@@ -160,15 +166,15 @@ function showReadingResult() {
     elements.resultCard.classList.add("is-visible");
   });
 
-  elements.musicSection.hidden = false;
+  if (elements.musicTitle.textContent.trim()) {
+    elements.musicSection.hidden = false;
+  }
 }
 
-function updateActionLabels(isAfterDraw) {
+function updateActionLabel(isAfterDraw) {
   elements.startBtn.textContent = isAfterDraw
     ? LOVE_PAGE_CONFIG.redrawButtonLabel
     : LOVE_PAGE_CONFIG.startButtonLabel;
-
-  elements.resetBtn.disabled = !isAfterDraw;
 }
 
 function chooseNextCard(cards) {
@@ -187,9 +193,57 @@ function chooseNextCard(cards) {
   return nextCard;
 }
 
+function normalizeTrack(rawTrack) {
+  if (!rawTrack || typeof rawTrack !== "object") {
+    return null;
+  }
+
+  const href =
+    typeof rawTrack.href === "string" && rawTrack.href.trim()
+      ? rawTrack.href.trim()
+      : LOVE_PAGE_CONFIG.fallbackMusicTrack.href;
+
+  return {
+    slug: rawTrack.slug || LOVE_PAGE_CONFIG.fallbackMusicTrack.slug,
+    title: rawTrack.title || LOVE_PAGE_CONFIG.fallbackMusicTrack.title,
+    description: rawTrack.description || LOVE_PAGE_CONFIG.fallbackMusicTrack.description,
+    href,
+    buttonLabel: rawTrack.buttonLabel || LOVE_PAGE_CONFIG.fallbackMusicTrack.buttonLabel,
+    mood: rawTrack.mood || LOVE_PAGE_CONFIG.fallbackMusicTrack.mood
+  };
+}
+
+async function loadMusicTracks() {
+  try {
+    const response = await fetch(LOVE_PAGE_CONFIG.musicIndexUrl, {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(`music/index.json の取得に失敗しました: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!isNonEmptyArray(data)) {
+      throw new Error("music/index.json の形式が不正です。");
+    }
+
+    state.musicTracks = data
+      .map(normalizeTrack)
+      .filter(Boolean);
+  } catch (error) {
+    console.warn("音楽データの読み込みに失敗したため、フォールバック設定を使用します。", error);
+    state.musicTracks = [LOVE_PAGE_CONFIG.fallbackMusicTrack];
+  }
+}
+
 function getTrack() {
-  if (!isNonEmptyArray(LOVE_PAGE_CONFIG.music)) return null;
-  return LOVE_PAGE_CONFIG.music[0];
+  if (isNonEmptyArray(state.musicTracks)) {
+    return state.musicTracks[0];
+  }
+
+  return LOVE_PAGE_CONFIG.fallbackMusicTrack;
 }
 
 function renderTrack() {
@@ -203,7 +257,7 @@ function renderTrack() {
   elements.musicTitle.textContent = track.title || "";
   elements.musicText.textContent = track.description || "";
   elements.musicBtn.textContent = track.buttonLabel || "この曲を聴く";
-  elements.musicBtn.href = track.href || "#";
+  elements.musicBtn.href = track.href || LOVE_PAGE_CONFIG.fallbackMusicTrack.href;
   elements.musicBtn.setAttribute("aria-label", `${track.title || "楽曲"} を開く`);
 }
 
@@ -244,7 +298,7 @@ function drawReading() {
     animateCardFlip();
 
     state.hasDrawn = true;
-    updateActionLabels(true);
+    updateActionLabel(true);
 
     state.scrollTimerId = window.setTimeout(() => {
       scrollToReadingPanel();
@@ -255,17 +309,6 @@ function drawReading() {
   }
 }
 
-function resetReading() {
-  clearTimers();
-
-  state.hasDrawn = false;
-  setDefaultCardState();
-  setDefaultResultTextState();
-  hideReadingResult();
-  updateActionLabels(false);
-  scrollToReadingPanel();
-}
-
 function initStaticContent() {
   elements.year.textContent = new Date().getFullYear();
   elements.returnLink.href = LOVE_PAGE_CONFIG.returnUrl;
@@ -274,18 +317,18 @@ function initStaticContent() {
   setDefaultCardState();
   setDefaultResultTextState();
   hideReadingResult();
-  updateActionLabels(false);
+  updateActionLabel(false);
   renderTrack();
 }
 
 function bindEvents() {
   elements.startBtn.addEventListener("click", drawReading);
-  elements.resetBtn.addEventListener("click", resetReading);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   try {
     assertRequiredElements();
+    await loadMusicTracks();
     initStaticContent();
     bindEvents();
   } catch (error) {
