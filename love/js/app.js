@@ -2,7 +2,7 @@ const LOVE_PAGE_CONFIG = {
   consultationUrl: "https://lin.ee/LYnlU0f",
   returnUrl: "../tarot369.html",
   cardBackImage: "../tarot/card-back.webp",
-  musicIndexUrl: "../music/index.json",
+  musicIndexUrl: "./music/index.json",
   fallbackBridgeType: "ambiguous",
 
   defaultCtaTitle: "相手の本音や、この恋をどう扱えばいいかまで丁寧に知りたいときは",
@@ -13,12 +13,25 @@ const LOVE_PAGE_CONFIG = {
   defaultCtaButtonLabel: "この恋を、個人鑑定で丁寧に見てもらう",
   defaultSafeNote: "LINEからご相談いただけます。まだ相談するか迷っている段階でも大丈夫です。",
 
+  musicLabels: {
+    default: "今夜の気持ちに、そっとこの曲を聴く",
+    playing: "静かに再生しています",
+    paused: "もう一度聴く"
+  },
+
+  musicStatusText: {
+    default: "まだ再生していません",
+    playing: "再生中です",
+    paused: "一時停止しています",
+    error: "再生できませんでした。時間をおいてもう一度お試しください。"
+  },
+
   fallbackMusicTrack: {
     slug: "love-theme",
     title: "心が少し重たい夜に、そっと置いておきたい曲",
     description:
       "言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。",
-    href: "../music/tracks/love-theme.mp3",
+    src: "./music/tracks/love-theme.mp3",
     buttonLabel: "今夜の気持ちに、そっとこの曲を聴く",
     mood: "quiet-night"
   }
@@ -42,7 +55,8 @@ const state = {
   scrollTimerId: null,
   lastCardSlug: null,
   hasDrawn: false,
-  musicTracks: []
+  musicTracks: [],
+  manualMusicStop: false
 };
 
 const elements = {
@@ -63,14 +77,40 @@ const elements = {
   musicSection: byId("musicSection"),
   musicTitle: byId("musicTitle"),
   musicText: byId("musicText"),
-  musicBtn: byId("musicBtn"),
+  musicStatus: byId("musicStatus"),
+  musicPlayBtn: byId("musicPlayBtn"),
+  musicStopBtn: byId("musicStopBtn"),
+  loveThemeAudio: byId("loveThemeAudio"),
   readingPanel: byId("readingPanel")
 };
 
 function assertRequiredElements() {
-  const missing = Object.entries(elements)
-    .filter(([, value]) => !value)
-    .map(([key]) => key);
+  const requiredKeys = [
+    "year",
+    "returnLink",
+    "startBtn",
+    "cardWrap",
+    "cardImage",
+    "cardName",
+    "cardKeyword",
+    "resultCard",
+    "mainText",
+    "subText",
+    "bridgeText",
+    "ctaTitle",
+    "ctaBtn",
+    "safeNote",
+    "musicSection",
+    "musicTitle",
+    "musicText",
+    "musicStatus",
+    "musicPlayBtn",
+    "musicStopBtn",
+    "loveThemeAudio",
+    "readingPanel"
+  ];
+
+  const missing = requiredKeys.filter((key) => !elements[key]);
 
   if (missing.length > 0) {
     throw new Error(`必要なHTML要素が見つかりません: ${missing.join(", ")}`);
@@ -127,8 +167,6 @@ function clearTimers() {
 }
 
 function scrollToReadingPanel() {
-  if (!elements.readingPanel) return;
-
   elements.readingPanel.scrollIntoView({
     behavior: "smooth",
     block: "start"
@@ -198,16 +236,18 @@ function normalizeTrack(rawTrack) {
     return null;
   }
 
-  const href =
-    typeof rawTrack.href === "string" && rawTrack.href.trim()
+  const src =
+    typeof rawTrack.src === "string" && rawTrack.src.trim()
+      ? rawTrack.src.trim()
+      : typeof rawTrack.href === "string" && rawTrack.href.trim()
       ? rawTrack.href.trim()
-      : LOVE_PAGE_CONFIG.fallbackMusicTrack.href;
+      : LOVE_PAGE_CONFIG.fallbackMusicTrack.src;
 
   return {
     slug: rawTrack.slug || LOVE_PAGE_CONFIG.fallbackMusicTrack.slug,
     title: rawTrack.title || LOVE_PAGE_CONFIG.fallbackMusicTrack.title,
     description: rawTrack.description || LOVE_PAGE_CONFIG.fallbackMusicTrack.description,
-    href,
+    src,
     buttonLabel: rawTrack.buttonLabel || LOVE_PAGE_CONFIG.fallbackMusicTrack.buttonLabel,
     mood: rawTrack.mood || LOVE_PAGE_CONFIG.fallbackMusicTrack.mood
   };
@@ -225,13 +265,17 @@ async function loadMusicTracks() {
 
     const data = await response.json();
 
-    if (!isNonEmptyArray(data)) {
+    const trackList = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.tracks)
+      ? data.tracks
+      : null;
+
+    if (!isNonEmptyArray(trackList)) {
       throw new Error("music/index.json の形式が不正です。");
     }
 
-    state.musicTracks = data
-      .map(normalizeTrack)
-      .filter(Boolean);
+    state.musicTracks = trackList.map(normalizeTrack).filter(Boolean);
   } catch (error) {
     console.warn("音楽データの読み込みに失敗したため、フォールバック設定を使用します。", error);
     state.musicTracks = [LOVE_PAGE_CONFIG.fallbackMusicTrack];
@@ -246,6 +290,39 @@ function getTrack() {
   return LOVE_PAGE_CONFIG.fallbackMusicTrack;
 }
 
+function updateMusicUiState(mode) {
+  elements.musicPlayBtn.classList.toggle("is-playing", mode === "playing");
+  elements.musicPlayBtn.setAttribute("aria-pressed", mode === "playing" ? "true" : "false");
+
+  if (mode === "playing") {
+    elements.musicPlayBtn.textContent = LOVE_PAGE_CONFIG.musicLabels.playing;
+    elements.musicStatus.textContent = LOVE_PAGE_CONFIG.musicStatusText.playing;
+    return;
+  }
+
+  if (mode === "paused") {
+    elements.musicPlayBtn.textContent = LOVE_PAGE_CONFIG.musicLabels.paused;
+    elements.musicStatus.textContent = LOVE_PAGE_CONFIG.musicStatusText.paused;
+    return;
+  }
+
+  if (mode === "error") {
+    elements.musicPlayBtn.textContent = LOVE_PAGE_CONFIG.musicLabels.default;
+    elements.musicStatus.textContent = LOVE_PAGE_CONFIG.musicStatusText.error;
+    return;
+  }
+
+  elements.musicPlayBtn.textContent = LOVE_PAGE_CONFIG.musicLabels.default;
+  elements.musicStatus.textContent = LOVE_PAGE_CONFIG.musicStatusText.default;
+}
+
+function stopAndResetAudio() {
+  state.manualMusicStop = true;
+  elements.loveThemeAudio.pause();
+  elements.loveThemeAudio.currentTime = 0;
+  updateMusicUiState("default");
+}
+
 function renderTrack() {
   const track = getTrack();
 
@@ -256,9 +333,18 @@ function renderTrack() {
 
   elements.musicTitle.textContent = track.title || "";
   elements.musicText.textContent = track.description || "";
-  elements.musicBtn.textContent = track.buttonLabel || "この曲を聴く";
-  elements.musicBtn.href = track.href || LOVE_PAGE_CONFIG.fallbackMusicTrack.href;
-  elements.musicBtn.setAttribute("aria-label", `${track.title || "楽曲"} を開く`);
+  elements.musicPlayBtn.textContent = track.buttonLabel || LOVE_PAGE_CONFIG.musicLabels.default;
+  elements.musicPlayBtn.setAttribute("aria-label", `${track.title || "楽曲"} を再生`);
+
+  const sourceEl = elements.loveThemeAudio.querySelector("source");
+  if (sourceEl) {
+    sourceEl.src = track.src || LOVE_PAGE_CONFIG.fallbackMusicTrack.src;
+    elements.loveThemeAudio.load();
+  } else {
+    elements.loveThemeAudio.src = track.src || LOVE_PAGE_CONFIG.fallbackMusicTrack.src;
+  }
+
+  updateMusicUiState("default");
 }
 
 function renderReadingContent(card) {
@@ -269,12 +355,11 @@ function renderReadingContent(card) {
   elements.cardImage.alt = `${card.nameJa}のカード画像`;
   elements.cardName.textContent = card.nameJa || "";
   elements.cardKeyword.textContent = card.keyword || "";
-
   elements.mainText.textContent = pickRandom(card.mainPatterns);
   elements.subText.textContent = pickRandom(card.subPatterns);
   elements.bridgeText.textContent = pickRandom(bridgePatterns);
-  elements.ctaBtn.textContent = pickRandom(card.ctaPatterns);
-  elements.safeNote.textContent = pickRandom(card.safePatterns);
+  elements.ctaBtn.textContent = pickRandom(card.ctaPatterns) || LOVE_PAGE_CONFIG.defaultCtaButtonLabel;
+  elements.safeNote.textContent = pickRandom(card.safePatterns) || LOVE_PAGE_CONFIG.defaultSafeNote;
   elements.ctaTitle.textContent = LOVE_PAGE_CONFIG.defaultCtaTitle;
 }
 
@@ -289,6 +374,7 @@ function animateCardFlip() {
 function drawReading() {
   try {
     clearTimers();
+    stopAndResetAudio();
 
     const cards = getCards();
     const card = chooseNextCard(cards);
@@ -316,13 +402,66 @@ function initStaticContent() {
 
   setDefaultCardState();
   setDefaultResultTextState();
+  renderTrack();
   hideReadingResult();
   updateActionLabel(false);
-  renderTrack();
 }
 
-function bindEvents() {
+function bindReadingEvents() {
   elements.startBtn.addEventListener("click", drawReading);
+}
+
+function bindMusicEvents() {
+  const audio = elements.loveThemeAudio;
+
+  elements.musicPlayBtn.addEventListener("click", async () => {
+    try {
+      if (audio.paused) {
+        state.manualMusicStop = false;
+        await audio.play();
+        updateMusicUiState("playing");
+      } else {
+        audio.pause();
+        updateMusicUiState("paused");
+      }
+    } catch (error) {
+      console.error("Audio playback failed:", error);
+      updateMusicUiState("error");
+    }
+  });
+
+  elements.musicStopBtn.addEventListener("click", () => {
+    stopAndResetAudio();
+  });
+
+  audio.addEventListener("play", () => {
+    updateMusicUiState("playing");
+  });
+
+  audio.addEventListener("pause", () => {
+    if (state.manualMusicStop || audio.currentTime === 0) {
+      updateMusicUiState("default");
+      state.manualMusicStop = false;
+      return;
+    }
+
+    if (!audio.ended) {
+      updateMusicUiState("paused");
+    }
+  });
+
+  audio.addEventListener("ended", () => {
+    state.manualMusicStop = false;
+    audio.currentTime = 0;
+    updateMusicUiState("default");
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && !audio.paused) {
+      audio.pause();
+      updateMusicUiState("paused");
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -330,96 +469,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     assertRequiredElements();
     await loadMusicTracks();
     initStaticContent();
-    bindEvents();
+    bindReadingEvents();
+    bindMusicEvents();
   } catch (error) {
     console.error(error);
   }
 });
-
-(function () {
-  const audio = document.getElementById("loveThemeAudio");
-  const playBtn = document.getElementById("musicPlayBtn");
-  const stopBtn = document.getElementById("musicStopBtn");
-  const status = document.getElementById("musicStatus");
-
-  if (!audio || !playBtn || !stopBtn) return;
-
-  const DEFAULT_LABEL = "今夜の気持ちに、そっとこの曲を聴く";
-  const PLAYING_LABEL = "静かに再生しています";
-  const PAUSED_LABEL = "もう一度聴く";
-  let manualStop = false;
-
-  function updateState(mode) {
-    if (mode === "playing") {
-      playBtn.classList.add("is-playing");
-      playBtn.setAttribute("aria-pressed", "true");
-      playBtn.textContent = PLAYING_LABEL;
-      if (status) status.textContent = "再生中です";
-      return;
-    }
-
-    if (mode === "paused") {
-      playBtn.classList.remove("is-playing");
-      playBtn.setAttribute("aria-pressed", "false");
-      playBtn.textContent = PAUSED_LABEL;
-      if (status) status.textContent = "一時停止しています";
-      return;
-    }
-
-    playBtn.classList.remove("is-playing");
-    playBtn.setAttribute("aria-pressed", "false");
-    playBtn.textContent = DEFAULT_LABEL;
-    if (status) status.textContent = "まだ再生していません";
-  }
-
-  playBtn.addEventListener("click", async function () {
-    try {
-      if (audio.paused) {
-        manualStop = false;
-        await audio.play();
-        updateState("playing");
-      } else {
-        audio.pause();
-        updateState("paused");
-      }
-    } catch (error) {
-      console.error("Audio playback failed:", error);
-      if (status) {
-        status.textContent = "再生できませんでした。時間をおいてもう一度お試しください。";
-      }
-    }
-  });
-
-  stopBtn.addEventListener("click", function () {
-    manualStop = true;
-    audio.pause();
-    audio.currentTime = 0;
-    updateState("stopped");
-  });
-
-  audio.addEventListener("play", function () {
-    updateState("playing");
-  });
-
-  audio.addEventListener("pause", function () {
-    if (manualStop || audio.currentTime === 0) {
-      updateState("stopped");
-      manualStop = false;
-    } else if (!audio.ended) {
-      updateState("paused");
-    }
-  });
-
-  audio.addEventListener("ended", function () {
-    manualStop = false;
-    audio.currentTime = 0;
-    updateState("stopped");
-  });
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden && !audio.paused) {
-      audio.pause();
-      updateState("paused");
-    }
-  });
-})();
