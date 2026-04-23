@@ -2,7 +2,7 @@ const LOVE_PAGE_CONFIG = {
   consultationUrl: "https://lin.ee/LYnlU0f",
   returnUrl: "../tarot369.html",
   cardBackImage: "../tarot/card-back.webp",
-  musicIndexUrl: "./music/index.json",
+  musicIndexUrl: "music/index.json",
   fallbackBridgeType: "ambiguous",
 
   defaultCtaTitle: "相手の本音や、この恋をどう扱えばいいかまで丁寧に知りたいときは",
