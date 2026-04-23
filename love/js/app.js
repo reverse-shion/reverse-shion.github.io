@@ -27,14 +27,14 @@ const LOVE_PAGE_CONFIG = {
   },
 
   fallbackMusicTrack: {
-    slug: "love-theme",
-    title: "心が少し重たい夜に、そっと置いておきたい曲",
-    description:
-      "言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。",
-    src: "music/tracks/love-theme.mp3",
-    buttonLabel: "今夜の気持ちに、そっとこの曲を聴く",
-    mood: "quiet-night"
-  }
+  slug: "love-theme",
+  title: "心が少し重たい夜に、そっと置いておきたい曲",
+  description:
+    "言葉にならない気持ちを抱えたままでも聴けるように。少し切ないけれど、静かに心へ沈んでいく一曲です。",
+  src: "../music/tracks/love-theme.mp3",
+  buttonLabel: "今夜の気持ちに、そっとこの曲を聴く",
+  mood: "quiet-night"
+}
 };
 
 function byId(id) {
