@@ -11,7 +11,45 @@ const LOVE_PAGE_CONFIG = {
   startButtonLabel: "この恋に届いている言葉を受け取る",
   redrawButtonLabel: "もう一度、この恋の言葉を受け取る",
   defaultCtaButtonLabel: "この恋を、個人鑑定で丁寧に見てもらう",
-  defaultSafeNote: "LINEからご相談いただけます。まだ相談するか迷っている段階でも大丈夫です。",
+  defaultSafeNote:
+    "LINEからご相談いただけます。まだ相談するか迷っている段階でも大丈夫です。気持ちがまとまっていなくても、そのまま話せます。",
+
+  concernIntro: {
+    default:
+      "あの人の顔や名前、最後のやり取り、いちばん引っかかっている言葉、そして今いちばん不安になっていることを静かに思い浮かべてください。準備ができたら、下のボタンからこの恋に届いているメッセージを開けます。",
+    既読無視:
+      "最後に送った言葉、返事を待っている時間、既読がついたまま動かない画面。その中でいちばん苦しくなっている気持ちを、静かにここへ置いてください。",
+    相手の気持ち:
+      "あの人が今どんな気持ちでいるのか、あなたをどう見ているのか。知りたい本音をひとつだけ心に置いて、カードを開いてください。",
+    復縁:
+      "もう一度つながれる可能性、相手の中に残っている気持ち、今動くべきか待つべきか。その不安をひとつ、静かにカードへ預けてください。",
+    曖昧な関係:
+      "はっきりしない関係、言葉にされない距離感、期待していいのか分からない不安。その曖昧さの中にある本音を、カードで整理していきます。"
+  },
+
+  concernHint: {
+    default:
+      "※このページでは、今の恋に流れている大きな気配を一枚で映します。相手の本音、流れの変わり目、待つべきか進むべきかまで状況に合わせて整理したいときは、個人鑑定でさらに深く読み解けます。",
+    既読無視:
+      "※既読無視の背景には、相手の状況・気持ち・距離の取り方が重なっていることがあります。無料版では今いちばん強い気配を一枚で映し、個人鑑定では連絡の意味や次の動き方まで丁寧に整理します。",
+    相手の気持ち:
+      "※相手の気持ちは、言葉だけでは見えにくいことがあります。無料版では今の気持ちの傾きを一枚で映し、個人鑑定では関係の流れや今後の可能性まで深く読み解きます。",
+    復縁:
+      "※復縁は、可能性だけでなくタイミングと心の整え方が大切です。無料版では今の流れを一枚で映し、個人鑑定では相手の未練や再接近のきっかけまで整理します。",
+    曖昧な関係:
+      "※曖昧な関係ほど、一部分だけでは判断しきれないことがあります。無料版では今の関係の空気を一枚で映し、個人鑑定では相手の本音とあなたの守るべき境界線まで見ていきます。"
+  },
+
+  concernBridgePrefix: {
+    既読無視:
+      "既読無視が続くと、どうしても自分だけが置いていかれたように感じやすくなります。",
+    相手の気持ち:
+      "相手の気持ちを知りたいときほど、自分の心も揺れやすくなります。",
+    復縁:
+      "復縁を望む気持ちは、過去を戻したいだけでなく、まだ大切にしたい想いがある証です。",
+    曖昧な関係:
+      "曖昧な関係は、期待と不安が同時に育ちやすい場所です。"
+  },
 
   musicLabels: {
     default: "今夜の気持ちに、そっとこの曲を聴く",
@@ -50,11 +88,17 @@ function pickRandom(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+function normalizeText(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 const state = {
   flipTimerId: null,
   scrollTimerId: null,
+  stickyTimerIds: [],
   lastCardSlug: null,
   hasDrawn: false,
+  selectedConcern: "default",
   musicTracks: [],
   manualMusicStop: false
 };
@@ -62,18 +106,24 @@ const state = {
 const elements = {
   year: byId("year"),
   returnLink: byId("returnLink"),
+
   startBtn: byId("startBtn"),
+  concernLinks: Array.from(document.querySelectorAll(".concern-chips a")),
+
   cardWrap: byId("cardWrap"),
   cardImage: byId("cardImage"),
   cardName: byId("cardName"),
   cardKeyword: byId("cardKeyword"),
+
   resultCard: byId("resultCard"),
   mainText: byId("mainText"),
   subText: byId("subText"),
   bridgeText: byId("bridgeText"),
+
   ctaTitle: byId("ctaTitle"),
   ctaBtn: byId("ctaBtn"),
   safeNote: byId("safeNote"),
+
   musicSection: byId("musicSection"),
   musicTitle: byId("musicTitle"),
   musicText: byId("musicText"),
@@ -81,7 +131,13 @@ const elements = {
   musicPlayBtn: byId("musicPlayBtn"),
   musicStopBtn: byId("musicStopBtn"),
   loveThemeAudio: byId("loveThemeAudio"),
-  readingPanel: byId("readingPanel")
+
+  readingPanel: byId("readingPanel"),
+  startTitle: byId("startTitle"),
+  panelText: document.querySelector('[aria-labelledby="startTitle"] .panel-text'),
+  hint: document.querySelector('[aria-labelledby="startTitle"] .hint'),
+
+  stickyConsult: byId("stickyConsult")
 };
 
 function assertRequiredElements() {
@@ -107,7 +163,10 @@ function assertRequiredElements() {
     "musicPlayBtn",
     "musicStopBtn",
     "loveThemeAudio",
-    "readingPanel"
+    "readingPanel",
+    "startTitle",
+    "panelText",
+    "hint"
   ];
 
   const missing = requiredKeys.filter((key) => !elements[key]);
@@ -164,6 +223,14 @@ function clearTimers() {
     window.clearTimeout(state.scrollTimerId);
     state.scrollTimerId = null;
   }
+
+  state.stickyTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  state.stickyTimerIds = [];
+}
+
+function queueStickyCheck(delay) {
+  const timerId = window.setTimeout(updateStickyConsult, delay);
+  state.stickyTimerIds.push(timerId);
 }
 
 function scrollToReadingPanel() {
@@ -171,6 +238,30 @@ function scrollToReadingPanel() {
     behavior: "smooth",
     block: "start"
   });
+}
+
+function scrollToStartPanel() {
+  elements.startTitle.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function setSelectedConcern(concern) {
+  const nextConcern = LOVE_PAGE_CONFIG.concernIntro[concern] ? concern : "default";
+  state.selectedConcern = nextConcern;
+
+  elements.concernLinks.forEach((link) => {
+    const isSelected = link.dataset.concern === nextConcern;
+    link.classList.toggle("is-selected", isSelected);
+    link.setAttribute("aria-current", isSelected ? "true" : "false");
+  });
+
+  elements.panelText.textContent =
+    LOVE_PAGE_CONFIG.concernIntro[nextConcern] || LOVE_PAGE_CONFIG.concernIntro.default;
+
+  elements.hint.textContent =
+    LOVE_PAGE_CONFIG.concernHint[nextConcern] || LOVE_PAGE_CONFIG.concernHint.default;
 }
 
 function setDefaultCardState() {
@@ -194,6 +285,7 @@ function hideReadingResult() {
   elements.resultCard.classList.remove("is-visible");
   elements.resultCard.hidden = true;
   elements.musicSection.hidden = true;
+  updateStickyConsult();
 }
 
 function showReadingResult() {
@@ -202,11 +294,16 @@ function showReadingResult() {
 
   requestAnimationFrame(() => {
     elements.resultCard.classList.add("is-visible");
+    updateStickyConsult();
   });
 
   if (elements.musicTitle.textContent.trim()) {
     elements.musicSection.hidden = false;
   }
+
+  queueStickyCheck(400);
+  queueStickyCheck(900);
+  queueStickyCheck(1400);
 }
 
 function updateActionLabel(isAfterDraw) {
@@ -237,19 +334,21 @@ function normalizeTrack(rawTrack) {
   }
 
   const src =
-    typeof rawTrack.src === "string" && rawTrack.src.trim()
-      ? rawTrack.src.trim()
-      : typeof rawTrack.href === "string" && rawTrack.href.trim()
-      ? rawTrack.href.trim()
-      : LOVE_PAGE_CONFIG.fallbackMusicTrack.src;
+    normalizeText(rawTrack.src) ||
+    normalizeText(rawTrack.href) ||
+    LOVE_PAGE_CONFIG.fallbackMusicTrack.src;
 
   return {
-    slug: rawTrack.slug || LOVE_PAGE_CONFIG.fallbackMusicTrack.slug,
-    title: rawTrack.title || LOVE_PAGE_CONFIG.fallbackMusicTrack.title,
-    description: rawTrack.description || LOVE_PAGE_CONFIG.fallbackMusicTrack.description,
+    slug: normalizeText(rawTrack.slug) || LOVE_PAGE_CONFIG.fallbackMusicTrack.slug,
+    title: normalizeText(rawTrack.title) || LOVE_PAGE_CONFIG.fallbackMusicTrack.title,
+    description:
+      normalizeText(rawTrack.description) ||
+      LOVE_PAGE_CONFIG.fallbackMusicTrack.description,
     src,
-    buttonLabel: rawTrack.buttonLabel || LOVE_PAGE_CONFIG.fallbackMusicTrack.buttonLabel,
-    mood: rawTrack.mood || LOVE_PAGE_CONFIG.fallbackMusicTrack.mood
+    buttonLabel:
+      normalizeText(rawTrack.buttonLabel) ||
+      LOVE_PAGE_CONFIG.fallbackMusicTrack.buttonLabel,
+    mood: normalizeText(rawTrack.mood) || LOVE_PAGE_CONFIG.fallbackMusicTrack.mood
   };
 }
 
@@ -275,9 +374,16 @@ async function loadMusicTracks() {
       throw new Error("music/index.json の形式が不正です。");
     }
 
-    state.musicTracks = trackList.map(normalizeTrack).filter(Boolean);
+    const normalizedTracks = trackList.map(normalizeTrack).filter(Boolean);
+
+    state.musicTracks = isNonEmptyArray(normalizedTracks)
+      ? normalizedTracks
+      : [LOVE_PAGE_CONFIG.fallbackMusicTrack];
   } catch (error) {
-    console.warn("音楽データの読み込みに失敗したため、フォールバック設定を使用します。", error);
+    console.warn(
+      "音楽データの読み込みに失敗したため、フォールバック設定を使用します。",
+      error
+    );
     state.musicTracks = [LOVE_PAGE_CONFIG.fallbackMusicTrack];
   }
 }
@@ -318,7 +424,11 @@ function updateMusicUiState(mode) {
 
 function stopAndResetAudio() {
   state.manualMusicStop = true;
-  elements.loveThemeAudio.pause();
+
+  if (!elements.loveThemeAudio.paused) {
+    elements.loveThemeAudio.pause();
+  }
+
   elements.loveThemeAudio.currentTime = 0;
   updateMusicUiState("default");
 }
@@ -333,10 +443,12 @@ function renderTrack() {
 
   elements.musicTitle.textContent = track.title || "";
   elements.musicText.textContent = track.description || "";
-  elements.musicPlayBtn.textContent = track.buttonLabel || LOVE_PAGE_CONFIG.musicLabels.default;
+  elements.musicPlayBtn.textContent =
+    track.buttonLabel || LOVE_PAGE_CONFIG.musicLabels.default;
   elements.musicPlayBtn.setAttribute("aria-label", `${track.title || "楽曲"} を再生`);
 
   const sourceEl = elements.loveThemeAudio.querySelector("source");
+
   if (sourceEl) {
     sourceEl.src = track.src || LOVE_PAGE_CONFIG.fallbackMusicTrack.src;
     elements.loveThemeAudio.load();
@@ -347,21 +459,35 @@ function renderTrack() {
   updateMusicUiState("default");
 }
 
+function buildBridgeText(cardBridgeText) {
+  const prefix = LOVE_PAGE_CONFIG.concernBridgePrefix[state.selectedConcern];
+
+  if (!prefix) {
+    return cardBridgeText;
+  }
+
+  return `${prefix} ${cardBridgeText}`;
+}
+
 function renderReadingContent(card) {
   const imagePath = resolveCardImage(card);
   const bridgePatterns = getBridgePatternSet(card.bridgeType);
+  const pickedBridge = pickRandom(bridgePatterns);
 
   elements.cardImage.src = imagePath;
-  elements.cardImage.alt = `${card.nameJa}のカード画像`;
+  elements.cardImage.alt = `${card.nameJa || "引かれたカード"}のカード画像`;
   elements.cardName.textContent = card.nameJa || "";
   elements.cardKeyword.textContent = card.keyword || "";
   elements.mainText.textContent = pickRandom(card.mainPatterns);
   elements.subText.textContent = pickRandom(card.subPatterns);
-  elements.bridgeText.textContent = pickRandom(bridgePatterns);
+  elements.bridgeText.textContent = buildBridgeText(pickedBridge);
+
   elements.ctaBtn.textContent =
     pickRandom(card.ctaPatterns) || LOVE_PAGE_CONFIG.defaultCtaButtonLabel;
+
   elements.safeNote.textContent =
     pickRandom(card.safePatterns) || LOVE_PAGE_CONFIG.defaultSafeNote;
+
   elements.ctaTitle.textContent = LOVE_PAGE_CONFIG.defaultCtaTitle;
 }
 
@@ -393,8 +519,37 @@ function drawReading() {
     }, 220);
   } catch (error) {
     console.error(error);
-    window.alert("カードデータの読み込みに失敗しました。cards.js と app.js の設定を確認してください。");
+    window.alert(
+      "カードデータの読み込みに失敗しました。cards.js と app.js の設定を確認してください。"
+    );
   }
+}
+
+function updateStickyConsult() {
+  if (!elements.stickyConsult || !elements.resultCard) return;
+
+  const isResultVisible =
+    !elements.resultCard.hidden &&
+    (elements.resultCard.classList.contains("is-visible") ||
+      elements.resultCard.offsetHeight > 0);
+
+  elements.stickyConsult.hidden = !isResultVisible;
+  elements.stickyConsult.setAttribute("aria-hidden", isResultVisible ? "false" : "true");
+}
+
+function observeResultForSticky() {
+  if (!elements.stickyConsult || !elements.resultCard) return;
+
+  if ("MutationObserver" in window) {
+    const observer = new MutationObserver(updateStickyConsult);
+
+    observer.observe(elements.resultCard, {
+      attributes: true,
+      attributeFilter: ["hidden", "class", "style"]
+    });
+  }
+
+  updateStickyConsult();
 }
 
 function initStaticContent() {
@@ -402,11 +557,22 @@ function initStaticContent() {
   elements.returnLink.href = LOVE_PAGE_CONFIG.returnUrl;
   elements.ctaBtn.href = LOVE_PAGE_CONFIG.consultationUrl;
 
+  setSelectedConcern("default");
   setDefaultCardState();
   setDefaultResultTextState();
   renderTrack();
   hideReadingResult();
   updateActionLabel(false);
+}
+
+function bindConcernEvents() {
+  elements.concernLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      const concern = link.dataset.concern || "default";
+      setSelectedConcern(concern);
+      window.setTimeout(scrollToStartPanel, 80);
+    });
+  });
 }
 
 function bindReadingEvents() {
@@ -432,9 +598,7 @@ function bindMusicEvents() {
     }
   });
 
-  elements.musicStopBtn.addEventListener("click", () => {
-    stopAndResetAudio();
-  });
+  elements.musicStopBtn.addEventListener("click", stopAndResetAudio);
 
   audio.addEventListener("play", () => {
     updateMusicUiState("playing");
@@ -458,6 +622,10 @@ function bindMusicEvents() {
     updateMusicUiState("default");
   });
 
+  audio.addEventListener("error", () => {
+    updateMusicUiState("error");
+  });
+
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && !audio.paused) {
       audio.pause();
@@ -470,9 +638,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     assertRequiredElements();
     await loadMusicTracks();
+
     initStaticContent();
+    bindConcernEvents();
     bindReadingEvents();
     bindMusicEvents();
+    observeResultForSticky();
   } catch (error) {
     console.error(error);
   }
