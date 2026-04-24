@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#f7efee" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="color-scheme" content="light" />
 
   <title>Re:Verse Shion — 恋愛の星詠ワンカード（無料）</title>
 
@@ -12,16 +14,25 @@
     content="あの人の気持ち、既読無視、片想い、復縁、曖昧な関係。恋愛の悩みを一枚のカードからやさしく読み解く、詩韻の無料恋愛占い。"
   />
 
-  <meta name="format-detection" content="telephone=no" />
-  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://reverse-shion.github.io/love/" />
 
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Re:Verse Shion" />
   <meta property="og:title" content="Re:Verse Shion — 恋愛の星詠ワンカード" />
   <meta
     property="og:description"
     content="恋で心が揺れる日に。あの人の気持ちと、あなた自身の本音を一枚のカードからやさしく整理します。"
   />
-  <meta property="og:image" content="./assets/love-hero.webp" />
+  <meta property="og:url" content="https://reverse-shion.github.io/love/" />
+  <meta property="og:image" content="https://reverse-shion.github.io/love/assets/love-hero.webp" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Re:Verse Shion — 恋愛の星詠ワンカード" />
+  <meta
+    name="twitter:description"
+    content="恋で心が揺れる日に。あの人の気持ちと、あなた自身の本音を一枚のカードからやさしく整理します。"
+  />
+  <meta name="twitter:image" content="https://reverse-shion.github.io/love/assets/love-hero.webp" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -82,10 +93,10 @@
             <p class="concern-label">今の悩みに近いものはありますか？</p>
 
             <div class="concern-chips">
-              <a href="#startTitle">既読無視がつらい</a>
-              <a href="#startTitle">あの人の気持ちが知りたい</a>
-              <a href="#startTitle">復縁できるか不安</a>
-              <a href="#startTitle">曖昧な関係を整理したい</a>
+              <a href="#startTitle" data-concern="既読無視">既読無視がつらい</a>
+              <a href="#startTitle" data-concern="相手の気持ち">あの人の気持ちが知りたい</a>
+              <a href="#startTitle" data-concern="復縁">復縁できるか不安</a>
+              <a href="#startTitle" data-concern="曖昧な関係">曖昧な関係を整理したい</a>
             </div>
           </div>
 
@@ -444,15 +455,18 @@
         sticky.setAttribute("aria-hidden", isResultVisible ? "false" : "true");
       };
 
-      const observer = new MutationObserver(showSticky);
-      observer.observe(result, {
-        attributes: true,
-        attributeFilter: ["hidden", "class", "style"]
-      });
+      if ("MutationObserver" in window) {
+        const observer = new MutationObserver(showSticky);
+        observer.observe(result, {
+          attributes: true,
+          attributeFilter: ["hidden", "class", "style"]
+        });
+      }
 
       startBtn?.addEventListener("click", () => {
         window.setTimeout(showSticky, 900);
         window.setTimeout(showSticky, 1400);
+        window.setTimeout(showSticky, 2200);
       });
 
       showSticky();
