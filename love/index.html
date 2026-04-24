@@ -438,39 +438,6 @@
   <script src="./data/cards.js"></script>
   <script src="./js/app.js"></script>
 
-  <script>
-    (() => {
-      const sticky = document.getElementById("stickyConsult");
-      const result = document.getElementById("resultCard");
-      const startBtn = document.getElementById("startBtn");
 
-      if (!sticky || !result) return;
-
-      const showSticky = () => {
-        const isResultVisible =
-          !result.hidden &&
-          (result.classList.contains("is-visible") || result.offsetHeight > 0);
-
-        sticky.hidden = !isResultVisible;
-        sticky.setAttribute("aria-hidden", isResultVisible ? "false" : "true");
-      };
-
-      if ("MutationObserver" in window) {
-        const observer = new MutationObserver(showSticky);
-        observer.observe(result, {
-          attributes: true,
-          attributeFilter: ["hidden", "class", "style"]
-        });
-      }
-
-      startBtn?.addEventListener("click", () => {
-        window.setTimeout(showSticky, 900);
-        window.setTimeout(showSticky, 1400);
-        window.setTimeout(showSticky, 2200);
-      });
-
-      showSticky();
-    })();
-  </script>
 </body>
 </html>
