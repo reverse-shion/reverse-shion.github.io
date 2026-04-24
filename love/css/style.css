@@ -160,7 +160,7 @@ button {
   border-radius: var(--radius-xl);
   border: 1px solid var(--line);
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(252,247,249,0.98) 100%);
+    linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(252,247,249,0.98) 100%);
   box-shadow: var(--shadow-lg);
 }
 
@@ -177,6 +177,7 @@ button {
 .hero-visual {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
   background: #111;
 }
 
@@ -192,16 +193,16 @@ button {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(14,16,31,0.12) 0%, rgba(14,16,31,0.3) 100%),
-    linear-gradient(180deg, rgba(14,16,31,0) 52%, rgba(14,16,31,0.56) 100%),
-    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 32%);
+    linear-gradient(180deg, rgba(14,16,31,0.04) 0%, rgba(14,16,31,0.18) 100%),
+    linear-gradient(180deg, rgba(14,16,31,0) 60%, rgba(14,16,31,0.28) 100%),
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06), transparent 32%);
 }
 
-.hero-heading {
+.hero-badge-wrap {
   position: absolute;
-  left: 24px;
-  right: 24px;
-  bottom: 24px;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
   z-index: 2;
 }
 
@@ -219,7 +220,6 @@ button {
 .eyebrow {
   display: inline-block;
   padding: 6px 12px;
-  margin-bottom: 12px;
   border-radius: 999px;
   font-size: 0.8rem;
   color: #f4e7ee;
@@ -231,39 +231,34 @@ button {
   backdrop-filter: blur(10px);
 }
 
-.hero-title {
-  margin: 0;
-  font-size: clamp(2rem, 1.55rem + 2vw, 3.2rem);
-  line-height: 1.12;
-  font-weight: 600;
-  color: #fff8fb;
-  letter-spacing: 0.01em;
-  text-shadow: 0 6px 24px rgba(0,0,0,0.34);
-}
-
-.hero-title span {
-  display: inline-block;
-}
-
-.hero-title .accent-line {
-  background:
-    linear-gradient(135deg, #fff4e4 0%, #d7c0a0 35%, #e8c8d9 72%, #fff8fb 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .hero-copy {
   position: relative;
   z-index: 1;
   padding: 26px 24px 28px;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.86) 0%, rgba(249,242,246,0.98) 100%);
+    linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(249,242,246,0.98) 100%);
   border-top: 1px solid rgba(255,255,255,0.5);
 }
 
-.hero-lead {
+.hero-title {
   margin: 0;
+  font-size: clamp(1.95rem, 1.45rem + 2.2vw, 3rem);
+  line-height: 1.18;
+  font-weight: 600;
+  color: var(--text-deep);
+  letter-spacing: 0.01em;
+}
+
+.hero-title .accent-line {
+  background:
+    linear-gradient(135deg, #b38ba2 0%, #d4b1c4 40%, #8f6c86 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-lead {
+  margin: 16px 0 0;
   font-size: 1.02rem;
   color: var(--text-main);
 }
@@ -291,11 +286,68 @@ button {
   font-size: 0.95rem;
   color: var(--text-sub);
   background:
-    linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(244,237,241,0.98) 100%);
+    linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(244,237,241,0.99) 100%);
   border: 1px solid rgba(133, 103, 121, 0.14);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.9),
     0 8px 18px rgba(87, 61, 77, 0.06);
+}
+
+/* ===== Concern chips ===== */
+
+.concern-block {
+  margin-top: 20px;
+  padding: 18px 16px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(248,239,244,0.94) 100%);
+  border: 1px solid rgba(127, 97, 114, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+}
+
+.concern-label {
+  margin: 0;
+  font-size: 0.96rem;
+  color: var(--text-deep);
+  font-weight: 600;
+}
+
+.concern-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.concern-chips a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  color: var(--accent-deep);
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.94), rgba(245,236,241,0.98));
+  border: 1px solid rgba(143, 101, 125, 0.13);
+  box-shadow:
+    0 8px 18px rgba(87,61,77,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.concern-chips a:hover {
+  transform: translateY(-1px);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,229,236,0.99));
+  box-shadow:
+    0 12px 24px rgba(87,61,77,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.95);
 }
 
 .hero-actions {
@@ -377,15 +429,18 @@ button {
   border: 1px solid rgba(143, 101, 125, 0.1);
 }
 
-.intro-title {
+.intro-title,
+.panel-title,
+.consult-guide-title {
   margin: 0;
-  font-size: clamp(1.36rem, 1.12rem + 1vw, 2rem);
+  font-size: clamp(1.34rem, 1.12rem + 1vw, 2rem);
   line-height: 1.52;
   font-weight: 600;
   color: var(--text-deep);
 }
 
-.intro-text {
+.intro-text,
+.panel-text {
   margin: 12px 0 0;
   color: var(--text-sub);
 }
@@ -406,19 +461,6 @@ button {
   background:
     linear-gradient(135deg, rgba(255,255,255,0.84), rgba(240,227,234,0.96));
   border: 1px solid rgba(143, 101, 125, 0.1);
-}
-
-.panel-title {
-  margin: 0;
-  font-size: clamp(1.34rem, 1.12rem + 1vw, 2rem);
-  line-height: 1.5;
-  font-weight: 600;
-  color: var(--text-deep);
-}
-
-.panel-text {
-  margin: 12px 0 0;
-  color: var(--text-sub);
 }
 
 .reading-intro {
@@ -933,14 +975,6 @@ button {
   padding: 28px 22px;
 }
 
-.consult-guide-title {
-  margin: 0;
-  font-size: clamp(1.36rem, 1.12rem + 1vw, 2rem);
-  line-height: 1.52;
-  font-weight: 600;
-  color: var(--text-deep);
-}
-
 .consult-guide-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1025,10 +1059,14 @@ button {
   line-height: 1.8;
 }
 
-/* ===== Sticky CTA ===== */
+/* ===== Sticky CTA: result after only ===== */
 
 .sticky-consult {
   display: none;
+}
+
+.sticky-consult[hidden] {
+  display: none !important;
 }
 
 /* ===== Accessibility ===== */
@@ -1055,12 +1093,13 @@ button {
 
   .hero-image {
     aspect-ratio: 16 / 10;
+    object-position: center center;
   }
 
-  .hero-heading {
-    left: 18px;
-    right: 18px;
-    bottom: 18px;
+  .hero-badge-wrap {
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
   }
 
   .hero-copy,
@@ -1078,7 +1117,7 @@ button {
   }
 
   .hero-title {
-    font-size: clamp(1.8rem, 1.45rem + 2vw, 2.5rem);
+    font-size: clamp(1.78rem, 1.42rem + 2vw, 2.42rem);
   }
 
   .hero-lead {
@@ -1093,6 +1132,18 @@ button {
     min-height: 38px;
     padding: 8px 13px;
     font-size: 0.9rem;
+  }
+
+  .concern-block {
+    padding: 16px 14px;
+  }
+
+  .concern-chips {
+    gap: 8px;
+  }
+
+  .concern-chips a {
+    font-size: 0.86rem;
   }
 
   .action-row,
@@ -1111,7 +1162,7 @@ button {
     line-height: 1.46;
   }
 
-  .sticky-consult {
+  .sticky-consult:not([hidden]) {
     display: block;
     position: sticky;
     bottom: 12px;
@@ -1145,12 +1196,6 @@ button {
     padding-right: 10px;
   }
 
-  .hero-heading {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-  }
-
   .hero-copy {
     padding-top: 22px;
     padding-bottom: 24px;
@@ -1178,6 +1223,35 @@ button {
 
   .consult-guide-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1.08fr 0.92fr;
+    align-items: stretch;
+  }
+
+  .hero-visual {
+    min-height: 100%;
+  }
+
+  .hero-image {
+    height: 100%;
+    min-height: 540px;
+    aspect-ratio: auto;
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 34px 30px;
+  }
+
+  .hero-actions {
+    grid-template-columns: 1fr;
   }
 }
 
