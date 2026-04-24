@@ -55,17 +55,17 @@
 
           <div class="hero-visual-overlay" aria-hidden="true"></div>
 
-          <div class="hero-heading">
+          <div class="hero-badge-wrap">
             <div class="eyebrow">LOVE ONE-CARD READING</div>
-
-            <h1 id="pageTitle" class="hero-title">
-              <span>恋で揺れる心に、</span><br />
-              <span class="accent-line">今必要な一枚を。</span>
-            </h1>
           </div>
         </div>
 
         <div class="hero-copy">
+          <h1 id="pageTitle" class="hero-title">
+            恋で揺れる心に、<br />
+            <span class="accent-line">今必要な一枚を。</span>
+          </h1>
+
           <p class="hero-lead">
             <strong>あの人の気持ち、既読無視、片想い、復縁、曖昧な関係。</strong>
             すぐに答えを決めつけるのではなく、今の恋に流れている空気と、
@@ -77,6 +77,17 @@
             <li>不安を煽りません</li>
             <li>相談前の整理に使えます</li>
           </ul>
+
+          <div class="concern-block" aria-label="恋愛の悩み別入口">
+            <p class="concern-label">今の悩みに近いものはありますか？</p>
+
+            <div class="concern-chips">
+              <a href="#startTitle">既読無視がつらい</a>
+              <a href="#startTitle">あの人の気持ちが知りたい</a>
+              <a href="#startTitle">復縁できるか不安</a>
+              <a href="#startTitle">曖昧な関係を整理したい</a>
+            </div>
+          </div>
 
           <div class="hero-actions" aria-label="主な操作">
             <a class="btn btn-primary" href="#startTitle">
@@ -385,7 +396,13 @@
         </section>
       </main>
 
-      <div class="sticky-consult" aria-label="個人鑑定への固定リンク">
+      <div
+        id="stickyConsult"
+        class="sticky-consult"
+        hidden
+        aria-hidden="true"
+        aria-label="個人鑑定への固定リンク"
+      >
         <a
           href="https://lin.ee/LYnlU0f"
           target="_blank"
@@ -409,5 +426,37 @@
 
   <script src="./data/cards.js"></script>
   <script src="./js/app.js"></script>
+
+  <script>
+    (() => {
+      const sticky = document.getElementById("stickyConsult");
+      const result = document.getElementById("resultCard");
+      const startBtn = document.getElementById("startBtn");
+
+      if (!sticky || !result) return;
+
+      const showSticky = () => {
+        const isResultVisible =
+          !result.hidden &&
+          (result.classList.contains("is-visible") || result.offsetHeight > 0);
+
+        sticky.hidden = !isResultVisible;
+        sticky.setAttribute("aria-hidden", isResultVisible ? "false" : "true");
+      };
+
+      const observer = new MutationObserver(showSticky);
+      observer.observe(result, {
+        attributes: true,
+        attributeFilter: ["hidden", "class", "style"]
+      });
+
+      startBtn?.addEventListener("click", () => {
+        window.setTimeout(showSticky, 900);
+        window.setTimeout(showSticky, 1400);
+      });
+
+      showSticky();
+    })();
+  </script>
 </body>
 </html>
