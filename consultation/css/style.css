@@ -2,8 +2,8 @@
   --bg-page: #f7f0f3;
   --bg-page-2: #efe5eb;
 
-  --surface: rgba(255, 255, 255, 0.88);
-  --surface-strong: rgba(255, 255, 255, 0.96);
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-strong: rgba(255, 255, 255, 0.97);
   --surface-soft: rgba(255, 255, 255, 0.76);
 
   --text-main: #4c3947;
@@ -148,7 +148,7 @@ button {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(135deg, rgba(255,255,255,0.32), rgba(255,255,255,0)),
+    linear-gradient(135deg, rgba(255,255,255,0.34), rgba(255,255,255,0)),
     radial-gradient(circle at top right, rgba(181,141,164,0.13), transparent 32%),
     radial-gradient(circle at bottom left, rgba(203,177,136,0.11), transparent 34%);
 }
@@ -214,10 +214,11 @@ button {
 .hero-title {
   margin: 0;
   color: var(--text-deep);
-  font-size: clamp(2.05rem, 5.4vw, 3.75rem);
-  line-height: 1.28;
+  font-size: clamp(2rem, 5vw, 3.55rem);
+  line-height: 1.32;
   font-weight: 600;
   letter-spacing: 0.02em;
+  text-wrap: balance;
 }
 
 .hero-title-line {
@@ -324,6 +325,7 @@ button {
   font-size: clamp(1.38rem, 1.12rem + 1vw, 2.05rem);
   line-height: 1.52;
   font-weight: 600;
+  text-wrap: balance;
 }
 
 .section-text {
@@ -332,10 +334,42 @@ button {
   line-height: 1.95;
 }
 
+/* ===== Shared CTA Boxes ===== */
+
+.inline-cta-box,
+.menu-cta-box {
+  margin-top: 22px;
+  padding: 22px 18px;
+  border-radius: 26px;
+  text-align: center;
+  background:
+    linear-gradient(135deg, rgba(37,40,63,0.98) 0%, rgba(53,56,84,0.98) 52%, rgba(33,36,55,0.98) 100%);
+  border: 1px solid rgba(203,177,136,0.24);
+  box-shadow:
+    0 16px 36px rgba(40, 34, 58, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.inline-cta-box p,
+.menu-cta-box p {
+  max-width: 640px;
+  margin: 0 auto 16px;
+  color: rgba(255,250,246,0.84);
+  font-size: 0.95rem;
+  line-height: 1.9;
+}
+
+.inline-cta-box .btn,
+.menu-cta-box .btn {
+  width: min(100%, 420px);
+  margin: 0 auto;
+}
+
 /* ===== Cards / Grids ===== */
 
 .worry-grid,
-.safe-grid {
+.safe-grid,
+.recommend-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
@@ -344,7 +378,8 @@ button {
 
 .worry-card,
 .safe-item,
-.price-card {
+.price-card,
+.recommend-card {
   padding: 18px 16px;
   border-radius: 24px;
   background:
@@ -359,7 +394,8 @@ button {
 .safe-item h3,
 .feature-item h3,
 .price-card h3,
-.flow-list h3 {
+.flow-list h3,
+.recommend-card h3 {
   margin: 0;
   color: var(--text-deep);
   font-size: 1.05rem;
@@ -370,7 +406,8 @@ button {
 .safe-item p,
 .feature-item p,
 .price-card p,
-.flow-list p {
+.flow-list p,
+.recommend-card p {
   margin: 8px 0 0;
   color: var(--text-sub);
   font-size: 0.94rem;
@@ -465,32 +502,6 @@ button {
   color: var(--text-deep);
   font-size: 1.15rem;
   font-weight: 600;
-}
-
-.menu-cta-box {
-  margin-top: 22px;
-  padding: 22px 18px;
-  border-radius: 26px;
-  text-align: center;
-  background:
-    linear-gradient(135deg, rgba(37,40,63,0.98) 0%, rgba(53,56,84,0.98) 52%, rgba(33,36,55,0.98) 100%);
-  border: 1px solid rgba(203,177,136,0.24);
-  box-shadow:
-    0 16px 36px rgba(40, 34, 58, 0.18),
-    inset 0 1px 0 rgba(255,255,255,0.1);
-}
-
-.menu-cta-box p {
-  max-width: 620px;
-  margin: 0 auto 16px;
-  color: rgba(255,250,246,0.84);
-  font-size: 0.95rem;
-  line-height: 1.9;
-}
-
-.menu-cta-box .btn {
-  width: min(100%, 420px);
-  margin: 0 auto;
 }
 
 .menu-note {
@@ -603,17 +614,24 @@ details p {
 }
 
 .final-kicker {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   color: rgba(255,250,246,0.82);
   font-size: 0.82rem;
 }
 
-.final-cta h2 {
+.final-cta h2,
+.final-title {
   margin: 0;
   color: #fffaf6;
-  font-size: clamp(1.55rem, 1.22rem + 1.7vw, 2.5rem);
-  line-height: 1.48;
+  font-size: clamp(1.55rem, 1.22rem + 1.7vw, 2.42rem);
+  line-height: 1.55;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  text-wrap: balance;
+}
+
+.final-title span {
+  display: block;
 }
 
 .final-cta p {
@@ -810,7 +828,8 @@ details p {
 @media (max-width: 860px) {
   .menu-grid,
   .worry-grid,
-  .safe-grid {
+  .safe-grid,
+  .recommend-grid {
     grid-template-columns: 1fr;
   }
 
@@ -852,8 +871,12 @@ details p {
   }
 
   .hero-title {
-    font-size: clamp(1.95rem, 9.2vw, 3rem);
-    line-height: 1.34;
+    font-size: clamp(1.82rem, 8.4vw, 2.78rem);
+    line-height: 1.36;
+  }
+
+  .hero-title-line {
+    display: block;
   }
 
   .hero-lead {
@@ -886,6 +909,22 @@ details p {
     height: 38px;
   }
 
+  .inline-cta-box,
+  .menu-cta-box,
+  .template-box {
+    border-radius: 22px;
+  }
+
+  .final-cta h2,
+  .final-title {
+    font-size: clamp(1.42rem, 6.8vw, 2.15rem);
+    line-height: 1.58;
+  }
+
+  .final-title span {
+    display: block;
+  }
+
   .btn {
     padding-left: 18px;
     padding-right: 18px;
@@ -903,7 +942,8 @@ details p {
 
 @media (max-width: 420px) {
   .hero-title {
-    font-size: clamp(1.84rem, 9.4vw, 2.65rem);
+    font-size: clamp(1.72rem, 8.2vw, 2.42rem);
+    line-height: 1.38;
   }
 
   .section-title {
@@ -912,6 +952,11 @@ details p {
 
   .price {
     font-size: 1.42rem;
+  }
+
+  .final-cta h2,
+  .final-title {
+    font-size: clamp(1.34rem, 6.4vw, 1.92rem);
   }
 }
 
