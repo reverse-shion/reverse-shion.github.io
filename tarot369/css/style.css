@@ -37,6 +37,10 @@
   --container: 1080px;
 }
 
+/* =========================
+   RESET / BASE
+========================= */
+
 *,
 *::before,
 *::after {
@@ -136,7 +140,7 @@ a {
 }
 
 /* =========================
-   COMMON
+   COMMON CARD STYLE
 ========================= */
 
 .hero,
@@ -183,16 +187,20 @@ a {
 }
 
 /* =========================
-   HERO - FINAL
+   HERO / VISUAL
+   ここを一本化。重複禁止。
 ========================= */
 
 .hero-with-visual {
+  --hero-img-x: 50%;
+  --hero-img-y: 50%;
+
   position: relative;
-  overflow: hidden;
   isolation: isolate;
-  min-height: clamp(590px, 76vh, 780px);
+  overflow: hidden;
+  min-height: clamp(620px, 78svh, 820px);
   margin: 0 0 clamp(24px, 5vw, 52px);
-  padding: clamp(70px, 9vw, 116px) clamp(24px, 6vw, 76px);
+  padding: clamp(76px, 9vw, 116px) clamp(24px, 6vw, 76px);
   border-radius: 0 0 38px 38px;
   border: 1px solid rgba(203, 177, 136, 0.22);
   background: #111225;
@@ -203,24 +211,26 @@ a {
   box-shadow:
     var(--shadow-hero),
     0 10px 32px rgba(125, 95, 115, 0.13),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.28);
+    inset 0 -1px 0 rgba(255, 255, 255, 0.24);
 }
 
-/* 装飾フレーム。画像とは同じ箱の中で完結させる */
+/* 
+   重要：
+   以前の内側フレームは画像内の角丸装飾とズレて見えやすいので削除。
+   代わりに外枠と影だけで高級感を出す。
+*/
 .hero-with-visual::before {
   content: "";
   position: absolute;
-  inset: 10px;
+  inset: 0;
   z-index: 3;
   pointer-events: none;
-  border-radius: 0 0 30px 30px;
-  border: 1px solid rgba(255, 248, 247, 0.08);
+  border-radius: inherit;
   box-shadow:
-    inset 0 0 0 1px rgba(203, 177, 136, 0.08),
+    inset 0 0 0 1px rgba(255, 248, 247, 0.06),
     inset 0 0 72px rgba(203, 177, 136, 0.045);
 }
 
-/* 背景画像の箱をヒーロー枠と完全一致 */
 .hero-visual {
   position: absolute;
   inset: 0;
@@ -230,64 +240,61 @@ a {
   background: #111225;
 }
 
-/* ズレ防止：scale禁止、枠と画像を完全一致 */
 .hero-visual img {
   display: block;
   width: 100%;
   height: 100%;
   min-height: 100%;
   object-fit: cover;
-  object-position: center center;
+  object-position: var(--hero-img-x) var(--hero-img-y);
   transform: none !important;
-  border-radius: inherit;
+  border-radius: 0;
   filter:
     saturate(0.94)
     contrast(1.06)
-    brightness(0.62);
+    brightness(0.6);
 }
 
-/* オーバーレイも枠に完全一致 */
 .hero-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  border-radius: inherit;
   pointer-events: none;
+  border-radius: inherit;
   background:
-    radial-gradient(circle at 66% 16%, rgba(255, 233, 196, 0.18), transparent 30%),
-    radial-gradient(circle at 18% 34%, rgba(198, 158, 190, 0.13), transparent 34%),
+    radial-gradient(circle at 64% 14%, rgba(255, 233, 196, 0.16), transparent 30%),
+    radial-gradient(circle at 18% 34%, rgba(198, 158, 190, 0.12), transparent 34%),
     linear-gradient(
       90deg,
       rgba(8, 8, 20, 0.9) 0%,
-      rgba(12, 11, 27, 0.78) 36%,
-      rgba(20, 16, 38, 0.44) 64%,
-      rgba(11, 10, 24, 0.54) 100%
+      rgba(12, 11, 27, 0.78) 38%,
+      rgba(20, 16, 38, 0.48) 66%,
+      rgba(11, 10, 24, 0.56) 100%
     ),
     linear-gradient(
       180deg,
       rgba(10, 8, 22, 0.08) 0%,
-      rgba(10, 8, 22, 0.18) 54%,
-      rgba(247, 240, 243, 0.94) 100%
+      rgba(10, 8, 22, 0.18) 58%,
+      rgba(247, 240, 243, 0.86) 100%
     );
 }
 
-/* 下の霧。左右にはみ出させない */
 .hero-with-visual::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   bottom: -1px;
-  height: 24%;
-  z-index: 1;
+  height: 18%;
+  z-index: 2;
   pointer-events: none;
   border-radius: inherit;
   background:
-    radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.32), transparent 62%),
+    radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.24), transparent 64%),
     linear-gradient(
       180deg,
       rgba(247, 240, 243, 0) 0%,
-      rgba(247, 240, 243, 0.52) 62%,
+      rgba(247, 240, 243, 0.42) 68%,
       rgba(247, 240, 243, 1) 100%
     );
 }
@@ -302,10 +309,11 @@ a {
 .hero-content::before {
   content: "";
   position: absolute;
-  inset: -16px -14px -16px;
+  inset: -12px -10px -14px;
   z-index: -1;
   max-width: 100%;
-  border-radius: 26px;
+  border-radius: 24px;
+  pointer-events: none;
   background:
     radial-gradient(circle at 16% 0%, rgba(203, 177, 136, 0.08), transparent 34%),
     linear-gradient(
@@ -1078,48 +1086,45 @@ a {
   }
 
   .hero-with-visual {
-    min-height: 640px;
-    padding: 40px 16px 74px;
+    --hero-img-x: 50%;
+    --hero-img-y: 44%;
+
+    min-height: 660px;
+    padding: 34px 14px 54px;
     border-radius: 0 0 30px 30px;
     align-items: flex-end;
   }
 
-  .hero-with-visual::before {
-    inset: 8px;
-    border-radius: 0 0 23px 23px;
-  }
-
-  .hero-visual,
-  .hero-visual img,
-  .hero-overlay {
-    border-radius: inherit;
-  }
-
   .hero-visual img {
-    transform: none !important;
-    object-position: center center;
+    object-position: var(--hero-img-x) var(--hero-img-y);
     filter:
       saturate(0.94)
       contrast(1.06)
-      brightness(0.55);
+      brightness(0.54);
   }
 
   .hero-overlay {
     background:
-      radial-gradient(circle at 62% 14%, rgba(255, 230, 198, 0.15), transparent 28%),
+      radial-gradient(circle at 62% 12%, rgba(255, 230, 198, 0.14), transparent 28%),
       linear-gradient(
         180deg,
-        rgba(10, 9, 24, 0.28) 0%,
-        rgba(10, 9, 24, 0.46) 34%,
-        rgba(10, 9, 24, 0.84) 72%,
-        rgba(247, 240, 243, 0.98) 100%
+        rgba(10, 9, 24, 0.22) 0%,
+        rgba(10, 9, 24, 0.38) 30%,
+        rgba(10, 9, 24, 0.82) 72%,
+        rgba(247, 240, 243, 0.96) 100%
       );
   }
 
   .hero-with-visual::after {
-    left: 0;
-    right: 0;
-    height: 22%;
+    height: 16%;
+    background:
+      radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.2), transparent 64%),
+      linear-gradient(
+        180deg,
+        rgba(247, 240, 243, 0) 0%,
+        rgba(247, 240, 243, 0.38) 70%,
+        rgba(247, 240, 243, 1) 100%
+      );
   }
 
   .hero-content {
@@ -1127,14 +1132,14 @@ a {
   }
 
   .hero-content::before {
-    inset: -12px -9px -14px;
-    border-radius: 22px;
+    inset: -10px -7px -12px;
+    border-radius: 21px;
     background:
       linear-gradient(
         180deg,
-        rgba(7, 7, 18, 0.04),
-        rgba(10, 9, 24, 0.3) 42%,
-        rgba(10, 9, 24, 0.18)
+        rgba(7, 7, 18, 0.05),
+        rgba(10, 9, 24, 0.28) 42%,
+        rgba(10, 9, 24, 0.16)
       );
     backdrop-filter: blur(1.2px);
   }
@@ -1175,7 +1180,7 @@ a {
   }
 
   .hero-actions {
-    margin-top: 23px;
+    margin-top: 22px;
     gap: 10px;
   }
 
@@ -1185,7 +1190,7 @@ a {
   }
 
   .hero-note {
-    margin-top: 14px;
+    margin-top: 13px;
     font-size: 0.8rem;
     line-height: 1.74;
   }
@@ -1252,8 +1257,10 @@ a {
 
 @media (max-width: 420px) {
   .hero-with-visual {
-    min-height: 620px;
-    padding: 38px 14px 72px;
+    --hero-img-y: 43%;
+
+    min-height: 650px;
+    padding: 32px 12px 52px;
     border-radius: 0 0 28px 28px;
   }
 
@@ -1292,355 +1299,5 @@ a {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-}
-
-
-
-/* =========================
-   HERO - FIXED FINAL
-========================= */
-
-.hero-with-visual {
-  --hero-img-x: 50%;
-  --hero-img-y: 50%;
-
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  min-height: clamp(620px, 78svh, 820px);
-  margin: 0 0 clamp(24px, 5vw, 52px);
-  padding: clamp(76px, 9vw, 116px) clamp(24px, 6vw, 76px);
-  border-radius: 0 0 38px 38px;
-  border: 1px solid rgba(203, 177, 136, 0.22);
-  background: #111225;
-  background-clip: padding-box;
-  display: flex;
-  align-items: center;
-  text-align: left;
-  box-shadow:
-    var(--shadow-hero),
-    0 10px 32px rgba(125, 95, 115, 0.13),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.28);
-}
-
-/* 内側の高級フレーム */
-.hero-with-visual::before {
-  content: "";
-  position: absolute;
-  inset: 10px;
-  z-index: 3;
-  pointer-events: none;
-  border-radius: 0 0 30px 30px;
-  border: 1px solid rgba(255, 248, 247, 0.08);
-  box-shadow:
-    inset 0 0 0 1px rgba(203, 177, 136, 0.08),
-    inset 0 0 72px rgba(203, 177, 136, 0.045);
-}
-
-/* 背景画像エリア */
-.hero-visual {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  background: #111225;
-}
-
-/* 写真ズレ防止の本体 */
-.hero-visual img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  object-fit: cover;
-  object-position: var(--hero-img-x) var(--hero-img-y);
-  transform: none !important;
-  border-radius: inherit;
-  filter:
-    saturate(0.94)
-    contrast(1.06)
-    brightness(0.6);
-}
-
-/* 文字を読みやすくする暗幕 */
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 64% 14%, rgba(255, 233, 196, 0.16), transparent 30%),
-    radial-gradient(circle at 18% 34%, rgba(198, 158, 190, 0.12), transparent 34%),
-    linear-gradient(
-      90deg,
-      rgba(8, 8, 20, 0.9) 0%,
-      rgba(12, 11, 27, 0.78) 38%,
-      rgba(20, 16, 38, 0.48) 66%,
-      rgba(11, 10, 24, 0.56) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(10, 8, 22, 0.08) 0%,
-      rgba(10, 8, 22, 0.18) 58%,
-      rgba(247, 240, 243, 0.86) 100%
-    );
-}
-
-/* 下の霧。強すぎると画像がズレて見えるので控えめ */
-.hero-with-visual::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 18%;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: inherit;
-  background:
-    radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.24), transparent 64%),
-    linear-gradient(
-      180deg,
-      rgba(247, 240, 243, 0) 0%,
-      rgba(247, 240, 243, 0.42) 68%,
-      rgba(247, 240, 243, 1) 100%
-    );
-}
-
-.hero-content {
-  position: relative;
-  z-index: 4;
-  width: min(100%, 720px);
-  color: #fff8f7;
-}
-
-.hero-content::before {
-  content: "";
-  position: absolute;
-  inset: -16px -14px -16px;
-  z-index: -1;
-  max-width: 100%;
-  border-radius: 26px;
-  background:
-    radial-gradient(circle at 16% 0%, rgba(203, 177, 136, 0.08), transparent 34%),
-    linear-gradient(
-      135deg,
-      rgba(7, 7, 18, 0.2),
-      rgba(16, 12, 30, 0.12) 58%,
-      rgba(255, 255, 255, 0.025)
-    );
-  border: 1px solid rgba(255, 248, 247, 0.055);
-  box-shadow:
-    0 18px 54px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.045);
-  backdrop-filter: blur(1.8px);
-}
-
-/* =========================
-   HERO - MOBILE FIX
-========================= */
-
-@media (max-width: 768px) {
-  .site-shell {
-    padding: 0 10px 32px;
-  }
-
-  .hero-with-visual {
-    --hero-img-x: 50%;
-    --hero-img-y: 42%;
-
-    min-height: 680px;
-    padding: 34px 16px 58px;
-    border-radius: 0 0 30px 30px;
-    align-items: flex-end;
-  }
-
-  .hero-with-visual::before {
-    inset: 8px;
-    border-radius: 0 0 23px 23px;
-  }
-
-  .hero-visual,
-  .hero-visual img,
-  .hero-overlay {
-    border-radius: inherit;
-  }
-
-  .hero-visual img {
-    object-position: var(--hero-img-x) var(--hero-img-y);
-    filter:
-      saturate(0.94)
-      contrast(1.06)
-      brightness(0.54);
-  }
-
-  .hero-overlay {
-    background:
-      radial-gradient(circle at 62% 12%, rgba(255, 230, 198, 0.14), transparent 28%),
-      linear-gradient(
-        180deg,
-        rgba(10, 9, 24, 0.22) 0%,
-        rgba(10, 9, 24, 0.38) 30%,
-        rgba(10, 9, 24, 0.82) 72%,
-        rgba(247, 240, 243, 0.96) 100%
-      );
-  }
-
-  .hero-with-visual::after {
-    height: 16%;
-    background:
-      radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.2), transparent 64%),
-      linear-gradient(
-        180deg,
-        rgba(247, 240, 243, 0) 0%,
-        rgba(247, 240, 243, 0.38) 70%,
-        rgba(247, 240, 243, 1) 100%
-      );
-  }
-
-  .hero-content {
-    width: 100%;
-  }
-
-  .hero-content::before {
-    inset: -12px -9px -13px;
-    border-radius: 22px;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(7, 7, 18, 0.05),
-        rgba(10, 9, 24, 0.28) 42%,
-        rgba(10, 9, 24, 0.16)
-      );
-    backdrop-filter: blur(1.2px);
-  }
-
-  .hero-with-visual .hero-kicker {
-    margin-bottom: 14px;
-    padding: 8px 13px;
-    font-size: 0.66rem;
-    letter-spacing: 0.13em;
-  }
-
-  .hero-with-visual .hero-title {
-    font-size: clamp(1.96rem, 10.2vw, 3.12rem);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
-  }
-
-  .hero-with-visual .hero-lead {
-    max-width: none;
-    margin-top: 17px;
-    padding: 14px 15px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    line-height: 1.78;
-    letter-spacing: 0.014em;
-  }
-
-  .hero-with-visual .hero-chips {
-    margin-top: 17px;
-    gap: 8px;
-  }
-
-  .hero-with-visual .hero-chips span {
-    min-height: 31px;
-    padding: 0 10px;
-    font-size: 0.73rem;
-    letter-spacing: 0.018em;
-  }
-
-  .hero-actions {
-    margin-top: 22px;
-    gap: 10px;
-  }
-
-  .hero-actions .btn {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .hero-note {
-    margin-top: 13px;
-    font-size: 0.8rem;
-    line-height: 1.74;
-  }
-}
-
-@media (max-width: 420px) {
-  .hero-with-visual {
-    --hero-img-y: 40%;
-
-    min-height: 660px;
-    padding: 32px 14px 54px;
-    border-radius: 0 0 28px 28px;
-  }
-
-  .hero-with-visual .hero-title {
-    font-size: clamp(1.78rem, 10vw, 2.78rem);
-  }
-
-  .hero-with-visual .hero-lead {
-    font-size: 0.88rem;
-    line-height: 1.76;
-  }
-
-  .hero-with-visual .hero-kicker {
-    padding: 8px 13px;
-    font-size: 0.66rem;
-    letter-spacing: 0.13em;
-  }
-
-  .hero-note {
-    font-size: 0.8rem;
-  }
-}
-/* =========================
-   HERO FRAME ALIGN FIX
-   背景画像内のフレームとCSSフレームの二重ズレを防ぐ
-========================= */
-
-.hero-with-visual::before {
-  content: none;
-}
-
-.hero-content::before {
-  inset: -10px -8px -12px;
-  border-radius: 22px;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(7, 7, 18, 0.06),
-      rgba(10, 9, 24, 0.28) 44%,
-      rgba(10, 9, 24, 0.12)
-    );
-  border: 1px solid rgba(255, 248, 247, 0.045);
-  box-shadow:
-    0 14px 40px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
-}
-
-@media (max-width: 768px) {
-  .hero-with-visual {
-    --hero-img-x: 50%;
-    --hero-img-y: 44%;
-    min-height: 660px;
-    padding: 34px 14px 54px;
-  }
-
-  .hero-content::before {
-    inset: -10px -7px -12px;
-    border-radius: 21px;
-  }
-}
-
-@media (max-width: 420px) {
-  .hero-with-visual {
-    --hero-img-y: 43%;
-    min-height: 650px;
-    padding: 32px 12px 52px;
   }
 }
