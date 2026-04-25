@@ -1294,3 +1294,56 @@ a {
     transition-duration: 0.001ms !important;
   }
 }
+
+
+
+/* =========================
+   HERO - ズレ修正版
+========================= */
+
+@media (max-width: 768px) {
+  .hero-with-visual {
+    /* svh(実際の表示高さ)を活用して、ツールバーによるズレを防止 */
+    min-height: 580px; 
+    height: auto; 
+    padding: 60px 16px 80px; /* 上下の余白を調整 */
+    align-items: flex-end;
+    display: flex;
+  }
+
+  .hero-visual img {
+    /* 画像の切り抜き位置を「上端」に固定することで、
+       高さが変わっても顔や重要な要素がズレにくくします */
+    object-position: center 20%; 
+    height: 100%;
+    width: 100%;
+    filter: brightness(0.6); /* 少し明るくして画像の位置を確認しやすく */
+  }
+
+  .hero-overlay {
+    /* 下部の白い霧とのつながりをスムーズにし、画像が浮かないように調整 */
+    background: 
+      linear-gradient(
+        180deg,
+        rgba(10, 9, 24, 0.3) 0%,
+        rgba(10, 9, 24, 0.5) 40%,
+        rgba(10, 9, 24, 0.8) 75%,
+        rgba(247, 240, 243, 1) 100%
+      );
+  }
+
+  .hero-content {
+    /* コンテンツが画像の下の方に溜まりすぎないよう、
+       少しだけマージンを調整 */
+    margin-bottom: 20px;
+    z-index: 10;
+  }
+}
+
+/* 小さなデバイス向けの微調整 */
+@media (max-width: 420px) {
+  .hero-with-visual {
+    min-height: 540px;
+    padding-top: 50px;
+  }
+}
