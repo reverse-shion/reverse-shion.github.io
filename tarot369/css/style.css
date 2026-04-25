@@ -280,9 +280,9 @@ a {
   transform: none !important;
   border-radius: 0;
   filter:
-    saturate(1.02)
-    contrast(1.04)
-    brightness(0.82);
+    saturate(1.04)
+    contrast(1.06)
+    brightness(0.84);
 }
 
 /* 画像を見せるため、左だけ暗く・中央右は残す */
@@ -297,16 +297,16 @@ a {
     radial-gradient(circle at 50% 46%, rgba(203, 177, 136, 0.1), transparent 42%),
     linear-gradient(
       90deg,
-      rgba(7, 8, 20, 0.86) 0%,
-      rgba(9, 9, 24, 0.72) 30%,
-      rgba(14, 12, 30, 0.34) 58%,
-      rgba(10, 9, 24, 0.18) 100%
+      rgba(8, 9, 20, 0.78) 0%,
+      rgba(9, 10, 24, 0.62) 28%,
+      rgba(13, 12, 30, 0.28) 56%,
+      rgba(10, 9, 24, 0.14) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(8, 8, 20, 0.06) 0%,
-      rgba(8, 8, 20, 0.1) 54%,
-      rgba(247, 240, 243, 0.78) 100%
+      rgba(8, 8, 20, 0.03) 0%,
+      rgba(8, 8, 20, 0.08) 56%,
+      rgba(247, 240, 243, 0.74) 100%
     );
 }
 
@@ -317,7 +317,7 @@ a {
   z-index: 2;
   pointer-events: none;
   border-radius: inherit;
-  opacity: 0.18;
+  opacity: 0.1;
   filter: blur(0.12px);
   background:
     radial-gradient(circle at 72% 24%, rgba(234, 216, 184, 0.42) 0 1px, transparent 1.8px),
@@ -332,14 +332,14 @@ a {
 .hero-content {
   position: relative;
   z-index: 4;
-  width: min(100%, 650px);
+  width: min(100%, 640px);
   color: #fff8f7;
 }
 
 .hero-content::before {
   content: "";
   position: absolute;
-  inset: -18px -16px -20px;
+  inset: -14px -12px -16px;
   z-index: -1;
   max-width: 100%;
   border-radius: 28px;
@@ -348,16 +348,16 @@ a {
     radial-gradient(circle at 16% 0%, rgba(203, 177, 136, 0.13), transparent 34%),
     linear-gradient(
       135deg,
-      rgba(7, 7, 18, 0.52),
-      rgba(16, 12, 30, 0.3) 58%,
-      rgba(255, 255, 255, 0.035)
+      rgba(7, 8, 19, 0.58),
+      rgba(16, 13, 31, 0.34) 58%,
+      rgba(255, 255, 255, 0.03)
     );
-  border: 1px solid rgba(255, 248, 247, 0.09);
+  border: 1px solid rgba(239, 211, 166, 0.22);
   box-shadow:
     0 22px 64px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(2.4px);
-  -webkit-backdrop-filter: blur(2.4px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .hero-with-visual .hero-kicker {
@@ -397,7 +397,7 @@ a {
   margin: 0;
   color: #fffaf8;
   font-family: "Cormorant Garamond", "Noto Serif JP", serif;
-  font-size: clamp(2.5rem, 5.2vw, 4.65rem);
+  font-size: clamp(2.4rem, 4.9vw, 4.3rem);
   line-height: 1.04;
   letter-spacing: 0.035em;
   font-weight: 600;
@@ -492,6 +492,54 @@ a {
   line-height: 1.85;
   letter-spacing: 0.04em;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
+}
+
+/* =========================
+   TRUST STRIP
+========================= */
+
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: -12px 0 20px;
+}
+
+.trust-item {
+  padding: 18px 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(203, 177, 136, 0.26);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(203, 177, 136, 0.14), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(248, 237, 242, 0.82));
+  box-shadow:
+    0 16px 34px rgba(81, 56, 71, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.trust-item span {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-family: "Cormorant Garamond", serif;
+  color: rgba(125, 95, 115, 0.86);
+  letter-spacing: 0.18em;
+  font-size: 0.88rem;
+}
+
+.trust-item strong {
+  display: block;
+  color: var(--text-deep);
+  font-size: 1.03rem;
+  line-height: 1.5;
+}
+
+.trust-item p {
+  margin: 8px 0 0;
+  color: var(--text-sub);
+  font-size: 0.92rem;
+  line-height: 1.85;
 }
 
 /* =========================
@@ -925,8 +973,8 @@ a {
     linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 239, 244, 0.99) 100%);
   border: 1px solid rgba(203, 177, 136, 0.19);
   box-shadow:
-    0 18px 36px rgba(88, 61, 77, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    0 20px 42px rgba(88, 61, 77, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 .result-block[hidden] {
@@ -974,12 +1022,12 @@ a {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 241, 245, 0.98) 100%);
   box-shadow:
-    0 14px 30px rgba(95, 66, 83, 0.08),
+    0 16px 34px rgba(95, 66, 83, 0.11),
     inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
 .result-bridge {
-  border-color: rgba(203, 177, 136, 0.17);
+  border-color: rgba(203, 177, 136, 0.25);
 }
 
 .result-bridge-title {
@@ -996,7 +1044,7 @@ a {
 }
 
 .cta-box {
-  border-color: rgba(203, 177, 136, 0.2);
+  border-color: rgba(203, 177, 136, 0.3);
   background:
     radial-gradient(circle at 12% 0%, rgba(203, 177, 136, 0.09), transparent 34%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 241, 245, 0.99) 100%);
@@ -1089,13 +1137,13 @@ a {
 .consultation-card {
   position: relative;
   overflow: hidden;
-  border-color: rgba(188, 144, 98, 0.28);
+  border-color: rgba(188, 144, 98, 0.34);
   background:
     radial-gradient(circle at 20% 0%, rgba(218, 178, 126, 0.21), transparent 34%),
     radial-gradient(circle at 88% 22%, rgba(169, 132, 155, 0.12), transparent 34%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(250, 241, 246, 0.9));
   box-shadow:
-    0 24px 62px rgba(81, 56, 71, 0.13),
+    0 26px 68px rgba(81, 56, 71, 0.16),
     0 0 0 1px rgba(203, 177, 136, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
@@ -1211,6 +1259,12 @@ a {
     padding: 0 10px 32px;
   }
 
+  .trust-strip {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: -14px 0 14px;
+  }
+
   .hero-with-visual {
     --hero-img-x: 50%;
     --hero-img-y: 48%;
@@ -1231,22 +1285,22 @@ a {
     filter:
       saturate(1.02)
       contrast(1.04)
-      brightness(0.72);
+      brightness(0.8);
   }
 
   .hero-overlay {
     background:
       linear-gradient(
         180deg,
-        rgba(8, 8, 20, 0.12) 0%,
-        rgba(8, 8, 20, 0.28) 28%,
-        rgba(8, 8, 20, 0.76) 68%,
-        rgba(247, 240, 243, 0.94) 100%
+        rgba(8, 8, 20, 0.08) 0%,
+        rgba(8, 8, 20, 0.22) 34%,
+        rgba(8, 8, 20, 0.66) 72%,
+        rgba(247, 240, 243, 0.92) 100%
       );
   }
 
   .hero-orbit {
-    opacity: 0.12;
+    opacity: 0.08;
   }
 
   .hero-with-visual::after {
@@ -1271,12 +1325,13 @@ a {
     background:
       linear-gradient(
         180deg,
-        rgba(7, 7, 18, 0.08),
-        rgba(10, 9, 24, 0.34) 42%,
-        rgba(10, 9, 24, 0.18)
+        rgba(7, 7, 18, 0.16),
+        rgba(10, 9, 24, 0.48) 44%,
+        rgba(10, 9, 24, 0.24)
       );
-    backdrop-filter: blur(1.2px);
-    -webkit-backdrop-filter: blur(1.2px);
+    border: 1px solid rgba(239, 211, 166, 0.16);
+    backdrop-filter: blur(2.1px);
+    -webkit-backdrop-filter: blur(2.1px);
   }
 
   .hero-with-visual .hero-kicker {
@@ -1339,13 +1394,13 @@ a {
 }
 
 @media (max-width: 640px) {
-  .hero,
   .panel,
   .link-card {
     border-radius: 24px;
   }
 
-  .hero-with-visual {
+  .hero-with-visual,
+  .hero.hero-with-visual {
     border-radius: 0 0 32px 32px;
   }
 
@@ -1407,7 +1462,7 @@ a {
 @media (max-width: 420px) {
   .hero-with-visual {
     --hero-img-x: 50%;
-    --hero-img-y: 46%;
+    --hero-img-y: 47%;
 
     min-height: 660px;
     padding: 32px 12px 52px;
@@ -1436,6 +1491,8 @@ a {
 
 @media (max-width: 380px) {
   .hero-with-visual {
+    --hero-img-y: 46%;
+
     min-height: 640px;
     padding-left: 10px;
     padding-right: 10px;
