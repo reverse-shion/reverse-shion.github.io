@@ -1,6 +1,6 @@
 const LOVE_PAGE_CONFIG = {
   consultationUrl: "https://lin.ee/LYnlU0f",
-  returnUrl: "../tarot369.html",
+  returnUrl: "../tarot369/index.html",
   cardBackImage: "./tarot/card-back.webp",
   musicIndexUrl: "../music/index.json",
   fallbackBridgeType: "ambiguous",
