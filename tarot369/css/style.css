@@ -1148,3 +1148,379 @@ a {
     transition-duration: 0.001ms !important;
   }
 }
+/* =========================================================
+   SHION IMMERSIVE POLISH
+   既存CSSの一番下に追加
+========================================================= */
+
+/* ページ全体を少しだけ“星詠の空間”に寄せる */
+body {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 26%),
+    radial-gradient(circle at 12% 8%, rgba(203, 177, 136, 0.12) 0%, rgba(203, 177, 136, 0) 30%),
+    radial-gradient(circle at 88% 14%, rgba(169, 132, 155, 0.18) 0%, rgba(169, 132, 155, 0) 32%),
+    radial-gradient(circle at 50% 100%, rgba(31, 34, 54, 0.09) 0%, rgba(31, 34, 54, 0) 42%),
+    linear-gradient(180deg, #f8f1f4 0%, #efe4eb 52%, #f6eef2 100%);
+}
+
+/* トップ全体：普通のLPではなく“星詠ゲート”に見せる */
+.hero-with-visual {
+  min-height: clamp(660px, 82vh, 880px);
+  isolation: isolate;
+  border-radius: 0 0 42px 42px;
+  background: #101124;
+  box-shadow:
+    0 30px 100px rgba(32, 24, 52, 0.28),
+    0 8px 28px rgba(125, 95, 115, 0.14),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.38);
+}
+
+/* 画像：少し暗く・深く・映画的に */
+.hero-visual img {
+  filter:
+    saturate(0.92)
+    contrast(1.08)
+    brightness(0.66);
+  transform: scale(1.035);
+}
+
+/* トップに“星霧・奥行き・文字の読みやすさ”を追加 */
+.hero-overlay {
+  background:
+    radial-gradient(circle at 68% 18%, rgba(255, 233, 196, 0.26), transparent 26%),
+    radial-gradient(circle at 18% 34%, rgba(198, 158, 190, 0.16), transparent 32%),
+    radial-gradient(circle at 42% 64%, rgba(255, 255, 255, 0.1), transparent 34%),
+    linear-gradient(
+      90deg,
+      rgba(8, 8, 20, 0.94) 0%,
+      rgba(12, 11, 27, 0.86) 34%,
+      rgba(20, 16, 38, 0.54) 62%,
+      rgba(11, 10, 24, 0.62) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(10, 8, 22, 0.2) 0%,
+      rgba(10, 8, 22, 0.26) 54%,
+      rgba(247, 240, 243, 0.98) 100%
+    );
+}
+
+/* ヒーロー内に薄い神秘的な光枠 */
+.hero-with-visual::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 0 0 34px 34px;
+  border: 1px solid rgba(203, 177, 136, 0.18);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 0 80px rgba(203, 177, 136, 0.06);
+}
+
+/* 下部の霧：次のセクションへ自然につなげる */
+.hero-with-visual::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -1px;
+  height: 34%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.55), transparent 58%),
+    linear-gradient(
+      180deg,
+      rgba(247, 240, 243, 0) 0%,
+      rgba(247, 240, 243, 0.72) 58%,
+      rgba(247, 240, 243, 1) 100%
+    );
+}
+
+/* トップ文章ブロック：読みやすさを保ちつつ“言葉が浮かぶ”感じに */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 6px 0;
+}
+
+.hero-content::before {
+  content: "";
+  position: absolute;
+  inset: -26px -24px -22px;
+  z-index: -1;
+  max-width: 760px;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(203, 177, 136, 0.12), transparent 34%),
+    linear-gradient(
+      135deg,
+      rgba(7, 7, 18, 0.34),
+      rgba(16, 12, 30, 0.18) 54%,
+      rgba(255, 255, 255, 0.04)
+    );
+  border: 1px solid rgba(255, 248, 247, 0.08);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(3px);
+}
+
+/* キッカー：儀式の入口感 */
+.hero-with-visual .hero-kicker {
+  background:
+    linear-gradient(135deg, rgba(28, 22, 44, 0.72), rgba(56, 43, 67, 0.36));
+  border-color: rgba(239, 211, 166, 0.58);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* タイトル：強いけど重すぎない、星明かりの白 */
+.hero-with-visual .hero-title {
+  color: #fffaf8;
+  text-shadow:
+    0 4px 22px rgba(0, 0, 0, 0.52),
+    0 0 34px rgba(255, 226, 202, 0.22),
+    0 0 70px rgba(203, 177, 136, 0.16);
+}
+
+.hero-with-visual .hero-title span {
+  color: #fffaf8;
+}
+
+/* リード文：今よりさらに上質に。半透明カード感 */
+.hero-with-visual .hero-lead {
+  max-width: 660px;
+  padding: 18px 20px 19px;
+  border-radius: 26px;
+  color: rgba(255, 250, 248, 0.91);
+  background:
+    linear-gradient(135deg, rgba(9, 8, 21, 0.46), rgba(37, 31, 55, 0.26));
+  border: 1px solid rgba(255, 248, 247, 0.14);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(9px);
+}
+
+.hero-with-visual .hero-lead strong {
+  color: #fff5d9;
+  text-shadow: 0 0 24px rgba(203, 177, 136, 0.22);
+}
+
+/* チップ：少し高級感を上げる */
+.hero-with-visual .hero-chips span {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+  border-color: rgba(255, 248, 247, 0.28);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* トップCTA：メインを“受け取る儀式”に見せる */
+.hero-actions .btn-primary {
+  background:
+    radial-gradient(circle at 28% 0%, rgba(255, 245, 231, 0.34), transparent 34%),
+    linear-gradient(135deg, #ba8ba7 0%, #d7b2c6 44%, #9b718c 100%);
+  box-shadow:
+    0 22px 48px rgba(185, 141, 168, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+/* サブCTA：夜空の扉 */
+.hero-actions .btn-secondary {
+  background:
+    radial-gradient(circle at 30% 0%, rgba(203, 177, 136, 0.16), transparent 34%),
+    linear-gradient(135deg, #1b1e35 0%, #30334e 48%, #181b2e 100%);
+  box-shadow:
+    0 18px 42px rgba(15, 16, 32, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 文章下の補足：控えめに、でも安心感 */
+.hero-note {
+  color: rgba(255, 250, 248, 0.78);
+}
+
+/* パネル：トップから下へ降りた時も世界観が途切れないように */
+.panel,
+.link-card {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(203, 177, 136, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(252, 247, 249, 0.98) 100%);
+  border-color: rgba(121, 91, 110, 0.13);
+  box-shadow:
+    0 20px 54px rgba(81, 56, 71, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+/* セクションラベル：世界観の統一 */
+.panel-label,
+.result-label,
+.cta-label,
+.link-label {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(242, 232, 238, 0.96));
+  border-color: rgba(203, 177, 136, 0.2);
+  color: #806174;
+}
+
+/* カードエリア：カードが“降りてくる”空気 */
+.card-shell {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.78), transparent 42%),
+    radial-gradient(circle at 50% 34%, rgba(203, 177, 136, 0.14), transparent 48%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(244, 234, 239, 0.9) 100%);
+}
+
+/* カードのオーラを少し神秘的に */
+.card-frame::before {
+  content: "";
+  position: absolute;
+  inset: -34px;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 42px;
+  background:
+    conic-gradient(
+      from 180deg,
+      transparent,
+      rgba(203, 177, 136, 0.16),
+      transparent,
+      rgba(169, 132, 155, 0.14),
+      transparent
+    );
+  opacity: 0.5;
+  filter: blur(18px);
+  animation: slowHalo 9s linear infinite;
+}
+
+@keyframes slowHalo {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 結果表示：鑑定文が“白い紙”ではなく“星詠の記録”に見えるように */
+.result-block {
+  background:
+    radial-gradient(circle at 16% 0%, rgba(203, 177, 136, 0.1), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 239, 244, 0.99) 100%);
+  border-color: rgba(203, 177, 136, 0.18);
+}
+
+/* 個人鑑定カード：最後の導線を上品に強める */
+.consultation-card {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(218, 178, 126, 0.22), transparent 34%),
+    radial-gradient(circle at 88% 22%, rgba(169, 132, 155, 0.14), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(250, 241, 246, 0.9));
+}
+
+.consultation-link {
+  background:
+    radial-gradient(circle at 24% 0%, rgba(255, 255, 255, 0.52), transparent 32%),
+    linear-gradient(135deg, #fff6e9 0%, #edd1aa 46%, #c99563 100%);
+  color: #3b2838;
+  box-shadow:
+    0 18px 42px rgba(150, 101, 74, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+/* スマホ：トップの没入感を残しながら読みやすく */
+@media (max-width: 768px) {
+  .hero-with-visual {
+    min-height: 720px;
+    padding: 46px 18px 92px;
+    align-items: flex-end;
+    border-radius: 0 0 32px 32px;
+  }
+
+  .hero-with-visual::before {
+    inset: 12px;
+    border-radius: 0 0 26px 26px;
+  }
+
+  .hero-visual img {
+    object-position: center center;
+    filter:
+      saturate(0.92)
+      contrast(1.08)
+      brightness(0.56);
+  }
+
+  .hero-overlay {
+    background:
+      radial-gradient(circle at 62% 14%, rgba(255, 230, 198, 0.18), transparent 28%),
+      linear-gradient(
+        180deg,
+        rgba(10, 9, 24, 0.34) 0%,
+        rgba(10, 9, 24, 0.5) 32%,
+        rgba(10, 9, 24, 0.86) 68%,
+        rgba(247, 240, 243, 0.98) 100%
+      );
+  }
+
+  .hero-content::before {
+    inset: -18px -12px -20px;
+    border-radius: 28px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(7, 7, 18, 0.12),
+        rgba(10, 9, 24, 0.46) 38%,
+        rgba(10, 9, 24, 0.28)
+      );
+    backdrop-filter: blur(2px);
+  }
+
+  .hero-with-visual .hero-title {
+    font-size: clamp(2.08rem, 11.6vw, 3.45rem);
+    line-height: 1.03;
+    letter-spacing: 0.015em;
+  }
+
+  .hero-with-visual .hero-lead {
+    margin-top: 18px;
+    padding: 15px 15px;
+    font-size: 0.94rem;
+    line-height: 1.86;
+    letter-spacing: 0.02em;
+    border-radius: 22px;
+  }
+
+  .hero-actions {
+    margin-top: 26px;
+  }
+}
+
+/* 小さいスマホではタイトルの圧を抑えて“読みやすい神秘感”へ */
+@media (max-width: 420px) {
+  .hero-with-visual {
+    min-height: 710px;
+    padding: 44px 15px 88px;
+  }
+
+  .hero-with-visual .hero-title {
+    font-size: clamp(1.96rem, 11.8vw, 3rem);
+  }
+
+  .hero-with-visual .hero-lead {
+    font-size: 0.92rem;
+  }
+
+  .hero-with-visual .hero-kicker {
+    font-size: 0.68rem;
+    padding: 8px 13px;
+  }
+}
