@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f0f3" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="color-scheme" content="light" />
+
+  <title>Re:Verse Shion — 星詠ワンカード無料タロット</title>
+
+  <meta
+    name="description"
+    content="Re:Verse Shion（詩韻）による無料ワンカードタロット。恋愛・仕事・人間関係・今の自分に必要な言葉を、一枚のカードからやさしく読み解きます。"
+  />
+
+  <link rel="canonical" href="https://reverse-shion.github.io/tarot369/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Re:Verse Shion" />
+  <meta property="og:title" content="Re:Verse Shion — 星詠ワンカード無料タロット" />
+  <meta
+    property="og:description"
+    content="今のあなたに必要な言葉を、一枚のカードから。詩韻の星詠ワンカード無料タロット。"
+  />
+  <meta property="og:url" content="https://reverse-shion.github.io/tarot369/" />
+  <meta property="og:image" content="https://reverse-shion.github.io/love/tarot/card-back.webp" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Re:Verse Shion — 星詠ワンカード無料タロット" />
+  <meta
+    name="twitter:description"
+    content="今のあなたに必要な言葉を、一枚のカードから。詩韻の星詠ワンカード無料タロット。"
+  />
+  <meta name="twitter:image" content="https://reverse-shion.github.io/love/tarot/card-back.webp" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="preload" as="image" href="../love/tarot/card-back.webp" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body>
+  <div class="stardust" aria-hidden="true"></div>
+
+  <div class="site-shell">
+    <div class="page">
+      <header class="hero" aria-labelledby="pageTitle">
+        <p class="hero-kicker">FREE ONE-CARD READING</p>
+
+        <h1 id="pageTitle" class="hero-title">
+          <span>Re:Verse Shion</span><br />
+          星詠ワンカード
+        </h1>
+
+        <p class="hero-lead">
+          <strong>今のあなたに必要な言葉を、一枚のカードから。</strong>
+          恋愛、人間関係、仕事、これからの選択。
+          答えを急がせるのではなく、心の奥にある本音を静かに照らす無料タロットです。
+        </p>
+
+        <div class="hero-chips" aria-label="このページの特徴">
+          <span>無料で試せます</span>
+          <span>不安を煽りません</span>
+          <span>詩韻の言葉で読み解きます</span>
+        </div>
+      </header>
+
+      <main class="content-grid">
+        <section class="panel intro-panel" aria-labelledby="startTitle">
+          <p class="panel-label">STEP 1</p>
+
+          <h2 id="startTitle" class="panel-title">
+            今、いちばん近いテーマを選んでください
+          </h2>
+
+          <p id="topicLead" class="panel-text">
+            まずは、今のあなたの心に近いテーマをひとつ選んでください。
+            テーマを選ぶことで、カードから受け取る言葉の焦点が少しだけ定まります。
+          </p>
+
+          <div class="topic-block" aria-label="占いたいテーマ">
+            <button class="topic-chip is-selected" type="button" data-topic="self" aria-pressed="true">
+              今の私
+            </button>
+            <button class="topic-chip" type="button" data-topic="love" aria-pressed="false">
+              恋愛
+            </button>
+            <button class="topic-chip" type="button" data-topic="work" aria-pressed="false">
+              仕事・活動
+            </button>
+            <button class="topic-chip" type="button" data-topic="relation" aria-pressed="false">
+              人間関係
+            </button>
+          </div>
+
+          <div class="start-box">
+            <p class="start-copy">
+              深呼吸をひとつして、心の中で
+              <strong>「今の私に必要な言葉を受け取ります」</strong>
+              と唱えてから、カードを開いてください。
+            </p>
+
+            <div class="action-row">
+              <button id="startReadingBtn" class="btn btn-primary" type="button">
+                星詠を始める
+              </button>
+
+              <button id="resetBtn" class="btn btn-ghost" type="button" disabled>
+                もう一度占う
+              </button>
+            </div>
+
+            <p id="topicHint" class="micro-copy">
+              今の自分に必要なテーマを、一枚のカードが静かに映します。
+            </p>
+          </div>
+
+          <div class="brand-note">
+            <p class="brand-note-label">SHION PHILOSOPHY</p>
+            <p>
+              詩韻の占いは、未来を怖がらせるためのものではありません。
+              言葉にならなかった本音に光を当て、あなたが少しでも
+              「大丈夫だよ」と思える場所へ戻るための星詠です。
+            </p>
+          </div>
+        </section>
+
+        <section id="readingPanel" class="panel reading-panel" aria-labelledby="readingTitle">
+          <p class="panel-label">STEP 2</p>
+
+          <h2 id="readingTitle" class="panel-title">
+            今日、あなたに降りる一枚
+          </h2>
+
+          <p class="panel-text">
+            カードは、答えを決めつけるものではなく、
+            今の心に必要な視点を映す鏡です。
+          </p>
+
+          <div class="card-shell" aria-live="polite">
+            <div id="cardFrame" class="card-frame">
+              <div class="card">
+                <div class="card-face card-back" aria-hidden="true">
+                  <img
+                    id="cardBackImage"
+                    class="card-image"
+                    src="../love/tarot/card-back.webp"
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                  />
+                </div>
+
+                <div class="card-face card-front">
+                  <img
+                    id="cardFrontImage"
+                    class="card-image"
+                    src="../love/tarot/card-back.webp"
+                    alt="カード裏面"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="card-meta">
+              <p id="cardName" class="card-name">カードはまだ静かに伏せられています</p>
+              <p id="cardKeyword" class="card-keyword">星詠を始めてください</p>
+            </div>
+
+            <article id="resultBlock" class="result-block" hidden aria-live="polite">
+              <div class="result-head">
+                <p class="result-label">SHION READING</p>
+                <div class="result-divider" aria-hidden="true"></div>
+                <p id="resultTopic" class="result-topic">今のあなたへ</p>
+              </div>
+
+              <p id="resultMain" class="result-main"></p>
+              <p id="resultSub" class="result-sub"></p>
+
+              <div class="result-bridge">
+                <p class="result-bridge-title">この一枚の先を深く見るなら</p>
+                <p id="resultBridgeText" class="result-bridge-text"></p>
+              </div>
+
+              <div class="cta-box">
+                <p class="cta-label">PRIVATE READING</p>
+
+                <p id="ctaCopyText" class="cta-copy">
+                  この一枚で心が動いたなら、今の状況に合わせてさらに深く読み解けます。
+                </p>
+
+                <a
+                  id="consultBtn"
+                  class="btn btn-secondary"
+                  href="https://lin.ee/LYnlU0f"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  LINEで個人鑑定を相談する
+                </a>
+
+                <p id="consultSafeNote" class="safe-note">
+                  はじめての方も安心してご相談いただけます。無理な勧誘はありません。
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <section class="link-section" aria-label="詩韻の無料占い案内">
+        <div class="link-card">
+          <p class="link-label">LOVE READING</p>
+
+          <h2 class="link-title">
+            恋愛のことを、もう少し深く見たい方へ
+          </h2>
+
+          <p>
+            あの人の気持ち、既読無視、片想い、復縁、曖昧な関係。
+            今の悩みが恋愛に強くつながっているなら、
+            <strong>恋愛特化の無料星詠ページ</strong>
+            で、相手の気持ちや関係の流れをより丁寧に受け取れます。
+          </p>
+
+          <a class="love-link" href="../love/index.html">
+            <span>LOVE ONE-CARD READING</span>
+            恋愛の流れをもう少し深く見る
+          </a>
+        </div>
+
+        <div class="link-card">
+          <p class="link-label">ABOUT SHION</p>
+
+          <h2 class="link-title">
+            詩韻の鑑定で大切にしていること
+          </h2>
+
+          <p>
+            占い結果をただ言い切るのではなく、
+            今のあなたがどこで迷い、何を守りたくて、どんな言葉を必要としているのか。
+            その奥にある本音を、カードと言葉で丁寧に整理します。
+          </p>
+        </div>
+      </section>
+
+      <footer class="footer">
+        &copy; <span id="year"></span> Re:Verse Shion — 言葉が魂を救う世界へ
+      </footer>
+    </div>
+  </div>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>
