@@ -1598,3 +1598,49 @@ a {
     font-size: 0.8rem;
   }
 }
+/* =========================
+   HERO FRAME ALIGN FIX
+   背景画像内のフレームとCSSフレームの二重ズレを防ぐ
+========================= */
+
+.hero-with-visual::before {
+  content: none;
+}
+
+.hero-content::before {
+  inset: -10px -8px -12px;
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 7, 18, 0.06),
+      rgba(10, 9, 24, 0.28) 44%,
+      rgba(10, 9, 24, 0.12)
+    );
+  border: 1px solid rgba(255, 248, 247, 0.045);
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+@media (max-width: 768px) {
+  .hero-with-visual {
+    --hero-img-x: 50%;
+    --hero-img-y: 44%;
+    min-height: 660px;
+    padding: 34px 14px 54px;
+  }
+
+  .hero-content::before {
+    inset: -10px -7px -12px;
+    border-radius: 21px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-with-visual {
+    --hero-img-y: 43%;
+    min-height: 650px;
+    padding: 32px 12px 52px;
+  }
+}
