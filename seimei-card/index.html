@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#14172b" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <title>あなたの星命カード診断｜詩韻 -シオン-</title>
+  <meta name="description" content="生年月日から、あなたの魂に宿る本星命カード・詳細星命カード・コートカードを無料で診断。シオンとしおぽんが、星とタロットであなたの心をやさしく読み解きます。" />
+  <link rel="canonical" href="https://reverse-shion.github.io/seimei-card/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Re:Verse Shion" />
+  <meta property="og:title" content="あなたの星命カード診断｜詩韻 -シオン-" />
+  <meta property="og:description" content="生年月日から、あなたの魂に宿る一枚を無料診断。シオンとしおぽんが、星とタロットであなたの心をやさしく読み解きます。" />
+  <meta property="og:url" content="https://reverse-shion.github.io/seimei-card/" />
+  <meta property="og:image" content="https://reverse-shion.github.io/tarot369/assets/tarot369-hero.webp" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="あなたの星命カード診断｜詩韻 -シオン-" />
+  <meta name="twitter:description" content="生年月日から、あなたの魂に宿る一枚を無料診断。シオンとしおぽんが、星とタロットであなたの心をやさしく読み解きます。" />
+  <meta name="twitter:image" content="https://reverse-shion.github.io/tarot369/assets/tarot369-hero.webp" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="seimei-page">
+  <div class="seimei-sky" aria-hidden="true"></div>
+
+  <div class="seimei-shell">
+    <header class="seimei-hero" aria-labelledby="pageTitle">
+      <p class="seimei-kicker">SHION SEIMEI CARD</p>
+      <h1 id="pageTitle">あなたの星命カード診断</h1>
+      <p class="seimei-subcopy">生まれた日から、あなたの魂に宿る一枚を読み解きます。</p>
+      <p class="seimei-lead">
+        星命カードは、運命を決めつける占いではありません。<br />
+        あなたの中にある本質、才能、影、そして今必要な言葉を、星とタロットで読み解く詩韻式の無料診断です。
+      </p>
+      <div class="seimei-hero-links" aria-label="関連ページ">
+        <a href="../tarot369/index.html">今の心を見るワンカード</a>
+        <a href="../consultation/index.html">悩みを深く見る個人鑑定</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="seimei-panel seimei-form-panel" aria-labelledby="formTitle">
+        <div class="seimei-section-head">
+          <p class="seimei-label">FREE READING</p>
+          <h2 id="formTitle">生年月日をそっと教えてください</h2>
+          <p>出生時間や出生地は不要です。入力内容は保存・送信されません。</p>
+        </div>
+
+        <noscript>
+          <p class="seimei-noscript">この診断はJavaScriptを使用しています。ブラウザの設定でJavaScriptを有効にしてからお試しください。</p>
+        </noscript>
+
+        <form id="seimeiForm" class="seimei-form" novalidate>
+          <div class="seimei-field">
+            <label for="nickname">ニックネーム <span>任意</span></label>
+            <input id="nickname" name="nickname" type="text" placeholder="しおん" autocomplete="nickname" />
+          </div>
+
+          <div class="seimei-field">
+            <label for="birthDate">生年月日 <span class="seimei-required">必須</span></label>
+            <input id="birthDate" name="birthDate" type="date" required aria-describedby="dateHelp errorMessage" />
+            <p id="dateHelp" class="seimei-help">例：1984年1月1日生まれなら、1984-01-01 を選びます。</p>
+          </div>
+
+          <div class="seimei-field">
+            <label for="theme">相談テーマ <span>任意</span></label>
+            <select id="theme" name="theme">
+              <option value="今の自分">今の自分</option>
+              <option value="恋愛">恋愛</option>
+              <option value="仕事">仕事</option>
+              <option value="人間関係">人間関係</option>
+            </select>
+          </div>
+
+          <p id="errorMessage" class="seimei-error" aria-live="polite"></p>
+
+          <button class="seimei-submit" type="submit">星命カードを診断する</button>
+        </form>
+      </section>
+
+      <section id="resultArea" class="seimei-result" aria-live="polite" hidden></section>
+
+      <section class="seimei-note-panel" aria-label="注意書き">
+        <p>
+          ※この診断は、タロットと占星術のデカン対応をもとにした詩韻式の簡易判定です。星座の切り替わり付近やコートカードの境界付近は、出生年・出生時間によって変わる場合があります。より正確に知りたい方は、個人鑑定で詳しく読み解けます。
+        </p>
+      </section>
+    </main>
+
+    <footer class="seimei-footer">
+      <a href="../tarot369/index.html">無料ワンカード</a>
+      <span aria-hidden="true">・</span>
+      <a href="../consultation/index.html">個人鑑定</a>
+      <p>&copy; Re:Verse Shion — 言葉が魂を救う世界へ</p>
+    </footer>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
