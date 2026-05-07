@@ -1,37 +1,40 @@
 :root {
-  --seimei-bg: #090b18;
-  --seimei-bg-2: #11152a;
-  --seimei-bg-3: #1b1831;
+  --seimei-bg: #080a16;
+  --seimei-bg-2: #101327;
+  --seimei-bg-3: #17142a;
 
-  --seimei-ink: #35293d;
-  --seimei-ink-soft: #74687d;
-  --seimei-ink-muted: #8b8192;
+  --seimei-ink: #30243a;
+  --seimei-ink-soft: #716579;
+  --seimei-ink-muted: #918897;
 
   --seimei-moon: #fffaf0;
-  --seimei-moon-soft: rgba(255, 250, 240, 0.84);
-  --seimei-paper: rgba(255, 250, 242, 0.94);
-  --seimei-paper-2: rgba(248, 242, 235, 0.88);
+  --seimei-moon-2: #f8efe3;
+  --seimei-paper: rgba(255, 250, 242, 0.96);
+  --seimei-paper-2: rgba(248, 241, 232, 0.92);
 
   --seimei-lavender: #cbb7e6;
-  --seimei-lavender-soft: rgba(203, 183, 230, 0.28);
-  --seimei-lavender-deep: #80649e;
+  --seimei-lavender-soft: rgba(203, 183, 230, 0.25);
+  --seimei-lavender-deep: #765895;
 
   --seimei-gold: #dcc084;
-  --seimei-gold-soft: rgba(220, 192, 132, 0.36);
-  --seimei-gold-deep: #9e7437;
+  --seimei-gold-2: #f0dca8;
+  --seimei-gold-soft: rgba(220, 192, 132, 0.34);
+  --seimei-gold-deep: #9f7338;
 
   --seimei-rose: #b77a91;
+
   --seimei-line: rgba(220, 192, 132, 0.28);
   --seimei-line-soft: rgba(255, 250, 240, 0.12);
+  --seimei-line-dark: rgba(70, 48, 82, 0.15);
 
-  --seimei-shadow: 0 34px 90px rgba(0, 0, 0, 0.42);
-  --seimei-shadow-soft: 0 18px 46px rgba(0, 0, 0, 0.22);
-  --seimei-glow: 0 0 42px rgba(220, 192, 132, 0.16);
+  --seimei-shadow: 0 34px 90px rgba(0, 0, 0, 0.44);
+  --seimei-shadow-soft: 0 18px 46px rgba(30, 23, 45, 0.18);
+  --seimei-glow: 0 0 46px rgba(220, 192, 132, 0.15);
 
   --seimei-radius-xl: 34px;
-  --seimei-radius-lg: 26px;
-  --seimei-radius-md: 18px;
-  --seimei-radius-sm: 13px;
+  --seimei-radius-lg: 28px;
+  --seimei-radius-md: 20px;
+  --seimei-radius-sm: 14px;
 
   --seimei-container: 1040px;
 
@@ -46,23 +49,28 @@
 }
 
 html {
+  width: 100%;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body.seimei-page {
   position: relative;
+  width: 100%;
+  min-width: 0;
   min-height: 100svh;
   margin: 0;
   color: var(--seimei-ink);
   font-family: var(--seimei-serif);
-  line-height: 1.92;
-  letter-spacing: 0.015em;
+  font-feature-settings: "palt";
+  line-height: 1.95;
+  letter-spacing: 0.018em;
   background:
-    radial-gradient(circle at 50% -10%, rgba(255, 250, 240, 0.14), transparent 28%),
-    radial-gradient(circle at 14% 12%, rgba(203, 183, 230, 0.20), transparent 26%),
-    radial-gradient(circle at 88% 8%, rgba(220, 192, 132, 0.14), transparent 26%),
-    radial-gradient(circle at 50% 104%, rgba(92, 74, 132, 0.34), transparent 38%),
-    linear-gradient(180deg, var(--seimei-bg) 0%, var(--seimei-bg-2) 52%, var(--seimei-bg-3) 100%);
+    radial-gradient(circle at 50% -12%, rgba(255, 250, 240, 0.16), transparent 29%),
+    radial-gradient(circle at 13% 10%, rgba(203, 183, 230, 0.22), transparent 28%),
+    radial-gradient(circle at 88% 7%, rgba(220, 192, 132, 0.16), transparent 28%),
+    radial-gradient(circle at 50% 110%, rgba(92, 74, 132, 0.38), transparent 40%),
+    linear-gradient(180deg, var(--seimei-bg) 0%, var(--seimei-bg-2) 48%, var(--seimei-bg-3) 100%);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
@@ -80,10 +88,10 @@ body.seimei-page::after,
 body.seimei-page::before {
   z-index: -4;
   background:
-    radial-gradient(circle, rgba(255, 250, 240, 0.9) 0 1px, transparent 1.6px),
-    radial-gradient(circle, rgba(220, 192, 132, 0.62) 0 1px, transparent 1.55px),
-    radial-gradient(circle, rgba(203, 183, 230, 0.58) 0 1px, transparent 1.45px);
-  background-size: 142px 142px, 211px 211px, 317px 317px;
+    radial-gradient(circle, rgba(255, 250, 240, 0.86) 0 1px, transparent 1.55px),
+    radial-gradient(circle, rgba(220, 192, 132, 0.62) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(203, 183, 230, 0.56) 0 1px, transparent 1.42px);
+  background-size: 148px 148px, 218px 218px, 326px 326px;
   background-position: 12px 18px, 58px 72px, 140px 120px;
   opacity: 0.22;
 }
@@ -91,24 +99,25 @@ body.seimei-page::before {
 body.seimei-page::after {
   z-index: -3;
   background:
-    linear-gradient(180deg, rgba(9, 11, 24, 0.05) 0%, rgba(9, 11, 24, 0.72) 100%),
-    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.12), transparent 34%);
+    linear-gradient(180deg, rgba(8, 10, 22, 0.04) 0%, rgba(8, 10, 22, 0.74) 100%),
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.13), transparent 35%);
 }
 
 .seimei-sky {
   z-index: -2;
-  opacity: 0.95;
+  opacity: 0.92;
   background:
-    radial-gradient(circle at 50% 10%, rgba(255, 250, 240, 0.24) 0 0.26rem, transparent 0.36rem),
-    radial-gradient(circle at 50% 10%, rgba(255, 250, 240, 0.08) 0 4.5rem, transparent 4.7rem),
-    linear-gradient(115deg, transparent 0 42%, rgba(220, 192, 132, 0.08) 42.2%, transparent 43.2% 100%),
-    linear-gradient(68deg, transparent 0 62%, rgba(203, 183, 230, 0.06) 62.2%, transparent 63.2% 100%);
+    radial-gradient(circle at 50% 10%, rgba(255, 250, 240, 0.23) 0 0.24rem, transparent 0.35rem),
+    radial-gradient(circle at 50% 10%, rgba(255, 250, 240, 0.075) 0 4.5rem, transparent 4.75rem),
+    linear-gradient(115deg, transparent 0 42%, rgba(220, 192, 132, 0.075) 42.2%, transparent 43.2% 100%),
+    linear-gradient(68deg, transparent 0 62%, rgba(203, 183, 230, 0.058) 62.2%, transparent 63.2% 100%);
   filter: saturate(1.05);
 }
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -121,10 +130,20 @@ a {
   color: inherit;
 }
 
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
 .seimei-shell {
   width: min(100% - 32px, var(--seimei-container));
+  max-width: var(--seimei-container);
+  min-width: 0;
   margin: 0 auto;
-  padding: clamp(16px, 3vw, 30px) 0 48px;
+  padding: clamp(16px, 3vw, 30px) 0 52px;
 }
 
 /* =========================
@@ -136,6 +155,8 @@ a {
 .seimei-result,
 .seimei-note-panel {
   position: relative;
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
   border: 1px solid var(--seimei-line);
   border-radius: var(--seimei-radius-xl);
@@ -144,15 +165,15 @@ a {
 
 .seimei-hero {
   isolation: isolate;
-  padding: clamp(44px, 7vw, 86px) clamp(20px, 6vw, 72px);
+  padding: clamp(44px, 7vw, 88px) clamp(20px, 6vw, 74px);
   color: var(--seimei-moon);
   text-align: center;
   background:
-    radial-gradient(circle at 50% 10%, rgba(255, 250, 240, 0.14), transparent 22%),
-    radial-gradient(circle at 85% 12%, rgba(220, 192, 132, 0.22), transparent 30%),
-    radial-gradient(circle at 12% 10%, rgba(203, 183, 230, 0.24), transparent 34%),
-    linear-gradient(145deg, rgba(255, 250, 240, 0.08), rgba(255, 250, 240, 0.015) 42%, rgba(220, 192, 132, 0.055)),
-    rgba(10, 13, 29, 0.9);
+    radial-gradient(circle at 50% 8%, rgba(255, 250, 240, 0.15), transparent 23%),
+    radial-gradient(circle at 85% 12%, rgba(220, 192, 132, 0.22), transparent 31%),
+    radial-gradient(circle at 12% 10%, rgba(203, 183, 230, 0.24), transparent 35%),
+    linear-gradient(145deg, rgba(255, 250, 240, 0.085), rgba(255, 250, 240, 0.018) 43%, rgba(220, 192, 132, 0.058)),
+    rgba(10, 13, 29, 0.92);
 }
 
 .seimei-hero::before {
@@ -160,11 +181,11 @@ a {
   position: absolute;
   inset: 14px;
   z-index: -1;
-  border: 1px solid rgba(220, 192, 132, 0.18);
+  border: 1px solid rgba(220, 192, 132, 0.19);
   border-radius: calc(var(--seimei-radius-xl) - 12px);
   background:
-    linear-gradient(90deg, transparent, rgba(220, 192, 132, 0.12), transparent) top / 100% 1px no-repeat,
-    linear-gradient(90deg, transparent, rgba(203, 183, 230, 0.11), transparent) bottom / 100% 1px no-repeat;
+    linear-gradient(90deg, transparent, rgba(220, 192, 132, 0.14), transparent) top / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent, rgba(203, 183, 230, 0.12), transparent) bottom / 100% 1px no-repeat;
 }
 
 .seimei-hero::after {
@@ -173,7 +194,7 @@ a {
   right: clamp(22px, 7vw, 82px);
   top: clamp(10px, 2vw, 22px);
   z-index: -1;
-  color: rgba(220, 192, 132, 0.21);
+  color: rgba(220, 192, 132, 0.22);
   font-size: clamp(4.8rem, 15vw, 11rem);
   line-height: 1;
   transform: rotate(-8deg);
@@ -195,7 +216,7 @@ a {
 
 .seimei-kicker {
   margin: 0 0 14px;
-  color: var(--seimei-gold);
+  color: var(--seimei-gold-2);
   font-size: 0.92rem;
   font-weight: 700;
 }
@@ -267,14 +288,15 @@ main {
   display: grid;
   gap: 24px;
   margin-top: 24px;
+  min-width: 0;
 }
 
 .seimei-panel,
 .seimei-note-panel {
   padding: clamp(26px, 5vw, 46px);
   background:
-    linear-gradient(180deg, rgba(255, 250, 242, 0.96) 0%, rgba(248, 242, 235, 0.91) 100%),
-    radial-gradient(circle at top right, rgba(203, 183, 230, 0.18), transparent 36%);
+    radial-gradient(circle at 100% 0%, rgba(203, 183, 230, 0.15), transparent 36%),
+    linear-gradient(180deg, rgba(255, 250, 242, 0.97) 0%, rgba(248, 241, 232, 0.93) 100%);
 }
 
 .seimei-panel::before,
@@ -282,9 +304,15 @@ main {
   content: "";
   position: absolute;
   inset: 12px;
-  border: 1px solid rgba(158, 116, 55, 0.12);
+  border: 1px solid rgba(158, 116, 55, 0.13);
   border-radius: calc(var(--seimei-radius-xl) - 10px);
   pointer-events: none;
+}
+
+.seimei-panel > *,
+.seimei-note-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .seimei-label {
@@ -327,13 +355,19 @@ main {
 .seimei-form {
   position: relative;
   display: grid;
-  gap: 19px;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   margin-top: 28px;
 }
 
 .seimei-field {
   display: grid;
   gap: 8px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .seimei-field label {
@@ -353,18 +387,57 @@ main {
 
 .seimei-field input,
 .seimei-field select {
+  display: block;
   width: 100%;
-  min-height: 56px;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 58px;
+  margin: 0;
   padding: 12px 16px;
-  border: 1px solid rgba(128, 100, 158, 0.24);
-  border-radius: 17px;
+  border: 1px solid rgba(128, 100, 158, 0.25);
+  border-radius: 18px;
   color: var(--seimei-ink);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 250, 246, 0.88));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 246, 0.9));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     0 8px 18px rgba(53, 41, 61, 0.055);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+/* iPhone Safari の date input はここを強めに指定する */
+.seimei-field input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  line-height: normal;
+  text-align: center;
+}
+
+.seimei-field input[type="date"]::-webkit-date-and-time-value {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  text-align: center;
+}
+
+.seimei-field input[type="date"]::-webkit-calendar-picker-indicator {
+  margin: 0;
+  padding: 0;
+  opacity: 0.58;
+}
+
+.seimei-field select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 44px;
+  background:
+    linear-gradient(45deg, transparent 50%, #33243f 50%) right 22px center / 8px 8px no-repeat,
+    linear-gradient(135deg, #33243f 50%, transparent 50%) right 16px center / 8px 8px no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 246, 0.9));
 }
 
 .seimei-field input::placeholder {
@@ -374,11 +447,11 @@ main {
 .seimei-field input:focus,
 .seimei-field select:focus {
   outline: 0;
-  border-color: rgba(158, 116, 55, 0.58);
+  border-color: rgba(158, 116, 55, 0.6);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 251, 247, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 251, 247, 0.95));
   box-shadow:
-    0 0 0 4px rgba(220, 192, 132, 0.20),
+    0 0 0 4px rgba(220, 192, 132, 0.2),
     0 12px 26px rgba(53, 41, 61, 0.08);
 }
 
@@ -409,6 +482,7 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: auto;
   min-height: 60px;
   padding: 15px 26px;
   border: 0;
@@ -420,6 +494,11 @@ main {
   text-decoration: none;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+}
+
+.seimei-submit {
+  width: 100%;
+  max-width: 100%;
 }
 
 .seimei-submit::before,
@@ -446,7 +525,7 @@ main {
   color: #fffaf0;
   background:
     radial-gradient(circle at 30% 0%, rgba(255, 250, 240, 0.28), transparent 32%),
-    linear-gradient(135deg, #6c4e86 0%, #a989bd 42%, #7a5a91 100%);
+    linear-gradient(135deg, #5f437a 0%, #9e7ab7 46%, #72528d 100%);
   box-shadow:
     0 18px 40px rgba(75, 52, 102, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
@@ -544,11 +623,14 @@ main {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
+  width: 100%;
+  min-width: 0;
   margin-top: 28px;
 }
 
 .seimei-card-panel {
   position: relative;
+  min-width: 0;
   min-height: 100%;
   padding: 20px 16px 19px;
   border: 1px solid rgba(220, 192, 132, 0.28);
@@ -578,6 +660,8 @@ main {
 }
 
 .seimei-card-panel h3 {
+  position: relative;
+  z-index: 1;
   margin: 0;
   color: var(--seimei-moon);
   font-size: clamp(1.06rem, 2.2vw, 1.34rem);
@@ -602,11 +686,14 @@ main {
   z-index: 1;
   display: grid;
   gap: 18px;
+  width: 100%;
+  min-width: 0;
   margin-top: 26px;
 }
 
 .seimei-reading-block {
   position: relative;
+  min-width: 0;
   padding: clamp(18px, 3vw, 23px);
   border: 1px solid rgba(255, 250, 240, 0.11);
   border-radius: 22px;
@@ -614,7 +701,7 @@ main {
     linear-gradient(180deg, rgba(255, 250, 240, 0.072), rgba(255, 250, 240, 0.046));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.055),
-    0 12px 30px rgba(0, 0, 0, 0.10);
+    0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 .seimei-reading-block::before {
@@ -670,7 +757,14 @@ main {
   border-color: rgba(220, 192, 132, 0.34);
   background:
     radial-gradient(circle at 8% 0%, rgba(220, 192, 132, 0.18), transparent 34%),
-    linear-gradient(180deg, rgba(255, 250, 240, 0.10), rgba(255, 250, 240, 0.052));
+    linear-gradient(180deg, rgba(255, 250, 240, 0.1), rgba(255, 250, 240, 0.052));
+}
+
+.seimei-system-box {
+  border-color: rgba(203, 183, 230, 0.22);
+  background:
+    radial-gradient(circle at 94% 4%, rgba(203, 183, 230, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(255, 250, 240, 0.082), rgba(255, 250, 240, 0.048));
 }
 
 .seimei-speaker {
@@ -687,12 +781,13 @@ main {
   z-index: 1;
   display: grid;
   gap: 18px;
+  min-width: 0;
   margin-top: 28px;
   padding: clamp(22px, 4vw, 34px);
   border: 1px solid rgba(220, 192, 132, 0.34);
   border-radius: 28px;
   background:
-    radial-gradient(circle at 12% 0%, rgba(220, 192, 132, 0.20), transparent 34%),
+    radial-gradient(circle at 12% 0%, rgba(220, 192, 132, 0.2), transparent 34%),
     radial-gradient(circle at 92% 18%, rgba(203, 183, 230, 0.14), transparent 32%),
     rgba(255, 250, 240, 0.075);
   box-shadow:
@@ -707,6 +802,11 @@ main {
   border: 1px solid rgba(255, 250, 240, 0.08);
   border-radius: 20px;
   pointer-events: none;
+}
+
+.seimei-cta > * {
+  position: relative;
+  z-index: 1;
 }
 
 .seimei-cta-label {
@@ -732,7 +832,13 @@ main {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr);
   gap: 12px;
+  width: 100%;
+  min-width: 0;
   margin-top: 2px;
+}
+
+.seimei-cta-actions .seimei-btn {
+  width: 100%;
 }
 
 /* =========================
@@ -747,7 +853,7 @@ main {
 
 .seimei-footer {
   margin-top: 28px;
-  color: rgba(255, 250, 240, 0.70);
+  color: rgba(255, 250, 240, 0.7);
   text-align: center;
   font-size: 0.9rem;
 }
@@ -802,11 +908,12 @@ main {
 
 @media (max-width: 560px) {
   body.seimei-page {
-    line-height: 1.86;
+    line-height: 1.88;
   }
 
   .seimei-shell {
-    width: min(100% - 20px, var(--seimei-container));
+    width: calc(100% - 20px);
+    max-width: var(--seimei-container);
     padding-top: 12px;
   }
 
@@ -836,6 +943,35 @@ main {
   .seimei-result,
   .seimei-note-panel {
     padding: 22px 16px;
+  }
+
+  .seimei-panel::before,
+  .seimei-note-panel::before,
+  .seimei-result::before {
+    inset: 9px;
+    border-radius: 17px;
+  }
+
+  .seimei-form,
+  .seimei-field,
+  .seimei-field input,
+  .seimei-field select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .seimei-field input,
+  .seimei-field select {
+    min-height: 56px;
+    padding: 11px 14px;
+    border-radius: 17px;
+  }
+
+  .seimei-field input[type="date"] {
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 1rem;
   }
 
   .seimei-card-grid {
@@ -868,12 +1004,23 @@ main {
 
   .seimei-submit,
   .seimei-btn {
+    width: 100%;
     min-height: 60px;
     padding-inline: 18px;
   }
 }
 
 @media (max-width: 390px) {
+  .seimei-shell {
+    width: calc(100% - 16px);
+  }
+
+  .seimei-panel,
+  .seimei-result,
+  .seimei-note-panel {
+    padding-inline: 14px;
+  }
+
   .seimei-hero h1 {
     font-size: 2rem;
   }
@@ -884,6 +1031,11 @@ main {
 
   .seimei-result-title {
     font-size: 1.48rem;
+  }
+
+  .seimei-field input,
+  .seimei-field select {
+    font-size: 0.98rem;
   }
 }
 
