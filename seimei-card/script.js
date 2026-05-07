@@ -69,11 +69,16 @@ const COURT_CARD_TABLE = [
 
 const SEIMEI_SYSTEM = {
   title: "詩韻式 星命カードリーディング",
-  subtitle: "生まれた日に宿る星座・タロット・生命の樹を重ね、魂の傾向と今の悩みを読み解く占い",
+  subtitle:
+    "生まれた日に宿る星座・タロット・四大元素・生命の樹を重ね、魂の傾向と心の回復点を読み解く詩韻独自のカードリーディング。",
   definition:
-    "星命カードは、単なる性格診断ではありません。生年月日に宿る星座の質、大アルカナの魂の核、小アルカナの人生テーマ、コートカードの対人性、そして生命の樹の成長段階を重ねて読み解く、詩韻式のカードリーディングです。",
+    "星命カードは、単なる性格診断や未来を断定する占いではありません。生まれた月日に宿る星座の質、大アルカナが示す魂の核、小アルカナが映す人生テーマ、対人星命カードに表れる外側の役割、そして生命の樹における成長段階を重ね、その人がどこで傷つきやすく、どんな力を持ち、どんな言葉で自分を取り戻せるのかを読み解きます。",
+  method:
+    "このリーディングでは、伝統的なタロット象徴、西洋占星術のデカン、四大元素、生命の樹の構造をもとに、詩韻独自の言葉で再構成しています。専門知識をそのまま並べるのではなく、今の悩みに結びつく“心の地図”として読めるよう設計しています。",
   note:
-    "未来を決めつけるためではなく、なぜ同じ悩みを繰り返すのか、どこで傷つき、どんな言葉で自分を取り戻せるのかを照らすために使います。"
+    "結果はあなたを決めつけるためのものではありません。同じ不安を繰り返す理由、関係の中で無理をしやすい場所、本当は大切にしたい願いに気づくための入口です。",
+  promise:
+    "怖がらせるためではなく、心を取り戻すために。未来を縛るためではなく、選び直せる場所を照らすために。星命カードは、あなたの魂に残っている小さな光を言葉に変えていきます。"
 };
 
 const THEME_LABELS = {
@@ -320,7 +325,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、基盤作り、環境整備、チームや土台を安定させることが重要です。",
     relation: "人間関係では、気を張らずにいられる場所や相手を大切にする時です。"
   },
-
   "ペンタクル5": {
     title: "欠けた安心を見つめる土",
     element: "土",
@@ -351,7 +355,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、成果が出る前の見直し期間です。焦らず改善することで実りに近づきます。",
     relation: "人間関係では、時間をかけて信頼を育てる相手と、無理に続けている関係を見分ける時です。"
   },
-
   "ソード8": {
     title: "思考の檻に気づく風",
     element: "風",
@@ -382,7 +385,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、無理な思考や過剰な責任を終わらせる時です。整理と休息が次の行動を生みます。",
     relation: "人間関係では、傷ついた言葉や出来事を何度も反芻する流れを止める必要があります。"
   },
-
   "カップ2": {
     title: "心と心を結ぶ水",
     element: "水",
@@ -413,7 +415,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、現状への飽きや停滞感が出やすい時です。小さな意味の再発見が鍵です。",
     relation: "人間関係では、誘いや好意を受け取りにくくなっている可能性があります。まず心を休ませてください。"
   },
-
   "ワンド5": {
     title: "自分の火を試す段階",
     element: "火",
@@ -444,7 +445,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、立場や方針を守る力が求められます。逃げずに向き合うことで信頼が生まれます。",
     relation: "人間関係では、無理に全員に分かってもらおうとしなくて大丈夫です。"
   },
-
   "ペンタクル8": {
     title: "才能を磨く土",
     element: "土",
@@ -475,7 +475,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、長期的な成果、資産、信用、組織づくりに力があります。",
     relation: "人間関係では、一時的な楽しさより、長く支え合える関係を大切にする時です。"
   },
-
   "ソード2": {
     title: "心の天秤を整える風",
     element: "風",
@@ -506,7 +505,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、休息や整理期間を取ることで、次の判断が正確になります。",
     relation: "人間関係では、無理に返事をしたり会ったりせず、距離を置くことも回復になります。"
   },
-
   "カップ5": {
     title: "失ったものへの涙を受け止める水",
     element: "水",
@@ -537,7 +535,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、やりたいことが多く散らかりやすい時です。今選ぶべき一つに絞ることが鍵です。",
     relation: "人間関係では、相手への期待やイメージが膨らみやすい時です。現実の言動を見ることが大切です。"
   },
-
   "ワンド8": {
     title: "変化の流れに乗る火",
     element: "火",
@@ -568,7 +565,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、責任過多、タスク過多に注意が必要です。任せることも実力の一部です。",
     relation: "人間関係では、周囲の期待に応えすぎて自分の余白がなくなりやすい時です。"
   },
-
   "ペンタクル2": {
     title: "現実の波を乗りこなす土",
     element: "土",
@@ -599,7 +595,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、安定やお金を守る力があります。ただし、守りに入りすぎると成長が止まりやすくなります。",
     relation: "人間関係では、距離感や所有感を見直すことで心が軽くなります。"
   },
-
   "ソード5": {
     title: "自分らしさと孤独を扱う風",
     element: "風",
@@ -630,7 +625,6 @@ const DETAIL_CARD_DATA = {
     work: "仕事では、一人で進める力がありますが、情報共有を怠ると誤解につながります。",
     relation: "人間関係では、言わないことで守っているつもりの本音が、逆に距離を作ることがあります。"
   },
-
   "カップ8": {
     title: "満たされない場所を離れる水",
     element: "水",
@@ -762,6 +756,129 @@ const COURT_READING_DATA = {
   }
 };
 
+const ELEMENT_DIGNITY_TABLE = {
+  fire: {
+    fire: {
+      relation: "重なり合う",
+      title: "火が強く燃える星命",
+      summary: "内側の情熱と、外に出る行動力が重なりやすい配置です。",
+      text:
+        "あなたの内側には、物事を動かしたい衝動や、自分の意志で未来を切り開きたい火が宿っています。さらに人と関わる時にも、その火が外へ出やすいため、周囲からは情熱的・行動的・印象に残る人として見られやすいでしょう。ただし、火が強い星命は、燃え尽きや焦りも起こしやすいもの。大切なのは、勢いだけで走ることではなく、何のために燃えるのかを見失わないことです。"
+    },
+    air: {
+      relation: "響き合う",
+      title: "言葉が火を育てる星命",
+      summary: "情熱と言葉が結びつき、発信や対話によって力が開きやすい配置です。",
+      text:
+        "あなたの中にある情熱は、言葉・発信・会話・選択によって外へ広がります。思いついたことを胸の中にしまい込むより、言葉にして誰かへ届けた時、星命の火が強くなります。ただし、考えすぎると火が弱まり、勢いだけで話すと言葉が鋭くなりすぎます。あなたに必要なのは、熱量と知性を同じ器に入れること。伝えることで、道が開く星命です。"
+    },
+    water: {
+      relation: "揺れ合う",
+      title: "情熱と感情が揺れやすい星命",
+      summary: "進みたい衝動と、傷つきたくない心がぶつかりやすい配置です。",
+      text:
+        "あなたの内側には前へ進みたい火があります。けれど、人と関わる場面では感情の揺れや相手の反応を深く感じ取りやすく、動きたいのに不安で止まることがあります。この星命は弱いのではありません。情熱があるからこそ、傷つくことも怖くなるのです。焦って動くより、まず心の温度を整えること。感情を否定せずに扱えた時、あなたの火はやさしく、長く燃え続けます。"
+    },
+    earth: {
+      relation: "整え合う",
+      title: "情熱を現実に変える星命",
+      summary: "理想や衝動を、形ある成果や信頼へ変えていく配置です。",
+      text:
+        "あなたの内側には、始めたい、進みたい、形にしたいという火があります。一方で、人と関わる時には現実感や責任感が出やすく、勢いだけではなく、信頼できる形に整えようとします。この星命の鍵は、情熱を消すことではなく、続けられる仕組みに変えることです。小さな計画、習慣、約束、積み重ね。その中に、あなたの火が現実を変える力があります。"
+    }
+  },
+  water: {
+    fire: {
+      relation: "揺れ合う",
+      title: "感情と衝動がぶつかりやすい星命",
+      summary: "深く感じる心と、外へ向かう勢いが交差する配置です。",
+      text:
+        "あなたは心の奥で多くを感じ取る星命です。けれど、人と関わる場面では勢いや情熱が外へ出やすく、優しさと衝動の間で揺れることがあります。本当は受け止めたいのに、先に動いてしまう。本当は伝えたいのに、感情が追いつかない。そんな時は、行動する前に『私は本当は何を守りたいのか』を確認してください。感情を置き去りにしない行動が、あなたの星命を整えます。"
+    },
+    water: {
+      relation: "重なり合う",
+      title: "感受性が深く満ちる星命",
+      summary: "内側にも外側にも、水の感受性が強く出やすい配置です。",
+      text:
+        "あなたの星命には、深い共感力と、人の心の揺れを感じ取る力があります。内側でも外側でも水の力が働くため、誰かの痛みや沈黙に敏感で、言葉になる前の感情まで受け取ってしまうことがあるでしょう。それは大きな才能です。ただし、相手の気持ちを抱え込みすぎると、自分の輪郭が薄くなります。やさしさを守るためには、境界線もまた必要です。"
+    },
+    air: {
+      relation: "整え合う",
+      title: "感情を言葉に変える星命",
+      summary: "感じたことを言葉にすることで、心の整理が進む配置です。",
+      text:
+        "あなたの内側には、繊細な感情の流れがあります。そして外へ出る時には、言葉や思考の力が働きます。この星命は、感情をただ抱え込むのではなく、言葉にすることで自分を取り戻す配置です。日記、会話、発信、相談、リーディング。心に浮かんだものを丁寧に言語化するほど、迷いの輪郭が見えてきます。ただし、分析しすぎて本音から離れないようにしてください。"
+    },
+    earth: {
+      relation: "育て合う",
+      title: "心を安心へ育てる星命",
+      summary: "感情の豊かさと現実の安定が支え合う配置です。",
+      text:
+        "あなたの星命は、心のぬくもりを現実の安心へ変えていく力を持っています。感じるだけで終わらせず、関係、居場所、生活、信頼として育てていける人です。人を癒す力がある一方で、相手を支えることに意識が向きすぎると、自分の安心を後回しにしやすい面もあります。大切なのは、誰かの居場所になる前に、あなた自身が安心できる場所を持つことです。"
+    }
+  },
+  air: {
+    fire: {
+      relation: "響き合う",
+      title: "発想が行動へ変わる星命",
+      summary: "思考と言葉が、情熱や挑戦を後押しする配置です。",
+      text:
+        "あなたの内側には、考える力、見極める力、言葉にする力があります。そして人と関わる場面では、その思考が行動や情熱へ変わりやすい星命です。発信、会話、提案、決断によって流れが動きます。ただし、言葉が強くなりすぎると、届けたい本音より先に鋭さが伝わってしまうことがあります。あなたの言葉は、火をつける力を持つからこそ、温度を選ぶことが大切です。"
+    },
+    water: {
+      relation: "整え合う",
+      title: "心を言葉で整える星命",
+      summary: "思考と感情を行き来しながら、本音を見つける配置です。",
+      text:
+        "あなたは、頭で理解したい気持ちと、心で感じ取る力の両方を持っています。だからこそ、考えすぎて苦しくなる時もあれば、感じすぎて言葉を失う時もあるでしょう。この星命の鍵は、どちらか一方に偏らないことです。感情を否定せず、でも感情だけで決めつけない。言葉にしながら、心の温度も残す。そのバランスが、あなたを救います。"
+    },
+    air: {
+      relation: "重なり合う",
+      title: "思考と言葉が鋭くなる星命",
+      summary: "内側にも外側にも、風の知性と言語化の力が強く出る配置です。",
+      text:
+        "あなたの星命には、物事を見抜く力、言葉にする力、状況を整理する力が強く宿っています。人からは冷静で頭の回転が速い人、筋道を示してくれる人として見られやすいでしょう。ただし、風が強すぎると、心が追いつく前に答えを出そうとしてしまいます。正しさだけで自分を裁かないこと。時には、まだ言葉にならない気持ちをそのまま置いておくことも必要です。"
+    },
+    earth: {
+      relation: "噛み合いを整える",
+      title: "理想と現実を結び直す星命",
+      summary: "考えや理想を、現実へ落とし込む時に葛藤が出やすい配置です。",
+      text:
+        "あなたの内側には、考え、理想、分析、言葉の力があります。一方で人と関わる場面では、現実的な責任や結果を求められやすい星命です。頭では分かっているのに動けない。理想はあるのに形にする段階で止まる。そんな葛藤が起こりやすいでしょう。鍵は、完璧な答えを探すことではありません。今できる一歩に落とすこと。それが風と土をつなぎます。"
+    }
+  },
+  earth: {
+    fire: {
+      relation: "整え合う",
+      title: "現実に火を通す星命",
+      summary: "安定や継続の中に、情熱を宿していく配置です。",
+      text:
+        "あなたの内側には、現実を整え、積み重ね、確かな形を作りたい土の力があります。一方で、人と関わる時には情熱やリーダー性が出やすく、周囲を前へ動かす火が表れます。この星命は、慎重さと勢いを両方持っています。大切なのは、守りに入りすぎて火を消さないこと。積み重ねてきた土台に火を通すことで、あなたの力は大きく動き出します。"
+    },
+    water: {
+      relation: "育て合う",
+      title: "安心と感情を育てる星命",
+      summary: "現実的な安定と、心のやわらかさが支え合う配置です。",
+      text:
+        "あなたの内側には、暮らし、信頼、継続、責任を大切にする土の力があります。そして外側には、心を受け止める水の力が表れやすい星命です。人からは、安心できる人、話を聞いてくれる人、戻れる場所のような存在として見られやすいでしょう。ただし、支えることが当たり前になると、あなた自身の疲れに気づきにくくなります。安心は、与えるだけでなく受け取るものでもあります。"
+    },
+    air: {
+      relation: "噛み合いを整える",
+      title: "現実と思考が絡まりやすい星命",
+      summary: "現実感と分析力が強いぶん、考えすぎて動きにくくなる配置です。",
+      text:
+        "あなたの内側には、現実を守り、失敗を避け、確かなものを積み重ねたい力があります。そこに風の思考が重なると、慎重さと分析が強くなり、動く前に多くを考えすぎることがあります。これは弱さではなく、失敗から自分を守る知性です。ただし、考え続けるだけでは現実は変わりません。小さく試す、少し話す、一歩だけ動く。それが星命の滞りをほどきます。"
+    },
+    earth: {
+      relation: "重なり合う",
+      title: "現実を積み重ねる星命",
+      summary: "内側にも外側にも、土の安定と継続の力が強く出る配置です。",
+      text:
+        "あなたの星命には、現実を整え、信頼を積み重ね、長く続くものを築く力があります。人からは堅実で頼れる人、安心感のある人として見られやすいでしょう。ただし、土が強い星命は、守る力が強いぶん、変化を受け入れるまでに時間がかかることがあります。大切なのは、安定を壊すことではなく、安定の中に新しい余白を作ることです。"
+    }
+  }
+};
+
 const ERROR_MESSAGE = "生年月日を入力してね。しおぽんが星命カードを探しにいけないの……ぴょん。";
 
 function parseDateInput(value) {
@@ -805,6 +922,44 @@ function getCourtCardByDate(mmdd) {
   return findByDate(COURT_CARD_TABLE, mmdd);
 }
 
+function getElementByCardName(cardName) {
+  if (cardName.includes("ワンド")) {
+    return { key: "fire", name: "火", label: "情熱・行動・表現" };
+  }
+
+  if (cardName.includes("カップ")) {
+    return { key: "water", name: "水", label: "感情・共感・癒し" };
+  }
+
+  if (cardName.includes("ソード")) {
+    return { key: "air", name: "風", label: "思考・言葉・判断" };
+  }
+
+  if (cardName.includes("ペンタクル")) {
+    return { key: "earth", name: "土", label: "現実・安定・継続" };
+  }
+
+  return null;
+}
+
+function getElementDignity(detailCardName, courtCardName) {
+  const detailElement = getElementByCardName(detailCardName);
+  const courtElement = getElementByCardName(courtCardName);
+
+  if (!detailElement || !courtElement) return null;
+
+  const dignity = ELEMENT_DIGNITY_TABLE[detailElement.key][courtElement.key];
+
+  return {
+    detailElement,
+    courtElement,
+    relation: dignity.relation,
+    title: dignity.title,
+    summary: dignity.summary,
+    text: dignity.text
+  };
+}
+
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (char) => ({
     "&": "&amp;",
@@ -819,36 +974,48 @@ function normalizeTheme(theme) {
   return THEME_LABELS[theme] ? theme : "今の自分";
 }
 
-function buildThemeText(theme, majorData, detailData, courtData) {
+function buildThemeText(theme, majorData, detailData, courtData, balanceData) {
   const selectedTheme = normalizeTheme(theme);
+
+  const balanceParagraph = balanceData
+    ? `<p>また、星命バランスでは「${balanceData.title}」が示されています。これは、あなたの内側のテーマと、人前に出る役割がどのように響き合うかを表します。</p>`
+    : "";
 
   const themeMap = {
     "今の自分": `
       <p>今のあなたを読む時、中心にあるのは《${majorData.cardName}》の星命です。${majorData.self}</p>
       <p>詳細星命カード《${detailData.title}》は、今あなたが向き合っている具体的な段階を示します。${detailData.self}</p>
-      <p>そしてコートカードは《${courtData.title}》。${courtData.self}</p>
-      <p>今、大切なのは「自分はどうあるべきか」よりも、「本当はどこで無理をしていたのか」に気づくことです。</p>
+      <p>対人星命カード《${courtData.title}》は、外から見えるあなたの役割を表します。${courtData.self}</p>
+      ${balanceParagraph}
+      <p>今、大切なのは「ちゃんとしなきゃ」と自分を縛ることではありません。本当はどこで無理をしていたのか、どんな場面で自分の本音を置き去りにしてきたのかに気づくことです。</p>
+      <p>あなたの星命は、欠点を探すためのものではなく、心の使い方を取り戻すための地図です。</p>
     `,
 
     "恋愛": `
       <p>恋愛でこの星命を見る時、《${majorData.cardName}》はあなたの愛し方の核を示します。${majorData.love}</p>
       <p>詳細星命カード《${detailData.title}》は、今の恋で起こりやすい心の動きを表します。${detailData.love}</p>
-      <p>相手から見えるあなたの印象は《${courtData.title}》に表れます。${courtData.love}</p>
-      <p>この恋で大切なのは、相手の気持ちを当てることだけではありません。あなた自身が、どんな扱われ方を望み、どんな関係なら心が安心できるのかを見つめることです。</p>
+      <p>相手から見えるあなたの印象は、対人星命カード《${courtData.title}》に表れます。${courtData.love}</p>
+      ${balanceParagraph}
+      <p>この恋で大切なのは、相手の気持ちを当てることだけではありません。あなた自身が、どんな扱われ方を望み、どんな距離感なら安心できて、どんな言葉なら心を閉ざさずにいられるのかを見つめることです。</p>
+      <p>好きだからこそ不安になることがあります。けれど、不安だけを真実にしなくて大丈夫です。</p>
     `,
 
     "仕事": `
       <p>仕事でこの星命を見る時、《${majorData.cardName}》はあなたの才能の核を示します。${majorData.work}</p>
       <p>詳細星命カード《${detailData.title}》は、今の仕事運で伸ばすべき力や課題を示します。${detailData.work}</p>
-      <p>職場や活動の中で外に出やすいあなたの役割は《${courtData.title}》です。${courtData.work}</p>
-      <p>今の仕事で大切なのは、ただ頑張ることではなく、自分の星命がどの形なら長く燃え続けられるのかを見極めることです。</p>
+      <p>職場や活動の中で外に出やすいあなたの役割は、対人星命カード《${courtData.title}》です。${courtData.work}</p>
+      ${balanceParagraph}
+      <p>今の仕事で大切なのは、ただ努力量を増やすことではありません。どの働き方ならあなたの星命が長く燃え続けるのか、どんな役割なら心をすり減らさずに力を発揮できるのかを見極めることです。</p>
+      <p>才能は、無理を続けた先ではなく、自分に合った形を見つけた時に開きます。</p>
     `,
 
     "人間関係": `
       <p>人間関係でこの星命を見る時、《${majorData.cardName}》はあなたが人と関わる時の基本姿勢を示します。${majorData.relation}</p>
       <p>詳細星命カード《${detailData.title}》は、今の関係性で起こりやすい課題を表します。${detailData.relation}</p>
-      <p>周囲から見えるあなたの印象は《${courtData.title}》に表れます。${courtData.relation}</p>
-      <p>今、大切なのは誰かに合わせ続けることではなく、あなたの優しさが消耗しない距離感を見つけることです。</p>
+      <p>周囲から見えるあなたの印象は、対人星命カード《${courtData.title}》に表れます。${courtData.relation}</p>
+      ${balanceParagraph}
+      <p>今、大切なのは誰かに合わせ続けることではなく、あなたの優しさが消耗しない距離感を見つけることです。人との関係は、近ければ良いとは限りません。心が安心して呼吸できる距離こそ、今のあなたに必要な星命の間合いです。</p>
+      <p>離れることが冷たさではなく、自分を守るための誠実さになる時もあります。</p>
     `
   };
 
@@ -860,15 +1027,24 @@ function buildReadingText({ nickname, theme, major, decan, court }) {
   const majorData = READING_DATA[major.card];
   const detailData = DETAIL_CARD_DATA[decan.card];
   const courtData = COURT_READING_DATA[court.card];
+  const balanceData = getElementDignity(decan.card, court.card);
   const displayName = nickname ? `${escapeHtml(nickname)}さん` : "あなた";
 
   return {
     title: `${displayName}の星命カード`,
     lead:
       `あなたの本星命カードは《${majorData.cardName}》。${major.sign}に宿る「${majorData.typeName}」です。` +
-      `星命カードでは、この一枚を性格ではなく、魂が何を学び、どこで傷つき、どんな言葉で回復するのかを示す“魂の核”として読みます。`,
+      `星命カードでは、この一枚をただの性格ではなく、魂が何を学び、どこで傷つき、どんな言葉で回復していくのかを示す“核のカード”として読みます。`,
+
     systemDefinition: SEIMEI_SYSTEM.definition,
+    systemMethod: SEIMEI_SYSTEM.method,
     systemNote: SEIMEI_SYSTEM.note,
+    systemPromise: SEIMEI_SYSTEM.promise,
+
+    overviewTitle: "星命の全体像",
+    overviewText:
+      `あなたの星命は、《${majorData.cardName}》の魂の核を中心に、《${decan.card}》が示す具体的な人生テーマ、そして《${court.card}》が表す対人面の役割によって形作られています。` +
+      `これは単に「どんな性格か」を見るものではなく、あなたが人生の中でどんな場面に反応しやすく、何を守ろうとして、どこで心をすり減らしやすいのかを読むための構造です。`,
 
     mainTitle: `本星命カード：${majorData.cardName}`,
     mainText:
@@ -876,31 +1052,42 @@ function buildReadingText({ nickname, theme, major, decan, court }) {
 
     detailTitle: `詳細星命カード：${decan.card}`,
     detailText:
-      `《${decan.card}》は「${detailData.title}」。${decan.sign}のデークに宿る小アルカナで、人生の中で繰り返しやすい具体的なテーマを示します。${detailData.essence}`,
+      `《${decan.card}》は「${detailData.title}」。${decan.sign}のデカンに宿る小アルカナで、人生の中で繰り返しやすい具体的なテーマを示します。${detailData.essence}`,
 
     treeTitle: "生命の樹で見る魂の段階",
     treeText:
       `この詳細星命は、生命の樹では「${detailData.sephirah}」の段階に触れています。` +
-      `つまり、あなたの星命は抽象的な性格ではなく、今どの成長段階で悩みやすく、どこを整えると現実が動き出すのかを示しています。`,
+      `ここで示されるのは、あなたの心が今どの成長テーマに反応しやすいかということです。つまり星命カードは、抽象的な性格ではなく、どこを整えると現実が動き出すのかを映す“魂の段階図”でもあります。`,
 
-    courtTitle: `コートカード：${court.card}`,
+    courtTitle: `対人星命カード：${court.card}`,
     courtText:
-      `《${court.card}》は「${courtData.title}」。これは、あなたが人と関わる時に外へ表れやすい人格や役割を示します。${courtData.essence}`,
+      `《${court.card}》は「${courtData.title}」。これは、あなたが人と関わる時に外へ表れやすい人格、役割、周囲から見られやすい印象を示します。${courtData.essence}`,
+
+    balanceTitle: balanceData
+      ? `星命バランス：${balanceData.detailElement.name} × ${balanceData.courtElement.name}`
+      : "星命バランス",
+
+    balanceText: balanceData
+      ? `あなたの詳細星命カード《${decan.card}》には「${balanceData.detailElement.name}」の力が宿っています。これは、${balanceData.detailElement.label}を表します。` +
+        `一方、対人星命カード《${court.card}》には「${balanceData.courtElement.name}」の力が表れています。これは、${balanceData.courtElement.label}を表します。` +
+        `この組み合わせは「${balanceData.relation}」星命です。${balanceData.text}`
+      : "あなたの詳細星命と対人星命の元素関係を読み解きます。",
 
     lightShadowTitle: "光の面と影の面",
     lightShadowText:
       `この星命の光は、${majorData.light}です。一方で影として、${majorData.shadow}が出やすくなります。` +
-      `影は悪いものではありません。そこには、まだ言葉になっていない傷や願いが隠れています。${majorData.wound}`,
+      `ただし、影は悪いものではありません。そこには、まだ言葉になっていない傷、守りたかった願い、置き去りにしてきた本音が隠れています。${majorData.wound}`,
 
     recoveryTitle: "星命をひらく鍵",
     recoveryText:
-      `${majorData.recoveryKey} 星命カードは、あなたを決めつけるものではなく、心の使い方を思い出すための地図です。`,
+      `${majorData.recoveryKey} 星命カードは、あなたを分類して終わるものではありません。` +
+      `自分を責めてきた理由に気づき、心の使い方を少しずつ取り戻すための地図です。`,
 
     themeTitle: `${selectedTheme}への星命リーディング`,
-    themeText: buildThemeText(selectedTheme, majorData, detailData, courtData),
+    themeText: buildThemeText(selectedTheme, majorData, detailData, courtData, balanceData),
 
-    todayTitle: "今日の星命メッセージ",
-    todayText: majorData.message,
+    messageTitle: "いま必要な星命メッセージ",
+    messageText: majorData.message,
 
     shioponTitle: "しおぽんの星命メッセージ",
     shioponText: majorData.shioponLine,
@@ -918,14 +1105,14 @@ function renderResult({ nickname, theme, major, decan, court }) {
   if (!resultArea) return;
 
   const reading = buildReadingText({ nickname, theme, major, decan, court });
-  const selectedTheme = normalizeTheme(theme);
   const majorData = READING_DATA[major.card];
   const detailData = DETAIL_CARD_DATA[decan.card];
   const courtData = COURT_READING_DATA[court.card];
+  const balanceData = getElementDignity(decan.card, court.card);
 
   resultArea.innerHTML = `
     <div class="seimei-result-head">
-      <p class="seimei-label">SEIMEI READING</p>
+      <p class="seimei-label">SEIMEI CARD READING</p>
       <h2 class="seimei-result-title">${reading.title}</h2>
       <p class="seimei-result-lead">${reading.lead}</p>
     </div>
@@ -935,33 +1122,53 @@ function renderResult({ nickname, theme, major, decan, court }) {
       <h3>${SEIMEI_SYSTEM.title}</h3>
       <p>${SEIMEI_SYSTEM.subtitle}</p>
       <p>${reading.systemDefinition}</p>
+      <p>${reading.systemMethod}</p>
       <p>${reading.systemNote}</p>
+      <p>${reading.systemPromise}</p>
     </section>
 
-    <div class="seimei-card-grid" aria-label="診断された3つの星命カード">
+    <div class="seimei-card-grid" aria-label="診断された星命カード">
       <article class="seimei-card-panel">
-        <p class="seimei-card-label">MAIN CARD</p>
+        <p class="seimei-card-label">CORE</p>
         <h3>本星命カード：${major.card}</h3>
         <p>${major.sign}／${major.typeName}</p>
         <p>${majorData.archetype}</p>
       </article>
 
       <article class="seimei-card-panel">
-        <p class="seimei-card-label">DETAIL CARD</p>
+        <p class="seimei-card-label">THEME</p>
         <h3>詳細星命カード：${decan.card}</h3>
         <p>${detailData.title}</p>
         <p>${detailData.element}のエレメント／${detailData.sephirah}</p>
       </article>
 
       <article class="seimei-card-panel">
-        <p class="seimei-card-label">COURT CARD</p>
-        <h3>コートカード：${court.card}</h3>
+        <p class="seimei-card-label">PERSONA</p>
+        <h3>対人星命カード：${court.card}</h3>
         <p>${courtData.title}</p>
         <p>${courtData.essence}</p>
       </article>
+
+      ${
+        balanceData
+          ? `
+            <article class="seimei-card-panel">
+              <p class="seimei-card-label">BALANCE</p>
+              <h3>星命バランス：${balanceData.detailElement.name} × ${balanceData.courtElement.name}</h3>
+              <p>${balanceData.title}</p>
+              <p>${balanceData.summary}</p>
+            </article>
+          `
+          : ""
+      }
     </div>
 
     <div class="seimei-reading">
+      <section class="seimei-reading-block seimei-overview-block">
+        <h3>${reading.overviewTitle}</h3>
+        <p>${reading.overviewText}</p>
+      </section>
+
       <section class="seimei-reading-block">
         <h3>${reading.mainTitle}</h3>
         <p>${reading.mainText}</p>
@@ -982,6 +1189,11 @@ function renderResult({ nickname, theme, major, decan, court }) {
         <p>${reading.courtText}</p>
       </section>
 
+      <section class="seimei-reading-block seimei-balance-block">
+        <h3>${reading.balanceTitle}</h3>
+        <p>${reading.balanceText}</p>
+      </section>
+
       <section class="seimei-reading-block">
         <h3>${reading.lightShadowTitle}</h3>
         <p>${reading.lightShadowText}</p>
@@ -997,9 +1209,9 @@ function renderResult({ nickname, theme, major, decan, court }) {
         ${reading.themeText}
       </section>
 
-      <section class="seimei-reading-block">
-        <h3>${reading.todayTitle}</h3>
-        <p>${reading.todayText}</p>
+      <section class="seimei-reading-block seimei-message-block">
+        <h3>${reading.messageTitle}</h3>
+        <p>${reading.messageText}</p>
       </section>
 
       <section class="seimei-reading-block">
@@ -1014,17 +1226,22 @@ function renderResult({ nickname, theme, major, decan, court }) {
     </div>
 
     <section class="seimei-cta" aria-labelledby="seimeiCtaTitle">
-      <p class="seimei-cta-label">NEXT STEP</p>
+      <p class="seimei-cta-label">DEEP READING</p>
       <h3 id="seimeiCtaTitle">この星命を、今の悩みに合わせて深く読む</h3>
       <p>
-        星命カードは、生まれ持った魂の傾向を映す入口です。<br />
-        けれど、実際の恋愛、仕事、人間関係の中でこの星命がどう表れているかは、今の状況によって変わります。
+        ここで表示された星命は、あなたの魂に流れる基本構造です。<br />
+        けれど、実際の恋愛、仕事、人間関係の中でどの星命が強く表れているかは、今置かれている状況によって変わります。
       </p>
       <p>
-        「なぜ同じ恋で不安になるのか」<br />
-        「なぜ仕事で同じ壁にぶつかるのか」<br />
-        「なぜ人間関係で疲れやすいのか」<br />
-        その理由を、星命カード・タロット・言葉でさらに深く読み解きます。
+        たとえば、同じ《${major.card}》の星命でも、恋愛では不安として出ることがあり、仕事では才能として出ることがあります。<br />
+        同じ《${decan.card}》のテーマでも、相手との関係性や現在の選択によって、必要な言葉は変わります。
+      </p>
+      <p>
+        個人鑑定では、星命カードの結果に加えて、今の悩みに対するタロット展開を重ね、<br />
+        「なぜ同じ不安を繰り返すのか」<br />
+        「どこで自分を責めてしまうのか」<br />
+        「今、本当に選び直すべきことは何か」<br />
+        を、あなたの状況に合わせて深く読み解きます。
       </p>
       <div class="seimei-cta-actions">
         <a class="seimei-btn seimei-btn-primary" href="../consultation/index.html">この星命を個人鑑定で深く見る</a>
@@ -1090,11 +1307,14 @@ if (typeof window !== "undefined") {
     READING_DATA,
     DETAIL_CARD_DATA,
     COURT_READING_DATA,
+    ELEMENT_DIGNITY_TABLE,
     parseDateInput,
     isInRange,
     getMajorCardByDate,
     getDecanCardByDate,
     getCourtCardByDate,
+    getElementByCardName,
+    getElementDignity,
     buildReadingText,
     renderResult
   };
