@@ -70,15 +70,15 @@ const COURT_CARD_TABLE = [
 const SEIMEI_SYSTEM = {
   title: "詩韻式 星命カードリーディング",
   subtitle:
-    "生まれた日に宿る星座・タロット・四大元素・生命の樹を重ね、魂の傾向と心の回復点を読み解く詩韻独自のカードリーディング。",
+    "生まれた日に宿る星座・タロット・四大元素・生命の樹を重ね、あなたの心の癖と回復点を読み解く、詩韻独自のカードリーディング。",
   definition:
-    "星命カードは、単なる性格診断や未来を断定する占いではありません。生まれた月日に宿る星座の質、大アルカナが示す魂の核、小アルカナが映す人生テーマ、対人星命カードに表れる外側の役割、そして生命の樹における成長段階を重ね、その人がどこで傷つきやすく、どんな力を持ち、どんな言葉で自分を取り戻せるのかを読み解きます。",
+    "星命カードは、あなたを決めつけるための診断ではありません。生まれた日に宿る象徴をもとに、なぜ同じことで傷つきやすいのか、どんな場面で無理をしやすいのか、本当はどんな言葉で心が戻るのかを読むためのものです。",
   method:
-    "このリーディングでは、伝統的なタロット象徴、西洋占星術のデカン、四大元素、生命の樹の構造をもとに、詩韻独自の言葉で再構成しています。専門知識をそのまま並べるのではなく、今の悩みに結びつく“心の地図”として読めるよう設計しています。",
+    "このリーディングでは、タロット・西洋占星術・四大元素・生命の樹の考え方を、詩韻独自の言葉で再構成しています。専門用語を並べるのではなく、今の自分を見つめ直すための“心の地図”として読めるようにしています。",
   note:
-    "結果はあなたを決めつけるためのものではありません。同じ不安を繰り返す理由、関係の中で無理をしやすい場所、本当は大切にしたい願いに気づくための入口です。",
+    "結果は、あなたの性格を固定するものではありません。今まで責めてきた自分を、少し違う角度から理解するための入口です。",
   promise:
-    "怖がらせるためではなく、心を取り戻すために。未来を縛るためではなく、選び直せる場所を照らすために。星命カードは、あなたの魂に残っている小さな光を言葉に変えていきます。"
+    "怖がらせるためではなく、心を取り戻すために。未来を縛るためではなく、選び直せる場所を照らすために。星命カードは、あなたの中に残っている小さな光を言葉に変えていきます。"
 };
 
 const THEME_LABELS = {
@@ -291,6 +291,140 @@ const READING_DATA = {
     self: "今の自分を見る時、この星命は『不安の中にも、心からのメッセージがある』と伝えています。ただし、不安そのものを未来予言にしないでください。",
     message: "不安は、いつも真実とは限りません。",
     shioponLine: "この星命はね、暗い夜でも歩けるだけの光をくれるの。不安の海でも、月はちゃんと浮かんでるの……ぴょん。"
+  }
+};
+
+const MAJOR_HOOK_DATA = {
+  "皇帝": {
+    catchTitle: "ひとりで頑張る癖があるあなたへ",
+    oneLine: "あなたは、本当は不安でも、先に自分が何とかしようとしてしまう人です。",
+    opening:
+      "人に頼る前に、自分が動く。弱音を見せる前に、平気な顔をする。そんなふうに、気づけばいつも“しっかりしている側”に立ってきたのではないでしょうか。",
+    hidden:
+      "でもその強さの奥には、『ちゃんとしていないと認められない』『自分が崩れたら全部が止まってしまう』という緊張が隠れていることがあります。",
+    turn:
+      "この星命が見ているのは、あなたの強さそのものではなく、その強さの奥でずっと我慢してきた心です。"
+  },
+
+  "教皇": {
+    catchTitle: "信じられるものを大切にしたいあなたへ",
+    oneLine: "あなたは、軽い言葉よりも、積み重なる信頼を大切にする人です。",
+    opening:
+      "勢いだけの関係や、その場だけの約束では心が安心しにくい。ちゃんと向き合ってくれること、変わらずにいてくれること、言葉と行動が重なっていること。あなたにとって、それはとても大切なものです。",
+    hidden:
+      "そのぶん、曖昧な態度や急な変化に心が揺れやすく、『私だけが真面目に考えているのかな』と疲れてしまうことがあります。",
+    turn:
+      "この星命が見ているのは、あなたが守りたい安心と、変化を怖がる心の間にある本音です。"
+  },
+
+  "恋人": {
+    catchTitle: "言葉の温度に敏感なあなたへ",
+    oneLine: "あなたは、人との会話や距離感の中で、自分の本音に気づいていく人です。",
+    opening:
+      "何気ない一言、返信の雰囲気、相手の声の温度。そういう小さな変化を、あなたの心は思っている以上に受け取っています。",
+    hidden:
+      "だからこそ、選ばれたい気持ちと、自分で選びたい気持ちの間で揺れやすいところがあります。相手に合わせているうちに、『本当は私はどうしたいんだろう』と分からなくなることもあるかもしれません。",
+    turn:
+      "この星命が見ているのは、誰かに選ばれることではなく、あなた自身が何を大切に選びたいのかです。"
+  },
+
+  "戦車": {
+    catchTitle: "大切な人を守ろうとしてきたあなたへ",
+    oneLine: "あなたは、守りたいものがあるほど、強く前へ進もうとする人です。",
+    opening:
+      "好きな人、家族、仲間、自分の居場所。大切だと思ったもののためなら、多少無理をしてでも頑張ってしまうところがあるのではないでしょうか。",
+    hidden:
+      "でも、守りたい気持ちが強いほど、傷つく前に心を固くしてしまうことがあります。本当は不安なのに、先に強がってしまう。近づきたいのに、防衛してしまう。",
+    turn:
+      "この星命が見ているのは、あなたが守ってきたものと、そのために置き去りにしてきた自分の心です。"
+  },
+
+  "力": {
+    catchTitle: "明るく振る舞うほど、寂しさを隠してきたあなたへ",
+    oneLine: "あなたは、強さで押すよりも、やさしさで人の心をほどく人です。",
+    opening:
+      "あなたがいると場がやわらぐ。あなたの言葉で救われる人がいる。けれどその一方で、本当は寂しい時ほど笑ってしまうところがあるかもしれません。",
+    hidden:
+      "認められたい。大切にされたい。ちゃんと見てほしい。そんな気持ちがあるのに、『重いと思われたくない』と明るさの奥にしまい込んでしまうことがあります。",
+    turn:
+      "この星命が見ているのは、無理に輝くあなたではなく、弱さも含めて消えない本当の光です。"
+  },
+
+  "隠者": {
+    catchTitle: "表面的な答えでは満たされないあなたへ",
+    oneLine: "あなたは、物事の奥にある本質を静かに探し続ける人です。",
+    opening:
+      "『大丈夫』『気にしなくていい』という言葉だけでは、心が納得できないことがあるのではないでしょうか。あなたは、出来事の奥にある理由や、相手の本音、自分の本当の気持ちまで見つめようとする人です。",
+    hidden:
+      "そのぶん考えすぎて、答えが出ないことに疲れてしまうことがあります。誰かに話す前に、自分の中で何度も分析して、ひとりで抱え込んでしまうこともあるかもしれません。",
+    turn:
+      "この星命が見ているのは、答えを出す力ではなく、静けさの中で自分を責めずにいられる場所です。"
+  },
+
+  "正義": {
+    catchTitle: "我慢を“優しさ”にしてきたあなたへ",
+    oneLine: "あなたは、関係のバランスや言葉の違和感に、とても敏感な人です。",
+    opening:
+      "場を乱したくない。相手を責めたくない。だからこそ、自分の気持ちを飲み込んでしまうことがあるのではないでしょうか。",
+    hidden:
+      "でも本当は、ただ穏やかでいたいだけではありません。ちゃんと向き合ってほしい。大切にされていると感じたい。対等な関係でいたい。あなたの心は、そこを静かに見ています。",
+    turn:
+      "この星命が見ているのは、正しさではなく、あなたの心の天秤がどこで傾いていたのかです。"
+  },
+
+  "死神": {
+    catchTitle: "終わらせることが怖かったあなたへ",
+    oneLine: "あなたは、深く結びついたものほど、簡単には手放せない人です。",
+    opening:
+      "一度大切にした人や場所や願いを、すぐに過去にはできない。もう終わっていると頭では分かっていても、心だけがまだそこに残ってしまうことがあるかもしれません。",
+    hidden:
+      "それは弱さではありません。あなたの愛や覚悟が浅くないからこそ、終わりに痛みを感じるのです。",
+    turn:
+      "この星命が見ているのは、失ったものではなく、そこからもう一度生まれ変わろうとしているあなたです。"
+  },
+
+  "節制": {
+    catchTitle: "ひとつの正解に縛られたくないあなたへ",
+    oneLine: "あなたは、違う経験や価値観を混ぜ合わせながら、自分だけの道を作る人です。",
+    opening:
+      "ずっと同じ場所にいることや、ひとつの形に決め切ることに、どこか息苦しさを感じることがあるのではないでしょうか。",
+    hidden:
+      "自由でいたい。でも、いい加減にしたいわけではない。ちゃんと向き合いたい。でも、縛られたくはない。その間で揺れることが、この星命にはあります。",
+    turn:
+      "この星命が見ているのは、逃げる自由ではなく、あなたらしい誠実さをどう作っていくかです。"
+  },
+
+  "悪魔": {
+    catchTitle: "苦しくても、現実から逃げずにきたあなたへ",
+    oneLine: "あなたは、理想だけでは動かず、現実を見て形にする力を持つ人です。",
+    opening:
+      "責任、お金、結果、生活、立場。きれいごとだけでは済まないものを、あなたはちゃんと分かっている人です。",
+    hidden:
+      "だからこそ、苦しい関係や環境でも『自分が耐えればいい』『ここで逃げたらだめだ』と、自分を縛ってしまうことがあります。",
+    turn:
+      "この星命が見ているのは、あなたの現実力と、その力がいつの間にか鎖になっていないかということです。"
+  },
+
+  "星": {
+    catchTitle: "人と違う感覚を、ひとりで守ってきたあなたへ",
+    oneLine: "あなたは、まだ形になっていない未来に光を見つけられる人です。",
+    opening:
+      "周りと同じように感じられない。普通と言われる道に、どこか違和感がある。そんな感覚を持ちながらも、自分なりの希望を捨てずにきたのではないでしょうか。",
+    hidden:
+      "ただ、人と違う感覚を持つぶん、理解されない寂しさを抱えやすい星命でもあります。",
+    turn:
+      "この星命が見ているのは、今すぐ分かってもらえない願いの中に、未来を照らす光があるということです。"
+  },
+
+  "月": {
+    catchTitle: "感じすぎて、疲れてしまうあなたへ",
+    oneLine: "あなたは、言葉になる前の気配や感情を深く受け取る人です。",
+    opening:
+      "相手の表情、返信の間、声の少しの変化。誰かが何も言っていなくても、心が先に反応してしまうことがあるのではないでしょうか。",
+    hidden:
+      "その感受性は才能です。でも、不安が強くなると、まだ起きていないことまで真実のように感じてしまうことがあります。",
+    turn:
+      "この星命が見ているのは、不安を消すことではなく、不安の中にある本当の声を見分けることです。"
   }
 };
 
@@ -949,6 +1083,7 @@ function getElementDignity(detailCardName, courtCardName) {
   if (!detailElement || !courtElement) return null;
 
   const dignity = ELEMENT_DIGNITY_TABLE[detailElement.key][courtElement.key];
+  if (!dignity) return null;
 
   return {
     detailElement,
@@ -974,48 +1109,70 @@ function normalizeTheme(theme) {
   return THEME_LABELS[theme] ? theme : "今の自分";
 }
 
+function getMajorHook(cardName) {
+  return MAJOR_HOOK_DATA[cardName] || {
+    catchTitle: "今のあなたに必要な星命メッセージ",
+    oneLine: "あなたは、自分でも気づかないところで、心に多くのものを抱えてきた人です。",
+    opening: "普段は何気なく過ごしていても、心の奥ではずっと感じ取っていたことがあるはずです。",
+    hidden: "その感覚は、弱さではありません。あなたが大切なものにちゃんと反応してきた証です。",
+    turn: "この星命は、あなたが自分を取り戻すための入口を示しています。"
+  };
+}
+
 function buildThemeText(theme, majorData, detailData, courtData, balanceData) {
   const selectedTheme = normalizeTheme(theme);
 
   const balanceParagraph = balanceData
-    ? `<p>また、星命バランスでは「${balanceData.title}」が示されています。これは、あなたの内側のテーマと、人前に出る役割がどのように響き合うかを表します。</p>`
+    ? `<p>さらに、あなたの内側と外に出る印象には「${balanceData.title}」の流れがあります。自分では自然にしているつもりでも、人から見える姿と本音に少し差が出やすい配置です。だからこそ、知らないうちに疲れをため込むことがあります。</p>`
     : "";
 
   const themeMap = {
     "今の自分": `
-      <p>今のあなたを読む時、中心にあるのは《${majorData.cardName}》の星命です。${majorData.self}</p>
-      <p>詳細星命カード《${detailData.title}》は、今あなたが向き合っている具体的な段階を示します。${detailData.self}</p>
-      <p>対人星命カード《${courtData.title}》は、外から見えるあなたの役割を表します。${courtData.self}</p>
+      <p>今のあなたは、「このままでいいのかな」と感じながらも、簡単には立ち止まれなかったのかもしれません。</p>
+      <p>周りから見れば普通にできている。ちゃんとしている。けれど心の奥では、ずっと小さな違和感や疲れを抱えていた可能性があります。</p>
+      <p>${majorData.self}</p>
+      <p>今、あなたが向き合っている具体的なテーマは「${detailData.title}」。${detailData.self}</p>
+      <p>そして、人から見えるあなたの印象には「${courtData.title}」の色が出ています。${courtData.self}</p>
       ${balanceParagraph}
-      <p>今、大切なのは「ちゃんとしなきゃ」と自分を縛ることではありません。本当はどこで無理をしていたのか、どんな場面で自分の本音を置き去りにしてきたのかに気づくことです。</p>
-      <p>あなたの星命は、欠点を探すためのものではなく、心の使い方を取り戻すための地図です。</p>
+      <p>ここで大切なのは、自分を変えようと焦ることではありません。</p>
+      <p>まずは、どこで無理をしていたのか。どんな言葉をずっと飲み込んできたのか。そこに気づくことです。</p>
+      <p>気づくことは、弱くなることではありません。もう一度、自分の心を自分の場所へ戻していくための始まりです。</p>
     `,
 
     "恋愛": `
-      <p>恋愛でこの星命を見る時、《${majorData.cardName}》はあなたの愛し方の核を示します。${majorData.love}</p>
-      <p>詳細星命カード《${detailData.title}》は、今の恋で起こりやすい心の動きを表します。${detailData.love}</p>
-      <p>相手から見えるあなたの印象は、対人星命カード《${courtData.title}》に表れます。${courtData.love}</p>
+      <p>恋愛で今いちばん見てほしいのは、相手の気持ちより先に、あなた自身の心です。</p>
+      <p>好きだからこそ、少しの返信の遅さや、言葉の温度が気になってしまう。平気なふりをしていても、本当は不安でいっぱいになることがあるかもしれません。</p>
+      <p>${majorData.love}</p>
+      <p>今の恋で出やすい具体的なテーマは「${detailData.title}」。${detailData.love}</p>
+      <p>相手から見えるあなたの印象には「${courtData.title}」の色が出ています。${courtData.love}</p>
       ${balanceParagraph}
-      <p>この恋で大切なのは、相手の気持ちを当てることだけではありません。あなた自身が、どんな扱われ方を望み、どんな距離感なら安心できて、どんな言葉なら心を閉ざさずにいられるのかを見つめることです。</p>
-      <p>好きだからこそ不安になることがあります。けれど、不安だけを真実にしなくて大丈夫です。</p>
+      <p>この恋で大切なのは、相手の気持ちを当てることだけではありません。</p>
+      <p>あなたは本当は、どんな言葉で安心したいのか。どんな距離感なら苦しくならないのか。どんな扱われ方なら、自分をすり減らさずに愛せるのか。</p>
+      <p>そこを見つめた時、不安に振り回される恋から、自分を大切にできる恋へ戻っていけます。</p>
     `,
 
     "仕事": `
-      <p>仕事でこの星命を見る時、《${majorData.cardName}》はあなたの才能の核を示します。${majorData.work}</p>
-      <p>詳細星命カード《${detailData.title}》は、今の仕事運で伸ばすべき力や課題を示します。${detailData.work}</p>
-      <p>職場や活動の中で外に出やすいあなたの役割は、対人星命カード《${courtData.title}》です。${courtData.work}</p>
+      <p>仕事で今いちばん見てほしいのは、「もっと頑張れるか」ではなく、「この頑張り方があなたに合っているか」です。</p>
+      <p>あなたは、意味を感じられることには力を注げる人です。けれど、心が納得していないまま責任だけが増えると、少しずつ自分をすり減らしてしまいます。</p>
+      <p>${majorData.work}</p>
+      <p>今の仕事で伸ばすべき具体的なテーマは「${detailData.title}」。${detailData.work}</p>
+      <p>職場や活動の中で周囲から見られやすい役割は「${courtData.title}」。${courtData.work}</p>
       ${balanceParagraph}
-      <p>今の仕事で大切なのは、ただ努力量を増やすことではありません。どの働き方ならあなたの星命が長く燃え続けるのか、どんな役割なら心をすり減らさずに力を発揮できるのかを見極めることです。</p>
-      <p>才能は、無理を続けた先ではなく、自分に合った形を見つけた時に開きます。</p>
+      <p>今、大切なのは努力量を増やすことではありません。</p>
+      <p>どの働き方なら、あなたの星命が長く燃え続けるのか。どんな役割なら、心をすり減らさずに力を発揮できるのか。</p>
+      <p>才能は、無理の先ではなく、自分に合う形を見つけた時に開きます。</p>
     `,
 
     "人間関係": `
-      <p>人間関係でこの星命を見る時、《${majorData.cardName}》はあなたが人と関わる時の基本姿勢を示します。${majorData.relation}</p>
-      <p>詳細星命カード《${detailData.title}》は、今の関係性で起こりやすい課題を表します。${detailData.relation}</p>
-      <p>周囲から見えるあなたの印象は、対人星命カード《${courtData.title}》に表れます。${courtData.relation}</p>
+      <p>人間関係で今いちばん見てほしいのは、誰かとの距離よりも、あなたの心がちゃんと呼吸できているかです。</p>
+      <p>相手を傷つけたくない。場を乱したくない。そう思うほど、本音を言うタイミングを逃してしまうことがあるのではないでしょうか。</p>
+      <p>${majorData.relation}</p>
+      <p>今の関係性で起こりやすいテーマは「${detailData.title}」。${detailData.relation}</p>
+      <p>周囲から見えるあなたの印象には「${courtData.title}」の色が出ています。${courtData.relation}</p>
       ${balanceParagraph}
-      <p>今、大切なのは誰かに合わせ続けることではなく、あなたの優しさが消耗しない距離感を見つけることです。人との関係は、近ければ良いとは限りません。心が安心して呼吸できる距離こそ、今のあなたに必要な星命の間合いです。</p>
-      <p>離れることが冷たさではなく、自分を守るための誠実さになる時もあります。</p>
+      <p>今、大切なのは誰かに合わせ続けることではありません。</p>
+      <p>あなたの優しさが消耗しない距離感を見つけることです。</p>
+      <p>離れることが冷たさではなく、自分を守るための誠実さになる時もあります。近づくことだけが愛ではありません。</p>
     `
   };
 
@@ -1029,62 +1186,40 @@ function buildReadingText({ nickname, theme, major, decan, court }) {
   const courtData = COURT_READING_DATA[court.card];
   const balanceData = getElementDignity(decan.card, court.card);
   const displayName = nickname ? `${escapeHtml(nickname)}さん` : "あなた";
+  const hook = getMajorHook(major.card);
 
   return {
-    title: `${displayName}の星命カード`,
+    title: `${displayName}の星命リーディング`,
+
     lead:
-      `あなたの本星命カードは《${majorData.cardName}》。${major.sign}に宿る「${majorData.typeName}」です。` +
-      `星命カードでは、この一枚をただの性格ではなく、魂が何を学び、どこで傷つき、どんな言葉で回復していくのかを示す“核のカード”として読みます。`,
+      `${displayName}は、${hook.oneLine}` +
+      `このリーディングでは、あなたがどこで傷つきやすく、どんな力を持ち、どんな言葉で心を取り戻せるのかを読んでいきます。`,
 
-    systemDefinition: SEIMEI_SYSTEM.definition,
-    systemMethod: SEIMEI_SYSTEM.method,
-    systemNote: SEIMEI_SYSTEM.note,
-    systemPromise: SEIMEI_SYSTEM.promise,
-
-    overviewTitle: "星命の全体像",
-    overviewText:
-      `あなたの星命は、《${majorData.cardName}》の魂の核を中心に、《${decan.card}》が示す具体的な人生テーマ、そして《${court.card}》が表す対人面の役割によって形作られています。` +
-      `これは単に「どんな性格か」を見るものではなく、あなたが人生の中でどんな場面に反応しやすく、何を守ろうとして、どこで心をすり減らしやすいのかを読むための構造です。`,
-
-    mainTitle: `本星命カード：${majorData.cardName}`,
-    mainText:
-      `《${majorData.cardName}》は、${majorData.archetype}です。${majorData.essence}`,
-
-    detailTitle: `詳細星命カード：${decan.card}`,
-    detailText:
-      `《${decan.card}》は「${detailData.title}」。${decan.sign}のデカンに宿る小アルカナで、人生の中で繰り返しやすい具体的なテーマを示します。${detailData.essence}`,
-
-    treeTitle: "生命の樹で見る魂の段階",
-    treeText:
-      `この詳細星命は、生命の樹では「${detailData.sephirah}」の段階に触れています。` +
-      `ここで示されるのは、あなたの心が今どの成長テーマに反応しやすいかということです。つまり星命カードは、抽象的な性格ではなく、どこを整えると現実が動き出すのかを映す“魂の段階図”でもあります。`,
-
-    courtTitle: `対人星命カード：${court.card}`,
-    courtText:
-      `《${court.card}》は「${courtData.title}」。これは、あなたが人と関わる時に外へ表れやすい人格、役割、周囲から見られやすい印象を示します。${courtData.essence}`,
-
-    balanceTitle: balanceData
-      ? `星命バランス：${balanceData.detailElement.name} × ${balanceData.courtElement.name}`
-      : "星命バランス",
-
-    balanceText: balanceData
-      ? `あなたの詳細星命カード《${decan.card}》には「${balanceData.detailElement.name}」の力が宿っています。これは、${balanceData.detailElement.label}を表します。` +
-        `一方、対人星命カード《${court.card}》には「${balanceData.courtElement.name}」の力が表れています。これは、${balanceData.courtElement.label}を表します。` +
-        `この組み合わせは「${balanceData.relation}」星命です。${balanceData.text}`
-      : "あなたの詳細星命と対人星命の元素関係を読み解きます。",
-
-    lightShadowTitle: "光の面と影の面",
-    lightShadowText:
-      `この星命の光は、${majorData.light}です。一方で影として、${majorData.shadow}が出やすくなります。` +
-      `ただし、影は悪いものではありません。そこには、まだ言葉になっていない傷、守りたかった願い、置き去りにしてきた本音が隠れています。${majorData.wound}`,
-
-    recoveryTitle: "星命をひらく鍵",
-    recoveryText:
-      `${majorData.recoveryKey} 星命カードは、あなたを分類して終わるものではありません。` +
-      `自分を責めてきた理由に気づき、心の使い方を少しずつ取り戻すための地図です。`,
+    firstMessageTitle: hook.catchTitle,
+    firstMessageText:
+      `${hook.opening}` +
+      `<br /><br />` +
+      `${hook.hidden}` +
+      `<br /><br />` +
+      `${hook.turn}`,
 
     themeTitle: `${selectedTheme}への星命リーディング`,
     themeText: buildThemeText(selectedTheme, majorData, detailData, courtData, balanceData),
+
+    todayPointTitle: "今、あなたの心に出ているテーマ",
+    todayPointText:
+      `今のあなたに強く出ているテーマは「${detailData.title}」です。` +
+      `${detailData.self}` +
+      `<br /><br />` +
+      `そして人と関わる時には「${courtData.title}」の印象が表に出やすくなります。` +
+      `${courtData.self}`,
+
+    recoveryTitle: "心を戻すための鍵",
+    recoveryText:
+      `${majorData.recoveryKey}` +
+      `<br /><br />` +
+      `これは、あなたを変えるための言葉ではありません。` +
+      `今まで無理をしてきた場所に気づき、自分を責める流れから少しずつ抜け出すための鍵です。`,
 
     messageTitle: "いま必要な星命メッセージ",
     messageText: majorData.message,
@@ -1096,7 +1231,66 @@ function buildReadingText({ nickname, theme, major, decan, court }) {
     shionText:
       "あなたの星命は、あなたを縛るための名前ではありません。\n" +
       "同じ痛みを繰り返してきた理由を知り、そこから少しずつ自分を取り戻すための光です。\n\n" +
-      "大丈夫だよ。"
+      "大丈夫だよ。",
+
+    cardSummaryTitle: "今回出た星命カード",
+    cardSummaryText:
+      `ここから先は、なぜこのように読めるのかをカードの構造から見ていきます。` +
+      `<br /><br />` +
+      `あなたの本星命カードは《${majorData.cardName}》。${major.sign}に宿る「${majorData.typeName}」です。` +
+      `詳細星命カードは《${decan.card}》、対人星命カードは《${court.card}》です。`,
+
+    mainTitle: `本星命カード：${majorData.cardName}`,
+    mainText:
+      `《${majorData.cardName}》は、あなたの魂の核を表します。` +
+      `${majorData.essence}` +
+      `<br /><br />` +
+      `このカードが示す光は、${majorData.light}です。`,
+
+    detailTitle: `詳細星命カード：${decan.card}`,
+    detailText:
+      `《${decan.card}》は「${detailData.title}」。` +
+      `人生の中で繰り返しやすい具体的なテーマを示します。` +
+      `${detailData.essence}`,
+
+    treeTitle: "生命の樹で見る魂の段階",
+    treeText:
+      `この詳細星命は、生命の樹では「${detailData.sephirah}」の段階に触れています。` +
+      `<br /><br />` +
+      `難しく考える必要はありません。これは、あなたの心が今どのテーマで成長しようとしているかを表すものです。`,
+
+    courtTitle: `対人星命カード：${court.card}`,
+    courtText:
+      `《${court.card}》は「${courtData.title}」。` +
+      `あなたが人と関わる時に、外へ表れやすい雰囲気や役割を示します。` +
+      `${courtData.essence}`,
+
+    balanceTitle: balanceData
+      ? `星命バランス：${balanceData.detailElement.name} × ${balanceData.courtElement.name}`
+      : "星命バランス",
+
+    balanceText: balanceData
+      ? `あなたの内側には「${balanceData.detailElement.name}」の力があり、人前では「${balanceData.courtElement.name}」の力が出やすい配置です。` +
+        `この組み合わせは「${balanceData.relation}」星命です。` +
+        `<br /><br />` +
+        `${balanceData.text}`
+      : "あなたの詳細星命と対人星命の元素関係を読み解きます。",
+
+    lightShadowTitle: "光の面と影の面",
+    lightShadowText:
+      `この星命の光は、${majorData.light}です。` +
+      `<br /><br />` +
+      `一方で、影として${majorData.shadow}が出やすくなります。` +
+      `でも影は、悪いものではありません。そこには、まだ言葉になっていない傷や、守りたかった願いが隠れています。` +
+      `<br /><br />` +
+      `${majorData.wound}`,
+
+    systemTitle: SEIMEI_SYSTEM.title,
+    systemSubtitle: SEIMEI_SYSTEM.subtitle,
+    systemDefinition: SEIMEI_SYSTEM.definition,
+    systemMethod: SEIMEI_SYSTEM.method,
+    systemNote: SEIMEI_SYSTEM.note,
+    systemPromise: SEIMEI_SYSTEM.promise
   };
 }
 
@@ -1117,14 +1311,48 @@ function renderResult({ nickname, theme, major, decan, court }) {
       <p class="seimei-result-lead">${reading.lead}</p>
     </div>
 
-    <section class="seimei-reading-block seimei-system-box">
-      <p class="seimei-card-label">ABOUT SEIMEI CARD</p>
-      <h3>${SEIMEI_SYSTEM.title}</h3>
-      <p>${SEIMEI_SYSTEM.subtitle}</p>
-      <p>${reading.systemDefinition}</p>
-      <p>${reading.systemMethod}</p>
-      <p>${reading.systemNote}</p>
-      <p>${reading.systemPromise}</p>
+    <div class="seimei-reading">
+
+      <section class="seimei-reading-block seimei-message-block">
+        <h3>${reading.firstMessageTitle}</h3>
+        <p>${reading.firstMessageText}</p>
+      </section>
+
+      <section class="seimei-reading-block seimei-theme-block">
+        <h3>${reading.themeTitle}</h3>
+        ${reading.themeText}
+      </section>
+
+      <section class="seimei-reading-block">
+        <h3>${reading.todayPointTitle}</h3>
+        <p>${reading.todayPointText}</p>
+      </section>
+
+      <section class="seimei-reading-block seimei-message-block">
+        <h3>${reading.recoveryTitle}</h3>
+        <p>${reading.recoveryText}</p>
+      </section>
+
+      <section class="seimei-reading-block seimei-message-block">
+        <h3>${reading.messageTitle}</h3>
+        <p>${reading.messageText}</p>
+      </section>
+
+      <section class="seimei-reading-block">
+        <h3>${reading.shioponTitle}</h3>
+        <p><span class="seimei-speaker">しおぽん：</span><br />${reading.shioponText}</p>
+      </section>
+
+      <section class="seimei-reading-block">
+        <h3>${reading.shionTitle}</h3>
+        <p><span class="seimei-speaker">シオン：</span><br />${reading.shionText.replace(/\n/g, "<br />")}</p>
+      </section>
+
+    </div>
+
+    <section class="seimei-reading-block seimei-overview-block">
+      <h3>${reading.cardSummaryTitle}</h3>
+      <p>${reading.cardSummaryText}</p>
     </section>
 
     <div class="seimei-card-grid" aria-label="診断された星命カード">
@@ -1164,10 +1392,6 @@ function renderResult({ nickname, theme, major, decan, court }) {
     </div>
 
     <div class="seimei-reading">
-      <section class="seimei-reading-block seimei-overview-block">
-        <h3>${reading.overviewTitle}</h3>
-        <p>${reading.overviewText}</p>
-      </section>
 
       <section class="seimei-reading-block">
         <h3>${reading.mainTitle}</h3>
@@ -1199,50 +1423,40 @@ function renderResult({ nickname, theme, major, decan, court }) {
         <p>${reading.lightShadowText}</p>
       </section>
 
-      <section class="seimei-reading-block">
-        <h3>${reading.recoveryTitle}</h3>
-        <p>${reading.recoveryText}</p>
+      <section class="seimei-reading-block seimei-system-box">
+        <p class="seimei-card-label">ABOUT SEIMEI CARD</p>
+        <h3>${reading.systemTitle}</h3>
+        <p>${reading.systemSubtitle}</p>
+        <p>${reading.systemDefinition}</p>
+        <p>${reading.systemMethod}</p>
+        <p>${reading.systemNote}</p>
+        <p>${reading.systemPromise}</p>
       </section>
 
-      <section class="seimei-reading-block seimei-theme-block">
-        <h3>${reading.themeTitle}</h3>
-        ${reading.themeText}
-      </section>
-
-      <section class="seimei-reading-block seimei-message-block">
-        <h3>${reading.messageTitle}</h3>
-        <p>${reading.messageText}</p>
-      </section>
-
-      <section class="seimei-reading-block">
-        <h3>${reading.shioponTitle}</h3>
-        <p><span class="seimei-speaker">しおぽん：</span><br />${reading.shioponText}</p>
-      </section>
-
-      <section class="seimei-reading-block">
-        <h3>${reading.shionTitle}</h3>
-        <p><span class="seimei-speaker">シオン：</span><br />${reading.shionText.replace(/\n/g, "<br />")}</p>
-      </section>
     </div>
 
     <section class="seimei-cta" aria-labelledby="seimeiCtaTitle">
       <p class="seimei-cta-label">DEEP READING</p>
       <h3 id="seimeiCtaTitle">この星命を、今の悩みに合わせて深く読む</h3>
+
       <p>
-        ここで表示された星命は、あなたの魂に流れる基本構造です。<br />
-        けれど、実際の恋愛、仕事、人間関係の中でどの星命が強く表れているかは、今置かれている状況によって変わります。
+        ここに出た星命は、あなたの心の基本構造です。<br />
+        けれど、恋愛・仕事・人間関係の中で、どの部分が強く出ているかは今の状況によって変わります。
       </p>
+
       <p>
-        たとえば、同じ《${major.card}》の星命でも、恋愛では不安として出ることがあり、仕事では才能として出ることがあります。<br />
-        同じ《${decan.card}》のテーマでも、相手との関係性や現在の選択によって、必要な言葉は変わります。
+        同じ《${major.card}》の星命でも、恋愛では不安として出ることがあり、仕事では才能として出ることがあります。<br />
+        同じ《${decan.card}》のテーマでも、相手との関係性や今置かれている状況によって、必要な言葉は変わります。
       </p>
+
       <p>
-        個人鑑定では、星命カードの結果に加えて、今の悩みに対するタロット展開を重ね、<br />
+        個人鑑定では、星命カードの結果にタロット展開を重ねて、<br />
         「なぜ同じ不安を繰り返すのか」<br />
         「どこで自分を責めてしまうのか」<br />
         「今、本当に選び直すべきことは何か」<br />
         を、あなたの状況に合わせて深く読み解きます。
       </p>
+
       <div class="seimei-cta-actions">
         <a class="seimei-btn seimei-btn-primary" href="../consultation/index.html">この星命を個人鑑定で深く見る</a>
         <a class="seimei-btn seimei-btn-secondary" href="../tarot369/index.html">無料ワンカードも引いてみる</a>
@@ -1279,7 +1493,8 @@ function initSeimeiForm() {
     const court = getCourtCardByDate(parsedDate.mmdd);
 
     if (!major || !decan || !court) {
-      errorMessage.textContent = "星命カードの判定に迷ってしまいました。日付をもう一度確認してね……ぴょん。";
+      errorMessage.textContent =
+        "星命カードの判定に迷ってしまいました。日付をもう一度確認してね……ぴょん。";
       resultArea.hidden = true;
       return;
     }
@@ -1304,17 +1519,24 @@ if (typeof window !== "undefined") {
     DECAN_CARD_TABLE,
     COURT_CARD_TABLE,
     SEIMEI_SYSTEM,
+    THEME_LABELS,
     READING_DATA,
+    MAJOR_HOOK_DATA,
     DETAIL_CARD_DATA,
     COURT_READING_DATA,
     ELEMENT_DIGNITY_TABLE,
     parseDateInput,
     isInRange,
+    findByDate,
     getMajorCardByDate,
     getDecanCardByDate,
     getCourtCardByDate,
     getElementByCardName,
     getElementDignity,
+    escapeHtml,
+    normalizeTheme,
+    getMajorHook,
+    buildThemeText,
     buildReadingText,
     renderResult
   };
