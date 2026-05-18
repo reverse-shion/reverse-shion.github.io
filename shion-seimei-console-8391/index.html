@@ -4,69 +4,297 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+
   <title>詩韻式 星命鑑定コンソール</title>
+  <meta
+    name="description"
+    content="詩韻式 星命鑑定コンソール。生年月日から見える星命タイプとタロットの象徴を重ね、心を整える鑑定文を作成する内部用ページです。"
+  >
+
   <link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
-  <main class="shell">
+  <main class="shell" role="main">
     <section id="lockScreen" class="lock-card" aria-labelledby="lockTitle">
       <p class="eyebrow">Internal Console</p>
+
       <h1 id="lockTitle">詩韻式 星命鑑定コンソール</h1>
-      <p>このページは簡易ロックです。完全なセキュリティではありません。</p>
-      <label>パスワード<input id="password" type="password" autocomplete="off" placeholder="内部用パスワード"></label>
-      <button id="unlock" type="button">コンソールを開く</button>
+
+      <p class="lead-text">
+        星命の声を、相談者の心に届く言葉へ整えるための内部用ページです。
+      </p>
+
+      <p class="safety">
+        このページのロックは、関係者向けの簡易的なものです。
+        本格運用では、認証付きホスティングやローカル環境での管理をおすすめします。
+      </p>
+
+      <div class="form-row">
+        <label for="password">パスワード</label>
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="内部用パスワード"
+          aria-describedby="lockHelp"
+        >
+        <p id="lockHelp" class="input-help">
+          関係者以外に共有しないでください。鑑定データの扱いには十分ご注意ください。
+        </p>
+      </div>
+
+      <button id="unlock" type="button">
+        コンソールを開く
+      </button>
+
       <p id="lockMessage" class="error" aria-live="polite"></p>
+
       <ul class="notice-list">
-        <li>顧客情報は保存しないでください。</li>
-        <li>個人情報を入力したまま画面を放置しないでください。</li>
-        <li>本格運用では private repository、認証付きホスティング、またはローカル運用を検討してください。</li>
+        <li>顧客情報・個人情報は保存しないでください。</li>
+        <li>入力したまま画面を放置しないでください。</li>
+        <li>このページは外部API・DB・Cookie保存を前提にしていません。</li>
+        <li>公開URLで運用する場合は、必ずアクセス制限を検討してください。</li>
       </ul>
     </section>
 
-    <section id="app" hidden>
+    <section id="app" hidden aria-labelledby="appTitle">
       <header class="hero">
         <p class="eyebrow">Shion Seimei Console</p>
-        <h1>詩韻式 星命鑑定コンソール</h1>
-        <p class="subtitle">算命学参考データ × 詩韻式星命タイプ × タロット共鳴カード</p>
-        <p class="safety">算命学参考データはMVPの簡易判定を含みます。節入り時刻・大運・天中殺・十大主星・十二大従星は未実装または要確認です。</p>
+
+        <h1 id="appTitle">詩韻式 星命鑑定コンソール</h1>
+
+        <p class="subtitle">
+          生年月日から見えるあなたの星命と、タロットの象徴を重ねて、
+          今、心が一番必要としている言葉を一緒に整えます。
+        </p>
+
+        <div class="safety">
+          <p>
+            現在は簡易版として、生年月日から見える傾向を中心に表示しています。
+            節入り時刻・大運・天中殺・十大主星・十二大従星などは、今後の拡張または個別確認が必要です。
+          </p>
+          <p>
+            詩韻式では、カードを単純な吉凶で断定しません。
+            ひとつの象徴に含まれる光・影・偏り・整える鍵を見つめ、
+            相談者が現実に戻れる言葉へ整えていきます。
+          </p>
+        </div>
       </header>
+
       <div id="messages" class="messages" aria-live="polite"></div>
+
       <div class="console-grid">
-        <form id="consoleForm" class="panel input-panel" onsubmit="return false;">
-          <h2>入力パネル</h2>
-          <label>名前（任意）<input id="name" type="text" autocomplete="off" placeholder="例：デモ太郎"></label>
-          <label>生年月日（必須）<input id="birthDate" type="date" required></label>
-          <label>性別（任意）<select id="gender"><option value="">未選択</option><option>男性</option><option>女性</option><option>その他/回答しない</option></select></label>
-          <label>相談ジャンル（必須）<select id="topic" required><option value="">選択してください</option><option>総合</option><option>恋愛</option><option>仕事</option><option>金運</option><option>人間関係</option><option>今月の運勢</option></select></label>
-          <label>悩みメモ（任意）<textarea id="memo" rows="4" placeholder="相談内容の要点だけ。個人情報は残さないでください。"></textarea></label>
-          <label>タロット展開<select id="spread"><option value="1">1枚引き</option><option value="3">3枚引き</option><option value="5">5枚引き</option></select></label>
-          <div id="tarotSlots" class="tarot-slots"></div>
-          <div class="button-grid">
-            <button id="generateBase" type="button">基本カルテ生成</button>
-            <button id="generateTarot" type="button">タロット統合ドラフト生成</button>
-            <button id="polish" type="button">詩韻風に整える</button>
-            <button id="copy" type="button">鑑定文をコピー</button>
-            <button id="reset" type="button" class="ghost">リセット</button>
-            <button id="demo" type="button" class="ghost">デモ入力</button>
+        <form id="consoleForm" class="panel input-panel" autocomplete="off">
+          <header class="panel-header">
+            <h2>入力パネル</h2>
+            <p class="input-help">
+              鑑定に必要な要点だけを入力してください。
+              個人を特定できる情報は、できるだけ残さない運用をおすすめします。
+            </p>
+          </header>
+
+          <div class="form-row">
+            <label for="name">名前（任意）</label>
+            <input
+              id="name"
+              type="text"
+              maxlength="40"
+              autocomplete="off"
+              placeholder="例：デモ太郎"
+              aria-describedby="nameHelp"
+            >
+            <p id="nameHelp" class="input-help">
+              鑑定文の呼びかけに使います。未入力でも生成できます。
+            </p>
           </div>
+
+          <div class="form-row">
+            <label for="birthDate">生年月日（必須）</label>
+            <input
+              id="birthDate"
+              type="date"
+              min="1900-01-01"
+              required
+              aria-describedby="birthDateHelp"
+            >
+            <p id="birthDateHelp" class="input-help">
+              星命の芯を見るために使います。未来の日付は使用できません。
+            </p>
+          </div>
+
+          <div class="form-row">
+            <label for="gender">性別（任意）</label>
+            <select id="gender" aria-describedby="genderHelp">
+              <option value="">未選択</option>
+              <option value="男性">男性</option>
+              <option value="女性">女性</option>
+              <option value="その他/回答しない">その他/回答しない</option>
+            </select>
+            <p id="genderHelp" class="input-help">
+              現段階では補助情報です。未選択でも鑑定できます。
+            </p>
+          </div>
+
+          <div class="form-row">
+            <label for="topic">相談ジャンル（必須）</label>
+            <select id="topic" required aria-describedby="topicHelp">
+              <option value="">選択してください</option>
+              <option value="総合">総合</option>
+              <option value="恋愛">恋愛</option>
+              <option value="仕事">仕事</option>
+              <option value="金運">金運</option>
+              <option value="人間関係">人間関係</option>
+              <option value="今月の運勢">今月の運勢</option>
+            </select>
+            <p id="topicHelp" class="input-help">
+              いま一番見たいテーマを選ぶと、鑑定文の焦点が定まりやすくなります。
+            </p>
+          </div>
+
+          <div class="form-row">
+            <label for="memo">悩みメモ（任意）</label>
+            <textarea
+              id="memo"
+              rows="4"
+              maxlength="500"
+              placeholder="例：今後の働き方とお金の流れが不安。何から整えればいいか見たい。"
+              aria-describedby="memoHelp"
+            ></textarea>
+            <p id="memoHelp" class="input-help">
+              相談内容の要点だけで大丈夫です。
+              個人名・住所・連絡先などは残さないでください。
+            </p>
+          </div>
+
+          <div class="form-row">
+            <label for="spread">タロット展開</label>
+            <select id="spread" aria-describedby="spreadHelp">
+              <option value="1">1枚引き｜今のテーマ</option>
+              <option value="2">2枚引き｜今の流れ・整える鍵</option>
+              <option value="3" selected>3枚引き｜流れ・心の奥・進む道</option>
+              <option value="4">4枚引き｜現状・心の奥・課題・一歩</option>
+              <option value="5">5枚引き｜総合的に深く見る</option>
+            </select>
+            <p id="spreadHelp" class="input-help">
+              カードは星命タイプを決めるものではなく、
+              今の心と現実を整える補助線として読みます。
+            </p>
+          </div>
+
+          <section class="tarot-select-section" aria-labelledby="tarotSelectTitle">
+            <h3 id="tarotSelectTitle">タロットカード選択</h3>
+            <p class="input-help">
+              それぞれの位置に置くカードを選んでください。
+              詩韻式では、一枚ごとの象徴に含まれる光・影・整える鍵を読みます。
+            </p>
+
+            <div id="tarotSlots" class="tarot-slots"></div>
+          </section>
+
+          <div class="button-grid" aria-label="操作ボタン">
+            <button id="generateBase" type="button">
+              基本カルテ生成
+            </button>
+
+            <button id="generateTarot" type="button">
+              タロット共鳴を反映
+            </button>
+
+            <button id="polish" type="button">
+              詩韻式に整える
+            </button>
+
+            <button id="copy" type="button">
+              鑑定文をコピー
+            </button>
+
+            <button id="reset" type="button" class="ghost">
+              リセット
+            </button>
+
+            <button id="demo" type="button" class="ghost">
+              デモ入力
+            </button>
+          </div>
+
           <div class="security-note">
-            <strong>安全メモ：</strong>localStorage、sessionStorage、Cookie、外部API、DBは使用しません。入力内容はページ上のメモリ内だけで扱います。
+            <strong>安全メモ：</strong>
+            localStorage、sessionStorage、Cookie、外部API、DBは使用しません。
+            入力内容はページ上のメモリ内だけで扱います。
+            必要な鑑定文をコピーしたら、不要な入力はリセットしてください。
           </div>
         </form>
-        <section class="panel output-panel">
-          <div id="results"><section class="result-card empty"><h2>星命カルテ</h2><p>入力後に「基本カルテ生成」を押すと、ここに結果が表示されます。</p></section></div>
-          <section class="result-card final-card"><h2>15. 手編集できる最終鑑定文テキストエリア</h2><textarea id="finalReading" rows="18" placeholder="生成された鑑定文がここに入ります。必要に応じて手編集してください。"></textarea></section>
+
+        <section class="panel output-panel" aria-labelledby="outputTitle">
+          <header class="panel-header">
+            <h2 id="outputTitle">鑑定結果プレビュー</h2>
+            <p class="input-help">
+              生成された内容を確認し、相談者の状況に合わせて最終鑑定文を整えてください。
+            </p>
+          </header>
+
+          <div id="results">
+            <section class="result-card empty">
+              <h2>星命カルテ</h2>
+              <p>
+                入力後に「基本カルテ生成」を押すと、ここに結果が表示されます。
+              </p>
+              <p class="soft-text">
+                まずは生年月日から見える星命の芯を確認し、
+                必要に応じてタロット共鳴を重ねてください。
+              </p>
+            </section>
+          </div>
+
+          <section class="result-card final-card" aria-labelledby="finalReadingTitle">
+            <h2 id="finalReadingTitle">最終鑑定文（手編集可）</h2>
+
+            <p class="soft-text">
+              ここに生成された鑑定文が入ります。
+              そのまま渡すのではなく、相談者の声・状況・今の心の温度に合わせて、
+              最後は人の手で整えてください。
+            </p>
+
+            <textarea
+              id="finalReading"
+              rows="18"
+              placeholder="生成された鑑定文がここに入ります。必要に応じて手編集してください。"
+              aria-describedby="finalReadingHelp"
+            ></textarea>
+
+            <p id="finalReadingHelp" class="input-help">
+              コピー前に、断定が強すぎないか、相談者の心に寄り添う表現になっているかを確認してください。
+              最後の一言は、安心して前を向ける温度に整えるのがおすすめです。
+            </p>
+          </section>
         </section>
       </div>
     </section>
   </main>
-  <script src="./js/sanmei-data.js"></script>
-  <script src="./js/tarot-mapping.js"></script>
-  <script src="./js/utils.js"></script>
-  <script src="./js/validation.js"></script>
-  <script src="./js/sanmei-engine.js"></script>
-  <script src="./js/reading-template.js"></script>
-  <script src="./js/ui-render.js"></script>
-  <script src="./js/main.js"></script>
+
+  <script>
+    (function () {
+      var input = document.getElementById('birthDate');
+      if (!input) return;
+
+      var today = new Date();
+      var yyyy = today.getFullYear();
+      var mm = String(today.getMonth() + 1).padStart(2, '0');
+      var dd = String(today.getDate()).padStart(2, '0');
+
+      input.max = yyyy + '-' + mm + '-' + dd;
+    })();
+  </script>
+
+  <script src="./js/sanmei-data.js" defer></script>
+  <script src="./js/tarot-mapping.js" defer></script>
+  <script src="./js/utils.js" defer></script>
+  <script src="./js/validation.js" defer></script>
+  <script src="./js/sanmei-engine.js" defer></script>
+  <script src="./js/reading-template.js" defer></script>
+  <script src="./js/ui-render.js" defer></script>
+  <script src="./js/main.js" defer></script>
 </body>
 </html>
