@@ -6,10 +6,10 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="no-referrer">
 
-  <title>詩韻式 星命鑑定コンソール</title>
+  <title>詩韻式 星命未来鑑定コンソール</title>
   <meta
     name="description"
-    content="詩韻式 星命鑑定コンソール。生年月日から見える星命タイプとタロットの象徴を重ね、心を整える鑑定文を作成する内部用ページです。"
+    content="詩韻式 星命未来鑑定コンソール。生年月日から見える星命タイプとタロットの象徴を重ね、心を整える鑑定文を作成する内部用ページです。"
   >
 
   <link rel="stylesheet" href="./style.css">
@@ -20,7 +20,7 @@
     <section id="lockScreen" class="lock-card" aria-labelledby="lockTitle">
       <p class="eyebrow">Internal Console</p>
 
-      <h1 id="lockTitle">詩韻式 星命鑑定コンソール</h1>
+      <h1 id="lockTitle">詩韻式 星命未来鑑定コンソール</h1>
 
       <p class="lead-text">
         星命の声を、相談者の心に届く言葉へ整えるための内部用ページです。
@@ -63,11 +63,11 @@
       <header class="hero">
         <p class="eyebrow">Shion Seimei Console</p>
 
-        <h1 id="appTitle">詩韻式 星命鑑定コンソール</h1>
+        <h1 id="appTitle">詩韻式 星命未来鑑定コンソール</h1>
 
         <p class="subtitle">
           生年月日から見えるあなたの星命と、タロットの象徴を重ねて、
-          今、心が一番必要としている言葉を一緒に整えます。
+          今と未来の流れを読み、相談者へ渡せる言葉へ整えます。
         </p>
 
         <div class="safety">
@@ -124,6 +124,21 @@
             </p>
           </div>
 
+
+          <div class="form-row">
+            <label for="targetYear">鑑定対象年</label>
+            <input
+              id="targetYear"
+              type="number"
+              min="1900"
+              max="2200"
+              inputmode="numeric"
+              aria-describedby="targetYearHelp"
+            >
+            <p id="targetYearHelp" class="input-help">
+              未入力の場合は現在年で鑑定します。Phase 1では体感的な転換期・動きやすい月として扱います。
+            </p>
+          </div>
           <div class="form-row">
             <label for="gender">性別（任意）</label>
             <select id="gender" aria-describedby="genderHelp">
@@ -207,7 +222,7 @@
             </button>
 
             <button id="copy" type="button">
-              鑑定文をコピー
+              最終鑑定文全文コピー
             </button>
 
             <button id="reset" type="button" class="ghost">
@@ -234,6 +249,13 @@
               生成された内容を確認し、相談者の状況に合わせて最終鑑定文を整えてください。
             </p>
           </header>
+
+          <div class="result-tabs" aria-label="鑑定結果区分">
+            <span>基本鑑定</span>
+            <span>未来鑑定</span>
+            <span>タロット統合</span>
+            <span>最終鑑定文</span>
+          </div>
 
           <div id="results">
             <section class="result-card empty">
@@ -288,12 +310,15 @@
     })();
   </script>
 
-  <script src="./js/sanmei-data.js" defer></script>
-  <script src="./js/tarot-mapping.js" defer></script>
   <script src="./js/utils.js" defer></script>
-  <script src="./js/validation.js" defer></script>
+  <script src="./js/sanmei-data.js" defer></script>
   <script src="./js/sanmei-engine.js" defer></script>
+  <script src="./js/tarot-78.js" defer></script>
+  <script src="./js/tarot-mapping.js" defer></script>
+  <script src="./js/future-score.js" defer></script>
+  <script src="./js/monthly-reading.js" defer></script>
   <script src="./js/reading-template.js" defer></script>
+  <script src="./js/validation.js" defer></script>
   <script src="./js/ui-render.js" defer></script>
   <script src="./js/main.js" defer></script>
 </body>

@@ -1,14 +1,18 @@
 (function (root, factory) {
   let tarot = root.ShionTarotMapping;
+  let monthly = root.ShionMonthlyReading;
 
   if (typeof require === 'function' && (!tarot || typeof module !== 'undefined')) {
     tarot = require('./tarot-mapping.js');
   }
+  if (typeof require === 'function' && (!monthly || typeof module !== 'undefined')) {
+    try { monthly = require('./monthly-reading.js'); } catch (error) { monthly = null; }
+  }
 
-  const api = factory(tarot || {});
+  const api = factory(tarot || {}, monthly || {});
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.ShionReadingTemplate = api;
-})(typeof globalThis !== 'undefined' ? globalThis : window, function (Tarot) {
+})(typeof globalThis !== 'undefined' ? globalThis : window, function (Tarot, MonthlyReading) {
   const bannedReplacements = [
     [/絶対に破産します/g, 'お金の流れを整える必要が見えやすい時期です'],
     [/絶対に結婚できません/g, '関係性は急いで決めつけず、対話と行動の一致を見ていくことが大切です'],
@@ -674,7 +678,26 @@ ${ctx.reassurance}
     };
   }
 
-  function buildCoreReading(input, chart, tarotEntries) {
+  function buildFutureSection(input, chart, tarotEntries, futureScores, futureReading) {
+    const text = safeText(
+      futureReading || (MonthlyReading && typeof MonthlyReading.buildFutureReading === 'function'
+        ? MonthlyReading.buildFutureReading(input, chart, tarotEntries, futureScores || [])
+        : '')
+    );
+
+    if (!text) {
+      return compact(
+`4. 今年の総合運
+
+未来鑑定は、鑑定対象年と月別スコアを重ねることで表示されます。
+今は本質と現在のテーマを中心に、次の小さな一歩を整えていきます。`
+      );
+    }
+
+    return text;
+  }
+
+  function buildCoreReading(input, chart, tarotEntries, futureScores, futureReading) {
     const ctx = createContext(input, chart, tarotEntries);
 
     return compact(
@@ -683,7 +706,7 @@ ${ctx.reassurance}
         buildSanmeiSection(ctx),
         buildSeimeiSection(ctx),
         buildTopicSection(ctx),
-        buildThemeSection(ctx),
+        buildFutureSection(input, chart, tarotEntries, futureScores, futureReading),
         buildTarotSection(ctx),
         buildActionSection(ctx),
         buildClosingSection(ctx)
@@ -691,8 +714,8 @@ ${ctx.reassurance}
     );
   }
 
-  function generateReading(input, chart, tarotEntries = []) {
-    const text = buildCoreReading(input, chart, tarotEntries);
+  function generateReading(input, chart, tarotEntries = [], futureScores = [], futureReading = '') {
+    const text = buildCoreReading(input, chart, tarotEntries, futureScores, futureReading);
     return filterForbidden(text);
   }
 

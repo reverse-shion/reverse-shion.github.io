@@ -13,6 +13,8 @@
     minYear: 1900,
     maxNameLength: 40,
     maxMemoLength: 500,
+    minTargetYear: 1900,
+    maxTargetYear: 2200,
     allowedTopics: [
       '総合',
       '恋愛',
@@ -140,6 +142,25 @@
     return '';
   }
 
+  function normalizeTargetYear(value, today = new Date()) {
+    const currentYear = today.getFullYear();
+    const raw = text(value);
+    if (!raw) return currentYear;
+    const year = Number(raw);
+    if (!Number.isInteger(year)) return currentYear;
+    return Math.max(CONFIG.minTargetYear, Math.min(CONFIG.maxTargetYear, year));
+  }
+
+  function validateTargetYear(value) {
+    const raw = text(value);
+    if (!raw) return '';
+    const year = Number(raw);
+    if (!Number.isInteger(year)) return '鑑定対象年は西暦の数字で入力してください。未入力なら現在年で鑑定します。';
+    if (year < CONFIG.minTargetYear) return `${CONFIG.minTargetYear}年以降を入力してください。`;
+    if (year > CONFIG.maxTargetYear) return `${CONFIG.maxTargetYear}年までを目安に入力してください。`;
+    return '';
+  }
+
   function validateSpread(value) {
     const spread = Number(value);
 
@@ -168,6 +189,9 @@
 
     const spreadError = validateSpread(input.spread);
     if (spreadError) errors.push(spreadError);
+
+    const targetYearError = validateTargetYear(input.targetYear);
+    if (targetYearError) errors.push(targetYearError);
 
     const memoError = validateMemo(input.memo);
     if (memoError) errors.push(memoError);
@@ -201,7 +225,6 @@
       const cardName = text(card.name);
 
       if (isBlank(cardName)) {
-        errors.push(`${index + 1}枚目のタロットカードを選択してください。`);
         continue;
       }
 
@@ -237,6 +260,8 @@
     validateTopic,
     validateMemo,
     validateSpread,
+    validateTargetYear,
+    normalizeTargetYear,
     validateBaseInput,
     validateTarot,
     validateBeforeReading
