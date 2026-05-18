@@ -26,6 +26,7 @@
     gender: 'gender',
     topic: 'topic',
     memo: 'memo',
+    targetYear: 'targetYear',
     spread: 'spread',
     tarotSlots: '#tarotSlots',
 
@@ -37,11 +38,18 @@
     copy: 'copy'
   };
 
-  const state = {
+  const AppState = {
+    input: {},
     chart: null,
-    tarot: [],
+    tarotEntries: [],
+    futureScores: [],
+    futureReading: '',
+    finalReading: '',
     lastInputSignature: ''
   };
+
+  const state = AppState;
+  window.ShionSeimeiAppState = AppState;
 
   const $ = (selector) => document.querySelector(selector);
   const byId = (id) => document.getElementById(id);
@@ -80,6 +88,9 @@
       gender: rawValue(SELECTORS.gender),
       topic: rawValue(SELECTORS.topic),
       memo: rawValue(SELECTORS.memo).trim(),
+      targetYear: window.ShionValidation && typeof window.ShionValidation.normalizeTargetYear === 'function'
+        ? window.ShionValidation.normalizeTargetYear(rawValue(SELECTORS.targetYear))
+        : (Number(rawValue(SELECTORS.targetYear)) || new Date().getFullYear()),
       spread: Number(rawValue(SELECTORS.spread) || 1)
     };
   }
@@ -91,6 +102,7 @@
       gender: input.gender,
       topic: input.topic,
       memo: input.memo,
+      targetYear: input.targetYear,
       spread: input.spread
     });
   }
@@ -127,7 +139,10 @@
     if (!window.ShionUtils) missing.push('ShionUtils');
     if (!window.ShionValidation) missing.push('ShionValidation');
     if (!window.ShionSanmeiEngine) missing.push('ShionSanmeiEngine');
+    if (!window.ShionTarot78) missing.push('ShionTarot78');
     if (!window.ShionTarotMapping) missing.push('ShionTarotMapping');
+    if (!window.ShionFutureScore) missing.push('ShionFutureScore');
+    if (!window.ShionMonthlyReading) missing.push('ShionMonthlyReading');
     if (!window.ShionUiRender) missing.push('ShionUiRender');
     if (!window.ShionReadingTemplate) missing.push('ShionReadingTemplate');
 
@@ -159,6 +174,7 @@
   }
 
   function getTarotCards() {
+    if (window.ShionTarot78 && Array.isArray(window.ShionTarot78.TAROT_78_CARDS)) return window.ShionTarot78.TAROT_78_CARDS;
     return window.ShionTarotMapping && Array.isArray(window.ShionTarotMapping.TAROT_CARDS)
       ? window.ShionTarotMapping.TAROT_CARDS
       : [];
@@ -170,7 +186,7 @@
 
     if (!nameJa) return '';
 
-    const label = number ? `${number}. ${nameJa}` : nameJa;
+    const label = card && card.category === 'major' ? `${number}. ${nameJa}` : nameJa;
     return `<option value="${escapeHtml(nameJa)}">${escapeHtml(label)}</option>`;
   }
 
@@ -198,7 +214,7 @@
       `;
     }).join('');
 
-    state.tarot = [];
+    state.tarotEntries = [];
   }
 
   function readTarotEntries() {
@@ -295,16 +311,21 @@
     return state.chart;
   }
 
+  function buildFuture(input, chart, entries) {
+    state.futureScores = window.ShionFutureScore.buildFutureScores(input, chart, entries || [], window.ShionTarot78);
+    state.futureReading = window.ShionMonthlyReading.buildFutureReading(input, chart, entries || [], state.futureScores);
+  }
+
   function renderAll(includeTarot) {
     const result = $(SELECTORS.results);
     if (!result || !state.chart) return;
 
-    const input = getBaseInput();
+    const input = state.input && Object.keys(state.input).length ? state.input : getBaseInput();
     const type = state.chart.seimei && state.chart.seimei.baseType
       ? state.chart.seimei.baseType
       : {};
 
-    const entries = includeTarot ? state.tarot : [];
+    const entries = includeTarot ? state.tarotEntries : [];
     const positions = getSpreadPositions(entries.length);
     const findCard = getFindTarotFunction();
 
@@ -312,6 +333,7 @@
       window.ShionUiRender.renderChart(state.chart) +
       window.ShionUiRender.renderFiveElements(state.chart.fiveElements || {}) +
       window.ShionUiRender.renderTypeCards(type) +
+      window.ShionUiRender.renderFuture(state.futureScores, state.futureReading, window.ShionFutureScore) +
       window.ShionUiRender.renderTarot(entries, positions, findCard, input.topic) +
       window.ShionUiRender.renderActionAndFinal(type);
   }
@@ -319,6 +341,7 @@
   function setFinalReading(textValue) {
     const textarea = $(SELECTORS.finalReading);
     if (textarea) textarea.value = textValue || '';
+    state.finalReading = textValue || '';
   }
 
   function getFinalReading() {
@@ -327,7 +350,7 @@
   }
 
   function generateReading(input, chart, entries) {
-    return window.ShionReadingTemplate.generateReading(input, chart, entries);
+    return window.ShionReadingTemplate.generateReading(input, chart, entries, state.futureScores, state.futureReading);
   }
 
   function generateBase() {
@@ -339,9 +362,11 @@
 
       if (!showErrors(errors)) return;
 
+      state.input = input;
       state.chart = buildChart(input);
       state.lastInputSignature = createInputSignature(input);
-      state.tarot = [];
+      state.tarotEntries = [];
+      buildFuture(input, state.chart, []);
 
       renderAll(false);
       setFinalReading(generateReading(input, state.chart, []));
@@ -371,9 +396,11 @@
 
       if (!showErrors(errors)) return;
 
+      state.input = input;
       state.chart = buildChart(input);
       state.lastInputSignature = createInputSignature(input);
-      state.tarot = entries;
+      state.tarotEntries = entries;
+      buildFuture(input, state.chart, entries);
 
       renderAll(true);
       setFinalReading(generateReading(input, state.chart, entries));
@@ -417,9 +444,14 @@
     const form = byId(SELECTORS.form);
     if (form) form.reset();
 
+    state.input = {};
     state.chart = null;
-    state.tarot = [];
+    state.tarotEntries = [];
+    state.futureScores = [];
+    state.futureReading = '';
+    state.finalReading = '';
     state.lastInputSignature = '';
+    setValue(SELECTORS.targetYear, new Date().getFullYear());
 
     updateTarotSlots();
     renderEmptyResult();
@@ -433,6 +465,7 @@
     setValue(SELECTORS.gender, '');
     setValue(SELECTORS.topic, '仕事');
     setValue(SELECTORS.memo, '今後の働き方と金運が不安');
+    setValue(SELECTORS.targetYear, new Date().getFullYear());
     setValue(SELECTORS.spread, '3');
 
     updateTarotSlots();
@@ -507,7 +540,7 @@
     updateTarotSlots();
 
     if (state.chart) {
-      state.tarot = [];
+      state.tarotEntries = [];
       renderAll(false);
       showInfo([
         'カード枚数を変更しました。',
@@ -525,7 +558,7 @@
 
     const currentSignature = createInputSignature(getBaseInput());
     if (currentSignature !== state.lastInputSignature) {
-      state.tarot = [];
+      state.tarotEntries = [];
       renderEmptyResult();
       setFinalReading('');
       showInfo(['入力内容が変更されました。もう一度カルテを生成してください。']);
@@ -535,7 +568,7 @@
   }
 
   function bindBaseInputWatchers() {
-    [SELECTORS.name, SELECTORS.birthDate, SELECTORS.gender, SELECTORS.topic, SELECTORS.memo].forEach(
+    [SELECTORS.name, SELECTORS.birthDate, SELECTORS.gender, SELECTORS.topic, SELECTORS.memo, SELECTORS.targetYear].forEach(
       (id) => {
         bind(id, 'change', handleBaseInputChange);
       }
@@ -543,6 +576,7 @@
   }
 
   function initialize() {
+    if (!rawValue(SELECTORS.targetYear)) setValue(SELECTORS.targetYear, new Date().getFullYear());
     updateTarotSlots();
     renderEmptyResult();
 
@@ -562,6 +596,14 @@
     bind(SELECTORS.reset, 'click', resetAll);
     bind(SELECTORS.demo, 'click', demo);
     bind(SELECTORS.copy, 'click', copyReading);
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest && event.target.closest('[data-copy-target]');
+      if (!button) return;
+      const target = byId(button.getAttribute('data-copy-target'));
+      const value = target ? (target.value || target.textContent || '') : '';
+      const copyFn = window.ShionUtils && typeof window.ShionUtils.copyText === 'function' ? window.ShionUtils.copyText : (v) => navigator.clipboard.writeText(v);
+      copyFn(value).then(() => showInfo(['セクションをコピーしました。保存はしていません。']), () => showErrors(['コピーに失敗しました。手動で選択してください。']));
+    });
 
     bindBaseInputWatchers();
 

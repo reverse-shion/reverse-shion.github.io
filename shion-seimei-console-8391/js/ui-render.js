@@ -588,6 +588,51 @@
     `;
   }
 
+
+  function renderFuture(scores = [], futureReading = '', helpers = {}) {
+    const getTurning = helpers.getTurningPointMonths || function (items) { return (items || []).slice(0, 3); };
+    const getLove = helpers.getLoveOpportunityMonths || function (items) { return (items || []).slice(0, 3); };
+    const getWorkMoney = helpers.getWorkMoneyMonths || function (items) { return (items || []).slice(0, 3); };
+    const getCaution = helpers.getCautionMonths || function (items) { return (items || []).slice(0, 3); };
+    const list = (items) => (items || []).map((item) => esc(item.label || `${item.month}月`)).join('・') || '未算出';
+    const months = Array.isArray(scores) ? scores : [];
+    const themes = Array.from(new Set(months.flatMap((item) => item.themes || []))).slice(0, 5).join('・') || '整理・準備・対話';
+    const rows = months.map((item) => `
+      <tr>
+        <th scope="row">${esc(item.label)}</th>
+        <td>${esc((item.themes || []).join('・'))}</td>
+        <td>${esc(item.loveScore)}</td>
+        <td>${esc(item.workScore)}</td>
+        <td>${esc(item.moneyScore)}</td>
+        <td>${esc(item.cautionScore)}</td>
+        <td>${esc(item.note)}</td>
+      </tr>
+    `).join('');
+
+    return `
+      <section class="result-card future-card" aria-labelledby="future-section-title">
+        <div class="section-title-row">
+          <h2 id="future-section-title">未来鑑定</h2>
+          <button type="button" class="ghost section-copy" data-copy-target="futureReadingText">未来鑑定をコピー</button>
+        </div>
+        <div class="future-summary-grid">
+          ${miniCard('今年の総合テーマ', themes, 'action-card')}
+          ${miniCard('転換期の月', list(getTurning(months, 3)), 'strength-card')}
+          ${miniCard('恋愛・出会い', list(getLove(months, 3)))}
+          ${miniCard('仕事・金運', list(getWorkMoney(months, 3)))}
+          ${miniCard('注意月', list(getCaution(months, 3)), 'shadow-card')}
+        </div>
+        <div class="monthly-table-wrap">
+          <table class="monthly-table">
+            <thead><tr><th>月</th><th>テーマ</th><th>恋愛</th><th>仕事</th><th>金運</th><th>注意</th><th>メモ</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        <pre id="futureReadingText" class="reading-pre">${esc(futureReading || '未来鑑定文は生成後に表示されます。')}</pre>
+      </section>
+    `;
+  }
+
   function renderActionAndFinal(type = {}) {
     const advice = getTypeValue(
       type,
@@ -641,6 +686,7 @@
     renderFiveElements,
     renderTypeCards,
     renderTarot,
+    renderFuture,
     renderActionAndFinal,
 
     // 将来の共通化・テスト用
