@@ -1,61 +1,364 @@
 (function (root, factory) {
   let data = root.ShionSanmeiData;
-  if (typeof require === 'function' && (!data || typeof module !== 'undefined')) data = require('./sanmei-data.js');
-  const api = factory(data);
-  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+
+  if (typeof require === 'function' && (!data || typeof module !== 'undefined')) {
+    data = require('./sanmei-data.js');
+  }
+
+  const api = factory(data || {});
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = api;
+  }
+
   root.ShionSanmeiEngine = api;
 })(typeof globalThis !== 'undefined' ? globalThis : window, function (DATA) {
-  const { STEMS, BRANCHES, ELEMENTS, STEM_TO_SEIMEI, SEIMEI_TYPES, ELEMENT_NUANCE } = DATA;
-  const STATUS = { verified:'検証済み', simplified:'簡易判定', needsReview:'要確認', notImplemented:'未実装' };
-  const stemNames = STEMS.map(s => s.name), branchNames = BRANCHES.map(b => b.name);
-  function getStem(name) { return STEMS.find(s => s.name === name); }
-  function getBranch(name) { return BRANCHES.find(b => b.name === name); }
-  function sexagenary(index) { const i = ((index % 60) + 60) % 60; return { stem: stemNames[i % 10], branch: branchNames[i % 12], name: `${stemNames[i % 10]}${branchNames[i % 12]}` }; }
-  function parseDate(dateString) { const [y,m,d] = dateString.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); }
-  function getYearPillar(dateString) {
-    const [year, month, day] = dateString.split('-').map(Number);
-    const adjustedYear = (month < 2 || (month === 2 && day < 4)) ? year - 1 : year;
-    const pillar = sexagenary(adjustedYear - 4);
-    return { ...pillar, status:'simplified', label:'簡易年柱・要確認', basis:`${dateString}はMVP固定の立春（2月4日）${adjustedYear === year ? '以後' : '前'}として扱う簡易判定です。厳密な節入り時刻は未対応です。` };
+  'use strict';
+
+  const {
+    STEMS = [],
+    BRANCHES = [],
+    ELEMENTS = ['木', '火', '土', '金', '水'],
+    STEM_TO_SEIMEI = {},
+    SEIMEI_TYPES = {},
+    ELEMENT_NUANCE = {},
+    topicTemplates = {}
+  } = DATA;
+
+  const STATUS = {
+    verified: '検証済み',
+    simplified: '簡易判定',
+    needsReview: '要確認',
+    notImplemented: '未実装'
+  };
+
+  const stemNames = STEMS.map((stem) => stem.name);
+  const branchNames = BRANCHES.map((branch) => branch.name);
+
+  function text(value, fallback = '') {
+    if (value === null || value === undefined) return fallback;
+    const trimmed = String(value).trim();
+    return trimmed === '' ? fallback : trimmed;
   }
+
+  function getStem(name) {
+    return STEMS.find((stem) => stem.name === name) || null;
+  }
+
+  function getBranch(name) {
+    return BRANCHES.find((branch) => branch.name === name) || null;
+  }
+
+  function normalizeTopic(topic) {
+    const value = text(topic, '総合');
+    return topicTemplates[value] ? value : '総合';
+  }
+
+  function sexagenary(index) {
+    const i = ((index % 60) + 60) % 60;
+    const stem = stemNames[i % 10] || '';
+    const branch = branchNames[i % 12] || '';
+
+    return {
+      stem,
+      branch,
+      name: `${stem}${branch}`
+    };
+  }
+
+  function parseDate(dateString) {
+    const [year, month, day] = text(dateString).split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+
+  function getYearPillar(dateString) {
+    const [year, month, day] = text(dateString).split('-').map(Number);
+
+    const adjustedYear =
+      month < 2 || (month === 2 && day < 4)
+        ? year - 1
+        : year;
+
+    const pillar = sexagenary(adjustedYear - 4);
+
+    return {
+      ...pillar,
+      status: 'simplified',
+      label: '簡易年柱・要確認',
+      basis:
+        `${dateString}は、MVP版では立春を2月4日固定として扱っています。` +
+        `そのため、${adjustedYear === year ? '立春以後' : '立春前'}の年柱として簡易判定しています。` +
+        '厳密な節入り時刻は未対応です。'
+    };
+  }
+
   function getMonthBranchIndex(month, day) {
-    const boundaries = [[1,6,1],[2,4,2],[3,6,3],[4,5,4],[5,6,5],[6,6,6],[7,7,7],[8,8,8],[9,8,9],[10,8,10],[11,7,11],[12,7,0]];
+    const boundaries = [
+      [1, 6, 1],
+      [2, 4, 2],
+      [3, 6, 3],
+      [4, 5, 4],
+      [5, 6, 5],
+      [6, 6, 6],
+      [7, 7, 7],
+      [8, 8, 8],
+      [9, 8, 9],
+      [10, 8, 10],
+      [11, 7, 11],
+      [12, 7, 0]
+    ];
+
     let branchIndex = 1;
-    for (const [m,d,b] of boundaries) if (month > m || (month === m && day >= d)) branchIndex = b;
+
+    boundaries.forEach(([boundaryMonth, boundaryDay, index]) => {
+      if (
+        month > boundaryMonth ||
+        (month === boundaryMonth && day >= boundaryDay)
+      ) {
+        branchIndex = index;
+      }
+    });
+
     return branchIndex;
   }
+
   function getTigerMonthStemIndex(yearStem) {
-    const groups = { '甲':2, '己':2, '乙':4, '庚':4, '丙':6, '辛':6, '丁':8, '壬':8, '戊':0, '癸':0 };
-    return groups[yearStem];
+    const groups = {
+      '甲': 2,
+      '己': 2,
+      '乙': 4,
+      '庚': 4,
+      '丙': 6,
+      '辛': 6,
+      '丁': 8,
+      '壬': 8,
+      '戊': 0,
+      '癸': 0
+    };
+
+    return Number.isInteger(groups[yearStem]) ? groups[yearStem] : 2;
   }
+
   function getMonthPillar(dateString, yearStem) {
-    const [, month, day] = dateString.split('-').map(Number);
+    const [, month, day] = text(dateString).split('-').map(Number);
     const branchIndex = getMonthBranchIndex(month, day);
     const offsetFromTiger = (branchIndex - 2 + 12) % 12;
     const stemIndex = (getTigerMonthStemIndex(yearStem) + offsetFromTiger) % 10;
-    return { stem: stemNames[stemIndex], branch: branchNames[branchIndex], name:`${stemNames[stemIndex]}${branchNames[branchIndex]}`, status:'simplified', label:'簡易月柱', basis:'二十四節気の厳密な節入り時刻は未計算です。近似境界テーブルによる簡易月柱です。' };
+
+    const stem = stemNames[stemIndex] || '';
+    const branch = branchNames[branchIndex] || '';
+
+    return {
+      stem,
+      branch,
+      name: `${stem}${branch}`,
+      status: 'simplified',
+      label: '簡易月柱',
+      basis:
+        '二十四節気の厳密な節入り時刻は未計算です。' +
+        'MVP版では近似境界テーブルを使い、月柱を簡易判定しています。'
+    };
   }
-  function julianDayNumber(date) { const y = date.getUTCFullYear(), m = date.getUTCMonth()+1, d = date.getUTCDate(); const a = Math.floor((14-m)/12); const yy = y + 4800 - a; const mm = m + 12*a - 3; return d + Math.floor((153*mm+2)/5) + 365*yy + Math.floor(yy/4) - Math.floor(yy/100) + Math.floor(yy/400) - 32045; }
+
+  function julianDayNumber(date) {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1;
+    const day = date.getUTCDate();
+
+    const a = Math.floor((14 - month) / 12);
+    const y = year + 4800 - a;
+    const m = month + 12 * a - 3;
+
+    return (
+      day +
+      Math.floor((153 * m + 2) / 5) +
+      365 * y +
+      Math.floor(y / 4) -
+      Math.floor(y / 100) +
+      Math.floor(y / 400) -
+      32045
+    );
+  }
+
   function getDayPillar(dateString) {
-    const date = parseDate(dateString); const jdn = julianDayNumber(date);
-    const baseJdn = 2445703; // 1984-02-02を甲子日として扱う簡易基準（要検証）
+    const date = parseDate(dateString);
+    const jdn = julianDayNumber(date);
+
+    /*
+     * 1984-02-02を甲子日として扱う簡易基準。
+     * 日柱は鑑定の印象に関わるため、正式運用では暦データとの照合が必要。
+     */
+    const baseJdn = 2445703;
     const pillar = sexagenary(jdn - baseJdn);
-    return { ...pillar, status:'needsReview', label:'簡易日柱・要確認', basis:`Julian Day Number（${jdn}）と未検証基準日JDN ${baseJdn} から60干支を算出しています。README参照。` };
+
+    return {
+      ...pillar,
+      status: 'needsReview',
+      label: '簡易日柱・要確認',
+      basis:
+        `Julian Day Number（${jdn}）と、未検証基準日JDN ${baseJdn} から60干支を算出しています。` +
+        '現段階では簡易判定として扱い、正式鑑定では確認が必要です。'
+    };
   }
+
   function aggregateFiveElements(pillars) {
-    const balance = Object.fromEntries(ELEMENTS.map(e => [e, 0]));
-    pillars.forEach(p => { const stem = getStem(p.stem); const branch = getBranch(p.branch); if (stem) balance[stem.element] += 1; if (branch) balance[branch.element] += 1; });
-    const entries = Object.entries(balance); const max = Math.max(...entries.map(([,v]) => v)); const min = Math.min(...entries.map(([,v]) => v));
-    return { counts:balance, strongest:entries.filter(([,v]) => v === max).map(([e]) => e), weakest:entries.filter(([,v]) => v === min).map(([e]) => e), supplement:entries.filter(([,v]) => v === min).map(([e]) => e), note:'年柱・月柱・日柱の干支五行を集計した簡易バランスです。偏りは断定ではなく傾向として扱います。' };
+    const counts = Object.fromEntries(ELEMENTS.map((element) => [element, 0]));
+
+    (Array.isArray(pillars) ? pillars : []).forEach((pillar) => {
+      const stem = getStem(pillar && pillar.stem);
+      const branch = getBranch(pillar && pillar.branch);
+
+      if (stem && counts[stem.element] !== undefined) {
+        counts[stem.element] += 1;
+      }
+
+      if (branch && counts[branch.element] !== undefined) {
+        counts[branch.element] += 1;
+      }
+    });
+
+    const entries = Object.entries(counts);
+    const values = entries.map(([, value]) => value);
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+
+    const strongest = entries
+      .filter(([, value]) => value === max)
+      .map(([element]) => element);
+
+    const weakest = entries
+      .filter(([, value]) => value === min)
+      .map(([element]) => element);
+
+    return {
+      counts,
+      strongest,
+      weakest,
+      supplement: weakest,
+      note:
+        '年柱・月柱・日柱に含まれる干支の五行を集計した簡易バランスです。' +
+        '多い五行は出やすい力、少ない五行は意識すると助けになる力として見ます。' +
+        '良い・悪いではなく、心と行動の使い方を知るための目安です。'
+    };
   }
-  function determineSeimeiType(dayStem, balance, topic) {
-    const map = STEM_TO_SEIMEI[dayStem] || STEM_TO_SEIMEI['甲']; const baseType = SEIMEI_TYPES[map.base]; const subType = SEIMEI_TYPES[map.sub]; const strongest = balance.strongest[0];
-    return { status:'simplified', baseType, subType, resonantCards:map.cards, strongestElement:strongest, nuance:ELEMENT_NUANCE[strongest], topicFocus:baseType.templateByTopic[topic] || baseType.templateByTopic['総合'], basis:`日干「${dayStem}」から基本タイプを簡易判定し、五行最強要素「${strongest}」と相談ジャンルで焦点を補正しています。` };
+
+  function getElementReading(element) {
+    return ELEMENT_NUANCE[element] ||
+      '今のあなたに出やすい力を見ながら、無理なく使える形にしていくことが大切です。';
   }
-  function buildChart(input) {
-    const yearPillar = getYearPillar(input.birthDate); const monthPillar = getMonthPillar(input.birthDate, yearPillar.stem); const dayPillar = getDayPillar(input.birthDate);
-    const dayStemData = getStem(dayPillar.stem); const balance = aggregateFiveElements([yearPillar, monthPillar, dayPillar]); const seimei = determineSeimeiType(dayPillar.stem, balance, input.topic || '総合');
-    return { statuses:STATUS, pillars:{ year:yearPillar, month:monthPillar, day:dayPillar }, sanmeiReference:{ dayStem:dayPillar.stem, element:dayStemData.element, yinYang:dayStemData.yinYang, symbol:dayStemData.symbol, essence:dayStemData.essence, caution:dayStemData.caution }, fiveElements:balance, seimei };
+
+  function determineSeimeiType(dayStem, balance = {}, topic = '総合') {
+    const safeTopic = normalizeTopic(topic);
+    const map = STEM_TO_SEIMEI[dayStem] || STEM_TO_SEIMEI['甲'] || {};
+
+    const baseType =
+      SEIMEI_TYPES[map.base] ||
+      SEIMEI_TYPES.pioneer ||
+      {};
+
+    const subType =
+      SEIMEI_TYPES[map.sub] ||
+      SEIMEI_TYPES.hope ||
+      baseType;
+
+    const strongestElement =
+      Array.isArray(balance.strongest) && balance.strongest.length
+        ? balance.strongest[0]
+        : '';
+
+    const topicFocus =
+      baseType.templateByTopic && baseType.templateByTopic[safeTopic]
+        ? baseType.templateByTopic[safeTopic]
+        : baseType.templateByTopic && baseType.templateByTopic['総合']
+          ? baseType.templateByTopic['総合']
+          : topicTemplates[safeTopic] || topicTemplates['総合'] || '';
+
+    return {
+      status: 'simplified',
+      baseType,
+      subType,
+      resonantCards: Array.isArray(map.cards) ? map.cards : [],
+      strongestElement,
+      nuance: getElementReading(strongestElement),
+      topicFocus,
+      basis:
+        `日干「${dayStem}」から基本タイプを簡易判定し、` +
+        `五行で出やすい力「${strongestElement || '参考'}」と相談ジャンル「${safeTopic}」を重ねて焦点を合わせています。`
+    };
   }
-  return { STATUS, getStem, getBranch, getYearPillar, getMonthPillar, getDayPillar, julianDayNumber, aggregateFiveElements, determineSeimeiType, buildChart };
+
+  function buildSanmeiReference(dayPillar) {
+    const dayStemData = getStem(dayPillar && dayPillar.stem) || {};
+
+    return {
+      dayStem: text(dayPillar && dayPillar.stem, '未算出'),
+      element: text(dayStemData.element, '参考'),
+      yinYang: text(dayStemData.yinYang, '参考'),
+      symbol: text(dayStemData.symbol, '象徴'),
+      essence: text(dayStemData.essence, '本質を見直す力'),
+      caution: text(dayStemData.caution, '無理をしすぎないこと'),
+      deep: text(
+        dayStemData.deep,
+        'この日干は、あなたが無意識に大切にしている生き方の癖を映します。良い・悪いではなく、自分らしく戻るための手がかりとして見てください。'
+      )
+    };
+  }
+
+  function buildChart(input = {}) {
+    const birthDate = text(input.birthDate);
+    const topic = normalizeTopic(input.topic);
+
+    const yearPillar = getYearPillar(birthDate);
+    const monthPillar = getMonthPillar(birthDate, yearPillar.stem);
+    const dayPillar = getDayPillar(birthDate);
+
+    const fiveElements = aggregateFiveElements([
+      yearPillar,
+      monthPillar,
+      dayPillar
+    ]);
+
+    const seimei = determineSeimeiType(
+      dayPillar.stem,
+      fiveElements,
+      topic
+    );
+
+    return {
+      statuses: STATUS,
+
+      pillars: {
+        year: yearPillar,
+        month: monthPillar,
+        day: dayPillar
+      },
+
+      sanmeiReference: buildSanmeiReference(dayPillar),
+
+      fiveElements,
+
+      seimei,
+
+      readingMeta: {
+        topic,
+        method: '詩韻式 星命鑑定・簡易判定',
+        caution:
+          'この鑑定は、簡易日柱・簡易月柱を含むMVP版です。' +
+          '断定ではなく、今の自分を見つめ直し、現実の行動へつなげるための参考として扱ってください。'
+      }
+    };
+  }
+
+  return {
+    STATUS,
+    getStem,
+    getBranch,
+    getYearPillar,
+    getMonthPillar,
+    getDayPillar,
+    julianDayNumber,
+    aggregateFiveElements,
+    determineSeimeiType,
+    buildChart
+  };
 });
