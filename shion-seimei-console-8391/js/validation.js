@@ -35,6 +35,13 @@
     return text(value).length === 0;
   }
 
+  function normalizeCardName(value) {
+    return text(value)
+      .toLowerCase()
+      .replace(/[ 　]/g, '')
+      .replace(/正位置|逆位置|upright|reversed/gi, '');
+  }
+
   function isRealDate(value) {
     const dateText = text(value);
 
@@ -72,12 +79,10 @@
   function validateName(value) {
     const name = text(value);
 
-    if (!name) {
-      return '';
-    }
+    if (!name) return '';
 
     if (name.length > CONFIG.maxNameLength) {
-      return `お名前は${CONFIG.maxNameLength}文字以内で入力してください。`;
+      return `お名前は${CONFIG.maxNameLength}文字以内で入力してください。呼びかけに使うため、短めでも大丈夫です。`;
     }
 
     return '';
@@ -118,11 +123,11 @@
     const topic = text(value);
 
     if (!topic) {
-      return '相談ジャンルを選択してください。今どこを見たいのかを決めると、鑑定の言葉が届きやすくなります。';
+      return '相談ジャンルを選択してください。今どこを見たいのかを決めると、鑑定文の焦点が定まりやすくなります。';
     }
 
     if (!CONFIG.allowedTopics.includes(topic)) {
-      return '相談ジャンルの選択内容を確認してください。';
+      return '相談ジャンルの選択内容を確認してください。恋愛・仕事・金運など、今見たいテーマを選び直してください。';
     }
 
     return '';
@@ -131,12 +136,10 @@
   function validateMemo(value) {
     const memo = text(value);
 
-    if (!memo) {
-      return '';
-    }
+    if (!memo) return '';
 
     if (memo.length > CONFIG.maxMemoLength) {
-      return `相談メモは${CONFIG.maxMemoLength}文字以内で入力してください。少し短くすると、鑑定の焦点が定まりやすくなります。`;
+      return `相談メモは${CONFIG.maxMemoLength}文字以内で入力してください。要点を短くすると、鑑定の焦点が定まりやすくなります。`;
     }
 
     return '';
@@ -145,19 +148,42 @@
   function normalizeTargetYear(value, today = new Date()) {
     const currentYear = today.getFullYear();
     const raw = text(value);
+
     if (!raw) return currentYear;
+
     const year = Number(raw);
+
     if (!Number.isInteger(year)) return currentYear;
-    return Math.max(CONFIG.minTargetYear, Math.min(CONFIG.maxTargetYear, year));
+
+    return Math.max(
+      CONFIG.minTargetYear,
+      Math.min(CONFIG.maxTargetYear, year)
+    );
   }
 
   function validateTargetYear(value) {
     const raw = text(value);
+
     if (!raw) return '';
+
+    if (!/^\d{4}$/.test(raw)) {
+      return '鑑定対象年は西暦4桁の数字で入力してください。未入力なら現在年で鑑定します。';
+    }
+
     const year = Number(raw);
-    if (!Number.isInteger(year)) return '鑑定対象年は西暦の数字で入力してください。未入力なら現在年で鑑定します。';
-    if (year < CONFIG.minTargetYear) return `${CONFIG.minTargetYear}年以降を入力してください。`;
-    if (year > CONFIG.maxTargetYear) return `${CONFIG.maxTargetYear}年までを目安に入力してください。`;
+
+    if (!Number.isInteger(year)) {
+      return '鑑定対象年は西暦の数字で入力してください。未入力なら現在年で鑑定します。';
+    }
+
+    if (year < CONFIG.minTargetYear) {
+      return `${CONFIG.minTargetYear}年以降を入力してください。`;
+    }
+
+    if (year > CONFIG.maxTargetYear) {
+      return `${CONFIG.maxTargetYear}年までを目安に入力してください。`;
+    }
+
     return '';
   }
 
@@ -169,7 +195,7 @@
     }
 
     if (!CONFIG.allowedSpreads.includes(spread)) {
-      return 'カード枚数の選択内容を確認してください。';
+      return 'カード枚数の選択内容を確認してください。1枚から5枚まで選べます。';
     }
 
     return '';
@@ -190,7 +216,14 @@
     const spreadError = validateSpread(input.spread);
     if (spreadError) errors.push(spreadError);
 
-    const targetYearError = validateTargetYear(input.targetYear);
+    /*
+     * main.js 側で targetYear を normalize 済みの場合でも動くようにしつつ、
+     * 将来的に targetYearRaw を渡した場合は生値を優先して検証できます。
+     */
+    const targetYearValue =
+      input.targetYearRaw !== undefined ? input.targetYearRaw : input.targetYear;
+
+    const targetYearError = validateTargetYear(targetYearValue);
     if (targetYearError) errors.push(targetYearError);
 
     const memoError = validateMemo(input.memo);
@@ -204,7 +237,7 @@
     const spread = Number(count);
 
     if (!Number.isInteger(spread) || !CONFIG.allowedSpreads.includes(spread)) {
-      errors.push('カード枚数の選択内容を確認してください。');
+      errors.push('カード枚数の選択内容を確認してください。1枚から5枚まで選べます。');
       return errors;
     }
 
@@ -219,25 +252,34 @@
     }
 
     const selectedNames = [];
+    const normalizedNames = [];
 
     for (let index = 0; index < spread; index += 1) {
       const card = cards[index] || {};
       const cardName = text(card.name);
 
       if (isBlank(cardName)) {
+        errors.push(`${index + 1}枚目のカードを選択してください。`);
         continue;
       }
 
       selectedNames.push(cardName);
+      normalizedNames.push(normalizeCardName(cardName));
     }
 
-    const duplicated = selectedNames.filter((name, index, list) => {
-      return list.indexOf(name) !== index;
+    const duplicatedKeys = normalizedNames.filter((name, index, list) => {
+      return name && list.indexOf(name) !== index;
     });
 
-    if (duplicated.length > 0) {
+    if (duplicatedKeys.length > 0) {
+      const duplicatedLabels = unique(
+        selectedNames.filter((name) => {
+          return duplicatedKeys.includes(normalizeCardName(name));
+        })
+      );
+
       errors.push(
-        `同じカードが重複しています：${unique(duplicated).join('、')}。詩韻式では、それぞれの位置に別の象徴を置いて流れを読みます。`
+        `同じカードが重複しています：${duplicatedLabels.join('、')}。詩韻式では、それぞれの位置に別の象徴を置いて流れを読みます。`
       );
     }
 
@@ -254,7 +296,9 @@
   }
 
   return {
+    CONFIG,
     isRealDate,
+    normalizeCardName,
     validateBirthDate,
     validateName,
     validateTopic,
