@@ -1,5 +1,6 @@
 (function (root, factory) {
   let tarot = root.ShionTarotMapping;
+  let tarot78 = root.ShionTarot78;
   let monthly = root.ShionMonthlyReading;
 
   if (typeof require === 'function' && (!tarot || typeof module !== 'undefined')) {
@@ -7,6 +8,14 @@
       tarot = require('./tarot-mapping.js');
     } catch (error) {
       tarot = null;
+    }
+  }
+
+  if (typeof require === 'function' && (!tarot78 || typeof module !== 'undefined')) {
+    try {
+      tarot78 = require('./tarot-78.js');
+    } catch (error) {
+      tarot78 = null;
     }
   }
 
@@ -18,11 +27,11 @@
     }
   }
 
-  const api = factory(tarot || {}, monthly || {});
+  const api = factory(tarot || {}, tarot78 || {}, monthly || {});
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.ShionReadingTemplate = api;
-})(typeof globalThis !== 'undefined' ? globalThis : window, function (Tarot, MonthlyReading) {
+})(typeof globalThis !== 'undefined' ? globalThis : window, function (Tarot, Tarot78, MonthlyReading) {
   'use strict';
 
   const bannedReplacements = [
@@ -42,8 +51,8 @@
   ];
 
   const DEFAULT_POSITIONS = {
-    1: ['今のテーマ'],
-    2: ['今の流れ', '整える鍵'],
+    1: ['今のメッセージ'],
+    2: ['今の流れ', '見直す鍵'],
     3: ['今の流れ', '心の奥', '進む道'],
     4: ['現状', '心の奥', '課題', '未来への一歩'],
     5: ['現状', '心の奥', '課題', '助けになる力', '未来への一歩']
@@ -78,154 +87,154 @@
 
   const SHION_TAROT_INSIGHTS = {
     '愚者': {
-      essence: 'まだ名前のない自由。決まっていないからこそ、未来を選び直せるカードです。',
-      shadow: '自由でいたい気持ちが強くなるほど、責任や現実から少し離れたくなることがあります。',
-      adjustment: '勢いだけで飛び出すより、「どこへ向かいたいのか」を一つだけ決めてみてください。',
+      essence: 'まだ形になっていない未来へ、怖さを抱えながらも一歩を踏み出そうとするカードです。',
+      shadow: '自由でいたい気持ちが強くなるほど、現実の確認を後回しにしてしまうことがあります。',
+      adjustment: '勢いだけで決めず、「どこへ向かいたいのか」を一つだけ言葉にしてみてください。',
       humanMessage: '怖いのに進みたいなら、それは無謀ではありません。心が新しい景色を求めているサインです。',
       action: 'やってみたいことを一つだけメモしてください。大きく始めなくて大丈夫です。'
     },
     '魔術師': {
-      essence: '可能性を現実に変える始まりの力。手元にあるものから、最初の形を作るカードです。',
-      shadow: 'アイデアが多いほど、準備や構想だけで止まってしまうことがあります。',
-      adjustment: '完璧な準備を待つより、ひとつ形にすることが大切です。',
+      essence: '手元にあるものを使い、可能性を現実へ変えていくカードです。',
+      shadow: '考えやアイデアが増えるほど、準備だけで止まってしまうことがあります。',
+      adjustment: '完璧な準備を待つより、まず一つ形にしてみてください。',
       humanMessage: 'あなたの中には、もう材料があります。足りないものを数えるより、今あるものをどう使うかを見てください。',
       action: '考えていることを一つ、投稿・連絡・メモ・作業のどれかに変えてください。'
     },
     '女教皇': {
-      essence: '静かな直感と、まだ言葉にならない真実。心の奥で答えを感じ取るカードです。',
+      essence: '静かな直感と、まだ言葉にならない本音を映すカードです。',
       shadow: '感じ取る力が強い時ほど、確認しないまま心の中で結論を作ってしまうことがあります。',
       adjustment: '直感を大切にしながらも、事実と言葉で確かめることが必要です。',
       humanMessage: '違和感は無視しなくて大丈夫です。ただ、それを怖い結論に急がなくても大丈夫です。',
       action: '「見た事実」と「感じたこと」を分けて書き出してください。'
     },
     '女帝': {
-      essence: '受け入れ、育て、満たす力。愛情や豊かさを現実に広げるカードです。',
-      shadow: '与える力が強くなりすぎると、自分の満たされなさに気づけなくなることがあります。',
+      essence: '受け入れ、育て、満たしていく力を示すカードです。',
+      shadow: '与える力が強くなりすぎると、自分の寂しさや疲れに気づきにくくなります。',
       adjustment: '誰かを満たす前に、自分の心と身体にも栄養を戻してください。',
       humanMessage: 'あなたの優しさは、誰かを包む力になります。でも、空っぽになるまで与えなくていいのです。',
       action: '自分のために、温かい飲み物・食事・休息のどれかを一つ選んでください。'
     },
     '皇帝': {
-      essence: '責任、決断、土台を作る力。現実を支え、形にするカードです。',
+      essence: '責任を持ち、現実に土台を作っていくカードです。',
       shadow: '守ろうとする気持ちが強いほど、正しさや管理で押し切りたくなることがあります。',
       adjustment: '支配するより、安心できる仕組みを作ることが大切です。',
       humanMessage: '本当の強さは、何も頼らないことではありません。背負い方を見直すことも、ちゃんと強さです。',
       action: '今日やることを三つに絞り、残りは後日に回してください。'
     },
     '教皇': {
-      essence: '信頼、教え、受け継がれる知恵。人とのつながりの中で道を見つけるカードです。',
+      essence: '信頼、学び、受け継がれる知恵を示すカードです。',
       shadow: '常識や正しさを大切にするあまり、自分の本音を押し込めてしまうことがあります。',
       adjustment: '「こうあるべき」だけでなく、「本当はどうしたいか」も大切にしてください。',
       humanMessage: '誠実でいることと、我慢し続けることは同じではありません。',
       action: '信頼できる人に、今の気持ちを一言だけ話してみてください。'
     },
     '恋人': {
-      essence: '選択、心の一致、関係性の分岐点。何を選ぶかで未来が変わるカードです。',
-      shadow: '相手に選ばれたい気持ちが強くなると、自分が何を選びたいのか見えにくくなります。',
+      essence: '選ばれるかどうかではなく、自分が何を選びたいのかを問うカードです。',
+      shadow: '相手に選ばれたい気持ちが強くなると、自分の望みが見えにくくなります。',
       adjustment: '相手の気持ちだけでなく、自分の心が本当に安心できるかを見てください。',
       humanMessage: '愛されるかどうかだけではなく、あなた自身がその関係を選びたいかも大切です。',
       action: 'その関係で「嬉しいこと」と「苦しいこと」を一つずつ書き出してください。'
     },
     '戦車': {
-      essence: '前進、意志、突破力。迷いを抱えながらも進もうとするカードです。',
+      essence: '迷いを抱えながらも、前へ進もうとする力を示すカードです。',
       shadow: '進みたい気持ちが強いほど、焦りで自分や相手を急かしてしまうことがあります。',
       adjustment: '目的地とペースを見直してください。勢いよりも方向性が大切です。',
       humanMessage: '進む力はあります。だからこそ、どこへ向かうのかを決めることが大切です。',
       action: '今週中に進めることを一つだけ決め、具体的な日時を入れてください。'
     },
     '力': {
-      essence: '優しさ、忍耐、内なる強さ。力でねじ伏せず、心で向き合うカードです。',
-      shadow: '耐えられる力があるほど、つらさを我慢で処理してしまうことがあります。',
+      essence: '我慢ではなく、優しさで向き合う本当の強さを示すカードです。',
+      shadow: '耐えられる力があるほど、つらさを一人で抱えてしまうことがあります。',
       adjustment: '強いから大丈夫、ではなく、強い人にも休む場所が必要です。',
       humanMessage: 'ここまで耐えてきたことには意味があります。でも、これ以上ひとりで抱えなくてもいいのです。',
       action: '我慢していることを一つだけ言葉にしてください。誰かに言えないなら、紙でも大丈夫です。'
     },
     '隠者': {
-      essence: '内省、探究、静かな答え。外の声を離れ、自分の真実を探すカードです。',
+      essence: '外の声から離れ、自分の中にある答えを探すカードです。',
       shadow: '深く考えるほど、一人で抱え込み、誰にも届かない場所に閉じこもってしまうことがあります。',
       adjustment: '一人の時間は大切ですが、必要な言葉だけは外へ出してください。',
       humanMessage: '沈黙の中に答えはあります。ただ、その答えを自分だけで背負わなくても大丈夫です。',
       action: '今考えていることを三行だけ書き出してください。書くだけで見えてくるものがあります。'
     },
     '運命の輪': {
-      essence: '流れ、転機、巡り合わせ。止まっていたものが動き出すカードです。',
+      essence: '止まっていたものが動き出し、タイミングが変わっていくカードです。',
       shadow: '流れに任せすぎると、自分がどうしたいのかを見失いやすくなります。',
       adjustment: '偶然を待つだけでなく、どの流れに乗るかを自分で選ぶことが大切です。',
       humanMessage: '何かが少しずつ動き始めています。置いていかれるのではなく、選んで乗っていきましょう。',
       action: '最近起きた小さな変化を一つ書き出し、それをどう活かすか考えてください。'
     },
     '正義': {
-      essence: '判断、均衡、誠実な選択。感情と現実を並べて見るカードです。',
+      essence: '感情と現実を並べて、誠実な判断をしていくカードです。',
       shadow: '正しさを求めるほど、心の痛みや迷いを切り捨ててしまうことがあります。',
       adjustment: '冷静な判断に、心の納得も加えてください。',
       humanMessage: '正しいかどうかだけでは測れない想いがあります。苦しさも大切な判断材料です。',
       action: 'メリット・デメリットだけでなく、「自分の心がどう感じるか」も書き出してください。'
     },
     '吊るされた男': {
-      essence: '停止、受容、視点の転換。動けない時間の中に意味を見つけるカードです。',
+      essence: '動けない時間の中で、見方を変える必要を示すカードです。',
       shadow: '我慢を意味のあるものにしようとして、苦しさを正当化してしまうことがあります。',
       adjustment: '無理に進むより、見方を変えることで抜け道が見えてきます。',
       humanMessage: '止まっているように見える時間にも、心はちゃんと何かを学んでいます。焦らなくて大丈夫です。',
       action: '今の状況を、別の人に相談されたつもりで見直してみてください。'
     },
     '死神': {
-      essence: '終わり、手放し、再生。古い形を閉じ、新しい流れへ向かうカードです。',
+      essence: '古い形を終わらせ、次の自分へ向かうための区切りを示すカードです。',
       shadow: '終わりが見える時ほど、すべてを失うように感じて怖くなることがあります。',
       adjustment: '全部を捨てる必要はありません。残すものと手放すものを分けてください。',
       humanMessage: '終わりは罰ではありません。もう合わなくなった形を脱ぎ、次の自分へ戻るための区切りです。',
       action: '今の自分に必要なもの、もう苦しくなっているものを一つずつ書いてください。'
     },
     '節制': {
-      essence: '調和、回復、混ぜ合わせる力。違うものを無理なく馴染ませるカードです。',
+      essence: '違うものを少しずつ馴染ませ、無理のない形へ戻していくカードです。',
       shadow: 'バランスを取ろうとするほど、自分だけが我慢してしまうことがあります。',
       adjustment: '調和とは、自分を消すことではありません。あなたの気持ちも混ぜていいのです。',
       humanMessage: 'あなたが合わせてきた場の中に、あなた自身の声は入っていましたか。今度はそこを大切にしてください。',
       action: '自分が譲っていることを一つ見つけ、本当はどうしたいかを書いてください。'
     },
     '悪魔': {
-      essence: '欲望、執着、本音の影。心が何に縛られているかを映すカードです。',
+      essence: '心が何に縛られているのか、本音の影を映すカードです。',
       shadow: '欲しい、離れられない、やめられないという感情に、自分でも苦しくなることがあります。',
       adjustment: '欲を責めるより、その奥にある寂しさや不安を見てください。',
       humanMessage: '執着は弱さではなく、心が何かを強く求めているサインです。ただ、それに飲まれなくても大丈夫です。',
       action: '今手放せないものが「安心」「承認」「愛情」のどれに近いか考えてください。'
     },
     '塔': {
-      essence: '崩壊、気づき、真実の露呈。無理に積み上げたものが崩れ、本質が見えるカードです。',
+      essence: '無理に積み上げたものが崩れ、本当の問題が見えてくるカードです。',
       shadow: '突然の変化に、すべてが壊れたように感じてしまうことがあります。',
       adjustment: '崩れたものを見るだけでなく、なぜ無理が積み上がっていたのかを見てください。',
       humanMessage: 'それは罰ではありません。苦しめていた形が、もう続けられないと教えてくれているのです。',
       action: '今いちばん無理をしていることを一つだけ認めてください。認めるだけでも変化は始まります。'
     },
     '星': {
-      essence: '希望、癒し、未来への光。まだ遠くても、進む先に光を見つけるカードです。',
+      essence: 'まだ遠くても、未来に希望を置き直すカードです。',
       shadow: '希望を見るだけで現実の一歩が止まると、夢が遠いままになってしまいます。',
       adjustment: '希望を行動として現実に置いてください。',
       humanMessage: '今はまだ遠く感じても、光は消えていません。その星は、ちゃんと道しるべになります。',
       action: '未来のために今日できる行動を一つ選んでください。'
     },
     '月': {
-      essence: '不安、直感、揺れる心。はっきりしない夜の中で、本音を探すカードです。',
+      essence: '不安と直感が混ざる中で、本当の気持ちを探すカードです。',
       shadow: '想像が膨らむほど、不安を事実のように感じてしまうことがあります。',
       adjustment: '見えないものを怖がりすぎず、確認できることから見てください。',
       humanMessage: '不安になるのは弱いからではありません。大切だからこそ、心が先に揺れてしまうのです。',
       action: '不安を一つ書き、その横に「確認できること」を一つだけ書いてください。'
     },
     '太陽': {
-      essence: '喜び、解放、生命力。心が明るさを取り戻すカードです。',
+      essence: '心が明るさを取り戻し、素直な喜びへ向かうカードです。',
       shadow: '明るく進める時ほど、勢いで大切なことを見落としてしまうことがあります。',
       adjustment: '喜びを一時的な勢いで終わらせず、続けられる形にしてください。',
       humanMessage: '笑える時間は、ちゃんと戻ってきます。その光を、無理なく続く日常に置いていきましょう。',
       action: '今日うれしかったことを一つ残してください。小さな喜びが次の力になります。'
     },
     '審判': {
-      essence: '目覚め、再出発、呼び戻される本当の自分。過去を越えて選び直すカードです。',
+      essence: '過去を越えて、もう一度自分を選び直すカードです。',
       shadow: '過去を思い出すほど、あの時できなかった自分を責めてしまうことがあります。',
       adjustment: '過去を責めるより、今なら選び直せることに意識を向けてください。',
       humanMessage: '遅すぎることはありません。眠っていた声が、もう一度立ち上がろうとしています。',
       action: '昔あきらめたこと、今なら少しできそうなことを一つ書いてください。'
     },
     '世界': {
-      essence: '完成、統合、一区切り。ここまでの経験が一つの形になるカードです。',
+      essence: 'ここまでの経験が一つにつながり、次の段階へ向かうカードです。',
       shadow: '完成に近づくほど、終わることへの寂しさや、次へ進む怖さが出ることがあります。',
       adjustment: '終わりにしがみつかず、ここまでの経験を持って次の循環へ進んでください。',
       humanMessage: '積み重ねてきたものは、ちゃんと形になっています。終わりは喪失ではなく、次の扉でもあります。',
@@ -299,14 +308,69 @@
       if (byNormalized) return byNormalized;
     }
 
+    if (Tarot78 && typeof Tarot78.getTarot78ByName === 'function') {
+      const direct78 = Tarot78.getTarot78ByName(name);
+      if (direct78) return direct78;
+
+      const normalized = normalizeCardKey(name);
+      const normalized78 = Tarot78.getTarot78ByName(normalized);
+      if (normalized78) return normalized78;
+    }
+
     return null;
+  }
+
+  function getMinorTarotInsight(card, entryName) {
+    const name = safeText(card && card.nameJa, entryName || 'このカード');
+    const keywords = Array.isArray(card && card.keywords) ? card.keywords.filter(Boolean) : [];
+    const light = safeText(card && card.light);
+    const shadow = safeText(card && card.shadow);
+    const action = safeText(card && card.actionAdvice);
+    const caution = safeText(card && card.caution);
+    const suit = safeText(card && card.suit);
+    const theme = card && card.suit && card.suitTheme ? card.suitTheme : '';
+
+    const suitMessage = {
+      cups: '感情や思い出、心の距離感を見直す時に出やすいカードです。',
+      wands: '行動、熱意、外へ出す力が問われている時に出やすいカードです。',
+      swords: '考え方、言葉、判断を見直す時に出やすいカードです。',
+      pentacles: '仕事、お金、生活の安定を現実的に見直す時に出やすいカードです。'
+    };
+
+    return {
+      essence:
+        safeText(card && card.uprightMeaning) ||
+        `${name}は、${keywords.length ? keywords.join('、') : '今のテーマ'}を通して、現実の中で何を大切にするかを見せてくれるカードです。`,
+      shadow:
+        shadow ||
+        caution ||
+        'その象徴が強く出すぎると、気持ちや行動が少し偏りやすくなります。',
+      adjustment:
+        caution ||
+        '良い・悪いで決めつけず、今の自分にとって必要な見直しを一つだけ選んでください。',
+      humanMessage:
+        light ||
+        suitMessage[suit] ||
+        `${name}は、今の状況を落ち着いて見直すための補助線として出ています。焦らず、できることから見ていきましょう。`,
+      action:
+        action ||
+        '今いちばん気になることを一つだけ書き出し、今日できる行動を選んでください。'
+    };
   }
 
   function getTarotInsight(card, entryName) {
     const rawName = card && card.nameJa ? card.nameJa : entryName;
     const key = normalizeCardKey(rawName);
 
-    return SHION_TAROT_INSIGHTS[key] || {
+    if (SHION_TAROT_INSIGHTS[key]) {
+      return SHION_TAROT_INSIGHTS[key];
+    }
+
+    if (card) {
+      return getMinorTarotInsight(card, rawName);
+    }
+
+    return {
       essence: 'このカードは、今の心の状態を映し、現実を見るための象徴として現れています。',
       shadow: '象徴の力が強く出すぎると、気持ちや行動に偏りが生まれることがあります。',
       adjustment: '良い・悪いで決めつけず、今どこを見直すと自分らしさに戻れるのかを見てください。',
@@ -378,12 +442,14 @@
 
     const keywords = card && Array.isArray(card.uprightKeywords)
       ? card.uprightKeywords.filter(Boolean)
-      : [];
+      : card && Array.isArray(card.keywords)
+        ? card.keywords.filter(Boolean)
+        : [];
 
     const mappingMeaning = card && card.uprightMeaning ? card.uprightMeaning : '';
     const resonance = card && card.seimeiResonanceText
       ? card.seimeiResonanceText
-      : 'このカードは、今の星命タイプが持つ力を現実へ落とし込むための補助線になります。';
+      : 'このカードは、星命の性質を今の現実へ落とし込むための補助線になります。';
 
     const actionAdvice = card && card.actionAdvice ? card.actionAdvice : insight.action;
 
@@ -396,7 +462,7 @@ ${keywords.length ? keywords.join('、') : insight.essence}
 本質：
 ${insight.essence}
 
-${mappingMeaning ? `補助解釈：\n${mappingMeaning}\n\n` : ''}影として出やすいこと：
+${mappingMeaning && mappingMeaning !== insight.essence ? `補助解釈：\n${mappingMeaning}\n\n` : ''}影として出やすいこと：
 ${insight.shadow}
 
 見直すポイント：
@@ -542,14 +608,68 @@ ${ctx.relationship}
     );
   }
 
+  function buildFutureTextWithoutCta(input, chart, tarotEntries, futureScores) {
+    if (!MonthlyReading || typeof MonthlyReading.buildYearOverview !== 'function') {
+      return '';
+    }
+
+    const hasTarot = Array.isArray(tarotEntries) &&
+      tarotEntries.some((entry) => safeText(entry && (entry.name || entry.nameJa)));
+
+    const tarotNote = hasTarot
+      ? '選ばれたタロットのメッセージも、未来を見るための補助線として重ねています。'
+      : '今回はタロット未選択です。星命の傾向を中心に、今年の動きを見ています。';
+
+    return compact(
+[
+  '今年の結論',
+  MonthlyReading.buildYearOverview(input, chart, futureScores),
+  tarotNote,
+
+  '今年の運気マップ',
+  typeof MonthlyReading.buildYearMap === 'function'
+    ? MonthlyReading.buildYearMap(futureScores)
+    : '',
+
+  '数字の見方',
+  typeof MonthlyReading.buildScoreGuide === 'function'
+    ? MonthlyReading.buildScoreGuide()
+    : '',
+
+  '月別未来鑑定',
+  typeof MonthlyReading.buildMonthlyReading === 'function'
+    ? MonthlyReading.buildMonthlyReading(futureScores)
+    : '',
+
+  '恋愛・仕事・金運の流れ',
+  typeof MonthlyReading.buildLoveReading === 'function'
+    ? MonthlyReading.buildLoveReading(futureScores, input)
+    : '',
+  typeof MonthlyReading.buildWorkReading === 'function'
+    ? MonthlyReading.buildWorkReading(futureScores, input)
+    : '',
+  typeof MonthlyReading.buildMoneyReading === 'function'
+    ? MonthlyReading.buildMoneyReading(futureScores, input)
+    : '',
+
+  '今年意識したいこと',
+  typeof MonthlyReading.buildLuckyActionReading === 'function'
+    ? MonthlyReading.buildLuckyActionReading(futureScores, input)
+    : '',
+
+  'この先に待っている未来',
+  typeof MonthlyReading.buildFutureOutlook === 'function'
+    ? MonthlyReading.buildFutureOutlook(futureScores, input)
+    : ''
+].filter(Boolean).join('\n\n')
+    );
+  }
+
   function buildFutureSection(input, chart, tarotEntries, futureScores, futureReading) {
-    const generated = MonthlyReading && typeof MonthlyReading.buildFutureReading === 'function'
-      ? MonthlyReading.buildFutureReading(input, chart, tarotEntries, futureScores || [])
-      : '';
+    const generated = buildFutureTextWithoutCta(input, chart, tarotEntries, futureScores);
+    const body = safeText(futureReading || generated);
 
-    const text = safeText(futureReading || generated);
-
-    if (!text) {
+    if (!body) {
       return compact(
 `5. 未来鑑定
 
@@ -561,7 +681,7 @@ ${ctx.relationship}
     return compact(
 `5. 未来鑑定
 
-${text}`
+${body}`
     );
   }
 
@@ -772,6 +892,11 @@ ${ctx.reassurance}
     return filterForbidden(compact(result));
   }
 
+  function alreadyHasClosing(textValue) {
+    const value = safeText(textValue);
+    return /大丈夫だよ。?$/.test(value) || /大丈夫だよ。?\s*未来は/.test(value);
+  }
+
   function polishShionStyle(value) {
     let polished = compact(filterForbidden(value));
 
@@ -795,7 +920,7 @@ ${ctx.reassurance}
         '- 今日できる確認を一つだけ決める';
     }
 
-    if (!/大丈夫だよ。?$/.test(polished)) {
+    if (!alreadyHasClosing(polished)) {
       polished += '\n\n未来は、今ここからの選び方で少しずつ変えていけます。大丈夫だよ。';
     }
 
