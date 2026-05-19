@@ -120,9 +120,9 @@
       scoreNumber(item && item.relationshipScore)
     );
 
-    if (turning >= 68) return '転換期';
-    if (caution >= 65) return '慎重月';
-    if (activity >= 68 || averageActivityScore(item) >= 64) return '追い風月';
+    if (turning >= 76) return '転換期';
+    if (caution >= 68) return '慎重月';
+    if (activity >= 74 || averageActivityScore(item) >= 70) return '追い風月';
 
     return '整える月';
   }
@@ -210,6 +210,18 @@
     const list = leads[type] || leads['整える月'];
     const index = Math.abs(scoreNumber(item && item.month)) % list.length;
     return list[index];
+  }
+
+  function buildMonthlyLeadText(item) {
+    const monthLead = text(item && item.monthLead);
+    const themeText = text(item && item.themeText);
+
+    const parts = [];
+
+    if (monthLead) parts.push(monthLead);
+    if (themeText && themeText !== monthLead) parts.push(themeText);
+
+    return parts.length ? parts.join('\n') : fallbackMonthLead(item);
   }
 
   function fallbackMonthlyAction(item) {
@@ -353,7 +365,7 @@ ${months.map(themeLine).join('\n')}
         const label = monthLabel(item);
         const type = monthType(item);
         const themes = joinedThemes(item);
-        const lead = text(item.themeText || item.monthLead, fallbackMonthLead(item));
+        const lead = buildMonthlyLeadText(item);
         const caution = cautionLine(item);
         const action = text(item.monthlyAction, fallbackMonthlyAction(item));
         const keyword = text(item.monthlyKeyword, fallbackMonthlyKeyword(item));
