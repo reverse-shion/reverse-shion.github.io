@@ -33,62 +33,204 @@
     今月の運勢: { key: 'turningPointScore', amount: 4 }
   };
 
-  const MAIN_THEMES = [
-    '始動',
-    '確認',
-    '手放し',
-    '再構築',
-    '種まき',
-    '土台作り',
-    '関係修復',
-    '方向転換',
-    '決断',
-    '習慣化',
-    '収入整理',
-    '魅力発信',
-    '自己表現',
-    '距離感調整',
-    '休息',
-    '再挑戦',
-    '対話の再開',
-    '本音の整理',
-    '未来設計',
-    '現実化',
-    '優先順位',
-    '役割の見直し',
-    '安心の確認',
-    '言葉の整理',
-    '選び直し',
-    '生活の立て直し',
-    '約束の確認',
-    '気持ちの置き直し'
-  ];
+  const THEME_SETS = {
+    総合: {
+      main: [
+        '始動',
+        '確認',
+        '手放し',
+        '再構築',
+        '種まき',
+        '土台作り',
+        '方向転換',
+        '決断',
+        '習慣化',
+        '休息',
+        '再挑戦',
+        '本音の整理',
+        '未来設計',
+        '現実化',
+        '優先順位',
+        '役割の見直し',
+        '安心の確認',
+        '言葉の整理',
+        '選び直し',
+        '生活の立て直し'
+      ],
+      sub: [
+        '今できる一歩',
+        '信頼の確認',
+        '感情の整理',
+        '余白作り',
+        '準備の完了',
+        'リズムの調整',
+        '言葉にする',
+        '形にする',
+        '回復',
+        '見直し',
+        '育成',
+        '学び',
+        '境界線',
+        '本音の確認',
+        '現実的な判断',
+        '反応を見る',
+        '手応えを残す',
+        '無理を減らす',
+        '続け方を変える',
+        '選ぶ理由を持つ'
+      ]
+    },
 
-  const SUB_THEMES = [
-    '今できる一歩',
-    '信頼の確認',
-    '感情の整理',
-    '余白作り',
-    '準備の完了',
-    'リズムの調整',
-    '言葉にする',
-    '形にする',
-    '対話',
-    '回復',
-    '見直し',
-    '育成',
-    '学び',
-    '境界線',
-    '本音の確認',
-    '現実的な判断',
-    '反応を見る',
-    '手応えを残す',
-    '無理を減らす',
-    '続け方を変える',
-    '優先順位を決める',
-    '一度立ち止まる',
-    '選ぶ理由を持つ'
-  ];
+    恋愛: {
+      main: [
+        '心の距離',
+        '本音の確認',
+        '関係の見直し',
+        '連絡の温度',
+        '安心できる関係',
+        '相手との歩幅',
+        '気持ちの整理',
+        '選び直し',
+        '対話の再開',
+        '信頼の確認',
+        '愛情表現',
+        '待つ時間の扱い',
+        '関係修復',
+        '自分の望み'
+      ],
+      sub: [
+        '相手の言葉と行動を見る',
+        '自分の安心感を確かめる',
+        '伝えたいことを短くする',
+        '待つだけにしない',
+        '不安を決めつけにしない',
+        '会話のきっかけを作る',
+        '無理に合わせすぎない',
+        '期待と現実を分ける',
+        '寂しさを責めない',
+        '返事を急がない'
+      ]
+    },
+
+    仕事: {
+      main: [
+        '役割の見直し',
+        '発信の整理',
+        '評価につながる行動',
+        '仕事の優先順位',
+        '働き方の調整',
+        '新しい提案',
+        '成果の見せ方',
+        '学びの実践',
+        '再挑戦',
+        '土台作り',
+        'チャンスの入口',
+        '続け方の改善',
+        '環境の見直し',
+        '自分の強み'
+      ],
+      sub: [
+        '力を注ぐ場所を絞る',
+        '今見せたいことを決める',
+        '抱えすぎを減らす',
+        '小さく外へ出す',
+        '相談する相手を選ぶ',
+        '期限を決める',
+        '作業を分ける',
+        '学びを形にする',
+        '評価される動きを残す',
+        '無理な予定を見直す'
+      ]
+    },
+
+    金運: {
+      main: [
+        '収入整理',
+        '固定費の確認',
+        '支出の見直し',
+        'お金の入口',
+        '守るお金',
+        '使い方の見直し',
+        '仕事導線',
+        '価格の見直し',
+        '貯め方の改善',
+        '現実的な判断',
+        '生活費の整理',
+        '不安の正体',
+        '収益の種まき',
+        '契約の確認',
+        'お金の優先順位'
+      ],
+      sub: [
+        '数字を見る',
+        '固定費を一つ減らす',
+        '収入につながる行動を選ぶ',
+        '使う目的を決める',
+        '守る金額を決める',
+        '契約前に確認する',
+        '焦って増やそうとしない',
+        '今ある入口を育てる',
+        '支出を責めずに見る',
+        '生活の安心を作る'
+      ]
+    },
+
+    人間関係: {
+      main: [
+        '距離感調整',
+        '言葉の整理',
+        '境界線',
+        '信頼の確認',
+        '関係の見直し',
+        '対話の再開',
+        '無理を減らす',
+        '本音の扱い',
+        '役割の見直し',
+        '相手との歩幅',
+        '安心できる距離',
+        '誤解の確認',
+        '自分を守る線引き'
+      ],
+      sub: [
+        '返事を急がない',
+        '合わせすぎをやめる',
+        '言葉を選んで伝える',
+        '自分の疲れを確認する',
+        '無理な関係を見直す',
+        '距離を置く理由を整理する',
+        '一呼吸置いて返す',
+        '相手の機嫌を背負わない',
+        '本音を短く伝える',
+        '必要な縁を見極める'
+      ]
+    },
+
+    今月の運勢: {
+      main: [
+        '今月の優先順位',
+        '生活の見直し',
+        '気持ちの整理',
+        '行動の切り替え',
+        '予定の確認',
+        '今できる一歩',
+        '習慣の立て直し',
+        '休む勇気',
+        '流れの確認',
+        '小さな決断'
+      ],
+      sub: [
+        'やることを一つに絞る',
+        '後回しを一つ片づける',
+        '無理な予定を減らす',
+        '今月のテーマを決める',
+        '自分の疲れを見逃さない',
+        '小さな達成を残す',
+        '返事や約束を確認する',
+        '月末に振り返る',
+        '焦らず順番に進める'
+      ]
+    }
+  };
 
   const ELEMENT_ACTIONS = {
     木: [
@@ -156,7 +298,13 @@
   }
 
   function unique(values) {
-    return Array.from(new Set((Array.isArray(values) ? values : []).filter(Boolean)));
+    return Array.from(
+      new Set(
+        (Array.isArray(values) ? values : [])
+          .map((value) => text(value))
+          .filter(Boolean)
+      )
+    );
   }
 
   function monthAffinity(element, month) {
@@ -264,6 +412,7 @@
       if (card.suit === 'pentacles') acc.money += 6;
 
       acc.cards.push(card.nameJa);
+
       return acc;
     }, {
       love: 0,
@@ -276,15 +425,21 @@
     });
   }
 
-  function pickThemes(month, seed, chart) {
+  function getThemeSet(topic) {
+    return THEME_SETS[topic] || THEME_SETS['総合'];
+  }
+
+  function pickThemes(month, seed, chart, topic = '総合') {
+    const themeSet = getThemeSet(topic);
     const weakest = getWeakestElement(chart);
-    const main = pick(MAIN_THEMES, seed, `main:${month}`) || '見直し';
-    const sub = pick(SUB_THEMES, seed, `sub:${month}`) || '今できる一歩';
     const elementActions = ELEMENT_ACTIONS[weakest] || [];
 
+    const main = pick(themeSet.main, seed, `main:${topic}:${month}`) || '見直し';
+    const sub = pick(themeSet.sub, seed, `sub:${topic}:${month}`) || '今できる一歩';
+
     const elementTheme = elementActions.length
-      ? pick(elementActions, seed, `element:${month}`)
-      : pick(MAIN_THEMES, seed, `fallback:${month}`) || '準備';
+      ? pick(elementActions, seed, `element:${topic}:${month}`)
+      : pick(THEME_SETS['総合'].sub, seed, `fallback:${topic}:${month}`) || '準備';
 
     return unique([main, sub, elementTheme]).slice(0, 3);
   }
@@ -311,7 +466,7 @@
 
   function topicHint(topic) {
     if (topic === '恋愛') {
-      return '相手の気持ちを追いかけるより、自分の心が安心できるかを見てほしい時期です';
+      return '相手の反応だけでなく、自分が安心できているかも見てほしい時期です';
     }
 
     if (topic === '仕事') {
@@ -319,14 +474,39 @@
     }
 
     if (topic === '金運') {
-      return '不安を溜め込まず、お金の入口と出口を分けて見たい時期です';
+      return 'お金の入口・出口・守る分を分けて見たい時期です';
     }
 
     if (topic === '人間関係') {
       return '無理に合わせるより、続けられる距離感を見つけたい時期です';
     }
 
+    if (topic === '今月の運勢') {
+      return 'やることを増やすより、今月の優先順位を決めたい時期です';
+    }
+
     return '今の自分に合った進み方を選びやすい時期です';
+  }
+
+  function buildMonthLead(score) {
+    if (!score) return '今月は、自分のペースを大切にしながら進みたい月です。';
+
+    const label = score.label || `${score.month}月`;
+    const type = score.monthType || getMonthType(score);
+
+    if (type === '追い風月') {
+      return `${label}は、動いたことが反応につながりやすい月です。`;
+    }
+
+    if (type === '慎重月') {
+      return `${label}は、急ぐより確認を大切にしたい月です。`;
+    }
+
+    if (type === '転換期') {
+      return `${label}は、選び方や見え方が変わりやすい月です。`;
+    }
+
+    return `${label}は、足元を見直しながら次に備える月です。`;
   }
 
   function buildThemeText(score) {
@@ -338,22 +518,23 @@
     const support = themes[2] || '';
     const label = score.label || `${score.month}月`;
     const type = score.monthType || getMonthType(score);
-    const hint = topicHint(score.topic || '総合');
+    const topic = score.topic || '総合';
+    const hint = topicHint(topic);
 
     if (type === '追い風月') {
-      return `${label}は「${main}」が表に出やすい月です。${hint}。${sub}を意識すると、待っていた反応が返ってきやすくなります。`;
+      return `${label}は「${main}」が表に出やすい月です。${hint}。${sub}を意識すると、待っていた反応や手応えが返ってきやすくなります。`;
     }
 
     if (type === '慎重月') {
-      return `${label}は「${main}」を急がず扱いたい月です。${hint}。すぐに決めず、${sub}を挟むことで気持ちが落ち着きます。`;
+      return `${label}は「${main}」を急がず扱いたい月です。${hint}。すぐに決めるより、${sub}を挟むことで後悔を減らせます。`;
     }
 
     if (type === '転換期') {
-      return `${label}は「${main}」をきっかけに、気持ちの向きが変わりやすい月です。${hint}。${sub}を通して、次に選びたいものが見えてきます。`;
+      return `${label}は「${main}」をきっかけに、今までの見方が変わりやすい月です。${hint}。${sub}を通して、次に選びたいものが見えてきます。`;
     }
 
     if (support) {
-      return `${label}は「${main}」と「${support}」を見直す月です。${hint}。派手に動くより、続けられる形へ直す方が後の力になります。`;
+      return `${label}は「${main}」と「${support}」を見直す月です。${hint}。派手に広げるより、続けられる形に直す方が後の力になります。`;
     }
 
     return `${label}は「${main}」を丁寧に扱いたい月です。${hint}。焦らず、今できることから順番に見てください。`;
@@ -368,17 +549,17 @@
     const type = score.monthType || getMonthType(score);
 
     if (topic === '恋愛') {
-      if (type === '追い風月') return '伝えたい気持ちを短い言葉にして、勇気を出して送ってみる。';
-      if (type === '慎重月') return '相手の反応だけで決めず、自分が安心できているかを確かめる。';
-      if (type === '転換期') return 'この関係で本当に望んでいることを、紙に書き出してみる。';
-      return '待つ時間が苦しいときは、自分の気持ちを一度言葉にする。';
+      if (type === '追い風月') return '伝えたい気持ちを短い言葉にしてみる。';
+      if (type === '慎重月') return '相手の反応だけで決めず、自分の安心感も確かめる。';
+      if (type === '転換期') return 'この関係で本当に望んでいることを書き出す。';
+      return '不安になった出来事を、事実と想像に分けてみる。';
     }
 
     if (topic === '仕事') {
-      if (type === '追い風月') return '今見せたい成果やアイデアを、一つだけ外に出してみる。';
-      if (type === '慎重月') return '抱えている仕事を、続けるものと手放すものに分けてみる。';
+      if (type === '追い風月') return '今見せたい成果やアイデアを、一つだけ外に出す。';
+      if (type === '慎重月') return '抱えている仕事を、続けるものと手放すものに分ける。';
       if (type === '転換期') return '今の働き方で変えたいところを一つ明確にする。';
-      return '役割や優先順位を見直し、力を使う場所を絞ってみる。';
+      return '役割や優先順位を見直し、力を使う場所を絞る。';
     }
 
     if (topic === '金運') {
@@ -390,9 +571,16 @@
 
     if (topic === '人間関係') {
       if (type === '追い風月') return '気になっている相手に、短い言葉で近況を伝えてみる。';
-      if (type === '慎重月') return '返事を急がず、自分の本音を一度確認してから返す。';
+      if (type === '慎重月') return '返事を急がず、自分の本音を確認してから返す。';
       if (type === '転換期') return '無理を感じている関係を一つ見直してみる。';
       return '心が疲れる距離感を、少しだけ調整してみる。';
+    }
+
+    if (topic === '今月の運勢') {
+      if (type === '追い風月') return '今月やることを一つ決めて、早めに動いてみる。';
+      if (type === '慎重月') return '後回しにしている確認を一つ済ませる。';
+      if (type === '転換期') return '今月変えたい習慣を一つ書き出す。';
+      return '予定を一つ減らして、余白を作る。';
     }
 
     if (type === '追い風月') return `「${main}」につながることを一つ、外に出してみる。`;
@@ -413,9 +601,9 @@
     const phrases = {
       追い風月: [
         '動けば、道は応えてくれる',
-        '一歩が出せば、手応えもついてくる',
+        '一歩を出せば、手応えもついてくる',
         '今出す勇気が、次の扉を開く',
-        main ? `${main}を出すことで、景色が変わる` : '出すことから始まる'
+        main ? `${main}を外へ出すことで、景色が変わる` : '出すことから始まる'
       ],
       慎重月: [
         '急がない勇気も、前に進む力になる',
@@ -462,28 +650,6 @@
     return '';
   }
 
-  function buildMonthLead(score) {
-    if (!score) return '今月は、自分のペースを大切にしながら進みたい月です。';
-
-    const label = score.label || `${score.month}月`;
-    const type = score.monthType || getMonthType(score);
-    const hint = topicHint(score.topic);
-
-    if (type === '追い風月') {
-      return `${label}は追い風の吹く月です。${hint}。行動したことに反応が返ってきやすくなります。`;
-    }
-
-    if (type === '慎重月') {
-      return `${label}は慎重に進みたい月です。急がず確認を入れることで、余計な不安を減らせます。`;
-    }
-
-    if (type === '転換期') {
-      return `${label}は転換期です。気持ちや状況の向きが変わりやすい時期です。違和感に素直になることが大切です。`;
-    }
-
-    return `${label}は足元を見直す月です。${hint}。焦らず準備することで、後半の動きが楽になります。`;
-  }
-
   function buildNote(score) {
     if (!score) return '今できることから順番に';
 
@@ -508,7 +674,10 @@
     return Array.from({ length: 12 }, (_, index) => {
       const month = index + 1;
       const wave = (seed + year * (month + 7) + month * 31) % 29;
-      const affinity = monthAffinity(dayElement, month) + Math.floor(monthAffinity(strongest, month) / 2);
+      const affinity =
+        monthAffinity(dayElement, month) +
+        Math.floor(monthAffinity(strongest, month) / 2);
+
       const tarot = tarotInfluence(tarotEntries, tarot78, month);
       const base = 42 + wave + affinity;
 
@@ -516,10 +685,12 @@
         month,
         label: `${month}月`,
         topic,
+
         loveScore: clamp(base + (month % 3) * 4 + tarot.love),
         workScore: clamp(base + ((month + 1) % 4) * 3 + tarot.work),
         moneyScore: clamp(base + ((month + 2) % 5) * 2 + tarot.money),
         relationshipScore: clamp(base + ((month + 3) % 4) * 3 + tarot.relationship),
+
         cautionScore: clamp(
           34 +
           ((seed >>> (month % 8)) % 31) +
@@ -527,6 +698,7 @@
           tarot.caution -
           Math.floor(affinity / 2)
         ),
+
         turningPointScore: clamp(
           38 +
           wave +
@@ -534,7 +706,8 @@
           (month === ((seed % 12) + 1) ? 18 : 0) +
           tarot.turning
         ),
-        themes: pickThemes(month, seed, chart),
+
+        themes: [],
         cards: unique(tarot.cards).slice(0, 2),
         note: ''
       };
@@ -544,6 +717,7 @@
       }
 
       score.monthType = getMonthType(score);
+      score.themes = pickThemes(month, seed, chart, topic);
       score.monthLead = buildMonthLead(score);
       score.themeText = buildThemeText(score);
       score.monthlyAction = buildMonthlyAction(score);
