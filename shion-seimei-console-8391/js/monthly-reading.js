@@ -38,11 +38,6 @@
     return Number.isFinite(num) ? num : fallback;
   }
 
-  function scoreText(value) {
-    const num = Number(value);
-    return Number.isFinite(num) ? String(Math.round(num)) : '未算出';
-  }
-
   function monthLabel(item) {
     if (!item) return '';
     if (item.label) return item.label;
@@ -160,6 +155,12 @@
       .filter(Boolean)[0] || fallback;
   }
 
+  function secondTheme(item, fallback = '今できる一歩') {
+    return asArray(item && item.themes)
+      .map((theme) => text(theme))
+      .filter(Boolean)[1] || fallback;
+  }
+
   function getTopic(input = {}) {
     return text(input.topic, '総合');
   }
@@ -175,89 +176,217 @@
     return compact(
 `今回のメモには「${memo}」とあります。
 
-この言葉から、あなたが今何を一番気にかけているのかが伝わってきます。`
+この言葉から、今のあなたが何を一番気にかけているのかが伝わってきます。`
     );
   }
 
-  function fallbackMonthLead(item) {
+  function scoreTone(value) {
+    const score = scoreNumber(value);
+
+    if (score >= 80) return 'かなり動きやすい';
+    if (score >= 70) return '動きが出やすい';
+    if (score >= 60) return '少し意識に上がりやすい';
+    if (score >= 50) return '穏やかに扱いたい';
+    return '無理に急がなくていい';
+  }
+
+  function buildSoftScoreLine(item) {
+    return `恋愛は${scoreTone(item && item.loveScore)}、仕事は${scoreTone(item && item.workScore)}、金運は${scoreTone(item && item.moneyScore)}月です。注意面は${scoreTone(item && item.cautionScore)}ため、勢いより確認を大切にしてください。`;
+  }
+
+  function isGenericLead(value) {
+    const v = text(value);
+
+    if (!v) return true;
+
+    return [
+      '不安を溜め込まず、お金の入口と出口',
+      '足元を見直す月です',
+      '追い風の吹く月です',
+      '慎重に進みたい月です',
+      '転換期です。気持ちや状況の向き',
+      '行動したことに反応が返ってきやすくなります',
+      '焦らず準備することで、後半の動きが楽になります'
+    ].some((phrase) => v.includes(phrase));
+  }
+
+  function moneyFocusByMonth(item) {
+    const month = scoreNumber(item && item.month);
+    const type = monthType(item);
+    const theme = firstTheme(item);
+
+    if (type === '慎重月') {
+      return `${monthLabel(item)}は、大きな支出や契約を急がず確認したい月です。金額だけでなく、「今の自分に本当に必要か」を一度見直してください。`;
+    }
+
+    if (type === '転換期') {
+      return `${monthLabel(item)}は、お金の使い方や収入の作り方を選び直しやすい月です。「前と同じやり方でいいのか」と感じたら、そこに見直しのヒントがあります。`;
+    }
+
+    if (type === '追い風月') {
+      return `${monthLabel(item)}は、収入につながる行動を試しやすい月です。いきなり大きく増やすより、今できる入口を一つ増やす意識が合っています。`;
+    }
+
+    if ([1, 2].includes(month)) {
+      return `${monthLabel(item)}は、固定費や日々の出費を見直すのに向いています。まずは「なんとなく使っているお金」を一つ減らすだけでも十分です。`;
+    }
+
+    if ([9, 10].includes(month)) {
+      return `${monthLabel(item)}は、守るお金と動かすお金を分けたい月です。安心のために残すもの、未来のために使うものを分けて考えてください。`;
+    }
+
+    if ([11, 12].includes(month)) {
+      return `${monthLabel(item)}は、来年に向けたお金の使い方を決める時期です。焦って増やすより、続けられる仕組みを作る方が安定します。`;
+    }
+
+    return `${monthLabel(item)}は、「${theme}」を通してお金の扱い方を見直したい月です。増やすことだけでなく、安心して使える形を作ることも大切です。`;
+  }
+
+  function topicMonthLead(item, topic = '総合') {
     const label = monthLabel(item);
     const type = monthType(item);
-    const theme = firstTheme(item);
+    const main = firstTheme(item);
+    const sub = secondTheme(item);
 
-    const leads = {
-      '追い風月': [
-        `${label}は、動いた分だけ反応が返ってきやすい月です。迷っているなら、少し勇気を出して外に出してみてください。`,
-        `${label}は、待っているより行動した方が手応えを感じやすいタイミングです。完璧じゃなくても、今の自分で大丈夫です。`,
-        `${label}は「${theme}」がきっかけになりやすい月です。人との会話や自分の発信を止めすぎないことが大切です。`
-      ],
-      '慎重月': [
-        `${label}は、急ぐより立ち止まって確認するのに向いています。止まることは後退ではありません。`,
-        `${label}は気持ちが揺れやすい時期です。大事な判断は焦らず、一晩置くくらいの余裕を持ってください。`,
-        `${label}は「${theme}」を丁寧に扱う月です。今あるものを守りながら、次に繋げる準備をしましょう。`
-      ],
-      '転換期': [
-        `${label}は、これまでぼんやりしていたことがはっきり見え始める月です。「このままでいいのか」と感じたら、それが大事なサインです。`,
-        `${label}は、気持ちや状況の向きが変わりやすい時期です。古い違和感に気づいたら、無理に無視しないでください。`,
-        `${label}は、選び直しのタイミングです。今まで続けていたやり方を見直すことで、新しい道が見えやすくなります。`
-      ],
-      '整える月': [
-        `${label}は、大きく動くより足元を整える月です。予定や気持ちを整理すると、後がとても楽になります。`,
-        `${label}は、心に余白を作る時期です。詰め込みすぎていたものを一つ手放すだけでも、視界が変わります。`,
-        `${label}は「${theme}」を静かに進めるのに良い月です。焦らず、続けられる形を探してください。`
-      ]
-    };
+    if (topic === '金運') {
+      return moneyFocusByMonth(item);
+    }
 
-    const list = leads[type] || leads['整える月'];
-    const index = Math.abs(scoreNumber(item && item.month)) % list.length;
-    return list[index];
+    if (topic === '恋愛') {
+      if (type === '追い風月') {
+        return `${label}は、人との距離が動きやすい月です。相手の反応を待つだけでなく、自分の気持ちも短い言葉にしてみてください。`;
+      }
+
+      if (type === '慎重月') {
+        return `${label}は、恋愛を急いで決めつけない方がいい月です。相手の言葉だけでなく、行動の温度も落ち着いて見てください。`;
+      }
+
+      if (type === '転換期') {
+        return `${label}は、関係性の見え方が変わりやすい月です。「本当はどうしたいのか」を自分に聞く時間を作ってください。`;
+      }
+
+      return `${label}は、恋愛面では心の整理を優先したい月です。不安になった時ほど、事実と想像を分けて見てください。`;
+    }
+
+    if (topic === '仕事') {
+      if (type === '追い風月') {
+        return `${label}は、仕事で手応えを感じやすい月です。提案、発信、相談など、外へ出す行動に追い風があります。`;
+      }
+
+      if (type === '慎重月') {
+        return `${label}は、仕事の進め方を確認したい月です。抱えすぎている作業や、無理な予定を一度見直してください。`;
+      }
+
+      if (type === '転換期') {
+        return `${label}は、働き方や役割の見方が変わりやすい月です。続けるものと変えるものを分けると、次が見えてきます。`;
+      }
+
+      return `${label}は、仕事の足場を作る月です。派手な成果より、続けられる形を作ることが後の評価につながります。`;
+    }
+
+    if (topic === '人間関係') {
+      if (type === '追い風月') {
+        return `${label}は、人との会話から次のきっかけが生まれやすい月です。短い連絡や近況報告でも、関係が動く可能性があります。`;
+      }
+
+      if (type === '慎重月') {
+        return `${label}は、言葉の行き違いに注意したい月です。返事を急がず、少し時間を置いてから伝えると安心です。`;
+      }
+
+      if (type === '転換期') {
+        return `${label}は、距離感を選び直す月です。無理に合わせてきた関係ほど、自分の本音が見えやすくなります。`;
+      }
+
+      return `${label}は、人間関係を穏やかに見直したい月です。誰かに合わせる前に、自分の疲れ具合も確認してください。`;
+    }
+
+    if (type === '追い風月') {
+      return `${label}は、「${main}」が表に出やすい月です。${sub}を意識すると、動いた分だけ手応えが返ってきやすくなります。`;
+    }
+
+    if (type === '慎重月') {
+      return `${label}は、「${main}」を急がず扱いたい月です。すぐに決めるより、一度確認を入れることで後悔を減らせます。`;
+    }
+
+    if (type === '転換期') {
+      return `${label}は、「${main}」をきっかけに見え方が変わりやすい月です。違和感を無視せず、選び直す余地を残してください。`;
+    }
+
+    return `${label}は、「${main}」を静かに進めたい月です。大きく動くより、今あるものを扱いやすい形に直していきましょう。`;
   }
 
-  function buildMonthlyLeadText(item) {
-    const monthLead = text(item && item.monthLead);
+  function buildMonthlyLeadText(item, topic = '総合') {
     const themeText = text(item && item.themeText);
+    const monthLead = text(item && item.monthLead);
 
-    const parts = [];
+    if (themeText && !isGenericLead(themeText)) return themeText;
+    if (monthLead && !isGenericLead(monthLead)) return monthLead;
 
-    if (monthLead) parts.push(monthLead);
-    if (themeText && themeText !== monthLead) parts.push(themeText);
-
-    return parts.length ? parts.join('\n') : fallbackMonthLead(item);
+    return topicMonthLead(item, topic);
   }
 
-  function fallbackMonthlyAction(item) {
+  function fallbackMonthlyAction(item, topic = '総合') {
     const type = monthType(item);
     const theme = firstTheme(item);
 
-    if (type === '追い風月') return `「${theme}」につながることを一つだけ、外に出してみる。`;
-    if (type === '慎重月') return '大事な返事や約束は、すぐ決めず一度確認する。';
-    if (type === '転換期') return '今の違和感や「変えたい」と思うことを、紙に書き出してみる。';
+    if (topic === '金運') {
+      if (type === '追い風月') return '収入につながりそうな行動を、一つだけ試してみる。';
+      if (type === '慎重月') return '大きな支出や契約は、時間を置いてから決める。';
+      if (type === '転換期') return 'お金の使い方で変えたい習慣を一つ書き出す。';
+      return '固定費か毎日の出費を一つだけ見直す。';
+    }
 
-    return '予定や気持ちを一つ整理して、余白を意識的に作る。';
+    if (topic === '恋愛') {
+      if (type === '追い風月') return '伝えたい気持ちを短い言葉にしてみる。';
+      if (type === '慎重月') return '相手の反応だけで判断せず、自分の安心感も確認する。';
+      if (type === '転換期') return 'この関係で本当に望んでいることを書き出す。';
+      return '不安になった出来事を、事実と想像に分けてみる。';
+    }
+
+    if (topic === '仕事') {
+      if (type === '追い風月') return '今見せたい成果や考えを、一つだけ外に出す。';
+      if (type === '慎重月') return '抱えている仕事を「続けるもの」と「手放すもの」に分ける。';
+      if (type === '転換期') return '働き方で変えたい点を一つ明確にする。';
+      return '優先順位を一つ決め、力を注ぐ場所を絞る。';
+    }
+
+    if (topic === '人間関係') {
+      if (type === '追い風月') return '気になっている相手に、短い近況を伝えてみる。';
+      if (type === '慎重月') return '返事を急がず、自分の本音を確認してから伝える。';
+      if (type === '転換期') return '無理を感じている関係を一つ見直す。';
+      return '心が疲れる距離感を、少しだけ調整する。';
+    }
+
+    if (type === '追い風月') return `「${theme}」につながることを一つ、外に出してみる。`;
+    if (type === '慎重月') return '大事な返事や約束は、すぐ決めず一度確認する。';
+    if (type === '転換期') return '今の違和感や「変えたい」と思うことを書き出す。';
+
+    return '予定や気持ちを一つ整理して、余白を作る。';
   }
 
   function fallbackMonthlyKeyword(item) {
     const type = monthType(item);
 
     if (type === '追い風月') return '動けば、道は応えてくれる';
-    if (type === '慎重月') return '急がない勇気も、前に進む力';
-    if (type === '転換期') return '選び直すことで、見える世界が変わる';
+    if (type === '慎重月') return '急がない勇気も、前に進む力になる';
+    if (type === '転換期') return '選び直すことで、景色は変わる';
 
-    return '余白が、次の扉を開く';
+    return '余白が、次の力を生む';
   }
 
   function cautionLine(item) {
     const explicit = text(item && item.cautionText);
-    if (explicit) return explicit;
-
     const type = monthType(item);
     const caution = scoreNumber(item && item.cautionScore);
 
-    if (type === '慎重月' || caution >= 65) {
-      return 'ここは無理に前に進もうとせず、一度立ち止まって確認する方が安心です。';
+    if (explicit && caution >= 65) return explicit;
+
+    if (type === '慎重月' || caution >= 68) {
+      return 'ここは急いで前に進めるより、予定・お金・言葉を一度確認したい月です。';
     }
 
-    if ((type === '転換期' || type === '追い風月') && caution >= 58) {
-      return '動きやすい時期ですが、勢いだけで決めないことが大切です。';
+    if ((type === '転換期' || type === '追い風月') && caution >= 60) {
+      return '動きやすい時期ですが、勢いだけで決めると後で直したくなるかもしれません。大事なことほど一呼吸置いてください。';
     }
 
     return '';
@@ -272,10 +401,10 @@
       monthType(item) === '慎重月'
         ? '急いで広げるより、確認に向く月です'
         : monthType(item) === '追い風月'
-          ? '動いたことが反応として返りやすい月です'
+          ? '行動が反応につながりやすい月です'
           : monthType(item) === '転換期'
             ? '選び直しや方向転換が起こりやすい月です'
-            : '準備や土台づくりに向く月です'
+            : '準備や見直しに向く月です'
     );
 
     return `${label}は「${theme}」がテーマで、${note}。`;
@@ -292,32 +421,31 @@
     const subTheme = themes[1] || '一歩を出す';
     const strength = text(type.strength || type.essence, '今あるものを形にしていく力');
     const shadow = text(type.shadow, '考えすぎて動きが止まること');
-
     const memoText = memoOpening(input);
 
     const topicLine = topic === '恋愛'
-      ? '恋愛では、相手のことばかり考えるより、自分が安心できる関係かを大切にしてください。'
+      ? '恋愛では、相手の気持ちを追いかけすぎるより、自分が安心できる関係かを見ていくことが大切です。'
       : topic === '仕事'
         ? '仕事では、頑張る量より「どこに力を注ぐか」を選ぶことが今年の鍵になります。'
         : topic === '金運'
-          ? '金運では、不安を溜め込むより、お金の流れをシンプルに見える形にすることが大事です。'
+          ? '金運では、不安を抱え込むより、お金の入口・出口・守る分を分けて見ることが大事です。'
           : topic === '人間関係'
             ? '人間関係では、相手に合わせることより、自分が無理なくいられる距離感を見つけることが大切です。'
-            : '今年は、無理に大きく変わろうとするより、今の自分に合ったペースを見つける一年になりそうです。';
+            : '今年は、無理に大きく変わろうとするより、今の自分に合うペースを見つける一年になりそうです。';
 
     return compact(
 `${memoText ? `${memoText}\n\n` : ''}${year}年は、あなたにとって「頑張りすぎを手放す年」になりそうです。
 
-${typeName}の強みである「${strength}」は、確かに今年もあなたを支えてくれます。
-ただ、その力が強くなりすぎると${shadow}にもなりやすいので、意識的に「ほどく」ことを覚えておくと良いでしょう。
+${typeName}の強みである「${strength}」は、今年もあなたを支えてくれます。
+ただ、その力が強く出すぎると、${shadow}にもつながりやすくなります。
 
-今年は「${mainTheme}」と「${subTheme}」を、少しずつ現実に移していくイメージです。
+今年は「${mainTheme}」と「${subTheme}」を、現実の中で少しずつ扱っていく年です。
 
 ${topicLine}
 
 大きく結果を出そうとしなくて大丈夫です。
-今、あなたが何に疲れていて、何を大事にしたいと思っているのか。
-そこに耳を傾けるところから、今年は始まります。`
+今、何に疲れていて、何を大事にしたいのか。
+そこに気づくところから、今年の流れは変わり始めます。`
     );
   }
 
@@ -331,14 +459,14 @@ ${topicLine}
     const timeline = sortByMonth(months);
 
     return compact(
-`今年、特に流れが変わりやすい転換期は、影響の強さで見ると${monthList(months)}です。
+`今年、選択や切り替えが強く出やすい月は、影響の強さで見ると${monthList(months)}です。
 
 実際に体感しやすい順番は、${monthList(timeline)}です。
 
 ${months.map(themeLine).join('\n')}
 
-転換期は、派手な事件が起きる月というより、
-「このままでいいのかな」「そろそろ変えたい」という本音が自然と浮かび上がってくる時期です。
+転換期は、必ず大きな事件が起きる月ではありません。
+「このままでいいのかな」「そろそろ変えたい」という本音が浮かびやすい時期です。
 
 その声に気づけるかどうかが、大事なポイントになります。`
     );
@@ -346,35 +474,37 @@ ${months.map(themeLine).join('\n')}
 
   function buildScoreGuide() {
     return compact(
-`ここに出てくる数字は「運の良し悪し」を決める点数ではありません。
+`数字は「運の良し悪し」を決める点数ではありません。
 
-数字が高いほど、そのテーマが動きやすく、意識に上がりやすく、現実として形になりやすい目安だと思ってください。
+恋愛・仕事・金運・注意のテーマが、どれくらい表に出やすいかを見るための目安です。
 
-注意の数字が高い月も、怖い月ではありません。
-丁寧に確認を入れたり、少し距離を置いたりするだけで、避けられるトラブルは意外と多いものです。`
+注意が高い月も、怖い月ではありません。
+予定、支出、言葉、判断を少し丁寧に扱うことで、避けられるズレは多くあります。`
     );
   }
 
-  function buildMonthlyReading(scores = []) {
+  function buildMonthlyReading(scores = [], input = {}) {
     if (!Array.isArray(scores) || !scores.length) {
       return '月別運勢は、未来スコア生成後に表示されます。';
     }
+
+    const topic = getTopic(input);
 
     return sortByMonth(scores)
       .map((item) => {
         const label = monthLabel(item);
         const type = monthType(item);
         const themes = joinedThemes(item);
-        const lead = buildMonthlyLeadText(item);
+        const lead = buildMonthlyLeadText(item, topic);
         const caution = cautionLine(item);
-        const action = text(item.monthlyAction, fallbackMonthlyAction(item));
+        const action = fallbackMonthlyAction(item, topic);
         const keyword = text(item.monthlyKeyword, fallbackMonthlyKeyword(item));
 
         return compact(
 `${label}｜${type}
 
 テーマ：${themes}
-恋愛${scoreText(item.loveScore)}／仕事${scoreText(item.workScore)}／金運${scoreText(item.moneyScore)}／注意${scoreText(item.cautionScore)}
+月の見方：${buildSoftScoreLine(item)}
 
 ${lead}
 ${caution ? `\n${caution}` : ''}
@@ -399,22 +529,34 @@ ${keyword}。`
     const timeline = sortByMonth(months);
     const topic = getTopic(input);
 
-    const opening = topic === '恋愛'
-      ? '恋愛のことで心がざわついているなら、まず知っておいてほしいことがあります。'
-      : '恋愛以外のテーマでも、今年は人とのつながりが心を動かす場面が多くなりそうです。';
+    if (topic !== '恋愛') {
+      return compact(
+`恋愛や人との縁が動きやすい月は、${monthList(months)}です。
+実際に感じやすい順は${monthList(timeline)}です。
+
+今回の主テーマは「${topic}」なので、ここでは恋愛そのものよりも、
+人とのつながりが安心感や行動のきっかけになりやすい時期として見てください。
+
+${months.map((item) => {
+  const label = monthLabel(item);
+  const cards = asArray(item.cards).filter(Boolean).join('・') || '縁の気配';
+  return `${label}は${cards}が重なり、人とのやり取りから気づきが生まれやすい月です。`;
+}).join('\n')}`
+      );
+    }
 
     return compact(
-`${opening}
+`恋愛のことで心がざわついているなら、まず知っておいてほしいことがあります。
 
-相手の気持ちを確かめたいのに、なかなか言葉にできない。
-待っているのに反応が薄いと、どんどん不安が大きくなる。
-そんな気持ち、すごくわかります。
+相手の気持ちを確かめたいのに、なかなか聞けない。
+待っている時間が長くなるほど、不安だけが大きくなる。
+その苦しさは、決して弱さではありません。
 
 恋愛・出会いが動きやすい月は${monthList(months)}です。
 実際に感じやすい順は${monthList(timeline)}です。
 
 今年は「相手がどう思っているか」だけでなく、
-「自分はこの関係で安心できているか」も同じくらい大事にしてみてください。
+「自分はこの関係で安心できているか」も大切にしてください。
 
 ${months.map((item) => {
   const label = monthLabel(item);
@@ -432,23 +574,25 @@ ${months.map((item) => {
     }
 
     const timeline = sortByMonth(months);
+    const topic = getTopic(input);
+
+    const opening = topic === '金運'
+      ? '金運を安定させるには、仕事や収入の入口をどう作るかも大切になります。'
+      : '今年の仕事は、「もっと頑張る」よりも「どこに力を注ぐか」を選ぶことが大切になります。';
 
     return compact(
-`今年の仕事は、「もっと頑張る」よりも「どこに力を注ぐか」を選ぶことが大切になります。
+`${opening}
 
 全部を抱え込もうとすると、せっかくの力が分散してしまいます。
-自分の役割や見せ方を決めるほど、周りからの反応が変わりやすい一年です。
+役割、見せ方、収入につながる行動を絞るほど、次の道筋が見えやすくなります。
 
-仕事の流れが出やすい月は${monthList(months)}です。
+仕事の動きが出やすい月は${monthList(months)}です。
 実際に動きやすい順は${monthList(timeline)}です。
-
-完璧を待たず、今のできる形で一度外に出してみること。
-そこから次の道筋が見えてきます。
 
 ${months.map((item) => {
   const label = monthLabel(item);
   const theme = firstTheme(item, '見せ方の整理');
-  return `${label}は仕事${scoreText(item.workScore)}の流れが強まり、「${theme}」がポイントになります。`;
+  return `${label}は仕事面で「${theme}」がポイントになります。完璧を待つより、今できる形で一度外へ出してみてください。`;
 }).join('\n')}`
     );
   }
@@ -465,7 +609,7 @@ ${months.map((item) => {
 
     const opening = topic === '金運'
       ? '金運の不安を和らげるコツは、「不安の正体」を分けて見ることです。'
-      : '金運は一気に増やすより、守るべきところと動かすところを明確にすると安定します。';
+      : '金運は一気に増やすより、守るところと動かすところを分けると安定しやすくなります。';
 
     return compact(
 `${opening}
@@ -474,7 +618,7 @@ ${months.map((item) => {
 何を守りたいのか。
 どこから収入の入口を作るのか。
 
-この三つを見直すだけで、気持ちがかなり軽くなります。
+この三つが見えてくると、漠然とした不安は少し軽くなります。
 
 金運が動きやすい月は${monthList(months)}です。
 実際に見直しやすい順は${monthList(timeline)}です。
@@ -482,7 +626,20 @@ ${months.map((item) => {
 ${months.map((item) => {
   const label = monthLabel(item);
   const theme = firstTheme(item, '収入整理');
-  return `${label}は金運${scoreText(item.moneyScore)}の流れが出やすく、「${theme}」を意識すると良いでしょう。`;
+
+  if (monthType(item) === '慎重月') {
+    return `${label}は「${theme}」を急がず確認したい月です。大きな支出や契約は、一度時間を置いてから判断してください。`;
+  }
+
+  if (monthType(item) === '転換期') {
+    return `${label}は「${theme}」をきっかけに、お金の使い方を選び直しやすい月です。前のやり方にこだわりすぎないことが鍵になります。`;
+  }
+
+  if (monthType(item) === '追い風月') {
+    return `${label}は「${theme}」を収入の入口につなげやすい月です。思いついた行動を一つ、現実に試してみてください。`;
+  }
+
+  return `${label}は「${theme}」を見直しながら、お金の扱い方を安定させたい月です。`;
 }).join('\n')}`
     );
   }
@@ -522,28 +679,33 @@ ${months.map((item) => {
     const actions = {
       '恋愛': [
         '連絡する前に、本当に伝えたいことを一文にまとめる',
-        '相手の言葉と行動を分けて冷静に見る',
+        '相手の言葉と行動を分けて見る',
         '自分が安心できる関係かを自分に問う'
       ],
       '仕事': [
         '今一番見せたいことを一つ整理する',
         '抱えている仕事を「続ける・手放す」で分ける',
-        '学んだことを小さな形にして外に出す'
+        '学んだことを形にして外に出す'
       ],
       '金運': [
         '固定費を一つ見直す',
         '収入につながる行動を紙に書き出す',
-        '守るお金と使うお金を明確に分ける'
+        '守るお金と使うお金を分ける'
       ],
       '人間関係': [
         '返事を急がず一旦置く',
         '相手に合わせる前に自分の気持ちを確認する',
         '無理のない距離感を自分で決める'
       ],
+      '今月の運勢': [
+        '今月やることを一つに絞る',
+        '後回しにしている確認を一つ済ませる',
+        '月末にできたことを一つ認める'
+      ],
       '総合': [
         '月初に今月のテーマを一つ決める',
         '不安を事実と想像に分けて書き出す',
-        '月末に「できたこと」を一つ認める'
+        '月末にできたことを一つ認める'
       ]
     };
 
@@ -557,7 +719,7 @@ ${months.map((item) => {
 ・${list[2]}
 
 大きく変えようとしなくて大丈夫です。
-一つだけ選んで続けるだけで、未来の向きは少しずつ変わっていきます。`
+一つ選んで続けるだけでも、未来の向きは少しずつ変わっていきます。`
     );
   }
 
@@ -579,9 +741,11 @@ ${months.map((item) => {
 慎重月：${monthList(cautious)}
 転換期：${monthList(turning)}
 
-${turningRank.length ? `転換期は影響の強い順で${monthList(turningRank)}。実際に感じやすいのは${monthList(sortByMonth(turningRank))}です。` : ''}
+選択や切り替えが強く出やすい月は、影響の強い順で${monthList(turningRank)}です。
+実際に体感しやすい順番は${monthList(sortByMonth(turningRank))}です。
 
-${cautionRank.length ? `注意して見直したい月は${monthList(cautionRank)}。ここは丁寧に扱うと、大きなトラブルを避けやすいタイミングです。` : ''}`
+注意して見直したい月は${monthList(cautionRank)}です。
+ここは怖がる月ではなく、確認を丁寧にすることで余計な不安やズレを防ぎやすいタイミングです。`
     );
   }
 
@@ -592,11 +756,11 @@ ${cautionRank.length ? `注意して見直したい月は${monthList(cautionRank
     const last = turning[turning.length - 1] ? monthLabel(turning[turning.length - 1]) : '';
 
     const timelineText = first && last && first !== last
-      ? `${first}から${last}にかけて動いたことは、後半に手応えとして返ってきやすいでしょう。`
-      : '今年少しずつ選び直してきたことは、後半に少しずつ形を見せてくれます。';
+      ? `${first}から${last}にかけて向き合ったことは、後半に手応えとして返ってきやすいでしょう。`
+      : '今年選び直してきたことは、後半に少しずつ形を見せてくれます。';
 
     return compact(
-`${year}年の後半には、今まだぼんやりしている課題や気持ちに、だんだん輪郭が出てくるはずです。
+`${year}年の後半には、今まだぼんやりしている課題や気持ちに、少しずつ輪郭が出てきそうです。
 
 ${timelineText}
 
@@ -604,7 +768,7 @@ ${timelineText}
 「あ、この方向でいいのかもしれない」
 そう思える瞬間が増えていくイメージです。
 
-迷いは完全になくならなくても大丈夫です。
+迷いが完全になくならなくても大丈夫です。
 選ぶ理由が少しずつ見えてくるだけで、今年の意味は十分にあります。`
     );
   }
@@ -617,67 +781,64 @@ ${timelineText}
       : topic === '仕事'
         ? '今の環境を続けるべきか、動くならいつ・どの方向か、評価につながる選択など'
         : topic === '金運'
-          ? '不安の正体をどう整理するか、収入の入口をどう作るか、守るべきお金の形など'
+          ? '不安の正体、支出の見直し、収入につながる行動の整理など'
           : topic === '人間関係'
             ? '今の距離感を続けていいのか、どこまで合わせるべきか、自分を守る線引きなど'
             : '今の迷いの原因と、それに対して一番合う選択肢';
 
     return compact(
-`ここまでで、今年の大きな地図は見えてきたと思います。
+`ここまでで、今年の大きな傾向と、意識したい月は見えてきました。
 
-ただ、一年全体の傾向ではなく、
-「今、あなたが実際に立っている場所」から先を見るには、もう少し細かい視点が必要です。
+ただ、実際の悩みは一人ひとり違います。
+${topicDetail}は、今の状況とタロットを重ねることで、もっと細かく見ていけます。
 
-${topicDetail}
-
-そんなときは、個人鑑定であなたの現在の状況とタロットを重ねてみましょう。
-生年月日の流れだけではなく、今この瞬間のあなたに本当に響くメッセージをお伝えします。
-
-一人で抱え込まなくていいんです。
-必要なときに、一緒に丁寧に読み解いていきましょう。
-
-未来は、今からの選び方で少しずつ変えていけます。
-大丈夫だよ。まだ、間に合います。`
+必要な時は、一人で抱え込まずに相談してください。
+あなたの状況に合わせて、一緒に読み解いていきましょう。`
     );
   }
 
-  function buildFutureReading(input = {}, chart = {}, tarotEntries = [], scores = []) {
+  function buildFutureReading(input = {}, chart = {}, tarotEntries = [], scores = [], options = {}) {
     const hasTarot = Array.isArray(tarotEntries) && tarotEntries.some((entry) => text(entry.name || entry.nameJa));
+    const includeCta = options && options.includeCta === true;
 
     const tarotNote = hasTarot
-      ? '選ばれたタロットのメッセージも、未来の流れを読む大切な補助線として重ねています。'
-      : '今回はタロット未選択です。星命の流れを中心に、今年の動きをお伝えしています。';
+      ? '選ばれたタロットのメッセージも、未来を読むための補助線として重ねています。'
+      : '今回はタロット未選択です。星命の流れを中心に、今年の動きを見ています。';
 
-    return compact(
-[
-  '1. 今年の結論',
-  buildYearOverview(input, chart, scores),
-  tarotNote,
+    const sections = [
+      '【今年の結論】',
+      buildYearOverview(input, chart, scores),
+      tarotNote,
 
-  '2. 今年の運気マップ',
-  buildYearMap(scores),
+      '【今年の運気マップ】',
+      buildYearMap(scores),
 
-  '3. 数字の見方',
-  buildScoreGuide(),
+      '【数字の見方】',
+      buildScoreGuide(),
 
-  '4. 月別未来鑑定',
-  buildMonthlyReading(scores),
+      '【月別未来鑑定】',
+      buildMonthlyReading(scores, input),
 
-  '5. 恋愛・仕事・金運の流れ',
-  buildLoveReading(scores, input),
-  buildWorkReading(scores, input),
-  buildMoneyReading(scores, input),
+      '【恋愛・仕事・金運の流れ】',
+      buildLoveReading(scores, input),
+      buildWorkReading(scores, input),
+      buildMoneyReading(scores, input),
 
-  '6. 今年意識したいこと',
-  buildLuckyActionReading(scores, input),
+      '【今年意識したいこと】',
+      buildLuckyActionReading(scores, input),
 
-  '7. この先に待っている未来',
-  buildFutureOutlook(scores, input),
+      '【この先に待っている未来】',
+      buildFutureOutlook(scores, input)
+    ];
 
-  '8. 個人鑑定のご案内',
-  buildPersonalReadingCta(input)
-].join('\n\n')
-    );
+    if (includeCta) {
+      sections.push(
+        '【もっと深く見たい方へ】',
+        buildPersonalReadingCta(input)
+      );
+    }
+
+    return compact(sections.join('\n\n'));
   }
 
   return {
