@@ -3,11 +3,13 @@
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.ShionUiRender = api;
 })(typeof globalThis !== 'undefined' ? globalThis : window, function (Utils, SharedTarotInsights) {
+  'use strict';
+
   const escapeHtml =
     Utils && typeof Utils.escapeHtml === 'function'
       ? Utils.escapeHtml
       : function fallbackEscapeHtml(value) {
-          return String(value ?? '')
+          return String(value == null ? '' : value)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
@@ -16,6 +18,36 @@
         };
 
   const ELEMENT_ORDER = ['木', '火', '土', '金', '水'];
+
+  const ELEMENT_LABELS = {
+    木: {
+      label: '始める力',
+      note: '新しい一歩、発信、未来へ伸びる力'
+    },
+    火: {
+      label: '表現する力',
+      note: '情熱、喜び、魅力を外へ出す力'
+    },
+    土: {
+      label: '現実化する力',
+      note: '生活、土台、続けるための力'
+    },
+    金: {
+      label: '選び取る力',
+      note: '判断、整理、不要なものを手放す力'
+    },
+    水: {
+      label: '感じ取る力',
+      note: '感情、直感、本音に気づく力'
+    }
+  };
+
+  const MONTH_TYPE_STATUS = {
+    追い風月: 'strength',
+    慎重月: 'shadow',
+    転換期: 'important',
+    整える月: 'simplified'
+  };
 
   const DEFAULT_POSITIONS = {
     1: ['今のテーマ'],
@@ -56,7 +88,7 @@
     '愚者': {
       essence: 'まだ名前のない自由。決まっていないからこそ、未来を選び直せる力。',
       shadow: '自由でいたい気持ちが強くなるほど、責任や現実から少し離れたくなることがあります。',
-      adjustment: '勢いだけで飛び出すより、「どこへ向かいたいのか」を一つだけ決めると流れが整います。',
+      adjustment: '勢いだけで飛び出すより、「どこへ向かいたいのか」を一つだけ決めると進みやすくなります。',
       message: '怖さがあるのに進みたいなら、それは無謀ではなく、心が新しい景色を求めているサインです。',
       action: 'やってみたいことを一つだけメモしてください。大きく始めなくて大丈夫です。'
     },
@@ -85,7 +117,7 @@
       essence: '責任、決断、土台を作る力。現実を支え、形にするカードです。',
       shadow: '守ろうとする気持ちが強いほど、正しさや管理で押し切りたくなることがあります。',
       adjustment: '支配するより、安心できる仕組みを作ることが大切です。',
-      message: '本当の強さは、何も頼らないことではありません。背負い方を整えることも強さです。',
+      message: '本当の強さは、何も頼らないことではありません。背負い方を見直すことも強さです。',
       action: '今日やることを三つに絞り、残りは後日に回してください。'
     },
     '教皇': {
@@ -105,7 +137,7 @@
     '戦車': {
       essence: '前進、意志、突破力。迷いを抱えながらも進もうとするカードです。',
       shadow: '進みたい気持ちが強いほど、焦りで自分や相手を急かしてしまうことがあります。',
-      adjustment: '目的地とペースを整えてください。勢いよりも方向性が大切です。',
+      adjustment: '目的地とペースを見直してください。勢いよりも方向性が大切です。',
       message: '進む力はあります。だからこそ、どこへ向かうのかを決めることが大切です。',
       action: '今週中に進めることを一つだけ決め、具体的な日時を入れてください。'
     },
@@ -182,14 +214,14 @@
     '月': {
       essence: '不安、直感、揺れる心。はっきりしない夜の中で、本音を探すカードです。',
       shadow: '想像が膨らむほど、不安を事実のように感じてしまうことがあります。',
-      adjustment: '見えないものを怖がりすぎず、確認できることから整えてください。',
+      adjustment: '見えないものを怖がりすぎず、確認できることから見てください。',
       message: '不安になるのは弱いからではありません。大切だからこそ、心が先に揺れてしまうのです。',
       action: '不安を一つ書き、その横に「確認できること」を一つだけ書いてください。'
     },
     '太陽': {
       essence: '喜び、解放、生命力。心が明るさを取り戻すカードです。',
       shadow: '明るく進める時ほど、勢いで大切なことを見落としてしまうことがあります。',
-      adjustment: '喜びを一時的な勢いで終わらせず、続けられる形に整えてください。',
+      adjustment: '喜びを一時的な勢いで終わらせず、続けられる形にしてください。',
       message: '笑える時間は、ちゃんと戻ってきます。その光を、無理なく続く日常に置いていきましょう。',
       action: '今日うれしかったことを一つ残してください。小さな喜びが次の力になります。'
     },
@@ -216,7 +248,8 @@
 
   function text(value, fallback = '') {
     if (value === null || value === undefined) return fallback;
-    return String(value).trim();
+    const trimmed = String(value).trim();
+    return trimmed === '' ? fallback : trimmed;
   }
 
   function has(value) {
@@ -310,11 +343,11 @@
     const key = normalizeCardKey(cardName);
 
     return TAROT_INSIGHTS[key] || {
-      essence: 'このカードは、今の心の流れを映し、現実を整えるための象徴として現れています。',
+      essence: 'このカードは、今の心の状態を映し、現実を見るための象徴として現れています。',
       shadow: '象徴の力が強く出すぎると、気持ちや行動に偏りが生まれることがあります。',
-      adjustment: '良い・悪いで決めつけず、今どこを整えると自分らしさに戻れるのかを見てください。',
-      message: 'カードは未来を縛るものではありません。今の心が見落としていた声を、そっと照らすものです。',
-      action: '今いちばん気になることを一つだけ書き出し、今日できる小さな行動を選んでください。'
+      adjustment: '良い・悪いで決めつけず、今どこを見直すと自分らしさに戻れるのかを見てください。',
+      message: 'カードは未来を縛るものではありません。今の心が見落としていた声に気づくためのものです。',
+      action: '今いちばん気になることを一つだけ書き出し、今日できる行動を選んでください。'
     };
   }
 
@@ -328,17 +361,133 @@
     return normalizeCardKey(entry && entry.name ? entry.name : 'カード');
   }
 
+  function scoreText(value) {
+    const num = Number(value);
+    return Number.isFinite(num) ? String(Math.round(num)) : '未算出';
+  }
+
+  function monthLabel(item) {
+    if (!item) return '';
+    if (has(item.label)) return item.label;
+    return item.month ? `${item.month}月` : '';
+  }
+
+  function monthType(item) {
+    return text(item && item.monthType, '整える月');
+  }
+
+  function monthTypeStatus(type) {
+    return MONTH_TYPE_STATUS[type] || 'simplified';
+  }
+
+  function futureMonthList(items, fallback = '未算出') {
+    const list = Array.isArray(items)
+      ? items.map(monthLabel).filter(has)
+      : [];
+
+    return list.length ? list.join('・') : fallback;
+  }
+
+  function elementLabelList(values, fallback = '参考なし') {
+    const list = Array.isArray(values)
+      ? values
+          .map((element) => {
+            const info = ELEMENT_LABELS[element];
+            return info ? info.label : element;
+          })
+          .filter(has)
+      : [];
+
+    return list.length ? list.join('、') : fallback;
+  }
+
+  function collectThemes(months) {
+    if (!Array.isArray(months)) return [];
+
+    return months.reduce((acc, item) => {
+      const themes = item && Array.isArray(item.themes) ? item.themes : [];
+      themes.forEach((theme) => {
+        if (has(theme) && !acc.includes(theme)) acc.push(theme);
+      });
+      return acc;
+    }, []);
+  }
+
+  function firstTheme(item, fallback = '見直し') {
+    const themes = item && Array.isArray(item.themes) ? item.themes.filter(has) : [];
+    return themes[0] || fallback;
+  }
+
+  function joinedThemes(item, fallback = '見直し・準備') {
+    const themes = item && Array.isArray(item.themes) ? item.themes.filter(has).slice(0, 3) : [];
+    return themes.length ? themes.join('・') : fallback;
+  }
+
+  function buildMonthlyLeadText(item) {
+    const monthLead = text(item && item.monthLead);
+    const themeText = text(item && item.themeText);
+    const parts = [];
+
+    if (monthLead) parts.push(monthLead);
+    if (themeText && themeText !== monthLead) parts.push(themeText);
+
+    return parts.join('\n');
+  }
+
+  function monthlyFallbackText(item) {
+    const label = monthLabel(item);
+    const type = monthType(item);
+    const theme = firstTheme(item);
+
+    if (type === '追い風月') {
+      return `${label}は、行動が反応につながりやすい月です。「${theme}」を意識して、できることを一つ外へ出してみてください。`;
+    }
+
+    if (type === '慎重月') {
+      return `${label}は、急ぐより確認を大切にしたい月です。焦って決めず、いったん持ち帰る余裕を持ってください。`;
+    }
+
+    if (type === '転換期') {
+      return `${label}は、気持ちや状況の向きが変わりやすい月です。違和感が出たら、無視せず立ち止まって見てください。`;
+    }
+
+    return `${label}は、足元を見直す月です。予定や気持ちを一つ片づけるだけでも、次の一歩が軽くなります。`;
+  }
+
+  function monthlyCautionText(item) {
+    return text(item && item.cautionText);
+  }
+
+  function monthlyActionText(item) {
+    return text(item && item.monthlyAction, '今月できることを一つだけ選んで、無理のない形で進めてください。');
+  }
+
+  function monthlyKeywordText(item) {
+    return text(item && item.monthlyKeyword, '焦らず、今できることから');
+  }
+
+  function renderScorePills(item) {
+    return `
+      <div class="score-pill-row" aria-label="月別スコア">
+        <span class="score-pill love">恋愛 ${esc(scoreText(item && item.loveScore))}</span>
+        <span class="score-pill work">仕事 ${esc(scoreText(item && item.workScore))}</span>
+        <span class="score-pill money">金運 ${esc(scoreText(item && item.moneyScore))}</span>
+        <span class="score-pill caution">注意 ${esc(scoreText(item && item.cautionScore))}</span>
+      </div>
+    `;
+  }
+
   function renderHero(type) {
     const coreLine = getTypeValue(
       type,
       'coreLine',
-      'あなたの星命には、今の自分を整えながら未来へ進む力が宿っています。'
+      'あなたの星命には、今の自分を見つめ直しながら未来へ進む力が宿っています。'
     );
 
     const hook = getTypeValue(
       type,
       'hook',
-      'あなたは、自分の中にある本音を少しずつ言葉にしていくことで流れが整いやすい方です。'
+      'あなたは、自分の中にある本音を少しずつ言葉にしていくことで道が見えやすい方です。'
     );
 
     const pain = getTypeValue(
@@ -350,7 +499,7 @@
     return `
       <section class="result-card result-hero" aria-labelledby="result-hero-title">
         <div class="result-kicker">${badge('詩韻式 星命鑑定', 'simplified')}</div>
-        <h2 id="result-hero-title">鑑定の核心</h2>
+        <h2 id="result-hero-title">あなたの今年の物語</h2>
         <p class="core-line">${html(coreLine)}</p>
         ${paragraph(hook, 'lead-text')}
         ${paragraph(pain, 'soft-text')}
@@ -372,7 +521,7 @@
     const strength = getTypeValue(
       type,
       'strength',
-      type.essence || '今ある力を、現実の小さな行動へ変えていける力'
+      type.essence || '今ある力を、現実の行動へ変えていける力'
     );
 
     return `
@@ -381,27 +530,34 @@
       <section class="result-card" aria-labelledby="core-section-title">
         <h2 id="core-section-title">1. 生年月日から見える、あなたの芯</h2>
         <p>
-          日干は、あなたが無意識に大切にしている「生き方の芯」を映します。
-          頑張ろうとする時、傷ついた時、誰かを大切にしたい時に、ふと表に出る心の癖のようなものです。
+          ここでは、専門用語そのものよりも、
+          あなたが無意識に大切にしている生き方の癖を見ていきます。
         </p>
-
-        <dl class="data-list">
-          <dt>日干</dt>
-          <dd>${esc(ref.dayStem || '未算出')}（五行${esc(ref.element || '参考')}・${esc(ref.yinYang || '参考')}／${esc(ref.symbol || '象徴')}）</dd>
-
-          <dt>年柱</dt>
-          <dd>${esc(year.name || '未算出')} ${badge(year.label || '参考値', year.status || 'simplified')}</dd>
-
-          <dt>月柱</dt>
-          <dd>${esc(month.name || '未算出')} ${badge(month.label || '参考値', month.status || 'simplified')}</dd>
-
-          <dt>日柱</dt>
-          <dd>${esc(day.name || '未算出')} ${badge(day.label || '参考値', day.status || 'simplified')}</dd>
-        </dl>
+        <p class="soft-text">
+          頑張ろうとする時、傷ついた時、誰かを大切にしたい時。
+          ふと表に出る心の反応に、あなたらしさが出ます。
+        </p>
 
         ${paragraph(ref.deep, 'lead-text')}
 
-        ${note('ここで大切なのは、良い・悪いで決めることではありません。性質が強く出た時に、どう整えれば自分らしく戻れるかを見ることです。')}
+        <details class="basis-details">
+          <summary>診断に使用した参考データを見る</summary>
+          <dl class="data-list">
+            <dt>日干</dt>
+            <dd>${esc(ref.dayStem || '未算出')}（五行${esc(ref.element || '参考')}・${esc(ref.yinYang || '参考')}／${esc(ref.symbol || '象徴')}）</dd>
+
+            <dt>年柱</dt>
+            <dd>${esc(year.name || '未算出')} ${badge(year.label || '参考値', year.status || 'simplified')}</dd>
+
+            <dt>月柱</dt>
+            <dd>${esc(month.name || '未算出')} ${badge(month.label || '参考値', month.status || 'simplified')}</dd>
+
+            <dt>日柱</dt>
+            <dd>${esc(day.name || '未算出')} ${badge(day.label || '参考値', day.status || 'simplified')}</dd>
+          </dl>
+        </details>
+
+        ${note('大切なのは、性質を良い・悪いで決めることではありません。疲れた時にどこへ寄りやすいかを知り、自分に戻る方法を見つけることです。')}
       </section>
 
       <section class="result-card" aria-labelledby="basis-section-title">
@@ -438,15 +594,19 @@
   function renderFiveElements(balance = {}) {
     const counts = balance.counts || {};
     const values = ELEMENT_ORDER.map((element) => Number(counts[element] || 0));
-    const max = Math.max(...values, 1);
+    const max = Math.max.apply(null, values.concat([1]));
 
     const rows = ELEMENT_ORDER.map((element) => {
       const value = Number(counts[element] || 0);
       const width = Math.max((value / max) * 100, value > 0 ? 8 : 0);
+      const info = ELEMENT_LABELS[element] || { label: element, note: '' };
 
       return `
-        <div class="bar-row">
-          <span>${esc(element)}</span>
+        <div class="bar-row balance-row">
+          <span class="balance-name">
+            <strong>${esc(info.label)}</strong>
+            <small>${esc(element)}：${esc(info.note)}</small>
+          </span>
           <div class="bar" aria-hidden="true"><i style="width:${width}%"></i></div>
           <b>${esc(value)}</b>
         </div>
@@ -455,20 +615,20 @@
 
     return `
       <section class="result-card" aria-labelledby="five-elements-title">
-        <h2 id="five-elements-title">4. 五行バランス</h2>
+        <h2 id="five-elements-title">4. 心と行動のバランス</h2>
         <p class="soft-text">
-          五行の偏りは、欠点ではありません。
-          どの力が出やすく、どこを補うと心と現実が整いやすいかを見るための地図です。
+          ここでは五行を、専門用語ではなく「心と行動の使い方」として見ています。
+          どれが多いから良い、少ないから悪いというものではありません。
         </p>
 
-        <div class="five-elements-bars">
+        <div class="five-elements-bars balance-bars">
           ${rows}
         </div>
 
         <div class="summary-list">
-          <p><strong>強く出やすい五行：</strong>${esc(joinJa(balance.strongest))}</p>
-          <p><strong>弱く出やすい五行：</strong>${esc(joinJa(balance.weakest))}</p>
-          <p><strong>補うとよい五行：</strong>${esc(joinJa(balance.supplement))}</p>
+          <p><strong>今、出やすい力：</strong>${esc(elementLabelList(balance.strongest))}</p>
+          <p><strong>控えめになりやすい力：</strong>${esc(elementLabelList(balance.weakest))}</p>
+          <p><strong>意識すると助けになる力：</strong>${esc(elementLabelList(balance.supplement))}</p>
         </div>
 
         ${paragraph(balance.note)}
@@ -493,9 +653,9 @@
       <section class="result-card grid-mini" aria-label="星命タイプの詳細">
         ${miniCard('6. あなたの強み', type.strength || type.essence, 'strength-card')}
         ${miniCard('7. 疲れた時に出やすい形', type.shadow, 'shadow-card')}
-        ${miniCard('8. 恋愛で出やすい流れ', type.love)}
+        ${miniCard('8. 恋愛で出やすいこと', type.love)}
         ${miniCard('9. 仕事で活きる力', type.work)}
-        ${miniCard('10. 金運の整え方', type.money)}
+        ${miniCard('10. 金運の見直し方', type.money)}
         ${miniCard('11. 人間関係の癖', type.relationship)}
         ${miniCard('12. 今の運気テーマ', type.advice, 'action-card')}
       </section>
@@ -544,12 +704,12 @@
         ${readingBlock('本質', insight.essence)}
         ${uprightMeaning ? readingBlock('補助解釈', uprightMeaning) : ''}
         ${readingBlock('影として出やすいこと', insight.shadow)}
-        ${readingBlock('整えるポイント', insight.adjustment)}
+        ${readingBlock('見直すポイント', insight.adjustment)}
         ${readingBlock('心への言葉', insight.message)}
 
         ${readingBlock(
           `相談ジャンル「${topic}」に対して`,
-          '急いで答えを決めるより、今の感情・相手や状況の現実・次に取れる行動を分けて見ていくと、流れが整いやすくなります。'
+          '急いで答えを決めるより、今の感情・相手や状況の現実・次に取れる行動を分けて見ていくと、判断しやすくなります。'
         )}
 
         ${readingBlock('星命との共鳴', resonance)}
@@ -564,8 +724,7 @@
         <section class="result-card" aria-labelledby="tarot-section-title">
           <h2 id="tarot-section-title">13. タロット共鳴メッセージ</h2>
           <p>
-            カードを選ぶと、星命タイプを決めるものではなく、
-            今の状態・心の偏り・整える鍵・行動指針としての共鳴メッセージを表示します。
+            カードを選ぶと、今の状態・心の偏り・見直す鍵・行動指針としての共鳴メッセージを表示します。
           </p>
           ${note('詩韻式では逆位置は採用しません。すべてのカードを正位置の象徴として読み、その中にある光・影・調整点を見ていきます。')}
         </section>
@@ -580,7 +739,7 @@
     return `
       <section class="result-card" aria-labelledby="tarot-section-title">
         <h2 id="tarot-section-title">13. タロット共鳴メッセージ</h2>
-        ${note('詩韻式では逆位置は採用しません。すべてのカードを正位置の象徴として読み、その中にある光・影・偏り・整える鍵を見ていきます。')}
+        ${note('詩韻式では逆位置は採用しません。すべてのカードを正位置の象徴として読み、その中にある光・影・偏り・見直す鍵を見ていきます。')}
         <div class="tarot-card-list">
           ${items}
         </div>
@@ -588,47 +747,116 @@
     `;
   }
 
+  function renderFutureSummaryCards(months, helpers) {
+    const safeHelpers = helpers || {};
+    const getTurning = safeHelpers.getTurningPointMonths || function (items) { return (items || []).slice(0, 3); };
+    const getLove = safeHelpers.getLoveOpportunityMonths || function (items) { return (items || []).slice(0, 3); };
+    const getWorkMoney = safeHelpers.getWorkMoneyMonths || function (items) { return (items || []).slice(0, 3); };
+    const getCaution = safeHelpers.getCautionMonths || function (items) { return (items || []).slice(0, 3); };
+
+    const themes = collectThemes(months).slice(0, 5).join('・') || '見直し・準備・対話';
+
+    const tailwind = months.filter((item) => monthType(item) === '追い風月');
+    const cautious = months.filter((item) => monthType(item) === '慎重月');
+    const turning = months.filter((item) => monthType(item) === '転換期');
+
+    return `
+      <div class="future-summary-grid">
+        ${miniCard('今年の総合テーマ', themes, 'action-card')}
+        ${miniCard('追い風月', futureMonthList(tailwind, '今回は大きな追い風月より、準備や見直しが中心です'), 'strength-card')}
+        ${miniCard('慎重に見たい月', futureMonthList(cautious, futureMonthList(getCaution(months, 3))), 'shadow-card')}
+        ${miniCard('転換期', futureMonthList(turning, futureMonthList(getTurning(months, 3))), 'important-card')}
+        ${miniCard('恋愛・出会い', futureMonthList(getLove(months, 3)))}
+        ${miniCard('仕事・金運', futureMonthList(getWorkMoney(months, 3)))}
+      </div>
+    `;
+  }
+
+  function renderMonthCard(item) {
+    const type = monthType(item);
+    const lead = buildMonthlyLeadText(item) || monthlyFallbackText(item);
+    const caution = monthlyCautionText(item);
+    const action = monthlyActionText(item);
+    const keyword = monthlyKeywordText(item);
+
+    return `
+      <article class="future-month-card ${esc(`future-month-${monthTypeStatus(type)}`)}">
+        <header class="future-month-header">
+          <div>
+            <h3>${esc(monthLabel(item))}</h3>
+            <p class="future-month-theme">${esc(joinedThemes(item))}</p>
+          </div>
+          ${badge(type, monthTypeStatus(type))}
+        </header>
+
+        ${renderScorePills(item)}
+
+        <div class="future-month-body">
+          ${paragraph(lead, 'soft-text')}
+          ${caution ? paragraph(caution, 'future-caution-text') : ''}
+        </div>
+
+        <div class="future-month-action">
+          <strong>今月の行動</strong>
+          ${paragraph(action)}
+        </div>
+
+        <p class="future-keyword">「${esc(keyword)}」</p>
+      </article>
+    `;
+  }
+
+  function renderFutureReadingBox(futureReading) {
+    if (!has(futureReading)) {
+      return note('未来鑑定文は生成後に表示されます。', 'soft-note');
+    }
+
+    return `
+      <div class="future-reading-box">
+        <h3>鑑定書本文</h3>
+        <p class="soft-text">
+          月ごとの動きを見た後に、今年全体の読み解きを文章で確認できます。
+          気になるところだけでも大丈夫です。今の自分に近い言葉を拾ってみてください。
+        </p>
+        <pre id="futureReadingText" class="reading-pre">${esc(futureReading)}</pre>
+      </div>
+    `;
+  }
 
   function renderFuture(scores = [], futureReading = '', helpers = {}) {
-    const getTurning = helpers.getTurningPointMonths || function (items) { return (items || []).slice(0, 3); };
-    const getLove = helpers.getLoveOpportunityMonths || function (items) { return (items || []).slice(0, 3); };
-    const getWorkMoney = helpers.getWorkMoneyMonths || function (items) { return (items || []).slice(0, 3); };
-    const getCaution = helpers.getCautionMonths || function (items) { return (items || []).slice(0, 3); };
-    const list = (items) => (items || []).map((item) => esc(item.label || `${item.month}月`)).join('・') || '未算出';
     const months = Array.isArray(scores) ? scores : [];
-    const themes = Array.from(new Set(months.flatMap((item) => item.themes || []))).slice(0, 5).join('・') || '整理・準備・対話';
-    const rows = months.map((item) => `
-      <tr>
-        <th scope="row">${esc(item.label)}</th>
-        <td>${esc((item.themes || []).join('・'))}</td>
-        <td>${esc(item.loveScore)}</td>
-        <td>${esc(item.workScore)}</td>
-        <td>${esc(item.moneyScore)}</td>
-        <td>${esc(item.cautionScore)}</td>
-        <td>${esc(item.note)}</td>
-      </tr>
-    `).join('');
+    const monthCards = months.length
+      ? months.map(renderMonthCard).join('')
+      : note('月別スコアが生成されると、ここに12ヶ月分の未来鑑定カードが表示されます。');
+
+    const copyButton = has(futureReading)
+      ? '<button type="button" class="ghost section-copy" data-copy-target="futureReadingText">未来鑑定をコピー</button>'
+      : '';
 
     return `
       <section class="result-card future-card" aria-labelledby="future-section-title">
         <div class="section-title-row">
-          <h2 id="future-section-title">未来鑑定</h2>
-          <button type="button" class="ghost section-copy" data-copy-target="futureReadingText">未来鑑定をコピー</button>
+          <div>
+            <h2 id="future-section-title">あなたの今年の物語</h2>
+            <p class="soft-text">
+              月ごとの追い風、立ち止まりたい時期、選び直すタイミングを見ていきます。
+              良い・悪いではなく、あなたが無理なく進むための目安です。
+            </p>
+          </div>
+          ${copyButton}
         </div>
-        <div class="future-summary-grid">
-          ${miniCard('今年の総合テーマ', themes, 'action-card')}
-          ${miniCard('転換期の月', list(getTurning(months, 3)), 'strength-card')}
-          ${miniCard('恋愛・出会い', list(getLove(months, 3)))}
-          ${miniCard('仕事・金運', list(getWorkMoney(months, 3)))}
-          ${miniCard('注意月', list(getCaution(months, 3)), 'shadow-card')}
+
+        ${renderFutureSummaryCards(months, helpers)}
+
+        <div class="future-score-guide">
+          ${note('数字は運の良し悪しではありません。恋愛・仕事・金運・注意が、どれだけ表に出やすいかを見るための目安です。注意が高い月は怖い月ではなく、確認を丁寧にしたい月として読んでください。')}
         </div>
-        <div class="monthly-table-wrap">
-          <table class="monthly-table">
-            <thead><tr><th>月</th><th>テーマ</th><th>恋愛</th><th>仕事</th><th>金運</th><th>注意</th><th>メモ</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
+
+        <div class="future-month-grid">
+          ${monthCards}
         </div>
-        <pre id="futureReadingText" class="reading-pre">${esc(futureReading || '未来鑑定文は生成後に表示されます。')}</pre>
+
+        ${renderFutureReadingBox(futureReading)}
       </section>
     `;
   }
@@ -637,19 +865,19 @@
     const advice = getTypeValue(
       type,
       'advice',
-      '今日できる小さな一歩を一つだけ決めてください。'
+      '今日できる一歩を一つだけ決めてください。'
     );
 
     const message = getTypeValue(
       type,
       'message',
-      '星の言葉は、現実を整えるためのやさしい光です。'
+      '星の言葉は、現実を見つめ直すためのやさしい光です。'
     );
 
     const reassurance = getTypeValue(
       type,
       'reassurance',
-      '大丈夫だよ。小さく整えれば、光は戻ってきます。'
+      '大丈夫だよ。今できることから始めれば、未来は少しずつ変わります。'
     );
 
     return `
@@ -660,12 +888,12 @@
         <ul class="action-list">
           <li>いま一番気になっていることを、一文で書く</li>
           <li>それが「事実」なのか「想像」なのかを分ける</li>
-          <li>今日できる小さな確認を一つだけ選ぶ</li>
+          <li>今日できる確認を一つだけ選ぶ</li>
         </ul>
 
         <p class="soft-text">
           大きな決断は、心が少し落ち着いてからで大丈夫です。
-          焦って答えを出すより、整った状態で選ぶ方が、未来はやさしく変わります。
+          焦って答えを出すより、今の自分に合う形で選ぶ方が、未来は変わりやすくなります。
         </p>
       </section>
 
@@ -675,7 +903,7 @@
         <p class="final-message">${html(reassurance)}</p>
         <p class="soft-text">
           ここまで読んで、少しでも胸に残る言葉があったなら、
-          それが今のあなたに必要な星の声です。
+          それが今のあなたに必要なメッセージです。
         </p>
       </section>
     `;
@@ -689,7 +917,6 @@
     renderFuture,
     renderActionAndFinal,
 
-    // 将来の共通化・テスト用
     normalizeCardKey,
     getTarotInsight
   };
