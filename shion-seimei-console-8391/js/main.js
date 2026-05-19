@@ -13,7 +13,7 @@
     lockScreen: '#lockScreen',
     app: '#app',
     password: '#password',
-    unlock: '#unlock',
+    unlock: 'unlock',
     lockMessage: '#lockMessage',
 
     form: 'consoleForm',
@@ -68,7 +68,8 @@
 
   function text(value, fallback = '') {
     if (value === null || value === undefined) return fallback;
-    return String(value).trim();
+    const trimmed = String(value).trim();
+    return trimmed === '' ? fallback : trimmed;
   }
 
   function rawValue(id) {
@@ -82,15 +83,19 @@
   }
 
   function getBaseInput() {
+    const targetYear =
+      window.ShionValidation &&
+      typeof window.ShionValidation.normalizeTargetYear === 'function'
+        ? window.ShionValidation.normalizeTargetYear(rawValue(SELECTORS.targetYear))
+        : Number(rawValue(SELECTORS.targetYear)) || new Date().getFullYear();
+
     return {
       name: rawValue(SELECTORS.name).trim(),
       birthDate: rawValue(SELECTORS.birthDate),
       gender: rawValue(SELECTORS.gender),
       topic: rawValue(SELECTORS.topic),
       memo: rawValue(SELECTORS.memo).trim(),
-      targetYear: window.ShionValidation && typeof window.ShionValidation.normalizeTargetYear === 'function'
-        ? window.ShionValidation.normalizeTargetYear(rawValue(SELECTORS.targetYear))
-        : (Number(rawValue(SELECTORS.targetYear)) || new Date().getFullYear()),
+      targetYear,
       spread: Number(rawValue(SELECTORS.spread) || 1)
     };
   }
@@ -174,20 +179,36 @@
   }
 
   function getTarotCards() {
-    if (window.ShionTarot78 && Array.isArray(window.ShionTarot78.TAROT_78_CARDS)) return window.ShionTarot78.TAROT_78_CARDS;
-    return window.ShionTarotMapping && Array.isArray(window.ShionTarotMapping.TAROT_CARDS)
-      ? window.ShionTarotMapping.TAROT_CARDS
-      : [];
+    if (
+      window.ShionTarot78 &&
+      Array.isArray(window.ShionTarot78.TAROT_78_CARDS)
+    ) {
+      return window.ShionTarot78.TAROT_78_CARDS;
+    }
+
+    if (
+      window.ShionTarotMapping &&
+      Array.isArray(window.ShionTarotMapping.TAROT_CARDS)
+    ) {
+      return window.ShionTarotMapping.TAROT_CARDS;
+    }
+
+    return [];
   }
 
-  function tarotOption(card) {
-    const number = text(card && card.number);
+  function tarotOption(card, selectedValue = '') {
     const nameJa = text(card && card.nameJa);
-
     if (!nameJa) return '';
 
-    const label = card && card.category === 'major' ? `${number}. ${nameJa}` : nameJa;
-    return `<option value="${escapeHtml(nameJa)}">${escapeHtml(label)}</option>`;
+    const number = text(card && card.number);
+    const label =
+      card && card.category === 'major'
+        ? `${number}. ${nameJa}`
+        : nameJa;
+
+    const selected = selectedValue === nameJa ? ' selected' : '';
+
+    return `<option value="${escapeHtml(nameJa)}"${selected}>${escapeHtml(label)}</option>`;
   }
 
   function updateTarotSlots() {
@@ -198,8 +219,13 @@
     const cards = getTarotCards();
     const positions = getSpreadPositions(count);
 
+    const previousValues = Array.from({ length: count }, (_, index) =>
+      rawValue(`tarot-${index}`)
+    );
+
     container.innerHTML = Array.from({ length: count }, (_, index) => {
       const positionLabel = positions[index] || `${index + 1}枚目`;
+      const selectedValue = previousValues[index] || '';
 
       return `
         <div class="tarot-slot">
@@ -208,7 +234,7 @@
           </label>
           <select id="tarot-${index}" name="tarot-${index}">
             <option value="">カードを選択</option>
-            ${cards.map(tarotOption).join('')}
+            ${cards.map((card) => tarotOption(card, selectedValue)).join('')}
           </select>
         </div>
       `;
@@ -225,7 +251,7 @@
 
       /**
        * 詩韻式では逆位置を採用しません。
-       * ただし既存の validation / template との互換性を保つため、
+       * 既存の validation / template との互換性を保つため、
        * 内部値としては正位置固定で渡します。
        */
       orientation: 'upright'
@@ -278,12 +304,25 @@
     result.innerHTML = `
       <section class="result-card empty">
         <h2>星命カルテ</h2>
-        <p>入力後に「基本カルテ生成」を押すと、ここに結果が表示されます。</p>
+        <p>
+          入力後に「基本カルテを生成」を押すと、ここに星命の芯が表示されます。
+        </p>
+        <p class="soft-text">
+          まずは生年月日から見える心の傾向を確認し、
+          必要に応じてタロットと未来鑑定を重ねてください。
+        </p>
       </section>
     `;
   }
 
   function getFindTarotFunction() {
+    if (
+      window.ShionTarot78 &&
+      typeof window.ShionTarot78.getTarot78ByName === 'function'
+    ) {
+      return window.ShionTarot78.getTarot78ByName;
+    }
+
     if (
       window.ShionTarotMapping &&
       typeof window.ShionTarotMapping.findTarotByName === 'function'
@@ -300,40 +339,49 @@
     return window.ShionSanmeiEngine.buildChart(input);
   }
 
-  function ensureChart(input) {
-    const signature = createInputSignature(input);
-
-    if (!state.chart || state.lastInputSignature !== signature) {
-      state.chart = buildChart(input);
-      state.lastInputSignature = signature;
-    }
-
-    return state.chart;
-  }
-
   function buildFuture(input, chart, entries) {
-    state.futureScores = window.ShionFutureScore.buildFutureScores(input, chart, entries || [], window.ShionTarot78);
-    state.futureReading = window.ShionMonthlyReading.buildFutureReading(input, chart, entries || [], state.futureScores);
+    state.futureScores = window.ShionFutureScore.buildFutureScores(
+      input,
+      chart,
+      entries || [],
+      window.ShionTarot78
+    );
+
+    state.futureReading = window.ShionMonthlyReading.buildFutureReading(
+      input,
+      chart,
+      entries || [],
+      state.futureScores
+    );
   }
 
   function renderAll(includeTarot) {
     const result = $(SELECTORS.results);
     if (!result || !state.chart) return;
 
-    const input = state.input && Object.keys(state.input).length ? state.input : getBaseInput();
-    const type = state.chart.seimei && state.chart.seimei.baseType
-      ? state.chart.seimei.baseType
-      : {};
+    const input =
+      state.input && Object.keys(state.input).length
+        ? state.input
+        : getBaseInput();
+
+    const type =
+      state.chart.seimei && state.chart.seimei.baseType
+        ? state.chart.seimei.baseType
+        : {};
 
     const entries = includeTarot ? state.tarotEntries : [];
-    const positions = getSpreadPositions(entries.length);
+    const positions = getSpreadPositions(entries.length || input.spread || 1);
     const findCard = getFindTarotFunction();
 
     result.innerHTML =
       window.ShionUiRender.renderChart(state.chart) +
       window.ShionUiRender.renderFiveElements(state.chart.fiveElements || {}) +
       window.ShionUiRender.renderTypeCards(type) +
-      window.ShionUiRender.renderFuture(state.futureScores, state.futureReading, window.ShionFutureScore) +
+      window.ShionUiRender.renderFuture(
+        state.futureScores,
+        state.futureReading,
+        window.ShionFutureScore
+      ) +
       window.ShionUiRender.renderTarot(entries, positions, findCard, input.topic) +
       window.ShionUiRender.renderActionAndFinal(type);
   }
@@ -350,7 +398,13 @@
   }
 
   function generateReading(input, chart, entries) {
-    return window.ShionReadingTemplate.generateReading(input, chart, entries, state.futureScores, state.futureReading);
+    return window.ShionReadingTemplate.generateReading(
+      input,
+      chart,
+      entries,
+      state.futureScores,
+      state.futureReading
+    );
   }
 
   function generateBase() {
@@ -366,6 +420,7 @@
       state.chart = buildChart(input);
       state.lastInputSignature = createInputSignature(input);
       state.tarotEntries = [];
+
       buildFuture(input, state.chart, []);
 
       renderAll(false);
@@ -373,7 +428,7 @@
 
       showInfo([
         '基本カルテを生成しました。',
-        'ここから必要に応じて、タロット共鳴メッセージを重ねられます。'
+        '必要に応じて、タロット共鳴や未来鑑定を重ねてください。'
       ]);
     } catch (error) {
       console.error(error);
@@ -400,6 +455,7 @@
       state.chart = buildChart(input);
       state.lastInputSignature = createInputSignature(input);
       state.tarotEntries = entries;
+
       buildFuture(input, state.chart, entries);
 
       renderAll(true);
@@ -408,7 +464,7 @@
       showInfo([
         'タロット共鳴メッセージを反映しました。',
         '詩韻式では逆位置を使わず、すべて正位置の象徴として読みます。',
-        'カードの光だけでなく、影・偏り・整える鍵も一緒に見ています。'
+        'カードの本質・影・見直す鍵を、相談内容に合わせて確認してください。'
       ]);
     } catch (error) {
       console.error(error);
@@ -451,6 +507,7 @@
     state.futureReading = '';
     state.finalReading = '';
     state.lastInputSignature = '';
+
     setValue(SELECTORS.targetYear, new Date().getFullYear());
 
     updateTarotSlots();
@@ -460,11 +517,11 @@
   }
 
   function demo() {
-    setValue(SELECTORS.name, 'デモ太郎');
+    setValue(SELECTORS.name, 'デモさん');
     setValue(SELECTORS.birthDate, '1984-01-03');
     setValue(SELECTORS.gender, '');
     setValue(SELECTORS.topic, '仕事');
-    setValue(SELECTORS.memo, '今後の働き方と金運が不安');
+    setValue(SELECTORS.memo, '今後の働き方とお金のことが不安。何から動けばいいか知りたい。');
     setValue(SELECTORS.targetYear, new Date().getFullYear());
     setValue(SELECTORS.spread, '3');
 
@@ -510,6 +567,46 @@
     }
   }
 
+  function copyText(value) {
+    const content = text(value);
+
+    if (!content) {
+      return Promise.reject(new Error('empty copy text'));
+    }
+
+    if (
+      window.ShionUtils &&
+      typeof window.ShionUtils.copyText === 'function'
+    ) {
+      return Promise.resolve(window.ShionUtils.copyText(content));
+    }
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(content);
+    }
+
+    return new Promise((resolve, reject) => {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = content;
+        textarea.setAttribute('readonly', 'readonly');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '0';
+
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        const ok = document.execCommand('copy');
+        document.body.removeChild(textarea);
+
+        ok ? resolve() : reject(new Error('copy failed'));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   function copyReading() {
     const reading = getFinalReading();
 
@@ -518,16 +615,30 @@
       return;
     }
 
-    const copyFn =
-      window.ShionUtils && typeof window.ShionUtils.copyText === 'function'
-        ? window.ShionUtils.copyText
-        : function fallbackCopyText(value) {
-            return navigator.clipboard.writeText(value);
-          };
-
-    copyFn(reading).then(
+    copyText(reading).then(
       () => showInfo(['鑑定文をコピーしました。保存はしていません。']),
       () => showErrors(['コピーに失敗しました。手動で選択してコピーしてください。'])
+    );
+  }
+
+  function copySectionByTarget(targetId) {
+    const target = byId(targetId);
+
+    if (!target) {
+      showErrors(['コピー対象が見つかりませんでした。']);
+      return;
+    }
+
+    const value = target.value || target.textContent || '';
+
+    if (!text(value)) {
+      showErrors(['コピーできる内容がまだありません。']);
+      return;
+    }
+
+    copyText(value).then(
+      () => showInfo(['セクションをコピーしました。保存はしていません。']),
+      () => showErrors(['コピーに失敗しました。手動で選択してください。'])
     );
   }
 
@@ -542,46 +653,62 @@
     if (state.chart) {
       state.tarotEntries = [];
       renderAll(false);
+      setFinalReading('');
+
       showInfo([
         'カード枚数を変更しました。',
-        'タロット共鳴メッセージを反映する場合は、カードを選び直してください。'
+        'カードを選び直してから、タロット共鳴を反映してください。'
       ]);
     }
   }
 
   function handleBaseInputChange() {
-    /**
-     * 入力が変わった状態で古いチャートやタロット結果が残ると、
-     * 表示と鑑定文がズレる可能性があるため、生成済み状態だけ軽く無効化します。
-     */
     if (!state.chart) return;
 
     const currentSignature = createInputSignature(getBaseInput());
+
     if (currentSignature !== state.lastInputSignature) {
+      state.input = {};
+      state.chart = null;
       state.tarotEntries = [];
+      state.futureScores = [];
+      state.futureReading = '';
+      state.finalReading = '';
+      state.lastInputSignature = '';
+
       renderEmptyResult();
       setFinalReading('');
-      showInfo(['入力内容が変更されました。もう一度カルテを生成してください。']);
-      state.chart = null;
-      state.lastInputSignature = '';
+
+      showInfo([
+        '入力内容が変更されました。',
+        '古い鑑定結果とのズレを防ぐため、もう一度カルテを生成してください。'
+      ]);
     }
   }
 
   function bindBaseInputWatchers() {
-    [SELECTORS.name, SELECTORS.birthDate, SELECTORS.gender, SELECTORS.topic, SELECTORS.memo, SELECTORS.targetYear].forEach(
-      (id) => {
-        bind(id, 'change', handleBaseInputChange);
-      }
-    );
+    [
+      SELECTORS.name,
+      SELECTORS.birthDate,
+      SELECTORS.gender,
+      SELECTORS.topic,
+      SELECTORS.memo,
+      SELECTORS.targetYear
+    ].forEach((id) => {
+      bind(id, 'change', handleBaseInputChange);
+    });
   }
 
   function initialize() {
-    if (!rawValue(SELECTORS.targetYear)) setValue(SELECTORS.targetYear, new Date().getFullYear());
+    if (!rawValue(SELECTORS.targetYear)) {
+      setValue(SELECTORS.targetYear, new Date().getFullYear());
+    }
+
     updateTarotSlots();
     renderEmptyResult();
 
     bind(SELECTORS.spread, 'change', handleSpreadChange);
-    bind(SELECTORS.unlock.replace('#', ''), 'click', unlock);
+    bind(SELECTORS.unlock, 'click', unlock);
 
     const password = $(SELECTORS.password);
     if (password) {
@@ -596,17 +723,19 @@
     bind(SELECTORS.reset, 'click', resetAll);
     bind(SELECTORS.demo, 'click', demo);
     bind(SELECTORS.copy, 'click', copyReading);
+
     document.addEventListener('click', (event) => {
-      const button = event.target.closest && event.target.closest('[data-copy-target]');
+      const button =
+        event.target.closest &&
+        event.target.closest('[data-copy-target]');
+
       if (!button) return;
-      const target = byId(button.getAttribute('data-copy-target'));
-      const value = target ? (target.value || target.textContent || '') : '';
-      const copyFn = window.ShionUtils && typeof window.ShionUtils.copyText === 'function' ? window.ShionUtils.copyText : (v) => navigator.clipboard.writeText(v);
-      copyFn(value).then(() => showInfo(['セクションをコピーしました。保存はしていません。']), () => showErrors(['コピーに失敗しました。手動で選択してください。']));
+
+      const targetId = button.getAttribute('data-copy-target');
+      copySectionByTarget(targetId);
     });
 
     bindBaseInputWatchers();
-
     requireModules();
   }
 
