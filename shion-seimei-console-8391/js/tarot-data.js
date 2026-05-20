@@ -1,0 +1,1 @@
+(function(){const cards=(window.ShionTarot78&&window.ShionTarot78.TAROT_78_CARDS)||[];window.ShionTarotData={cards:cards.map(c=>c.nameJa).filter(Boolean),message:(name)=>name?`共鳴カード「${name}」は、光と影の両方を見ながら、今の一歩を選ぶことを促しています。`:'今回は星命の流れを中心に見ています。ここにタロットを重ねると、今の心の声をさらに細かく見ることができます。'};})();
