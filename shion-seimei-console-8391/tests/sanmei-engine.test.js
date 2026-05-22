@@ -23,8 +23,8 @@ test('星命タイプ判定が空にならない', () => assert.ok(chart.seimei.
 test('大アルカナ22枚が存在する', () => assert.strictEqual(tarot.TAROT_CARDS.length, 22));
 test('正位置・逆位置が存在する', () => { const c = tarot.TAROT_CARDS[0]; assert.ok(c.uprightMeaning); assert.ok(c.reversedMeaning); });
 test('1枚引きポジションが返る', () => assert.deepStrictEqual(tarot.SPREAD_POSITIONS[1], ['今のメッセージ']));
-test('3枚引きポジションが返る', () => assert.deepStrictEqual(tarot.SPREAD_POSITIONS[3], ['現在','課題','進む道']));
-test('5枚引きポジションが返る', () => assert.deepStrictEqual(tarot.SPREAD_POSITIONS[5], ['現在','宿命的テーマ','心のブレーキ','外側の状況','今取るべき行動']));
+test('3枚引きポジションが返る', () => assert.deepStrictEqual(tarot.SPREAD_POSITIONS[3], ['今の流れ','心の奥','進む道']));
+test('5枚引きポジションが返る', () => assert.deepStrictEqual(tarot.SPREAD_POSITIONS[5], ['現状','心の奥','課題','助けになる力','未来への一歩']));
 test('空の生年月日にエラー', () => assert.ok(validation.validateBirthDate('').length > 0));
 test('不正な日付にエラー', () => assert.ok(validation.validateBirthDate('2024-02-31').length > 0));
 test('未来の日付にエラー', () => assert.ok(validation.validateBirthDate('2999-01-01').length > 0));
