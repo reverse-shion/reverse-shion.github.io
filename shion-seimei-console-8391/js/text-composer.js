@@ -1,1 +1,25 @@
-window.ShionTextComposer={compose(input,data){const name=input.name||'ご相談者さま';const s=window.ShionSeimeiTypes[data.center]||window.ShionSeimeiTypes['調和'];const tarot=window.ShionTarotData.message(input.tarot);return`それでは、${name}さんの星命を見ていきます。\n\nまず中心にあるのは「${data.center}」の気配。${s.core}傾向があり、${s.strength}力が表れやすい方です。いっぽうで、${s.care}ところもあります。\n\n次に${data.year.year}年。テーマは「${data.year.title}」。${data.year.yearlyMessage.general}\n${input.topic}では、${data.year.yearlyMessage[{"総合":"general","恋愛":"love","仕事":"work","金運":"money","人間関係":"relationship","今月の運勢":"general"}[input.topic]]}\n\n${tarot}\n\n3年間の流れは、2026年は整える年、2027年は形にする年、2028年は結実して次の役割へ進む年です。\n\n今日やるべきこと\n1. 気になっていることを一文で書く\n2. 事実と想像を分ける\n3. 今日できる確認を一つ選ぶ\n\n大きな答えを今日すぐ出さなくても大丈夫。\n大丈夫だよ。あなたの一歩は、ちゃんと未来につながっています。`;}};
+window.ShionTextComposer = {
+  compose(input, data) {
+    const name = input.name || 'ご相談者さま';
+    const s = window.ShionSeimeiTypes[data.centerKey] || window.ShionSeimeiTypes[data.center] || window.ShionSeimeiTypes['調和'];
+    const tarot = window.ShionTarotData.message(input.tarot);
+    const ref = data.chart.sanmeiReference || {};
+    const pillars = data.chart.pillars || {};
+    const z = data.zodiacDecan || {};
+
+    return `それでは、${name}さんの星命を見ていきます。
+
+これは詩韻式の参考鑑定で、自己理解の補助線としてお使いください。
+中心星命は「${data.center}」、補助星命は「${data.sub}」。${s.core}傾向があり、${s.strength}力が表れやすい方です。
+
+算命学参考としては、日干は「${ref.dayStem || '未算出'}（${ref.element || '参考'}・${ref.yinYang || '参考'}）」。
+年柱 ${pillars.year ? pillars.year.name : '-'} / 月柱 ${pillars.month ? pillars.month.name : '-'} / 日柱 ${pillars.day ? pillars.day.name : '-'} を重ねると、今の力の使い方が見えやすくなります。
+
+星座デカンは「${z.zodiacNameJa || '未判定'} 第${z.decanNumber || '-'}デカン」。${z.seimeiMessage || ''}
+${z.boundaryWarning || ''}
+
+${tarot}
+
+月別未来鑑定は、相談ジャンル・五行・星命タイプ・タロット共鳴を重ねた参考ガイドです。断定ではなく、今月の行動のヒントとしてやさしく使ってください。`;
+  }
+};

@@ -1,1 +1,47 @@
-window.ShionReadingEngine={build(input){const profile=(window.ShionSanmeiEngine&&window.ShionSanmeiEngine.buildChart)?window.ShionSanmeiEngine.buildChart(input.birthDate):{};const center=(profile.primaryType&&profile.primaryType.name)||"希望";const sub=(profile.secondaryType&&profile.secondaryType.name)||"調和";const y=window.ShionYearData[input.targetYear];const months=Array.from({length:12},(_,i)=>{const m=i+1;const type=y.turningMonths.includes(m)?"転換":y.cautionMonths.includes(m)?"慎重":y.luckyMonths.includes(m)?"追い風":"整え";return{month:m,title:`${m}月の${window.ShionMonthlyThemes[i]}`,theme:`${type}の流れ`,message:`${m}月は${window.ShionCategoryThemes[input.topic]}で「${window.ShionMonthlyThemes[i]}」を意識すると流れが整いやすい時期です。`,action:`${type==='追い風'?'外へ出す行動を一つ。':type==='慎重'?'確認作業を先に。':type==='転換'?'選択肢を比較して選び直す。':'休息と再設計を優先。'}`,phrase:`${window.ShionMonthlyThemes[i]}は未来を育てる。`};});return{center,sub,year:y,months};}};
+(function (root) {
+  const api = {
+    build(input) {
+      const chart = (root.ShionSanmeiEngine && root.ShionSanmeiEngine.buildChart)
+        ? root.ShionSanmeiEngine.buildChart(input)
+        : {};
+      const zodiacDecan = (root.ShionZodiacDecan && root.ShionZodiacDecan.getZodiacDecan)
+        ? root.ShionZodiacDecan.getZodiacDecan(input.birthDate)
+        : null;
+
+      const centerType = chart.seimei && chart.seimei.baseType ? chart.seimei.baseType : {};
+      const subType = chart.seimei && chart.seimei.subType ? chart.seimei.subType : {};
+      const center = centerType.name || '調和の星命';
+      const sub = subType.name || '希望の星命';
+      const centerKey = centerType.id || centerType.key || center;
+      const subKey = subType.id || subType.key || sub;
+
+      const tarotEntries = input.tarot ? [{ name: input.tarot }] : [];
+      const scores = (root.ShionFutureScore && root.ShionFutureScore.buildFutureScores)
+        ? root.ShionFutureScore.buildFutureScores(input, chart, tarotEntries, root.ShionTarot78)
+        : [];
+
+      const months = scores.map((score) => ({
+        month: score.month,
+        title: `${score.month}月のテーマ：${score.themeKeywords && score.themeKeywords[0] ? score.themeKeywords[0] : '整え'}`,
+        theme: score.monthType,
+        message: score.message,
+        action: score.action,
+        phrase: score.phrase,
+        caution: score.caution
+      }));
+
+      const year = {
+        year: Number(input.targetYear),
+        title: `${input.targetYear}年の流れ`,
+        luckyMonths: months.filter((m) => m.theme === '追い風月').map((m) => m.month),
+        cautionMonths: months.filter((m) => m.theme === '慎重月').map((m) => m.month),
+        turningMonths: months.filter((m) => m.theme === '転換期').map((m) => m.month)
+      };
+
+      return { center, sub, centerKey, subKey, chart, zodiacDecan, year, months };
+    }
+  };
+
+  root.ShionReadingEngine = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof globalThis !== 'undefined' ? globalThis : window);

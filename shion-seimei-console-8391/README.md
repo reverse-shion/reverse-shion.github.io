@@ -110,6 +110,19 @@ Phase 1では逆位置フラグは実装せず、各カードの `shadow` と `c
 
 星命タイプは算命学そのものではなく、詩韻式独自解釈です。
 
+
+## 星座デカン（12星座×3区分）
+
+`js/zodiac-decan.js` で、生年月日から黄道十二星座と第1〜第3デカンを簡易判定します。出生時刻・出生地は使わず、境界日前後は「簡易判定（要確認）」として表示します。
+
+鑑定画面では次を根拠欄に表示します。
+
+- 算命学参考（日干・五行・陰陽・年柱/月柱/日柱）
+- 星命タイプ（中心星命・補助星命）
+- 星座デカン（星座名・第何デカン・象徴）
+- タロット共鳴
+- 月別未来鑑定（テーマ・月タイプ・行動・注意点）
+
 ## 禁止表現フィルター
 
 鑑定文生成と「詩韻風に整える」処理で、医療・法律・投資・借金・破産・寿命などを断定する表現や、過度に不安を煽る表現を柔らかく現実的な表現へ置換します。
@@ -120,6 +133,8 @@ Phase 1では逆位置フラグは実装せず、各カードの `shadow` と `c
 node shion-seimei-console-8391/tests/sanmei-engine.test.js
 node shion-seimei-console-8391/tests/tarot-78.test.js
 node shion-seimei-console-8391/tests/future-score.test.js
+node shion-seimei-console-8391/tests/reading-engine.test.js
+node shion-seimei-console-8391/tests/zodiac-decan.test.js
 ```
 
 ## ローカル確認方法
