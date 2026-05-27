@@ -1,45 +1,678 @@
 :root {
-  --bg-deep: #07112f;
-  --bg-mid: #101b4d;
-  --bg-soft: #1b245f;
-  --gold: #d8bd7a;
-  --moon: #f4ecdc;
-  --lavender: #b9a7ff;
-  --text-main: #f7f1e6;
-  --text-sub: rgba(247, 241, 230, 0.72);
-  --card: rgba(255, 255, 255, 0.075);
-  --card-border: rgba(216, 189, 122, 0.32);
+  --navy: #081225;
+  --navy2: #101c34;
+  --navy3: #172542;
+  --deep: #040812;
+
+  --gold: #c8a45d;
+  --gold2: #f0d99a;
+  --gold3: #fff1bd;
+  --gold-soft: rgba(200, 164, 93, 0.16);
+
+  --moon: #f7f3ea;
+  --moon-soft: rgba(247, 243, 234, 0.78);
+
+  --lav: #c9b8ee;
+  --lav2: #eee6ff;
+  --lav3: #f6f0ff;
+  --lav-soft: rgba(201, 184, 238, 0.15);
+
+  --silver: #bcc7d1;
+  --silver2: #d7dee6;
+
+  --panel: rgba(14, 28, 52, 0.9);
+  --panel2: rgba(255, 255, 255, 0.06);
+  --panel3: rgba(255, 255, 255, 0.09);
+
+  --line: rgba(200, 164, 93, 0.35);
+  --line-strong: rgba(240, 217, 154, 0.55);
+  --line-soft: rgba(188, 199, 209, 0.22);
+  --line-lav: rgba(201, 184, 238, 0.28);
+
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+  --shadow-soft: 0 14px 44px rgba(0, 0, 0, 0.24);
+  --shadow-card: 0 18px 54px rgba(0, 0, 0, 0.26);
+
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+
+  --font-serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+  --font-sans: "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", system-ui, sans-serif;
 }
-* { box-sizing: border-box; }
+
+/* ===== base / overflow fix ===== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  font-family: "Hiragino Sans", sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--moon);
+  font-family: var(--font-sans);
+  line-height: 1.85;
+  letter-spacing: 0.02em;
   background:
-    radial-gradient(circle at top left, rgba(185, 167, 255, 0.22), transparent 34%),
-    radial-gradient(circle at top right, rgba(216, 189, 122, 0.14), transparent 28%),
-    linear-gradient(180deg, #101b4d 0%, #07112f 55%, #06091c 100%);
-  color: var(--text-main);
+    radial-gradient(circle at top left, rgba(201, 184, 238, 0.22), transparent 34%),
+    radial-gradient(circle at top right, rgba(240, 217, 154, 0.14), transparent 28%),
+    linear-gradient(180deg, #101b4d 0%, #07112f 55%, #040812 100%);
 }
-.page { max-width: 900px; margin: auto; padding: 14px; overflow-x: clip; }
-.card { background: var(--card); border: 1px solid var(--card-border); border-radius: 18px; padding: 18px; margin: 14px 0; box-shadow: 0 12px 30px rgba(0,0,0,.25),0 0 24px rgba(185,167,255,.08); }
-.eyebrow,.year-reading-section h4, h2 { color: var(--gold); }
-h1 { font-size: 1.45rem; line-height: 1.6; }
-label { display:block; margin:10px 0; font-size:.95rem; }
-input,select,textarea,button { width:100%; margin-top:4px; padding:11px; border-radius:10px; border:1px solid #4d5ba1; background:#111b48; color:var(--moon); }
-.buttons{display:grid;gap:8px}.cta,button{background:linear-gradient(90deg,#b99a57,#e9d8a2);color:#231e14;text-decoration:none;font-weight:700;text-align:center;display:block}
-.subtle{color:var(--text-sub);font-size:.9rem}.msg{color:#ffdca8}.grid{display:grid;gap:10px}.kpi{padding:12px;background:rgba(10,17,45,.55);border-radius:12px;border:1px solid rgba(216,189,122,.24);line-height:1.7}
-.year-cards{display:grid;gap:14px}
-.year-card { display:block; width:100%; padding:20px; border-radius:20px; margin-bottom:4px; background:rgba(255,255,255,.075); border:1px solid rgba(216,189,122,.32); box-shadow:0 12px 30px rgba(0,0,0,.25),0 0 24px rgba(185,167,255,.08); }
-.year-card-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
-.year-label { font-size:1.45rem; font-weight:700; margin:0; }
-.year-age { font-size:.95rem; color:var(--text-sub); margin:4px 0 0; }
-.arcana-pair { display:grid; grid-template-columns:1fr; gap:10px; margin:14px 0; }
-.arcana-badge { padding:12px 14px; border-radius:14px; background:rgba(255,255,255,.08); border:1px solid rgba(216,189,122,.22); }
-.arcana-badge span { display:block; font-size:.78rem; color:var(--gold); margin-bottom:4px; }
-.arcana-badge strong { font-size:1.05rem; word-break: keep-all; overflow-wrap: break-word; }
-.year-reading-section,.reading-block { margin-top:16px; }
-.year-reading-section h4,.reading-block h3 { font-size:.9rem; color:var(--gold); margin:0 0 7px; }
-.year-reading-section p,.reading-block p,.current-message { font-size:.98rem; line-height:1.85; letter-spacing:.02em; margin:0; word-break: keep-all; overflow-wrap: break-word; }
-.lock{position:relative}.lock:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(7,17,47,.78));pointer-events:none}
-@media(min-width:720px){.buttons{grid-template-columns:repeat(4,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:760px){.arcana-pair{grid-template-columns:1fr 1fr}}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(247, 243, 234, 0.22) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(200, 164, 93, 0.14) 1px, transparent 1.5px);
+  background-size: 92px 92px, 146px 146px;
+  background-position: 12px 18px, 40px 48px;
+  opacity: 0.22;
+  z-index: -1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(240, 217, 154, 0.09), transparent 36%),
+    linear-gradient(180deg, transparent 0%, rgba(4, 8, 18, 0.42) 100%);
+  z-index: -1;
+}
+
+.page,
+.card,
+.result-card,
+.year-card,
+.reading-block,
+.current-message,
+.year-reading-section,
+.arcana-badge,
+.kpi,
+.grid,
+.year-cards {
+  max-width: 100%;
+  min-width: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+strong,
+small,
+span,
+li,
+div,
+section,
+article {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-break: strict;
+}
+
+pre,
+textarea {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ===== layout ===== */
+
+.page {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 18px 14px 28px;
+  overflow-x: hidden;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  margin: 16px 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025)),
+    var(--panel);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top right, rgba(240, 217, 154, 0.1), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(201, 184, 238, 0.09), transparent 36%);
+  opacity: 0.8;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== hero ===== */
+
+.hero {
+  padding: 26px 22px;
+  border-color: rgba(240, 217, 154, 0.42);
+  background:
+    radial-gradient(circle at top right, rgba(240, 217, 154, 0.12), transparent 36%),
+    radial-gradient(circle at bottom left, rgba(201, 184, 238, 0.12), transparent 34%),
+    rgba(14, 28, 52, 0.92);
+}
+
+.eyebrow {
+  margin: 0 0 0.65rem;
+  color: var(--gold2);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  letter-spacing: 0.04em;
+}
+
+h1 {
+  margin: 0.2rem 0 0.9rem;
+  color: var(--moon);
+  font-size: clamp(1.75rem, 7vw, 3.1rem);
+  line-height: 1.35;
+}
+
+h2 {
+  margin: 0 0 0.9rem;
+  color: var(--gold2);
+  font-size: clamp(1.35rem, 4.6vw, 1.9rem);
+}
+
+h3 {
+  margin: 1.5rem 0 0.75rem;
+  color: var(--lav2);
+  font-size: clamp(1.08rem, 3.8vw, 1.35rem);
+}
+
+h4 {
+  margin: 0 0 0.45rem;
+  color: var(--gold2);
+  font-size: 0.95rem;
+}
+
+.hero p,
+.note p {
+  margin: 0.75rem 0;
+}
+
+.subtle {
+  color: var(--silver2);
+  font-size: 0.92rem;
+  line-height: 1.8;
+}
+
+/* ===== form ===== */
+
+label {
+  display: block;
+  margin: 14px 0;
+  color: var(--moon);
+  font-weight: 700;
+}
+
+input,
+select,
+textarea,
+button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 12px 13px;
+  border: 1px solid rgba(188, 199, 209, 0.34);
+  border-radius: 14px;
+  font: inherit;
+  font-size: 16px;
+}
+
+input,
+select,
+textarea {
+  background: rgba(255, 255, 255, 0.075);
+  color: var(--moon);
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(240, 217, 154, 0.72);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(200, 164, 93, 0.1);
+}
+
+select option {
+  color: var(--navy);
+  background: var(--moon);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+button,
+.cta {
+  display: block;
+  min-height: 44px;
+  border: 1px solid rgba(240, 217, 154, 0.78);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--gold2), var(--gold) 52%, #8f6b2f);
+  color: var(--navy);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+button {
+  padding: 12px 14px;
+}
+
+.cta {
+  margin-top: 18px;
+  padding: 12px 16px;
+}
+
+button:hover,
+.cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.32);
+}
+
+button:active,
+.cta:active {
+  transform: translateY(0);
+}
+
+.msg {
+  color: var(--gold3);
+  font-weight: 700;
+}
+
+/* ===== result summary ===== */
+
+.result-card {
+  border-color: rgba(240, 217, 154, 0.42);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.kpi {
+  padding: 14px;
+  border: 1px solid rgba(240, 217, 154, 0.28);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(200, 164, 93, 0.08), rgba(255, 255, 255, 0.035));
+  line-height: 1.75;
+}
+
+.kpi strong {
+  color: var(--gold2);
+}
+
+.kpi small {
+  color: var(--silver2);
+}
+
+/* ===== current message ===== */
+
+.current-message {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid rgba(240, 217, 154, 0.28);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(200, 164, 93, 0.11), rgba(201, 184, 238, 0.06));
+  color: var(--moon);
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 4vw, 1.12rem);
+  line-height: 2;
+  letter-spacing: 0.04em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* ===== year cards ===== */
+
+.year-cards {
+  display: grid;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.year-card {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  border: 1px solid rgba(216, 189, 122, 0.34);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at top right, rgba(201, 184, 238, 0.1), transparent 35%),
+    rgba(255, 255, 255, 0.065);
+  box-shadow: var(--shadow-card);
+}
+
+.year-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.year-label {
+  margin: 0;
+  color: var(--moon);
+  font-family: var(--font-serif);
+  font-size: clamp(1.55rem, 7vw, 2.3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+}
+
+.year-age {
+  margin: 6px 0 0;
+  color: var(--silver2);
+  font-size: 0.95rem;
+}
+
+.arcana-pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.arcana-badge {
+  padding: 13px 14px;
+  border: 1px solid rgba(216, 189, 122, 0.28);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(240, 217, 154, 0.08), rgba(255, 255, 255, 0.04));
+}
+
+.arcana-badge span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--gold2);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.arcana-badge strong {
+  display: block;
+  color: var(--moon);
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.55;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.year-reading-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(188, 199, 209, 0.16);
+}
+
+.year-reading-section p {
+  margin: 0;
+  color: var(--moon-soft);
+  font-size: 0.98rem;
+  line-height: 1.9;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* ===== reading blocks ===== */
+
+.reading-sections {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.reading-block {
+  padding: 15px 16px;
+  border: 1px solid rgba(201, 184, 238, 0.28);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(201, 184, 238, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.reading-block h3 {
+  margin: 0 0 0.45rem;
+  color: var(--gold2);
+  font-size: 1rem;
+}
+
+.reading-block p {
+  margin: 0;
+  color: var(--moon-soft);
+  font-size: 0.98rem;
+  line-height: 1.9;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* ===== lock card ===== */
+
+.lock {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(201, 184, 238, 0.32);
+}
+
+.lock > * {
+  position: relative;
+  z-index: 1;
+}
+
+.lock::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(7, 17, 47, 0.7) 100%);
+}
+
+/* ===== list / note ===== */
+
+ul {
+  padding-left: 1.25rem;
+}
+
+li {
+  margin: 0.45rem 0;
+  line-height: 1.8;
+}
+
+.note {
+  color: var(--silver2);
+  font-size: 0.9rem;
+}
+
+/* ===== responsive ===== */
+
+@media (min-width: 720px) {
+  .page {
+    padding: 28px 20px 42px;
+  }
+
+  .card {
+    padding: 26px;
+  }
+
+  .buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 760px) {
+  .arcana-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 980px) {
+  .buttons {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .page {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .hero {
+    padding: 20px 16px;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 8vw, 2.15rem);
+  }
+
+  h2 {
+    font-size: 1.32rem;
+  }
+
+  h3 {
+    font-size: 1.08rem;
+  }
+
+  .year-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .current-message,
+  .reading-block,
+  .kpi,
+  .arcana-badge {
+    padding: 13px;
+  }
+
+  .year-reading-section p,
+  .reading-block p,
+  .current-message {
+    font-size: 0.96rem;
+    line-height: 1.9;
+  }
+}
+
+@media (max-width: 390px) {
+  .page {
+    padding: 8px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .year-card {
+    padding: 14px;
+  }
+
+  .buttons,
+  .grid,
+  .year-cards,
+  .arcana-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
