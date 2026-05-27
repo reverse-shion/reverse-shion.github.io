@@ -95,3 +95,9 @@ window.ShionMessages = (function () {
     }
   };
 })();
+
+
+window.ShionMessages.getCardThemeMeaning=function(card,theme){const m={love:"loveMeaning",relationship:"relationshipMeaning",work:"workMeaning",money:"moneyMeaning",general:"uprightMeaning"};const k=m[theme]||"uprightMeaning";return card?.[k]||card?.uprightMeaning||card?.humanMessage||"";};
+window.ShionMessages.buildTarotCardReading=function(card,position,theme){const t=window.ShionMessages.getCardThemeMeaning(card,theme);return [`${position}に出た《${card.nameJa}》は、今のあなたに必要な視点を映しています。`,t,card.shadow?`ただ、${card.shadow}`:"",card.adjustment?`だから今は、${card.adjustment}`:"",card.actionAdvice?`今日できる一歩は、${card.actionAdvice}`:"","この小さな一歩が、未来の流れを少しずつ変えるきっかけになります。"].filter(Boolean).join("\n\n");};
+window.ShionMessages.themeKey=function(topic){if(["恋愛","復縁","片想い"].includes(topic))return "love";if(topic==="人間関係")return "relationship";if(topic==="仕事")return "work";if(topic==="金運")return "money";return "general";};
+window.ShionMessages.themeCTA=function(topic){const t=window.ShionMessages.themeKey(topic);const map={love:{body:"ここまでが、無料診断で見える大きな流れです。恋愛では相手の本音や連絡の可能性、動くべき時期など具体条件で答えが変わります。個人鑑定では、あなたの状況に合わせて丁寧に見ていきます。",btn:"相手の本音と今後の流れを詳しく見る"},relationship:{body:"ここまでが、無料診断で見える大きな流れです。人間関係の改善では、相手との距離感や言葉選びを個別に調整することが鍵になります。個人鑑定で具体的に整理できます。",btn:"相手との関係を詳しく見る"},work:{body:"ここまでが、無料診断で見える大きな流れです。仕事は現実条件で判断が変わるため、動く時期や優先順位まで具体化するには個人鑑定が向いています。",btn:"今後の方向性を個人鑑定で見る"},money:{body:"ここまでが、無料診断で見える大きな流れです。お金の不安は収入・支出・働き方の条件で答えが変わるため、個人鑑定で現実に合わせて詳しく見ていきます。",btn:"お金と今後の流れを詳しく見る"},general:{body:"ここまでが、無料診断で見える大きな流れです。あなたが引っかかった言葉を起点に、個人鑑定では時期や選択をさらに具体的に読み解けます。",btn:"個人鑑定でさらに深く見る"}};return map[t];};
