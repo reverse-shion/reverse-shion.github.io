@@ -1,1 +1,45 @@
-:root{--bg:#0b1330;--card:#121c42;--text:#f8f4e8;--muted:#c9c2df;--gold:#d6b56b;--lav:#b7a5e6}*{box-sizing:border-box}body{margin:0;font-family:"Hiragino Sans",sans-serif;background:radial-gradient(circle at top,#1c2450,#090f24 65%);color:var(--text)}.page{max-width:900px;margin:auto;padding:16px}.card{background:linear-gradient(165deg,#141f48,#111838);border:1px solid #2d3768;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 36px #0005}.eyebrow{color:var(--gold)}h1{font-size:1.5rem;line-height:1.6}h2{font-size:1.2rem;color:var(--gold)}label{display:block;margin:10px 0;font-size:.95rem}input,select,textarea,button{width:100%;margin-top:4px;padding:11px;border-radius:10px;border:1px solid #35407a;background:#0c1435;color:#fff}.buttons{display:grid;gap:8px}.cta,button{background:linear-gradient(90deg,#b99a57,#e9d8a2);color:#231e14;text-decoration:none;font-weight:700;text-align:center;display:block}.subtle{color:var(--muted);font-size:.9rem}.msg{color:#ffdca8}.grid{display:grid;gap:10px}.kpi{padding:12px;background:#0b1332;border-radius:12px;border:1px solid #2f3c74}.lock{position:relative;filter:blur(1px) saturate(.6);pointer-events:none}.lock:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,#0a1028)}table{width:100%;border-collapse:collapse;font-size:.86rem}th,td{border-bottom:1px solid #344172;padding:8px;text-align:left}@media(min-width:720px){.buttons{grid-template-columns:repeat(4,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
+:root {
+  --bg-deep: #07112f;
+  --bg-mid: #101b4d;
+  --bg-soft: #1b245f;
+  --gold: #d8bd7a;
+  --moon: #f4ecdc;
+  --lavender: #b9a7ff;
+  --text-main: #f7f1e6;
+  --text-sub: rgba(247, 241, 230, 0.72);
+  --card: rgba(255, 255, 255, 0.075);
+  --card-border: rgba(216, 189, 122, 0.32);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Hiragino Sans", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(185, 167, 255, 0.22), transparent 34%),
+    radial-gradient(circle at top right, rgba(216, 189, 122, 0.14), transparent 28%),
+    linear-gradient(180deg, #101b4d 0%, #07112f 55%, #06091c 100%);
+  color: var(--text-main);
+}
+.page { max-width: 900px; margin: auto; padding: 14px; overflow-x: clip; }
+.card { background: var(--card); border: 1px solid var(--card-border); border-radius: 18px; padding: 18px; margin: 14px 0; box-shadow: 0 12px 30px rgba(0,0,0,.25),0 0 24px rgba(185,167,255,.08); }
+.eyebrow,.year-reading-section h4, h2 { color: var(--gold); }
+h1 { font-size: 1.45rem; line-height: 1.6; }
+label { display:block; margin:10px 0; font-size:.95rem; }
+input,select,textarea,button { width:100%; margin-top:4px; padding:11px; border-radius:10px; border:1px solid #4d5ba1; background:#111b48; color:var(--moon); }
+.buttons{display:grid;gap:8px}.cta,button{background:linear-gradient(90deg,#b99a57,#e9d8a2);color:#231e14;text-decoration:none;font-weight:700;text-align:center;display:block}
+.subtle{color:var(--text-sub);font-size:.9rem}.msg{color:#ffdca8}.grid{display:grid;gap:10px}.kpi{padding:12px;background:rgba(10,17,45,.55);border-radius:12px;border:1px solid rgba(216,189,122,.24);line-height:1.7}
+.year-cards{display:grid;gap:14px}
+.year-card { display:block; width:100%; padding:20px; border-radius:20px; margin-bottom:4px; background:rgba(255,255,255,.075); border:1px solid rgba(216,189,122,.32); box-shadow:0 12px 30px rgba(0,0,0,.25),0 0 24px rgba(185,167,255,.08); }
+.year-card-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.year-label { font-size:1.45rem; font-weight:700; margin:0; }
+.year-age { font-size:.95rem; color:var(--text-sub); margin:4px 0 0; }
+.arcana-pair { display:grid; grid-template-columns:1fr; gap:10px; margin:14px 0; }
+.arcana-badge { padding:12px 14px; border-radius:14px; background:rgba(255,255,255,.08); border:1px solid rgba(216,189,122,.22); }
+.arcana-badge span { display:block; font-size:.78rem; color:var(--gold); margin-bottom:4px; }
+.arcana-badge strong { font-size:1.05rem; word-break: keep-all; overflow-wrap: break-word; }
+.year-reading-section,.reading-block { margin-top:16px; }
+.year-reading-section h4,.reading-block h3 { font-size:.9rem; color:var(--gold); margin:0 0 7px; }
+.year-reading-section p,.reading-block p,.current-message { font-size:.98rem; line-height:1.85; letter-spacing:.02em; margin:0; word-break: keep-all; overflow-wrap: break-word; }
+.lock{position:relative}.lock:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(7,17,47,.78));pointer-events:none}
+@media(min-width:720px){.buttons{grid-template-columns:repeat(4,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:760px){.arcana-pair{grid-template-columns:1fr 1fr}}
