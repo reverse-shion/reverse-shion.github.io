@@ -20,6 +20,7 @@
   <!-- JavaScript：読み込み順を崩さないこと -->
   <script src="./js/utils.js?v=20260527-01" defer></script>
   <script src="./js/validation.js?v=20260527-01" defer></script>
+  <script src="./js/tarot-78.js?v=20260527-01" defer></script>
   <script src="./js/tarot-data.js?v=20260527-01" defer></script>
   <script src="./js/decan-map.js?v=20260527-01" defer></script>
   <script src="./js/messages.js?v=20260527-01" defer></script>
@@ -210,6 +211,16 @@
             <option value="10">全体をしっかり10枚で見る</option>
           </select>
         </label>
+
+        <section id="tarotPreview" class="card tarot-preview" aria-live="polite">
+          <h3>タロット共鳴カード</h3>
+          <p id="tarotIntro" class="subtle">今のあなたに必要な星の声を、タロットで受け取ります。スプレッドを選ぶとカードを引けます。</p>
+          <div id="tarotCards" class="tarot-card-list"></div>
+          <div class="tarot-preview-actions">
+            <button type="button" id="redrawTarot" class="ghost-btn">もう一度カードを引く</button>
+            <p class="subtle">引き直すと、今回の鑑定書に反映されるカードも変わります。</p>
+          </div>
+        </section>
 
         <div class="card" aria-label="安全に使うためのご案内">
           <p class="subtle">
