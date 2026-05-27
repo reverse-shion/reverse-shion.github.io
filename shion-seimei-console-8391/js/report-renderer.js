@@ -25,9 +25,9 @@ window.ShionReportRenderer = (() => {
   ];
 
   const DEFAULT_PRODUCTS = {
-    paidReport: { name: "この恋の現在地レポート", regularPrice: 4980, launchPrice: 2980, url: "#paid-report" },
-    premiumReading: { name: "相手の本音と今後の流れ タロット鑑定", price: 6800, url: "#premium-reading" },
-    deepReading: { name: "深掘り恋愛タロット鑑定書", price: 12800, url: "#deep-reading" }
+    paidReport: { name: "この恋の現在地レポート", regularPrice: 4980, launchPrice: 2980, url: "TODO_PAID_REPORT_BASE_URL", target: "まずは関係性を整理したい人" },
+    premiumReading: { name: "相手の本音と今後の流れ タロット鑑定", price: 6800, url: "TODO_PREMIUM_READING_BASE_URL", target: "相手の気持ちと今後を知りたい人" },
+    deepReading: { name: "深掘り恋愛タロット鑑定書", price: 12800, url: "TODO_DEEP_READING_BASE_URL", target: "複雑な恋・復縁・曖昧な関係を深く整理したい人" }
   };
 
   function escapeHtml(value) {
@@ -153,7 +153,7 @@ window.ShionReportRenderer = (() => {
         </div>
         <div class="progress" aria-label="現在地 ${progressLabel}%"><span style="width:${progressLabel}%"></span></div>
         <p class="subtle">現在地：人生100年地図の約${progressLabel}%</p>
-        <a class="cta" href="${escapeHtml(safeProducts.premiumReading.url)}">個人鑑定の案内を見る</a>
+        <a class="cta" href="#premium-reading">個人鑑定の案内を見る</a>
       </section>`;
   }
 
@@ -190,50 +190,83 @@ window.ShionReportRenderer = (() => {
         <div class="sales-block main-offer">
           <h3>もっと詳しく知りたい方へ</h3>
           <p>${escapeHtml(safeProducts.paidReport.name)}（通常${formatPrice(safeProducts.paidReport.regularPrice)}円→記念価格${formatPrice(safeProducts.paidReport.launchPrice)}円）</p>
-          <a class="cta" href="${escapeHtml(safeProducts.paidReport.url)}">この恋の現在地レポートを見る</a>
+          <a class="cta" href="#paid-report">この恋の現在地レポートを見る</a>
         </div>
         <div class="sales-block">
           <h3>相手の本音まで知りたい方へ</h3>
-          <a class="cta ghost" href="${escapeHtml(safeProducts.premiumReading.url)}">相手の本音と今後をタロットで見る</a>
+          <a class="cta ghost" href="#premium-reading">相手の本音と今後をタロットで見る</a>
         </div>
         <div class="sales-block">
-          <a class="cta ghost" href="${escapeHtml(safeProducts.deepReading.url)}">深掘り鑑定書を見る</a>
+          <a class="cta ghost" href="#deep-reading">深掘り鑑定書を見る</a>
         </div>
       </section>`;
   }
 
+
+
+  function isLiveUrl(url) {
+    const value = String(url ?? "").trim();
+    if (!value || /TODO/i.test(value)) return false;
+    return /^(https?:)?\/\//.test(value);
+  }
+
+  function buildBaseButton(url, label) {
+    if (!isLiveUrl(url)) {
+      return `<span class="base-cta is-disabled" aria-disabled="true">準備中</span>`;
+    }
+    return `<a class="base-cta" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+  }
+
   function renderOfferSections(products = DEFAULT_PRODUCTS) {
     const safeProducts = getSafeProducts(products);
-    const paidPrice = formatPrice(safeProducts.paidReport.launchPrice);
-    const premiumPrice = formatPrice(safeProducts.premiumReading.price);
-    const deepPrice = formatPrice(safeProducts.deepReading.price);
+    const paid = safeProducts.paidReport;
+    const premium = safeProducts.premiumReading;
+    const deep = safeProducts.deepReading;
 
     return `
       <section id="paid-report" class="card offer-card">
         <p class="eyebrow">PAID REPORT</p>
-        <h2>この恋の現在地レポート</h2>
-        <p>無料結果よりも、惹かれ合う理由・すれ違いの原因・今後の距離感を深く読み解く有料レポートです。</p>
-        <p><strong>記念価格 ${paidPrice}円</strong></p>
-        <p class="subtle">購入ページのURLを設定すると、この欄からそのまま申込み導線にできます。</p>
-        <a class="cta ghost" href="#result">無料結果へ戻る</a>
+        <h2>${escapeHtml(paid.name)}</h2>
+        <p class="offer-empathy">既読がつかないだけで、胸が苦しくなる。優しい日もあるのに、ふとした沈黙で不安になる。そんな恋を、ひとりで抱え続けなくて大丈夫です。</p>
+        <p class="price-line">通常 ${formatPrice(paid.regularPrice)}円 / 記念価格 <strong>${formatPrice(paid.launchPrice)}円</strong></p>
+        <p><strong>こんな方へ：</strong>${escapeHtml(paid.target || "まずは関係性を整理したい人")}</p>
+        <ul class="offer-list">
+          <li><strong>この鑑定で分かること：</strong>惹かれ合う理由、すれ違いの引き金、今の距離感に合う行動指針。</li>
+          <li><strong>納品形式：</strong>テキストレポート（BASE購入後に案内される方法で納品）。</li>
+          <li><strong>注意事項：</strong>医療・法律・投資などの専門判断の代替ではなく、未来を断定するものではありません。</li>
+        </ul>
+        ${buildBaseButton(paid.url, `${paid.name}をBASEで購入する`)}
+        <a class="back-link" href="#result">無料結果へ戻る</a>
       </section>
 
       <section id="premium-reading" class="card offer-card">
-        <p class="eyebrow">TAROT READING</p>
-        <h2>相手の本音と今後の流れ</h2>
-        <p>相手の気持ち、今後の展開、あなたが取るべき行動をタロットで個別に深掘りします。</p>
-        <p><strong>${premiumPrice}円</strong></p>
-        <p class="subtle">BASE・公式LINE・予約ページのURLが決まったら、main.js の PRODUCTS.premiumReading.url に設定してください。</p>
-        <a class="cta ghost" href="#result">無料結果へ戻る</a>
+        <p class="eyebrow">PREMIUM TAROT</p>
+        <h2>${escapeHtml(premium.name)}</h2>
+        <p class="offer-empathy">気持ちを確かめたいのに、聞くほど怖くなる。曖昧なまま待ち続ける夜に、心がすり減ってしまう。だからこそ、丁寧に本音の流れを読み解きます。</p>
+        <p class="price-line"><strong>${formatPrice(premium.price)}円</strong></p>
+        <p><strong>こんな方へ：</strong>${escapeHtml(premium.target || "相手の気持ちと今後を知りたい人")}</p>
+        <ul class="offer-list">
+          <li><strong>この鑑定で分かること：</strong>相手の本音、関係の流れ、今のあなたに必要な関わり方。</li>
+          <li><strong>納品形式：</strong>個別タロット鑑定文（BASEの商品ページの案内に沿って提供）。</li>
+          <li><strong>注意事項：</strong>相手の行動や未来を強制・断定するものではありません。心を整えるための指針としてご活用ください。</li>
+        </ul>
+        ${buildBaseButton(premium.url, `${premium.name}をBASEで購入する`)}
+        <a class="back-link" href="#result">無料結果へ戻る</a>
       </section>
 
       <section id="deep-reading" class="card offer-card">
         <p class="eyebrow">DEEP READING</p>
-        <h2>深掘り恋愛タロット鑑定書</h2>
-        <p>複雑な恋、復縁、曖昧な関係など、簡単には言葉にできない悩みを丁寧に読み解く鑑定書です。</p>
-        <p><strong>${deepPrice}円</strong></p>
-        <p class="subtle">ここも販売ページURLを設定すると、申込みボタンとして使えます。</p>
-        <a class="cta ghost" href="#result">無料結果へ戻る</a>
+        <h2>${escapeHtml(deep.name)}</h2>
+        <p class="offer-empathy">復縁したい気持ち、手放したくない気持ち、でも傷つきたくない気持ち。言葉にならない恋の迷いを、静かにほどくための深掘り鑑定です。</p>
+        <p class="price-line"><strong>${formatPrice(deep.price)}円</strong></p>
+        <p><strong>こんな方へ：</strong>${escapeHtml(deep.target || "複雑な恋・復縁・曖昧な関係を深く整理したい人")}</p>
+        <ul class="offer-list">
+          <li><strong>この鑑定で分かること：</strong>複雑な状況の背景、感情の絡まり、関係を整える現実的な一歩。</li>
+          <li><strong>納品形式：</strong>深掘り鑑定書（文章中心の読み物としてお届け）。</li>
+          <li><strong>注意事項：</strong>不安を煽る断定は行いません。あなたの意思と安心を大切に、選択肢を明確にするための鑑定です。</li>
+        </ul>
+        ${buildBaseButton(deep.url, `${deep.name}をBASEで購入する`)}
+        <a class="back-link" href="#result">無料結果へ戻る</a>
       </section>`;
   }
 
