@@ -1,224 +1,281 @@
-<section class="hero card" aria-labelledby="pageTitle">
-  <p class="eyebrow">SHION SEIMEI ORBIT TAROT</p>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-  <h1 id="pageTitle">
-    生年月日から、<br>
-    あなたの今の流れと今後3年の道しるべを読み解きます。
-  </h1>
+  <title>詩韻式 星命軌道タロット診断｜生年月日で読み解く星命と今後3年の流れ</title>
 
-  <p>
-    どうして今、同じことで悩んでしまうのか。
-    なぜ、前に進みたいのに迷いが消えないのか。
-    その理由は、あなたが今立っている“人生の章”に隠れているかもしれません。
-  </p>
+  <meta
+    name="description"
+    content="詩韻式 星命軌道タロット診断。生年月日から星命・人生章・年運・今後3年の流れを読み解き、今のあなたに必要な言葉を届けます。"
+  >
 
-  <p>
-    詩韻式 星命軌道タロット診断は、生年月日から
-    <strong>星命・人生章・年運・今後3年の流れ</strong>を重ねて読み解き、
-    今のあなたに必要な言葉を届ける診断です。
-  </p>
+  <meta name="theme-color" content="#081225">
+  <meta name="format-detection" content="telephone=no">
 
-  <div class="card" aria-label="この診断で分かること">
-    <h2>この診断で分かること</h2>
-    <ul>
-      <li><strong>星命：</strong>あなたが生まれ持つ心のテーマ</li>
-      <li><strong>人生章：</strong>今、人生のどんな場面に立っているか</li>
-      <li><strong>年運：</strong>今年流れ込みやすい運気の傾向</li>
-      <li><strong>今後3年：</strong>これから意識したい選択と流れ</li>
-      <li><strong>タロット：</strong>今の悩みに対する具体的なメッセージ</li>
-    </ul>
-  </div>
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/style.css?v=20260527-01">
 
-  <p class="subtle">
-    これは、未来を決めつけるための診断ではありません。
-    あなたがどこから来て、今どの流れの中にいて、
-    次に何を選べるのかを照らすための“星の地図”です。
-  </p>
+  <!-- JavaScript：読み込み順を崩さないこと -->
+  <script src="./js/utils.js?v=20260527-01" defer></script>
+  <script src="./js/validation.js?v=20260527-01" defer></script>
+  <script src="./js/tarot-data.js?v=20260527-01" defer></script>
+  <script src="./js/decan-map.js?v=20260527-01" defer></script>
+  <script src="./js/messages.js?v=20260527-01" defer></script>
+  <script src="./js/seimei-engine.js?v=20260527-01" defer></script>
+  <script src="./js/report-renderer.js?v=20260527-01" defer></script>
+  <script src="./js/main.js?v=20260527-01" defer></script>
+</head>
 
-  <a href="#form" class="cta" aria-label="診断フォームへ移動する">
-    今の星命軌道を見てみる
-  </a>
-</section>
+<body>
+  <main class="page">
+    <section class="hero card" aria-labelledby="pageTitle">
+      <p class="eyebrow">SHION SEIMEI ORBIT TAROT</p>
 
-<section id="form" class="card" aria-labelledby="formTitle">
-  <h2 id="formTitle">診断フォーム</h2>
+      <h1 id="pageTitle">
+        生年月日から、<br>
+        あなたの今の流れと今後3年の道しるべを読み解きます。
+      </h1>
 
-  <p class="subtle">
-    名前と生年月日を入力すると、あなたの星命軌道と今後3年の流れを自動で読み解きます。
-    入力内容はブラウザ上でのみ処理され、保存されません。
-  </p>
-
-  <form id="readingForm" autocomplete="off" novalidate>
-    <label for="name">
-      表示するお名前・ニックネーム <span aria-hidden="true">*</span>
-      <input
-        id="name"
-        name="name"
-        type="text"
-        required
-        maxlength="40"
-        placeholder="例：しおん"
-        aria-describedby="nameHelp"
-      >
-    </label>
-    <p id="nameHelp" class="subtle">
-      鑑定結果に表示する呼び名です。本名でなくても大丈夫です。
-    </p>
-
-    <label for="birthDate">
-      生年月日 <span aria-hidden="true">*</span>
-      <input
-        id="birthDate"
-        name="birthDate"
-        type="date"
-        required
-        aria-describedby="birthDateHelp"
-      >
-    </label>
-    <p id="birthDateHelp" class="subtle">
-      星命・人生章・年運を読み解くために使用します。
-    </p>
-
-    <label for="readingDate">
-      鑑定日 <span aria-hidden="true">*</span>
-      <input
-        id="readingDate"
-        name="readingDate"
-        type="date"
-        required
-        aria-describedby="readingDateHelp"
-      >
-    </label>
-    <p id="readingDateHelp" class="subtle">
-      通常は今日の日付で大丈夫です。年運や今後の流れを読む基準日になります。
-    </p>
-
-    <details class="card">
-      <summary>より詳しく見たい方はこちら</summary>
-
-      <label for="birthTime">
-        出生時間
-        <input
-          id="birthTime"
-          name="birthTime"
-          type="time"
-          aria-describedby="birthTimeHelp"
-        >
-      </label>
-      <p id="birthTimeHelp" class="subtle">
-        不明な場合は空欄で進められます。
+      <p>
+        どうして今、同じことで悩んでしまうのか。
+        なぜ、前に進みたいのに迷いが消えないのか。
+        その理由は、あなたが今立っている“人生の章”に隠れているかもしれません。
       </p>
 
-      <label for="birthPlace">
-        出生地
-        <input
-          id="birthPlace"
-          name="birthPlace"
-          type="text"
-          maxlength="60"
-          placeholder="例：愛知県"
-          aria-describedby="birthPlaceHelp"
-        >
-      </label>
-      <p id="birthPlaceHelp" class="subtle">
-        分かる範囲で入力してください。不明な場合は空欄でも大丈夫です。
+      <p>
+        詩韻式 星命軌道タロット診断は、生年月日から
+        <strong>星命・人生章・年運・今後3年の流れ</strong>を重ねて読み解き、
+        今のあなたに必要な言葉を届ける診断です。
       </p>
-    </details>
 
-    <label for="topic">
-      今いちばん見たいテーマ
-      <select id="topic" name="topic">
-        <option value="総合">総合</option>
-        <option value="恋愛">恋愛</option>
-        <option value="復縁">復縁</option>
-        <option value="片想い">片想い</option>
-        <option value="仕事">仕事</option>
-        <option value="金運">金運</option>
-        <option value="人間関係">人間関係</option>
-        <option value="今月の運勢">今月の運勢</option>
-        <option value="人生の節目">人生の節目</option>
-      </select>
-    </label>
+      <div class="card" aria-label="この診断で分かること">
+        <h2>この診断で分かること</h2>
+        <ul>
+          <li><strong>星命：</strong>あなたが生まれ持つ心のテーマ</li>
+          <li><strong>人生章：</strong>今、人生のどんな場面に立っているか</li>
+          <li><strong>年運：</strong>今年流れ込みやすい運気の傾向</li>
+          <li><strong>今後3年：</strong>これから意識したい選択と流れ</li>
+          <li><strong>タロット：</strong>今の悩みに対する具体的なメッセージ</li>
+        </ul>
+      </div>
 
-    <label for="memo">
-      悩みメモ
-      <textarea
-        id="memo"
-        name="memo"
-        rows="4"
-        maxlength="500"
-        placeholder="例：恋愛の流れを知りたい、仕事の方向性に迷っている、これから何を選べばいいか知りたい"
-        aria-describedby="memoHelp"
-      ></textarea>
-    </label>
-    <p id="memoHelp" class="subtle">
-      入力しなくても診断できます。個人名・住所・電話番号などは入れないでください。
-    </p>
-
-    <label for="spread">
-      タロットでどこまで深く見るか
-      <select id="spread" name="spread">
-        <option value="0">星命中心で見る</option>
-        <option value="1">今のメッセージを1枚で見る</option>
-        <option value="3">現在・課題・未来を3枚で見る</option>
-        <option value="5">流れを少し深く5枚で見る</option>
-        <option value="10">全体をしっかり10枚で見る</option>
-      </select>
-    </label>
-
-    <div class="card" aria-label="安全に使うためのご案内">
       <p class="subtle">
-        この診断では、本名・住所・電話番号などの個人情報は不要です。
-        入力は必要最小限にし、安心してご利用ください。
+        これは、未来を決めつけるための診断ではありません。
+        あなたがどこから来て、今どの流れの中にいて、
+        次に何を選べるのかを照らすための“星の地図”です。
       </p>
-    </div>
 
-    <div class="buttons" aria-label="診断とコピー操作">
-      <button type="submit">
-        診断する
-      </button>
+      <a href="#form" class="cta" aria-label="診断フォームへ移動する">
+        今の星命軌道を見てみる
+      </a>
+    </section>
 
-      <button type="button" id="copyFull">
-        鑑定書用に全文コピー
-      </button>
+    <section id="form" class="card" aria-labelledby="formTitle">
+      <h2 id="formTitle">診断フォーム</h2>
 
-      <button type="button" id="copyShort">
-        SNS用に短くコピー
-      </button>
+      <p class="subtle">
+        名前と生年月日を入力すると、あなたの星命軌道と今後3年の流れを自動で読み解きます。
+        入力内容はブラウザ上でのみ処理され、保存されません。
+      </p>
 
-      <button type="button" id="copyMsg">
-        鑑定文をコピー
-      </button>
-    </div>
+      <form id="readingForm" autocomplete="off" novalidate>
+        <label for="name">
+          表示するお名前・ニックネーム <span aria-hidden="true">*</span>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            maxlength="40"
+            placeholder="例：しおん"
+            aria-describedby="nameHelp"
+          >
+        </label>
+        <p id="nameHelp" class="subtle">
+          鑑定結果に表示する呼び名です。本名でなくても大丈夫です。
+        </p>
 
-    <p class="subtle">
-      ※コピー機能は、診断結果が表示された後に使用できます。
-    </p>
+        <label for="birthDate">
+          生年月日 <span aria-hidden="true">*</span>
+          <input
+            id="birthDate"
+            name="birthDate"
+            type="date"
+            required
+            aria-describedby="birthDateHelp"
+          >
+        </label>
+        <p id="birthDateHelp" class="subtle">
+          星命・人生章・年運を読み解くために使用します。
+        </p>
 
-    <p id="msg" class="msg" role="status" aria-live="polite"></p>
-  </form>
-</section>
+        <label for="readingDate">
+          鑑定日 <span aria-hidden="true">*</span>
+          <input
+            id="readingDate"
+            name="readingDate"
+            type="date"
+            required
+            aria-describedby="readingDateHelp"
+          >
+        </label>
+        <p id="readingDateHelp" class="subtle">
+          通常は今日の日付で大丈夫です。年運や今後の流れを読む基準日になります。
+        </p>
 
-<section
-  id="result"
-  aria-live="polite"
-  aria-label="診断結果"
-></section>
+        <details class="card">
+          <summary>より詳しく見たい方はこちら</summary>
 
-<section class="note card" aria-labelledby="noticeTitle">
-  <h2 id="noticeTitle">ご利用前の大切なご案内</h2>
+          <label for="birthTime">
+            出生時間
+            <input
+              id="birthTime"
+              name="birthTime"
+              type="time"
+              aria-describedby="birthTimeHelp"
+            >
+          </label>
+          <p id="birthTimeHelp" class="subtle">
+            不明な場合は空欄で進められます。
+          </p>
 
-  <p>
-    この診断は、占い・自己理解・内省を目的とした参考コンテンツです。
-    未来や結果を断定・保証するものではありません。
-  </p>
+          <label for="birthPlace">
+            出生地
+            <input
+              id="birthPlace"
+              name="birthPlace"
+              type="text"
+              maxlength="60"
+              placeholder="例：愛知県"
+              aria-describedby="birthPlaceHelp"
+            >
+          </label>
+          <p id="birthPlaceHelp" class="subtle">
+            分かる範囲で入力してください。不明な場合は空欄でも大丈夫です。
+          </p>
 
-  <p>
-    医療・法律・投資・合否・生死に関する判断は、必ず専門機関へご相談ください。
-  </p>
+          <label for="gender">
+            性別
+            <select id="gender" name="gender">
+              <option value="">未回答</option>
+              <option value="女性">女性</option>
+              <option value="男性">男性</option>
+              <option value="その他">その他</option>
+            </select>
+          </label>
+          <p class="subtle">
+            任意項目です。診断ロジックで使用しない場合は、後から非表示にしても大丈夫です。
+          </p>
+        </details>
 
-  <p>
-    入力内容はブラウザ上でのみ処理され、保存されません。
-    個人名・住所・電話番号など、不要な個人情報は入力しないでください。
-  </p>
-</section>
+        <label for="topic">
+          今いちばん見たいテーマ
+          <select id="topic" name="topic">
+            <option value="総合">総合</option>
+            <option value="恋愛">恋愛</option>
+            <option value="復縁">復縁</option>
+            <option value="片想い">片想い</option>
+            <option value="仕事">仕事</option>
+            <option value="金運">金運</option>
+            <option value="人間関係">人間関係</option>
+            <option value="今月の運勢">今月の運勢</option>
+            <option value="人生の節目">人生の節目</option>
+          </select>
+        </label>
+
+        <label for="memo">
+          悩みメモ
+          <textarea
+            id="memo"
+            name="memo"
+            rows="4"
+            maxlength="500"
+            placeholder="例：恋愛の流れを知りたい、仕事の方向性に迷っている、これから何を選べばいいか知りたい"
+            aria-describedby="memoHelp"
+          ></textarea>
+        </label>
+        <p id="memoHelp" class="subtle">
+          入力しなくても診断できます。個人名・住所・電話番号などは入れないでください。
+        </p>
+
+        <label for="spread">
+          タロットでどこまで深く見るか
+          <select id="spread" name="spread">
+            <option value="0">星命中心で見る</option>
+            <option value="1">今のメッセージを1枚で見る</option>
+            <option value="3">現在・課題・未来を3枚で見る</option>
+            <option value="5">流れを少し深く5枚で見る</option>
+            <option value="10">全体をしっかり10枚で見る</option>
+          </select>
+        </label>
+
+        <div class="card" aria-label="安全に使うためのご案内">
+          <p class="subtle">
+            この診断では、本名・住所・電話番号などの個人情報は不要です。
+            入力は必要最小限にし、安心してご利用ください。
+          </p>
+        </div>
+
+        <div class="buttons" aria-label="診断とコピー操作">
+          <button type="submit" id="submitReading">
+            診断する
+          </button>
+
+          <button type="button" id="copyFull">
+            鑑定書用に全文コピー
+          </button>
+
+          <button type="button" id="copyShort">
+            SNS用に短くコピー
+          </button>
+
+          <button type="button" id="copyMsg">
+            鑑定文をコピー
+          </button>
+        </div>
+
+        <p class="subtle">
+          ※コピー機能は、診断結果が表示された後に使用できます。
+        </p>
+
+        <p id="msg" class="msg" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section
+      id="result"
+      aria-live="polite"
+      aria-label="診断結果"
+    ></section>
+
+    <section class="note card" aria-labelledby="noticeTitle">
+      <h2 id="noticeTitle">ご利用前の大切なご案内</h2>
+
+      <p>
+        この診断は、占い・自己理解・内省を目的とした参考コンテンツです。
+        未来や結果を断定・保証するものではありません。
+      </p>
+
+      <p>
+        医療・法律・投資・合否・生死に関する判断は、必ず専門機関へご相談ください。
+      </p>
+
+      <p>
+        入力内容はブラウザ上でのみ処理され、保存されません。
+        個人名・住所・電話番号など、不要な個人情報は入力しないでください。
+      </p>
+    </section>
+
+    <noscript>
+      <section class="note card">
+        <h2>JavaScriptを有効にしてください</h2>
+        <p>
+          この診断はブラウザ上で計算を行うため、JavaScriptを有効にする必要があります。
+        </p>
+      </section>
+    </noscript>
+  </main>
+</body>
+</html>
