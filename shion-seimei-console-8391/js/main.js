@@ -11,17 +11,20 @@
       name: "この恋の現在地レポート",
       regularPrice: 4980,
       launchPrice: 2980,
-      url: "#paid-report"
+      url: "TODO_PAID_REPORT_BASE_URL",
+      target: "まずは関係性を整理したい人"
     },
     premiumReading: {
       name: "相手の本音と今後の流れ タロット鑑定",
       price: 6800,
-      url: "#premium-reading"
+      url: "TODO_PREMIUM_READING_BASE_URL",
+      target: "相手の気持ちと今後を知りたい人"
     },
     deepReading: {
       name: "深掘り恋愛タロット鑑定書",
       price: 12800,
-      url: "#deep-reading"
+      url: "TODO_DEEP_READING_BASE_URL",
+      target: "複雑な恋・復縁・曖昧な関係を深く整理したい人"
     }
   };
 
