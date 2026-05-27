@@ -3,47 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>詩韻式 星命未来鑑定</title>
-  <meta name="description" content="星命とタロットを重ね、今のあなたに必要な言葉を読み解く詩韻式鑑定体験ページ。">
+  <title>詩韻式 星命軌道タロット診断</title>
+  <meta name="description" content="生年月日から星命・人生章・年運とタロットを重ね、今いる場所と次の一歩を照らす詩韻式 星命軌道タロット診断。">
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-  <main class="page">
-    <section class="hero"><h1>詩韻式 星命未来鑑定</h1><p>星命とタロットを重ね、今のあなたに必要な言葉を読み解きます。</p></section>
-    <section class="intro"><p>ここから、あなたの星命を静かに開いていきます。運の良し悪しではなく、力の使い方と次の一歩を一緒に見ていきましょう。</p></section>
-    <section class="panel">
-      <h2>鑑定の準備</h2><p>まず、あなたの星命を開くために必要な情報を教えてください。詳しく書かなくても大丈夫です。</p>
-      <form id="readingForm" autocomplete="off">
-        <label>名前（任意）<input id="name" type="text" maxlength="40" placeholder="未入力なら ご相談者さま"></label>
-        <label>生年月日（必須）<input id="birthDate" type="date" required min="1900-01-01"></label>
-        <label>鑑定対象年<select id="targetYear"><option>2026</option><option>2027</option><option>2028</option></select></label>
-        <label>性別（任意）<select id="gender"><option value="">回答しない</option><option>男性</option><option>女性</option><option>その他</option></select></label>
-        <label>相談ジャンル<select id="topic" required><option value="">選択してください</option><option>総合</option><option>恋愛</option><option>仕事</option><option>金運</option><option>人間関係</option><option>今月の運勢</option></select></label>
-        <label>悩みメモ（任意）<textarea id="memo" rows="3"></textarea></label>
-        <label>タロット展開<select id="spread"><option value="1">1枚引き</option><option value="2">2枚引き</option><option value="3" selected>3枚引き</option><option value="4">4枚引き</option><option value="5">5枚引き</option></select></label>
-        <label>タロットカード<select id="tarot"><option value="">今回は星命を中心に見る</option></select></label>
-        <div class="buttons"><button type="submit">星命を開く</button><button type="button" id="demo">デモ入力</button><button type="button" id="reset">入力リセット</button><button type="button" id="copy">鑑定文をコピー</button></div>
-      </form>
+<main class="page">
+  <section class="hero card">
+    <p class="eyebrow">詩韻式 星命軌道タロット診断</p>
+    <h1>あなたが生まれた宇宙の場所に、<br>もう二度と戻ることはありません。</h1>
+    <p>けれど、それは失ったという意味ではなく、ここまで旅してきた証です。</p>
+    <p>詩韻式 星命軌道タロットは、生年月日からあなたの星命・人生章・今年の流れを読み解き、今いる場所から次へ進むための言葉を届けます。</p>
+    <p class="subtle">これは、未来を決めつける診断ではありません。あなたがどこから来て、今どの章に立ち、次に何を選べるのかを照らすための星の地図です。</p>
+    <a href="#form" class="cta">星命軌道を診断する</a>
+  </section>
+
+  <section id="form" class="card">
+    <h2>診断フォーム</h2>
+    <form id="readingForm" autocomplete="off">
+      <label>名前またはニックネーム*<input id="name" required maxlength="40"></label>
+      <label>生年月日*<input id="birthDate" type="date" required></label>
+      <label>鑑定日*<input id="readingDate" type="date" required></label>
+      <label>出生時間<input id="birthTime" type="time"></label>
+      <label>出生地<input id="birthPlace" maxlength="60"></label>
+      <label>性別<select id="gender"><option value="">未回答</option><option>女性</option><option>男性</option><option>その他</option></select></label>
+      <label>相談ジャンル<select id="topic"><option>総合</option><option>恋愛</option><option>復縁</option><option>片想い</option><option>仕事</option><option>金運</option><option>人間関係</option><option>今月の運勢</option><option>人生の節目</option></select></label>
+      <label>悩みメモ<textarea id="memo" rows="3"></textarea></label>
+      <p class="subtle">本名、住所、電話番号などの個人情報は入力しないでください。</p>
+      <label>タロット展開数<select id="spread"><option value="0">星命中心で見る</option><option value="1">1枚引き</option><option value="3">3枚引き</option><option value="5">5枚引き</option><option value="10">10枚引き</option></select></label>
+      <div class="buttons"><button type="submit">診断する</button><button type="button" id="copyFull">鑑定書用に全文コピー</button><button type="button" id="copyShort">SNS用に短くコピー</button><button type="button" id="copyMsg">鑑定文をコピー</button></div>
       <p id="msg" class="msg"></p>
-    </section>
-    <section id="result" class="result"></section>
-    <section class="note"><p>入力内容はブラウザ上の処理にのみ使用し、保存されません。個人名・住所・連絡先など、不要な個人情報は入力しないでください。</p><p>占いは未来を保証するものではなく、自分の心と向き合うための参考としてお楽しみください。</p></section>
-  </main>
-  <script src="./js/sanmei-data.js"></script>
-  <script src="./js/sanmei-engine.js"></script>
-  <script src="./js/tarot-78.js"></script>
-  <script src="./js/future-score.js"></script>
-  <script src="./js/zodiac-decan.js"></script>
-  <script src="./js/seimei-types.js"></script>
-  <script src="./data/category-themes.js"></script>
-  <script src="./data/monthly-themes.js"></script>
-  <script src="./data/years/2026.js"></script>
-  <script src="./data/years/2027.js"></script>
-  <script src="./data/years/2028.js"></script>
-  <script src="./js/tarot-data.js"></script>
-  <script src="./js/reading-engine.js"></script>
-  <script src="./js/text-composer.js"></script>
-  <script src="./js/ui-renderer.js"></script>
-  <script src="./js/main.js"></script>
-</body>
-</html>
+    </form>
+  </section>
+
+  <section id="result"></section>
+
+  <section class="note card"><p>この診断は、占い・自己理解・内省を目的とした参考コンテンツです。未来や結果を保証するものではありません。医療・法律・投資・合否・生死に関する判断は、専門機関へご相談ください。入力内容はブラウザ上でのみ処理され、保存されません。個人名・住所・電話番号など、不要な個人情報は入力しないでください。</p></section>
+</main>
+<script src="./js/utils.js"></script><script src="./js/validation.js"></script><script src="./js/tarot-data.js"></script><script src="./js/decan-map.js"></script><script src="./js/messages.js"></script><script src="./js/seimei-engine.js"></script><script src="./js/report-renderer.js"></script><script src="./js/main.js"></script>
+</body></html>
