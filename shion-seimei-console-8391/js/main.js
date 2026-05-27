@@ -1,3 +1,64 @@
-(()=>{const $=id=>document.getElementById(id),form=$('readingForm'),msg=$('msg'),result=$('result');$('readingDate').value=new Date().toISOString().slice(0,10);let state=null;
-form.addEventListener('submit',e=>{e.preventDefault();const input={name:$('name').value.trim(),birthDate:$('birthDate').value,readingDate:$('readingDate').value,topic:$('topic').value};const v=window.ShionValidation.validate(input);if(!v.ok){msg.textContent=v.message;return;}const r=window.ShionSeimeiEngine.build(input);const reading=window.ShionReportRenderer.render(result,input,r);state={input,r,reading};msg.textContent='診断を表示しました。';});
-const copy=async(type)=>{if(!state){msg.textContent='先に診断してください。';return;}const txt=window.ShionReportRenderer.buildCopy(state.input,state.r,state.reading,type==='short');await window.ShionUtils.copyText(txt);msg.textContent='コピーしました。';};$('copyFull').onclick=()=>copy('full');$('copyShort').onclick=()=>copy('short');$('copyMsg').onclick=async()=>{const t=document.getElementById('readingText');if(!t)return;await window.ShionUtils.copyText(t.textContent);msg.textContent='鑑定文をコピーしました。';};})();
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const COPY = {
+    heroTitle: "なぜ惹かれるのに、不安になるのか。",
+    heroSubtitle: "2人の星命から、この恋の現在地を読み解きます。"
+  };
+
+  const PRODUCTS = {
+    paidReport: { name: "この恋の現在地レポート", regularPrice: 4980, launchPrice: 2980, url: "#paid-report" },
+    premiumReading: { name: "相手の本音と今後の流れ タロット鑑定", price: 6800, url: "#premium-reading" },
+    deepReading: { name: "深掘り恋愛タロット鑑定書", price: 12800, url: "#deep-reading" }
+  };
+
+  const form = $("readingForm");
+  const msg = $("msg");
+  const result = $("result");
+  const modeInputs = Array.from(document.querySelectorAll('input[name="diagnosisType"]'));
+  const pairFields = $("pairFields");
+  const singleFields = $("singleFields");
+  const readingDate = $("readingDate");
+
+  const today = new Date().toISOString().slice(0, 10);
+  readingDate.value = today;
+
+  function getMode() {
+    return modeInputs.find((input) => input.checked)?.value || "pair";
+  }
+
+  function syncMode() {
+    const pair = getMode() === "pair";
+    pairFields.hidden = !pair;
+    singleFields.hidden = pair;
+  }
+
+  modeInputs.forEach((input) => input.addEventListener("change", syncMode));
+  syncMode();
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const mode = getMode();
+    const input = {
+      diagnosisType: mode,
+      readingDate: readingDate.value,
+      userName: $("userName").value.trim(),
+      userBirthDate: $("userBirthDate").value,
+      partnerName: $("partnerName").value.trim(),
+      partnerBirthDate: $("partnerBirthDate").value,
+      singleName: $("singleName").value.trim(),
+      singleBirthDate: $("singleBirthDate").value
+    };
+
+    const validation = window.ShionValidation.validate(input);
+    if (!validation.ok) {
+      msg.textContent = validation.message;
+      result.innerHTML = "";
+      return;
+    }
+
+    const reading = window.ShionReportRenderer.render(result, input, { COPY, PRODUCTS });
+    window.__shionState = { input, reading };
+    msg.textContent = "診断結果を表示しました。";
+  });
+})();
