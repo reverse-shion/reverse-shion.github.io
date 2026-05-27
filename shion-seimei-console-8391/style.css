@@ -67,10 +67,9 @@ body {
   font-family: var(--font-serif);
   color: var(--moon);
   background:
-    radial-gradient(circle at top left, rgba(90, 108, 164, 0.48) 0, transparent 34%),
-    radial-gradient(circle at top right, rgba(201, 184, 238, 0.17) 0, transparent 30%),
-    radial-gradient(circle at 50% 12%, rgba(200, 164, 93, 0.10) 0, transparent 34%),
-    linear-gradient(135deg, #0b1428 0%, var(--navy) 44%, var(--deep) 100%);
+    radial-gradient(circle at top left, rgba(185, 167, 255, 0.22), transparent 34%),
+    radial-gradient(circle at top right, rgba(216, 189, 122, 0.14), transparent 28%),
+    linear-gradient(180deg, #101b4d 0%, #07112f 55%, #06091c 100%);
   line-height: 1.8;
   letter-spacing: 0.01em;
 }
@@ -1321,4 +1320,48 @@ strong {
   margin: 0;
   line-height: 1.9;
   white-space: pre-wrap;
+}
+
+.result-card .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.result-card .kpi {
+  background: var(--card, rgba(255,255,255,0.075));
+  border: 1px solid var(--card-border, rgba(216,189,122,0.32));
+  border-radius: 14px;
+  padding: 12px;
+  line-height: 1.8;
+}
+.current-message {
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 12px;
+  padding: 14px;
+  white-space: pre-wrap;
+}
+.year-cards { margin-top: 12px; }
+.year-card {
+  display: block;
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(212, 183, 111, 0.35);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+.year-card-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.year-main { font-size:1.35rem; font-weight:700; }
+.year-age { font-size:0.95rem; color:rgba(255,255,255,0.75); }
+.arcana-pair { display:grid; grid-template-columns:1fr; gap:10px; margin:14px 0; }
+.arcana-badge { padding:10px 12px; border-radius:14px; background:rgba(255,255,255,0.08); }
+.reading-section { margin-top:14px; }
+.reading-section h4 { font-size:0.9rem; color:#d8bd7a; margin-bottom:6px; }
+.reading-section p { font-size:0.98rem; line-height:1.85; letter-spacing:0.02em; margin:0; }
+.lock p { margin: 0 0 10px; }
+@media (max-width: 390px) {
+  .shell { width: min(100%, 96vw); }
+  .result-card .grid { grid-template-columns: 1fr; }
+  .year-card { padding: 16px; }
 }
