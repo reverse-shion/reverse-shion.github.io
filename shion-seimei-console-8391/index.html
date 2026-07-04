@@ -63,10 +63,19 @@
         </fieldset>
         <div class="grid two">
           <label for="clientDesiredDate">希望日 任意<input id="clientDesiredDate" name="client_desired_date" type="date"></label>
-          <label for="symbolMatchLevel">象徴一致度（Re補助） 任意<select id="symbolMatchLevel" name="symbol_match_level"><option value="0">0：特に重なりなし</option><option value="1">1：少し重なる</option><option value="2">2：強く重なる</option><option value="3">3：強すぎる・特別視しやすい</option></select><span class="help-text">カード・希望日・相談内容の象徴がどれくらい重なっているか</span></label>
+          <div class="auto-symbol-match" aria-live="polite">
+            <span>象徴一致度（自動）</span>
+            <strong id="symbolMatchDisplay">0：特に重なりなし</strong>
+            <p id="symbolMatchReasons" class="help-text">カード・希望日・相談内容の重なりから、Re判定用に自動計算します。</p>
+          </div>
+          <input id="symbolMatchLevel" name="symbol_match_level" type="hidden" value="0">
         </div>
         <label for="clientWords">相談者の言葉 任意<textarea id="clientWords" name="client_words" rows="3" placeholder="例：どうしてもこの日に連絡したい気持ちがある"></textarea></label>
-        <label for="additionalCards">additional_cards 任意<textarea id="additionalCards" name="additional_cards" rows="2" placeholder="例：The Moon, Cups 7, Cups 2"></textarea></label>
+        <details class="advanced-options">
+          <summary>上級設定：補助カードを入力する</summary>
+          <label for="additionalCards">補助カード（任意・上級）<textarea id="additionalCards" name="additional_cards" rows="2" placeholder="例：The Moon, Cups 7, Cups 2 ※既に出ているカードがある場合のみ"></textarea></label>
+          <p class="help-text">追加でカードを引く必要はありません。既に別の展開で出ているカードがある場合だけ入力してください。</p>
+        </details>
         <label class="check" for="premiumMode"><input id="premiumMode" name="premium_mode" type="checkbox"> Re判定を使う（プレミアム検証）</label>
         <div class="actions"><button class="button primary" type="submit">星導日を計算する</button><button class="button ghost" type="reset">入力を整え直す</button></div>
         <p id="formStatus" class="status" aria-live="polite"></p>
