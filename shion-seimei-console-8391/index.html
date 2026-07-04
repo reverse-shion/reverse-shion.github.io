@@ -39,14 +39,27 @@
           <label for="theme">テーマ <span class="required">必須</span><select id="theme" name="theme" required></select></label>
         </div>
         <label for="decanCard">デカンカード <span class="required">必須</span><select id="decanCard" name="decan_card" required></select></label>
-        <fieldset>
+        <fieldset class="day-key-fieldset">
           <legend>日の鍵カード <span class="required">必須</span></legend>
-          <div class="grid two">
-            <label for="dayKeyCardType">種類<select id="dayKeyCardType" name="day_key_card_type" required></select></label>
-            <label for="dayKeyCardSuit">スート<select id="dayKeyCardSuit" name="day_key_card_suit" required></select></label>
-            <label for="dayKeyCardRank">ランク<select id="dayKeyCardRank" name="day_key_card_rank" required></select></label>
-            <label for="dayKeyCardNumber">Major番号 / 補助数値<input id="dayKeyCardNumber" name="day_key_card_number" type="number" min="0" max="21" value="7" required></label>
+          <div class="tab-list" role="tablist" aria-label="日の鍵カード種別">
+            <button class="tab-button active" type="button" role="tab" id="dayKeyMajorTab" aria-controls="dayKeyMajorPanel" aria-selected="true" data-day-key-tab="major">大アルカナ</button>
+            <button class="tab-button" type="button" role="tab" id="dayKeyMinorTab" aria-controls="dayKeyMinorPanel" aria-selected="false" data-day-key-tab="minor">小アルカナ</button>
           </div>
+          <div id="dayKeyMajorPanel" class="tab-panel" role="tabpanel" aria-labelledby="dayKeyMajorTab">
+            <label for="dayKeyMajorCard">大アルカナカード名<select id="dayKeyMajorCard"></select></label>
+            <p class="calculation-note">計算用番号：<strong id="majorNumberValue">17</strong></p>
+          </div>
+          <div id="dayKeyMinorPanel" class="tab-panel" role="tabpanel" aria-labelledby="dayKeyMinorTab" hidden>
+            <div class="grid two">
+              <label for="dayKeyMinorSuit">スート<select id="dayKeyMinorSuit"></select></label>
+              <label for="dayKeyMinorRank">ランク<select id="dayKeyMinorRank"></select></label>
+            </div>
+            <p class="help-text">小アルカナはランクから日付インデックスを自動計算します。Major番号 / 補助数値の入力は不要です。</p>
+          </div>
+          <input id="dayKeyCardType" name="day_key_card_type" type="hidden" required>
+          <input id="dayKeyCardSuit" name="day_key_card_suit" type="hidden" required>
+          <input id="dayKeyCardRank" name="day_key_card_rank" type="hidden" required>
+          <input id="dayKeyCardNumber" name="day_key_card_number" type="hidden">
         </fieldset>
         <div class="grid two">
           <label for="clientDesiredDate">希望日 任意<input id="clientDesiredDate" name="client_desired_date" type="date"></label>
