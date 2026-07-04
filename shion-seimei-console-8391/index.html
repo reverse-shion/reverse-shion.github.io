@@ -3,52 +3,70 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>この恋の現在地診断｜詩韻 -シオン-</title>
-  <meta name="description" content="無料でこの恋の現在地を確認。2人の星命カードと現在地カードから、惹かれる理由と距離感を読み解きます。">
-  <link rel="stylesheet" href="./css/style.css?v=20260527-06">
-  <script src="./js/validation.js?v=20260527-06" defer></script>
-  <script src="./js/report-renderer.js?v=20260527-06" defer></script>
-  <script src="./js/main.js?v=20260527-06" defer></script>
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="description" content="詩韻式 星導日リーディング。恋愛・復縁・連絡タイミングの内部テスト用鑑定補助コンソールです。">
+  <title>詩韻式 星導日リーディング</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <script src="./assets/js/seido-date.js" defer></script>
+  <script src="./assets/js/messages.js" defer></script>
+  <script src="./assets/js/copy.js" defer></script>
+  <script src="./assets/js/app.js" defer></script>
 </head>
 <body>
   <main class="page">
-    <section class="hero card">
-      <p class="eyebrow">SHION LOVE READING</p>
-      <h1>なぜ惹かれるのに、不安になるのか。</h1>
-      <p class="subtle">2人の星命から、この恋の現在地を読み解きます。</p>
-      <p>この恋の現在地診断は、あなたとお相手の星命カード・現在地カードを照らし合わせ、2人が惹かれ合う理由と、すれ違いやすい場所を読み解く恋愛診断です。</p>
-      <p>相性が良い・悪いを決めつけるものではありません。</p>
-      <a href="#form" class="cta">無料でこの恋の現在地を見る</a>
-      <a href="#premium-reading" class="cta ghost">相手の本音をタロットで見る</a>
+    <section class="hero" aria-labelledby="heroTitle">
+      <p class="badge">未告知・内部テスト用MVP</p>
+      <p class="eyebrow">詩韻式 星導日リーディング</p>
+      <h1 id="heroTitle">星が導く、恋が動く日。</h1>
+      <p class="lead">タロットと星の対応から、あなたが動きやすい日・整える日・慎重になる日を読み解きます。</p>
+      <p class="notice">このページは詩韻の内部テスト用コンソールです。鑑定補助と検証を目的としています。</p>
+      <a class="button primary" href="#readingForm">星導日を見てみる</a>
     </section>
 
-    <section id="form" class="card">
-      <h2>診断フォーム</h2>
-      <div class="mode-switch">
-        <label><input type="radio" name="diagnosisType" value="pair" checked> この恋の現在地診断</label>
-        <label><input type="radio" name="diagnosisType" value="single"> 星命現在地診断</label>
+    <section class="card intro">
+      <h2>この診断で見えること</h2>
+      <p>この診断は、未来を決めつけるものではありません。あなたが自分の本音を大切にしながら、いつ、どんな言葉で一歩を踏み出せるかを照らすためのものです。</p>
+      <div class="pill-grid" aria-label="出力内容">
+        <span>本命日</span><span>準備日</span><span>慎重日</span><span>おすすめ行動</span><span>避ける行動</span><span>言葉の温度感</span>
       </div>
-      <p class="subtle">初期設定は2人相性診断です。お相手の本名は不要です。ニックネームやイニシャルでも診断できます。住所・電話番号などの個人情報は入力しないでください。</p>
+    </section>
+
+    <section class="card" aria-labelledby="formTitle">
+      <h2 id="formTitle">星導日リーディング</h2>
       <form id="readingForm" novalidate>
-        <div id="pairFields">
-          <h3>あなた</h3>
-          <label>あなたの名前・ニックネーム<input id="userName" type="text" required></label>
-          <label>あなたの生年月日<input id="userBirthDate" type="date" required></label>
-          <h3>お相手</h3>
-          <label>お相手の呼び名・ニックネーム<input id="partnerName" type="text" required></label>
-          <label>お相手の生年月日<input id="partnerBirthDate" type="date" required></label>
+        <div class="grid two">
+          <label for="seasonYear">season_year <span class="required">必須</span><input id="seasonYear" name="season_year" type="number" min="1900" max="2100" value="2026" required></label>
+          <label for="theme">テーマ <span class="required">必須</span><select id="theme" name="theme" required></select></label>
         </div>
-        <div id="singleFields" hidden>
-          <label>名前・ニックネーム<input id="singleName" type="text"></label>
-          <label>生年月日<input id="singleBirthDate" type="date"></label>
+        <label for="decanCard">デカンカード <span class="required">必須</span><select id="decanCard" name="decan_card" required></select></label>
+        <fieldset>
+          <legend>日の鍵カード <span class="required">必須</span></legend>
+          <div class="grid two">
+            <label for="dayKeyCardType">種類<select id="dayKeyCardType" name="day_key_card_type" required></select></label>
+            <label for="dayKeyCardSuit">スート<select id="dayKeyCardSuit" name="day_key_card_suit" required></select></label>
+            <label for="dayKeyCardRank">ランク<select id="dayKeyCardRank" name="day_key_card_rank" required></select></label>
+            <label for="dayKeyCardNumber">Major番号 / 補助数値<input id="dayKeyCardNumber" name="day_key_card_number" type="number" min="0" max="21" value="7" required></label>
+          </div>
+        </fieldset>
+        <div class="grid two">
+          <label for="clientDesiredDate">希望日 任意<input id="clientDesiredDate" name="client_desired_date" type="date"></label>
+          <label for="symbolMatchLevel">symbol_match_level 任意<select id="symbolMatchLevel" name="symbol_match_level"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
         </div>
-        <label>診断日<input id="readingDate" type="date" required></label>
-        <button type="submit">無料でこの恋の現在地を見る</button>
-        <p id="msg" class="msg"></p>
+        <label for="clientWords">相談者の言葉 任意<textarea id="clientWords" name="client_words" rows="3" placeholder="例：どうしてもこの日に連絡したい気持ちがある"></textarea></label>
+        <label for="additionalCards">additional_cards 任意<textarea id="additionalCards" name="additional_cards" rows="2" placeholder="例：The Moon, Cups 7, Cups 2"></textarea></label>
+        <label class="check" for="premiumMode"><input id="premiumMode" name="premium_mode" type="checkbox"> Re判定を使う（プレミアム検証）</label>
+        <div class="actions"><button class="button primary" type="submit">星導日を計算する</button><button class="button ghost" type="reset">入力を整え直す</button></div>
+        <p id="formStatus" class="status" aria-live="polite"></p>
       </form>
     </section>
 
-    <section id="result" aria-live="polite"></section>
+    <section id="result" class="result" aria-live="polite"></section>
+
+    <section class="card disclaimer">
+      <h2>注意書き</h2>
+      <p>この診断は、占い・自己理解・内省を目的とした参考コンテンツです。未来や相手の行動を断定・保証するものではありません。医療・法律・投資・生死・合否に関する判断は専門機関へご相談ください。</p>
+      <p>入力内容は外部送信・保存しません。noindex / robots.txt はアクセス制限ではないため、本格的な秘匿運用では認証付き環境へ分離してください。</p>
+    </section>
   </main>
 </body>
 </html>
