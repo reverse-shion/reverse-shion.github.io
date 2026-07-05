@@ -27,7 +27,7 @@
       <h2>この診断で見えること</h2>
       <p>この診断は、未来を決めつけるものではありません。あなたが自分の本音を大切にしながら、いつ、どんな言葉で一歩を踏み出せるかを照らすためのものです。</p>
       <div class="pill-grid" aria-label="出力内容">
-        <span>本命日</span><span>準備日</span><span>慎重日</span><span>おすすめ行動</span><span>避ける行動</span><span>言葉の温度感</span>
+        <span>本命期間</span><span>本命日</span><span>準備日</span><span>慎重日</span><span>おすすめ行動</span><span>避ける行動</span><span>言葉の温度感</span>
       </div>
     </section>
 
@@ -38,9 +38,20 @@
           <label for="seasonYear">season_year <span class="required">必須</span><input id="seasonYear" name="season_year" type="number" min="1900" max="2100" value="2026" required></label>
           <label for="theme">テーマ <span class="required">必須</span><select id="theme" name="theme" required></select></label>
         </div>
-        <label for="decanCard">デカンカード <span class="required">必須</span><select id="decanCard" name="decan_card" required></select></label>
+        <fieldset class="day-key-fieldset">
+          <legend>期間カード（星座・デカン） <span class="required">必須</span></legend>
+          <p class="help-text">大アルカナは約1ヶ月の流れ、小アルカナは10日単位の具体的な流れとして読みます。</p>
+          <div class="tab-list" role="tablist" aria-label="期間カード種別">
+            <button class="tab-button" type="button" role="tab" aria-selected="false" data-period-tab="major">大アルカナ</button>
+            <button class="tab-button active" type="button" role="tab" aria-selected="true" data-period-tab="minor">小アルカナ</button>
+          </div>
+          <div id="periodMajorPanel" class="tab-panel" role="tabpanel" hidden><label for="periodMajorCard">大アルカナカード名<select id="periodMajorCard"></select></label></div>
+          <div id="periodMinorPanel" class="tab-panel" role="tabpanel"><label for="periodMinorCard">小アルカナ（デカン）<select id="periodMinorCard"></select></label></div>
+          <input id="decanCard" name="decan_card" type="hidden" required>
+        </fieldset>
         <fieldset class="day-key-fieldset">
           <legend>日の鍵カード <span class="required">必須</span></legend>
+          <p class="help-text">期間カードと重なる場合は、本命期間を絞り込みます。日付対応がないカードは、行動テーマや言葉の温度感として読みます。</p>
           <div class="tab-list" role="tablist" aria-label="日の鍵カード種別">
             <button class="tab-button active" type="button" role="tab" id="dayKeyMajorTab" aria-controls="dayKeyMajorPanel" aria-selected="true" data-day-key-tab="major">大アルカナ</button>
             <button class="tab-button" type="button" role="tab" id="dayKeyMinorTab" aria-controls="dayKeyMinorPanel" aria-selected="false" data-day-key-tab="minor">小アルカナ</button>
@@ -76,7 +87,6 @@
           <label for="additionalCards">補助カード（任意・上級）<textarea id="additionalCards" name="additional_cards" rows="2" placeholder="例：The Moon, Cups 7, Cups 2 ※既に出ているカードがある場合のみ"></textarea></label>
           <p class="help-text">追加でカードを引く必要はありません。既に別の展開で出ているカードがある場合だけ入力してください。</p>
         </details>
-        <label class="check" for="premiumMode"><input id="premiumMode" name="premium_mode" type="checkbox"> Re判定を使う（プレミアム検証）</label>
         <div class="actions"><button class="button primary" type="submit">星導日を計算する</button><button class="button ghost" type="reset">入力を整え直す</button></div>
         <p id="formStatus" class="status" aria-live="polite"></p>
       </form>
