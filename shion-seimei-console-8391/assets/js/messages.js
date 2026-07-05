@@ -20,5 +20,22 @@ function getMeaning(i){const tone=getSuitTone(i.day_key_card_suit,i.major_theme,
 function buildRecommended(i,themeBase){const adj=reAdjustment(i);return `${themeBase.purpose}を土台にしながら、${getCourtAction(i.court_ruler,i.theme,getReLevel(i))}${adj?' '+adj.rec:''}`;}
 function buildAvoid(i,themeBase){const adj=reAdjustment(i);return `${themeBase.avoid}に気をつけながら、${getMajorAvoidance(i.major_theme,i.theme,getReLevel(i))} ${adj?adj.avoid:'言葉を整えてから動くと安心です。'}`;}
 function buildTone(i,themeBase){return getSuitTone(i.day_key_card_suit,i.major_theme,i.theme,messageReLevel(i)).words.map(w=>'「'+w+'」').join(' / ');}
-function generateCustomerMessage(result){const i=result.internal,themeBase=THEME_BASE[i.theme]||THEME_BASE.general; const re=reMessage(i); const meaning=getMeaning(i); const recommended=buildRecommended(i,themeBase); const avoid=buildAvoid(i,themeBase); const tone=buildTone(i,themeBase); const full=`星が導く本命日は、${jpDate(i.primary_date)}です。${re}\n\nこの日は、${meaning}\n\n準備日は${jpDate(i.preparation_date)}です。この日に伝えたいことを一度整理しておくと、本命日に落ち着いて動けます。\n\n慎重日は${jpDate(i.caution_date)}です。この日は相手の反応を急がず、追いLINEや強い確認を控えることが大切です。\n\nおすすめ行動：${recommended}\n避ける行動：${avoid}\n言葉の温度感：${tone}\n\n結果を急がず、未来を決めつけず、今できる一歩だけを選んでください。`; return{full,meaning,recommended,avoid,tone,short:`本命日：${jpDate(i.primary_date)}。準備日：${jpDate(i.preparation_date)}。慎重日：${jpDate(i.caution_date)}。${courtStyle(i.court_ruler)}流れで、言葉は${getSuitTone(i.day_key_card_suit,i.major_theme,i.theme,messageReLevel(i)).desc}を大切に。`};}
+function generateCustomerMessage(result){const i=result.internal,themeBase=THEME_BASE[i.theme]||THEME_BASE.general; const primaryWindow=i.primary_window_start&&i.primary_window_end?`${jpDate(i.primary_window_start)}〜${jpDate(i.primary_window_end)}`:'象徴を中心に読む流れ'; const primary=i.primary_date?`${jpDate(i.primary_date)}前後`:'日付を固定しない'; const reason=(i.explanation_reasons||[]).join(' '); const desired={inside_primary:'希望日はカードが示す本命期間内に入っているため、今回はその日を動きやすい候補日として採用します。',inside_secondary:'希望日は第一候補期間からは離れていますが、もう一方のカードが示す期間とは重なっています。',outside_all:'希望日は大切な気持ちとして受け止めます。ただ、カード上では本命期間の方が自然に動きやすい流れです。',fixation_risk:'この日だけに意味を固定しすぎず、前後の流れも含めて見ていきましょう。',none:''}[i.desired_date_status]||''; const recommended=buildRecommended(i,themeBase); const avoid=buildAvoid(i,themeBase); const tone=buildTone(i,themeBase); const prep=i.preparation_date?jpDate(i.preparation_date):'本命期間の前に整える時間'; const caution=i.caution_date?jpDate(i.caution_date):'本命期間の後に見つめる時間'; const full=`恋が動きやすい本命期間は、${primaryWindow}です。
+
+その中でも動きやすい本命日は、${primary}として読みます。相手を必ず動かす日ではなく、あなたが言葉を整えて一歩動きやすい候補日です。
+
+気持ちを整える準備日は${prep}です。伝えたいことを一度整理しておくと、本命期間に落ち着いて動きやすくなります。
+
+焦らず見つめる慎重日は${caution}です。相手の反応を急がず、追いLINEや強い確認を控える意識が安心です。
+
+なぜこの期間？
+${reason}${desired?`
+${desired}`:''}
+${i.confidence_label}
+
+おすすめ行動：${recommended}
+避ける行動：${avoid}
+言葉の温度感：${tone}
+
+結果を急がず、未来を決めつけず、今できる一歩だけを選んでください。`; return{full,meaning:reason,recommended,avoid,tone,reason,short:`本命期間：${primaryWindow}。本命日：${primary}。準備日：${prep}。慎重日：${caution}。`};}
 return{THEMES,ACTIONS,MAJOR,COURT,MAJOR_AVOIDANCE,SUIT_TONE,getCourtRank,getCourtAction,getMajorAvoidance,getSuitTone,getMeaning,buildRecommended,buildAvoid,buildTone,generateCustomerMessage,jpDate};});
