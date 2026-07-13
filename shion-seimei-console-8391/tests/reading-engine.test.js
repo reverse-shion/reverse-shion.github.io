@@ -1,11 +1,11 @@
 const assert = require('assert');
 const sanmeiData = require('../js/sanmei-data.js');
 globalThis.ShionSanmeiData = sanmeiData;
-globalThis.ShionSanmeiEngine = require('../js/sanmei-engine.js');
+globalThis.ShionSanmeiEngine = require('../js/legacy/sanmei-engine.js');
 globalThis.ShionTarot78 = require('../js/tarot-78.js');
-globalThis.ShionFutureScore = require('../js/future-score.js');
+globalThis.ShionFutureScore = require('../js/legacy/future-score.js');
 globalThis.ShionZodiacDecan = require('../js/zodiac-decan.js');
-const readingEngine = require('../js/reading-engine.js');
+const readingEngine = require('../js/legacy/reading-engine.js');
 
 function build(input) {
   return globalThis.ShionReadingEngine.build(input);

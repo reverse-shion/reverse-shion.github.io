@@ -11,7 +11,10 @@ function buildDateRange(startMd,endMd,seasonYear){const startSeasonMonth=startMd
 function buildRangeNear(startMd,endMd,seasonYear,desired){if(!desired) return buildDateRange(startMd,endMd,seasonYear); const y=parse(desired).y; const candidates=[y-1,y,y+1].map(season=>buildDateRange(startMd,endMd,season)); const containing=candidates.find(r=>contains(r,desired)); if(containing) return containing; return buildDateRange(startMd,endMd,seasonYear);}
 function contains(r,d){return parse(d).t>=parse(r.start).t&&parse(d).t<=parse(r.end).t} function overlap(a,b){const s=parse(a.start).t>parse(b.start).t?a.start:b.start; const e=parse(a.end).t<parse(b.end).t?a.end:b.end; return parse(s).t<=parse(e).t?{start:s,end:e}:null;}
 function clipDate(value,start,end){const v=parse(value).t,s=parse(start).t,e=parse(end).t; return fmt({t:Math.min(Math.max(v,s),e)});} function normalizeTo1to10(n){const x=Number(n); if(!Number.isFinite(x)) return 1; if(x===0) return 10; return ((Math.abs(Math.trunc(x))-1)%10)+1;}
-function getDayIndex(card){const r=card.rank; if(card.type==='major') return normalizeTo1to10(card.number); if(r==='Ace') return 1; if(['Page','Knight','Queen','King'].includes(r)) return {Page:2,Knight:4,Queen:7,King:10}[r]; return normalizeTo1to10(r);} function getSuitShift(){return 0;}
+function getDayIndex(card){const r=card.rank; if(card.type==='major') return normalizeTo1to10(card.number); if(r==='Ace') return 1; if(['Page','Knight','Queen','King'].includes(r)) return {Page:2,Knight:4,Queen:7,King:10}[r]; return normalizeTo1to10(r);}
+// SuitShift is a reserved extension point. The current MVP intentionally fixes it at 0
+// and does not use suit-based correction for date calculation.
+function getSuitShift(){return 0;}
 function calculatePreparationDate(primary,start){return clipDate(addDays(primary,-2),addDays(start,-1),primary)} function calculateCautionDate(primary,start,end){return clipDate(addDays(primary,1),primary,addDays(end,1))}
 function cardSuit(text){return (String(text||'').match(/Wands|Cups|Swords|Pentacles/)||[])[0]||'';} function cardRank(text){return (String(text||'').match(/Ace|Page|Knight|Queen|King|\b(?:10|[2-9])\b/)||[])[0]||'';}
 function dayCardName(input){return input.day_key_card_type==='major'?MAJOR_NAMES[Number(input.day_key_card_number)]||'Unknown Major':`${input.day_key_card_suit} ${input.day_key_card_rank}`;}

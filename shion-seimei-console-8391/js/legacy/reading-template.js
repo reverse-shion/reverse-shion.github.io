@@ -5,7 +5,7 @@
 
   if (typeof require === 'function' && (!tarot || typeof module !== 'undefined')) {
     try {
-      tarot = require('./tarot-mapping.js');
+      tarot = require('../tarot-mapping.js');
     } catch (error) {
       tarot = null;
     }
@@ -13,7 +13,7 @@
 
   if (typeof require === 'function' && (!tarot78 || typeof module !== 'undefined')) {
     try {
-      tarot78 = require('./tarot-78.js');
+      tarot78 = require('../tarot-78.js');
     } catch (error) {
       tarot78 = null;
     }

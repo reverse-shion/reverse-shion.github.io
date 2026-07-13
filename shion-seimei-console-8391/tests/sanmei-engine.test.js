@@ -3,9 +3,17 @@ const data = require('../js/sanmei-data.js');
 globalThis.ShionSanmeiData = data;
 const tarot = require('../js/tarot-mapping.js');
 globalThis.ShionTarotMapping = tarot;
-const engine = require('../js/sanmei-engine.js');
-const validation = require('../js/validation.js');
-const reading = require('../js/reading-template.js');
+const engine = require('../js/legacy/sanmei-engine.js');
+const validation = {
+  validateBirthDate(value) {
+    if (!value) return ['生年月日を入力してください'];
+    const date = new Date(`${value}T00:00:00Z`);
+    if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return ['不正な日付です'];
+    if (value > new Date().toISOString().slice(0, 10)) return ['未来の日付は使えません'];
+    return [];
+  }
+};
+const reading = require('../js/legacy/reading-template.js');
 
 function test(name, fn) {
   try { fn(); console.log(`✓ ${name}`); } catch (error) { console.error(`✗ ${name}`); throw error; }
