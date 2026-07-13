@@ -2,7 +2,7 @@
   let data = root.ShionSanmeiData;
 
   if (typeof require === 'function' && (!data || typeof module !== 'undefined')) {
-    data = require('./sanmei-data.js');
+    data = require('../sanmei-data.js');
   }
 
   const api = factory(data || {});

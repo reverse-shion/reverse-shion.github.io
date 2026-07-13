@@ -1,10 +1,10 @@
 const assert = require('assert');
 const data = require('../js/sanmei-data.js');
 globalThis.ShionSanmeiData = data;
-const engine = require('../js/sanmei-engine.js');
+const engine = require('../js/legacy/sanmei-engine.js');
 const tarot78 = require('../js/tarot-78.js');
 globalThis.ShionTarot78 = tarot78;
-const future = require('../js/future-score.js');
+const future = require('../js/legacy/future-score.js');
 
 function test(name, fn) {
   try { fn(); console.log(`✓ ${name}`); } catch (error) { console.error(`✗ ${name}`); throw error; }
