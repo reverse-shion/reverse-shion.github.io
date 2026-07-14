@@ -150,6 +150,9 @@ Re判定は日付を変更するための機能ではなく、その日の使い
 - `SuitShift` は引き続き `getSuitShift()` により0固定です。
 - Re判定、年またぎ、Anthony Lewisデカン表の内容は変更しません。
 - 日付計算結果と内部JSONの主要値は `tests/seido-date.test.js` のゴールデンテストで保護します。
+- Phase 1完了監査として、`tests/pr86-seido-compat.test.js` でPR #86前後の `calculateSeidoTiming()` 戻り値全体と `internal` 全体の一致を固定します。
+- `tests/seido-date-regression.test.js` と `tests/fixtures/seido-date-regression.json` で現在の日付計算戻り値全体を正本として固定します。
+- `tests/messages-regression.test.js` と `tests/fixtures/messages-regression.json` で現在の顧客向け文章を正本として固定します。
 - `messages.js` は現時点ではデータ定数と文章生成処理を同一ファイルに残し、表示文の変更リスクを避けます。
 
 ## 注意書き
