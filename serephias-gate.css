@@ -40,6 +40,11 @@ body.gate-active {
   overflow: hidden;
 }
 
+body.gate-shortcut-transition {
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+
 /* ===========================
    2. ヘッダー & フッター
 =========================== */
@@ -115,7 +120,7 @@ body.gate-active {
   min-height: 100vh;
 
   width: 100%;
-  max-width: 640px;
+  max-width: 960px;
 
   display: flex;
   flex-direction: column;
@@ -125,17 +130,15 @@ body.gate-active {
   overflow: hidden;
 }
 
-.gate-inner {
-  text-align: center;
-}
+.gate-inner {}
 
 .gate-heading {
-  font-size: 1.18rem;
+  font-size: 1.22rem;
   letter-spacing: 0.28em;
   margin-bottom: 6px;
 }
 .gate-lead {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   line-height: 1.9;
   color: rgba(245, 235, 225, 0.9);
   margin-bottom: 18px;
@@ -146,31 +149,144 @@ button, a {
   outline: none;
 }
 
-/* 《祈りを捧げる》ボタン */
-.gate-pray-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 10px 20px;
-  background: radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
-  color: #25130c;
-  font-family: inherit;
-  font-size: 0.9rem;
-  display: inline-flex;
+.gate-layout {
+  display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 22px;
+}
+
+.gate-text-block {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  order: 1;
+}
+
+.gate-lumiere {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: min(420px, 80vw);
+  order: 2;
+  opacity: 0.92;
+  animation: lumiereFloat 8s ease-in-out infinite;
+}
+
+.gate-lumiere img {
+  width: 100%;
+  max-width: 420px;
+  filter: drop-shadow(0 10px 24px rgba(120, 90, 200, 0.6));
+}
+
+.gate-lumiere::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  width: 64%;
+  height: 18px;
+  background: radial-gradient(circle, rgba(210, 195, 255, 0.6), rgba(80, 60, 130, 0.0));
+  filter: blur(10px);
+  opacity: 0.9;
+}
+
+.gate-lumiere-glow {
+  position: absolute;
+  inset: 6% 8%;
+  background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.22), rgba(120, 100, 200, 0.08), rgba(10, 6, 20, 0.0));
+  filter: blur(14px);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.gate-action-block {
+  width: 100%;
+  max-width: 560px;
+  order: 3;
+  text-align: center;
+}
+
+@keyframes lumiereFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (min-width: 600px) {
+  .gate-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-areas:
+      "text lum"
+      "actions lum";
+    align-items: start;
+    gap: 24px;
+  }
+  .gate-text-block {
+    max-width: 520px;
+    text-align: left;
+    grid-area: text;
+  }
+  .gate-lumiere {
+    grid-area: lum;
+    align-self: stretch;
+  }
+  .gate-action-block {
+    grid-area: actions;
+    max-width: 520px;
+    text-align: left;
+  }
+}
+
+.gate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 10px 0 2px;
+  align-items: stretch;
+}
+
+@media (min-width: 600px) {
+  .gate-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* 《祈りを捧げる》ボタン */
+.gate-pray-btn,
+.gate-shortcut-btn {
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 2px;
   cursor: pointer;
-  box-shadow:
-    0 0 20px rgba(255, 215, 122, 0.9),
-    0 0 34px rgba(0, 0, 0, 0.95);
   transition:
     transform 0.12s ease-out,
     box-shadow 0.12s ease-out,
     filter 0.12s ease-out,
-    opacity 0.2s ease-out;
+    opacity 0.2s ease-out,
+    background 0.2s ease-out,
+    border-color 0.2s ease-out;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  text-align: left;
 }
+
+.gate-pray-btn {
+  border: none;
+  background: radial-gradient(circle at 50% 0%, #fff5d6 0, #ffd77a 38%, #c08833 100%);
+  color: #25130c;
+  box-shadow:
+    0 0 20px rgba(255, 215, 122, 0.9),
+    0 0 34px rgba(0, 0, 0, 0.95);
+}
+
 .gate-pray-btn::after {
   content: "";
   position: absolute;
@@ -203,6 +319,51 @@ button, a {
 .gate-pray-btn.is-disabled {
   opacity: 0.75;
   cursor: default;
+}
+
+/* ショートカットボタン */
+.gate-shortcut-btn {
+  border: 1px solid rgba(160, 150, 255, 0.6);
+  background: linear-gradient(120deg, rgba(120, 110, 200, 0.12), rgba(90, 120, 210, 0.18));
+  color: #e7e5ff;
+  box-shadow:
+    inset 0 0 10px rgba(120, 120, 200, 0.2),
+    0 10px 24px rgba(0, 0, 0, 0.4);
+  display: none;
+}
+
+body.is-return-visit .gate-shortcut-btn {
+  display: inline-flex;
+}
+
+.gate-shortcut-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 100% 50%, rgba(255, 255, 255, 0.08), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.gate-shortcut-main {
+  letter-spacing: 0.12em;
+}
+
+.gate-shortcut-sub {
+  font-size: 0.78rem;
+  color: rgba(220, 215, 255, 0.9);
+}
+
+.gate-shortcut-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(190, 185, 255, 0.9);
+  box-shadow:
+    inset 0 0 12px rgba(140, 150, 240, 0.25),
+    0 12px 28px rgba(0, 0, 0, 0.5);
+}
+
+.gate-shortcut-btn:hover::after {
+  opacity: 1;
 }
 
 .gate-audio-note {
@@ -535,6 +696,60 @@ button, a {
     0 0 6px rgba(0, 0, 0, 0.9),
     0 0 14px rgba(0, 0, 0, 0.8);
   z-index: 10;
+}
+
+.awaken-comment-list {
+  width: min(520px, 90vw);
+  min-height: 88px;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(12, 18, 46, 0.75), rgba(8, 12, 30, 0.72));
+  border: 1px solid rgba(170, 200, 255, 0.18);
+  box-shadow:
+    inset 0 0 16px rgba(100, 140, 240, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+
+.awaken-comment-list::before {
+  content: "";
+  position: absolute;
+  inset: 8% 10%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+  filter: blur(18px);
+  opacity: 0.6;
+}
+
+.awaken-comment-item {
+  position: relative;
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: #f1e8d8;
+  text-shadow: 0 0 12px rgba(255, 230, 170, 0.65);
+  margin: 4px 0;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: awakenFadeUp 0.9s ease forwards;
+  z-index: 1;
+}
+
+.awaken-comment-item.leaving {
+  animation: awakenFadeOut 0.8s ease forwards;
+}
+
+@keyframes awakenFadeUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  40% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes awakenFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-6px); }
 }
 
 /* キャプション */

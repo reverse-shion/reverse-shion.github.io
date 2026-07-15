@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const body           = document.body;
 
   const prayBtn        = document.getElementById('gatePrayButton');
+  const shortcutBtn    = document.getElementById('gateShortcutButton');
   const audioNote      = document.getElementById('gateAudioNote');
   const poemBox        = document.getElementById('serephiasPoem');
   const poemBody       = document.getElementById('serephiasPoemBody');
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const particlesLayer = document.getElementById('awakenParticles');
   const lightColumn    = document.getElementById('lightColumn');
   const gateBtn        = document.getElementById('awakeningGateButton');
+  const commentList    = document.getElementById('awakenCommentList');
 
   const bgm            = document.getElementById('gateBgm');
 
@@ -22,6 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 転送先URL
   const NEXT_URL = 'https://reverse-shion.github.io/serephias-chamber.html';
+
+  const awakenComments = [
+    'あなたの祈りは、まだ言葉にならない光として震えている。',
+    'このゲートは、忘れられた願いをひとつずつ星へと還す。',
+    '迷いも痛みも、そのまま抱いたまま進んでよい。',
+    'ここから先は、あなたの選んだ「一歩」が物語を書く。'
+  ];
+
+  let commentTimer = null;
+  let commentIndex = 0;
+  let commentFlowStarted = false;
 
    // ===============================
   // 0. イントロ動画制御（クロムは即スキップ）
@@ -60,6 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(skipIntro, 15000);
     }
   }
+  // =========================
+  // 0-2. 訪問フラグ
+  // =========================
+  const visitedFlag = localStorage.getItem('serephiasAwakenVisited');
+  if (visitedFlag === '1') {
+    body.classList.add('is-return-visit');
+  } else {
+    body.classList.add('is-first-visit');
+  }
+
   // =========================
   // 1. 星粒子を生成
   // =========================
@@ -171,6 +194,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function spawnAwakenComment() {
+    if (!commentList || awakenComments.length === 0) return;
+    const text = awakenComments[commentIndex % awakenComments.length];
+    commentIndex++;
+
+    const item = document.createElement('div');
+    item.className = 'awaken-comment-item';
+    item.textContent = text;
+    commentList.appendChild(item);
+
+    const items = commentList.querySelectorAll('.awaken-comment-item');
+    if (items.length > 3) {
+      const first = items[0];
+      first.classList.add('leaving');
+      setTimeout(() => first.remove(), 700);
+    }
+  }
+
+  function startAwakenCommentFlow() {
+    if (commentFlowStarted || !commentList) return;
+    commentFlowStarted = true;
+    spawnAwakenComment();
+    commentTimer = setInterval(spawnAwakenComment, 2600);
+  }
+
   // =========================
   // 3. BGM フェードイン
   // =========================
@@ -224,41 +272,54 @@ document.addEventListener('DOMContentLoaded', () => {
         if (overlay) {
           overlay.classList.add('active');
           body.classList.add('gate-active');
+          startAwakenCommentFlow();
         }
       }, 800);
     });
   }
 
-// =========================
-// 5. 覚醒ゲートタップ（即プチュン→暗闇）
-// =========================
-if (gateBtn && overlay) {
-  gateBtn.addEventListener('click', () => {
-    if (gateOpened) return;
-    gateOpened = true;
+  if (shortcutBtn) {
+    shortcutBtn.addEventListener('click', () => {
+      if (body.classList.contains('gate-shortcut-transition')) return;
+      body.classList.add('gate-shortcut-transition');
+      setTimeout(() => {
+        window.location.href = NEXT_URL;
+      }, 350);
+    });
+  }
 
-    // BGM停止
-    if (bgm) {
-      bgm.pause();
-      bgm.currentTime = 0;
-    }
+  // =========================
+  // 5. 覚醒ゲートタップ（即プチュン→暗闇）
+  // =========================
+  if (gateBtn && overlay) {
+    gateBtn.addEventListener('click', () => {
+      if (gateOpened) return;
+      gateOpened = true;
 
-    // 触れた瞬間の“反応”だけ（軽いタップ感）
-    gateBtn.classList.add('tapped');
+      localStorage.setItem('serephiasAwakenVisited', '1');
 
-    // ★ 即プチュン開始
-    overlay.classList.add('is-flash');
+      // BGM停止
+      if (bgm) {
+        bgm.pause();
+        bgm.currentTime = 0;
+      }
 
-    // ★ プチュン途中で画面全要素を消す（0.15s）
-    setTimeout(() => {
-      overlay.classList.add('to-void');
-    }, 150);
+      // 触れた瞬間の“反応”だけ（軽いタップ感）
+      gateBtn.classList.add('tapped');
 
-    // ★ 真っ黒のまま次ページへ（0.55s）
-    setTimeout(() => {
-      document.body.classList.remove('gate-active');
-      window.location.href = NEXT_URL;
-    }, 550);
-  });
-}
+      // ★ 即プチュン開始
+      overlay.classList.add('is-flash');
+
+      // ★ プチュン途中で画面全要素を消す（0.15s）
+      setTimeout(() => {
+        overlay.classList.add('to-void');
+      }, 150);
+
+      // ★ 真っ黒のまま次ページへ（0.55s）
+      setTimeout(() => {
+        document.body.classList.remove('gate-active');
+        window.location.href = NEXT_URL;
+      }, 550);
+    });
+  }
 });
