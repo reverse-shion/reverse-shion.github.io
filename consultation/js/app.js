@@ -1,8 +1,6 @@
 const elements = {
   year: document.getElementById("year"),
   stardust: document.querySelector(".stardust"),
-  stickyCta: document.getElementById("stickyCta"),
-  finalCta: document.querySelector(".final-cta"),
   copyTemplateBtn: document.getElementById("copyTemplateBtn"),
   templateText: document.getElementById("templateText"),
   copyStatus: document.getElementById("copyStatus")
@@ -27,30 +25,6 @@ function spawnStardust() {
 
     elements.stardust.appendChild(star);
   }
-}
-
-function setupStickyCta() {
-  if (!elements.stickyCta || !elements.finalCta) return;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const entry = entries[0];
-      const shouldHide = entry.isIntersecting;
-
-      elements.stickyCta.hidden = shouldHide;
-      elements.stickyCta.setAttribute("aria-hidden", shouldHide ? "true" : "false");
-    },
-    {
-      threshold: 0.18
-    }
-  );
-
-  observer.observe(elements.finalCta);
-
-  window.setTimeout(() => {
-    elements.stickyCta.hidden = false;
-    elements.stickyCta.setAttribute("aria-hidden", "false");
-  }, 900);
 }
 
 async function copyTemplate() {
@@ -92,7 +66,6 @@ function init() {
   }
 
   spawnStardust();
-  setupStickyCta();
   setupFaq();
 
   elements.copyTemplateBtn?.addEventListener("click", copyTemplate);
