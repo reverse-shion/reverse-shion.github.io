@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>リュミエールの間 | Lumiere Gate</title>
+  <title>TAROT BREAKER | リュミエールの間</title>
+  <meta name="description" content="TAROT BREAKERの体験型プロローグ。案内人リュミエールと出会い、物語・星界探索・会話から進む道を選びます。">
+  <link rel="canonical" href="https://reverse-shion.github.io/lumiere-gate.html">
   <style>
     :root {
       --silver: #f3f5ff;
@@ -367,22 +369,213 @@
       100% { transform: translateY(-16px) scale(1); opacity: 0; }
     }
 
+    .gate-home,
+    .gate-guide {
+      position: fixed;
+      top: max(14px, env(safe-area-inset-top));
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid rgba(243, 217, 163, 0.48);
+      border-radius: 999px;
+      background: rgba(8, 10, 22, 0.56);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+    .gate-home { left: max(14px, env(safe-area-inset-left)); }
+    .gate-guide { right: calc(max(14px, env(safe-area-inset-right)) + 54px); }
+    .gate-home:hover,
+    .gate-guide:hover,
+    .gate-home:focus-visible,
+    .gate-guide:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(243, 217, 163, 0.9);
+      background: rgba(25, 24, 45, 0.76);
+      outline: none;
+    }
+
+    .gate-identity {
+      position: fixed;
+      top: max(16px, env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 19;
+      color: rgba(255, 255, 255, 0.9);
+      text-align: center;
+      text-shadow: 0 0 18px rgba(217, 215, 255, 0.52);
+      pointer-events: none;
+    }
+    .gate-identity__kicker {
+      margin: 0 0 2px;
+      color: var(--gold);
+      font-size: 9px;
+      letter-spacing: 0.24em;
+    }
+    .gate-identity h1 {
+      margin: 0;
+      font-size: clamp(12px, 1.7vw, 15px);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+    }
+
+    .welcome-text__kicker {
+      margin-bottom: 10px;
+      color: var(--gold);
+      font-size: 11px;
+      letter-spacing: 0.24em;
+    }
+    .welcome-text__guide {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      letter-spacing: 0.05em;
+    }
+
     .menu {
       position: absolute;
       left: 50%;
-      bottom: 3vh;
+      bottom: max(14px, calc(env(safe-area-inset-bottom) + 8px));
       transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: min(960px, 94vw);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      width: min(980px, 94vw);
       z-index: 6;
+      padding: 13px;
+      border: 1px solid rgba(243, 217, 163, 0.36);
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(12, 13, 29, 0.76), rgba(8, 9, 21, 0.86));
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(14px);
       opacity: 0;
-      transition: opacity 600ms ease;
+      transition: opacity 600ms ease, transform 600ms ease;
       pointer-events: none;
     }
-    .menu.is-visible { opacity: 1; pointer-events: auto; }
+    .menu.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .menu-intro,
+    .resonance-status,
+    .secret-choice {
+      grid-column: 1 / -1;
+    }
+    .menu-intro {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0 2px 2px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    .menu-intro__kicker {
+      color: var(--gold);
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      white-space: nowrap;
+    }
+    .menu-intro p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .path-choice {
+      position: relative;
+      display: flex;
+      min-width: 0;
+      min-height: 78px;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 4px;
+      overflow: hidden;
+      padding: 12px 14px;
+      border: 1px solid rgba(243, 217, 163, 0.52);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.91), rgba(224, 222, 255, 0.82));
+      color: #4f421e;
+      font-family: var(--font-ja);
+      text-align: left;
+      text-decoration: none;
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .path-choice:hover,
+    .path-choice:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(243, 217, 163, 0.94);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
+      outline: none;
+    }
+    .path-choice__number {
+      position: absolute;
+      top: 8px;
+      right: 11px;
+      color: rgba(114, 92, 27, 0.22);
+      font-family: Georgia, serif;
+      font-size: 22px;
+    }
+    .path-choice__title {
+      position: relative;
+      z-index: 2;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .path-choice__hint {
+      position: relative;
+      z-index: 2;
+      color: rgba(45, 43, 58, 0.68);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .resonance-status {
+      margin: 0;
+      padding: 1px 3px 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 10px;
+      line-height: 1.5;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+    .resonance-status.is-unlocked {
+      color: var(--gold);
+      text-shadow: 0 0 12px rgba(243, 217, 163, 0.56);
+    }
+
+    .secret-choice {
+      min-height: 54px;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(33, 28, 57, 0.95), rgba(79, 58, 101, 0.92));
+      color: #fff7e6;
+      text-align: center;
+    }
+    .secret-choice .path-choice__hint { color: rgba(255, 255, 255, 0.72); }
+    .secret-choice[hidden] { display: none; }
+
+    .noscript-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-content: center;
+      gap: 12px;
+      padding: 24px;
+      background: #0b0c16;
+      color: #fff;
+      text-align: center;
+    }
+    .noscript-gate a { color: var(--gold); }
 
     .sound-toggle {
       position: fixed;
@@ -427,22 +620,66 @@
     .overlay-dim.show { opacity: 1; pointer-events: auto; }
 
     @media (max-width: 720px) {
+      .gate-home,
+      .gate-guide {
+        min-height: 38px;
+        padding: 0 10px;
+        font-size: 10px;
+      }
+      .gate-guide { right: calc(max(10px, env(safe-area-inset-right)) + 50px); }
+      .gate-identity {
+        top: calc(max(14px, env(safe-area-inset-top)) + 52px);
+      }
       .dialogue-window { bottom: 8vh; border-radius: 14px; }
-      .menu { bottom: 3vh; gap: 10px; }
+      .menu {
+        bottom: max(10px, env(safe-area-inset-bottom));
+        grid-template-columns: 1fr;
+        gap: 7px;
+        max-height: 58vh;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 16px;
+      }
+      .menu-intro,
+      .resonance-status,
+      .secret-choice { grid-column: 1; }
+      .menu-intro {
+        align-items: center;
+        flex-direction: column;
+        gap: 2px;
+        text-align: center;
+      }
+      .path-choice {
+        min-height: 62px;
+        padding: 9px 12px;
+      }
+      .path-choice__title { font-size: 14px; }
+      .path-choice__hint { font-size: 10px; }
       .gold-button { width: calc(50% - 8px); justify-content: center; text-align: center; }
       .name-input { flex-direction: column; align-items: stretch; }
-      .name-input input { width: 100%; }
+      .name-input input,
+      .name-input .gold-button { width: 100%; }
       :root { --lumiere-bust-bottom: 20vh; }
     }
     @media (max-width: 480px) {
       .lumiere-full { bottom: 4vh; }
       .dialogue-window { padding: 12px 14px 18px; }
+      .gate-home { left: max(10px, env(safe-area-inset-left)); }
+      .sound-toggle { top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); }
       :root { --lumiere-bust-bottom: 18vh; }
     }
     @media (max-height: 700px) {
       .dialogue-window { bottom: 10vh; }
-      .menu { bottom: 2.4vh; }
+      .menu { max-height: 62vh; }
       :root { --lumiere-bust-bottom: 16vh; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
@@ -452,11 +689,20 @@
 
   <div class="star-field" aria-hidden="true"></div>
 
+  <a class="gate-home" href="/" aria-label="Re:Verse Shion公式トップへ戻る">← 公式トップ</a>
+  <div class="gate-identity" aria-hidden="true">
+    <p class="gate-identity__kicker">TAROT BREAKER</p>
+    <h1>リュミエールの間</h1>
+  </div>
+  <a class="gate-guide" href="tarot-breaker/" aria-label="演出を飛ばしてTAROT BREAKERの作品案内を見る">作品案内</a>
+
   <main>
     <section class="scene scene-foyer is-active" aria-label="静かな前室">
       <div class="welcome-text" id="welcomeText">
+        <div class="welcome-text__kicker">TAROT BREAKER — INTERACTIVE PROLOGUE</div>
         <div>……ようこそ。</div>
         <div>ここは、リュミエールの間——星の記憶が静かに灯る場所。</div>
+        <div class="welcome-text__guide">名前を預け、星界へ続く道を選んでください。</div>
       </div>
     </section>
 
@@ -486,20 +732,41 @@
         </div>
       </div>
 
-      <div class="menu" id="menu">
-        <button class="gold-button" data-action="pray" aria-label="セレフィアスに祈りを捧げる">
-          セレフィアスに祈りを捧げる
-          <div class="particle-layer"></div>
+      <div class="menu" id="menu" aria-label="TAROT BREAKERで進む道">
+        <div class="menu-intro">
+          <span class="menu-intro__kicker">CHOOSE YOUR PATH</span>
+          <p>心が反応する道を選んでください。迷ったら「物語を始める」から。</p>
+        </div>
+
+        <a class="path-choice" data-action="story" href="tarot-breaker/story/guide.html" aria-label="物語を始める。初めての人向けガイドへ">
+          <span class="path-choice__number" aria-hidden="true">01</span>
+          <span class="path-choice__title">物語を始める</span>
+          <span class="path-choice__hint">第1話・読む順番を知り、最初の観測点へ</span>
+          <span class="particle-layer" aria-hidden="true"></span>
+        </a>
+
+        <a class="path-choice" data-action="explore" href="star-memory.html" aria-label="星界を探索する。STAR MEMORYへ">
+          <span class="path-choice__number" aria-hidden="true">02</span>
+          <span class="path-choice__title">星界を探索する</span>
+          <span class="path-choice__hint">キャラクター・世界観・各ゲートを自由に巡る</span>
+          <span class="particle-layer" aria-hidden="true"></span>
+        </a>
+
+        <button class="path-choice" data-action="talk" aria-label="リュミエールと話す">
+          <span class="path-choice__number" aria-hidden="true">03</span>
+          <span class="path-choice__title">リュミエールと話す</span>
+          <span class="path-choice__hint">言葉を交わし、隠された星路を探す</span>
+          <span class="particle-layer" aria-hidden="true"></span>
         </button>
 
-        <button class="gold-button" data-action="village" aria-label="始まりの町に行く" style="display:none;">
-          始まりの町に行く
-          <div class="particle-layer"></div>
-        </button>
+        <p class="resonance-status" id="resonanceStatus" aria-live="polite">
+          リュミエールとの対話で、まだ見えない星路が開きます（0/2）
+        </p>
 
-        <button class="gold-button" data-action="talk" aria-label="リュミエールと話す">
-          リュミエールと話す
-          <div class="particle-layer"></div>
+        <button class="path-choice secret-choice" data-action="pray" aria-label="解放されたセレフィアスの間へ進む" hidden>
+          <span class="path-choice__title">隠し星路：セレフィアスへ祈る</span>
+          <span class="path-choice__hint">二つの対話が呼び覚ました、星霊の深層へ</span>
+          <span class="particle-layer" aria-hidden="true"></span>
         </button>
       </div>
     </section>
@@ -508,6 +775,14 @@
   <button class="sound-toggle" id="soundToggle" aria-label="BGM 切り替え"><span>♪</span></button>
   <div class="overlay-dim" id="dimOverlay"></div>
   <audio id="bgm" src="audio/lumiere-theme.mp3" loop preload="auto"></audio>
+
+  <noscript>
+    <div class="noscript-gate">
+      <p>TAROT BREAKERの体験にはJavaScriptが必要です。</p>
+      <a href="tarot-breaker/">作品案内を見る</a>
+      <a href="/">公式トップへ戻る</a>
+    </div>
+  </noscript>
 
   <script>
     (() => {
@@ -531,12 +806,16 @@
       const nameField      = document.getElementById("visitorName");
       const nameSubmit     = document.getElementById("nameSubmit");
       const menu           = document.getElementById("menu");
-      const menuButtons    = menu.querySelectorAll("button");
+      const menuActions    = menu.querySelectorAll("[data-action]");
+      const resonanceStatus = document.getElementById("resonanceStatus");
+      const secretChoice    = menu.querySelector('[data-action="pray"]');
       const soundToggle    = document.getElementById("soundToggle");
       const bgm            = document.getElementById("bgm");
       const dimOverlay     = document.getElementById("dimOverlay");
 
       const STORAGE_MUTE = "lumiereBgmMuted";
+      const resonanceGoal = 2;
+      let resonanceCount = 0;
 
       const blinkMin = 3000;
       const blinkMax = 7000;
@@ -1225,14 +1504,14 @@
         menu.classList.remove("is-visible");
         hideBust();
 
-        setTimeout(() => welcomeText.classList.add("show"), 3000);
+        setTimeout(() => welcomeText.classList.add("show"), 700);
 
         setTimeout(() => {
           welcomeText.classList.remove("show");
           sceneFoyer.classList.remove("is-active");
           sceneHall.classList.add("is-active");
           enterHall();
-        }, 6200);
+        }, 3600);
       };
 
       const enterHall = () => {
@@ -1295,8 +1574,12 @@
       };
 
       const updateMenuForReturn = () => {
-        const villageBtn = menu.querySelector('[data-action="village"]');
-        villageBtn.style.display = (getBaseUserName() ? "inline-flex" : "none");
+        const unlocked = resonanceCount >= resonanceGoal;
+        secretChoice.hidden = !unlocked;
+        resonanceStatus.classList.toggle("is-unlocked", unlocked);
+        resonanceStatus.textContent = unlocked
+          ? "共鳴が満ち、新たな星路が開きました。"
+          : "リュミエールとの対話で、まだ見えない星路が開きます（" + resonanceCount + "/" + resonanceGoal + "）";
       };
 
       // =========================================================
@@ -1316,7 +1599,29 @@
 
       const endConversation = () => {
         isConversation = false;
+        const wasUnlocked = resonanceCount >= resonanceGoal;
+        resonanceCount = Math.min(resonanceGoal, resonanceCount + 1);
+        const justUnlocked = !wasUnlocked && resonanceCount >= resonanceGoal;
+
         hideDialogueWindow();
+
+        if (justUnlocked) {
+          const unlockPages = [{
+            text: "……いま、星の奥で新しい扉が応えました。\nあなたの言葉が、隠されていた星路を照らしたようです。",
+            expr: "default"
+          }];
+
+          setTimeout(() => {
+            playPages(unlockPages, () => {
+              hideDialogueWindow();
+              updateMenuForReturn();
+              menu.classList.add("is-visible");
+            });
+          }, 260);
+          return;
+        }
+
+        updateMenuForReturn();
         setTimeout(() => { menu.classList.add("is-visible"); }, 350);
       };
 
@@ -1345,24 +1650,38 @@
         showNameFixed();
       });
 
-      menuButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          spawnParticles(btn);
-          spawnColumnLight(btn);
+      nameField.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          nameSubmit.click();
+        }
+      });
+
+      menuActions.forEach((control) => {
+        control.addEventListener("click", (event) => {
+          const action = control.dataset.action;
+          if (control.tagName === "A") event.preventDefault();
+
+          spawnParticles(control);
+          spawnColumnLight(control);
           ensureBgm();
 
-          const action = btn.dataset.action;
-
-          if (action === "pray") {
-            dimOverlay.textContent = "静かに祈りを届けています……";
+          if (action === "story") {
+            dimOverlay.textContent = "最初の物語へ、星の記憶をたどります。";
             dimOverlay.classList.add("show");
-            setTimeout(() => { window.location.href = "serephias-chamber.html"; }, 900);
+            setTimeout(() => { window.location.href = control.getAttribute("href"); }, 720);
           }
 
-          if (action === "village") {
-            dimOverlay.textContent = "風の音が、始まりの町へと導きます。";
+          if (action === "explore") {
+            dimOverlay.textContent = "星の回廊が、静かにひらいていきます。";
             dimOverlay.classList.add("show");
-            setTimeout(() => { window.location.href = "star-memory.html"; }, 900);
+            setTimeout(() => { window.location.href = control.getAttribute("href"); }, 720);
+          }
+
+          if (action === "pray") {
+            dimOverlay.textContent = "共鳴した祈りを、星霊の深層へ届けています……";
+            dimOverlay.classList.add("show");
+            setTimeout(() => { window.location.href = "serephias-chamber.html"; }, 900);
           }
 
           if (action === "talk") {
