@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Re:Verse Shion — 占い × 思想</title>
-  <meta name="description" content="Re:Verse Shion（詩韻）— 占い × 思想。タロットとことばで、恋・仕事・運命の“今”を照らす。無料体験から個人鑑定・講座まで。">
+  <title>Re:Verse Shion — 占い × 思想 × TAROT BREAKER</title>
+  <meta name="description" content="Re:Verse Shion（詩韻）の公式サイト。占い・詩韻思想・TAROT BREAKERの三つの入口から、言葉とカードの世界へ。無料占いと個人鑑定のご案内も掲載しています。">
 
   <!-- Canonical / Robots -->
   <link rel="canonical" href="https://reverse-shion.github.io/">
@@ -28,14 +28,14 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:site_name" content="Re:Verse Shion">
-  <meta property="og:title" content="Re:Verse Shion — 占い × 思想">
-  <meta property="og:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta property="og:title" content="Re:Verse Shion — 占い × 思想 × TAROT BREAKER">
+  <meta property="og:description" content="占い・詩韻思想・TAROT BREAKER。三つの入口から、言葉とカードの世界へ。">
   <meta property="og:url" content="https://reverse-shion.github.io/">
   <meta property="og:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
-  <meta property="og:image:alt" content="Re:Verse Shion — 占い × 思想">
+  <meta property="og:image:alt" content="Re:Verse Shion — 占い × 思想 × TAROT BREAKER">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Re:Verse Shion — 占い × 思想">
-  <meta name="twitter:description" content="タロットとことばで“今”を照らす。無料体験→個人鑑定・講座へ。">
+  <meta name="twitter:title" content="Re:Verse Shion — 占い × 思想 × TAROT BREAKER">
+  <meta name="twitter:description" content="占い・詩韻思想・TAROT BREAKER。三つの入口から、言葉とカードの世界へ。">
   <meta name="twitter:image" content="https://reverse-shion.github.io/assets/ogp.jpg">
 
   <!-- Fonts -->
@@ -74,6 +74,120 @@
 
   <!-- 外部CSS -->
   <link rel="stylesheet" href="/shion-home.css">
+  <style>
+  /* ===== 公式トップ：三本柱 ===== */
+  .pillar-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:18px;
+    margin-top:20px;
+  }
+  .pillar-card{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    min-height:270px;
+    padding:22px 20px 20px;
+    border-radius:20px;
+    background:
+      radial-gradient(circle at 100% 0%,rgba(255,231,170,.34),transparent 42%),
+      rgba(255,255,255,.94);
+    border:1px solid rgba(224,180,79,.28);
+    box-shadow:0 10px 26px rgba(70,52,20,.10);
+    overflow:hidden;
+    transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+  }
+  .pillar-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(224,180,79,.58);
+    box-shadow:0 16px 32px rgba(70,52,20,.15);
+  }
+  .pillar-number{
+    position:absolute;
+    top:13px;
+    right:16px;
+    font-family:'Cinzel',serif;
+    font-size:34px;
+    color:rgba(224,180,79,.18);
+  }
+  .pillar-eyebrow{
+    min-height:2.7em;
+    margin:0 36px 10px 0;
+    font-family:'Cinzel',serif;
+    font-size:10px;
+    line-height:1.5;
+    letter-spacing:.2em;
+    color:rgba(90,70,40,.72);
+  }
+  .pillar-card h3{
+    margin-bottom:10px;
+    font-size:20px;
+    letter-spacing:.08em;
+    color:#3a2c10;
+  }
+  .pillar-card p{
+    margin-bottom:18px;
+    font-size:13px;
+    line-height:1.85;
+    color:rgba(30,26,26,.72);
+  }
+  .pillar-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:auto;
+    color:#6a4b1c;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-decoration:none;
+  }
+  .pillar-link::after{
+    content:"→";
+    color:var(--gold);
+    transition:transform .2s ease;
+  }
+  .pillar-link:hover::after{transform:translateX(4px)}
+  .free-reading-strip{
+    margin-top:18px;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    border-radius:18px;
+    background:linear-gradient(135deg,rgba(255,247,232,.96),rgba(255,255,255,.92));
+    border:1px solid rgba(224,180,79,.34);
+  }
+  .free-reading-strip__copy{flex:1}
+  .free-reading-strip__label{
+    margin-bottom:4px;
+    font-size:10px;
+    letter-spacing:.2em;
+    color:rgba(120,95,45,.86);
+  }
+  .free-reading-strip h3{
+    margin-bottom:5px;
+    font-size:17px;
+    color:#3a2c10;
+  }
+  .free-reading-strip p{
+    font-size:13px;
+    line-height:1.7;
+    color:rgba(30,26,26,.7);
+  }
+  .free-reading-strip .shion-btn{
+    flex:0 0 auto;
+    width:auto;
+    min-width:174px;
+  }
+  @media (max-width:760px){
+    .pillar-grid{grid-template-columns:1fr}
+    .pillar-card{min-height:0}
+    .free-reading-strip{align-items:stretch;flex-direction:column}
+    .free-reading-strip .shion-btn{width:100%;max-width:none}
+  }
+  </style>
 </head>
 <body>
 
@@ -105,65 +219,62 @@
     <nav class="nav" aria-label="メインナビゲーション">
       <a href="/" class="nav-logo">Re:Verse Shion</a>
       <ul class="nav-menu">
-        <li><a href="/shion2.html">無料占い</a></li>
-        <li><a href="#services">個人鑑定・講座</a></li>
-        <li><a href="ncode-field.html">詩韻思想</a></li>
-        <li class="nav-contact"><a href="#contact">お問い合わせ</a></li>
+        <li><a href="#services">占い</a></li>
+        <li><a href="ncode-field.html">思想</a></li>
+        <li><a href="lumiere-gate.html">タロブレ</a></li>
+        <li class="nav-contact"><a href="tarot369/index.html">無料占い</a></li>
       </ul>
     </nav>
   </header>
 
   <!-- ===== メインコンテンツ ===== -->
   <main class="page" role="main">
-    <!-- ヒーロー：無料占いへのゲートを明示 -->
-    <section class="hero" id="hero" aria-label="星界リーディング（無料占い）への入り口">
+    <!-- ヒーロー：三本柱と無料占いへの案内 -->
+    <section class="hero" id="hero" aria-label="Re:Verse Shionの三つの入口">
       <div class="hero-main">
-        <p class="kicker">SHION PHILOSOPHY × TAROT READING</p>
+        <p class="kicker">TAROT READING × SHION PHILOSOPHY × STORY</p>
 
         <p class="hero-catch">言葉が魂を救う。</p>
 
         <h1 class="hero-title">
           RE:VERSE SHION
-          <span class="jp">詩韻思想 × 星界リーディング</span>
+          <span class="jp">占い × 思想 × TAROT BREAKER</span>
         </h1>
 
         <p class="hero-lead">
-          詩韻思想（Shion Philosophy）にもとづき、タロットとことばで恋愛・仕事・人間関係の“今”を読み解く占いサイトです。<br>
-          まずは <span class="hero-highlight">無料の「星界リーディング」</span> で、今のあなたの物語を一枚のカードから受け取ってください。
+          Re:Verse Shionは、<strong>占い・詩韻思想・TAROT BREAKER</strong>の三つを、言葉とカードでつなぐ公式サイトです。<br>
+          今の迷いを整理したい方も、考え方を深く読みたい方も、物語の世界を旅したい方も。心に近い入口から進んでください。
         </p>
 
         <p class="hero-note">
-          このトップページは「星界への玄関ホール」。一歩進めば、白いカードがめくられ、金色の言葉としてあなたの心のログが降りてきます。
+          はじめての方は、無料の「星詠ワンカードタロット」から体験できます。
         </p>
 
-        <section class="cta-area" aria-label="はじめての方への案内">
-          <!-- メイン：無料占い -->
-          <a href="tarot369/index.html" class="shion-btn gold" id="gate-reading">
-            <span class="label">星界リーディングを始める（無料）</span>
-            <span class="hint">はじめての方におすすめ｜カードをめくる無料占い</span>
+        <section class="cta-area" aria-label="公式サイトの入口">
+          <a href="#pillars" class="shion-btn gold" id="gate-pillars">
+            <span class="label">三つの入口から選ぶ</span>
+            <span class="hint">占い・思想・TAROT BREAKER</span>
           </a>
-          <!-- サブ：思想を読む -->
-          <a href="ncode-field.html " class="shion-btn glass" id="gate-philosophy">
-            <span class="label">詩韻思想をじっくり読む</span>
-            <span class="hint">世界観や哲学を文章で深く知りたい方向け</span>
+          <a href="tarot369/index.html" class="shion-btn glass" id="gate-reading">
+            <span class="label">無料占いを試す</span>
+            <span class="hint">一枚のカードから、今の心に必要な言葉を受け取る</span>
           </a>
-  
         </section>
        
 
-        <!-- シンプルなステップ案内 -->
-        <div class="flow-hints" aria-label="利用の流れ">
+        <!-- 三本柱の短い案内 -->
+        <div class="flow-hints" aria-label="Re:Verse Shionの三本柱">
           <div class="flow-item">
-            <span class="flow-step">STEP 1</span>
-            <span class="flow-label">星界リーディング（無料）</span>
+            <span class="flow-step">01</span>
+            <span class="flow-label">占い</span>
           </div>
           <div class="flow-item">
-            <span class="flow-step">STEP 2</span>
-            <span class="flow-label">気になる結果は個人鑑定で深掘り</span>
+            <span class="flow-step">02</span>
+            <span class="flow-label">詩韻思想</span>
           </div>
           <div class="flow-item">
-            <span class="flow-step">STEP 3</span>
-            <span class="flow-label">さらに詩韻思想で“言葉の世界”へ</span>
+            <span class="flow-step">03</span>
+            <span class="flow-label">TAROT BREAKER</span>
           </div>
         </div>
       </div>
@@ -173,44 +284,83 @@
         <div class="hero-orb"></div>
         <div class="hero-card">
           <div class="hero-card-inner">
-            <span class="hero-card-title">STAR CODE</span>
-            <span class="hero-card-sub">TAROT READING</span>
+            <span class="hero-card-title">THREE PATHS</span>
+            <span class="hero-card-sub">ONE WORLD</span>
           </div>
         </div>
       </div>
     </section>
-    <a href="lumiere-gate.html"
-   class="seiki-core-btn">
-  SEREPHIAS GATE<br>― 星霊の門を開く ―
 
-  <span class="flow" aria-hidden="true"></span>
-</a>
+    <!-- 三本柱 -->
+    <section class="section pillars" id="pillars" aria-labelledby="pillars-title">
+      <p class="section-kicker">THREE PATHS, ONE WORLD</p>
+      <h2 class="section-title" id="pillars-title">三つの入口</h2>
+      <p class="section-text">
+        求めているものに近い入口を選んでください。三つの道は、すべて「言葉が魂を救う」という同じ世界につながっています。
+      </p>
 
-    <!-- 詩韻思想とは -->
+      <div class="pillar-grid">
+        <article class="pillar-card">
+          <span class="pillar-number" aria-hidden="true">01</span>
+          <p class="pillar-eyebrow">TAROT READING</p>
+          <h3>占い</h3>
+          <p>恋愛・仕事・人間関係。事実と解釈を分けながら、今の迷いと次の選択をカードと言葉で整理します。</p>
+          <a class="pillar-link" href="./consultation/">個人鑑定について見る</a>
+        </article>
+
+        <article class="pillar-card">
+          <span class="pillar-number" aria-hidden="true">02</span>
+          <p class="pillar-eyebrow">SHION PHILOSOPHY</p>
+          <h3>詩韻思想</h3>
+          <p>答えを与えるのではなく、自分の心を読み直すために。占い・言葉・生き方をめぐる思想を届けます。</p>
+          <a class="pillar-link" href="ncode-field.html">思想の世界を読む</a>
+        </article>
+
+        <article class="pillar-card">
+          <span class="pillar-number" aria-hidden="true">03</span>
+          <p class="pillar-eyebrow">TAROT BREAKER</p>
+          <h3>TAROT BREAKER</h3>
+          <p>タロットの象徴が人物として息づく物語。シオンとしおぽんとともに、運命と言葉をめぐる世界へ。</p>
+          <a class="pillar-link" href="lumiere-gate.html">物語の入口へ進む</a>
+        </article>
+      </div>
+
+      <div class="free-reading-strip">
+        <div class="free-reading-strip__copy">
+          <p class="free-reading-strip__label">FREE TAROT READING</p>
+          <h3>まずは一枚、無料で引いてみる</h3>
+          <p>今の心に近いテーマを選び、一枚のカードから言葉を受け取れます。</p>
+        </div>
+        <a href="tarot369/index.html" class="shion-btn gold small">無料占いを始める</a>
+      </div>
+    </section>
+
+    <!-- Re:Verse Shionとは -->
     <section class="section about" id="about">
       <p class="section-kicker">はじめて来てくれた方へ</p>
-      <h2 class="section-title">詩韻思想とは</h2>
+      <h2 class="section-title">Re:Verse Shionとは</h2>
       <p class="section-text">
-        詩韻思想は、「言葉が魂を救う」という前提から生まれたオリジナルの哲学です。タロット占いと組み合わせることで、あなたの本音や迷いを“星のログ”として読み解き、未来の選択肢をそっと増やしていきます。<br>
-        一般的な占いのように「当たる／当たらない」だけではなく、<strong>「どう受け取り、どう生きるか」</strong>までを一緒に考えていくための思想でもあります。
+        Re:Verse Shionは、占い・思想・物語の三つを通して、言葉にならない心を読み直すための場所です。<br>
+        どの入口から入っても、中心にあるのは<strong>「言葉が魂を救う」</strong>という願いです。
       </p>
       <ul class="feature-list">
-        <li>タロットカードを使って「今のあなた」の物語を読む</li>
-        <li>哲学的な視点から、状況の意味や学びを整理する</li>
-        <li>詩のような言葉で、心が少し軽くなるメッセージを届ける</li>
+        <li><strong>占い</strong>で、今の迷いと選択肢を整理する</li>
+        <li><strong>詩韻思想</strong>で、心や生き方を言葉から考える</li>
+        <li><strong>TAROT BREAKER</strong>で、タロットの象徴を物語として体験する</li>
       </ul>
     </section>
 
-    <!-- サービス -->
+    <!-- 占い -->
     <section class="section services" id="services">
-      <h2 class="section-title">サービス</h2>
+      <h2 class="section-title">占い</h2>
+      <p class="section-text">まずは無料の一枚引きから。具体的な悩みは個人鑑定で、カードと言葉を使って丁寧に整理します。</p>
       <div class="service-cards">
         <!-- 1：無料占い -->
         <div class="card">
           <h3>星界リーディング（無料）</h3>
           <p>一枚のカードをめくり、今のあなたの「星の物語」を受け取る無料占いです。</p>
           <p class="card-tag">まずはここから</p>
-          <a href="/shion2.html" class="shion-btn small">無料で占う</a>
+          <a href="tarot369/index.html" class="shion-btn small">無料で占う</a>
         </div>
         <!-- 2：個人鑑定 -->
         <div class="card">
@@ -382,8 +532,8 @@
       });
     }
 
+    attachGateEffect('gate-pillars');
     attachGateEffect('gate-reading');
-    attachGateEffect('gate-philosophy');
   </script>
 
   <script>
