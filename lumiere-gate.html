@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>TAROT BREAKER | リュミエールの間</title>
-  <meta name="description" content="TAROT BREAKERの体験型プロローグ。案内人リュミエールと出会い、物語・星界探索・会話から進む道を選びます。">
+  <meta name="description" content="星の言霊とタロットが、閉じた未来を読み直す宇宙神話。案内人リュミエールと出会い、物語・星界探索・会話から進む道を選ぶTAROT BREAKERの体験型プロローグです。">
   <link rel="canonical" href="https://reverse-shion.github.io/lumiere-gate.html">
   <style>
     :root {
@@ -390,7 +390,7 @@
       transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
     }
     .gate-home { left: max(14px, env(safe-area-inset-left)); }
-    .gate-guide { right: calc(max(14px, env(safe-area-inset-right)) + 54px); }
+    .gate-guide { right: calc(max(14px, env(safe-area-inset-right)) + 126px); }
     .gate-home:hover,
     .gate-guide:hover,
     .gate-home:focus-visible,
@@ -403,38 +403,81 @@
 
     .gate-identity {
       position: fixed;
-      top: max(16px, env(safe-area-inset-top));
+      top: max(14px, env(safe-area-inset-top));
       left: 50%;
       transform: translateX(-50%);
       z-index: 19;
-      color: rgba(255, 255, 255, 0.9);
+      min-width: min(320px, 50vw);
+      padding: 10px 22px 11px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 218, 148, 0.55);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(217, 215, 255, 0.22), transparent 58%),
+        linear-gradient(180deg, rgba(8, 10, 25, 0.84), rgba(12, 12, 28, 0.68));
+      box-shadow:
+        0 12px 34px rgba(0, 0, 0, 0.34),
+        inset 0 0 24px rgba(255, 255, 255, 0.05),
+        0 0 24px rgba(217, 215, 255, 0.12);
+      color: #fff;
       text-align: center;
-      text-shadow: 0 0 18px rgba(217, 215, 255, 0.52);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(12px);
+      pointer-events: none;
+    }
+    .gate-identity::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
       pointer-events: none;
     }
     .gate-identity__kicker {
-      margin: 0 0 2px;
-      color: var(--gold);
-      font-size: 9px;
+      position: relative;
+      margin: 0 0 3px;
+      color: #ffe0a2;
+      font-size: 10px;
+      font-weight: 700;
       letter-spacing: 0.24em;
+      text-shadow: 0 0 12px rgba(243, 217, 163, 0.55), 0 2px 8px #000;
     }
     .gate-identity h1 {
+      position: relative;
       margin: 0;
-      font-size: clamp(12px, 1.7vw, 15px);
-      font-weight: 500;
-      letter-spacing: 0.12em;
+      font-size: clamp(15px, 2vw, 19px);
+      font-weight: 700;
+      letter-spacing: 0.13em;
+    }
+    .gate-identity__tagline {
+      position: relative;
+      margin: 4px 0 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 10px;
+      line-height: 1.5;
+      letter-spacing: 0.08em;
     }
 
     .welcome-text__kicker {
       margin-bottom: 10px;
-      color: var(--gold);
+      color: #ffe0a2;
       font-size: 11px;
+      font-weight: 700;
       letter-spacing: 0.24em;
+    }
+    .welcome-text__promise {
+      margin: 2px 0 10px;
+      color: #fff;
+      font-size: clamp(21px, 4vw, 32px);
+      font-weight: 700;
+      line-height: 1.55;
+      letter-spacing: 0.08em;
     }
     .welcome-text__guide {
       margin-top: 10px;
-      color: rgba(255, 255, 255, 0.78);
+      color: rgba(255, 255, 255, 0.82);
       font-size: 13px;
+      line-height: 1.8;
       letter-spacing: 0.05em;
     }
 
@@ -579,27 +622,54 @@
 
     .sound-toggle {
       position: fixed;
-      top: 14px;
-      right: 14px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(243, 217, 163, 0.7);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
+      top: max(14px, env(safe-area-inset-top));
+      right: max(14px, env(safe-area-inset-right));
       z-index: 20;
-      transition: transform 140ms ease, box-shadow 140ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: auto;
+      min-width: 118px;
+      height: 44px;
+      padding: 0 13px;
+      border: 1px solid rgba(243, 217, 163, 0.68);
+      border-radius: 999px;
+      background: rgba(8, 10, 22, 0.62);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
     }
-    .sound-toggle:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+    .sound-toggle:hover,
+    .sound-toggle:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(243, 217, 163, 0.95);
+      background: rgba(25, 24, 45, 0.8);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+      outline: none;
+    }
     .sound-toggle:active { transform: translateY(0); }
-    .sound-toggle span {
-      font-size: 18px;
-      color: #5b4a1c;
-      text-shadow: 0 0 6px rgba(243, 217, 163, 0.7);
+    .sound-toggle.is-playing {
+      border-color: #ffe0a2;
+      background: linear-gradient(135deg, rgba(74, 54, 99, 0.9), rgba(18, 19, 42, 0.88));
+      box-shadow: 0 0 20px rgba(217, 215, 255, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+    .sound-toggle__icon {
+      min-width: 14px;
+      color: #ffe0a2;
+      font-size: 16px;
+      line-height: 1;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(243, 217, 163, 0.8);
       user-select: none;
+    }
+    .sound-toggle__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
     }
 
     .overlay-dim {
@@ -626,10 +696,17 @@
         padding: 0 10px;
         font-size: 10px;
       }
-      .gate-guide { right: calc(max(10px, env(safe-area-inset-right)) + 50px); }
+      .gate-guide { right: calc(max(10px, env(safe-area-inset-right)) + 116px); }
       .gate-identity {
         top: calc(max(14px, env(safe-area-inset-top)) + 52px);
+        width: min(264px, 72vw);
+        min-width: 0;
+        padding: 9px 14px 10px;
+        border-radius: 15px;
       }
+      .gate-identity__kicker { font-size: 9px; }
+      .gate-identity h1 { font-size: 15px; }
+      .gate-identity__tagline { font-size: 9px; }
       .dialogue-window { bottom: 8vh; border-radius: 14px; }
       .menu {
         bottom: max(10px, env(safe-area-inset-bottom));
@@ -665,7 +742,14 @@
       .lumiere-full { bottom: 4vh; }
       .dialogue-window { padding: 12px 14px 18px; }
       .gate-home { left: max(10px, env(safe-area-inset-left)); }
-      .sound-toggle { top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); }
+      .sound-toggle {
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
+        min-width: 106px;
+        height: 38px;
+        padding: 0 10px;
+      }
+      .sound-toggle__label { font-size: 9px; }
       :root { --lumiere-bust-bottom: 18vh; }
     }
     @media (max-height: 700px) {
@@ -690,19 +774,20 @@
   <div class="star-field" aria-hidden="true"></div>
 
   <a class="gate-home" href="/" aria-label="Re:Verse Shion公式トップへ戻る">← 公式トップ</a>
-  <div class="gate-identity" aria-hidden="true">
+  <div class="gate-identity">
     <p class="gate-identity__kicker">TAROT BREAKER</p>
     <h1>リュミエールの間</h1>
+    <p class="gate-identity__tagline">星の言霊が、運命の扉をひらく</p>
   </div>
-  <a class="gate-guide" href="tarot-breaker/" aria-label="演出を飛ばしてTAROT BREAKERの作品案内を見る">作品案内</a>
+  <a class="gate-guide" href="tarot-breaker/" aria-label="TAROT BREAKERの作品案内を見る">タロブレとは</a>
 
   <main>
     <section class="scene scene-foyer is-active" aria-label="静かな前室">
       <div class="welcome-text" id="welcomeText">
-        <div class="welcome-text__kicker">TAROT BREAKER — INTERACTIVE PROLOGUE</div>
-        <div>……ようこそ。</div>
-        <div>ここは、リュミエールの間——星の記憶が静かに灯る場所。</div>
-        <div class="welcome-text__guide">名前を預け、星界へ続く道を選んでください。</div>
+        <div class="welcome-text__kicker">TAROT BREAKER — INTERACTIVE STORY</div>
+        <div class="welcome-text__promise">星の言霊が、<br>閉じた未来を読み直す。</div>
+        <div>ここは、物語とあなたの選択が交わる境界——リュミエールの間。</div>
+        <div class="welcome-text__guide">扉の先では、選んだ道によって異なる星界が待っています。</div>
       </div>
     </section>
 
@@ -735,7 +820,7 @@
       <div class="menu" id="menu" aria-label="TAROT BREAKERで進む道">
         <div class="menu-intro">
           <span class="menu-intro__kicker">CHOOSE YOUR PATH</span>
-          <p>心が反応する道を選んでください。迷ったら「物語を始める」から。</p>
+          <p>あなたの選択が、星界の見え方を変えます。迷ったら「物語を始める」から。</p>
         </div>
 
         <a class="path-choice" data-action="story" href="tarot-breaker/story/guide.html" aria-label="物語を始める。初めての人向けガイドへ">
@@ -772,9 +857,12 @@
     </section>
   </main>
 
-  <button class="sound-toggle" id="soundToggle" aria-label="BGM 切り替え"><span>♪</span></button>
+  <button class="sound-toggle" id="soundToggle" type="button" aria-label="星封ラグナを再生" aria-pressed="false">
+    <span class="sound-toggle__icon" aria-hidden="true">♪</span>
+    <span class="sound-toggle__label">星封ラグナ</span>
+  </button>
   <div class="overlay-dim" id="dimOverlay"></div>
-  <audio id="bgm" src="audio/lumiere-theme.mp3" loop preload="auto"></audio>
+  <audio id="bgm" src="audio/seifu-raguna.mp3" loop preload="metadata"></audio>
 
   <noscript>
     <div class="noscript-gate">
@@ -810,10 +898,11 @@
       const resonanceStatus = document.getElementById("resonanceStatus");
       const secretChoice    = menu.querySelector('[data-action="pray"]');
       const soundToggle    = document.getElementById("soundToggle");
+      const soundIcon      = soundToggle.querySelector(".sound-toggle__icon");
+      const soundLabel     = soundToggle.querySelector(".sound-toggle__label");
       const bgm            = document.getElementById("bgm");
       const dimOverlay     = document.getElementById("dimOverlay");
 
-      const STORAGE_MUTE = "lumiereBgmMuted";
       const resonanceGoal = 2;
       let resonanceCount = 0;
 
@@ -1454,20 +1543,43 @@
       };
 
       // =========================================================
-      // BGM
+      // MUSIC：星封ラグナ（明示操作で再生／停止）
       // =========================================================
-      const setMute = (muted) => {
-        bgm.muted = muted;
-        soundToggle.querySelector("span").textContent = muted ? "♪×" : "♪";
-        localStorage.setItem(STORAGE_MUTE, muted ? "1" : "0");
+      let bgmBusy = false;
+
+      const updateBgmUi = (playing, failed = false) => {
+        soundToggle.classList.toggle("is-playing", playing);
+        soundToggle.setAttribute("aria-pressed", playing ? "true" : "false");
+        soundToggle.setAttribute("aria-label", failed
+          ? "星封ラグナを再生できませんでした"
+          : (playing ? "星封ラグナを停止" : "星封ラグナを再生"));
+        soundIcon.textContent = playing ? "Ⅱ" : "♪";
+        soundLabel.textContent = failed ? "再生できません" : "星封ラグナ";
       };
 
-      const ensureBgm = () => {
-        if (bgm.dataset.started) return;
-        bgm.dataset.started = "1";
-        bgm.volume = 0.6;
-        if (!bgm.muted) bgm.play().catch(() => {});
+      const toggleBgm = async () => {
+        if (bgmBusy) return;
+        bgmBusy = true;
+
+        try {
+          if (bgm.paused) {
+            bgm.volume = 0.68;
+            await bgm.play();
+            updateBgmUi(true);
+          } else {
+            bgm.pause();
+            updateBgmUi(false);
+          }
+        } catch (error) {
+          updateBgmUi(false, true);
+          setTimeout(() => updateBgmUi(false), 2200);
+        } finally {
+          bgmBusy = false;
+        }
       };
+
+      bgm.addEventListener("play", () => updateBgmUi(true));
+      bgm.addEventListener("pause", () => updateBgmUi(false));
 
       // =========================================================
       // プリロード（shy含む）
@@ -1504,14 +1616,14 @@
         menu.classList.remove("is-visible");
         hideBust();
 
-        setTimeout(() => welcomeText.classList.add("show"), 700);
+        setTimeout(() => welcomeText.classList.add("show"), 500);
 
         setTimeout(() => {
           welcomeText.classList.remove("show");
           sceneFoyer.classList.remove("is-active");
           sceneHall.classList.add("is-active");
           enterHall();
-        }, 3600);
+        }, 4200);
       };
 
       const enterHall = () => {
@@ -1546,15 +1658,25 @@
         hideBust();
         fullFigure.classList.add("show");
 
-        const firstPages = buildPagesFromLines(injectName(getLines("first-visit")), { groupSize: 2 });
-        const askPages   = buildPagesFromLines(injectName(getLines("ask-name")),   { groupSize: 2 });
+        const firstPages = [
+          {
+            text: "ようこそ、旅人様。\nここは《TAROT BREAKER》と現実の境界——リュミエールの間です。",
+            expr: "default"
+          },
+          {
+            text: "星の言霊とタロットが、閉じた未来を読み直す物語。\nあなたが選ぶ道によって、見える星界は少しずつ変わります。",
+            expr: "default"
+          },
+          {
+            text: "物語を辿るか、星界を探索するか、それとも私と話すか。\nまずは旅の記録に、お名前を預けていただけますか？",
+            expr: "default"
+          }
+        ];
 
         playPages(firstPages, () => {
-          playPages(askPages, () => {
-            nameInput.style.display = "flex";
-            nameField.focus();
-            resetDialogueHandlers();
-          }, { keepVisible: true });
+          nameInput.style.display = "flex";
+          nameField.focus();
+          resetDialogueHandlers();
         }, { keepVisible: true });
       };
 
@@ -1664,7 +1786,6 @@
 
           spawnParticles(control);
           spawnColumnLight(control);
-          ensureBgm();
 
           if (action === "story") {
             dimOverlay.textContent = "最初の物語へ、星の記憶をたどります。";
@@ -1692,13 +1813,7 @@
         });
       });
 
-      soundToggle.addEventListener("click", () => {
-        const muted = !(localStorage.getItem(STORAGE_MUTE) === "1");
-        setMute(muted);
-        ensureBgm();
-      });
-
-      document.body.addEventListener("click", ensureBgm, { once: true });
+      soundToggle.addEventListener("click", toggleBgm);
 
       // =========================================================
       // 初期化
@@ -1706,7 +1821,7 @@
       const startLumiereGate = () => {
         createStars();
         preloadImages();
-        setMute(localStorage.getItem(STORAGE_MUTE) === "1");
+        updateBgmUi(false);
 
         setExpression("default");
 
