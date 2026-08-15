@@ -2,30 +2,848 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guide | TAROT BREAKER</title>
-  <meta name="description" content="読解ガイドページ。">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>第一観測門 | TAROT BREAKER</title>
+  <meta name="description" content="リュミエールに導かれ、TAROT BREAKERの最初の物語へ。星の言霊とタロットが閉じた未来を読み直す、第一観測門。">
+  <meta name="theme-color" content="#070a16">
   <link rel="canonical" href="https://reverse-shion.github.io/tarot-breaker/story/guide.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/common.css">
   <link rel="stylesheet" href="../css/tb-core.css">
-  <link rel="stylesheet" href="../css/tb-sections.css">
-  <link rel="stylesheet" href="../css/tb-lore.css">
+  <style>
+    :root {
+      --gate-gold: #f2d69c;
+      --gate-gold-bright: #fff0c8;
+      --gate-blue: #9db9ff;
+      --gate-violet: #b8a6ff;
+      --gate-text: #f9f7f1;
+      --gate-muted: rgba(237, 239, 250, 0.72);
+      --gate-panel: rgba(8, 11, 27, 0.78);
+      --gate-line: rgba(239, 213, 157, 0.3);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body.story-gate-body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+      color: var(--gate-text);
+      background:
+        radial-gradient(circle at 50% -8%, rgba(124, 147, 255, 0.18), transparent 30%),
+        linear-gradient(180deg, #080b19 0%, #050711 56%, #03040b 100%);
+      font-family: "Noto Sans JP", sans-serif;
+    }
+
+    .story-skip {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      z-index: 100;
+      transform: translate(-50%, -160%);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #fff;
+      color: #111;
+      text-decoration: none;
+    }
+
+    .story-skip:focus { transform: translate(-50%, 0); }
+
+    .story-topbar {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 50;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+      min-height: 64px;
+      padding:
+        max(10px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        10px
+        max(16px, env(safe-area-inset-left));
+      background: linear-gradient(180deg, rgba(3, 5, 14, 0.86), rgba(3, 5, 14, 0));
+      pointer-events: none;
+    }
+
+    .story-topbar > * { pointer-events: auto; }
+
+    .story-return,
+    .story-sound {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      width: max-content;
+      padding: 0 15px;
+      border: 1px solid rgba(242, 214, 156, 0.4);
+      border-radius: 999px;
+      background: rgba(8, 10, 25, 0.66);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+      color: rgba(255, 255, 255, 0.88);
+      font: 500 12px/1 "Noto Sans JP", sans-serif;
+      letter-spacing: 0.07em;
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .story-return:hover,
+    .story-return:focus-visible,
+    .story-sound:hover,
+    .story-sound:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(242, 214, 156, 0.82);
+      background: rgba(19, 20, 43, 0.86);
+      outline: none;
+    }
+
+    .story-brand {
+      color: rgba(255, 255, 255, 0.74);
+      font: 600 11px/1 "Noto Sans JP", sans-serif;
+      letter-spacing: 0.24em;
+      text-decoration: none;
+    }
+
+    .story-sound {
+      justify-self: end;
+      gap: 7px;
+      cursor: pointer;
+    }
+
+    .story-sound.is-playing {
+      border-color: rgba(242, 214, 156, 0.86);
+      box-shadow: 0 0 26px rgba(184, 166, 255, 0.2);
+    }
+
+    .story-sound__icon {
+      width: 1em;
+      color: var(--gate-gold);
+      font-family: Georgia, serif;
+      text-align: center;
+    }
+
+    .story-gate { min-height: 100vh; }
+
+    .story-hero {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      min-height: 100svh;
+      place-items: center;
+      overflow: hidden;
+      padding: 108px 20px 72px;
+      text-align: center;
+    }
+
+    .story-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -4;
+      background:
+        linear-gradient(180deg, rgba(3, 5, 14, 0.18), rgba(4, 6, 17, 0.64) 52%, #050711 100%),
+        radial-gradient(circle at 50% 34%, rgba(217, 215, 255, 0.1), transparent 30%),
+        url("../../img/lumiere-hall.jpg") center 34% / cover no-repeat;
+      filter: saturate(0.82) contrast(1.04);
+      transform: scale(1.03);
+    }
+
+    .story-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(circle at 50% 42%, transparent 0 18%, rgba(3, 5, 15, 0.16) 46%, rgba(2, 3, 10, 0.72) 100%),
+        linear-gradient(90deg, rgba(3, 5, 14, 0.42), transparent 28% 72%, rgba(3, 5, 14, 0.42));
+    }
+
+    .story-stars,
+    .story-stars::before,
+    .story-stars::after {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 14% 23%, rgba(255,255,255,.8) 0 1px, transparent 1.6px),
+        radial-gradient(circle at 81% 19%, rgba(255,240,200,.75) 0 1px, transparent 1.7px),
+        radial-gradient(circle at 68% 66%, rgba(181,196,255,.7) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 27% 72%, rgba(255,255,255,.65) 0 1px, transparent 1.6px);
+      background-size: 310px 260px, 390px 330px, 430px 360px, 360px 310px;
+      content: "";
+      opacity: 0.6;
+      animation: story-star-drift 18s linear infinite;
+    }
+
+    .story-stars::before {
+      transform: translateY(18px) scale(1.08);
+      opacity: 0.35;
+      animation-duration: 26s;
+    }
+
+    .story-stars::after {
+      transform: translateY(-12px) scale(0.92);
+      opacity: 0.24;
+      animation-duration: 34s;
+      animation-direction: reverse;
+    }
+
+    @keyframes story-star-drift {
+      0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+      100% { background-position: 0 -38px, 0 -26px, 0 -44px, 0 -30px; }
+    }
+
+    .story-hero__content {
+      width: min(760px, 100%);
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 900ms ease, transform 900ms ease;
+    }
+
+    .is-ready .story-hero__content {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .story-kicker {
+      margin: 0 0 16px;
+      color: var(--gate-gold);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-shadow: 0 0 16px rgba(242, 214, 156, 0.45);
+    }
+
+    .story-handoff {
+      width: min(610px, 100%);
+      margin: 0 auto 24px;
+      padding: 16px 20px;
+      border: 1px solid rgba(242, 214, 156, 0.32);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(184, 166, 255, 0.14), transparent 68%),
+        rgba(5, 7, 20, 0.66);
+      box-shadow: 0 18px 54px rgba(0, 0, 0, 0.3), inset 0 0 28px rgba(255, 255, 255, 0.025);
+      backdrop-filter: blur(10px);
+    }
+
+    .story-handoff__name {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--gate-gold);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+    }
+
+    .story-handoff p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.9);
+      font-family: "Shippori Mincho", serif;
+      font-size: clamp(15px, 2.3vw, 18px);
+      line-height: 1.9;
+      letter-spacing: 0.04em;
+    }
+
+    .story-hero h1 {
+      margin: 0;
+      color: #fff;
+      font-family: "Shippori Mincho", serif;
+      font-size: clamp(38px, 7vw, 72px);
+      font-weight: 600;
+      line-height: 1.12;
+      letter-spacing: 0.08em;
+      text-shadow: 0 3px 18px rgba(0,0,0,.86), 0 0 34px rgba(157,185,255,.2);
+    }
+
+    .story-hero__en {
+      display: block;
+      margin-top: 9px;
+      color: rgba(255, 255, 255, 0.54);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.34em;
+    }
+
+    .story-hero__lead {
+      margin: 22px auto 28px;
+      max-width: 620px;
+      color: rgba(255, 255, 255, 0.87);
+      font-family: "Shippori Mincho", serif;
+      font-size: clamp(17px, 2.5vw, 22px);
+      line-height: 1.9;
+      letter-spacing: 0.06em;
+      text-shadow: 0 2px 14px rgba(0,0,0,.9);
+    }
+
+    .story-portal {
+      position: relative;
+      display: grid;
+      grid-template-columns: 58px 1fr 28px;
+      align-items: center;
+      gap: 14px;
+      width: min(430px, 100%);
+      min-height: 88px;
+      margin: 0 auto;
+      padding: 13px 17px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 229, 173, 0.72);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 12% 50%, rgba(255, 242, 206, 0.18), transparent 28%),
+        linear-gradient(135deg, rgba(70, 59, 103, 0.94), rgba(20, 27, 65, 0.96));
+      box-shadow:
+        0 18px 56px rgba(0, 0, 0, 0.42),
+        0 0 34px rgba(157, 185, 255, 0.17),
+        inset 0 0 28px rgba(255, 255, 255, 0.04);
+      color: #fff;
+      text-align: left;
+      text-decoration: none;
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    }
+
+    .story-portal::before {
+      content: "";
+      position: absolute;
+      inset: -80% -25%;
+      background: linear-gradient(105deg, transparent 43%, rgba(255,255,255,.15) 50%, transparent 57%);
+      transform: translateX(-48%);
+      transition: transform 650ms ease;
+    }
+
+    .story-portal:hover,
+    .story-portal:focus-visible {
+      transform: translateY(-3px) scale(1.012);
+      border-color: rgba(255, 237, 199, 1);
+      box-shadow: 0 24px 68px rgba(0,0,0,.5), 0 0 46px rgba(184,166,255,.28);
+      outline: none;
+    }
+
+    .story-portal:hover::before,
+    .story-portal:focus-visible::before { transform: translateX(48%); }
+
+    .story-portal__seal {
+      position: relative;
+      display: grid;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      border: 1px solid rgba(255, 229, 173, 0.65);
+      border-radius: 50%;
+      color: var(--gate-gold-bright);
+      font: 24px/1 Georgia, serif;
+      box-shadow: inset 0 0 18px rgba(255, 229, 173, 0.12), 0 0 18px rgba(184,166,255,.16);
+    }
+
+    .story-portal__seal::before,
+    .story-portal__seal::after {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(157, 185, 255, 0.45);
+      transform: rotate(45deg);
+      animation: seal-turn 12s linear infinite;
+    }
+
+    .story-portal__seal::after {
+      inset: 13px;
+      border-color: rgba(255, 229, 173, 0.36);
+      animation-direction: reverse;
+      animation-duration: 8s;
+    }
+
+    @keyframes seal-turn { to { transform: rotate(405deg); } }
+
+    .story-portal__copy { position: relative; z-index: 1; }
+
+    .story-portal__copy small,
+    .story-portal__copy strong,
+    .story-portal__copy span { display: block; }
+
+    .story-portal__copy small {
+      margin-bottom: 4px;
+      color: var(--gate-gold);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+    }
+
+    .story-portal__copy strong {
+      font-family: "Shippori Mincho", serif;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+
+    .story-portal__copy span {
+      margin-top: 3px;
+      color: rgba(255,255,255,.68);
+      font-size: 11px;
+    }
+
+    .story-portal__arrow {
+      position: relative;
+      z-index: 1;
+      color: var(--gate-gold);
+      font-size: 20px;
+      transition: transform 180ms ease;
+    }
+
+    .story-portal:hover .story-portal__arrow { transform: translateX(3px); }
+
+    .story-external-note {
+      margin: 13px 0 0;
+      color: rgba(255,255,255,.53);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+    }
+
+    .story-scroll-cue {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      display: grid;
+      gap: 7px;
+      place-items: center;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,.46);
+      font-size: 8px;
+      letter-spacing: .22em;
+    }
+
+    .story-scroll-cue::after {
+      content: "";
+      width: 1px;
+      height: 24px;
+      background: linear-gradient(var(--gate-gold), transparent);
+      animation: scroll-pulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes scroll-pulse {
+      0%, 100% { opacity: .25; transform: scaleY(.55); transform-origin: top; }
+      50% { opacity: .9; transform: scaleY(1); transform-origin: top; }
+    }
+
+    .story-content {
+      position: relative;
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 74px 0 96px;
+    }
+
+    .story-content::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: min(760px, 100%);
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, rgba(242,214,156,.4), transparent);
+    }
+
+    .story-section-heading {
+      max-width: 700px;
+      margin: 0 auto 34px;
+      text-align: center;
+    }
+
+    .story-section-heading p {
+      margin: 0 0 9px;
+      color: var(--gate-gold);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+    }
+
+    .story-section-heading h2 {
+      margin: 0;
+      font-family: "Shippori Mincho", serif;
+      font-size: clamp(27px, 4.6vw, 44px);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .story-promises {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .story-promise {
+      position: relative;
+      min-height: 230px;
+      overflow: hidden;
+      padding: 25px 22px;
+      border: 1px solid rgba(214, 220, 255, 0.15);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 86% 0%, rgba(157,185,255,.12), transparent 32%),
+        linear-gradient(180deg, rgba(16,20,42,.82), rgba(7,10,23,.9));
+      box-shadow: 0 16px 42px rgba(0,0,0,.23);
+    }
+
+    .story-promise__number {
+      display: block;
+      margin-bottom: 35px;
+      color: rgba(242,214,156,.46);
+      font: 500 13px/1 Georgia, serif;
+      letter-spacing: .14em;
+    }
+
+    .story-promise h3 {
+      margin: 0 0 12px;
+      font-family: "Shippori Mincho", serif;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.6;
+      letter-spacing: .04em;
+    }
+
+    .story-promise p {
+      margin: 0;
+      color: var(--gate-muted);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    .story-promise__star {
+      position: absolute;
+      right: 19px;
+      bottom: 14px;
+      color: rgba(184,166,255,.22);
+      font: 38px/1 Georgia, serif;
+    }
+
+    .story-final {
+      margin-top: 48px;
+      padding: 38px 24px;
+      border: 1px solid var(--gate-line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(242,214,156,.1), transparent 40%),
+        linear-gradient(180deg, rgba(19,18,42,.78), rgba(7,9,22,.88));
+      text-align: center;
+    }
+
+    .story-final blockquote {
+      margin: 0 auto 26px;
+      max-width: 650px;
+      color: rgba(255,255,255,.88);
+      font-family: "Shippori Mincho", serif;
+      font-size: clamp(16px, 2.5vw, 20px);
+      line-height: 2;
+    }
+
+    .story-final blockquote strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--gate-gold);
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 10px;
+      letter-spacing: .2em;
+    }
+
+    .story-final .story-portal { min-height: 76px; }
+
+    .story-notes {
+      margin-top: 26px;
+      border: 1px solid rgba(214,220,255,.13);
+      border-radius: 19px;
+      background: rgba(7,9,21,.64);
+    }
+
+    .story-notes summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 62px;
+      padding: 0 20px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      letter-spacing: .04em;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .story-notes summary::-webkit-details-marker { display: none; }
+    .story-notes summary::after { content: "+"; color: var(--gate-gold); font-size: 20px; }
+    .story-notes[open] summary::after { content: "−"; }
+
+    .story-notes__links {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 14px 14px;
+    }
+
+    .story-notes__links a {
+      display: grid;
+      min-height: 78px;
+      align-content: center;
+      gap: 4px;
+      padding: 12px 14px;
+      border: 1px solid rgba(214,220,255,.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,.025);
+      color: #fff;
+      text-decoration: none;
+      transition: border-color 180ms ease, background 180ms ease;
+    }
+
+    .story-notes__links a:hover,
+    .story-notes__links a:focus-visible {
+      border-color: rgba(242,214,156,.55);
+      background: rgba(255,255,255,.05);
+      outline: none;
+    }
+
+    .story-notes__links strong { font-size: 13px; }
+    .story-notes__links span { color: var(--gate-muted); font-size: 10px; line-height: 1.5; }
+
+    .story-footer {
+      padding: 28px 20px calc(32px + env(safe-area-inset-bottom));
+      color: rgba(255,255,255,.42);
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      .story-promises { grid-template-columns: 1fr; }
+      .story-promise { min-height: 0; }
+      .story-promise__number { margin-bottom: 20px; }
+      .story-notes__links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .story-topbar {
+        grid-template-columns: 1fr auto;
+        min-height: 58px;
+        padding-inline: 10px;
+      }
+
+      .story-brand { display: none; }
+
+      .story-return,
+      .story-sound {
+        min-height: 39px;
+        padding-inline: 12px;
+        font-size: 10px;
+      }
+
+      .story-hero { padding: 88px 14px 64px; }
+      .story-handoff { padding: 13px 14px; }
+      .story-handoff p { line-height: 1.8; }
+      .story-hero__lead { margin-top: 18px; }
+      .story-portal { grid-template-columns: 52px 1fr 20px; gap: 10px; min-height: 82px; padding: 12px; }
+      .story-portal__seal { width: 50px; height: 50px; }
+      .story-portal__copy strong { font-size: 18px; }
+      .story-scroll-cue { display: none; }
+      .story-content { width: min(100% - 20px, 1040px); padding: 58px 0 74px; }
+      .story-section-heading { margin-bottom: 25px; }
+      .story-promise { padding: 21px 18px; border-radius: 18px; }
+      .story-final { padding: 30px 15px; border-radius: 21px; }
+      .story-notes__links { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 390px) {
+      .story-return { padding-inline: 10px; }
+      .story-return span { display: none; }
+      .story-sound__label { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .story-hero h1 { font-size: 36px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .story-stars,
+      .story-stars::before,
+      .story-stars::after,
+      .story-portal__seal::before,
+      .story-portal__seal::after,
+      .story-scroll-cue::after { animation: none; }
+      .story-hero__content { opacity: 1; transform: none; transition: none; }
+      .story-portal,
+      .story-return,
+      .story-sound { transition: none; }
+    }
+  </style>
 </head>
-<body class="tb-body">
-  <main class="tb-main">
-    <section class="tb-section">
-      <p class="tb-section-kicker">COSMIC ARCHIVE</p>
-      <h1>Story Guide</h1>
-      <p class="tb-lead">初読者が神話層へ段階的に入るための案内。</p>
-      <div class="tb-actions">
-        <a class="tb-btn tb-btn--ghost" href="../index.html">Portal Top</a>
-        <a class="tb-btn tb-btn--ghost" href="../cosmogenesis.html">Cosmogenesis</a>
+<body class="tb-body story-gate-body">
+  <a class="story-skip" href="#story-main">物語の入口へ移動</a>
+
+  <header class="story-topbar" aria-label="ページ操作">
+    <a class="story-return" href="../../lumiere-gate.html">
+      ← <span>リュミエールの間</span>
+    </a>
+    <a class="story-brand" href="../index.html">TAROT BREAKER</a>
+    <button class="story-sound" type="button" aria-pressed="false" aria-label="星封ラグナを再生">
+      <span class="story-sound__icon" aria-hidden="true">♪</span>
+      <span class="story-sound__label">星封ラグナ</span>
+    </button>
+  </header>
+
+  <main id="story-main" class="story-gate">
+    <section class="story-hero" aria-labelledby="story-title">
+      <div class="story-stars" aria-hidden="true"></div>
+
+      <div class="story-hero__content">
+        <p class="story-kicker">TAROT BREAKER · FIRST GATE</p>
+
+        <div class="story-handoff">
+          <span class="story-handoff__name">LUMIERE</span>
+          <p>「旅人様。ここから先は、説明ではなく物語です。」</p>
+        </div>
+
+        <h1 id="story-title">
+          第一観測門
+          <span class="story-hero__en">THE FIRST OBSERVATION</span>
+        </h1>
+
+        <p class="story-hero__lead">
+          迷いによって閉じた未来を、<br>
+          星の言霊と一枚のカードが読み直していく。
+        </p>
+
+        <a class="story-portal" href="https://ncode.syosetu.com/n8578lq/1">
+          <span class="story-portal__seal" aria-hidden="true">✦</span>
+          <span class="story-portal__copy">
+            <small>BEGIN THE STORY</small>
+            <strong>星門をひらく</strong>
+            <span>第1話・最初の観測点へ</span>
+          </span>
+          <span class="story-portal__arrow" aria-hidden="true">›</span>
+        </a>
+        <p class="story-external-note">小説投稿サイト「小説家になろう」で物語が開きます</p>
       </div>
+
+      <span class="story-scroll-cue" aria-hidden="true">BEYOND THE GATE</span>
     </section>
-    <section class="tb-section">
-      <h2>Knowledge Network</h2>
-      <p><a class='tb-inline-link' href='./arcs.html'>Arcs</a> / <a class='tb-inline-link' href='./timeline.html'>Timeline</a> / <a class='tb-inline-link' href='../index.html#entry'>Entry</a></p>
-    </section>
+
+    <div class="story-content">
+      <section aria-labelledby="promise-title">
+        <div class="story-section-heading">
+          <p>WHAT AWAITS YOU</p>
+          <h2 id="promise-title">扉の先で、何が始まるのか</h2>
+        </div>
+
+        <div class="story-promises">
+          <article class="story-promise">
+            <span class="story-promise__number">01</span>
+            <h3>迷いが、未来を閉ざす</h3>
+            <p>言えなかった言葉、選べなかった道。心の痛みは、現実の星路にも影を落とします。</p>
+            <span class="story-promise__star" aria-hidden="true">✦</span>
+          </article>
+
+          <article class="story-promise">
+            <span class="story-promise__number">02</span>
+            <h3>星の言霊が、意味を読み直す</h3>
+            <p>シオンとしおぽんは、消すのではなく読み直すことで、閉じた可能性を探します。</p>
+            <span class="story-promise__star" aria-hidden="true">✧</span>
+          </article>
+
+          <article class="story-promise">
+            <span class="story-promise__number">03</span>
+            <h3>一枚のカードが、次を照らす</h3>
+            <p>タロットは答えを決めるものではなく、もう一度選ぶための光として物語に現れます。</p>
+            <span class="story-promise__star" aria-hidden="true">◇</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="story-final" aria-label="物語を始める">
+        <blockquote>
+          <strong>LUMIERE</strong>
+          「世界のすべてを覚える必要はありません。<br>
+          最初の星を見届ければ、物語があなたを導きます。」
+        </blockquote>
+
+        <a class="story-portal" href="https://ncode.syosetu.com/n8578lq/1">
+          <span class="story-portal__seal" aria-hidden="true">✦</span>
+          <span class="story-portal__copy">
+            <small>START READING</small>
+            <strong>第1話から読む</strong>
+            <span>あなたの最初の観測を始める</span>
+          </span>
+          <span class="story-portal__arrow" aria-hidden="true">›</span>
+        </a>
+      </section>
+
+      <details class="story-notes">
+        <summary>物語に入る前に、少しだけ知りたい</summary>
+        <nav class="story-notes__links" aria-label="補助資料">
+          <a href="../index.html#intro">
+            <strong>タロブレとは</strong>
+            <span>物語の核を短く知る</span>
+          </a>
+          <a href="../index.html#characters">
+            <strong>登場人物</strong>
+            <span>主要人物を先に見る</span>
+          </a>
+          <a href="./arcs.html">
+            <strong>章一覧</strong>
+            <span>物語全体の流れを見る</span>
+          </a>
+          <a href="./timeline.html">
+            <strong>時系列</strong>
+            <span>出来事の順番を確認する</span>
+          </a>
+        </nav>
+      </details>
+    </div>
   </main>
+
+  <footer class="story-footer">TAROT BREAKER · RE:VERSE SHION</footer>
+
+  <audio id="story-bgm" src="../../audio/seifu-raguna.mp3" loop preload="metadata"></audio>
+  <script>
+    (() => {
+      const body = document.body;
+      const soundButton = document.querySelector(".story-sound");
+      const soundIcon = document.querySelector(".story-sound__icon");
+      const soundLabel = document.querySelector(".story-sound__label");
+      const bgm = document.getElementById("story-bgm");
+      let busy = false;
+
+      const updateSound = (playing, failed = false) => {
+        soundButton.classList.toggle("is-playing", playing);
+        soundButton.setAttribute("aria-pressed", playing ? "true" : "false");
+        soundButton.setAttribute("aria-label", failed
+          ? "星封ラグナを再生できませんでした"
+          : (playing ? "星封ラグナを停止" : "星封ラグナを再生"));
+        soundIcon.textContent = playing ? "Ⅱ" : "♪";
+        soundLabel.textContent = failed ? "再生できません" : "星封ラグナ";
+      };
+
+      soundButton.addEventListener("click", async () => {
+        if (busy) return;
+        busy = true;
+        try {
+          if (bgm.paused) {
+            bgm.volume = 0.56;
+            await bgm.play();
+          } else {
+            bgm.pause();
+          }
+        } catch (error) {
+          updateSound(false, true);
+          window.setTimeout(() => updateSound(false), 2200);
+        } finally {
+          busy = false;
+        }
+      });
+
+      bgm.addEventListener("play", () => updateSound(true));
+      bgm.addEventListener("pause", () => updateSound(false));
+      window.requestAnimationFrame(() => body.classList.add("is-ready"));
+    })();
+  </script>
 </body>
 </html>
