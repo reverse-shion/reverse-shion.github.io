@@ -21,7 +21,7 @@
       --transition: 900ms ease;
       --font-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
-      --lumiere-bust-bottom: 22vh;
+      --lumiere-bust-bottom: 18vh;
 
       --lumiere-mouth-x: 0px;
       --lumiere-mouth-y: 0px;
@@ -143,14 +143,18 @@
 
     .lumiere-full {
       position: absolute;
-      bottom: 8vh;
+      bottom: clamp(76px, 8vh, 112px);
       left: 50%;
       transform: translateX(-50%) translateY(10px);
       opacity: 0;
-      max-width: min(60vh, 70vw);
+      width: min(50vh, 54vw);
+      max-width: none;
       transition: opacity 800ms ease, transform 1600ms ease;
       z-index: 3;
       animation: float 9s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(243, 217, 163, 0.22));
+      -webkit-mask-image: radial-gradient(ellipse 76% 90% at 50% 48%, #000 0 55%, rgba(0, 0, 0, 0.9) 70%, transparent 100%);
+      mask-image: radial-gradient(ellipse 76% 90% at 50% 48%, #000 0 55%, rgba(0, 0, 0, 0.9) 70%, transparent 100%);
     }
     .lumiere-full.show {
       opacity: 1;
@@ -167,12 +171,12 @@
       bottom: calc(var(--lumiere-bust-bottom) + env(safe-area-inset-bottom, 0px));
       left: 50%;
       transform: translateX(-50%);
-      max-width: min(58vh, 78vw);
+      max-width: none;
       opacity: 0;
       transition: opacity 800ms ease;
       z-index: 4;
       animation: gentleFloat 6s ease-in-out infinite;
-      filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
+      filter: drop-shadow(0 0 16px rgba(255,255,255,0.42));
     }
     .lumiere-bust.is-visible { opacity: 1; }
     .lumiere-bust.speaking { filter: drop-shadow(0 0 16px rgba(255,255,255,0.8)); }
@@ -185,9 +189,52 @@
 
     .lumiere-bust .frame.lumiere-face{
       position: relative;
-      width: min(80vw, 420px);
+      width: min(32vw, 350px);
       margin: 0 auto;
       display: inline-block;
+      -webkit-mask-image: radial-gradient(ellipse 76% 91% at 50% 45%, #000 0 58%, rgba(0, 0, 0, 0.92) 72%, transparent 100%);
+      mask-image: radial-gradient(ellipse 76% 91% at 50% 45%, #000 0 58%, rgba(0, 0, 0, 0.92) 72%, transparent 100%);
+    }
+
+    .lumiere-intro {
+      position: absolute;
+      top: 24%;
+      right: max(5vw, 38px);
+      z-index: 4;
+      color: #fff;
+      text-align: right;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.82);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 900ms ease 320ms, transform 900ms ease 320ms;
+      pointer-events: none;
+    }
+    .lumiere-full.show + .lumiere-intro {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .lumiere-intro__role {
+      display: block;
+      margin-bottom: 5px;
+      color: #ffe0a2;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+    }
+    .lumiere-intro__name {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(24px, 3vw, 38px);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      line-height: 1.1;
+    }
+    .lumiere-intro__ja {
+      display: block;
+      margin-top: 7px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 11px;
+      letter-spacing: 0.12em;
     }
 
     .lumiere-base{
@@ -219,16 +266,18 @@
     .dialogue-window {
       position: absolute;
       left: 50%;
-      bottom: 6vh;
+      bottom: max(18px, calc(env(safe-area-inset-bottom) + 10px));
       transform: translateX(-50%);
-      width: min(var(--dialog-max), 92vw);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.58));
-      border: 1px solid rgba(243, 217, 163, 0.6);
-      border-radius: 16px;
+      width: min(760px, calc(100vw - 32px));
+      background:
+        radial-gradient(circle at 20% 0%, rgba(217, 215, 255, 0.13), transparent 46%),
+        linear-gradient(180deg, rgba(12, 14, 31, 0.84), rgba(8, 10, 24, 0.9));
+      border: 1px solid rgba(243, 217, 163, 0.52);
+      border-radius: 18px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-      padding: clamp(14px, 3vw, 18px);
-      color: #1b1e2a;
+      backdrop-filter: blur(15px);
+      padding: clamp(14px, 2.4vw, 18px) clamp(16px, 3vw, 22px) clamp(18px, 2.6vw, 22px);
+      color: rgba(255, 255, 255, 0.94);
       z-index: 5;
       opacity: 0;
       transition: opacity 600ms ease;
@@ -237,17 +286,19 @@
     .dialogue-window.is-visible { opacity: 1; pointer-events: auto; }
 
     .dialogue-name {
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      color: #6c5c2c;
-      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: #f3d9a3;
+      margin-bottom: 7px;
     }
 
     .dialogue-text {
       white-space: pre-line;
       font-size: clamp(15px, 2.5vw, 17px);
       line-height: 1.7;
-      min-height: 3.4em;
+      min-height: 3.3em;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
     }
 
     .dialogue-next {
@@ -255,7 +306,7 @@
       right: 14px;
       bottom: 10px;
       font-size: 13px;
-      color: #876c2b;
+      color: #f3d9a3;
       text-shadow: 0 0 8px rgba(243, 217, 163, 0.7);
       opacity: 0;
       animation: blink 1.4s ease-in-out infinite;
@@ -270,7 +321,7 @@
       gap: 10px;
       align-items: center;
     }
-    .name-input label { font-size: 14px; color: #3b3b52; }
+    .name-input label { font-size: 14px; color: rgba(255, 255, 255, 0.82); }
     .name-input input {
       flex: 1 1 180px;
       padding: 10px 12px;
@@ -288,7 +339,7 @@
     }
     .name-input .error {
       width: 100%;
-      color: #8a1f2d;
+      color: #ffb7c1;
       font-size: 13px;
       margin-top: -4px;
     }
@@ -369,75 +420,98 @@
       100% { transform: translateY(-16px) scale(1); opacity: 0; }
     }
 
+    .gate-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 20;
+      width: 100%;
+      padding:
+        max(8px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        22px
+        max(12px, env(safe-area-inset-left));
+      background: linear-gradient(180deg, rgba(6, 7, 17, 0.82) 0%, rgba(6, 7, 17, 0.42) 62%, transparent 100%);
+      pointer-events: none;
+    }
+    .gate-header__inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+      width: min(1180px, 100%);
+      min-height: 56px;
+      margin: 0 auto;
+    }
+    .gate-actions {
+      display: flex;
+      align-items: center;
+      justify-self: end;
+      gap: 7px;
+      pointer-events: auto;
+    }
     .gate-home,
     .gate-guide {
-      position: fixed;
-      top: max(14px, env(safe-area-inset-top));
-      z-index: 20;
       display: inline-flex;
       align-items: center;
-      min-height: 42px;
-      padding: 0 14px;
-      border: 1px solid rgba(243, 217, 163, 0.48);
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid transparent;
       border-radius: 999px;
-      background: rgba(8, 10, 22, 0.56);
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 12px;
-      letter-spacing: 0.08em;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 11px;
+      letter-spacing: 0.06em;
       text-decoration: none;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+      transition: border-color 180ms ease, background 180ms ease, color 180ms ease, transform 180ms ease;
+      pointer-events: auto;
     }
-    .gate-home { left: max(14px, env(safe-area-inset-left)); }
-    .gate-guide { right: calc(max(14px, env(safe-area-inset-right)) + 126px); }
+    .gate-home { justify-self: start; }
+    .gate-control__icon {
+      color: #f3d9a3;
+      font-size: 15px;
+      line-height: 1;
+    }
+    .gate-control__label--short { display: none; }
     .gate-home:hover,
     .gate-guide:hover,
     .gate-home:focus-visible,
     .gate-guide:focus-visible {
       transform: translateY(-1px);
-      border-color: rgba(243, 217, 163, 0.9);
-      background: rgba(25, 24, 45, 0.76);
+      border-color: rgba(243, 217, 163, 0.42);
+      background: rgba(25, 24, 45, 0.58);
+      color: #fff;
       outline: none;
     }
 
     .gate-identity {
-      position: fixed;
-      top: max(14px, env(safe-area-inset-top));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 19;
-      min-width: min(320px, 50vw);
-      padding: 10px 22px 11px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 218, 148, 0.55);
-      border-radius: 18px;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(217, 215, 255, 0.22), transparent 58%),
-        linear-gradient(180deg, rgba(8, 10, 25, 0.84), rgba(12, 12, 28, 0.68));
-      box-shadow:
-        0 12px 34px rgba(0, 0, 0, 0.34),
-        inset 0 0 24px rgba(255, 255, 255, 0.05),
-        0 0 24px rgba(217, 215, 255, 0.12);
+      position: relative;
+      min-width: min(300px, 42vw);
+      padding: 2px 18px 4px;
       color: #fff;
       text-align: center;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.88);
-      backdrop-filter: blur(12px);
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
       pointer-events: none;
     }
-    .gate-identity::before {
+    .gate-identity::after {
       content: "";
       position: absolute;
-      inset: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
+      left: 50%;
+      bottom: -4px;
+      width: 76%;
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, rgba(243, 217, 163, 0.7), transparent);
+      box-shadow: 0 0 12px rgba(243, 217, 163, 0.34);
       pointer-events: none;
     }
     .gate-identity__kicker {
       position: relative;
-      margin: 0 0 3px;
+      margin: 0 0 2px;
       color: #ffe0a2;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.24em;
       text-shadow: 0 0 12px rgba(243, 217, 163, 0.55), 0 2px 8px #000;
@@ -445,15 +519,15 @@
     .gate-identity h1 {
       position: relative;
       margin: 0;
-      font-size: clamp(15px, 2vw, 19px);
+      font-size: clamp(16px, 1.7vw, 19px);
       font-weight: 700;
       letter-spacing: 0.13em;
     }
     .gate-identity__tagline {
       position: relative;
-      margin: 4px 0 0;
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 10px;
+      margin: 3px 0 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 9px;
       line-height: 1.5;
       letter-spacing: 0.08em;
     }
@@ -621,40 +695,35 @@
     .noscript-gate a { color: var(--gold); }
 
     .sound-toggle {
-      position: fixed;
-      top: max(14px, env(safe-area-inset-top));
-      right: max(14px, env(safe-area-inset-right));
-      z-index: 20;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 7px;
       width: auto;
-      min-width: 118px;
-      height: 44px;
-      padding: 0 13px;
-      border: 1px solid rgba(243, 217, 163, 0.68);
+      min-width: 104px;
+      height: 38px;
+      padding: 0 11px;
+      border: 1px solid transparent;
       border-radius: 999px;
-      background: rgba(8, 10, 22, 0.62);
-      color: #fff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
-      backdrop-filter: blur(10px);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.82);
+      box-shadow: none;
       cursor: pointer;
       transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
     }
     .sound-toggle:hover,
     .sound-toggle:focus-visible {
       transform: translateY(-1px);
-      border-color: rgba(243, 217, 163, 0.95);
-      background: rgba(25, 24, 45, 0.8);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+      border-color: rgba(243, 217, 163, 0.42);
+      background: rgba(25, 24, 45, 0.58);
+      box-shadow: none;
       outline: none;
     }
     .sound-toggle:active { transform: translateY(0); }
     .sound-toggle.is-playing {
-      border-color: #ffe0a2;
-      background: linear-gradient(135deg, rgba(74, 54, 99, 0.9), rgba(18, 19, 42, 0.88));
-      box-shadow: 0 0 20px rgba(217, 215, 255, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+      border-color: rgba(255, 224, 162, 0.72);
+      background: rgba(50, 38, 72, 0.66);
+      box-shadow: 0 0 18px rgba(217, 215, 255, 0.18);
     }
     .sound-toggle__icon {
       min-width: 14px;
@@ -666,7 +735,7 @@
       user-select: none;
     }
     .sound-toggle__label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.08em;
       white-space: nowrap;
@@ -690,24 +759,60 @@
     .overlay-dim.show { opacity: 1; pointer-events: auto; }
 
     @media (max-width: 720px) {
+      .gate-header {
+        padding:
+          max(7px, env(safe-area-inset-top))
+          max(8px, env(safe-area-inset-right))
+          18px
+          max(8px, env(safe-area-inset-left));
+      }
+      .gate-header__inner {
+        grid-template-columns: auto minmax(118px, 1fr) auto;
+        gap: 3px;
+        min-height: 48px;
+      }
       .gate-home,
       .gate-guide {
-        min-height: 38px;
-        padding: 0 10px;
-        font-size: 10px;
+        min-height: 34px;
+        padding: 0 8px;
+        font-size: 9px;
       }
-      .gate-guide { right: calc(max(10px, env(safe-area-inset-right)) + 116px); }
+      .gate-actions { gap: 0; }
       .gate-identity {
-        top: calc(max(14px, env(safe-area-inset-top)) + 52px);
-        width: min(264px, 72vw);
+        width: auto;
         min-width: 0;
-        padding: 9px 14px 10px;
-        border-radius: 15px;
+        padding: 1px 4px 3px;
       }
-      .gate-identity__kicker { font-size: 9px; }
-      .gate-identity h1 { font-size: 15px; }
-      .gate-identity__tagline { font-size: 9px; }
-      .dialogue-window { bottom: 8vh; border-radius: 14px; }
+      .gate-identity__kicker { font-size: 7px; letter-spacing: 0.18em; }
+      .gate-identity h1 { font-size: 13px; letter-spacing: 0.08em; white-space: nowrap; }
+      .gate-identity__tagline { display: none; }
+      .gate-control__label--long { display: none; }
+      .gate-control__label--short { display: inline; }
+      .sound-toggle {
+        width: 34px;
+        min-width: 34px;
+        height: 34px;
+        padding: 0;
+      }
+      .sound-toggle__label { display: none; }
+      .lumiere-full {
+        width: min(66vw, 42vh);
+      }
+      .lumiere-bust .frame.lumiere-face {
+        width: min(60vw, 300px);
+      }
+      .lumiere-intro {
+        top: calc(max(7px, env(safe-area-inset-top)) + 78px);
+        right: 14px;
+      }
+      .lumiere-intro__role { font-size: 8px; }
+      .lumiere-intro__name { font-size: 21px; }
+      .lumiere-intro__ja { margin-top: 5px; font-size: 9px; }
+      .dialogue-window {
+        bottom: max(10px, calc(env(safe-area-inset-bottom) + 6px));
+        width: calc(100vw - 20px);
+        border-radius: 16px;
+      }
       .menu {
         bottom: max(10px, env(safe-area-inset-bottom));
         grid-template-columns: 1fr;
@@ -736,26 +841,17 @@
       .name-input { flex-direction: column; align-items: stretch; }
       .name-input input,
       .name-input .gold-button { width: 100%; }
-      :root { --lumiere-bust-bottom: 20vh; }
+      :root { --lumiere-bust-bottom: 16vh; }
     }
     @media (max-width: 480px) {
-      .lumiere-full { bottom: 4vh; }
       .dialogue-window { padding: 12px 14px 18px; }
-      .gate-home { left: max(10px, env(safe-area-inset-left)); }
-      .sound-toggle {
-        top: max(10px, env(safe-area-inset-top));
-        right: max(10px, env(safe-area-inset-right));
-        min-width: 106px;
-        height: 38px;
-        padding: 0 10px;
-      }
-      .sound-toggle__label { font-size: 9px; }
-      :root { --lumiere-bust-bottom: 18vh; }
+      .lumiere-intro__ja { display: none; }
+      :root { --lumiere-bust-bottom: 15vh; }
     }
     @media (max-height: 700px) {
-      .dialogue-window { bottom: 10vh; }
+      .dialogue-window { bottom: max(8px, env(safe-area-inset-bottom)); }
       .menu { max-height: 62vh; }
-      :root { --lumiere-bust-bottom: 16vh; }
+      :root { --lumiere-bust-bottom: 14vh; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -773,13 +869,31 @@
 
   <div class="star-field" aria-hidden="true"></div>
 
-  <a class="gate-home" href="/" aria-label="Re:Verse Shion公式トップへ戻る">← 公式トップ</a>
-  <div class="gate-identity">
-    <p class="gate-identity__kicker">TAROT BREAKER</p>
-    <h1>リュミエールの間</h1>
-    <p class="gate-identity__tagline">星の言霊が、運命の扉をひらく</p>
-  </div>
-  <a class="gate-guide" href="tarot-breaker/" aria-label="TAROT BREAKERの作品案内を見る">タロブレとは</a>
+  <header class="gate-header">
+    <div class="gate-header__inner">
+      <a class="gate-home" href="/" aria-label="Re:Verse Shion公式トップへ戻る">
+        <span class="gate-control__icon" aria-hidden="true">←</span>
+        <span class="gate-control__label gate-control__label--long">公式トップ</span>
+        <span class="gate-control__label gate-control__label--short">公式</span>
+      </a>
+
+      <div class="gate-identity">
+        <p class="gate-identity__kicker">TAROT BREAKER</p>
+        <h1>リュミエールの間</h1>
+        <p class="gate-identity__tagline">星の言霊が、運命の扉をひらく</p>
+      </div>
+
+      <nav class="gate-actions" aria-label="ページ操作">
+        <a class="gate-guide" href="tarot-breaker/" aria-label="TAROT BREAKERの作品案内を見る">
+          <span class="gate-control__label">作品案内</span>
+        </a>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-label="星封ラグナを再生" aria-pressed="false">
+          <span class="sound-toggle__icon" aria-hidden="true">♪</span>
+          <span class="sound-toggle__label">星封ラグナ</span>
+        </button>
+      </nav>
+    </div>
+  </header>
 
   <main>
     <section class="scene scene-foyer is-active" aria-label="静かな前室">
@@ -795,6 +909,11 @@
       <div class="hall-overlay"></div>
 
       <img src="img/lumiere-full.png" alt="" class="lumiere-full" id="fullFigure">
+      <div class="lumiere-intro" aria-hidden="true">
+        <span class="lumiere-intro__role">STAR GUIDE</span>
+        <span class="lumiere-intro__name">LUMIERE</span>
+        <span class="lumiere-intro__ja">星界の案内人・リュミエール</span>
+      </div>
 
       <div class="lumiere-bust" id="bustContainer" aria-hidden="true">
         <div class="frame lumiere-face" id="lumiereFaceFrame">
@@ -805,7 +924,7 @@
       </div>
 
       <div class="dialogue-window" id="dialogueWindow" aria-live="polite">
-        <div class="dialogue-name">Lumiere</div>
+        <div class="dialogue-name">LUMIERE · 星界の案内人</div>
         <div class="dialogue-text" id="dialogueText"></div>
         <div class="dialogue-next" id="dialogueNext">▶</div>
 
@@ -857,10 +976,6 @@
     </section>
   </main>
 
-  <button class="sound-toggle" id="soundToggle" type="button" aria-label="星封ラグナを再生" aria-pressed="false">
-    <span class="sound-toggle__icon" aria-hidden="true">♪</span>
-    <span class="sound-toggle__label">星封ラグナ</span>
-  </button>
   <div class="overlay-dim" id="dimOverlay"></div>
   <audio id="bgm" src="audio/seifu-raguna.mp3" loop preload="metadata"></audio>
 
