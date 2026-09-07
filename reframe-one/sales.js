@@ -1,18 +1,18 @@
-// Stripe審査完了後は、この2行だけを更新してください。
+// PAY.JP本番審査・決済導入完了後は、この2行を更新します。
 const SALES_STATUS = "preparing"; // "preparing" | "open" | "closed"
-const STRIPE_PAYMENT_URL = "";
+const PAYMENT_URL = "";
 
 const salesViews = {
-  preparing: "現在、販売開始準備中です",
+  preparing: "現在、カード決済の導入準備中です",
   closed: "Re:Frame ONE βの募集は終了しました。ご参加ありがとうございました。"
 };
 
 document.querySelectorAll("[data-sales-cta]").forEach((container) => {
-  const canPurchase = SALES_STATUS === "open" && STRIPE_PAYMENT_URL;
+  const canPurchase = SALES_STATUS === "open" && PAYMENT_URL;
   if (canPurchase) {
     const link = document.createElement("a");
     link.className = "purchase-button";
-    link.href = STRIPE_PAYMENT_URL;
+    link.href = PAYMENT_URL;
     link.textContent = "Re:Frame ONE βを購入する　¥980";
     link.setAttribute("aria-label", "Re:Frame ONE βを980円で購入する");
     container.appendChild(link);
