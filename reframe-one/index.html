@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8f2f8">
+  <meta name="theme-color" content="#f7f0f7">
   <meta name="color-scheme" content="light">
   <title>Re:Frame ONE β｜「相手はどう思ってる？」から「私はどうする？」へ。</title>
   <meta name="description" content="Re:Frame ONEは、恋愛で感情のまま動く前に10分立ち止まり、事実・解釈・感情を整理して、今日の一歩を自分で選ぶための自己整理Webアプリです。">
@@ -14,308 +14,428 @@
   <meta property="og:title" content="Re:Frame ONE β｜「相手はどう思ってる？」から「私はどうする？」へ。">
   <meta property="og:description" content="返信が来ない夜。答えを当てる前に、事実・解釈・感情を分けて、今日の自分の一歩を選ぶ10分。">
   <meta property="og:url" content="https://reverse-shion.github.io/reframe-one/">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Noto+Serif+JP:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Re:Frame ONE LP conversion & mobile readability refinements */
-    .hero-proof{
-      display:flex;flex-wrap:wrap;gap:8px 10px;margin:18px 0 24px;padding:0;list-style:none
+    :root{
+      --bg:#fcf8fc;
+      --bg-soft:#f5ecf6;
+      --panel:#ffffffcc;
+      --panel-strong:#fffdfefe;
+      --line:rgba(90,65,113,.12);
+      --line-strong:rgba(90,65,113,.18);
+      --ink:#2e2538;
+      --muted:#6f6679;
+      --violet:#74528c;
+      --violet-deep:#55366d;
+      --rose:#ba7e9e;
+      --gold:#b9975b;
+      --shadow:0 20px 60px rgba(84,58,104,.10);
+      --radius:24px;
+      --max:1120px;
     }
-    .hero-proof li{
-      padding:8px 12px;border:1px solid rgba(130,100,158,.14);border-radius:999px;
-      background:rgba(255,255,255,.66);color:#675c70;font-size:11px;line-height:1.4
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(214,184,224,.28), transparent 28%),
+        radial-gradient(circle at 100% 12%, rgba(243,206,219,.28), transparent 26%),
+        linear-gradient(180deg, #fffdfd 0%, #fbf7fb 25%, #f5edf6 100%);
+      font-family:"Noto Serif JP",serif;
+      line-height:1.8;
+      letter-spacing:.02em;
     }
-    .hero-promise{
-      max-width:680px;margin:22px 0 0;padding:17px 20px;border-left:2px solid var(--rose);
-      background:rgba(255,255,255,.48);color:var(--violet-deep);font-size:14px;line-height:1.9
+    img{max-width:100%;display:block}
+    a{color:inherit}
+    .container{width:min(calc(100% - 40px), var(--max));margin:0 auto}
+    .site-header{
+      position:sticky;top:0;z-index:20;
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      background:rgba(255,252,255,.76);
+      border-bottom:1px solid var(--line);
     }
-    .prelaunch-link{
-      display:inline-flex;align-items:center;justify-content:center;margin-top:14px;
-      color:var(--violet-deep);font-size:12px;font-weight:600;text-underline-offset:4px
+    .site-header__inner{
+      min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px;
     }
-    .quick-value{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:42px
-    }
-    .quick-value article{
-      padding:22px 20px;border:1px solid rgba(130,100,158,.13);border-radius:18px;
-      background:rgba(255,255,255,.68);box-shadow:0 10px 28px rgba(77,52,92,.04)
-    }
-    .quick-value b{
-      display:block;margin-bottom:8px;color:var(--rose);font-family:Cinzel,serif;
-      font-size:10px;letter-spacing:.18em
-    }
-    .quick-value h3{margin:0 0 8px;color:var(--ink-deep);font-size:16px}
-    .quick-value p{margin:0;color:var(--muted);font-size:12px;line-height:1.8}
+    .brand{display:flex;flex-direction:column;text-decoration:none;line-height:1.2}
+    .brand strong{font-family:Cinzel,serif;font-size:20px;letter-spacing:.16em;color:var(--violet-deep)}
+    .brand span{font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+    .header-tag{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.72);font-size:12px;color:var(--muted)}
 
-    .can-cannot{
-      display:grid;grid-template-columns:1.12fr .88fr;gap:18px
+    .hero{padding:44px 0 28px}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:28px;align-items:start}
+    .hero-copy,.hero-side,.section-card,.faq-item,.value-card,.audience-card,.step-card,.brand-card,.can-card,.purchase-card,.final-cta{
+      background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);
     }
-    .can-cannot article{
-      padding:28px;border:1px solid rgba(130,100,158,.13);border-radius:20px;
-      background:rgba(255,255,255,.68)
-    }
-    .can-cannot article:first-child{
-      background:linear-gradient(145deg,rgba(252,241,246,.92),rgba(244,238,250,.9))
-    }
-    .can-cannot h3{margin:0 0 14px;color:var(--ink-deep)}
-    .can-cannot ul{margin:0;padding-left:1.2em;color:var(--muted);font-size:14px}
-    .can-cannot li+li{margin-top:8px}
+    .hero-copy{padding:34px}
+    .eyebrow{display:flex;align-items:center;gap:10px;margin:0 0 18px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--violet);font-family:Cinzel,serif}
+    .eyebrow .beta{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1px solid rgba(116,82,140,.35);font-size:14px}
+    .hero-copy h1{margin:0;font-size:clamp(34px,6vw,60px);line-height:1.3;letter-spacing:.04em;color:var(--ink);text-wrap:balance}
+    .hero-copy h1 em{font-style:normal;color:var(--violet-deep)}
+    .hero-sub{margin:20px 0 0;font-size:18px;color:var(--rose)}
+    .hero-lead{margin:22px 0 0;font-size:15px;color:var(--muted)}
+    .trust-chips{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0 0;padding:0;list-style:none}
+    .trust-chips li{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--violet-deep)}
+    .hero-promise{margin:22px 0 0;padding:18px 18px 18px 20px;border-left:3px solid var(--rose);background:rgba(255,255,255,.72);border-radius:16px;font-size:14px;color:var(--violet-deep)}
+    .mini-brand{margin-top:22px;font-size:13px;color:var(--muted)}
+    .mini-brand strong{color:var(--ink)}
 
-    .purchase-info{padding-top:84px;padding-bottom:84px}
-    .purchase-card{
-      padding:32px;border:1px solid rgba(130,100,158,.15);border-radius:24px;
-      background:rgba(255,255,255,.78);box-shadow:var(--shadow)
-    }
-    .purchase-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.95}
-    .purchase-card p+p{margin-top:16px}
-    .purchase-card strong{color:var(--ink-deep)}
-    .purchase-card a{color:var(--violet-deep);font-weight:600;text-underline-offset:4px}
-    .access-steps{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0
-    }
-    .access-steps div{
-      padding:16px;border:1px solid rgba(130,100,158,.12);border-radius:14px;
-      background:rgba(248,243,250,.78)
-    }
-    .access-steps b{
-      display:block;margin-bottom:5px;color:var(--rose);font-family:Cinzel,serif;
-      font-size:9px;letter-spacing:.15em
-    }
-    .access-steps span{color:var(--ink);font-size:12px;line-height:1.6}
-    .period-note{
-      margin-top:18px!important;padding:14px 16px;border-radius:14px;
-      background:rgba(244,223,232,.32);color:var(--ink)!important
-    }
+    .hero-side{padding:24px;display:grid;gap:18px}
+    .offer-panel{padding:24px;border-radius:20px;background:linear-gradient(145deg, rgba(121,86,145,.10), rgba(223,191,206,.18));border:1px solid var(--line)}
+    .offer-kicker{margin:0;color:var(--violet);font-family:Cinzel,serif;letter-spacing:.16em;font-size:11px;text-transform:uppercase}
+    .offer-price{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-top:12px}
+    .offer-price strong{font-family:Cinzel,serif;font-size:54px;line-height:1;color:var(--violet-deep)}
+    .offer-price span{font-size:13px;color:var(--muted)}
+    .sales-cta{width:100%;margin-top:18px}
+    .purchase-button,.sales-message{display:flex;align-items:center;justify-content:center;min-height:62px;width:100%;padding:16px 18px;border-radius:999px;text-align:center;font-weight:600;text-decoration:none;letter-spacing:.04em}
+    .purchase-button{color:#fff;background:linear-gradient(96deg,#72538b 0%,#b97d9e 55%,#cfa56b 100%);box-shadow:0 16px 38px rgba(116,82,140,.26)}
+    .sales-message{background:#fff;color:var(--violet-deep);border:1px solid var(--line-strong)}
+    .cta-note{margin:12px 0 0;font-size:12px;color:var(--muted)}
+    .cta-links{display:grid;gap:10px;margin-top:16px}
+    .text-link{display:inline-flex;justify-content:center;align-items:center;padding:13px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;text-decoration:none;font-size:14px;color:var(--violet-deep)}
 
-    .faq-grid{display:grid;gap:10px}
-    .faq-grid details{
-      padding:18px 20px;border:1px solid rgba(130,100,158,.13);border-radius:16px;
-      background:rgba(255,255,255,.65)
-    }
-    .faq-grid summary{
-      cursor:pointer;color:var(--ink-deep);font-weight:600;font-size:14px
-    }
-    .faq-grid p{margin:12px 0 0;color:var(--muted);font-size:13px;line-height:1.9}
+    .hero-points{display:grid;gap:12px}
+    .hero-point{display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:start;padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
+    .hero-point__num{display:grid;place-items:center;width:56px;height:56px;border-radius:18px;background:linear-gradient(145deg,rgba(116,82,140,.14),rgba(186,126,158,.12));font-family:Cinzel,serif;color:var(--violet-deep);font-size:18px}
+    .hero-point h2{margin:0 0 4px;font-size:18px;color:var(--ink)}
+    .hero-point p{margin:0;font-size:13px;color:var(--muted)}
 
-    /* The old .prose color was intended for the dark tarot block only. */
-    .section:not(.tarot-section) .prose p{color:var(--muted)}
-    .section:not(.tarot-section) .prose strong{color:var(--ink-deep)}
-    .section:not(.tarot-section) .prose a{color:var(--violet-deep)}
+    .section{padding:28px 0}
+    .section-heading{margin-bottom:18px}
+    .section-heading .label{display:block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--rose);font-family:Cinzel,serif;margin-bottom:8px}
+    .section-heading h2{margin:0;font-size:clamp(28px,4.2vw,42px);line-height:1.35;letter-spacing:.04em;color:var(--ink)}
+    .section-heading p{margin:12px 0 0;color:var(--muted);font-size:15px;max-width:760px}
 
-    @media(max-width:820px){
-      .quick-value,.can-cannot,.access-steps{grid-template-columns:1fr}
-      .purchase-info{padding-top:64px;padding-bottom:64px}
+    .audience-grid,.value-grid,.steps-grid,.faq-grid{display:grid;gap:16px}
+    .audience-grid{grid-template-columns:repeat(3,1fr)}
+    .audience-card,.value-card,.step-card,.faq-item,.brand-card,.can-card,.purchase-card,.section-card{padding:24px}
+    .audience-card h3,.value-card h3,.step-card h3,.brand-card h3,.can-card h3,.purchase-card h3,.faq-item h3{margin:0 0 10px;font-size:18px;color:var(--ink)}
+    .audience-card p,.value-card p,.step-card p,.brand-card p,.can-card p,.purchase-card p,.faq-item p{margin:0;color:var(--muted);font-size:14px}
+
+    .value-grid{grid-template-columns:repeat(3,1fr)}
+    .value-card__kicker,.step-card__kicker{display:block;margin-bottom:10px;color:var(--violet);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-family:Cinzel,serif}
+
+    .split-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+    .brand-card{background:linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,242,250,.92))}
+    .brand-quote{margin-top:18px;padding:18px;border-radius:18px;background:rgba(116,82,140,.08);color:var(--violet-deep);font-size:15px}
+    .can-card ul{margin:0;padding-left:1.2em;color:var(--muted)}
+    .can-card li+li{margin-top:8px}
+
+    .beta-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+    .purchase-card{background:var(--panel-strong)}
+    .access-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+    .access-steps div{padding:16px;border-radius:16px;border:1px solid var(--line);background:rgba(116,82,140,.05)}
+    .access-steps b{display:block;margin-bottom:6px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rose);font-family:Cinzel,serif}
+    .access-steps span{font-size:13px;color:var(--ink)}
+    .period-note{padding:16px;border-radius:16px;background:rgba(186,126,158,.08);font-size:13px;color:var(--violet-deep)}
+    .purchase-box{padding:26px;border-radius:24px;background:linear-gradient(160deg, rgba(120,85,144,.10), rgba(237,205,221,.18));border:1px solid var(--line);position:sticky;top:94px}
+    .purchase-box .badge{display:inline-block;padding:9px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;color:var(--violet-deep)}
+    .purchase-box .price{margin:18px 0 6px;font-family:Cinzel,serif;font-size:60px;line-height:1;color:var(--violet-deep)}
+    .purchase-box .caption{margin:0;color:var(--muted);font-size:13px}
+    .purchase-box .text-link{margin-top:14px}
+
+    .faq-grid{grid-template-columns:repeat(2,1fr)}
+    .faq-item{background:rgba(255,255,255,.82)}
+
+    .final-cta{padding:34px;margin:28px 0 56px;text-align:center;background:linear-gradient(160deg, rgba(255,255,255,.96), rgba(247,239,249,.94))}
+    .final-cta h2{margin:0;font-size:clamp(30px,4.2vw,46px);line-height:1.35;letter-spacing:.04em}
+    .final-cta p{margin:14px auto 0;max-width:720px;color:var(--muted);font-size:15px}
+    .final-cta .offer-line{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:18px;font-size:14px;color:var(--violet-deep)}
+    .final-cta .sales-cta{max-width:420px;margin:20px auto 0}
+    .final-cta .cta-links{max-width:420px;margin:14px auto 0}
+
+    .site-footer{padding:30px 0 48px;border-top:1px solid var(--line)}
+    .footer-inner{display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center}
+    .footer-brand{font-family:Cinzel,serif;text-decoration:none;color:var(--violet-deep);letter-spacing:.1em}
+    .footer-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px}
+    .footer-nav a{font-size:12px;color:var(--muted);text-decoration:none}
+    .footer-copy{font-size:11px;color:#9a91a4}
+
+    @media (max-width: 980px){
+      .hero-grid,.beta-layout,.split-grid{grid-template-columns:1fr}
+      .audience-grid,.value-grid,.faq-grid{grid-template-columns:1fr 1fr}
+      .purchase-box{position:static}
     }
-    @media(max-width:520px){
-      .section{padding-top:56px;padding-bottom:56px}
-      .hero{padding-top:46px;padding-bottom:54px}
-      .hero__layout{gap:26px}
-      .hero__visual{min-height:225px}
-      .oracle-card{width:155px}
-      .lead{margin:24px 0 20px}
-      .hero-proof{justify-content:center;margin:14px 0 20px}
-      .hero-promise{margin-top:18px;padding:14px 16px;font-size:13px;text-align:left}
-      .quick-value{margin-top:30px}
-      .quick-value article{padding:18px}
-      h2{margin-bottom:24px}
-      .closing-copy{margin-top:34px}
-      .purchase-info{padding-top:48px;padding-bottom:48px}
-      .purchase-card{padding:22px 18px;border-radius:20px}
-      .access-steps{margin:18px 0}
-      .final-cta{padding-top:72px;padding-bottom:72px}
-      .final-cta:before{width:360px;height:360px}
-      .after-purchase{margin-top:30px}
+    @media (max-width: 720px){
+      .container{width:min(calc(100% - 28px), var(--max))}
+      .site-header__inner{min-height:64px}
+      .brand strong{font-size:18px}
+      .header-tag{display:none}
+      .hero{padding:26px 0 18px}
+      .hero-copy,.hero-side,.audience-card,.value-card,.step-card,.brand-card,.can-card,.purchase-card,.faq-item,.final-cta{padding:22px}
+      .hero-copy h1{font-size:clamp(30px,10vw,44px)}
+      .hero-sub{font-size:16px}
+      .hero-lead{font-size:14px}
+      .hero-point{grid-template-columns:48px 1fr}
+      .hero-point__num{width:48px;height:48px;border-radius:14px}
+      .audience-grid,.value-grid,.faq-grid,.access-steps{grid-template-columns:1fr}
+      .section{padding:20px 0}
+      .section-heading h2{font-size:28px}
+      .offer-price strong,.purchase-box .price{font-size:48px}
+      .final-cta{margin-bottom:40px}
     }
   </style>
 </head>
 <body>
-  <header class="lp-header">
-    <a class="brand" href="/" aria-label="Re:Verse Shion 公式サイトTOPへ">
-      <strong>Re:Frame ONE</strong><span>by Re:Verse Shion</span>
-    </a>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="/" aria-label="Re:Verse Shion 公式サイトTOPへ">
+        <strong>RE:FRAME ONE</strong>
+        <span>by Re:Verse Shion</span>
+      </a>
+      <div class="header-tag">恋愛の衝動に飲まれる前に、10分だけ立ち止まる</div>
+    </div>
   </header>
 
   <main>
-    <section class="hero section" aria-labelledby="main-title">
-      <div class="hero__ambient hero__ambient--rose" aria-hidden="true"></div>
-      <div class="hero__ambient hero__ambient--violet" aria-hidden="true"></div>
-      <div class="hero__layout">
-        <div class="hero__copy">
-          <p class="eyebrow">RE:FRAME ONE <span>β</span></p>
-          <p class="hero-kicker">好きなのに、安心できない夜に。</p>
-          <h1 id="main-title">「相手はどう思ってる？」から。<br><em>「私はどうする？」へ。<br class="mobile-break">今の自分を整理する10分。</em></h1>
-          <p class="lead">返信が来ない。連絡が減った。態度が少し違う。<br>そんなとき、頭の中では「嫌われたかも」「もう終わりかも」と、まだ分からないことまで答えに変わってしまいます。Re:Frame ONEは、<strong>事実・解釈・感情を分け、今日の一歩を自分で選び直す</strong>ための自己整理Webアプリです。</p>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Re:Frame One <span class="beta">β</span></p>
+          <h1>「相手はどう思ってる？」から。<br><em>「私はどうする？」へ。</em></h1>
+          <p class="hero-sub">好きなのに、安心できない夜に。今の自分を整理する10分。</p>
+          <p class="hero-lead">Re:Frame ONEは、恋愛で感情のまま動く前に、<strong>事実・解釈・感情</strong>を一度分けて、今日の一歩を自分で選ぶための自己整理Webアプリです。未来を断定するためではなく、今の自分を読み直すために使います。</p>
 
-          <ul class="hero-proof" aria-label="商品概要">
+          <ul class="trust-chips" aria-label="商品概要">
             <li>初回β・5名限定</li>
             <li>980円（税込）</li>
             <li>約10分</li>
             <li>スマホで利用</li>
           </ul>
 
-          <div class="offer" aria-label="商品情報"><span>β版・5名限定</span><strong>¥980</strong></div>
-          <div class="sales-cta" data-sales-cta></div>
-          <p class="cta-note">カード決済（PAY.JP）は現在審査・導入準備中です。審査完了後、このページで販売を開始します。</p>
-          <a class="prelaunch-link" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせ・購入前の質問をLINEで受け取る</a>
+          <div class="hero-promise">返信が来ない。連絡が減った。態度が少し違う。そんなとき頭の中で膨らむ「嫌われたかも」「もう終わりかも」を、いったん事実と分けて、自分の気持ちと選択へ戻すための設計です。</div>
 
-          <p class="hero-promise"><strong>未来を当てるためではありません。</strong><br>感情のまま連絡する前に、一度止まり、「私はどうしたい？」へ戻るための10分です。</p>
-          <p class="hero-whisper">答えを急がなくていい夜がある。</p>
+          <p class="mini-brand"><strong>詩韻 -シオン-</strong> が大切にしているのは、未来を当てることよりも、あなたの選択をあなたに返すことです。</p>
         </div>
 
-        <div class="hero__visual" aria-hidden="true">
-          <div class="oracle-card">
-            <span class="oracle-card__ring oracle-card__ring--outer"></span>
-            <span class="oracle-card__ring oracle-card__ring--inner"></span>
-            <span class="oracle-card__moon"></span>
-            <i class="star star--1"></i><i class="star star--2"></i><i class="star star--3"></i><i class="star star--4"></i><i class="star star--5"></i>
-            <b>RE:FRAME</b>
-            <small>READ YOUR INNER SKY</small>
+        <aside class="hero-side" aria-label="購入案内と特徴">
+          <div class="offer-panel">
+            <p class="offer-kicker">Limited beta offer</p>
+            <div class="offer-price">
+              <div>
+                <span>β版・5名限定</span>
+                <strong>¥980</strong>
+              </div>
+              <span>約10分 / スマホ利用</span>
+            </div>
+            <div class="sales-cta" data-sales-cta></div>
+            <p class="cta-note">現在、カード決済（PAY.JP）は審査・導入準備中です。販売開始のお知らせや購入前のご質問はLINEで受け付けています。</p>
+            <div class="cta-links">
+              <a class="text-link" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせをLINEで受け取る</a>
+              <a class="text-link" href="#purchase-info">購入とご利用の流れを見る</a>
+            </div>
+          </div>
+
+          <div class="hero-points">
+            <article class="hero-point">
+              <div class="hero-point__num">01</div>
+              <div>
+                <h2>PAUSE</h2>
+                <p>感情のまま追いLINEする前に、まず一度立ち止まる。</p>
+              </div>
+            </article>
+            <article class="hero-point">
+              <div class="hero-point__num">02</div>
+              <div>
+                <h2>SEPARATE</h2>
+                <p>起きた事実、まだ分からないこと、自分の解釈を分ける。</p>
+              </div>
+            </article>
+            <article class="hero-point">
+              <div class="hero-point__num">03</div>
+              <div>
+                <h2>CHOOSE</h2>
+                <p>「相手はどう思うか」ではなく、「私はどうするか」を選ぶ。</p>
+              </div>
+            </article>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <span class="label">For who</span>
+          <h2>こんな人のためのRe:Frame ONEです。</h2>
+          <p>最初の一瞬で「自分向けか」が分かるように、使う場面をはっきりさせています。</p>
+        </div>
+        <div class="audience-grid">
+          <article class="audience-card"><h3>返信が来なくて苦しい</h3><p>何度もスマホを確認してしまい、頭の中がそのことばかりになってしまう。</p></article>
+          <article class="audience-card"><h3>既読・未読の意味を考え続ける</h3><p>たった一つの反応から、悪い想像がどんどん膨らんでしまう。</p></article>
+          <article class="audience-card"><h3>追いLINEするか迷う</h3><p>連絡する、待つ、今日は決めない。その判断が感情で揺れてしまう。</p></article>
+          <article class="audience-card"><h3>占いや検索を繰り返してしまう</h3><p>見た瞬間は落ち着くけれど、またすぐ別の答えを探しに行ってしまう。</p></article>
+          <article class="audience-card"><h3>相手の気持ちばかり追ってしまう</h3><p>本当は自分の気持ちや望みも大切にしたいのに、後回しになってしまう。</p></article>
+          <article class="audience-card"><h3>今夜だけでも落ち着きたい</h3><p>大きな決断ではなく、まず「今日の一歩」を静かに決めたい。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <span class="label">What you get</span>
+          <h2>この商品で受け取れるのは、<br>「答え」ではなく「選べる状態」です。</h2>
+          <p>Re:Frame ONEは、未来予測アプリではありません。考えが混ざっている状態をほどき、自分の足元を取り戻すための体験です。</p>
+        </div>
+        <div class="value-grid">
+          <article class="value-card">
+            <span class="value-card__kicker">Value 01</span>
+            <h3>衝動を止める</h3>
+            <p>不安のピークで動く前に、短い時間でも冷静さを取り戻しやすくなります。</p>
+          </article>
+          <article class="value-card">
+            <span class="value-card__kicker">Value 02</span>
+            <h3>頭の中を整理する</h3>
+            <p>事実・不明・解釈・感情を分けることで、悩みの輪郭がはっきりします。</p>
+          </article>
+          <article class="value-card">
+            <span class="value-card__kicker">Value 03</span>
+            <h3>次の一歩を選ぶ</h3>
+            <p>連絡する、待つ、今日は決めない。今の自分に合う一歩を自分で選びます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <span class="label">How it works</span>
+          <h2>使い方は、シンプルに3段階です。</h2>
+          <p>最初の体験を想像しやすいように、流れを短く見せています。</p>
+        </div>
+        <div class="value-grid">
+          <article class="step-card">
+            <span class="step-card__kicker">Step 01</span>
+            <h3>感情の強さを確認する</h3>
+            <p>まず今の衝動や気持ちの強さを見つめます。強いほど、先に立ち止まる意味があります。</p>
+          </article>
+          <article class="step-card">
+            <span class="step-card__kicker">Step 02</span>
+            <h3>混ざっているものを分ける</h3>
+            <p>起きた事実、まだ分からないこと、自分の解釈、そして感情と願いを整理します。</p>
+          </article>
+          <article class="step-card">
+            <span class="step-card__kicker">Step 03</span>
+            <h3>今日の一歩を決める</h3>
+            <p>カードからの別視点も使いながら、今の自分が選べる一歩を仮決定します。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <span class="label">Brand</span>
+          <h2>ブランドの考え方も、最初に伝えておきます。</h2>
+          <p>Re:Frame ONEは、詩韻 -シオン- の「未来を当てるのではなく、今の自分を読み直す」という思想から生まれています。</p>
+        </div>
+        <div class="split-grid">
+          <article class="brand-card">
+            <h3>詩韻 -シオン- のスタンス</h3>
+            <p>相手の本心を断定したり、不安を煽って依存させるのではなく、状況を整理しながら、自分で納得できる選択へ戻るための占い・言葉・設計を大切にしています。</p>
+            <div class="brand-quote">未来を当てるのではなく、今の自分を読み直す。<br>そのためにカードを「答え」ではなく「視点」として使います。</div>
+          </article>
+          <article class="can-card">
+            <h3>この商品ができること / できないこと</h3>
+            <ul>
+              <li><strong>できること：</strong> 感情が高まった場面で、一度立ち止まり、自分の考えを整理し、次の一歩を選ぶ手助け。</li>
+              <li><strong>できないこと：</strong> 相手の本心の断定、返信保証、復縁保証、恋愛成功保証、医療・心理療法・カウンセリングの代替。</li>
+              <li><strong>位置づけ：</strong> 不安をゼロにする商品ではなく、混乱の中で「自分で選べる状態」へ戻るための自己整理ツール。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="purchase-info">
+      <div class="container beta-layout">
+        <div>
+          <div class="section-heading">
+            <span class="label">Purchase & access</span>
+            <h2>購入とご利用の流れ</h2>
+            <p>購入前に不安が残らないよう、流れと条件をできるだけシンプルにまとめています。</p>
+          </div>
+          <article class="purchase-card">
+            <h3>購入後の流れ</h3>
+            <div class="access-steps">
+              <div><b>Step 1</b><span>決済または購入受付</span></div>
+              <div><b>Step 2</b><span>原則24時間以内にご案内</span></div>
+              <div><b>Step 3</b><span>専用URLから利用開始</span></div>
+            </div>
+            <p>β版利用料は<strong>980円（税込）の一回払い</strong>です。決済確認後、原則24時間以内を目安に、購入時にご指定いただく連絡先へ利用URLと購入者専用アクセス情報をご案内します。</p>
+            <p>ご利用後、任意のアンケートにご協力いただけると嬉しいです。今回のβ版は、正式販売前に「本当に整理しやすくなるか」「自分の一歩を選びやすくなるか」を検証するための初回5名限定提供です。</p>
+            <p class="period-note">※ β版は<strong>公開期間内でご利用いただく検証版</strong>です。正式版の永久利用権ではありません。アクセス情報の第三者共有・転載はできません。利用開始後の購入者都合による返金は原則お受けしませんが、運営側の不具合等で実質的に利用できなかった場合は個別対応します。</p>
+            <p><a href="./terms.html">利用規約</a> ／ <a href="./privacy.html">プライバシーポリシー</a> ／ <a href="./tokusho.html">特定商取引法に基づく表記</a></p>
+          </article>
+        </div>
+
+        <aside class="purchase-box">
+          <span class="badge">初回β・5名限定</span>
+          <div class="price">¥980</div>
+          <p class="caption">約10分 / スマホで利用 / 恋愛の衝動整理に特化</p>
+          <div class="sales-cta" data-sales-cta></div>
+          <div class="cta-links">
+            <a class="text-link" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">購入前に質問する</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <span class="label">FAQ</span>
+          <h2>購入前によくある質問</h2>
+        </div>
+        <div class="faq-grid">
+          <article class="faq-item"><h3>占いですか？</h3><p>タロットカードは使いますが、未来や相手の本心を断定するためではなく、別の視点を得るために使います。</p></article>
+          <article class="faq-item"><h3>ChatGPTとの違いは何ですか？</h3><p>Re:Frame ONEは、詩韻の考え方に基づいた順序で、事実・不明・解釈・感情・選択肢を分ける体験として設計されています。単に会話を返すだけではなく、整理の流れ自体が商品です。</p></article>
+          <article class="faq-item"><h3>不安はなくなりますか？</h3><p>不安をゼロにすることは約束しません。ただ、不安に飲まれたまま動くのではなく、いったん整理して選べる状態に戻ることを目指します。</p></article>
+          <article class="faq-item"><h3>復縁できますか？ 返信は来ますか？</h3><p>復縁や返信、相手の態度改善を保証する商品ではありません。自分の次の一歩を考えるためのサービスです。</p></article>
+          <article class="faq-item"><h3>個人情報は保存されますか？</h3><p>詳細はプライバシーポリシーをご確認ください。β版運用では、必要以上の個人情報を扱わない方針です。</p></article>
+          <article class="faq-item"><h3>今はまだ購入できますか？</h3><p>現在はPAY.JPの審査・導入準備中です。販売開始のお知らせはLINEで受け取れます。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="final-cta">
+          <h2>相手の答えを追い続ける夜から、<br>今日の自分の一歩へ。</h2>
+          <p>Re:Frame ONE βは、恋愛で感情が高まったときに、あなたの選択をあなたへ返すための10分です。</p>
+          <div class="offer-line">
+            <span>初回β・5名限定</span>
+            <span>980円（税込）</span>
+            <span>約10分</span>
+            <span>スマホで利用</span>
+          </div>
+          <div class="sales-cta" data-sales-cta></div>
+          <div class="cta-links">
+            <a class="text-link" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせをLINEで受け取る</a>
           </div>
         </div>
       </div>
-
-      <div class="quick-value" aria-label="Re:Frame ONEで行うこと">
-        <article><b>01 · PAUSE</b><h3>まず、止まる。</h3><p>追いLINEやSNS確認など、感情のまま動く前に10分だけ間をつくります。</p></article>
-        <article><b>02 · SEPARATE</b><h3>混ざったものを分ける。</h3><p>起きた事実と、まだ分からないこと、自分の解釈や感情を整理します。</p></article>
-        <article><b>03 · CHOOSE</b><h3>自分で一歩を選ぶ。</h3><p>連絡する・待つ・今日は決めない。答えではなく、今できる選択へ戻ります。</p></article>
-      </div>
-    </section>
-
-    <section class="section narrow" aria-labelledby="night-title">
-      <p class="section-label"><span>揺れる夜に</span><small>FOR THE RESTLESS NIGHT</small></p>
-      <h2 id="night-title">こんなときに、Re:Frame ONEを。</h2>
-      <ul class="quiet-list">
-        <li>返信が来なくて、何度もスマホを確認してしまう</li>
-        <li>既読や未読の意味を考え続けてしまう</li>
-        <li>前より連絡が減った理由を探し続けてしまう</li>
-        <li>相手の言葉を何度も思い返してしまう</li>
-        <li>「連絡する／待つ」を決められない</li>
-        <li>検索や占いを繰り返しても、また考え始めてしまう</li>
-      </ul>
-      <p class="closing-copy">相手の答えを探し続ける前に。<br>一度だけ、自分の中で起きていることを整理します。</p>
-    </section>
-
-    <section class="section wide frames-section" aria-labelledby="steps-title">
-      <p class="section-label"><span>心をほどく7つの視点</span><small>SEVEN FRAMES</small></p>
-      <h2 id="steps-title">答えを出す前に、<br>混ざっているものを分ける。</h2>
-      <div class="frame-grid">
-        <article><b>01</b><h3>事実</h3><p>実際に起きたこと。</p></article>
-        <article><b>02</b><h3>まだ分からないこと</h3><p>現時点では確認できていないこと。</p></article>
-        <article><b>03</b><h3>自分が足した意味</h3><p>事実から自分が想像・解釈していること。</p></article>
-        <article><b>04</b><h3>感情と願い</h3><p>今、自分が感じていることと望んでいること。</p></article>
-        <article><b>05</b><h3>カードからの別視点</h3><p>未来予測ではなく、状況を見るための別の視点。</p></article>
-        <article><b>06</b><h3>今選べる行動</h3><p>現在の自分にできる選択肢。</p></article>
-        <article><b>07</b><h3>今日の一歩</h3><p>実行する・保留するを含めて、自分で選ぶひとつ。</p></article>
-      </div>
-    </section>
-
-    <section class="section narrow" aria-labelledby="compare-title">
-      <p class="section-label"><span>考え続ける夜から</span><small>BEFORE / RE:FRAME</small></p>
-      <h2 id="compare-title">「分からない」を、<br>無理に答えにしない。</h2>
-      <div class="comparison">
-        <article><h3>Before</h3><ol><li>返信が来ない</li><li>嫌われたかもしれない</li><li>検索する</li><li>占いやSNSを見る</li><li>また考え始める</li></ol></article>
-        <article class="comparison__after"><h3>Re:Frame</h3><ol><li>返信が来ない</li><li>返信が来ていないことは事実</li><li>理由はまだ分からない</li><li>自分が何を感じているかを見る</li><li>選択肢を整理する</li><li>今日の一歩を決める</li></ol></article>
-      </div>
-      <p class="closing-copy">分からないことを、分からないまま置いておく。<br>それも、自分で選べるひとつの答えです。</p>
-    </section>
-
-    <section class="section split-section tarot-section" aria-labelledby="tarot-title">
-      <div><p class="section-label"><span>カードが照らす別の角度</span><small>PERSPECTIVE GENERATOR</small></p><h2 id="tarot-title">カードは「答え」ではなく、<br>視点として使います。</h2></div>
-      <div class="prose"><p>Re:Frame ONEではタロットカードを使用します。ただし、未来・結果・他者の内心を断定するためには使用しません。</p><p>カードを、別の角度から状況を見るための <strong>Perspective Generator</strong> として扱います。</p><blockquote>未来を当てるのではなく、<br>今の自分を読み直す。</blockquote></div>
-    </section>
-
-    <section class="section narrow" aria-labelledby="boundary-title">
-      <p class="section-label"><span>できること・できないこと</span><small>BOUNDARIES</small></p>
-      <h2 id="boundary-title">選択を助ける。<br>答えを決めつけない。</h2>
-      <div class="can-cannot">
-        <article>
-          <h3>Re:Frame ONEでできること</h3>
-          <ul>
-            <li>事実・不明・解釈・感情を整理する</li>
-            <li>衝動的に動く前に、少し間をつくる</li>
-            <li>今とれる選択肢を見つける</li>
-            <li>「今日は決めない」も含め、自分で一歩を選ぶ</li>
-          </ul>
-        </article>
-        <article>
-          <h3>約束しないこと</h3>
-          <ul>
-            <li>相手の本心や未来の断定</li>
-            <li>復縁・返信・関係改善の保証</li>
-            <li>心理診断や治療、カウンセリングの代替</li>
-            <li>不安がなくなることの保証</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="section beta" aria-labelledby="beta-title">
-      <div>
-        <p class="section-label"><span>最初の5名へ</span><small>LIMITED BETA</small></p>
-        <h2 id="beta-title">今回は、最初の5名だけ。</h2>
-        <p>Re:Frame ONEは現在β版です。正式販売前に「10分で整理できたか」「感情のまま動く前に止まれたか」「自分で次の一歩を選べたか」を確認するため、最初の5名に限定して提供します。</p>
-        <p>使って終わりではなく、翌日のRe:Checkで「昨日の選択を今どう感じるか」まで振り返ります。ご利用後、任意のアンケートにご協力いただけましたら幸いです。</p>
-      </div>
-      <div class="beta-ticket"><span>Re:Frame ONE</span><strong>β</strong><dl><div><dt>定員</dt><dd>5名限定</dd></div><div><dt>価格</dt><dd>980円（税込）</dd></div><div><dt>目安</dt><dd>約10分＋翌日確認</dd></div></dl></div>
-    </section>
-
-    <section class="section narrow" aria-labelledby="faq-title">
-      <p class="section-label"><span>購入前の疑問</span><small>FAQ</small></p>
-      <h2 id="faq-title">よくある質問。</h2>
-      <div class="faq-grid">
-        <details><summary>これは占いですか？</summary><p>タロットは使いますが、未来や相手の気持ちを当てるための鑑定商品ではありません。カードを「別の見方」をつくるきっかけとして使い、自分の状況と選択を整理します。</p></details>
-        <details><summary>相手の本心は分かりますか？</summary><p>分かりません。確認できないことは「まだ分からないこと」として扱います。推測を事実に変えないことが、Re:Frame ONEの重要な設計です。</p></details>
-        <details><summary>ChatGPTに相談するのと何が違いますか？</summary><p>自由会話ではなく、詩韻が設計した順番で「止まる→分ける→感じる→別視点→選ぶ→見直す」まで進むことに特化しています。答えをもらうより、自分で選べる状態へ戻るための体験です。</p></details>
-        <details><summary>不安はなくなりますか？</summary><p>不安がなくなることは保証していません。今起きていることを整理し、感情に押されるままではなく、次の一歩を考えやすくすることを目指しています。</p></details>
-      </div>
-    </section>
-
-    <section class="section narrow purchase-info" aria-labelledby="purchase-info-title">
-      <p class="section-label"><span>購入とご利用について</span><small>PURCHASE & ACCESS</small></p>
-      <h2 id="purchase-info-title">決済後、購入者専用の<br>アクセス情報をご案内します。</h2>
-
-      <div class="purchase-card">
-        <p><strong>β版利用料は980円（税込）の一回払いです。</strong> 決済確認後、原則24時間以内を目安に、購入時にご指定いただく連絡先へ利用URLと購入者専用アクセス情報をご案内します。</p>
-
-        <div class="access-steps" aria-label="購入後の流れ">
-          <div><b>STEP 1</b><span>カード決済</span></div>
-          <div><b>STEP 2</b><span>原則24時間以内に利用案内</span></div>
-          <div><b>STEP 3</b><span>Re:Frame ONE βを利用</span></div>
-        </div>
-
-        <p class="period-note"><strong>β版は期間限定公開です。</strong> 利用終了日は、販売開始時にこのページと購入後の案内へ明記します。正式版の永久利用権を販売するものではありません。</p>
-
-        <p>アクセス情報の第三者への共有・転載はできません。デジタルサービスの性質上、利用開始後の購入者都合による返金は原則としてお受けしませんが、運営側の不具合等で実質的に利用できなかった場合は個別に対応します。</p>
-
-        <p><a href="./terms.html">利用規約</a>、<a href="./privacy.html">プライバシーポリシー</a>、<a href="./tokusho.html">特定商取引法に基づく表記</a>をご確認ください。</p>
-      </div>
-    </section>
-
-    <section class="section final-cta" aria-labelledby="final-title">
-      <p class="section-label"><span>今日の一歩へ</span><small>YOUR NEXT STEP</small></p>
-      <h2 id="final-title">相手の答えではなく、<br>今日の自分の一歩を決める。</h2>
-      <p class="product-name">Re:Frame ONE β</p>
-      <div class="offer"><span>β版・5名限定</span><strong>¥980</strong></div>
-      <div class="sales-cta" data-sales-cta></div>
-      <p class="cta-note">カード決済（PAY.JP）は現在審査・導入準備中です。審査完了後、このページで販売を開始します。</p>
-      <a class="prelaunch-link" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせ・購入前の質問をLINEで受け取る</a>
-      <div class="after-purchase"><p>購入後は、決済確認後、原則24時間以内に利用URLと購入者専用アクセス情報をご案内します。</p><a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">購入前のお問い合わせ</a></div>
     </section>
   </main>
 
-  <footer class="lp-footer">
-    <a class="footer-brand" href="/">Re:Verse Shion 公式サイト</a>
-    <nav aria-label="フッターナビゲーション">
-      <a href="./tokusho.html">特定商取引法に基づく表記</a>
-      <a href="./terms.html">利用規約</a>
-      <a href="./privacy.html">プライバシーポリシー</a>
-      <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
-    </nav>
-    <small>&copy; 2026 Re:Verse Shion</small>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="footer-brand" href="/">Re:Verse Shion</a>
+      <nav class="footer-nav" aria-label="フッターナビゲーション">
+        <a href="./tokusho.html">特定商取引法に基づく表記</a>
+        <a href="./terms.html">利用規約</a>
+        <a href="./privacy.html">プライバシーポリシー</a>
+        <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
+      </nav>
+      <div class="footer-copy">&copy; 2026 Re:Verse Shion</div>
+    </div>
   </footer>
 
   <script src="./sales.js"></script>
