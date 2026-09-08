@@ -5,20 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f2f8">
   <meta name="color-scheme" content="light">
-  <title>Re:Frame ONE β｜返信が来ない夜に、自分を整理する10分</title>
-  <meta name="description" content="Re:Frame ONEは、恋愛場面で起きた出来事を事実・解釈・感情・選択肢に分け、今の自分を読み直すための自己整理Webアプリです。">
+  <title>Re:Frame ONE β｜「相手はどう思ってる？」から「私はどうする？」へ。</title>
+  <meta name="description" content="Re:Frame ONEは、恋愛で感情のまま動く前に10分立ち止まり、事実・解釈・感情を整理して、今日の一歩を自分で選ぶための自己整理Webアプリです。">
   <link rel="canonical" href="https://reverse-shion.github.io/reframe-one/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:site_name" content="Re:Verse Shion">
-  <meta property="og:title" content="Re:Frame ONE β｜返信が来ない夜に、自分を整理する10分">
-  <meta property="og:description" content="事実・解釈・感情・選択肢を分け、今の自分を読み直すための自己整理Webアプリ。">
+  <meta property="og:title" content="Re:Frame ONE β｜「相手はどう思ってる？」から「私はどうする？」へ。">
+  <meta property="og:description" content="返信が来ない夜。答えを当てる前に、事実・解釈・感情を分けて、今日の自分の一歩を選ぶ10分。">
   <meta property="og:url" content="https://reverse-shion.github.io/reframe-one/">
   <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Noto+Serif+JP:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
+
+  <style>
+    /* Re:Frame ONE LP conversion & mobile readability refinements */
+    .hero-proof{
+      display:flex;flex-wrap:wrap;gap:8px 10px;margin:18px 0 24px;padding:0;list-style:none
+    }
+    .hero-proof li{
+      padding:8px 12px;border:1px solid rgba(130,100,158,.14);border-radius:999px;
+      background:rgba(255,255,255,.66);color:#675c70;font-size:11px;line-height:1.4
+    }
+    .hero-promise{
+      max-width:680px;margin:22px 0 0;padding:17px 20px;border-left:2px solid var(--rose);
+      background:rgba(255,255,255,.48);color:var(--violet-deep);font-size:14px;line-height:1.9
+    }
+    .prelaunch-link{
+      display:inline-flex;align-items:center;justify-content:center;margin-top:14px;
+      color:var(--violet-deep);font-size:12px;font-weight:600;text-underline-offset:4px
+    }
+    .quick-value{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:42px
+    }
+    .quick-value article{
+      padding:22px 20px;border:1px solid rgba(130,100,158,.13);border-radius:18px;
+      background:rgba(255,255,255,.68);box-shadow:0 10px 28px rgba(77,52,92,.04)
+    }
+    .quick-value b{
+      display:block;margin-bottom:8px;color:var(--rose);font-family:Cinzel,serif;
+      font-size:10px;letter-spacing:.18em
+    }
+    .quick-value h3{margin:0 0 8px;color:var(--ink-deep);font-size:16px}
+    .quick-value p{margin:0;color:var(--muted);font-size:12px;line-height:1.8}
+
+    .can-cannot{
+      display:grid;grid-template-columns:1.12fr .88fr;gap:18px
+    }
+    .can-cannot article{
+      padding:28px;border:1px solid rgba(130,100,158,.13);border-radius:20px;
+      background:rgba(255,255,255,.68)
+    }
+    .can-cannot article:first-child{
+      background:linear-gradient(145deg,rgba(252,241,246,.92),rgba(244,238,250,.9))
+    }
+    .can-cannot h3{margin:0 0 14px;color:var(--ink-deep)}
+    .can-cannot ul{margin:0;padding-left:1.2em;color:var(--muted);font-size:14px}
+    .can-cannot li+li{margin-top:8px}
+
+    .purchase-info{padding-top:84px;padding-bottom:84px}
+    .purchase-card{
+      padding:32px;border:1px solid rgba(130,100,158,.15);border-radius:24px;
+      background:rgba(255,255,255,.78);box-shadow:var(--shadow)
+    }
+    .purchase-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.95}
+    .purchase-card p+p{margin-top:16px}
+    .purchase-card strong{color:var(--ink-deep)}
+    .purchase-card a{color:var(--violet-deep);font-weight:600;text-underline-offset:4px}
+    .access-steps{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0
+    }
+    .access-steps div{
+      padding:16px;border:1px solid rgba(130,100,158,.12);border-radius:14px;
+      background:rgba(248,243,250,.78)
+    }
+    .access-steps b{
+      display:block;margin-bottom:5px;color:var(--rose);font-family:Cinzel,serif;
+      font-size:9px;letter-spacing:.15em
+    }
+    .access-steps span{color:var(--ink);font-size:12px;line-height:1.6}
+    .period-note{
+      margin-top:18px!important;padding:14px 16px;border-radius:14px;
+      background:rgba(244,223,232,.32);color:var(--ink)!important
+    }
+
+    .faq-grid{display:grid;gap:10px}
+    .faq-grid details{
+      padding:18px 20px;border:1px solid rgba(130,100,158,.13);border-radius:16px;
+      background:rgba(255,255,255,.65)
+    }
+    .faq-grid summary{
+      cursor:pointer;color:var(--ink-deep);font-weight:600;font-size:14px
+    }
+    .faq-grid p{margin:12px 0 0;color:var(--muted);font-size:13px;line-height:1.9}
+
+    /* The old .prose color was intended for the dark tarot block only. */
+    .section:not(.tarot-section) .prose p{color:var(--muted)}
+    .section:not(.tarot-section) .prose strong{color:var(--ink-deep)}
+    .section:not(.tarot-section) .prose a{color:var(--violet-deep)}
+
+    @media(max-width:820px){
+      .quick-value,.can-cannot,.access-steps{grid-template-columns:1fr}
+      .purchase-info{padding-top:64px;padding-bottom:64px}
+    }
+    @media(max-width:520px){
+      .section{padding-top:56px;padding-bottom:56px}
+      .hero{padding-top:46px;padding-bottom:54px}
+      .hero__layout{gap:26px}
+      .hero__visual{min-height:225px}
+      .oracle-card{width:155px}
+      .lead{margin:24px 0 20px}
+      .hero-proof{justify-content:center;margin:14px 0 20px}
+      .hero-promise{margin-top:18px;padding:14px 16px;font-size:13px;text-align:left}
+      .quick-value{margin-top:30px}
+      .quick-value article{padding:18px}
+      h2{margin-bottom:24px}
+      .closing-copy{margin-top:34px}
+      .purchase-info{padding-top:48px;padding-bottom:48px}
+      .purchase-card{padding:22px 18px;border-radius:20px}
+      .access-steps{margin:18px 0}
+      .final-cta{padding-top:72px;padding-bottom:72px}
+      .final-cta:before{width:360px;height:360px}
+      .after-purchase{margin-top:30px}
+    }
+  </style>
 </head>
 <body>
   <header class="lp-header">
@@ -34,12 +146,23 @@
       <div class="hero__layout">
         <div class="hero__copy">
           <p class="eyebrow">RE:FRAME ONE <span>β</span></p>
-          <p class="hero-kicker">恋の答えを探し続けてしまう夜に。</p>
-          <h1 id="main-title">返信が来ない夜に。<br><em>答えを当てるのではなく、<br class="mobile-break">今の自分を整理する10分。</em></h1>
-          <p class="lead">Re:Frame ONEは、相手の気持ちを予測するためのアプリではありません。<br>起きたことと、自分の中で膨らんだ解釈を一度分けて、<br>「今の自分はどうしたいのか」を読み直すための小さな整理ツールです。</p>
+          <p class="hero-kicker">好きなのに、安心できない夜に。</p>
+          <h1 id="main-title">「相手はどう思ってる？」から。<br><em>「私はどうする？」へ。<br class="mobile-break">今の自分を整理する10分。</em></h1>
+          <p class="lead">返信が来ない。連絡が減った。態度が少し違う。<br>そんなとき、頭の中では「嫌われたかも」「もう終わりかも」と、まだ分からないことまで答えに変わってしまいます。Re:Frame ONEは、<strong>事実・解釈・感情を分け、今日の一歩を自分で選び直す</strong>ための自己整理Webアプリです。</p>
+
+          <ul class="hero-proof" aria-label="商品概要">
+            <li>初回β・5名限定</li>
+            <li>980円（税込）</li>
+            <li>約10分</li>
+            <li>スマホで利用</li>
+          </ul>
+
           <div class="offer" aria-label="商品情報"><span>β版・5名限定</span><strong>¥980</strong></div>
           <div class="sales-cta" data-sales-cta></div>
-          <p class="cta-note">現在、PAY.JPを利用したカード決済の導入準備中です。審査・実装完了後、このページから購入できます。</p>
+          <p class="cta-note">カード決済（PAY.JP）は現在審査・導入準備中です。審査完了後、このページで販売を開始します。</p>
+          <a class="prelaunch-link" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせ・購入前の質問をLINEで受け取る</a>
+
+          <p class="hero-promise"><strong>未来を当てるためではありません。</strong><br>感情のまま連絡する前に、一度止まり、「私はどうしたい？」へ戻るための10分です。</p>
           <p class="hero-whisper">答えを急がなくていい夜がある。</p>
         </div>
 
@@ -54,17 +177,26 @@
           </div>
         </div>
       </div>
+
+      <div class="quick-value" aria-label="Re:Frame ONEで行うこと">
+        <article><b>01 · PAUSE</b><h3>まず、止まる。</h3><p>追いLINEやSNS確認など、感情のまま動く前に10分だけ間をつくります。</p></article>
+        <article><b>02 · SEPARATE</b><h3>混ざったものを分ける。</h3><p>起きた事実と、まだ分からないこと、自分の解釈や感情を整理します。</p></article>
+        <article><b>03 · CHOOSE</b><h3>自分で一歩を選ぶ。</h3><p>連絡する・待つ・今日は決めない。答えではなく、今できる選択へ戻ります。</p></article>
+      </div>
     </section>
 
     <section class="section narrow" aria-labelledby="night-title">
       <p class="section-label"><span>揺れる夜に</span><small>FOR THE RESTLESS NIGHT</small></p>
-      <h2 id="night-title">こんな夜に、Re:Frame ONEを。</h2>
+      <h2 id="night-title">こんなときに、Re:Frame ONEを。</h2>
       <ul class="quiet-list">
-        <li>返信が来なくて、何度もスマホを確認してしまう</li><li>既読や未読の意味を考え続けてしまう</li>
-        <li>前より連絡が減った理由を探し続けてしまう</li><li>相手の言葉を何度も思い返してしまう</li>
-        <li>「連絡する／待つ」を決められない</li><li>検索や占いを繰り返しても、また考え始めてしまう</li>
+        <li>返信が来なくて、何度もスマホを確認してしまう</li>
+        <li>既読や未読の意味を考え続けてしまう</li>
+        <li>前より連絡が減った理由を探し続けてしまう</li>
+        <li>相手の言葉を何度も思い返してしまう</li>
+        <li>「連絡する／待つ」を決められない</li>
+        <li>検索や占いを繰り返しても、また考え始めてしまう</li>
       </ul>
-      <p class="closing-copy">相手の答えを探す前に、<br>一度だけ「自分の中で起きていること」を整理します。</p>
+      <p class="closing-copy">相手の答えを探し続ける前に。<br>一度だけ、自分の中で起きていることを整理します。</p>
     </section>
 
     <section class="section wide frames-section" aria-labelledby="steps-title">
@@ -77,7 +209,7 @@
         <article><b>04</b><h3>感情と願い</h3><p>今、自分が感じていることと望んでいること。</p></article>
         <article><b>05</b><h3>カードからの別視点</h3><p>未来予測ではなく、状況を見るための別の視点。</p></article>
         <article><b>06</b><h3>今選べる行動</h3><p>現在の自分にできる選択肢。</p></article>
-        <article><b>07</b><h3>今日の一歩</h3><p>今日、自分が選べるひとつ。</p></article>
+        <article><b>07</b><h3>今日の一歩</h3><p>実行する・保留するを含めて、自分で選ぶひとつ。</p></article>
       </div>
     </section>
 
@@ -88,45 +220,104 @@
         <article><h3>Before</h3><ol><li>返信が来ない</li><li>嫌われたかもしれない</li><li>検索する</li><li>占いやSNSを見る</li><li>また考え始める</li></ol></article>
         <article class="comparison__after"><h3>Re:Frame</h3><ol><li>返信が来ない</li><li>返信が来ていないことは事実</li><li>理由はまだ分からない</li><li>自分が何を感じているかを見る</li><li>選択肢を整理する</li><li>今日の一歩を決める</li></ol></article>
       </div>
-      <p class="closing-copy">分からないことを、<br>分からないまま置いておくことも、ひとつの選択です。</p>
+      <p class="closing-copy">分からないことを、分からないまま置いておく。<br>それも、自分で選べるひとつの答えです。</p>
     </section>
 
     <section class="section split-section tarot-section" aria-labelledby="tarot-title">
       <div><p class="section-label"><span>カードが照らす別の角度</span><small>PERSPECTIVE GENERATOR</small></p><h2 id="tarot-title">カードは「答え」ではなく、<br>視点として使います。</h2></div>
-      <div class="prose"><p>Re:Frame ONEではタロットカードを使用します。ただし、未来・結果・他者の内心を断定するためには使用しません。</p><p>タロットは <strong>Perspective Generator</strong> —— 別の角度から状況を見るための、視点生成装置として扱います。</p><blockquote>未来を当てるのではなく、<br>今の自分を読み直す。</blockquote></div>
+      <div class="prose"><p>Re:Frame ONEではタロットカードを使用します。ただし、未来・結果・他者の内心を断定するためには使用しません。</p><p>カードを、別の角度から状況を見るための <strong>Perspective Generator</strong> として扱います。</p><blockquote>未来を当てるのではなく、<br>今の自分を読み直す。</blockquote></div>
     </section>
 
-    <section class="section narrow promise" aria-labelledby="promise-title">
-      <p class="section-label"><span>大切にしている境界線</span><small>WHAT WE DO NOT PROMISE</small></p><h2 id="promise-title">Re:Frame ONEが<br>約束しないこと</h2>
-      <p>Re:Frame ONEは、未来予測、相手の本心の断定、復縁・関係改善・連絡が来ることの保証、心理診断、医療行為、心理療法、カウンセリングの代替、不安や精神状態の治療・改善保証を提供するものではありません。</p>
-      <p>不安をなくすことを約束する商品ではありません。今考えていることを整理し、自分自身で次の選択を考えるための商品です。</p>
+    <section class="section narrow" aria-labelledby="boundary-title">
+      <p class="section-label"><span>できること・できないこと</span><small>BOUNDARIES</small></p>
+      <h2 id="boundary-title">選択を助ける。<br>答えを決めつけない。</h2>
+      <div class="can-cannot">
+        <article>
+          <h3>Re:Frame ONEでできること</h3>
+          <ul>
+            <li>事実・不明・解釈・感情を整理する</li>
+            <li>衝動的に動く前に、少し間をつくる</li>
+            <li>今とれる選択肢を見つける</li>
+            <li>「今日は決めない」も含め、自分で一歩を選ぶ</li>
+          </ul>
+        </article>
+        <article>
+          <h3>約束しないこと</h3>
+          <ul>
+            <li>相手の本心や未来の断定</li>
+            <li>復縁・返信・関係改善の保証</li>
+            <li>心理診断や治療、カウンセリングの代替</li>
+            <li>不安がなくなることの保証</li>
+          </ul>
+        </article>
+      </div>
     </section>
 
     <section class="section beta" aria-labelledby="beta-title">
-      <div><p class="section-label"><span>最初の5名へ</span><small>LIMITED BETA</small></p><h2 id="beta-title">今回は、最初の5名だけ。</h2><p>Re:Frame ONEは現在β版です。正式販売前に「自分の状況を整理できたか」「次の行動を決めやすくなったか」を確認するため、最初の5名に限定して提供します。</p><p>ご利用後、任意のアンケートにご協力いただけましたら幸いです。</p></div>
-      <div class="beta-ticket"><span>Re:Frame ONE</span><strong>β</strong><dl><div><dt>定員</dt><dd>5名限定</dd></div><div><dt>価格</dt><dd>980円</dd></div></dl></div>
+      <div>
+        <p class="section-label"><span>最初の5名へ</span><small>LIMITED BETA</small></p>
+        <h2 id="beta-title">今回は、最初の5名だけ。</h2>
+        <p>Re:Frame ONEは現在β版です。正式販売前に「10分で整理できたか」「感情のまま動く前に止まれたか」「自分で次の一歩を選べたか」を確認するため、最初の5名に限定して提供します。</p>
+        <p>使って終わりではなく、翌日のRe:Checkで「昨日の選択を今どう感じるか」まで振り返ります。ご利用後、任意のアンケートにご協力いただけましたら幸いです。</p>
+      </div>
+      <div class="beta-ticket"><span>Re:Frame ONE</span><strong>β</strong><dl><div><dt>定員</dt><dd>5名限定</dd></div><div><dt>価格</dt><dd>980円（税込）</dd></div><div><dt>目安</dt><dd>約10分＋翌日確認</dd></div></dl></div>
     </section>
 
-    <section class="section narrow" aria-labelledby="purchase-info-title">
+    <section class="section narrow" aria-labelledby="faq-title">
+      <p class="section-label"><span>購入前の疑問</span><small>FAQ</small></p>
+      <h2 id="faq-title">よくある質問。</h2>
+      <div class="faq-grid">
+        <details><summary>これは占いですか？</summary><p>タロットは使いますが、未来や相手の気持ちを当てるための鑑定商品ではありません。カードを「別の見方」をつくるきっかけとして使い、自分の状況と選択を整理します。</p></details>
+        <details><summary>相手の本心は分かりますか？</summary><p>分かりません。確認できないことは「まだ分からないこと」として扱います。推測を事実に変えないことが、Re:Frame ONEの重要な設計です。</p></details>
+        <details><summary>ChatGPTに相談するのと何が違いますか？</summary><p>自由会話ではなく、詩韻が設計した順番で「止まる→分ける→感じる→別視点→選ぶ→見直す」まで進むことに特化しています。答えをもらうより、自分で選べる状態へ戻るための体験です。</p></details>
+        <details><summary>不安はなくなりますか？</summary><p>不安がなくなることは保証していません。今起きていることを整理し、感情に押されるままではなく、次の一歩を考えやすくすることを目指しています。</p></details>
+      </div>
+    </section>
+
+    <section class="section narrow purchase-info" aria-labelledby="purchase-info-title">
       <p class="section-label"><span>購入とご利用について</span><small>PURCHASE & ACCESS</small></p>
       <h2 id="purchase-info-title">決済後、購入者専用の<br>アクセス情報をご案内します。</h2>
-      <div class="prose">
-        <p>β版は980円（税込）の都度購入です。決済確認後、原則24時間以内を目安に、購入時にご指定いただく連絡先へ利用URLと購入者専用アクセス情報をご案内します。</p>
+
+      <div class="purchase-card">
+        <p><strong>β版利用料は980円（税込）の一回払いです。</strong> 決済確認後、原則24時間以内を目安に、購入時にご指定いただく連絡先へ利用URLと購入者専用アクセス情報をご案内します。</p>
+
+        <div class="access-steps" aria-label="購入後の流れ">
+          <div><b>STEP 1</b><span>カード決済</span></div>
+          <div><b>STEP 2</b><span>原則24時間以内に利用案内</span></div>
+          <div><b>STEP 3</b><span>Re:Frame ONE βを利用</span></div>
+        </div>
+
+        <p class="period-note"><strong>β版は期間限定公開です。</strong> 利用終了日は、販売開始時にこのページと購入後の案内へ明記します。正式版の永久利用権を販売するものではありません。</p>
+
         <p>アクセス情報の第三者への共有・転載はできません。デジタルサービスの性質上、利用開始後の購入者都合による返金は原則としてお受けしませんが、運営側の不具合等で実質的に利用できなかった場合は個別に対応します。</p>
+
         <p><a href="./terms.html">利用規約</a>、<a href="./privacy.html">プライバシーポリシー</a>、<a href="./tokusho.html">特定商取引法に基づく表記</a>をご確認ください。</p>
       </div>
     </section>
 
     <section class="section final-cta" aria-labelledby="final-title">
-      <p class="section-label"><span>今日の一歩へ</span><small>YOUR NEXT STEP</small></p><h2 id="final-title">相手の答えではなく、<br>今日の自分の一歩を決める。</h2>
-      <p class="product-name">Re:Frame ONE β</p><div class="offer"><span>β版・5名限定</span><strong>¥980</strong></div>
+      <p class="section-label"><span>今日の一歩へ</span><small>YOUR NEXT STEP</small></p>
+      <h2 id="final-title">相手の答えではなく、<br>今日の自分の一歩を決める。</h2>
+      <p class="product-name">Re:Frame ONE β</p>
+      <div class="offer"><span>β版・5名限定</span><strong>¥980</strong></div>
       <div class="sales-cta" data-sales-cta></div>
-      <p class="cta-note">現在、PAY.JPを利用したカード決済の導入準備中です。審査・実装完了後、このページから購入できます。</p>
-      <div class="after-purchase"><p>購入後は、決済確認後、購入時にご指定いただく連絡先へ原則24時間以内に利用URLと購入者専用アクセス情報をご案内します。</p><a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">購入前のお問い合わせ</a></div>
+      <p class="cta-note">カード決済（PAY.JP）は現在審査・導入準備中です。審査完了後、このページで販売を開始します。</p>
+      <a class="prelaunch-link" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせ・購入前の質問をLINEで受け取る</a>
+      <div class="after-purchase"><p>購入後は、決済確認後、原則24時間以内に利用URLと購入者専用アクセス情報をご案内します。</p><a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">購入前のお問い合わせ</a></div>
     </section>
   </main>
 
-  <footer class="lp-footer"><a class="footer-brand" href="/">Re:Verse Shion 公式サイト</a><nav aria-label="フッターナビゲーション"><a href="./tokusho.html">特定商取引法に基づく表記</a><a href="./terms.html">利用規約</a><a href="./privacy.html">プライバシーポリシー</a><a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">お問い合わせ</a></nav><small>&copy; 2026 Re:Verse Shion</small></footer>
+  <footer class="lp-footer">
+    <a class="footer-brand" href="/">Re:Verse Shion 公式サイト</a>
+    <nav aria-label="フッターナビゲーション">
+      <a href="./tokusho.html">特定商取引法に基づく表記</a>
+      <a href="./terms.html">利用規約</a>
+      <a href="./privacy.html">プライバシーポリシー</a>
+      <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
+    </nav>
+    <small>&copy; 2026 Re:Verse Shion</small>
+  </footer>
+
   <script src="./sales.js"></script>
 </body>
 </html>
