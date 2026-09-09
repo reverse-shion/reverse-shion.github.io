@@ -1,61 +1,450 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#faf4f9">
-<meta name="color-scheme" content="light">
-<title>Re:Frame ONE β｜「相手はどう思ってる？」から「私はどうする？」へ。</title>
-<meta name="description" content="Re:Frame ONEは、恋愛で感情のまま動く前に10分立ち止まり、事実・不明・解釈・感情を整理して、今日の一歩を自分で選ぶための自己整理Webアプリです。">
-<link rel="canonical" href="https://reverse-shion.github.io/reframe-one/">
-<meta property="og:type" content="website"><meta property="og:locale" content="ja_JP"><meta property="og:site_name" content="Re:Verse Shion">
-<meta property="og:title" content="Re:Frame ONE β｜「相手はどう思ってる？」から「私はどうする？」へ。">
-<meta property="og:description" content="返信が来ない夜。未来を当てる前に、今の自分を読み直す10分。">
-<meta property="og:url" content="https://reverse-shion.github.io/reframe-one/">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--ink:#2f2637;--muted:#6f6578;--violet:#67457f;--deep:#4e3265;--rose:#c789a7;--gold:#b58c4d;--line:rgba(103,69,127,.13);--shadow:0 18px 48px rgba(84,56,100,.10);--r:26px;--max:1120px}
-*{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;color:var(--ink);font-family:"Noto Serif JP",serif;line-height:1.85;letter-spacing:.02em;background:radial-gradient(circle at 8% 0,rgba(221,198,228,.35),transparent 24%),radial-gradient(circle at 96% 12%,rgba(244,211,226,.32),transparent 24%),linear-gradient(180deg,#fffdfd,#faf5fa 35%,#f3eaf4)}a{color:inherit}img{display:block;width:100%;height:auto}.wrap{width:min(calc(100% - 28px),var(--max));margin:auto}
-header{position:sticky;top:0;z-index:20;background:rgba(255,252,255,.88);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border-bottom:1px solid var(--line)}.head{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;flex-direction:column;text-decoration:none;line-height:1.08}.brand strong{font:600 18px/1.1 Cinzel,serif;letter-spacing:.16em;color:var(--deep)}.brand span{margin-top:6px;font-size:10px;letter-spacing:.2em;color:#887d90;text-transform:uppercase}.head-note{font-size:12px;color:var(--muted);padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#fff}
-.hero{padding:24px 0 18px}.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;align-items:start}.card{background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.hero-copy{padding:28px}.eyebrow{display:flex;align-items:center;gap:10px;margin:0 0 12px;font:500 11px/1.2 Cinzel,serif;letter-spacing:.18em;text-transform:uppercase;color:var(--violet)}.beta{display:grid;place-items:center;width:31px;height:31px;border:1px solid rgba(103,69,127,.28);border-radius:50%;font-size:14px}.kicker{margin:0 0 8px;color:var(--rose);font-size:14px}h1,h2{word-break:keep-all;line-break:strict}h1{margin:0;font-size:clamp(2rem,5vw,3.6rem);line-height:1.32;letter-spacing:.035em}h1 span{display:block}h1 .accent{color:var(--violet)}.lead{margin:16px 0 0;color:var(--muted);font-size:15px}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0;padding:0;list-style:none}.chips li{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;color:var(--deep)}.actions{display:grid;gap:10px;margin-top:18px}.sales-cta{width:100%}.purchase-button,.sales-message,.primary,.secondary{display:flex;align-items:center;justify-content:center;min-height:58px;padding:15px 18px;border-radius:999px;text-align:center;text-decoration:none;font-weight:600;letter-spacing:.03em}.purchase-button{background:linear-gradient(100deg,#72538b,#b77999 58%,#cfaa70);color:#fff;box-shadow:0 14px 30px rgba(103,69,127,.22)}.sales-message{background:#fff;color:var(--deep);border:1px solid rgba(103,69,127,.18)}.primary{background:linear-gradient(100deg,#604276,#7b568f);color:#fff;box-shadow:0 12px 28px rgba(78,50,101,.18)}.secondary{background:#fff;color:var(--deep);border:1px solid var(--line)}.note{margin:10px 0 0;color:#877d90;font-size:11px}.promise{margin-top:16px;padding:15px 17px;border-radius:18px;background:linear-gradient(145deg,rgba(250,239,246,.94),rgba(246,241,250,.94));border:1px solid var(--line);color:var(--deep);font-size:13px}.brand-line{margin:14px 0 0;color:#786e81;font-size:12px}
-.hero-visual{padding:14px}.hero-visual img{border-radius:19px;aspect-ratio:1/1;object-fit:cover}.caption{margin:10px 3px 0;color:#81768a;font-size:12px}
-section{padding:18px 0}.label{display:block;margin-bottom:7px;color:var(--rose);font:500 11px/1.2 Cinzel,serif;letter-spacing:.18em;text-transform:uppercase}h2{margin:0;font-size:clamp(1.75rem,4vw,2.7rem);line-height:1.48;letter-spacing:.03em}.desc{margin:9px 0 0;color:var(--muted);font-size:14px}.grid3,.grid2,.faq{display:grid;gap:13px}.grid3{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:repeat(2,1fr)}.mini{padding:21px}.mini b{display:block;margin-bottom:8px;color:var(--rose);font:500 10px/1.2 Cinzel,serif;letter-spacing:.16em;text-transform:uppercase}.mini h3,.box h3,.faq h3{margin:0 0 8px;font-size:19px;line-height:1.55}.mini p,.box p,.faq p{margin:0;color:var(--muted);font-size:13px}.box{padding:22px}.split{display:grid;grid-template-columns:1fr 1fr;gap:15px;align-items:start}.quote{padding:22px;background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(249,241,248,.94));border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.quote blockquote{margin:0;color:var(--deep);font-size:21px;line-height:1.75}.quote p{margin:12px 0 0;color:var(--muted);font-size:13px}.check{margin:0;padding-left:1.2em;color:var(--muted);font-size:13px}.check li+li{margin-top:7px}
-.purchase{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}.purchase-main{padding:24px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:16px 0}.steps div{padding:14px;border-radius:16px;background:linear-gradient(145deg,rgba(248,242,250,.96),#fff);border:1px solid var(--line)}.steps b{display:block;margin-bottom:5px;color:var(--rose);font:500 9px/1.2 Cinzel,serif;letter-spacing:.16em;text-transform:uppercase}.steps span{font-size:12px}.purchase-main p{margin:0;color:var(--muted);font-size:13px}.purchase-main p+p{margin-top:12px}.period{padding:14px;border-radius:16px;background:rgba(199,137,167,.10);color:var(--deep)!important}.buybox{position:sticky;top:86px;padding:22px;border-radius:22px;background:linear-gradient(160deg,rgba(112,76,136,.10),rgba(248,237,244,.96));border:1px solid var(--line);box-shadow:var(--shadow)}.badge{display:inline-block;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:11px;color:var(--deep)}.price{margin:16px 0 7px;font:600 54px/1 Cinzel,serif;color:var(--deep)}.buybox p{margin:0;color:var(--muted);font-size:12px}.faq{grid-template-columns:repeat(2,1fr)}.faq article{padding:19px}
-.final{padding:28px;text-align:center;margin:18px 0 44px;background:linear-gradient(160deg,rgba(255,255,255,.96),rgba(248,240,249,.96));border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.final h2{max-width:12ch;margin:auto}.final p{margin:12px auto 0;max-width:680px;color:var(--muted);font-size:14px}.offerline{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:16px;color:var(--deep);font-size:13px}.final .actions{max-width:420px;margin:18px auto 0}
-footer{padding:26px 0 40px;border-top:1px solid var(--line)}.foot{display:flex;flex-direction:column;align-items:center;gap:15px;text-align:center}.foot-brand{font-family:Cinzel,serif;color:var(--deep);text-decoration:none;letter-spacing:.1em}.footnav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 16px}.footnav a{font-size:11px;color:#81768a;text-decoration:none}.copy{font-size:10px;color:#a199aa}
-@media(max-width:900px){.hero-grid,.split,.purchase{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.buybox{position:static}}
-@media(max-width:680px){.wrap{width:min(calc(100% - 22px),var(--max))}.head{min-height:64px}.head-note{display:none}.hero{padding-top:14px}.hero-copy{padding:21px 19px 23px}h1{font-size:clamp(1.95rem,9vw,2.45rem);line-height:1.4}.lead{font-size:14px}h2{font-size:clamp(1.6rem,7.2vw,2rem);line-height:1.55}.grid2,.faq,.steps{grid-template-columns:1fr}.hero-visual,.mini,.box,.purchase-main,.faq article,.final{padding-left:18px;padding-right:18px}.caption{font-size:11px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fbf6fb">
+  <meta name="color-scheme" content="light">
+  <title>Re:Frame ONE β｜「相手はどう思ってる？」から「私はどうする？」へ。</title>
+  <meta name="description" content="恋愛で感情のまま動く前に、事実・まだ分からないこと・解釈・感情を整理して、今日の一歩を自分で選ぶ10分。Re:Frame ONE β。">
+  <link rel="canonical" href="https://reverse-shion.github.io/reframe-one/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:site_name" content="Re:Verse Shion">
+  <meta property="og:title" content="Re:Frame ONE β｜今の自分を読み直す10分">
+  <meta property="og:description" content="返信が来ない夜。相手の答えを追う前に、自分の気持ちと選択へ戻るための自己整理Webアプリ。">
+  <meta property="og:url" content="https://reverse-shion.github.io/reframe-one/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#30263a;
+      --ink-soft:#6f6578;
+      --violet:#73518a;
+      --violet-deep:#52366a;
+      --rose:#c88da9;
+      --rose-soft:#f7eaf0;
+      --gold:#b79558;
+      --ivory:#fffdfb;
+      --paper:#fcf8fc;
+      --line:rgba(100,70,122,.13);
+      --line-strong:rgba(100,70,122,.22);
+      --shadow:0 16px 42px rgba(83,57,99,.09);
+      --shadow-soft:0 10px 28px rgba(83,57,99,.06);
+      --radius:26px;
+      --max:1080px;
+    }
+
+    *,*::before,*::after{box-sizing:border-box;min-width:0}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
+    body{
+      margin:0;
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden;
+      color:var(--ink);
+      font-family:"Noto Serif JP",serif;
+      line-height:1.82;
+      letter-spacing:.018em;
+      background:
+        radial-gradient(circle at 8% 0,rgba(225,203,231,.32),transparent 26%),
+        radial-gradient(circle at 96% 18%,rgba(246,217,230,.28),transparent 24%),
+        linear-gradient(180deg,#fffdfd 0%,#faf5fa 38%,#f4ebf5 100%);
+    }
+    img{display:block;max-width:100%;height:auto}
+    a{color:inherit}
+    button,input,textarea,select{font:inherit}
+
+    .wrap{width:min(calc(100% - 28px),var(--max));max-width:100%;margin-inline:auto}
+
+    .site-header{
+      position:sticky;top:0;z-index:30;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,252,255,.88);
+      backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+    }
+    .header-inner{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;flex-direction:column;text-decoration:none;line-height:1.05}
+    .brand strong{font-family:Cinzel,serif;font-size:17px;font-weight:600;letter-spacing:.15em;color:var(--violet-deep)}
+    .brand span{margin-top:6px;font-size:9px;letter-spacing:.20em;text-transform:uppercase;color:#897f90}
+    .header-note{font-size:11px;color:var(--ink-soft);padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.78)}
+
+    .hero{padding:18px 0 14px}
+    .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:start}
+    .surface{background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .hero-copy{padding:26px}
+    .eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 11px;font-family:Cinzel,serif;font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--violet)}
+    .beta-mark{display:grid;place-items:center;width:29px;height:29px;border:1px solid rgba(115,81,138,.3);border-radius:50%;font-size:13px}
+    .kicker{margin:0 0 10px;color:var(--rose);font-size:13px;font-weight:500}
+    h1,h2,h3,p{overflow-wrap:break-word}
+    h1{
+      margin:0;
+      font-size:clamp(2rem,4.8vw,3.45rem);
+      line-height:1.34;
+      letter-spacing:.025em;
+      font-weight:600;
+      text-wrap:balance;
+    }
+    .hero-line{display:block}
+    .hero-accent{color:var(--violet)}
+    .lead{margin:16px 0 0;color:var(--ink-soft);font-size:15px}
+    .lead strong{color:var(--ink);font-weight:600}
+
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:19px 0 0;padding:0;list-style:none}
+    .chips li{padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:11.5px;color:var(--violet-deep);white-space:normal}
+
+    .cta-stack{display:grid;gap:10px;margin-top:18px}
+    .sales-cta{width:100%}
+    .purchase-button,.sales-message,.cta-primary,.cta-secondary{
+      width:100%;max-width:100%;min-height:56px;
+      display:flex;align-items:center;justify-content:center;
+      padding:14px 16px;border-radius:999px;text-align:center;
+      text-decoration:none;line-height:1.5;font-size:14px;font-weight:600;
+      white-space:normal;overflow-wrap:anywhere;word-break:normal;
+    }
+    .purchase-button{background:linear-gradient(100deg,#65447c 0%,#936584 58%,#c59f67 100%);color:#fff;box-shadow:0 14px 30px rgba(103,69,127,.20)}
+    .sales-message{min-height:48px;background:rgba(255,255,255,.76);color:var(--violet-deep);border:1px solid var(--line-strong);font-size:12.5px;font-weight:500}
+    .cta-primary{background:linear-gradient(105deg,#5f4076,#7d5890);color:#fff;box-shadow:0 12px 28px rgba(78,50,101,.16)}
+    .cta-secondary{background:#fff;color:var(--violet-deep);border:1px solid var(--line)}
+    .cta-primary:focus-visible,.cta-secondary:focus-visible,.purchase-button:focus-visible{outline:3px solid rgba(200,141,169,.34);outline-offset:3px}
+    .cta-hint{margin:10px 0 0;color:#8b8192;font-size:10.8px}
+    .promise{margin-top:15px;padding:14px 15px;border-radius:17px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(251,241,247,.94),rgba(247,242,250,.94));color:var(--violet-deep);font-size:12.5px}
+    .brand-line{margin:13px 0 0;color:#7d7485;font-size:11.5px}
+
+    .hero-media{padding:12px}
+    .image-frame{position:relative;overflow:hidden;border-radius:20px;background:linear-gradient(145deg,#2e2447,#65487a);aspect-ratio:1/1}
+    .image-frame img{width:100%;height:100%;object-fit:cover}
+    .image-fallback{position:absolute;inset:0;display:none;place-items:center;padding:30px;text-align:center;color:#fff;background:radial-gradient(circle at 65% 25%,rgba(255,231,197,.23),transparent 22%),linear-gradient(145deg,#241c3f,#65487a)}
+    .image-fallback strong{display:block;font-family:Cinzel,serif;letter-spacing:.12em;font-size:24px}
+    .image-fallback span{display:block;margin-top:10px;font-size:12px;color:rgba(255,255,255,.76)}
+    .caption{margin:9px 3px 1px;color:#83798b;font-size:10.8px}
+
+    section{padding:18px 0}
+    .section-head{margin-bottom:14px}
+    .label{display:block;margin-bottom:7px;font-family:Cinzel,serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rose)}
+    h2{margin:0;font-size:clamp(1.7rem,3.8vw,2.55rem);line-height:1.48;letter-spacing:.025em;font-weight:600;text-wrap:balance}
+    .desc{margin:8px 0 0;color:var(--ink-soft);font-size:13.5px}
+
+    .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .mini-card{padding:20px}
+    .mini-card b{display:block;margin-bottom:7px;font-family:Cinzel,serif;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose)}
+    .mini-card h3{margin:0 0 7px;font-size:18px;line-height:1.5}
+    .mini-card p{margin:0;color:var(--ink-soft);font-size:12.5px}
+
+    .feature-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:16px;align-items:start}
+    .feature-copy{display:grid;gap:11px}
+    .info-card{padding:20px}
+    .info-card h3{margin:0 0 7px;font-size:17px;line-height:1.55}
+    .info-card p{margin:0;color:var(--ink-soft);font-size:12.5px}
+    .media-card{padding:12px}
+    .media-card .image-frame{border-radius:18px}
+
+    .brand-grid{display:grid;grid-template-columns:.94fr 1.06fr;gap:14px;align-items:stretch}
+    .quote-card{padding:22px;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(249,241,248,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-soft)}
+    .quote-card blockquote{margin:0;color:var(--violet-deep);font-size:20px;line-height:1.72}
+    .quote-card p{margin:11px 0 0;color:var(--ink-soft);font-size:12.5px}
+    .list-card{padding:22px}
+    .list-card h3{margin:0 0 10px;font-size:18px}
+    .check-list{margin:0;padding-left:1.2em;color:var(--ink-soft);font-size:12.5px}
+    .check-list li+li{margin-top:7px}
+
+    .gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .gallery-grid .media-card{height:100%}
+    .gallery-grid .caption{font-size:10.5px}
+
+    .purchase-grid{display:grid;grid-template-columns:1fr 320px;gap:15px;align-items:start}
+    .purchase-main{padding:23px}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0}
+    .step{padding:13px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(249,243,250,.97),#fff)}
+    .step b{display:block;margin-bottom:5px;font-family:Cinzel,serif;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose)}
+    .step span{font-size:11.5px}
+    .purchase-main p{margin:0;color:var(--ink-soft);font-size:12.5px}
+    .purchase-main p+p{margin-top:11px}
+    .period{padding:13px;border-radius:15px;background:rgba(200,141,169,.10);color:var(--violet-deep)!important}
+    .legal-links a{font-weight:600;color:var(--violet-deep);text-underline-offset:3px}
+
+    .buy-box{position:sticky;top:84px;padding:21px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(116,80,139,.10),rgba(249,238,245,.96));box-shadow:var(--shadow)}
+    .badge{display:inline-block;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:10.5px;color:var(--violet-deep)}
+    .price{margin:15px 0 7px;font-family:Cinzel,serif;font-size:50px;line-height:1;color:var(--violet-deep)}
+    .buy-box p{margin:0;color:var(--ink-soft);font-size:11.5px}
+
+    .faq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+    .faq-card{padding:18px}
+    .faq-card h3{margin:0 0 6px;font-size:16px;line-height:1.55}
+    .faq-card p{margin:0;color:var(--ink-soft);font-size:12px}
+
+    .final-cta{padding:28px;text-align:center;margin:17px 0 40px;background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(248,240,249,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .final-cta h2{max-width:13ch;margin-inline:auto}
+    .final-cta p{max-width:650px;margin:11px auto 0;color:var(--ink-soft);font-size:13px}
+    .offer-line{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:15px;color:var(--violet-deep);font-size:12px}
+    .final-cta .cta-stack{max-width:420px;margin:17px auto 0}
+
+    footer{padding:24px 0 38px;border-top:1px solid var(--line)}
+    .footer-inner{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+    .footer-brand{font-family:Cinzel,serif;color:var(--violet-deep);text-decoration:none;letter-spacing:.11em}
+    .footer-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 15px}
+    .footer-nav a{font-size:10.5px;color:#81778a;text-decoration:none}
+    .copyright{font-size:9.5px;color:#a198a7}
+
+    @media(max-width:900px){
+      .hero-grid,.feature-grid,.brand-grid,.purchase-grid{grid-template-columns:1fr}
+      .value-grid{grid-template-columns:1fr 1fr}
+      .buy-box{position:static}
+    }
+
+    @media(max-width:680px){
+      .wrap{width:min(calc(100% - 20px),var(--max))}
+      .header-inner{min-height:62px}
+      .brand strong{font-size:16px}
+      .header-note{display:none}
+      .hero{padding-top:12px}
+      .hero-grid{gap:12px}
+      .hero-copy{padding:20px 17px 21px}
+      .eyebrow{margin-bottom:10px}
+      .kicker{font-size:12.5px}
+      h1{font-size:clamp(1.86rem,8.4vw,2.28rem);line-height:1.42;letter-spacing:.01em;text-wrap:pretty}
+      .hero-line{display:inline}
+      .hero-line::after{content:""}
+      .hero-accent{display:block;margin-top:2px}
+      .lead{font-size:13.5px;line-height:1.9}
+      .chips{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+      .chips li{text-align:center;padding:8px 6px;font-size:10.8px}
+      .purchase-button,.sales-message,.cta-primary,.cta-secondary{font-size:13px;min-height:53px;padding:13px 14px;border-radius:18px}
+      .sales-message{font-size:11.8px}
+      .cta-hint{font-size:10px}
+      .promise{font-size:11.8px}
+      .brand-line{font-size:10.8px}
+      .hero-media{padding:10px}
+      .caption{font-size:10px}
+      section{padding:15px 0}
+      h2{font-size:clamp(1.55rem,7vw,1.95rem);line-height:1.55;text-wrap:pretty}
+      .desc{font-size:12.5px}
+      .value-grid,.gallery-grid,.faq-grid,.steps{grid-template-columns:1fr}
+      .mini-card,.info-card,.quote-card,.list-card,.purchase-main,.faq-card{padding:18px 17px}
+      .quote-card blockquote{font-size:18px}
+      .price{font-size:46px}
+      .final-cta{padding:24px 17px}
+      .final-cta h2{max-width:100%}
+      .offer-line{gap:6px 10px}
+    }
+
+    @media(max-width:390px){
+      h1{font-size:1.82rem}
+      .chips li{font-size:10.3px}
+      .purchase-button,.sales-message,.cta-primary,.cta-secondary{font-size:12.4px}
+    }
+  </style>
 </head>
 <body>
-<header><div class="wrap head"><a class="brand" href="/"><strong>RE:FRAME ONE</strong><span>by Re:Verse Shion</span></a><div class="head-note">恋愛で感情が高まった夜に、10分だけ立ち止まる</div></div></header>
-<main>
-<section class="hero"><div class="wrap hero-grid">
-<div class="card hero-copy"><p class="eyebrow">Re:Frame One <span class="beta">β</span></p><p class="kicker">恋愛の自己整理Webアプリ</p>
-<h1><span>「相手はどう思ってる？」から、</span><span class="accent">「私はどうする？」へ。</span></h1>
-<p class="lead">好きなのに、安心できない夜に。感情のまま動く前に、<strong>事実・まだ分からないこと・解釈・感情</strong>をやさしく分けて、今日の一歩を自分で選ぶ10分です。</p>
-<ul class="chips"><li>初回β・5名限定</li><li>980円（税込）</li><li>約10分</li><li>スマホで利用</li></ul>
-<div class="actions"><div class="sales-cta" data-sales-cta></div><a class="primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせをLINEで受け取る</a><a class="secondary" href="#purchase-info">購入とご利用の流れを見る</a></div>
-<p class="note">現在、カード決済（PAY.JP）は審査・導入準備中です。審査完了後、このページで販売を開始します。</p>
-<div class="promise"><strong>未来を当てるためではありません。</strong> 相手の本心を断定するのではなく、今の自分を読み直し、落ち着いて選べる状態へ戻るための設計です。</div>
-<p class="brand-line">詩韻 -シオン- が大切にしているのは、未来を当てることよりも、あなたの選択をあなたへ返すことです。</p></div>
-<div class="card hero-visual"><img src="data:image/webp;base64,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" alt="Re:Frame ONE βの世界観と商品イメージ"><p class="caption">夜の静けさとラベンダーの世界観で、落ち着いて自分へ戻る時間を表現しています。</p></div>
-</div></section>
-<section><div class="wrap"><span class="label">What Re:Frame does</span><h2>最初に知ってほしいのは、<br>この3つです。</h2><p class="desc">説明を読む前に、「何をしてくれる商品か」がすぐ分かるようにしました。</p><div class="grid3" style="margin-top:14px">
-<article class="card mini"><b>01 · Pause</b><h3>まず、止まる。</h3><p>追いLINEやSNS確認の前に、10分だけ立ち止まる時間をつくります。</p></article>
-<article class="card mini"><b>02 · Separate</b><h3>混ざったものを分ける。</h3><p>事実、まだ分からないこと、自分が足した解釈や感情を整理します。</p></article>
-<article class="card mini"><b>03 · Choose</b><h3>今日の一歩を選ぶ。</h3><p>連絡する・待つ・今日は決めない。今の自分に合う一歩へ戻ります。</p></article></div></div></section>
-<section><div class="wrap split"><div><span class="label">For who</span><h2>こんな夜に、<br>Re:Frame ONEを。</h2><p class="desc">「これ、自分のことかも」と感じる人へ。</p><div class="grid2" style="margin-top:14px">
-<article class="card box"><h3>返信が来なくて苦しい</h3><p>何度もスマホを見てしまい、考えが止まらなくなる。</p></article><article class="card box"><h3>既読・未読の意味を考え続ける</h3><p>ひとつの反応から、悪い想像が膨らんでしまう。</p></article><article class="card box"><h3>追いLINEするか迷う</h3><p>連絡する・待つ・今日は決めない。その判断が揺れる。</p></article><article class="card box"><h3>占いや検索を繰り返してしまう</h3><p>落ち着きたくて調べるのに、また不安が戻ってしまう。</p></article></div></div>
-<div class="quote"><span class="label">Brand philosophy</span><blockquote>未来を当てるのではなく、<br>今の自分を読み直す。</blockquote><p>Re:Frame ONEは、詩韻 -シオン- のこの考え方から生まれています。カードは「正解」ではなく、別の視点を得るために使います。</p></div></div></section>
-<section><div class="wrap split"><div class="card box"><span class="label">What you get</span><h3>受け取れるのは、<br>「答え」ではなく「選べる状態」。</h3><ul class="check"><li>不安のピークで動く前に、少し立ち止まれる</li><li>事実・不明・解釈・感情が分かれ、考えを整理しやすくなる</li><li>相手の答えではなく、自分の次の一歩を考えやすくなる</li><li>「今日は決めない」も自分の選択として扱える</li></ul></div><div class="card box"><span class="label">Boundaries</span><h3>できること / 約束しないこと</h3><ul class="check"><li>自分の状況・感情・選択肢を整理する</li><li>タロットから別の角度を得る</li><li>相手の本心や未来は断定しない</li><li>復縁・返信・関係改善や不安の消失を保証しない</li><li>医療・心理療法・カウンセリングの代替ではない</li></ul></div></div></section>
-<section id="purchase-info"><div class="wrap purchase"><article class="card purchase-main"><span class="label">Purchase & access</span><h2>購入とご利用の流れ</h2><div class="steps"><div><b>Step 1</b><span>決済または購入受付</span></div><div><b>Step 2</b><span>原則24時間以内にご案内</span></div><div><b>Step 3</b><span>専用URLから利用開始</span></div></div><p><strong>β版利用料は980円（税込）の一回払い</strong>です。決済確認後、原則24時間以内を目安に、購入時にご指定いただく連絡先へ利用URLと購入者専用アクセス情報をご案内します。</p><p>今回のβ版は、正式販売前に「整理しやすくなるか」「自分の一歩を選びやすくなるか」を検証するための初回5名限定提供です。ご利用後のアンケートは任意です。</p><p class="period">※ β版は<strong>公開期間内でご利用いただく検証版</strong>です。正式版の永久利用権ではありません。アクセス情報の第三者共有・転載はできません。利用開始後の購入者都合による返金は原則お受けしませんが、運営側の不具合等で実質的に利用できなかった場合は個別対応します。</p><p><a href="./terms.html">利用規約</a> ／ <a href="./privacy.html">プライバシーポリシー</a> ／ <a href="./tokusho.html">特定商取引法に基づく表記</a></p></article>
-<aside class="buybox"><span class="badge">初回β・5名限定</span><div class="price">¥980</div><p>約10分 / スマホで利用 / 恋愛の自己整理に特化</p><div class="actions"><div class="sales-cta" data-sales-cta></div><a class="primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">購入前に質問する</a></div></aside></div></section>
-<section><div class="wrap"><span class="label">FAQ</span><h2>購入前によくある質問</h2><div class="faq" style="margin-top:14px"><article class="card"><h3>占いですか？</h3><p>タロットカードは使いますが、未来や相手の本心を断定するためではなく、別の視点を得るために使います。</p></article><article class="card"><h3>ChatGPTとの違いは？</h3><p>詩韻の考え方に基づき、事実・不明・解釈・感情・選択肢を分けて進む流れそのものを商品として設計しています。</p></article><article class="card"><h3>不安はなくなりますか？</h3><p>不安をゼロにすることは約束しません。感情に押されたままではなく、整理して選べる状態へ戻ることを目指します。</p></article><article class="card"><h3>復縁や返信は保証されますか？</h3><p>復縁・返信・関係改善を保証する商品ではありません。自分の次の一歩を考えるためのサービスです。</p></article></div></div></section>
-<section><div class="wrap"><div class="final"><span class="label">Your next step</span><h2>相手の答えを追い続ける夜から、今日の自分の一歩へ。</h2><p>Re:Frame ONE βは、恋愛で感情が高まったときに、あなたの選択をあなたへ返すための10分です。</p><div class="offerline"><span>初回β・5名限定</span><span>980円（税込）</span><span>約10分</span><span>スマホで利用</span></div><div class="actions"><div class="sales-cta" data-sales-cta></div><a class="primary" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始のお知らせをLINEで受け取る</a></div></div></div></section>
-</main>
-<footer><div class="wrap foot"><a class="foot-brand" href="/">Re:Verse Shion</a><nav class="footnav"><a href="./tokusho.html">特定商取引法に基づく表記</a><a href="./terms.html">利用規約</a><a href="./privacy.html">プライバシーポリシー</a><a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">お問い合わせ</a></nav><div class="copy">&copy; 2026 Re:Verse Shion</div></div></footer>
-<script src="./sales.js"></script>
-</body></html>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/" aria-label="Re:Verse Shion 公式サイトへ">
+        <strong>RE:FRAME ONE</strong>
+        <span>by Re:Verse Shion</span>
+      </a>
+      <div class="header-note">恋愛で感情が高まった夜に、10分だけ立ち止まる</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="surface hero-copy">
+          <p class="eyebrow">Re:Frame One <span class="beta-mark">β</span></p>
+          <p class="kicker">恋愛の自己整理Webアプリ</p>
+          <h1 id="hero-title">
+            <span class="hero-line">「相手はどう思ってる？」から、</span>
+            <span class="hero-line hero-accent">「私はどうする？」へ。</span>
+          </h1>
+          <p class="lead">好きなのに、安心できない夜に。感情のまま動く前に、<strong>事実・まだ分からないこと・解釈・感情</strong>をやさしく分けて、今日の一歩を自分で選ぶ10分です。</p>
+
+          <ul class="chips" aria-label="商品概要">
+            <li>初回β・5名限定</li>
+            <li>980円（税込）</li>
+            <li>約10分</li>
+            <li>スマホで利用</li>
+          </ul>
+
+          <div class="cta-stack">
+            <div class="sales-cta" data-sales-cta></div>
+            <a class="cta-primary line-cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始をLINEで受け取る</a>
+            <a class="cta-secondary" href="#purchase-info">購入とご利用の流れを見る</a>
+          </div>
+          <p class="cta-hint">現在、カード決済（PAY.JP）は審査・導入準備中です。販売開始後、この場所から購入できます。</p>
+
+          <div class="promise"><strong>未来を当てるためではありません。</strong> 相手の本心を断定するのではなく、今の自分を読み直し、落ち着いて選べる状態へ戻るための設計です。</div>
+          <p class="brand-line">詩韻 -シオン- が大切にしているのは、未来を当てることよりも、あなたの選択をあなたへ返すことです。</p>
+        </div>
+
+        <figure class="surface hero-media">
+          <div class="image-frame">
+            <img src="./assets/reframe-one-hero.webp" alt="Re:Frame ONE βの紹介ビジュアル。返信が来ない夜に、自分を整理する10分。" fetchpriority="high" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+            <div class="image-fallback" aria-hidden="true"><div><strong>RE:FRAME ONE β</strong><span>今の自分を読み直す10分</span></div></div>
+          </div>
+          <figcaption class="caption">答えを急ぐ夜に、まず自分へ戻る時間を。</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section aria-labelledby="value-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="label">What Re:Frame does</span>
+          <h2 id="value-title">この10分で、することは3つ。</h2>
+          <p class="desc">答えを増やすのではなく、考えをほどいて、自分で選べる状態へ戻ります。</p>
+        </div>
+        <div class="value-grid">
+          <article class="surface mini-card"><b>01 · Pause</b><h3>まず、止まる。</h3><p>追いLINEやSNS確認の前に、短い間をつくります。</p></article>
+          <article class="surface mini-card"><b>02 · Separate</b><h3>混ざったものを分ける。</h3><p>事実・不明・解釈・感情を、ひとつずつ見分けます。</p></article>
+          <article class="surface mini-card"><b>03 · Choose</b><h3>今日の一歩を選ぶ。</h3><p>連絡する・待つ・今日は決めない。今の自分で選びます。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="night-title">
+      <div class="wrap feature-grid">
+        <div>
+          <div class="section-head">
+            <span class="label">For the restless night</span>
+            <h2 id="night-title">こんな夜に、Re:Frame ONEを。</h2>
+          </div>
+          <div class="feature-copy">
+            <article class="surface info-card"><h3>返信が来なくて、何度もスマホを見てしまう</h3><p>「嫌われたかも」と考え始める前に、起きていることを整理します。</p></article>
+            <article class="surface info-card"><h3>既読・未読の意味を考え続けてしまう</h3><p>確認できることと、まだ分からないことを分けます。</p></article>
+            <article class="surface info-card"><h3>追いLINEするか、待つかで揺れている</h3><p>相手の答えではなく、自分が今選べる行動を見つけます。</p></article>
+          </div>
+        </div>
+        <figure class="surface media-card">
+          <div class="image-frame">
+            <img src="./assets/reframe-one-separate.webp" alt="Re:Frame ONEで、事実・まだ不明なこと・重なった解釈を分けるイメージ" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+            <div class="image-fallback" aria-hidden="true"><div><strong>SEPARATE</strong><span>混ざったものを、ひとつずつ分ける。</span></div></div>
+          </div>
+          <figcaption class="caption">「分からない」を無理に答えへ変えないことも、Re:Frameの大切な設計です。</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section aria-labelledby="brand-title">
+      <div class="wrap brand-grid">
+        <article class="quote-card">
+          <span class="label">Re:Verse Shion philosophy</span>
+          <blockquote id="brand-title">未来を当てるのではなく、<br>今の自分を読み直す。</blockquote>
+          <p>Re:Frame ONEは、詩韻 -シオン- の「選択を本人へ返す」という考え方から生まれました。カードも、答えを断定するためではなく、別の角度から自分を見るために使います。</p>
+        </article>
+        <article class="surface list-card">
+          <span class="label">What you receive</span>
+          <h3>受け取れるのは「正解」ではなく、選べる余白。</h3>
+          <ul class="check-list">
+            <li>感情のピークで動く前に、少し間をつくる</li>
+            <li>事実と想像を分け、悩みの輪郭を見やすくする</li>
+            <li>カードから別の視点を借りる</li>
+            <li>「今日は決めない」も含めて、自分の一歩を選ぶ</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="perspective-title">
+      <div class="wrap gallery-grid">
+        <figure class="surface media-card">
+          <div class="image-frame">
+            <img src="./assets/reframe-one-tarot-perspective.webp" alt="タロットカードを未来予測ではなく別の視点として使うRe:Frame ONEのイメージ" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+            <div class="image-fallback" aria-hidden="true"><div><strong>PERSPECTIVE</strong><span>カードは答えではなく、もう一つの視点。</span></div></div>
+          </div>
+          <figcaption class="caption" id="perspective-title">カードは「正解」を決めず、今ある情報を別の角度から見直すために使います。</figcaption>
+        </figure>
+        <figure class="surface media-card">
+          <div class="image-frame">
+            <img src="./assets/reframe-one-experience.webp" alt="Re:Frame ONEをスマホで約10分使う体験イメージ" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+            <div class="image-fallback" aria-hidden="true"><div><strong>10 MINUTES</strong><span>考えすぎていることを、ひとつずつ。</span></div></div>
+          </div>
+          <figcaption class="caption">大きな決断を迫るのではなく、その夜にできる小さな再選択へつなげます。</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="purchase-info" aria-labelledby="purchase-title">
+      <div class="wrap purchase-grid">
+        <article class="surface purchase-main">
+          <span class="label">Purchase & access</span>
+          <h2 id="purchase-title">購入とご利用の流れ</h2>
+          <div class="steps" aria-label="購入後の流れ">
+            <div class="step"><b>Step 1</b><span>決済・購入受付</span></div>
+            <div class="step"><b>Step 2</b><span>原則24時間以内にご案内</span></div>
+            <div class="step"><b>Step 3</b><span>専用URLから利用開始</span></div>
+          </div>
+          <p><strong>β版利用料は980円（税込）の一回払い</strong>です。決済確認後、原則24時間以内を目安に、購入時にご指定いただく連絡先へ利用URLと購入者専用アクセス情報をご案内します。</p>
+          <p>今回は正式販売前の初回βとして、5名限定で提供します。ご利用後、任意のアンケートにご協力いただけると嬉しいです。</p>
+          <p class="period">※ β版は<strong>公開期間内でご利用いただく検証版</strong>です。正式版の永久利用権ではありません。アクセス情報の第三者共有・転載はできません。運営側の不具合等で実質的に利用できなかった場合は個別に対応します。</p>
+          <p class="legal-links"><a href="./terms.html">利用規約</a> ／ <a href="./privacy.html">プライバシーポリシー</a> ／ <a href="./tokusho.html">特定商取引法に基づく表記</a></p>
+        </article>
+
+        <aside class="buy-box" aria-label="β版購入情報">
+          <span class="badge">初回β・5名限定</span>
+          <div class="price">¥980</div>
+          <p>約10分 / スマホで利用 / 恋愛の自己整理に特化</p>
+          <div class="cta-stack">
+            <div class="sales-cta" data-sales-cta></div>
+            <a class="cta-primary line-cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">購入前にLINEで質問する</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="section-head"><span class="label">FAQ</span><h2 id="faq-title">購入前によくある質問</h2></div>
+        <div class="faq-grid">
+          <article class="surface faq-card"><h3>これは占いですか？</h3><p>タロットは使いますが、未来や相手の本心を断定する鑑定商品ではありません。カードは別の視点を得るために使います。</p></article>
+          <article class="surface faq-card"><h3>ChatGPTとの違いは？</h3><p>自由会話ではなく、詩韻が設計した順番で「止まる・分ける・感じる・別視点・選ぶ」まで進む体験そのものが商品です。</p></article>
+          <article class="surface faq-card"><h3>不安はなくなりますか？</h3><p>不安がゼロになることは約束しません。感情に押されるままではなく、自分で考えやすい状態へ戻ることを目指します。</p></article>
+          <article class="surface faq-card"><h3>復縁や返信は保証されますか？</h3><p>保証しません。相手を動かすためではなく、自分の選択を自分へ返すためのサービスです。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="final-cta">
+          <span class="label">Your next step</span>
+          <h2>相手の答えを追う夜から、今日の自分の一歩へ。</h2>
+          <p>答えを急がなくていい夜がある。Re:Frame ONE βは、そんな夜に自分へ戻るための10分です。</p>
+          <div class="offer-line"><span>初回β・5名限定</span><span>980円（税込）</span><span>約10分</span><span>スマホで利用</span></div>
+          <div class="cta-stack">
+            <div class="sales-cta" data-sales-cta></div>
+            <a class="cta-primary line-cta" href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">販売開始をLINEで受け取る</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <a class="footer-brand" href="/">Re:Verse Shion</a>
+      <nav class="footer-nav" aria-label="フッターナビゲーション">
+        <a href="./tokusho.html">特定商取引法に基づく表記</a>
+        <a href="./terms.html">利用規約</a>
+        <a href="./privacy.html">プライバシーポリシー</a>
+        <a href="https://lin.ee/LYnlU0f" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
+      </nav>
+      <div class="copyright">&copy; 2026 Re:Verse Shion</div>
+    </div>
+  </footer>
+
+  <script src="./sales.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.cta-stack').forEach((stack) => {
+        if (stack.querySelector('.purchase-button')) stack.classList.add('is-live');
+      });
+      document.querySelectorAll('.cta-stack.is-live .line-cta').forEach((link) => {
+        link.classList.remove('cta-primary');
+        link.classList.add('cta-secondary');
+      });
+    });
+  </script>
+</body>
+</html>
