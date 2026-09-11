@@ -2,6 +2,7 @@
 const SALES_STATUS = "preparing"; // "preparing" | "open" | "closed"
 const CHECKOUT_URL = ""; // 公開アプリの https://.../payjp/checkout
 const LINE_URL = "https://lin.ee/LYnlU0f";
+const BETA_TERM_DAYS = 14;
 
 const salesViews = {
   closed: "Re:Frame ONE βの募集は終了しました。ご参加ありがとうございました。"
@@ -52,7 +53,7 @@ function replaceBrandPositioning() {
       const p = card.querySelector('p');
       if (tag) tag.textContent = 'INPUT HANDLING';
       if (title) title.textContent = '相談文の扱い';
-      if (p) p.textContent = '相談文の整理処理には外部AIサービス（Google Gemini API）を使用します。実名・住所・電話番号・LINE ID・勤務先など、個人を特定できる内容は入力しないでください。';
+      if (p) p.textContent = '相談文の整理処理にはGoogle Gemini APIを使用します。実名・住所・電話番号・LINE ID・勤務先など、個人を特定できる内容は入力しないでください。';
     }
   });
 
@@ -85,7 +86,39 @@ function replaceBrandPositioning() {
   }
 }
 
+function applyBetaTerms() {
+  document.querySelectorAll('.payfacts').forEach((list) => {
+    if (list.querySelector('[data-beta-term]')) return;
+    const term = document.createElement('li');
+    term.dataset.betaTerm = '1';
+    term.textContent = `利用案内日から${BETA_TERM_DAYS}日間`;
+    const usage = document.createElement('li');
+    usage.dataset.betaTerm = '1';
+    usage.textContent = '期間中は商品上の総回数制限なし';
+    list.append(term, usage);
+  });
+
+  const purchaseMain = document.querySelector('.purchase-main');
+  if (purchaseMain && !purchaseMain.querySelector('[data-beta-terms-copy]')) {
+    const copy = document.createElement('p');
+    copy.dataset.betaTermsCopy = '1';
+    copy.innerHTML = `<strong>利用案内日から${BETA_TERM_DAYS}日間ご利用いただけます。</strong>期間中は商品上の総回数制限を設けません。ただし、短時間に何度も連続利用する場合は、安全・負荷対策のため一時的に制限されることがあります。`;
+    const legal = purchaseMain.querySelector('.legal');
+    purchaseMain.insertBefore(copy, legal || null);
+  }
+
+  const faq = document.querySelector('.faq');
+  if (faq && !faq.querySelector('[data-beta-usage-faq]')) {
+    const details = document.createElement('details');
+    details.className = 'panel';
+    details.dataset.betaUsageFaq = '1';
+    details.innerHTML = `<summary>どのくらい使えますか？</summary><p>アクセス情報をお送りした日から${BETA_TERM_DAYS}日間ご利用いただけます。期間中は商品上の総回数制限を設けていません。必要な場面で使うためのβ版で、短時間の連続利用には安全・負荷対策上の制限があります。</p>`;
+    faq.appendChild(details);
+  }
+}
+
 replaceBrandPositioning();
+applyBetaTerms();
 
 document.querySelectorAll("[data-sales-cta]").forEach((container) => {
   container.replaceChildren();
@@ -117,7 +150,7 @@ document.querySelectorAll("[data-sales-cta]").forEach((container) => {
 
     const note = document.createElement("small");
     note.className = "sales-status-note";
-    note.textContent = "カード決済（PAY.JP）は現在、審査・導入準備中です。";
+    note.textContent = `初回βは5名・980円。利用案内日から${BETA_TERM_DAYS}日間。カード決済（PAY.JP）は現在、審査・導入準備中です。`;
 
     container.append(link, note);
     return;
