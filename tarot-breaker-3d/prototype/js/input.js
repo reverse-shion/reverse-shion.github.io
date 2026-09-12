@@ -47,15 +47,10 @@ export class InputController {
       };
     };
 
-    // Gameplay must win over Safari text selection / callouts.
     for (const type of ['contextmenu', 'selectstart', 'dragstart']) {
       on(look, type, e => e.preventDefault());
     }
 
-    // One-finger swipe anywhere = movement command.
-    // A completed swipe latches movement so the player walks smoothly without
-    // repeatedly dragging. A simple tap stops movement.
-    // A second simultaneous finger is reserved for manual camera adjustment.
     on(look, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
       const coarse = e.pointerType === 'touch' || e.pointerType === 'pen';
@@ -78,8 +73,6 @@ export class InputController {
         if (distance < 8) return;
 
         this.gesture.moved = true;
-        // Lock to one of four cardinal directions. This removes thumb drift and
-        // makes "up means straight forward" deterministic on a phone.
         if (Math.abs(dy) >= Math.abs(dx)) {
           this.axis = { x: 0, z: dy < 0 ? -1 : 1 };
         } else {
@@ -124,7 +117,6 @@ export class InputController {
       }
     });
 
-    // Hidden compatibility target retained for the existing automated input test.
     on(stick, 'pointerdown', e => {
       if (!this.enabled) return;
       e.preventDefault();
