@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.5.0';
-import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.5.0';
-import { createWorld } from './world.js?v=p2-1.5.0';
-import { InputController } from './input.js?v=p2-1.5.0';
-import { AudioController } from './audio.js?v=p2-1.5.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.5.0';
+import { asset, loadJSON } from './config.js?v=p2-1.6.0';
+import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.6.0';
+import { createWorld } from './world.js?v=p2-1.6.0';
+import { InputController } from './input.js?v=p2-1.6.0';
+import { AudioController } from './audio.js?v=p2-1.6.0';
+import { SkitBridge } from './skit-bridge.js?v=p2-1.6.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -26,18 +26,21 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   const world = createWorld($('scene'), map, events);
   running = true;
   const state = createState(map); state.mode = 'explore';
-  let suspended = false, contextLost = false, disposed = false, raf = 0, previous = 0, lastPrompt = undefined, noticeTimer;
+  let suspended = false, contextLost = false, disposed = false, raf = 0, previous = 0, lastPrompt = null, noticeTimer;
   let autoFollow = true;
   const cleanups = [];
 
-  function on(el, type, fn) { el.addEventListener(type, fn); cleanups.push(() => el.removeEventListener(type, fn)); }
+  function on(el, type, fn, options) {
+    el.addEventListener(type, fn, options);
+    cleanups.push(() => el.removeEventListener(type, fn, options));
+  }
   function notice(message) {
     $('notice').textContent = message; $('notice').hidden = false; clearTimeout(noticeTimer);
     noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 6500);
   }
   function syncFollowButton() {
     const button = $('view-follow');
-    button.textContent = autoFollow ? '視点追尾 ON' : '視点追尾 OFF';
+    button.textContent = autoFollow ? '自動視点 ON' : '自動視点 OFF';
     button.setAttribute('aria-pressed', String(autoFollow));
   }
 
@@ -57,7 +60,9 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   const skit = new SkitBridge({
     host: $('sv-skit'), mount: $('skit-mount'), closeButton: $('close-skit'), characters,
     onClose: completed => {
-      leaveSkit(state, completed); $('world').inert = false; $('world').removeAttribute('aria-hidden');
+      leaveSkit(state, completed);
+      $('world').inert = false;
+      $('world').removeAttribute('aria-hidden');
       sync();
       if (!suspended && !disposed) { $('world').focus({ preventScroll: true }); startLoop(); }
     },
@@ -68,34 +73,42 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     const active = !suspended && !contextLost && !disposed;
     input.setEnabled(active && state.mode === 'explore');
     $('controls').hidden = !active || state.mode !== 'explore';
-    audio.setScene(state.mode, active); syncFollowButton(); updatePrompt();
+    audio.setScene(state.mode, active);
+    syncFollowButton();
+    updatePrompt();
   }
 
   function updatePrompt() {
-    if (state.mode !== 'explore') { $('interact').hidden = true; return; }
+    if (state.mode !== 'explore') {
+      $('interact').hidden = true;
+      return;
+    }
+
     const event = nearbyEvent(state, events, map);
     const id = event?.id || null;
-    if (id === lastPrompt) return;
-    const entering = Boolean(event) && lastPrompt !== undefined && lastPrompt !== id;
+    const entering = Boolean(event) && id !== lastPrompt;
+
+    // Always refresh visibility. This matters after returning from a skit at the
+    // same position: the button was hidden during the skit and must become tappable again.
     $('interact').hidden = !event;
-    $('guide').textContent = event ? 'シオンの記憶が反応している——会話を始めます' : '↑↓←→ スワイプで移動 ／ タップで停止';
+    $('guide').textContent = event
+      ? 'ふたりがいる。話しかけてみよう'
+      : '上へ押し出す：歩く ／ 左右：向きを変える ／ 指を離す：止まる';
     if (event) $('interact').textContent = event.label;
+
+    if (entering) input.stopMovement();
     lastPrompt = id;
-    if (entering) {
-      input.stopMovement();
-      queueMicrotask(() => {
-        const current = nearbyEvent(state, events, map);
-        if (!suspended && !disposed && state.mode === 'explore' && current?.id === id) interact();
-      });
-    }
   }
 
   function interact() {
     if (suspended || disposed || state.mode !== 'explore') return;
     const event = nearbyEvent(state, events, map);
     if (!enterSkit(state, event)) return;
-    input.stopMovement(); stopLoop(); sync();
-    $('world').inert = true; $('world').setAttribute('aria-hidden', 'true');
+    input.stopMovement();
+    stopLoop();
+    sync();
+    $('world').inert = true;
+    $('world').setAttribute('aria-hidden', 'true');
     void skit.open(event);
   }
 
@@ -103,10 +116,14 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   function frame(now) {
     raf = 0;
     if (suspended || disposed || contextLost || state.mode !== 'explore') return;
-    const dt = previous ? (now - previous) / 1000 : 0; previous = now;
-    movePlayer(state, input.sample(), dt, map);
-    if (autoFollow && input.isMoving()) assistView(state, dt);
-    world.render(state.player); updatePrompt();
+    const dt = previous ? (now - previous) / 1000 : 0;
+    previous = now;
+    const movement = input.sample();
+    const moving = Math.hypot(movement.x, movement.z) > 0.03;
+    movePlayer(state, movement, dt, map);
+    if (autoFollow && moving) assistView(state, dt);
+    world.render(state.player, { moving, delta: dt });
+    updatePrompt();
     raf = requestAnimationFrame(frame);
   }
   function startLoop() {
@@ -124,12 +141,17 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     world.resize(); sync(); $('world').focus({ preventScroll: true }); startLoop();
   }
 
-  on($('interact'), 'click', interact);
-  on($('sound'), 'click', () => audio.toggle());
-  on($('skit-sound'), 'click', () => audio.toggle());
-  on($('view-follow'), 'click', () => {
-    autoFollow = !autoFollow; syncFollowButton();
-    notice(autoFollow ? '視点追尾をONにしました。移動中は視線が自然に正面へ戻ります。' : '視点追尾をOFFにしました。現在の視線角度を保ちます。');
+  // Controls sit above the full-screen gesture surface. Stop propagation at the
+  // button boundary so a tap can never be interpreted as a locomotion gesture.
+  on($('interact'), 'pointerdown', e => { e.stopPropagation(); input.stopMovement(); });
+  on($('interact'), 'click', e => { e.stopPropagation(); interact(); });
+  on($('sound'), 'click', e => { e.stopPropagation(); audio.toggle(); });
+  on($('skit-sound'), 'click', e => { e.stopPropagation(); audio.toggle(); });
+  on($('view-follow'), 'click', e => {
+    e.stopPropagation();
+    autoFollow = !autoFollow;
+    syncFollowButton();
+    notice(autoFollow ? '自動視点をONにしました。歩行中は視線が自然に水平へ戻ります。' : '自動視点をOFFにしました。視線の上下角度を保ちます。');
   });
   on($('resume'), 'click', resume);
   on(document, 'visibilitychange', () => { if (document.hidden) pause(); });
@@ -144,7 +166,8 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     clearTimeout(noticeTimer); cleanups.forEach(fn => fn()); running = false;
   }
 
-  $('start-screen').hidden = true; $('world').focus({ preventScroll: true });
+  $('start-screen').hidden = true;
+  $('world').focus({ preventScroll: true });
   if (navigator.serviceWorker?.controller) notice('以前のサイトデータが残る場合があります。表示が古い場合は再読み込みしてください。');
   sync(); world.render(state.player); startLoop();
 }
