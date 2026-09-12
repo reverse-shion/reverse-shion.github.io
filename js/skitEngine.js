@@ -75,6 +75,7 @@
       returnHref,
       onReturn,
       onNext,
+      useStoredName = true,
     }) {
       // ① 前回を必ず停止
       this.stop();
@@ -104,7 +105,11 @@
       this.byeTimer2 = null;
 
       // ★ userName: passed > stored > guest
-      const stored = (localStorage.getItem("sv_user_name") || "").trim();
+      let stored = "";
+      if (useStoredName) {
+        try { stored = (localStorage.getItem("sv_user_name") || "").trim(); }
+        catch (_) { /* Storage can be unavailable in private / embedded contexts. */ }
+      }
       const passed = (userName && String(userName).trim()) || "";
       this.userName = passed || stored || "ゲスト";
 
