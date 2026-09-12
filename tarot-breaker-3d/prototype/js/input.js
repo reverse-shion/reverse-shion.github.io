@@ -16,20 +16,14 @@ export class InputController {
       el.addEventListener(type, fn, options);
       this.cleanups.push(() => el.removeEventListener(type, fn, options));
     };
-
-    const setCapture = (el, id) => {
-      try { el.setPointerCapture(id); } catch (_) {}
-    };
-    const releaseCapture = (el, id) => {
-      try { if (el.hasPointerCapture?.(id)) el.releasePointerCapture(id); } catch (_) {}
-    };
+    const setCapture = (el, id) => { try { el.setPointerCapture(id); } catch (_) {} };
+    const releaseCapture = (el, id) => { try { if (el.hasPointerCapture?.(id)) el.releasePointerCapture(id); } catch (_) {} };
 
     const beginGesture = e => {
       e.preventDefault();
       setCapture(look, e.pointerId);
       this.gesture = { id: e.pointerId, el: look, startX: e.clientX, startY: e.clientY, moved: false };
     };
-
     const beginLook = e => {
       e.preventDefault();
       setCapture(look, e.pointerId);
@@ -122,14 +116,8 @@ export class InputController {
         e.preventDefault();
         this.keys.add(e.code);
       }
-      if (e.code === 'Space') {
-        e.preventDefault();
-        this.stopMovement();
-      }
-      if (e.code === 'KeyE' && !e.repeat) {
-        e.preventDefault();
-        onInteract();
-      }
+      if (e.code === 'Space') { e.preventDefault(); this.stopMovement(); }
+      if (e.code === 'KeyE' && !e.repeat) { e.preventDefault(); onInteract(); }
     });
     on(target, 'keyup', e => this.keys.delete(e.code));
     on(target, 'blur', () => this.reset());
@@ -145,13 +133,8 @@ export class InputController {
     };
   }
 
-  isMoving() {
-    return Math.abs(this.axis.x) > 0.01 || Math.abs(this.axis.z) > 0.01 || this.keys.size > 0;
-  }
-
-  stopMovement() {
-    this.axis = { x: 0, z: 0 };
-  }
+  isMoving() { return Math.abs(this.axis.x) > 0.01 || Math.abs(this.axis.z) > 0.01 || this.keys.size > 0; }
+  stopMovement() { this.axis = { x: 0, z: 0 }; }
 
   reset() {
     if (this.gesture) releaseCapture(this.gesture.el, this.gesture.id);
@@ -162,14 +145,6 @@ export class InputController {
     this.stopMovement();
   }
 
-  setEnabled(value) {
-    this.enabled = value;
-    if (!value) this.reset();
-  }
-
-  dispose() {
-    this.setEnabled(false);
-    this.cleanups.forEach(fn => fn());
-    this.cleanups = [];
-  }
+  setEnabled(value) { this.enabled = value; if (!value) this.reset(); }
+  dispose() { this.setEnabled(false); this.cleanups.forEach(fn => fn()); this.cleanups = []; }
 }
