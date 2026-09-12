@@ -27,29 +27,16 @@ export class InputController {
     const beginGesture = e => {
       e.preventDefault();
       setCapture(look, e.pointerId);
-      this.gesture = {
-        id: e.pointerId,
-        el: look,
-        startX: e.clientX,
-        startY: e.clientY,
-        moved: false
-      };
+      this.gesture = { id: e.pointerId, el: look, startX: e.clientX, startY: e.clientY, moved: false };
     };
 
     const beginLook = e => {
       e.preventDefault();
       setCapture(look, e.pointerId);
-      this.lookPointer = {
-        id: e.pointerId,
-        el: look,
-        x: e.clientX,
-        y: e.clientY
-      };
+      this.lookPointer = { id: e.pointerId, el: look, x: e.clientX, y: e.clientY };
     };
 
-    for (const type of ['contextmenu', 'selectstart', 'dragstart']) {
-      on(look, type, e => e.preventDefault());
-    }
+    for (const type of ['contextmenu', 'selectstart', 'dragstart']) on(look, type, e => e.preventDefault());
 
     on(look, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
@@ -64,23 +51,16 @@ export class InputController {
 
     on(look, 'pointermove', e => {
       if (!this.enabled) return;
-
       if (this.gesture?.id === e.pointerId) {
         e.preventDefault();
         const dx = e.clientX - this.gesture.startX;
         const dy = e.clientY - this.gesture.startY;
-        const distance = Math.hypot(dx, dy);
-        if (distance < 8) return;
-
+        if (Math.hypot(dx, dy) < 8) return;
         this.gesture.moved = true;
-        if (Math.abs(dy) >= Math.abs(dx)) {
-          this.axis = { x: 0, z: dy < 0 ? -1 : 1 };
-        } else {
-          this.axis = { x: dx < 0 ? -1 : 1, z: 0 };
-        }
+        if (Math.abs(dy) >= Math.abs(dx)) this.axis = { x: 0, z: dy < 0 ? -1 : 1 };
+        else this.axis = { x: dx < 0 ? -1 : 1, z: 0 };
         return;
       }
-
       if (this.lookPointer?.id === e.pointerId) {
         e.preventDefault();
         onLook(e.clientX - this.lookPointer.x, e.clientY - this.lookPointer.y);
@@ -122,13 +102,7 @@ export class InputController {
       e.preventDefault();
       setCapture(stick, e.pointerId);
       const rect = stick.getBoundingClientRect();
-      this.gesture = {
-        id: e.pointerId,
-        el: stick,
-        startX: rect.left + rect.width / 2,
-        startY: rect.top + rect.height / 2,
-        moved: false
-      };
+      this.gesture = { id: e.pointerId, el: stick, startX: rect.left + rect.width / 2, startY: rect.top + rect.height / 2, moved: false };
     });
     on(stick, 'pointermove', e => {
       if (!this.enabled || this.gesture?.id !== e.pointerId) return;
