@@ -7,51 +7,63 @@
   <meta name="theme-color" content="#101526">
   <title>TAROT BREAKER 3D — 星界の小さな散歩</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="../../css/shiopon-skit.css?v=p2-1.1.0">
-  <link rel="stylesheet" href="./css/prototype.css?v=p2-1.1.0">
+  <link rel="stylesheet" href="../../css/shiopon-skit.css?v=p2-1.2.0">
+  <link rel="stylesheet" href="./css/prototype.css?v=p2-1.2.0">
+  <link rel="stylesheet" href="./css/mobile-controls.css?v=p2-1.2.0">
 </head>
 <body>
   <main id="world" aria-label="1000年前の星界" tabindex="-1">
     <canvas id="scene" aria-label="シオンの目で歩く星界の回廊"></canvas>
-    <div id="look" aria-label="ドラッグして見回す"></div>
+    <div id="look" aria-label="左側で移動、右側をドラッグして見回す"></div>
     <header class="hud">
       <div><span class="eyebrow">TAROT BREAKER</span><p>1000年前の星界 <span>／ 回廊の試作</span></p></div>
-      <button id="sound" type="button" aria-pressed="false">音楽 OFF</button>
+      <button id="sound" type="button" aria-pressed="true">音楽 ON</button>
     </header>
-    <p id="guide" class="guide">正面の小さな光へ歩いてみよう</p>
+    <p id="guide" class="guide">左側を触って進む ／ 右側をスワイプして見回す</p>
     <div class="reticle" aria-hidden="true">·</div>
     <div id="controls" hidden>
-      <div id="stick" aria-label="移動スティック"><span id="thumb"></span><span class="stick-label">移動</span></div>
-      <p class="look-hint">右側をスワイプして見回す</p>
+      <div id="stick" aria-hidden="true"><span id="thumb"></span><span class="stick-label">移動</span></div>
+      <p class="look-hint">左側：移動　／　右側：視点</p>
       <button id="interact" type="button" hidden>ふたりと話す</button>
       <p class="keyboard-hint">WASD：移動　ドラッグ：視点　E：会話</p>
     </div>
   </main>
+
   <section id="start-screen" class="screen" aria-labelledby="start-title">
     <div class="intro">
       <p class="eyebrow">TAROT BREAKER · PHASE 2</p>
       <h1 id="start-title">星界の<br>小さな散歩</h1>
-      <p class="lead">シオンの目で歩く、1000年前。<br>小さな光のそばで、ふたりとひと休み。</p>
-      <p class="instructions">左のスティックで歩く。右側をスワイプして見回す。<br>光に近づいたら「ふたりと話す」を押してください。</p>
+      <p class="lead">シオンの目で歩く、1000年前。<br>正面の光へ向かうと、ふたりとの会話が始まります。</p>
+      <p class="instructions">画面の左側を触って、そのまま指を倒すように動かすと移動。<br>右側をスワイプすると視点が動きます。固定スティックを狙う必要はありません。</p>
       <button id="start" class="primary" type="button">GAME START</button>
-      <p id="start-status" role="status">移動と会話を試すプロトタイプです。音楽は後からONにできます。</p>
+      <p id="start-status" role="status">ゲーム開始のタップで音楽もONにします。いつでも右上からOFFにできます。</p>
       <noscript>この試作にはJavaScriptが必要です。</noscript>
     </div>
   </section>
+
   <section id="pause-screen" class="screen" hidden aria-labelledby="pause-title">
-    <div class="intro compact"><h2 id="pause-title">ひと休み中</h2><p id="pause-message">準備ができたら、散歩を再開できます。</p><button id="resume" class="primary" type="button">散歩を再開</button></div>
+    <div class="intro compact">
+      <h2 id="pause-title">一時停止</h2>
+      <p id="pause-message">ゲームを一時停止しました。</p>
+      <button id="resume" class="primary" type="button">ゲームに戻る</button>
+    </div>
   </section>
+
   <div id="sv-skit" hidden>
     <div class="sv-overlay">
       <div class="sv-overlay-backdrop"></div>
       <section class="sv-overlay-panel" role="dialog" aria-modal="true" aria-label="シオン・しおぽん・リュミエールの会話" tabindex="-1">
-        <div class="skit-toolbar"><button id="skit-sound" type="button" aria-pressed="false">音楽 OFF</button><button id="close-skit" type="button">星界へ戻る ×</button></div>
+        <div class="skit-toolbar">
+          <button id="skit-sound" type="button" aria-pressed="true">音楽 ON</button>
+          <button id="close-skit" type="button">星界へ戻る ×</button>
+        </div>
         <div class="sv-overlay-body"><div id="skit-mount" class="sv-engine-root"></div></div>
       </section>
     </div>
   </div>
+
   <p id="notice" class="notice" role="status" hidden></p>
-  <script src="../../js/skitEngine.js?v=p2-1.1.0"></script>
-  <script type="module" src="./js/boot.js?v=p2-1.1.0"></script>
+  <script src="../../js/skitEngine.js?v=p2-1.2.0"></script>
+  <script type="module" src="./js/boot.js?v=p2-1.2.0"></script>
 </body>
 </html>
