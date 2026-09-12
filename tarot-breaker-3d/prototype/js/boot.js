@@ -6,7 +6,7 @@ start.addEventListener('click', async () => {
 
   // Prime BGM directly from the user's tap. This is important on iPhone/iPad,
   // where starting audio only after async loading can lose the user gesture.
-  const initialAudio = new Audio(new URL('../../../audio/seifu-raguna.mp3?v=p2-1.2.0', import.meta.url).href);
+  const initialAudio = new Audio(new URL('../../../audio/seifu-raguna.mp3?v=p2-1.3.0', import.meta.url).href);
   initialAudio.loop = true;
   initialAudio.volume = 0.34;
   initialAudio.preload = 'auto';
@@ -16,7 +16,7 @@ start.addEventListener('click', async () => {
   } catch (_) {}
 
   try {
-    const { startGame } = await import('./app.js?v=p2-1.2.0');
+    const { startGame } = await import('./app.js?v=p2-1.3.0');
     await startGame({ initialAudio, initialSoundEnabled: true });
   } catch (error) {
     initialAudio.pause();
