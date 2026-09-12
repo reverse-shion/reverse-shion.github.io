@@ -20,12 +20,14 @@ export function movePlayer(state, input, delta, map) {
 export function lookPlayer(state, dx, dy) {
   if (state.mode !== 'explore') return;
   state.player.yaw = (state.player.yaw - clamp(dx, -80, 80) * 0.003) % (Math.PI * 2);
-  state.player.pitch = clamp(state.player.pitch - clamp(dy, -80, 80) * 0.0025, -0.8, 0.8);
+  state.player.pitch = clamp(state.player.pitch - clamp(dy, -80, 80) * 0.0027, -1.05, 1.05);
 }
 export function assistView(state, delta) {
   if (state.mode !== 'explore') return;
   const dt = clamp(delta, 0, 0.05);
-  const factor = 1 - Math.exp(-5.5 * dt);
+  // Gentle horizon recovery: free-look is respected first, then walking slowly
+  // settles the vertical view back toward a natural forward gaze.
+  const factor = 1 - Math.exp(-2.4 * dt);
   state.player.pitch += (0 - state.player.pitch) * factor;
   if (Math.abs(state.player.pitch) < 0.002) state.player.pitch = 0;
 }
