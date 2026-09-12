@@ -1,4 +1,4 @@
-import { asset, loadJSON } from './config.js?v=p2-1.8.0';
+import { asset, loadJSON } from './config.js?v=p2-1.9.0';
 
 // Reuses the site's skit engine while adapting it to one self-contained 3D memory.
 // First view prioritizes immersion; replay adds an explicit SKIP escape hatch.
