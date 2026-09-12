@@ -106,6 +106,18 @@ test('late fetch after close cannot overwrite a later conversation; errors permi
   globalThis.fetch=async()=>({ok:true,json:async()=>structuredClone(skitData)});await controller.open(events[0]);assert.ok(controller.session);
   controller.dispose();dom.window.close();
 });
+test('shared engine preserves legacy stored/passed names and survives denied storage', async () => {
+  const dom = new JSDOM('<section class="sv-overlay-panel"><div id="root"></div></section>', { runScripts:'outside-only',pretendToBeVisual:true,url:'https://example.test/' });
+  const w=dom.window;w.eval(fs.readFileSync(path.join(root,'js/skitEngine.js'),'utf8'));
+  w.fetch=async()=>({ok:true,json:async()=>structuredClone(skitData)});
+  const engine=w.SV_SkitEngine, options={rootEl:w.document.getElementById('root'),skitUrl:'/skit.json'};
+  w.localStorage.setItem('sv_user_name','既存の閲覧者');
+  await engine.start(options);assert.equal(engine.userName,'既存の閲覧者');
+  await engine.start({...options,userName:'指定名'});assert.equal(engine.userName,'指定名');
+  Object.defineProperty(w,'localStorage',{get(){throw new Error('denied');}});
+  await engine.start(options);assert.equal(engine.userName,'ゲスト');
+  engine.stop();dom.window.close();
+});
 test('touch move and look have separate pointers; cancel, blur, resize and pause clear input', () => {
   const {dom,w,controller}=domFixture(); let dx=0;
   const $=id=>w.document.getElementById(id), stick=$('stick'),look=$('look');
