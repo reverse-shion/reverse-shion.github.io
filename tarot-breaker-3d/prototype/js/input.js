@@ -1,4 +1,4 @@
-import { clamp } from './state.js?v=p2-1.5.0';
+import { clamp } from './state.js?v=p2-1.6.0';
 
 export class InputController {
   constructor({ stick, thumb, look, onLook, onInteract, target = window }) {
@@ -7,8 +7,8 @@ export class InputController {
     this.look = look;
     this.keys = new Set();
     this.enabled = false;
-    this.axis = { x: 0, z: 0 };
-    this.gesture = null;
+    this.forward = 0;
+    this.drivePointer = null;
     this.lookPointer = null;
     this.cleanups = [];
 
@@ -19,25 +19,40 @@ export class InputController {
     const setCapture = (el, id) => { try { el.setPointerCapture(id); } catch (_) {} };
     const releaseCapture = (el, id) => { try { if (el.hasPointerCapture?.(id)) el.releasePointerCapture(id); } catch (_) {} };
 
-    const beginGesture = e => {
+    const beginDrive = (e, el = look) => {
       e.preventDefault();
-      setCapture(look, e.pointerId);
-      this.gesture = { id: e.pointerId, el: look, startX: e.clientX, startY: e.clientY, moved: false };
+      setCapture(el, e.pointerId);
+      this.drivePointer = {
+        id: e.pointerId,
+        el,
+        startX: e.clientX,
+        startY: e.clientY,
+        lastX: e.clientX,
+        lastY: e.clientY
+      };
+      this.forward = 0;
     };
+
     const beginLook = e => {
       e.preventDefault();
       setCapture(look, e.pointerId);
       this.lookPointer = { id: e.pointerId, el: look, x: e.clientX, y: e.clientY };
     };
 
-    for (const type of ['contextmenu', 'selectstart', 'dragstart']) on(look, type, e => e.preventDefault());
+    for (const type of ['contextmenu', 'selectstart', 'dragstart']) {
+      on(look, type, e => e.preventDefault());
+    }
 
+    // One finger: walk and steer. Up/down controls walking speed; horizontal
+    // movement turns Shion's body/view instead of sliding sideways.
+    // A second finger is reserved for free-look adjustment.
     on(look, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      if (e.target?.closest?.('button, [role="button"]')) return;
       const coarse = e.pointerType === 'touch' || e.pointerType === 'pen';
       if (coarse) {
-        if (!this.gesture) beginGesture(e);
-        else if (!this.lookPointer && e.pointerId !== this.gesture.id) beginLook(e);
+        if (!this.drivePointer) beginDrive(e);
+        else if (!this.lookPointer && e.pointerId !== this.drivePointer.id) beginLook(e);
         return;
       }
       if (!this.lookPointer) beginLook(e);
@@ -45,31 +60,40 @@ export class InputController {
 
     on(look, 'pointermove', e => {
       if (!this.enabled) return;
-      if (this.gesture?.id === e.pointerId) {
+      if (this.drivePointer?.id === e.pointerId) {
         e.preventDefault();
-        const dx = e.clientX - this.gesture.startX;
-        const dy = e.clientY - this.gesture.startY;
-        if (Math.hypot(dx, dy) < 8) return;
-        this.gesture.moved = true;
-        if (Math.abs(dy) >= Math.abs(dx)) this.axis = { x: 0, z: dy < 0 ? -1 : 1 };
-        else this.axis = { x: dx < 0 ? -1 : 1, z: 0 };
+        const p = this.drivePointer;
+        const totalY = e.clientY - p.startY;
+        const stepX = e.clientX - p.lastX;
+        p.lastX = e.clientX;
+        p.lastY = e.clientY;
+
+        // Vertical displacement becomes continuous walking while the finger stays down.
+        // Small movements are ignored; ~42px reaches full walking speed.
+        const deadzone = 5;
+        if (Math.abs(totalY) <= deadzone) this.forward = 0;
+        else this.forward = clamp(-(totalY - Math.sign(totalY) * deadzone) / 37, -1, 1);
+
+        // Horizontal finger movement rotates the body/view, so a curve feels like walking
+        // around a corner rather than strafing across the floor.
+        if (Math.abs(stepX) > 0.1) onLook(stepX * 1.15, 0);
         return;
       }
+
       if (this.lookPointer?.id === e.pointerId) {
         e.preventDefault();
-        onLook(e.clientX - this.lookPointer.x, e.clientY - this.lookPointer.y);
-        this.lookPointer.x = e.clientX;
-        this.lookPointer.y = e.clientY;
+        const p = this.lookPointer;
+        onLook(e.clientX - p.x, e.clientY - p.y);
+        p.x = e.clientX;
+        p.y = e.clientY;
       }
     }, { passive: false });
 
     const finish = e => {
-      if (this.gesture?.id === e.pointerId) {
-        const moved = this.gesture.moved;
-        releaseCapture(this.gesture.el, e.pointerId);
-        this.gesture = null;
-        if (!moved) this.stopMovement();
-        return;
+      if (this.drivePointer?.id === e.pointerId) {
+        releaseCapture(this.drivePointer.el, e.pointerId);
+        this.drivePointer = null;
+        this.forward = 0;
       }
       if (this.lookPointer?.id === e.pointerId) {
         releaseCapture(this.lookPointer.el, e.pointerId);
@@ -77,36 +101,23 @@ export class InputController {
       }
     };
 
-    on(look, 'pointerup', finish);
-    on(look, 'lostpointercapture', finish);
-    on(look, 'pointercancel', e => {
-      if (this.gesture?.id === e.pointerId) {
-        releaseCapture(this.gesture.el, e.pointerId);
-        this.gesture = null;
-        this.stopMovement();
-      }
-      if (this.lookPointer?.id === e.pointerId) {
-        releaseCapture(this.lookPointer.el, e.pointerId);
-        this.lookPointer = null;
-      }
-    });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) on(look, type, finish);
 
+    // Hidden fallback target retained for test/non-touch compatibility.
     on(stick, 'pointerdown', e => {
       if (!this.enabled) return;
-      e.preventDefault();
-      setCapture(stick, e.pointerId);
-      const rect = stick.getBoundingClientRect();
-      this.gesture = { id: e.pointerId, el: stick, startX: rect.left + rect.width / 2, startY: rect.top + rect.height / 2, moved: false };
+      beginDrive(e, stick);
     });
     on(stick, 'pointermove', e => {
-      if (!this.enabled || this.gesture?.id !== e.pointerId) return;
+      if (!this.enabled || this.drivePointer?.id !== e.pointerId) return;
       e.preventDefault();
-      const dx = e.clientX - this.gesture.startX;
-      const dy = e.clientY - this.gesture.startY;
-      if (Math.hypot(dx, dy) < 6) return;
-      this.gesture.moved = true;
-      if (Math.abs(dy) >= Math.abs(dx)) this.axis = { x: 0, z: dy < 0 ? -1 : 1 };
-      else this.axis = { x: dx < 0 ? -1 : 1, z: 0 };
+      const p = this.drivePointer;
+      const totalY = e.clientY - p.startY;
+      const stepX = e.clientX - p.lastX;
+      p.lastX = e.clientX;
+      const deadzone = 5;
+      this.forward = Math.abs(totalY) <= deadzone ? 0 : clamp(-(totalY - Math.sign(totalY) * deadzone) / 37, -1, 1);
+      if (Math.abs(stepX) > 0.1) onLook(stepX * 1.15, 0);
     });
     for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) on(stick, type, finish);
 
@@ -128,21 +139,31 @@ export class InputController {
     if (!this.enabled) return { x: 0, z: 0 };
     const has = (...codes) => codes.some(c => this.keys.has(c)) ? 1 : 0;
     return {
-      x: clamp(this.axis.x + has('KeyD','ArrowRight') - has('KeyA','ArrowLeft'), -1, 1),
-      z: clamp(this.axis.z + has('KeyS','ArrowDown') - has('KeyW','ArrowUp'), -1, 1)
+      // Touch never strafes. A/D remains available on desktop.
+      x: clamp(has('KeyD','ArrowRight') - has('KeyA','ArrowLeft'), -1, 1),
+      z: clamp(-this.forward + has('KeyS','ArrowDown') - has('KeyW','ArrowUp'), -1, 1)
     };
   }
 
-  isMoving() { return Math.abs(this.axis.x) > 0.01 || Math.abs(this.axis.z) > 0.01 || this.keys.size > 0; }
-  stopMovement() { this.axis = { x: 0, z: 0 }; }
+  isMoving() {
+    return Math.abs(this.forward) > 0.03 ||
+      ['KeyW','KeyS','ArrowUp','ArrowDown','KeyA','KeyD','ArrowLeft','ArrowRight'].some(code => this.keys.has(code));
+  }
+
+  stopMovement() {
+    this.forward = 0;
+    if (this.drivePointer) {
+      this.drivePointer.startY = this.drivePointer.lastY;
+    }
+  }
 
   reset() {
-    if (this.gesture) releaseCapture(this.gesture.el, this.gesture.id);
+    if (this.drivePointer) releaseCapture(this.drivePointer.el, this.drivePointer.id);
     if (this.lookPointer) releaseCapture(this.lookPointer.el, this.lookPointer.id);
-    this.gesture = null;
+    this.drivePointer = null;
     this.lookPointer = null;
     this.keys.clear();
-    this.stopMovement();
+    this.forward = 0;
   }
 
   setEnabled(value) { this.enabled = value; if (!value) this.reset(); }
