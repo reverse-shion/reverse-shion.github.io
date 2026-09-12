@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.4.0';
-import { createState, movePlayer, lookPlayer, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.4.0';
-import { createWorld } from './world.js?v=p2-1.4.0';
-import { InputController } from './input.js?v=p2-1.4.0';
-import { AudioController } from './audio.js?v=p2-1.4.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.4.0';
+import { asset, loadJSON } from './config.js?v=p2-1.5.0';
+import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.5.0';
+import { createWorld } from './world.js?v=p2-1.5.0';
+import { InputController } from './input.js?v=p2-1.5.0';
+import { AudioController } from './audio.js?v=p2-1.5.0';
+import { SkitBridge } from './skit-bridge.js?v=p2-1.5.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -39,6 +39,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   let previous = 0;
   let lastPrompt = undefined;
   let noticeTimer;
+  let autoFollow = true;
   const cleanups = [];
 
   function on(el, type, fn) {
@@ -51,6 +52,12 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     $('notice').hidden = false;
     clearTimeout(noticeTimer);
     noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 6500);
+  }
+
+  function syncFollowButton() {
+    const button = $('view-follow');
+    button.textContent = autoFollow ? '視点追尾 ON' : '視点追尾 OFF';
+    button.setAttribute('aria-pressed', String(autoFollow));
   }
 
   const audio = new AudioController(
@@ -98,6 +105,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     input.setEnabled(active && state.mode === 'explore');
     $('controls').hidden = !active || state.mode !== 'explore';
     audio.setScene(state.mode, active);
+    syncFollowButton();
     updatePrompt();
   }
 
@@ -115,11 +123,12 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     $('interact').hidden = !event;
     $('guide').textContent = event
       ? 'シオンの記憶が反応している——会話を始めます'
-      : 'シオンの視界 ｜ 左：移動 ／ 右：視点';
+      : '↑↓←→ スワイプで移動 ／ タップで停止';
     if (event) $('interact').textContent = event.label;
     lastPrompt = id;
 
     if (entering) {
+      input.stopMovement();
       queueMicrotask(() => {
         const current = nearbyEvent(state, events, map);
         if (!suspended && !disposed && state.mode === 'explore' && current?.id === id) interact();
@@ -131,6 +140,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     if (suspended || disposed || state.mode !== 'explore') return;
     const event = nearbyEvent(state, events, map);
     if (!enterSkit(state, event)) return;
+    input.stopMovement();
     stopLoop();
     sync();
     $('world').inert = true;
@@ -149,7 +159,9 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     if (suspended || disposed || contextLost || state.mode !== 'explore') return;
     const dt = previous ? (now - previous) / 1000 : 0;
     previous = now;
-    movePlayer(state, input.sample(), dt, map);
+    const movement = input.sample();
+    movePlayer(state, movement, dt, map);
+    if (autoFollow && input.isMoving()) assistView(state, dt);
     world.render(state.player);
     updatePrompt();
     raf = requestAnimationFrame(frame);
@@ -164,6 +176,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   function pause(message = '記憶の追体験を一時停止しました。') {
     if (disposed || suspended) return;
     suspended = true;
+    input.stopMovement();
     stopLoop();
     skit.close(false);
     sync();
@@ -187,6 +200,11 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   on($('interact'), 'click', interact);
   on($('sound'), 'click', () => audio.toggle());
   on($('skit-sound'), 'click', () => audio.toggle());
+  on($('view-follow'), 'click', () => {
+    autoFollow = !autoFollow;
+    syncFollowButton();
+    notice(autoFollow ? '視点追尾をONにしました。移動中は視線が自然に正面へ戻ります。' : '視点追尾をOFFにしました。現在の視線角度を保ちます。');
+  });
   on($('resume'), 'click', resume);
 
   on(document, 'visibilitychange', () => {
