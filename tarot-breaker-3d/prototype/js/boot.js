@@ -6,7 +6,7 @@ start.addEventListener('click', async () => {
   status.hidden = false;
   status.textContent = '星の記憶へ——';
 
-  const initialAudio = new Audio(new URL('../../../audio/seifu-raguna.mp3?v=p2-1.8.0', import.meta.url).href);
+  const initialAudio = new Audio(new URL('../../../audio/seifu-raguna.mp3?v=p2-1.9.0', import.meta.url).href);
   initialAudio.loop = true;
   initialAudio.volume = 0.34;
   initialAudio.preload = 'auto';
@@ -16,7 +16,7 @@ start.addEventListener('click', async () => {
   } catch (_) {}
 
   try {
-    const { startGame } = await import('./app.js?v=p2-1.8.0');
+    const { startGame } = await import('./app.js?v=p2-1.9.0');
     await startGame({ initialAudio, initialSoundEnabled: true });
   } catch (error) {
     initialAudio.pause();
