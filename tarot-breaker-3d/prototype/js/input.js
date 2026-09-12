@@ -1,4 +1,4 @@
-import { clamp } from './state.js?v=p2-1.6.0';
+import { clamp } from './state.js?v=p2-1.9.0';
 
 export class InputController {
   constructor({ stick, thumb, look, onLook, onInteract, target = window }) {
@@ -10,7 +10,9 @@ export class InputController {
     this.forward = 0;
     this.drivePointer = null;
     this.lookPointer = null;
+    this.lastLookEndAt = -Infinity;
     this.cleanups = [];
+    this.now = () => target.performance?.now?.() ?? Date.now();
 
     const on = (el, type, fn, options) => {
       el.addEventListener(type, fn, options);
@@ -36,16 +38,22 @@ export class InputController {
     const beginLook = e => {
       e.preventDefault();
       setCapture(look, e.pointerId);
-      this.lookPointer = { id: e.pointerId, el: look, x: e.clientX, y: e.clientY };
+      this.lookPointer = {
+        id: e.pointerId,
+        el: look,
+        x: e.clientX,
+        y: e.clientY,
+        moved: false
+      };
     };
 
     for (const type of ['contextmenu', 'selectstart', 'dragstart']) {
       on(look, type, e => e.preventDefault());
     }
 
-    // One finger: walk and steer. Up/down controls walking speed; horizontal
-    // movement turns Shion's body/view instead of sliding sideways.
-    // A second finger is reserved for free-look adjustment.
+    // One finger owns locomotion: vertical displacement walks, horizontal movement turns.
+    // A second finger becomes free-look and can look up/down/left/right without changing
+    // the movement rule or adding another visible control to the screen.
     on(look, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
       if (e.target?.closest?.('button, [role="button"]')) return;
@@ -68,14 +76,10 @@ export class InputController {
         p.lastX = e.clientX;
         p.lastY = e.clientY;
 
-        // Vertical displacement becomes continuous walking while the finger stays down.
-        // Small movements are ignored; ~42px reaches full walking speed.
         const deadzone = 5;
         if (Math.abs(totalY) <= deadzone) this.forward = 0;
         else this.forward = clamp(-(totalY - Math.sign(totalY) * deadzone) / 37, -1, 1);
 
-        // Horizontal finger movement rotates the body/view, so a curve feels like walking
-        // around a corner rather than strafing across the floor.
         if (Math.abs(stepX) > 0.1) onLook(stepX * 1.15, 0);
         return;
       }
@@ -83,7 +87,10 @@ export class InputController {
       if (this.lookPointer?.id === e.pointerId) {
         e.preventDefault();
         const p = this.lookPointer;
-        onLook(e.clientX - p.x, e.clientY - p.y);
+        const dx = e.clientX - p.x;
+        const dy = e.clientY - p.y;
+        if (Math.hypot(dx, dy) > 0.3) p.moved = true;
+        onLook(dx, dy);
         p.x = e.clientX;
         p.y = e.clientY;
       }
@@ -96,14 +103,16 @@ export class InputController {
         this.forward = 0;
       }
       if (this.lookPointer?.id === e.pointerId) {
+        const moved = this.lookPointer.moved;
         releaseCapture(this.lookPointer.el, e.pointerId);
         this.lookPointer = null;
+        if (moved) this.lastLookEndAt = this.now();
       }
     };
 
     for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) on(look, type, finish);
 
-    // Hidden fallback target retained for test/non-touch compatibility.
+    // Hidden fallback target retained for tests / non-touch compatibility.
     on(stick, 'pointerdown', e => {
       if (!this.enabled) return;
       beginDrive(e, stick);
@@ -139,7 +148,6 @@ export class InputController {
     if (!this.enabled) return { x: 0, z: 0 };
     const has = (...codes) => codes.some(c => this.keys.has(c)) ? 1 : 0;
     return {
-      // Touch never strafes. A/D remains available on desktop.
       x: clamp(has('KeyD','ArrowRight') - has('KeyA','ArrowLeft'), -1, 1),
       z: clamp(-this.forward + has('KeyS','ArrowDown') - has('KeyW','ArrowUp'), -1, 1)
     };
@@ -150,11 +158,17 @@ export class InputController {
       ['KeyW','KeyS','ArrowUp','ArrowDown','KeyA','KeyD','ArrowLeft','ArrowRight'].some(code => this.keys.has(code));
   }
 
+  isFreeLooking() {
+    return Boolean(this.lookPointer);
+  }
+
+  recentlyLooked(now = this.now(), graceMs = 1200) {
+    return now - this.lastLookEndAt < graceMs;
+  }
+
   stopMovement() {
     this.forward = 0;
-    if (this.drivePointer) {
-      this.drivePointer.startY = this.drivePointer.lastY;
-    }
+    if (this.drivePointer) this.drivePointer.startY = this.drivePointer.lastY;
   }
 
   reset() {
