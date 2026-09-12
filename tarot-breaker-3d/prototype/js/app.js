@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.3.0';
-import { createState, movePlayer, lookPlayer, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.3.0';
-import { createWorld } from './world.js?v=p2-1.3.0';
-import { InputController } from './input.js?v=p2-1.3.0';
-import { AudioController } from './audio.js?v=p2-1.3.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.3.0';
+import { asset, loadJSON } from './config.js?v=p2-1.4.0';
+import { createState, movePlayer, lookPlayer, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.4.0';
+import { createWorld } from './world.js?v=p2-1.4.0';
+import { InputController } from './input.js?v=p2-1.4.0';
+import { AudioController } from './audio.js?v=p2-1.4.0';
+import { SkitBridge } from './skit-bridge.js?v=p2-1.4.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -114,8 +114,8 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     const entering = Boolean(event) && lastPrompt !== undefined && lastPrompt !== id;
     $('interact').hidden = !event;
     $('guide').textContent = event
-      ? '光に触れました。会話を始めます'
-      : '左側を上へなぞる：前進 ／ 右側をなぞる：視点';
+      ? 'シオンの記憶が反応している——会話を始めます'
+      : 'シオンの視界 ｜ 左：移動 ／ 右：視点';
     if (event) $('interact').textContent = event.label;
     lastPrompt = id;
 
@@ -161,7 +161,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     }
   }
 
-  function pause(message = 'ゲームを一時停止しました。') {
+  function pause(message = '記憶の追体験を一時停止しました。') {
     if (disposed || suspended) return;
     suspended = true;
     stopLoop();
@@ -211,7 +211,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     contextLost = false;
     world.resize();
     $('resume').disabled = false;
-    $('pause-message').textContent = '描画が戻りました。再開できます。';
+    $('pause-message').textContent = '描画が戻りました。記憶へ戻れます。';
   });
 
   on(window, 'pagehide', e => {
