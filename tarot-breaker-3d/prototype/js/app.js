@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.9.0';
-import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.9.0';
-import { createWorld } from './world.js?v=p2-1.9.0';
-import { InputController } from './input.js?v=p2-1.9.0';
-import { AudioController } from './audio.js?v=p2-1.9.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.9.0';
+import { asset, loadJSON } from './config.js?v=star-country-v1.0';
+import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=star-country-v1.0';
+import { createWorld } from './world.js?v=star-country-v1.0';
+import { InputController } from './input.js?v=star-country-v1.0';
+import { AudioController } from './audio.js?v=star-country-v1.0';
+import { SkitBridge } from './skit-bridge.js?v=star-country-v1.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -87,7 +87,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
       leaveSkit(state, completed);
       if (completed && finishedEventId) {
         completedEvents.add(finishedEventId);
-        notice('記憶の残響が、星界へ溶けていく。');
+        notice('記憶の光が、星の国へ静かにほどけていく。');
       }
       $('world').inert = false;
       $('world').removeAttribute('aria-hidden');
@@ -123,7 +123,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     $('interact').hidden = !event;
     $('guide').hidden = !event;
     if (event) {
-      $('guide').textContent = completed ? '懐かしい残響が、ここにある。' : '星の残響が、ここにある。';
+      $('guide').textContent = completed ? '懐かしい共鳴が、まだここに残っている。' : '星の光が、かすかに揺れている。';
       $('interact').textContent = completed ? 'もう一度、記憶に触れる' : 'ふたりに声をかける';
     }
 
@@ -160,9 +160,6 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     const moving = Math.hypot(movement.x, movement.z) > 0.03;
     movePlayer(state, movement, dt, map);
 
-    // Free-look is always available with the second finger. After the player finishes
-    // looking around, keep that view briefly; only then let walking gently recover the
-    // vertical gaze toward the horizon. No visible ON/OFF setting is needed.
     if (moving && !input.isFreeLooking() && !input.recentlyLooked(now, 1200)) {
       assistView(state, dt);
     }
@@ -178,9 +175,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     }
   }
 
-  // Recovery appears only after the page genuinely leaves the foreground or WebGL is lost.
-  // There is deliberately no inactivity timer.
-  function pause(message = '星界は、ここで待っています。') {
+  function pause(message = '星の国は、ここで待っています。') {
     if (disposed || suspended) return;
     suspended = true;
     input.stopMovement();
@@ -242,14 +237,14 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   on($('scene'), 'webglcontextlost', e => {
     e.preventDefault();
     contextLost = true;
-    pause('星界の描画を復旧しています。戻らない場合はページを再読み込みしてください。');
+    pause('星の国の光を復旧しています。戻らない場合はページを再読み込みしてください。');
   });
 
   on($('scene'), 'webglcontextrestored', () => {
     contextLost = false;
     world.resize();
     $('resume').disabled = false;
-    $('pause-message').textContent = '星界の光が戻りました。';
+    $('pause-message').textContent = '星の国の光が戻りました。';
   });
 
   on(window, 'pagehide', e => {
