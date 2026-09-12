@@ -22,6 +22,13 @@ export function lookPlayer(state, dx, dy) {
   state.player.yaw = (state.player.yaw - clamp(dx, -80, 80) * 0.003) % (Math.PI * 2);
   state.player.pitch = clamp(state.player.pitch - clamp(dy, -80, 80) * 0.0025, -0.8, 0.8);
 }
+export function assistView(state, delta) {
+  if (state.mode !== 'explore') return;
+  const dt = clamp(delta, 0, 0.05);
+  const factor = 1 - Math.exp(-5.5 * dt);
+  state.player.pitch += (0 - state.player.pitch) * factor;
+  if (Math.abs(state.player.pitch) < 0.002) state.player.pitch = 0;
+}
 export function nearbyEvent(state, events, map) {
   if (state.mode !== 'explore') return null;
   return events.find(e => e.mapId === map.mapId && e.era === map.era && Math.hypot(state.player.x - e.position.x, state.player.z - e.position.z) <= e.radius) || null;
