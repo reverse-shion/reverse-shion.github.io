@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.7.0';
-import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.7.0';
-import { createWorld } from './world.js?v=p2-1.7.0';
-import { InputController } from './input.js?v=p2-1.7.0';
-import { AudioController } from './audio.js?v=p2-1.7.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.7.0';
+import { asset, loadJSON } from './config.js?v=p2-1.8.0';
+import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.8.0';
+import { createWorld } from './world.js?v=p2-1.8.0';
+import { InputController } from './input.js?v=p2-1.8.0';
+import { AudioController } from './audio.js?v=p2-1.8.0';
+import { SkitBridge } from './skit-bridge.js?v=p2-1.8.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -17,17 +17,29 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
       loadJSON(asset('tarot-breaker-3d/prototype/data/events.json'), startup.signal),
       loadJSON(asset('tarot-breaker-3d/prototype/data/characters.json'), startup.signal)
     ]);
-  } finally { clearTimeout(startupTimer); }
+  } finally {
+    clearTimeout(startupTimer);
+  }
 
   const events = eventData.events;
-  if (map.era !== 'past_1000' || !map.spawn || !Array.isArray(events) || !events.length) throw new Error('Invalid world data');
+  if (map.era !== 'past_1000' || !map.spawn || !Array.isArray(events) || !events.length) {
+    throw new Error('Invalid world data');
+  }
 
   const $ = id => document.getElementById(id);
   const world = createWorld($('scene'), map, events);
   running = true;
-  const state = createState(map); state.mode = 'explore';
+  const state = createState(map);
+  state.mode = 'explore';
   const completedEvents = new Set();
-  let suspended = false, contextLost = false, disposed = false, raf = 0, previous = 0, lastPrompt = null, noticeTimer;
+
+  let suspended = false;
+  let contextLost = false;
+  let disposed = false;
+  let raf = 0;
+  let previous = 0;
+  let lastPrompt = null;
+  let noticeTimer;
   let autoFollow = true;
   const cleanups = [];
 
@@ -35,42 +47,62 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     el.addEventListener(type, fn, options);
     cleanups.push(() => el.removeEventListener(type, fn, options));
   }
+
   function notice(message) {
-    $('notice').textContent = message; $('notice').hidden = false; clearTimeout(noticeTimer);
-    noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 4200);
+    $('notice').textContent = message;
+    $('notice').hidden = false;
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 2600);
   }
+
   function syncFollowButton() {
     const button = $('view-follow');
     button.textContent = autoFollow ? '自動視点 ON' : '自動視点 OFF';
     button.setAttribute('aria-pressed', String(autoFollow));
   }
 
-  const audio = new AudioController(asset('audio/seifu-raguna.mp3'), (enabled, message) => {
-    for (const id of ['sound', 'skit-sound']) {
-      $(id).textContent = enabled ? '音楽 ON' : '音楽 OFF';
-      $(id).setAttribute('aria-pressed', String(enabled));
-    }
-    if (message) notice(message);
-  }, () => new Audio(), initialAudio, initialSoundEnabled);
+  const audio = new AudioController(
+    asset('audio/seifu-raguna.mp3'),
+    (enabled, message) => {
+      for (const id of ['sound', 'skit-sound']) {
+        $(id).textContent = enabled ? '音楽 ON' : '音楽 OFF';
+        $(id).setAttribute('aria-pressed', String(enabled));
+      }
+      if (message) notice(message);
+    },
+    () => new Audio(),
+    initialAudio,
+    initialSoundEnabled
+  );
 
   const input = new InputController({
-    stick: $('stick'), thumb: $('thumb'), look: $('look'),
-    onLook: (dx, dy) => lookPlayer(state, dx, dy), onInteract: interact
+    stick: $('stick'),
+    thumb: $('thumb'),
+    look: $('look'),
+    onLook: (dx, dy) => lookPlayer(state, dx, dy),
+    onInteract: interact
   });
 
   const skit = new SkitBridge({
-    host: $('sv-skit'), mount: $('skit-mount'), closeButton: $('close-skit'), characters,
+    host: $('sv-skit'),
+    mount: $('skit-mount'),
+    closeButton: $('close-skit'),
+    skipButton: $('skip-memory'),
+    characters,
     onClose: completed => {
       const finishedEventId = state.eventId;
       leaveSkit(state, completed);
       if (completed && finishedEventId) {
         completedEvents.add(finishedEventId);
-        notice('ひとつの記憶を見届けました。星界を歩き続けられます。');
+        notice('記憶の残響が、星界へ溶けていく。');
       }
       $('world').inert = false;
       $('world').removeAttribute('aria-hidden');
       sync();
-      if (!suspended && !disposed) { $('world').focus({ preventScroll: true }); startLoop(); }
+      if (!suspended && !disposed) {
+        $('world').focus({ preventScroll: true });
+        startLoop();
+      }
     },
     onError: notice
   });
@@ -87,6 +119,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   function updatePrompt() {
     if (state.mode !== 'explore') {
       $('interact').hidden = true;
+      $('guide').hidden = true;
       return;
     }
 
@@ -96,10 +129,11 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     const completed = Boolean(id && completedEvents.has(id));
 
     $('interact').hidden = !event;
-    $('guide').textContent = event
-      ? (completed ? 'この記憶は見届けた。もう一度たどることもできる' : 'ここに、ふたりとの記憶が残っている')
-      : '上：歩く ／ 左右：曲がる ／ 指を離す：止まる';
-    if (event) $('interact').textContent = completed ? 'もう一度この記憶を見る' : event.label;
+    $('guide').hidden = !event;
+    if (event) {
+      $('guide').textContent = completed ? '懐かしい残響が、ここにある。' : '星の残響が、ここにある。';
+      $('interact').textContent = completed ? 'もう一度、記憶に触れる' : 'ふたりに声をかける';
+    }
 
     if (entering) input.stopMovement();
     lastPrompt = id;
@@ -108,16 +142,23 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   function interact() {
     if (suspended || disposed || state.mode !== 'explore') return;
     const event = nearbyEvent(state, events, map);
+    if (!event) return;
+    const replay = completedEvents.has(event.id);
     if (!enterSkit(state, event)) return;
     input.stopMovement();
     stopLoop();
     sync();
     $('world').inert = true;
     $('world').setAttribute('aria-hidden', 'true');
-    void skit.open(event);
+    void skit.open(event, { replay });
   }
 
-  function stopLoop() { if (raf) cancelAnimationFrame(raf); raf = 0; previous = 0; }
+  function stopLoop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    previous = 0;
+  }
+
   function frame(now) {
     raf = 0;
     if (suspended || disposed || contextLost || state.mode !== 'explore') return;
@@ -131,46 +172,116 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     updatePrompt();
     raf = requestAnimationFrame(frame);
   }
+
   function startLoop() {
-    if (!raf && !suspended && !disposed && !contextLost && state.mode === 'explore') raf = requestAnimationFrame(frame);
+    if (!raf && !suspended && !disposed && !contextLost && state.mode === 'explore') {
+      raf = requestAnimationFrame(frame);
+    }
   }
 
-  function pause(message = '記憶の追体験を一時停止しました。') {
+  // Recovery appears only after the page genuinely leaves the foreground or WebGL is lost.
+  // There is deliberately no inactivity timer.
+  function pause(message = '星界は、ここで待っています。') {
     if (disposed || suspended) return;
-    suspended = true; input.stopMovement(); stopLoop(); skit.close(false); sync();
-    $('pause-message').textContent = message; $('pause-screen').hidden = false; $('world').inert = true; $('resume').disabled = contextLost;
+    suspended = true;
+    input.stopMovement();
+    stopLoop();
+    sync();
+    $('pause-message').textContent = message;
+    $('pause-screen').hidden = false;
+    $('resume').disabled = contextLost;
   }
+
   function resume() {
     if (contextLost || disposed || document.hidden) return;
-    suspended = false; $('pause-screen').hidden = true; $('world').inert = false;
-    world.resize(); sync(); $('world').focus({ preventScroll: true }); startLoop();
+    suspended = false;
+    $('pause-screen').hidden = true;
+    world.resize();
+    sync();
+
+    if (state.mode === 'skit') {
+      $('world').inert = true;
+      document.querySelector('#sv-skit .sv-dialogue')?.focus({ preventScroll: true });
+      return;
+    }
+
+    $('world').inert = false;
+    $('world').focus({ preventScroll: true });
+    startLoop();
   }
 
-  on($('interact'), 'pointerdown', e => { e.stopPropagation(); input.stopMovement(); });
-  on($('interact'), 'click', e => { e.stopPropagation(); interact(); });
-  on($('sound'), 'click', e => { e.stopPropagation(); audio.toggle(); });
-  on($('skit-sound'), 'click', e => { e.stopPropagation(); audio.toggle(); });
+  on($('interact'), 'pointerdown', e => {
+    e.stopPropagation();
+    input.stopMovement();
+  });
+  on($('interact'), 'click', e => {
+    e.stopPropagation();
+    interact();
+  });
+  on($('sound'), 'click', e => {
+    e.stopPropagation();
+    audio.toggle();
+  });
+  on($('skit-sound'), 'click', e => {
+    e.stopPropagation();
+    audio.toggle();
+  });
   on($('view-follow'), 'click', e => {
     e.stopPropagation();
     autoFollow = !autoFollow;
     syncFollowButton();
-    notice(autoFollow ? '自動視点をONにしました。歩行中は視線が自然に水平へ戻ります。' : '自動視点をOFFにしました。視線の上下角度を保ちます。');
   });
   on($('resume'), 'click', resume);
-  on(document, 'visibilitychange', () => { if (document.hidden) pause(); });
-  on(window, 'resize', () => { input.reset(); if (!contextLost) { world.resize(); world.render(state.player); } });
-  on($('scene'), 'webglcontextlost', e => { e.preventDefault(); contextLost = true; pause('描画を復旧しています。戻らない場合は、このページを再読み込みしてください。'); });
-  on($('scene'), 'webglcontextrestored', () => { contextLost = false; world.resize(); $('resume').disabled = false; $('pause-message').textContent = '描画が戻りました。記憶へ戻れます。'; });
-  on(window, 'pagehide', e => { if (e.persisted) pause(); else dispose(); });
-  on(window, 'pageshow', e => { if (e.persisted && !disposed) pause(); });
+
+  on(document, 'visibilitychange', () => {
+    if (document.hidden) pause();
+  });
+
+  on(window, 'resize', () => {
+    input.reset();
+    if (!contextLost) {
+      world.resize();
+      world.render(state.player);
+    }
+  });
+
+  on($('scene'), 'webglcontextlost', e => {
+    e.preventDefault();
+    contextLost = true;
+    pause('星界の描画を復旧しています。戻らない場合はページを再読み込みしてください。');
+  });
+
+  on($('scene'), 'webglcontextrestored', () => {
+    contextLost = false;
+    world.resize();
+    $('resume').disabled = false;
+    $('pause-message').textContent = '星界の光が戻りました。';
+  });
+
+  on(window, 'pagehide', e => {
+    if (e.persisted) pause();
+    else dispose();
+  });
+
+  on(window, 'pageshow', e => {
+    if (e.persisted && !disposed) pause();
+  });
 
   function dispose() {
-    disposed = true; stopLoop(); skit.dispose(); input.dispose(); audio.dispose(); world.dispose();
-    clearTimeout(noticeTimer); cleanups.forEach(fn => fn()); running = false;
+    disposed = true;
+    stopLoop();
+    skit.dispose();
+    input.dispose();
+    audio.dispose();
+    world.dispose();
+    clearTimeout(noticeTimer);
+    cleanups.forEach(fn => fn());
+    running = false;
   }
 
   $('start-screen').hidden = true;
   $('world').focus({ preventScroll: true });
-  if (navigator.serviceWorker?.controller) notice('以前のサイトデータが残る場合があります。表示が古い場合は再読み込みしてください。');
-  sync(); world.render(state.player); startLoop();
+  sync();
+  world.render(state.player);
+  startLoop();
 }
