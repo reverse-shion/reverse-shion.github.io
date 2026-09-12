@@ -7,28 +7,28 @@
   <meta name="theme-color" content="#101526">
   <title>TAROT BREAKER 3D — 1000年前のシオンの記憶</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="../../css/shiopon-skit.css?v=p2-1.5.0">
-  <link rel="stylesheet" href="./css/prototype.css?v=p2-1.5.0">
-  <link rel="stylesheet" href="./css/mobile-controls.css?v=p2-1.5.0">
+  <link rel="stylesheet" href="../../css/shiopon-skit.css?v=p2-1.6.0">
+  <link rel="stylesheet" href="./css/prototype.css?v=p2-1.6.0">
+  <link rel="stylesheet" href="./css/mobile-controls.css?v=p2-1.6.0">
 </head>
 <body>
   <main id="world" aria-label="1000年前のシオンの記憶" tabindex="-1">
     <canvas id="scene" aria-label="シオンの視界で追体験する星界の回廊"></canvas>
-    <div id="look" aria-label="画面を上下左右にスワイプして移動。タップで停止。二本指で視点を調整"></div>
+    <div id="look" aria-label="一本指で前後に歩き、左右へ曲がる。二本指で視線を調整"></div>
     <header class="hud">
       <div><span class="eyebrow">TAROT BREAKER</span><p>1000年前の星界 <span>／ シオンの記憶</span></p></div>
       <div class="hud-actions">
-        <button id="view-follow" type="button" aria-pressed="true">視点追尾 ON</button>
+        <button id="view-follow" type="button" aria-pressed="true">自動視点 ON</button>
         <button id="sound" type="button" aria-pressed="true">音楽 ON</button>
       </div>
     </header>
-    <p id="guide" class="guide">↑↓←→ スワイプで移動 ／ タップで停止</p>
+    <p id="guide" class="guide">上へ押し出す：歩く ／ 左右：向きを変える ／ 指を離す：止まる</p>
     <div class="reticle" aria-hidden="true">·</div>
     <div id="controls" hidden>
       <div id="stick" aria-hidden="true"><span id="thumb"></span><span class="stick-label">移動</span></div>
-      <p class="look-hint">スワイプ：移動　／　タップ：停止</p>
+      <p class="look-hint">上：前進　／　左右：曲がる　／　離す：停止</p>
       <button id="interact" type="button" hidden>ふたりと話す</button>
-      <p class="keyboard-hint">WASD：移動　ドラッグ：視点　Space：停止　E：会話</p>
+      <p class="keyboard-hint">WASD：移動　ドラッグ：視点　E：会話</p>
     </div>
   </main>
 
@@ -37,9 +37,9 @@
       <p class="eyebrow">TAROT BREAKER · MEMORY</p>
       <h1 id="start-title">1000年前の<br>シオンの記憶</h1>
       <p class="lead">これは、あなた自身がシオンになる物語ではありません。<br>星に残された記憶をたどり、観測者としてシオンの視界を追体験します。</p>
-      <p class="instructions">画面のどこでも、上へスワイプで前進。下で後退。左右でその方向へ移動します。<br>一度スワイプすると滑らかに歩き続け、画面を1回タップすると停止します。視点追尾は右上からON/OFFできます。</p>
+      <p class="instructions">一本指を上へ押し出すように動かすと前へ歩きます。<br>歩きながら左右へ動かすと、その方向へ身体ごと曲がります。左右だけならその場で向きを変えます。指を離すと停止します。</p>
       <button id="start" class="primary" type="button">記憶をたどる</button>
-      <p id="start-status" role="status">正面の光へ進むと、しおぽんとリュミエールとの記憶が始まります。</p>
+      <p id="start-status" role="status">正面の光へ進むと、しおぽんとリュミエールに話しかけられます。</p>
       <noscript>この試作にはJavaScriptが必要です。</noscript>
     </div>
   </section>
@@ -66,7 +66,7 @@
   </div>
 
   <p id="notice" class="notice" role="status" hidden></p>
-  <script src="../../js/skitEngine.js?v=p2-1.5.0"></script>
-  <script type="module" src="./js/boot.js?v=p2-1.5.0"></script>
+  <script src="../../js/skitEngine.js?v=p2-1.6.0"></script>
+  <script type="module" src="./js/boot.js?v=p2-1.6.0"></script>
 </body>
 </html>
