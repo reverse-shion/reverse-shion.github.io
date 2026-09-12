@@ -1,20 +1,10 @@
-/* Phase 2 mobile playtest corrections (v1.2)
-   The joystick is a floating indicator, not a fixed target the player must hit. */
-#stick {
-  left: 0;
-  top: 0;
-  bottom: auto !important;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .08s ease;
-  background: #202c4477;
-  border-color: #d8e3f966;
-  box-shadow: 0 8px 34px #0004;
+/* Phase 2 mobile controls v1.3
+   The play field itself is the controller: left half moves, right half looks. */
+#stick,
+#thumb,
+.stick-label {
+  display: none !important;
 }
-
-#stick.is-active { opacity: 1; }
-#stick .stick-label { display: none; }
 
 .look-hint {
   left: 50%;
@@ -43,7 +33,9 @@
 }
 
 @media (max-height: 520px) and (orientation: landscape) {
-  #stick { width: 104px; height: 104px; }
   #interact { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 44px); }
-  .look-hint { bottom: max(6px, env(safe-area-inset-bottom)); font-size: 10px; }
+  .look-hint {
+    bottom: max(6px, env(safe-area-inset-bottom));
+    font-size: 10px;
+  }
 }
