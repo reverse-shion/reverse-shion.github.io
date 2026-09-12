@@ -1,5 +1,24 @@
-/* Phase 2 mobile controls v1.3
-   The play field itself is the controller: left half moves, right half looks. */
+/* Phase 2 mobile controls v1.4
+   The play field itself is the controller: left half moves, right half looks.
+   Gameplay must win over iOS text selection / touch callouts. */
+#world,
+#world *,
+#look,
+#scene,
+#controls {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+}
+
+#world,
+#look,
+#scene {
+  touch-action: none !important;
+  overscroll-behavior: none;
+}
+
 #stick,
 #thumb,
 .stick-label {
@@ -20,6 +39,7 @@
   color: #e3e8f1;
   background: #10152688;
   backdrop-filter: blur(5px);
+  pointer-events: none;
 }
 
 #interact {
