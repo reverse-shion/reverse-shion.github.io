@@ -4,9 +4,9 @@ const status = document.getElementById('start-status');
 start.addEventListener('click', async () => {
   start.disabled = true;
   status.hidden = false;
-  status.textContent = '星の記憶へ——';
+  status.textContent = '星の国へ——';
 
-  const initialAudio = new Audio(new URL('../../../audio/seifu-raguna.mp3?v=p2-1.9.0', import.meta.url).href);
+  const initialAudio = new Audio(new URL('../../../audio/seifu-raguna.mp3?v=star-country-v1.0', import.meta.url).href);
   initialAudio.loop = true;
   initialAudio.volume = 0.34;
   initialAudio.preload = 'auto';
@@ -16,13 +16,13 @@ start.addEventListener('click', async () => {
   } catch (_) {}
 
   try {
-    const { startGame } = await import('./app.js?v=p2-1.9.0');
+    const { startGame } = await import('./app.js?v=star-country-v1.0');
     await startGame({ initialAudio, initialSoundEnabled: true });
   } catch (error) {
     initialAudio.pause();
-    console.error('Phase 2 startup:', error);
+    console.error('Star Country startup:', error);
     status.hidden = false;
-    status.textContent = '記憶を開けませんでした。通信状態を確かめて、もう一度試してください。';
+    status.textContent = '星の国へ入れませんでした。通信状態を確かめて、もう一度試してください。';
     start.textContent = 'もう一度';
     start.disabled = false;
   }
