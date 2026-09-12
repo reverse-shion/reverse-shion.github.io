@@ -1,0 +1,49 @@
+/* Phase 2 mobile playtest corrections (v1.2)
+   The joystick is a floating indicator, not a fixed target the player must hit. */
+#stick {
+  left: 0;
+  top: 0;
+  bottom: auto !important;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .08s ease;
+  background: #202c4477;
+  border-color: #d8e3f966;
+  box-shadow: 0 8px 34px #0004;
+}
+
+#stick.is-active { opacity: 1; }
+#stick .stick-label { display: none; }
+
+.look-hint {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  bottom: calc(max(14px, env(safe-area-inset-bottom)) + 4px);
+  width: auto;
+  max-width: 92vw;
+  margin: 0;
+  padding: 7px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: #e3e8f1;
+  background: #10152688;
+  backdrop-filter: blur(5px);
+}
+
+#interact {
+  bottom: calc(max(24px, env(safe-area-inset-bottom)) + 72px);
+  min-width: 180px;
+  font-weight: 700;
+}
+
+@media (pointer: coarse) {
+  .look-hint { display: block; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  #stick { width: 104px; height: 104px; }
+  #interact { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 44px); }
+  .look-hint { bottom: max(6px, env(safe-area-inset-bottom)); font-size: 10px; }
+}
