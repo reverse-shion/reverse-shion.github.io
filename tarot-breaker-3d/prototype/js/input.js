@@ -1,4 +1,4 @@
-import { clamp } from './state.js?v=p2-1.3.0';
+import { clamp } from './state.js?v=p2-1.4.0';
 
 export class InputController {
   constructor({ stick, thumb, look, onLook, onInteract, target = window }) {
@@ -23,7 +23,7 @@ export class InputController {
     const moveActive = () => [...this.pointers.values()].some(p => p.kind === 'move');
     const lookActive = () => [...this.pointers.values()].some(p => p.kind === 'look');
 
-    const beginMove = (e, el, originX, originY, radius = 44) => {
+    const beginMove = (e, el, originX, originY, radius = 32) => {
       if (!this.enabled || moveActive()) return false;
       e.preventDefault();
       setCapture(el, e.pointerId);
@@ -36,7 +36,6 @@ export class InputController {
         originY,
         radius
       });
-      this.updateMove(e, this.pointers.get(e.pointerId));
       return true;
     };
 
@@ -63,19 +62,22 @@ export class InputController {
       } catch (_) {}
     };
 
-    // Mobile: the screen itself is the controller.
-    // Left half = move from the point where the thumb lands.
-    // Right half = camera. No visible joystick is required.
+    // Prevent Safari from turning gameplay gestures into text selection / callouts.
+    for (const type of ['contextmenu', 'selectstart', 'dragstart']) {
+      on(look, type, e => e.preventDefault());
+    }
+
+    // Mobile: left half = move, right half = camera. No visible joystick.
     on(look, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
       const coarse = e.pointerType === 'touch' || e.pointerType === 'pen';
       const width = target.innerWidth || document.documentElement.clientWidth || 390;
       if (coarse && !moveActive() && e.clientX < width * 0.5) {
-        beginMove(e, look, e.clientX, e.clientY, 44);
+        beginMove(e, look, e.clientX, e.clientY, 32);
       } else {
         beginLook(e, look);
       }
-    });
+    }, { passive: false });
 
     on(look, 'pointermove', e => {
       const p = this.pointers.get(e.pointerId);
@@ -88,13 +90,13 @@ export class InputController {
         p.x = e.clientX;
         p.y = e.clientY;
       }
-    });
+    }, { passive: false });
 
     for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
       on(look, type, finish);
     }
 
-    // Hidden fallback target retained for automated tests and non-touch fallback.
+    // Hidden fallback retained for tests / non-touch fallback.
     on(stick, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
       const rect = stick.getBoundingClientRect();
@@ -134,7 +136,7 @@ export class InputController {
     const dx = e.clientX - entry.originX;
     const dy = e.clientY - entry.originY;
     const distance = Math.hypot(dx, dy);
-    const deadzone = 6;
+    const deadzone = 2;
 
     if (distance <= deadzone) {
       this.axis = { x: 0, z: 0 };
@@ -146,18 +148,18 @@ export class InputController {
     const absX = Math.abs(x);
     const absZ = Math.abs(z);
 
-    // Strong cardinal assistance for touch screens. A mostly vertical gesture
-    // becomes perfectly straight forward/back even when the thumb drifts sideways.
-    if (absX <= absZ * 0.58) {
+    // Generous cardinal assistance: an intended forward/back gesture stays straight
+    // even with normal thumb drift. Sideways movement remains available deliberately.
+    if (absX <= absZ * 0.75) {
       x = 0;
       z = Math.sign(z);
-    } else if (absZ <= absX * 0.42) {
+    } else if (absZ <= absX * 0.48) {
       x = Math.sign(x);
       z = 0;
     }
 
-    // Reach normal walking speed quickly without requiring a long swipe.
-    const strength = clamp((distance - deadzone) / 26, 0, 1);
+    // Full walking speed after only a short drag; no long hold or large swipe needed.
+    const strength = clamp((distance - deadzone) / 12, 0, 1);
     this.axis = { x: x * strength, z: z * strength };
   }
 
