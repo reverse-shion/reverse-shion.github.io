@@ -13,11 +13,27 @@
 
   const WORLD = { width: 512, height: 384 };
   const SPAWN = { x: 256, y: 349 };
-  const FRAME = { w: 32, h: 50, count: 8 };
   const PLAYER_DRAW = { w: 35, h: 55 };
   const SPEED = 74;
   const directionRows = { down: 0, up: 1, left: 2, right: 3 };
 
+  const ASSET_COMMIT = '62430d2c905ce8e816927ccd531daf0f61a04baf';
+  const BASE = `reverse-shion/reverse-shion.github.io@${ASSET_COMMIT}/tarot-breaker-2d/assets`;
+  const mapSources = [
+    `https://cdn.jsdelivr.net/gh/${BASE}/star-gate-garden.jpg`,
+    `https://raw.githubusercontent.com/reverse-shion/reverse-shion.github.io/${ASSET_COMMIT}/tarot-breaker-2d/assets/star-gate-garden.jpg`
+  ];
+  const spriteSources = [
+    `https://cdn.jsdelivr.net/gh/${BASE}/shion-walk.png`,
+    `https://raw.githubusercontent.com/reverse-shion/reverse-shion.github.io/${ASSET_COMMIT}/tarot-breaker-2d/assets/shion-walk.png`
+  ];
+
+  const map = new Image();
+  const sprite = new Image();
+  map.crossOrigin = 'anonymous';
+  sprite.crossOrigin = 'anonymous';
+
+  let frame = { w: 32, h: 50, count: 8 };
   let loaded = false;
   let running = false;
   let cssWidth = 1;
@@ -32,38 +48,26 @@
   const keys = new Set();
   const stick = { active: false, id: null, ox: 0, oy: 0, x: 0, y: 0 };
 
-  const map = new Image();
-  const sprite = new Image();
+  function setStatus(text) { loadNote.textContent = text; }
 
-  function failBoot(message) {
-    loaded = false;
-    startButton.disabled = true;
-    startButton.textContent = '起動できません';
-    loadNote.textContent = message;
-  }
-
-  function loadEmbeddedImage(image, mime, base64, label) {
+  function loadWithFallback(image, sources, label) {
     return new Promise((resolve, reject) => {
-      if (typeof base64 !== 'string' || base64.length < 100) {
-        reject(new Error(`${label}データがありません`));
-        return;
-      }
-      let settled = false;
-      image.onload = () => {
-        if (settled) return;
-        settled = true;
-        resolve(image);
+      let i = 0;
+      const tryNext = () => {
+        if (i >= sources.length) {
+          reject(new Error(`${label}を読み込めませんでした`));
+          return;
+        }
+        const src = sources[i++];
+        setStatus(`${label}を読み込み中… ${i}/${sources.length}`);
+        image.onload = () => {
+          if (image.naturalWidth > 0 && image.naturalHeight > 0) resolve(image);
+          else tryNext();
+        };
+        image.onerror = tryNext;
+        image.src = `${src}?v=015`;
       };
-      image.onerror = () => {
-        if (settled) return;
-        settled = true;
-        reject(new Error(`${label}の復元に失敗`));
-      };
-      image.src = `data:${mime};base64,${base64}`;
-      if (image.complete && image.naturalWidth > 0) {
-        settled = true;
-        resolve(image);
-      }
+      tryNext();
     });
   }
 
@@ -137,7 +141,7 @@
     frameTime += dt;
     if (frameTime >= 0.095) {
       frameTime = 0;
-      player.frame = (player.frame + 1) % FRAME.count;
+      player.frame = (player.frame + 1) % frame.count;
     }
   }
 
@@ -178,11 +182,11 @@
     ctx.fill();
 
     const row = directionRows[player.dir];
-    const frame = player.moving ? player.frame : 0;
+    const currentFrame = player.moving ? player.frame : 0;
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       sprite,
-      frame * FRAME.w, row * FRAME.h, FRAME.w, FRAME.h,
+      currentFrame * frame.w, row * frame.h, frame.w, frame.h,
       player.x - PLAYER_DRAW.w / 2, player.y - PLAYER_DRAW.h + 4,
       PLAYER_DRAW.w, PLAYER_DRAW.h
     );
@@ -279,31 +283,30 @@
   }, { passive: false });
   window.addEventListener('keyup', e => keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key));
 
-  const mapData = window.__TB_MAP_B64;
-  const spriteData = window.__TB_SPRITE_B64;
-  const mapLen = typeof mapData === 'string' ? mapData.length : 0;
-  const spriteLen = typeof spriteData === 'string' ? spriteData.length : 0;
-
-  loadNote.textContent = `内蔵データを復元中… map:${mapLen} sprite:${spriteLen}`;
-
-  if (!mapLen || !spriteLen) {
-    failBoot(`内蔵データ不足 map:${mapLen} sprite:${spriteLen}`);
-    return;
-  }
-
+  setStatus('ゲーム素材を読み込んでいます…');
   Promise.all([
-    loadEmbeddedImage(map, 'image/jpeg', mapData, 'マップ'),
-    loadEmbeddedImage(sprite, 'image/png', spriteData, 'シオン')
+    loadWithFallback(map, mapSources, '星の国マップ'),
+    loadWithFallback(sprite, spriteSources, 'シオン')
   ]).then(() => {
+    frame = {
+      w: Math.floor(sprite.naturalWidth / 8),
+      h: Math.floor(sprite.naturalHeight / 4),
+      count: 8
+    };
+    if (frame.w < 4 || frame.h < 4) throw new Error('シオンのスプライトサイズが不正です');
+
     loaded = true;
     resize();
     reset();
     draw();
     startButton.disabled = false;
     startButton.textContent = '星の国へ';
-    loadNote.textContent = 'タップして探索を始める';
+    setStatus(`準備完了 map:${map.naturalWidth}×${map.naturalHeight} / shion:${sprite.naturalWidth}×${sprite.naturalHeight}`);
   }).catch(err => {
     console.error(err);
-    failBoot(`${err.message} map:${mapLen} sprite:${spriteLen}`);
+    loaded = false;
+    startButton.disabled = true;
+    startButton.textContent = '起動できません';
+    setStatus(`${err.message}。通信を確認して再読み込みしてください。`);
   });
 })();
