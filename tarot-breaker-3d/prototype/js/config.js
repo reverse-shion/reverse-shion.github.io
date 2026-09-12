@@ -1,4 +1,4 @@
-export const VERSION = 'p2-1.9.0';
+export const VERSION = 'star-country-v1.0';
 export const ROOT = new URL('../../../', import.meta.url);
 export function asset(path) {
   const url = new URL(path, ROOT);
