@@ -4,7 +4,6 @@ start.addEventListener('click', async () => {
   start.disabled = true;
   document.getElementById('start-status').textContent = '1000年前の記憶へつないでいます…';
 
-  // Prime BGM directly from the user's tap for iPhone/iPad media policies.
   const initialAudio = new Audio(new URL('../../../audio/seifu-raguna.mp3?v=p2-1.4.0', import.meta.url).href);
   initialAudio.loop = true;
   initialAudio.volume = 0.34;
