@@ -40,13 +40,13 @@ export class InputController {
       this.thumb.style.transform = '';
     };
 
-    const beginMove = (e, el, originX, originY, floating = true) => {
+    const beginMove = (e, el, originX, originY, floating = true, radius = 54) => {
       if (!this.enabled || moveActive()) return false;
       e.preventDefault();
       setCapture(el, e.pointerId);
       this.pointers.set(e.pointerId, {
         kind: 'move', el, x: e.clientX, y: e.clientY,
-        originX, originY, floating
+        originX, originY, floating, radius
       });
       if (floating) showFloatingStick(originX, originY);
       this.updateMove(e, this.pointers.get(e.pointerId));
@@ -82,7 +82,7 @@ export class InputController {
       const coarse = e.pointerType === 'touch' || e.pointerType === 'pen';
       const width = target.innerWidth || document.documentElement.clientWidth || 390;
       if (coarse && !moveActive() && e.clientX <= width * 0.52) {
-        beginMove(e, look, e.clientX, e.clientY, true);
+        beginMove(e, look, e.clientX, e.clientY, true, 54);
       } else {
         beginLook(e, look);
       }
@@ -106,7 +106,8 @@ export class InputController {
     on(stick, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
       const rect = stick.getBoundingClientRect();
-      beginMove(e, stick, rect.left + rect.width / 2, rect.top + rect.height / 2, false);
+      const radius = Math.max(24, Math.min(rect.width, rect.height) * 0.32);
+      beginMove(e, stick, rect.left + rect.width / 2, rect.top + rect.height / 2, false, radius);
     });
     on(stick, 'pointermove', e => {
       const p = this.pointers.get(e.pointerId);
@@ -133,7 +134,7 @@ export class InputController {
   }
 
   updateMove(e, entry) {
-    const radius = 54;
+    const radius = entry.radius || 54;
     let x = (e.clientX - entry.originX) / radius;
     let z = (e.clientY - entry.originY) / radius;
     const rawSize = Math.hypot(x, z);
