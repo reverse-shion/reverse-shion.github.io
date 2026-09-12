@@ -1,4 +1,4 @@
-import { clamp } from './state.js?v=p2-1.4.0';
+import { clamp } from './state.js?v=p2-1.5.0';
 
 export class InputController {
   constructor({ stick, thumb, look, onLook, onInteract, target = window }) {
@@ -8,7 +8,8 @@ export class InputController {
     this.keys = new Set();
     this.enabled = false;
     this.axis = { x: 0, z: 0 };
-    this.pointers = new Map();
+    this.gesture = null;
+    this.lookPointer = null;
     this.cleanups = [];
 
     const on = (el, type, fn, options) => {
@@ -19,101 +20,135 @@ export class InputController {
     const setCapture = (el, id) => {
       try { el.setPointerCapture(id); } catch (_) {}
     };
-
-    const moveActive = () => [...this.pointers.values()].some(p => p.kind === 'move');
-    const lookActive = () => [...this.pointers.values()].some(p => p.kind === 'look');
-
-    const beginMove = (e, el, originX, originY, radius = 32) => {
-      if (!this.enabled || moveActive()) return false;
-      e.preventDefault();
-      setCapture(el, e.pointerId);
-      this.pointers.set(e.pointerId, {
-        kind: 'move',
-        el,
-        x: e.clientX,
-        y: e.clientY,
-        originX,
-        originY,
-        radius
-      });
-      return true;
+    const releaseCapture = (el, id) => {
+      try { if (el.hasPointerCapture?.(id)) el.releasePointerCapture(id); } catch (_) {}
     };
 
-    const beginLook = (e, el) => {
-      if (!this.enabled || lookActive()) return false;
+    const beginGesture = e => {
       e.preventDefault();
-      setCapture(el, e.pointerId);
-      this.pointers.set(e.pointerId, {
-        kind: 'look',
-        el,
+      setCapture(look, e.pointerId);
+      this.gesture = {
+        id: e.pointerId,
+        el: look,
+        startX: e.clientX,
+        startY: e.clientY,
+        moved: false
+      };
+    };
+
+    const beginLook = e => {
+      e.preventDefault();
+      setCapture(look, e.pointerId);
+      this.lookPointer = {
+        id: e.pointerId,
+        el: look,
         x: e.clientX,
         y: e.clientY
-      });
-      return true;
+      };
     };
 
-    const finish = e => {
-      const entry = this.pointers.get(e.pointerId);
-      if (!entry) return;
-      this.pointers.delete(e.pointerId);
-      if (entry.kind === 'move') this.axis = { x: 0, z: 0 };
-      try {
-        if (entry.el.hasPointerCapture?.(e.pointerId)) entry.el.releasePointerCapture(e.pointerId);
-      } catch (_) {}
-    };
-
-    // Prevent Safari from turning gameplay gestures into text selection / callouts.
+    // Gameplay must win over Safari text selection / callouts.
     for (const type of ['contextmenu', 'selectstart', 'dragstart']) {
       on(look, type, e => e.preventDefault());
     }
 
-    // Mobile: left half = move, right half = camera. No visible joystick.
+    // One-finger swipe anywhere = movement command.
+    // A completed swipe latches movement so the player walks smoothly without
+    // repeatedly dragging. A simple tap stops movement.
+    // A second simultaneous finger is reserved for manual camera adjustment.
     on(look, 'pointerdown', e => {
       if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
       const coarse = e.pointerType === 'touch' || e.pointerType === 'pen';
-      const width = target.innerWidth || document.documentElement.clientWidth || 390;
-      if (coarse && !moveActive() && e.clientX < width * 0.5) {
-        beginMove(e, look, e.clientX, e.clientY, 32);
-      } else {
-        beginLook(e, look);
+      if (coarse) {
+        if (!this.gesture) beginGesture(e);
+        else if (!this.lookPointer && e.pointerId !== this.gesture.id) beginLook(e);
+        return;
       }
+      if (!this.lookPointer) beginLook(e);
     }, { passive: false });
 
     on(look, 'pointermove', e => {
-      const p = this.pointers.get(e.pointerId);
-      if (!this.enabled || !p) return;
-      e.preventDefault();
-      if (p.kind === 'move') {
-        this.updateMove(e, p);
-      } else {
-        onLook(e.clientX - p.x, e.clientY - p.y);
-        p.x = e.clientX;
-        p.y = e.clientY;
+      if (!this.enabled) return;
+
+      if (this.gesture?.id === e.pointerId) {
+        e.preventDefault();
+        const dx = e.clientX - this.gesture.startX;
+        const dy = e.clientY - this.gesture.startY;
+        const distance = Math.hypot(dx, dy);
+        if (distance < 8) return;
+
+        this.gesture.moved = true;
+        // Lock to one of four cardinal directions. This removes thumb drift and
+        // makes "up means straight forward" deterministic on a phone.
+        if (Math.abs(dy) >= Math.abs(dx)) {
+          this.axis = { x: 0, z: dy < 0 ? -1 : 1 };
+        } else {
+          this.axis = { x: dx < 0 ? -1 : 1, z: 0 };
+        }
+        return;
+      }
+
+      if (this.lookPointer?.id === e.pointerId) {
+        e.preventDefault();
+        onLook(e.clientX - this.lookPointer.x, e.clientY - this.lookPointer.y);
+        this.lookPointer.x = e.clientX;
+        this.lookPointer.y = e.clientY;
       }
     }, { passive: false });
 
-    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-      on(look, type, finish);
-    }
+    const finish = e => {
+      if (this.gesture?.id === e.pointerId) {
+        const moved = this.gesture.moved;
+        releaseCapture(this.gesture.el, e.pointerId);
+        this.gesture = null;
+        if (!moved) this.stopMovement();
+        return;
+      }
+      if (this.lookPointer?.id === e.pointerId) {
+        releaseCapture(this.lookPointer.el, e.pointerId);
+        this.lookPointer = null;
+      }
+    };
 
-    // Hidden fallback retained for tests / non-touch fallback.
+    on(look, 'pointerup', finish);
+    on(look, 'lostpointercapture', finish);
+    on(look, 'pointercancel', e => {
+      if (this.gesture?.id === e.pointerId) {
+        releaseCapture(this.gesture.el, e.pointerId);
+        this.gesture = null;
+        this.stopMovement();
+      }
+      if (this.lookPointer?.id === e.pointerId) {
+        releaseCapture(this.lookPointer.el, e.pointerId);
+        this.lookPointer = null;
+      }
+    });
+
+    // Hidden compatibility target retained for the existing automated input test.
     on(stick, 'pointerdown', e => {
-      if (!this.enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
-      const rect = stick.getBoundingClientRect();
-      const radius = Math.max(24, Math.min(rect.width || 100, rect.height || 100) * 0.32);
-      beginMove(e, stick, rect.left + rect.width / 2, rect.top + rect.height / 2, radius);
-    });
-
-    on(stick, 'pointermove', e => {
-      const p = this.pointers.get(e.pointerId);
-      if (!this.enabled || !p || p.kind !== 'move') return;
+      if (!this.enabled) return;
       e.preventDefault();
-      this.updateMove(e, p);
+      setCapture(stick, e.pointerId);
+      const rect = stick.getBoundingClientRect();
+      this.gesture = {
+        id: e.pointerId,
+        el: stick,
+        startX: rect.left + rect.width / 2,
+        startY: rect.top + rect.height / 2,
+        moved: false
+      };
     });
-
-    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-      on(stick, type, finish);
-    }
+    on(stick, 'pointermove', e => {
+      if (!this.enabled || this.gesture?.id !== e.pointerId) return;
+      e.preventDefault();
+      const dx = e.clientX - this.gesture.startX;
+      const dy = e.clientY - this.gesture.startY;
+      if (Math.hypot(dx, dy) < 6) return;
+      this.gesture.moved = true;
+      if (Math.abs(dy) >= Math.abs(dx)) this.axis = { x: 0, z: dy < 0 ? -1 : 1 };
+      else this.axis = { x: dx < 0 ? -1 : 1, z: 0 };
+    });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) on(stick, type, finish);
 
     on(target, 'keydown', e => {
       if (!this.enabled || /INPUT|TEXTAREA|SELECT|BUTTON/.test(e.target?.tagName)) return;
@@ -121,46 +156,18 @@ export class InputController {
         e.preventDefault();
         this.keys.add(e.code);
       }
+      if (e.code === 'Space') {
+        e.preventDefault();
+        this.stopMovement();
+      }
       if (e.code === 'KeyE' && !e.repeat) {
         e.preventDefault();
         onInteract();
       }
     });
-
     on(target, 'keyup', e => this.keys.delete(e.code));
     on(target, 'blur', () => this.reset());
     on(target, 'resize', () => this.reset());
-  }
-
-  updateMove(e, entry) {
-    const dx = e.clientX - entry.originX;
-    const dy = e.clientY - entry.originY;
-    const distance = Math.hypot(dx, dy);
-    const deadzone = 2;
-
-    if (distance <= deadzone) {
-      this.axis = { x: 0, z: 0 };
-      return;
-    }
-
-    let x = dx / distance;
-    let z = dy / distance;
-    const absX = Math.abs(x);
-    const absZ = Math.abs(z);
-
-    // Generous cardinal assistance: an intended forward/back gesture stays straight
-    // even with normal thumb drift. Sideways movement remains available deliberately.
-    if (absX <= absZ * 0.75) {
-      x = 0;
-      z = Math.sign(z);
-    } else if (absZ <= absX * 0.48) {
-      x = Math.sign(x);
-      z = 0;
-    }
-
-    // Full walking speed after only a short drag; no long hold or large swipe needed.
-    const strength = clamp((distance - deadzone) / 12, 0, 1);
-    this.axis = { x: x * strength, z: z * strength };
   }
 
   sample() {
@@ -172,16 +179,21 @@ export class InputController {
     };
   }
 
-  reset() {
-    const pointers = [...this.pointers.entries()];
-    this.pointers.clear();
-    for (const [id, p] of pointers) {
-      try {
-        if (p.el.hasPointerCapture?.(id)) p.el.releasePointerCapture(id);
-      } catch (_) {}
-    }
-    this.keys.clear();
+  isMoving() {
+    return Math.abs(this.axis.x) > 0.01 || Math.abs(this.axis.z) > 0.01 || this.keys.size > 0;
+  }
+
+  stopMovement() {
     this.axis = { x: 0, z: 0 };
+  }
+
+  reset() {
+    if (this.gesture) releaseCapture(this.gesture.el, this.gesture.id);
+    if (this.lookPointer) releaseCapture(this.lookPointer.el, this.lookPointer.id);
+    this.gesture = null;
+    this.lookPointer = null;
+    this.keys.clear();
+    this.stopMovement();
   }
 
   setEnabled(value) {
