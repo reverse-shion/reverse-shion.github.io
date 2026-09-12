@@ -2,7 +2,7 @@
 
 実行基準：ユーザー指定「Astra Phase 2 実行仕様書 v1.1」。作業日：2026-09-11〜12 UTC。
 
-**Phase 2実装部分完了／外部検証待ち。判定：HOLD — VALIDATION HOLD。**
+**Phase 2実装部分完了／3D一連動作・実機検証待ち。判定：HOLD — VALIDATION HOLD。** 外部ブラウザでは起動画面とスキット単独検証を実施済み。3Dは検証ブラウザのWebGL無効化により未確認。
 
 対象リポジトリは `reverse-shion/reverse-shion.github.io`。既存ブランチ `feature/tarot-breaker-3d-phase2-prototype`、開始コミット `4a6ee178c491f96bc87a13228547b5e6fbf9d508` から継続。別のリモートPhase 2ブランチは作成していない。mainへのマージ、本番公開、Phase 3開始は行わない。
 
@@ -103,6 +103,19 @@ jsdom・合成イベント・FakeAudioによる検証を、実ブラウザ表示
 
 3D描画・歩行・一連の復帰と音の聴取は **外部ブラウザ／実機検証待ち**。3Dを偽の2Dへ置き換えず、スキット単独の実表示確認用に `prototype/tests/skit-smoke.html` を追加し、3D検証と明確に分離した。
 
+外部Chrome・1363×936の画面で、同じBridge／エンジン／CSS／JSON／画像／音源を使った単独テストを実施した。
+
+| 外部ブラウザで実施した確認 | 観察結果 |
+| --- | --- |
+| 3人の実画像と会話枠 | スクリーンショットで3人・本文・操作ボタンを確認 |
+| 表情2種類以上 | シオン calm-smile→thoughtful、リュミエール listening→soft-smile、しおぽん warm→thinking。描画と画像ラベルの変更を確認 |
+| 8ノード読了→終了 | 「終了回数：1 ／ 最後まで読了」、モーダル非表示・開始ボタンへフォーカス復帰 |
+| 再開始→途中終了 | 2回目を開始し4回送った後に上部の戻るで「終了回数：2 ／ 途中で終了」 |
+| BGM実ファイル | readyState=4、duration約253.08秒、再生位置7.41→58.58秒。画面上で会話0.18／退出0.34を確認 |
+| BGM OFF | paused=true、音源要素1個。実際の音を聴いた検証とは区別 |
+
+これは**3D復帰の目視合格ではない**。3D入力・描画の接続は自動検証およびコード確認、実表示・実機操作は未確認として残す。
+
 ### 安全なプレビューの調査
 
 GitHub Pagesの既存公開はmain/root。featureブランチ用の専用プレビュー設定は存在しない。公開元切替・mainマージ・公式サイト内への試作配置は行わない。[GitHub Pagesの公開元設定](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
@@ -111,7 +124,12 @@ Sitesも確認したが、提供される配信操作は本番配信扱いのた
 
 公開GitHubブランチの資産を開発用Content-Typeで表示するraw.githackの**開発用URL**を使用。本番の公開元・ポータルを変更せず、固定コミットのPhase 2入口を表示できた。初回はサービス側の「Open the page」を押して進む確認ページがある。3Dを遊べることの確認はWebGL有効な実機で行う。[raw.githackの開発用URL説明](https://raw.githack.com/)
 
-初回確認コミット：`085d97ff05f58962e9853435f00b45f6078354df`。最終プレビューの固定コミットURLはPRに記載する。開発用第三者配信であり、公式サイト公開・恒久配信・可用性保証にはしない。実機テスト後も本番への反映は別判断。
+初回確認コミット：`085d97ff05f58962e9853435f00b45f6078354df`。検証用URLの固定コミットは `4bcd6db9ed1c3f44b6c73de96e427ad2373e262e`。それ以降の変更は本レポートの検証結果追記のみで、実行コードは同一。
+
+- [Phase 2ゲーム入口・実機確認用](https://raw.githack.com/reverse-shion/reverse-shion.github.io/4bcd6db9ed1c3f44b6c73de96e427ad2373e262e/tarot-breaker-3d/prototype/index.html)
+- [スキット単独テスト・3D検証の代用にはしない](https://raw.githack.com/reverse-shion/reverse-shion.github.io/4bcd6db9ed1c3f44b6c73de96e427ad2373e262e/tarot-breaker-3d/prototype/tests/skit-smoke.html)
+
+両URLともブラウザで到達を確認。開発用第三者配信であり、公式サイト公開・恒久配信・可用性保証にはしない。実機テスト後も本番への反映は別判断。
 
 ## 8. D — スマートフォン実機検証状況
 
@@ -177,11 +195,11 @@ Phase 1で確認されたルートSWの2重install/activate/fetch、相互キャ
 
 ## 13. 未解決問題
 
-1. 外部ブラウザでの画面・操作とスマートフォン実機の受入が未完了。
+1. WebGL有効な外部ブラウザでの3D一連動作とスマートフォン実機の受入が未完了。スキット単独は実表示確認済み。
 2. 実機でのFPS・メモリ・発熱・初回通信時間・会話10枚の転送量の許容判定。
 3. 公式オリジンにある既存SWと旧キャッシュの更新確認。
 4. 縦横の最適方向、会話の文字サイズ、2本指操作の理解しやすさ。
-5. 画像／BGM実ファイルの外部配信先のCSP・MIME・再生動作。
+5. 公式配信先のCSP・MIME・再生動作。開発用配信先では採用画像の表示とBGMの読込・再生状態を確認済み。
 
 既存エンジンの変更は保存名の任意無効化と例外fallbackのみだが、共有ファイルであるため、将来マージ前に既存スキットページのスモーク確認も必要。
 
@@ -195,6 +213,6 @@ Phase 1で確認されたルートSWの2重install/activate/fetch、相互キャ
 
 **HOLD — VALIDATION HOLD。Phase 3には進まない。**
 
-実装・自動検証は完了しているが、実際の表示・スマホ操作・音・性能の重要確認が残る。クラウドのローカルURL制限はENVIRONMENT HOLDの要因として記録し、方式そのもののNO-GOやコード上のTECHNICAL HOLDと混同しない。
+実装・自動検証・スキット単独のブラウザ確認は完了しているが、3Dの実表示・スマホ操作・実音・性能の重要確認が残る。ローカルURL制限とクラウドブラウザのWebGL無効化はENVIRONMENT HOLDの要因として記録し、方式そのもののNO-GOやコード上のTECHNICAL HOLDと混同しない。ユーザーがWebGL有効な端末で開けるプレビューを用意できたため、次の判断を止めている主因はVALIDATION HOLDとする。
 
 GO／GO WITH CONDITIONSへの変更には外部ブラウザと実機で一連の体験を確認し、必要な修正・条件を記録する。次にユーザーが確認するのはPhase 2の動作であり、mainマージ・本番反映・Phase 3開始はそれぞれ別の明示判断とする。
