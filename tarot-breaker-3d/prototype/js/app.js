@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.2.0';
-import { createState, movePlayer, lookPlayer, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.2.0';
-import { createWorld } from './world.js?v=p2-1.2.0';
-import { InputController } from './input.js?v=p2-1.2.0';
-import { AudioController } from './audio.js?v=p2-1.2.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.2.0';
+import { asset, loadJSON } from './config.js?v=p2-1.3.0';
+import { createState, movePlayer, lookPlayer, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.3.0';
+import { createWorld } from './world.js?v=p2-1.3.0';
+import { InputController } from './input.js?v=p2-1.3.0';
+import { AudioController } from './audio.js?v=p2-1.3.0';
+import { SkitBridge } from './skit-bridge.js?v=p2-1.3.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -115,13 +115,10 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     $('interact').hidden = !event;
     $('guide').textContent = event
       ? '光に触れました。会話を始めます'
-      : '左側を触って進む ／ 右側をスワイプして見回す';
+      : '左側を上へなぞる：前進 ／ 右側をなぞる：視点';
     if (event) $('interact').textContent = event.label;
     lastPrompt = id;
 
-    // Mobile playtest feedback: reaching the marker must visibly do something.
-    // Auto-open once on entry. After returning from the skit it will not loop;
-    // the player must leave the radius and enter it again to auto-open again.
     if (entering) {
       queueMicrotask(() => {
         const current = nearbyEvent(state, events, map);
@@ -192,8 +189,6 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   on($('skit-sound'), 'click', () => audio.toggle());
   on($('resume'), 'click', resume);
 
-  // Do not pause on window blur: mobile Safari can emit blur during normal browser
-  // chrome / touch interactions. Pause only when the document truly becomes hidden.
   on(document, 'visibilitychange', () => {
     if (document.hidden) pause();
   });
