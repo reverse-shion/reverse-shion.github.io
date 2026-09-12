@@ -26,9 +26,10 @@ button:disabled { opacity: .5; cursor: wait; }
 .intro { width: min(100%,620px); margin: auto; }
 .intro h1 { font-family: "Hiragino Mincho ProN","Yu Mincho",serif; font-weight: 400; font-size: clamp(42px,8vw,76px); line-height: 1.35; letter-spacing: .06em; margin: 24px 0; }
 .lead { color: #d3d9e6; line-height: 2; font-size: 15px; }
-.instructions { font-size: 12px; color: #a9b6ca; line-height: 1.9; margin: 28px 0; }
+.instructions { font-size: 12px; color: #a9b6ca; line-height: 1.9; margin: 24px 0 14px; }
+.prototype-note { max-width: 560px; margin: 0 0 26px; padding: 12px 14px; border-left: 2px solid #c9b88988; background: #111a2a88; color: #bdc8d8; font-size: 11px; line-height: 1.8; }
 .primary { background: #e5d6ad; border: none; color: #182136; letter-spacing: .08em; border-radius: 4px; padding: 17px 34px; }
-#start-status { font-size: 11px; line-height: 1.8; max-width: 400px; color: #a9b6ca; margin-top: 20px; }
+#start-status { font-size: 11px; line-height: 1.8; max-width: 440px; color: #a9b6ca; margin-top: 20px; }
 .compact { text-align: center; }
 .compact p { line-height: 1.9; }
 #pause-screen { z-index: 110; background: #101526ef; }
@@ -40,7 +41,8 @@ button:disabled { opacity: .5; cursor: wait; }
 .skit-toolbar { display: flex; align-items: flex-start; gap: 10px; }
 #skit-sound { font-size: 12px; background: #182237ee; }
 #sv-skit .sv-overlay-body { height: calc(100% - 56px); min-height: 330px; padding: 0; }
-#sv-skit .sv-engine-root { height: 100%; }
+#sv-skit .sv-engine-root { height: 100%; opacity: 1; transform: translateY(0); transition: opacity .36s ease, transform .36s ease; }
+#sv-skit .sv-engine-root.sv-memory-complete { opacity: 0; transform: translateY(4px); pointer-events: none; }
 #sv-skit .sv-shell { height: 100%; grid-template-rows: minmax(100px,1fr) auto; gap: 10px; }
 #sv-skit .sv-stage { min-height: 100px; padding: 6px; gap: 5px; }
 #sv-skit .sv-slot { min-height: 100px; }
@@ -60,6 +62,7 @@ body #sv-skit .sv-dialogue { min-height: 132px !important; }
 @media (max-height: 520px) and (orientation: landscape) {
   .intro h1 { font-size: 34px; margin: 8px 0; } .intro h1 br { display: none; }
   .intro .lead { font-size: 12px; margin: 8px 0; } .instructions { margin: 10px 0; }
+  .prototype-note { margin-bottom: 10px; padding: 8px 10px; }
   #start-status { margin-top: 8px; } .primary { padding: 12px 28px; }
   #stick { width: 100px; height: 100px; bottom: max(18px,env(safe-area-inset-bottom)); }
   #interact { bottom: max(28px,env(safe-area-inset-bottom)); }
@@ -70,4 +73,7 @@ body #sv-skit .sv-dialogue { min-height: 132px !important; }
   #sv-skit .sv-dialogue { max-height: none; min-height: 0; }
   .hud p span { display: none; }
 }
-@media (prefers-reduced-motion: reduce) { #sv-skit *, #sv-skit *::before, #sv-skit *::after { animation: none !important; transition: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  #sv-skit *, #sv-skit *::before, #sv-skit *::after { animation: none !important; transition: none !important; }
+  #sv-skit .sv-engine-root.sv-memory-complete { transform: none; }
+}
