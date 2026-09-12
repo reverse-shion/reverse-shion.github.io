@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.8.0';
-import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.8.0';
-import { createWorld } from './world.js?v=p2-1.8.0';
-import { InputController } from './input.js?v=p2-1.8.0';
-import { AudioController } from './audio.js?v=p2-1.8.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.8.0';
+import { asset, loadJSON } from './config.js?v=p2-1.9.0';
+import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.9.0';
+import { createWorld } from './world.js?v=p2-1.9.0';
+import { InputController } from './input.js?v=p2-1.9.0';
+import { AudioController } from './audio.js?v=p2-1.9.0';
+import { SkitBridge } from './skit-bridge.js?v=p2-1.9.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -40,7 +40,6 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   let previous = 0;
   let lastPrompt = null;
   let noticeTimer;
-  let autoFollow = true;
   const cleanups = [];
 
   function on(el, type, fn, options) {
@@ -53,12 +52,6 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     $('notice').hidden = false;
     clearTimeout(noticeTimer);
     noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 2600);
-  }
-
-  function syncFollowButton() {
-    const button = $('view-follow');
-    button.textContent = autoFollow ? '自動視点 ON' : '自動視点 OFF';
-    button.setAttribute('aria-pressed', String(autoFollow));
   }
 
   const audio = new AudioController(
@@ -112,7 +105,6 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     input.setEnabled(active && state.mode === 'explore');
     $('controls').hidden = !active || state.mode !== 'explore';
     audio.setScene(state.mode, active);
-    syncFollowButton();
     updatePrompt();
   }
 
@@ -167,7 +159,14 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     const movement = input.sample();
     const moving = Math.hypot(movement.x, movement.z) > 0.03;
     movePlayer(state, movement, dt, map);
-    if (autoFollow && moving) assistView(state, dt);
+
+    // Free-look is always available with the second finger. After the player finishes
+    // looking around, keep that view briefly; only then let walking gently recover the
+    // vertical gaze toward the horizon. No visible ON/OFF setting is needed.
+    if (moving && !input.isFreeLooking() && !input.recentlyLooked(now, 1200)) {
+      assistView(state, dt);
+    }
+
     world.render(state.player, { moving, delta: dt });
     updatePrompt();
     raf = requestAnimationFrame(frame);
@@ -225,11 +224,6 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   on($('skit-sound'), 'click', e => {
     e.stopPropagation();
     audio.toggle();
-  });
-  on($('view-follow'), 'click', e => {
-    e.stopPropagation();
-    autoFollow = !autoFollow;
-    syncFollowButton();
   });
   on($('resume'), 'click', resume);
 
