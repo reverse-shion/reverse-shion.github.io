@@ -11,16 +11,19 @@
   const knob = document.getElementById('joystick-knob');
   const resetButton = document.getElementById('reset');
 
-  const WORLD = { width: 512, height: 384 };
-  const SPAWN = { x: 256, y: 349 };
+  // v0.2 Scale Test: the original 1448x1086 artwork is the world coordinate system.
+  const WORLD = { width: 1448, height: 1086 };
+  const SPAWN = { x: 724, y: 1015 };
   const FRAME = { w: 32, h: 50, count: 8 };
-  const PLAYER_DRAW = { w: 35, h: 55 };
-  const SPEED = 74;
-  const DPR_LIMIT = 1.75;
+  const PLAYER_DRAW = { w: 33, h: 52 };
+  const SPEED = 155;
+  const DPR_LIMIT = 2;
+  const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
   const directionRows = { down: 0, up: 1, left: 2, right: 3 };
 
   const map = new Image();
   const sprite = new Image();
+  let mapMode = 'HD';
   let loaded = false;
   let running = false;
   let cssWidth = 1;
@@ -35,9 +38,25 @@
   const keys = new Set();
   const stick = { active: false, id: null, ox: 0, oy: 0, x: 0, y: 0 };
 
-  function setStatus(text) {
-    loadNote.textContent = text;
+  // Scale-test collision: conservative walkable surfaces only. Final collision comes after sprite approval.
+  const walkAreas = [
+    { type: 'poly', points: [[590,1086],[858,1086],[885,955],[905,825],[910,730],[885,655],[835,605],[615,605],[570,660],[565,780],[575,925]] },
+    { type: 'ellipse', cx: 724, cy: 535, rx: 300, ry: 174 },
+    { type: 'poly', points: [[575,500],[875,500],[885,420],[870,340],[860,245],[850,190],[598,190],[588,250],[575,345],[565,430]] }
+  ];
+  const blockers = [
+    { type: 'ellipse', cx: 724, cy: 545, rx: 128, ry: 84 }
+  ];
+
+  let debugHud = null;
+  if (DEBUG) {
+    debugHud = document.createElement('div');
+    debugHud.style.cssText = 'position:absolute;left:10px;top:10px;z-index:20;padding:7px 9px;border-radius:8px;background:rgba(5,8,24,.72);color:#fff;font:11px/1.45 ui-monospace,monospace;pointer-events:none;white-space:pre;';
+    document.getElementById('game-shell').appendChild(debugHud);
   }
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const setStatus = text => { loadNote.textContent = text; };
 
   function failBoot(message) {
     loaded = false;
@@ -48,12 +67,15 @@
 
   function loadDataImage(image, mime, base64, label) {
     return new Promise((resolve, reject) => {
+      if (typeof base64 !== 'string' || base64.length < 100) {
+        reject(new Error(`${label}データがありません`));
+        return;
+      }
       let settled = false;
       const done = () => {
         if (settled) return;
         settled = true;
-        if (image.naturalWidth > 0 && image.naturalHeight > 0) resolve(image);
-        else reject(new Error(`${label}のサイズを取得できません`));
+        image.naturalWidth > 0 ? resolve(image) : reject(new Error(`${label}のサイズを取得できません`));
       };
       const fail = () => {
         if (settled) return;
@@ -67,32 +89,34 @@
     });
   }
 
-  const scale = 512 / 1448;
-  const Z = points => points.map(([x, y]) => [x * scale, y * scale]);
-  const walkZones = [
-    { type: 'poly', points: Z([[555,1086],[902,1086],[950,920],[980,790],[965,675],[925,590],[925,480],[530,480],[500,585],[500,700],[520,845]]) },
-    { type: 'ellipse', cx: 730 * scale, cy: 515 * scale, rx: 286 * scale, ry: 155 * scale },
-    { type: 'poly', points: Z([[550,470],[914,470],[902,370],[870,280],[865,165],[590,165],[580,280],[550,370]]) },
-    { type: 'poly', points: Z([[430,390],[580,390],[565,515],[390,555],[145,545],[0,515],[0,385],[180,365]]) },
-    { type: 'poly', points: Z([[900,390],[1040,355],[1230,350],[1448,370],[1448,565],[1265,590],[1080,570],[940,525]]) },
-    { type: 'poly', points: Z([[1020,555],[1448,540],[1448,840],[1280,845],[1120,790],[1000,680]]) }
-  ];
-
-  function pointInPoly(x, y, pts) {
+  function pointInPoly(x, y, points) {
     let inside = false;
-    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-      const [xi, yi] = pts[i];
-      const [xj, yj] = pts[j];
-      if (((yi > y) !== (yj > y)) && x < (xj - xi) * (y - yi) / ((yj - yi) || 0.000001) + xi) inside = !inside;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      const [xi, yi] = points[i];
+      const [xj, yj] = points[j];
+      const hit = ((yi > y) !== (yj > y)) && x < (xj - xi) * (y - yi) / ((yj - yi) || 0.000001) + xi;
+      if (hit) inside = !inside;
     }
     return inside;
   }
 
-  function walkable(x, y) {
-    if (x < 5 || y < 45 || x > WORLD.width - 5 || y > WORLD.height - 3) return false;
-    return walkZones.some(zone => zone.type === 'ellipse'
-      ? (((x - zone.cx) / zone.rx) ** 2 + ((y - zone.cy) / zone.ry) ** 2 <= 1)
-      : pointInPoly(x, y, zone.points));
+  function inArea(x, y, area) {
+    if (area.type === 'ellipse') {
+      return ((x - area.cx) / area.rx) ** 2 + ((y - area.cy) / area.ry) ** 2 <= 1;
+    }
+    return pointInPoly(x, y, area.points);
+  }
+
+  function walkPoint(x, y) {
+    if (x < 4 || y < 4 || x > WORLD.width - 4 || y > WORLD.height - 4) return false;
+    const onGround = walkAreas.some(area => inArea(x, y, area));
+    const blocked = blockers.some(area => inArea(x, y, area));
+    return onGround && !blocked;
+  }
+
+  // The character coordinate is the center of the feet, not the image rectangle.
+  function canStand(x, y) {
+    return walkPoint(x, y) && walkPoint(x - 6, y) && walkPoint(x + 6, y) && walkPoint(x, y + 3);
   }
 
   function resize() {
@@ -103,8 +127,10 @@
     canvas.width = Math.round(cssWidth * dpr);
     canvas.height = Math.round(cssHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const cover = Math.max(cssWidth / WORLD.width, cssHeight / WORLD.height);
-    camera.zoom = Math.max(cover, 1.06);
+
+    // Keep Shion close to a stable on-screen size instead of fitting the whole map.
+    const scaleByViewport = Math.min(cssWidth / 620, cssHeight / 560);
+    camera.zoom = clamp(scaleByViewport, 0.88, 1.22);
   }
 
   function inputVector() {
@@ -114,10 +140,7 @@
     if (keys.has('ArrowRight') || keys.has('d')) x += 1;
     if (keys.has('ArrowUp') || keys.has('w')) y -= 1;
     if (keys.has('ArrowDown') || keys.has('s')) y += 1;
-    if (stick.active) {
-      x += stick.x;
-      y += stick.y;
-    }
+    if (stick.active) { x += stick.x; y += stick.y; }
     const len = Math.hypot(x, y);
     return len > 1 ? { x: x / len, y: y / len } : { x, y };
   }
@@ -136,16 +159,16 @@
 
     const nx = player.x + v.x * SPEED * dt;
     const ny = player.y + v.y * SPEED * dt;
-    if (walkable(nx, ny)) {
+    if (canStand(nx, ny)) {
       player.x = nx;
       player.y = ny;
     } else {
-      if (walkable(nx, player.y)) player.x = nx;
-      if (walkable(player.x, ny)) player.y = ny;
+      if (canStand(nx, player.y)) player.x = nx;
+      if (canStand(player.x, ny)) player.y = ny;
     }
 
     frameTime += dt;
-    if (frameTime >= 0.095) {
+    if (frameTime >= 0.105) {
       frameTime = 0;
       player.frame = (player.frame + 1) % FRAME.count;
     }
@@ -156,37 +179,49 @@
     const viewH = cssHeight / camera.zoom;
     const halfW = viewW / 2;
     const halfH = viewH / 2;
-    const targetX = Math.max(halfW, Math.min(WORLD.width - halfW, player.x));
-    const targetY = Math.max(halfH, Math.min(WORLD.height - halfH, player.y - 14));
-    const ease = 1 - Math.exp(-8 * dt);
+    const targetX = clamp(player.x, halfW, WORLD.width - halfW);
+    const targetY = clamp(player.y - 42, halfH, WORLD.height - halfH);
+    const ease = 1 - Math.exp(-7 * dt);
     camera.x += (targetX - camera.x) * ease;
     camera.y += (targetY - camera.y) * ease;
+  }
+
+  function drawArea(area, fill, stroke) {
+    ctx.beginPath();
+    if (area.type === 'ellipse') {
+      ctx.ellipse(area.cx, area.cy, area.rx, area.ry, 0, 0, Math.PI * 2);
+    } else {
+      area.points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+      ctx.closePath();
+    }
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 2 / camera.zoom;
+    ctx.fill();
+    ctx.stroke();
   }
 
   function draw() {
     const viewW = cssWidth / camera.zoom;
     const viewH = cssHeight / camera.zoom;
-    const sx = Math.max(0, Math.min(Math.max(0, WORLD.width - viewW), camera.x - viewW / 2));
-    const sy = Math.max(0, Math.min(Math.max(0, WORLD.height - viewH), camera.y - viewH / 2));
+    const sx = clamp(camera.x - viewW / 2, 0, Math.max(0, WORLD.width - viewW));
+    const sy = clamp(camera.y - viewH / 2, 0, Math.max(0, WORLD.height - viewH));
 
     ctx.save();
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-sx, -sy);
     ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(map, 0, 0, WORLD.width, WORLD.height);
 
-    ctx.globalAlpha = 0.12 + (Math.sin(elapsed * 1.2) + 1) * 0.08;
-    ctx.fillStyle = '#fff5d7';
-    for (let i = 0; i < 22; i++) {
-      const x = 30 + ((i * 83) % 455);
-      const y = 45 + ((i * 57) % 250);
-      ctx.fillRect(x, y, 1, 1);
+    if (DEBUG) {
+      walkAreas.forEach(a => drawArea(a, 'rgba(80,255,160,.10)', 'rgba(80,255,160,.72)'));
+      blockers.forEach(a => drawArea(a, 'rgba(255,70,90,.18)', 'rgba(255,70,90,.9)'));
     }
-    ctx.globalAlpha = 1;
 
-    ctx.fillStyle = 'rgba(12,10,30,.28)';
+    ctx.fillStyle = 'rgba(12,10,30,.22)';
     ctx.beginPath();
-    ctx.ellipse(player.x, player.y - 1, 10, 3.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(player.x, player.y + 1, 10, 3.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
     const row = directionRows[player.dir];
@@ -198,7 +233,18 @@
       player.x - PLAYER_DRAW.w / 2, player.y - PLAYER_DRAW.h + 4,
       PLAYER_DRAW.w, PLAYER_DRAW.h
     );
+
+    if (DEBUG) {
+      ctx.fillStyle = '#ffda69';
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
+
+    if (debugHud) {
+      debugHud.textContent = `v0.2 SCALE TEST\nworld ${WORLD.width}x${WORLD.height}\nShion ${PLAYER_DRAW.h}px world\nzoom ${camera.zoom.toFixed(2)}\npos ${player.x.toFixed(0)}, ${player.y.toFixed(0)}\nmap ${mapMode}`;
+    }
   }
 
   function loop(now) {
@@ -218,8 +264,9 @@
     player.y = SPAWN.y;
     player.dir = 'up';
     player.frame = 0;
+    player.moving = false;
     camera.x = SPAWN.x;
-    camera.y = SPAWN.y;
+    camera.y = SPAWN.y - 42;
   }
 
   function dismissStartScreen() {
@@ -242,22 +289,25 @@
     last = performance.now();
     draw();
     requestAnimationFrame(loop);
-    setTimeout(() => guide.classList.add('is-gone'), 7000);
+    setTimeout(() => guide.classList.add('is-gone'), 6500);
   }
 
   function pointerDown(e) {
     if (!running) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    if (e.clientX > cssWidth * 0.66) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    if (px > cssWidth * 0.68) return;
     stick.active = true;
     stick.id = e.pointerId;
-    stick.ox = e.clientX;
-    stick.oy = e.clientY;
+    stick.ox = px;
+    stick.oy = py;
     stick.x = 0;
     stick.y = 0;
     joystick.hidden = false;
-    joystick.style.left = `${e.clientX}px`;
-    joystick.style.top = `${e.clientY}px`;
+    joystick.style.left = `${px}px`;
+    joystick.style.top = `${py}px`;
     canvas.setPointerCapture?.(e.pointerId);
     guide.classList.add('is-gone');
     e.preventDefault();
@@ -265,14 +315,14 @@
 
   function pointerMove(e) {
     if (!stick.active || e.pointerId !== stick.id) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
     const max = 38;
-    let dx = e.clientX - stick.ox;
-    let dy = e.clientY - stick.oy;
+    let dx = px - stick.ox;
+    let dy = py - stick.oy;
     const len = Math.hypot(dx, dy);
-    if (len > max) {
-      dx = dx / len * max;
-      dy = dy / len * max;
-    }
+    if (len > max) { dx = dx / len * max; dy = dy / len * max; }
     stick.x = dx / max;
     stick.y = dy / max;
     knob.style.transform = `translate(${dx}px,${dy}px)`;
@@ -296,11 +346,7 @@
   canvas.addEventListener('pointermove', pointerMove, { passive: false });
   canvas.addEventListener('pointerup', pointerEnd);
   canvas.addEventListener('pointercancel', pointerEnd);
-
-  window.addEventListener('resize', () => {
-    resize();
-    if (loaded) draw();
-  });
+  window.addEventListener('resize', () => { resize(); if (loaded) draw(); });
 
   window.addEventListener('keydown', e => {
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
@@ -310,41 +356,49 @@
       e.preventDefault();
     }
   }, { passive: false });
+  window.addEventListener('keyup', e => keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key));
 
-  window.addEventListener('keyup', e => {
-    keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key);
-  });
-
-  const mapData = window.__TB_MAP_B64;
+  const hdParts = Array.isArray(window.__TB_MAP_AVIF_PARTS) ? window.__TB_MAP_AVIF_PARTS : [];
+  const hdMapData = hdParts.join('');
+  const fallbackMapData = window.__TB_MAP_B64;
   const spriteParts = Array.isArray(window.__TB_SPRITE_PARTS) ? window.__TB_SPRITE_PARTS : [];
   const spriteData = spriteParts.join('');
-  const mapLen = typeof mapData === 'string' ? mapData.length : 0;
-  const spriteLen = spriteData.length;
 
-  setStatus(`内蔵データを復元中… map:${mapLen} sprite:${spriteLen} parts:${spriteParts.length}`);
-
-  if (!mapLen || spriteParts.length !== 6 || spriteLen !== 27368) {
-    failBoot(`ゲームデータ不足 map:${mapLen} sprite:${spriteLen} parts:${spriteParts.length}`);
-    return;
+  async function loadMap() {
+    if (hdParts.filter(Boolean).length === 6 && hdMapData.length > 10000) {
+      try {
+        await loadDataImage(map, 'image/avif', hdMapData, '高解像度マップ');
+        if (map.naturalWidth === WORLD.width && map.naturalHeight === WORLD.height) {
+          mapMode = 'HD 1448x1086';
+          return;
+        }
+        throw new Error(`HDマップサイズ不正 ${map.naturalWidth}x${map.naturalHeight}`);
+      } catch (error) {
+        console.warn('HD map fallback:', error);
+      }
+    }
+    mapMode = 'LOW-RES FALLBACK';
+    await loadDataImage(map, 'image/jpeg', fallbackMapData, '予備マップ');
   }
 
+  setStatus('1448×1086 高解像度マップを復元しています…');
+
   Promise.all([
-    loadDataImage(map, 'image/jpeg', mapData, '星の国マップ'),
+    loadMap(),
     loadDataImage(sprite, 'image/png', spriteData, 'シオン')
   ]).then(() => {
     if (sprite.naturalWidth !== 256 || sprite.naturalHeight !== 200) {
       throw new Error(`シオン画像サイズ不正 ${sprite.naturalWidth}×${sprite.naturalHeight}`);
     }
-
     loaded = true;
     resize();
     reset();
     draw();
     startButton.disabled = false;
     startButton.textContent = '星の国へ';
-    setStatus(`準備完了 map:${map.naturalWidth}×${map.naturalHeight} / shion:${sprite.naturalWidth}×${sprite.naturalHeight}`);
+    setStatus(`${mapMode} / シオン52px / Scale Test`);
   }).catch(error => {
     console.error(error);
-    failBoot(`${error.message} / map:${mapLen} sprite:${spriteLen} parts:${spriteParts.length}`);
+    failBoot(error.message);
   });
 })();
