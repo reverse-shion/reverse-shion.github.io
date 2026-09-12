@@ -21,9 +21,9 @@
   const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
   const directionRows = { down: 0, up: 1, left: 2, right: 3 };
 
-  const map = new Image();
   const sprite = new Image();
-  let mapMode = 'HD';
+  let mapObjectUrl = null;
+  let mapMode = 'HD FIXED';
   let loaded = false;
   let running = false;
   let cssWidth = 1;
@@ -33,11 +33,11 @@
   let frameTime = 0;
 
   const player = { x: SPAWN.x, y: SPAWN.y, dir: 'up', moving: false, frame: 0 };
-  const camera = { x: SPAWN.x, y: SPAWN.y, zoom: 1 };
+  const camera = { x: SPAWN.x, y: SPAWN.y - 42, zoom: 1 };
   const keys = new Set();
   const stick = { active: false, id: null, ox: 0, oy: 0, x: 0, y: 0 };
 
-  // v0.2 Scale Test only. Final collision will use a dedicated walkability mask.
+  // Scale-test collision only. Final collision will use a dedicated walk mask.
   const walkAreas = [
     { type: 'poly', points: [[590,1086],[858,1086],[885,955],[905,825],[910,730],[885,655],[835,605],[615,605],[570,660],[565,780],[575,925]] },
     { type: 'ellipse', cx: 724, cy: 535, rx: 300, ry: 174 },
@@ -50,7 +50,7 @@
   let debugHud = null;
   if (DEBUG) {
     debugHud = document.createElement('div');
-    debugHud.style.cssText = 'position:absolute;left:10px;top:10px;z-index:30;padding:7px 9px;border-radius:8px;background:rgba(5,8,24,.72);color:#fff;font:11px/1.45 ui-monospace,monospace;pointer-events:none;white-space:pre;';
+    debugHud.style.cssText = 'position:absolute;left:10px;top:10px;z-index:20;padding:7px 9px;border-radius:8px;background:rgba(5,8,24,.78);color:#fff;font:11px/1.45 ui-monospace,monospace;pointer-events:none;white-space:pre;';
     document.getElementById('game-shell').appendChild(debugHud);
   }
 
@@ -70,31 +70,48 @@
         reject(new Error(`${label}データがありません`));
         return;
       }
-      image.onload = () => image.naturalWidth > 0 ? resolve(image) : reject(new Error(`${label}サイズ不正`));
-      image.onerror = () => reject(new Error(`${label}の復元に失敗`));
+      let settled = false;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        image.naturalWidth > 0 ? resolve(image) : reject(new Error(`${label}のサイズを取得できません`));
+      };
+      const fail = () => {
+        if (settled) return;
+        settled = true;
+        reject(new Error(`${label}の復元に失敗`));
+      };
+      image.onload = done;
+      image.onerror = fail;
       image.src = `data:${mime};base64,${base64}`;
+      if (image.complete && image.naturalWidth > 0) done();
     });
   }
 
-  function base64BlobUrl(base64, mime) {
+  function base64BlobUrl(mime, base64) {
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
     return URL.createObjectURL(new Blob([bytes], { type: mime }));
   }
 
-  function blobImage(image, mime, base64, label) {
+  function loadMapElement(src, label) {
     return new Promise((resolve, reject) => {
-      if (typeof base64 !== 'string' || base64.length < 100) {
-        reject(new Error(`${label}データがありません`));
-        return;
-      }
-      let url;
-      try { url = base64BlobUrl(base64, mime); }
-      catch { reject(new Error(`${label}データ変換に失敗`)); return; }
-      image.onload = () => image.naturalWidth > 0 ? resolve(image) : reject(new Error(`${label}サイズ不正`));
-      image.onerror = () => reject(new Error(`${label}の復元に失敗`));
-      image.src = url;
+      let settled = false;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        mapLayer.naturalWidth > 0 ? resolve(mapLayer) : reject(new Error(`${label}のサイズを取得できません`));
+      };
+      const fail = () => {
+        if (settled) return;
+        settled = true;
+        reject(new Error(`${label}の表示に失敗`));
+      };
+      mapLayer.onload = done;
+      mapLayer.onerror = fail;
+      mapLayer.src = src;
+      if (mapLayer.complete && mapLayer.naturalWidth > 0) done();
     });
   }
 
@@ -118,10 +135,10 @@
 
   function walkPoint(x, y) {
     if (x < 4 || y < 4 || x > WORLD.width - 4 || y > WORLD.height - 4) return false;
-    return walkAreas.some(a => inArea(x, y, a)) && !blockers.some(a => inArea(x, y, a));
+    return walkAreas.some(area => inArea(x, y, area)) && !blockers.some(area => inArea(x, y, area));
   }
 
-  // The game coordinate is the center of Shion's feet.
+  // Player coordinate = center of the feet.
   function canStand(x, y) {
     return walkPoint(x, y) && walkPoint(x - 6, y) && walkPoint(x + 6, y) && walkPoint(x, y + 3);
   }
@@ -135,13 +152,14 @@
     canvas.height = Math.round(cssHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Do not fit the whole map. Keep Shion at a stable RPG scale on screen.
+    // Never fit the full map. Keep a stable character/world scale.
     const scaleByViewport = Math.min(cssWidth / 620, cssHeight / 560);
     camera.zoom = clamp(scaleByViewport, 0.88, 1.22);
   }
 
   function inputVector() {
-    let x = 0, y = 0;
+    let x = 0;
+    let y = 0;
     if (keys.has('ArrowLeft') || keys.has('a')) x -= 1;
     if (keys.has('ArrowRight') || keys.has('d')) x += 1;
     if (keys.has('ArrowUp') || keys.has('w')) y -= 1;
@@ -154,7 +172,10 @@
   function updatePlayer(dt) {
     const v = inputVector();
     player.moving = Math.hypot(v.x, v.y) > 0.08;
-    if (!player.moving) { player.frame = 0; return; }
+    if (!player.moving) {
+      player.frame = 0;
+      return;
+    }
 
     player.dir = Math.abs(v.x) > Math.abs(v.y)
       ? (v.x < 0 ? 'left' : 'right')
@@ -163,7 +184,8 @@
     const nx = player.x + v.x * SPEED * dt;
     const ny = player.y + v.y * SPEED * dt;
     if (canStand(nx, ny)) {
-      player.x = nx; player.y = ny;
+      player.x = nx;
+      player.y = ny;
     } else {
       if (canStand(nx, player.y)) player.x = nx;
       if (canStand(player.x, ny)) player.y = ny;
@@ -188,12 +210,12 @@
     camera.y += (targetY - camera.y) * ease;
   }
 
-  function viewport() {
+  function viewportOrigin() {
     const viewW = cssWidth / camera.zoom;
     const viewH = cssHeight / camera.zoom;
     return {
-      sx: clamp(camera.x - viewW / 2, 0, Math.max(0, WORLD.width - viewW)),
-      sy: clamp(camera.y - viewH / 2, 0, Math.max(0, WORLD.height - viewH))
+      x: clamp(camera.x - viewW / 2, 0, Math.max(0, WORLD.width - viewW)),
+      y: clamp(camera.y - viewH / 2, 0, Math.max(0, WORLD.height - viewH))
     };
   }
 
@@ -203,21 +225,24 @@
 
   function drawArea(area, fill, stroke) {
     ctx.beginPath();
-    if (area.type === 'ellipse') ctx.ellipse(area.cx, area.cy, area.rx, area.ry, 0, 0, Math.PI * 2);
-    else {
+    if (area.type === 'ellipse') {
+      ctx.ellipse(area.cx, area.cy, area.rx, area.ry, 0, 0, Math.PI * 2);
+    } else {
       area.points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
       ctx.closePath();
     }
     ctx.fillStyle = fill;
     ctx.strokeStyle = stroke;
     ctx.lineWidth = 2 / camera.zoom;
-    ctx.fill(); ctx.stroke();
+    ctx.fill();
+    ctx.stroke();
   }
 
   function draw() {
-    const { sx, sy } = viewport();
+    const { x: sx, y: sy } = viewportOrigin();
     syncMapLayer(sx, sy);
 
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     ctx.save();
     ctx.scale(camera.zoom, camera.zoom);
@@ -252,7 +277,7 @@
     ctx.restore();
 
     if (debugHud) {
-      debugHud.textContent = `v0.2.1 SCALE TEST\nworld ${WORLD.width}x${WORLD.height}\nShion ${PLAYER_DRAW.h}px world\nzoom ${camera.zoom.toFixed(2)}\npos ${player.x.toFixed(0)}, ${player.y.toFixed(0)}\nmap ${mapMode}`;
+      debugHud.textContent = `v0.2.2 SCALE TEST\nworld ${WORLD.width}x${WORLD.height}\nShion ${PLAYER_DRAW.h}px world\nzoom ${camera.zoom.toFixed(2)}\npos ${player.x.toFixed(0)}, ${player.y.toFixed(0)}\nmap ${mapMode}`;
     }
   }
 
@@ -308,7 +333,10 @@
     if (px > cssWidth * 0.68) return;
     stick.active = true;
     stick.id = e.pointerId;
-    stick.ox = px; stick.oy = py; stick.x = 0; stick.y = 0;
+    stick.ox = px;
+    stick.oy = py;
+    stick.x = 0;
+    stick.y = 0;
     joystick.hidden = false;
     joystick.style.left = `${px}px`;
     joystick.style.top = `${py}px`;
@@ -337,7 +365,8 @@
     if (!stick.active || e.pointerId !== stick.id) return;
     stick.active = false;
     stick.id = null;
-    stick.x = 0; stick.y = 0;
+    stick.x = 0;
+    stick.y = 0;
     knob.style.transform = 'translate(0,0)';
     joystick.hidden = true;
   }
@@ -361,30 +390,36 @@
   }, { passive: false });
   window.addEventListener('keyup', e => keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key));
 
-  const hdParts = Array.isArray(window.__TB_MAP_AVIF_PARTS) ? window.__TB_MAP_AVIF_PARTS : [];
-  const hdMapData = hdParts.join('');
+  const fixedParts = Array.isArray(window.__TB_MAP_FIXED_PARTS) ? window.__TB_MAP_FIXED_PARTS : [];
+  const fixedMapData = fixedParts.join('');
   const fallbackMapData = window.__TB_MAP_B64;
   const spriteParts = Array.isArray(window.__TB_SPRITE_PARTS) ? window.__TB_SPRITE_PARTS : [];
   const spriteData = spriteParts.join('');
 
   async function loadMap() {
-    if (hdParts.filter(Boolean).length === 6 && hdMapData.length > 10000) {
+    const completeFixed = fixedParts.length === 4 && fixedParts.every(Boolean) && fixedMapData.length === 148304;
+    if (completeFixed) {
       try {
-        await blobImage(map, 'image/avif', hdMapData, '高解像度マップ');
-        if (map.naturalWidth === WORLD.width && map.naturalHeight === WORLD.height) {
-          mapMode = 'HD 1448x1086 DOM';
-          mapLayer.src = map.src;
-          return;
+        mapObjectUrl = base64BlobUrl('image/avif', fixedMapData);
+        await loadMapElement(mapObjectUrl, '高解像度マップ');
+        if (mapLayer.naturalWidth !== WORLD.width || mapLayer.naturalHeight !== WORLD.height) {
+          throw new Error(`HDマップサイズ不正 ${mapLayer.naturalWidth}×${mapLayer.naturalHeight}`);
         }
-        throw new Error(`HDマップサイズ不正 ${map.naturalWidth}x${map.naturalHeight}`);
+        mapMode = `HD FIXED ${mapLayer.naturalWidth}x${mapLayer.naturalHeight}`;
+        return;
       } catch (error) {
-        console.warn('HD map fallback:', error);
+        console.warn('Fixed HD map fallback:', error);
+        if (mapObjectUrl) {
+          URL.revokeObjectURL(mapObjectUrl);
+          mapObjectUrl = null;
+        }
       }
+    } else {
+      console.warn(`Fixed HD data incomplete: parts=${fixedParts.length} len=${fixedMapData.length}`);
     }
 
-    await dataUrlImage(map, 'image/jpeg', fallbackMapData, '予備マップ');
-    mapMode = `LOW-RES ${map.naturalWidth}x${map.naturalHeight}`;
-    mapLayer.src = map.src;
+    mapMode = 'LOW-RES FALLBACK';
+    await loadMapElement(`data:image/jpeg;base64,${fallbackMapData}`, '予備マップ');
   }
 
   setStatus('1448×1086 高解像度マップを復元しています…');
