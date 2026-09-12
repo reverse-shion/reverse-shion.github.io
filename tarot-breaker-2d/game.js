@@ -13,7 +13,7 @@
 
   const WORLD = { width: 512, height: 384 };
   const SPAWN = { x: 256, y: 349 };
-  const FRAME = { w: 16, h: 25, count: 8 };
+  const FRAME = { w: 32, h: 50, count: 8 };
   const PLAYER_DRAW = { w: 35, h: 55 };
   const SPEED = 74;
   const directionRows = { down: 0, up: 1, left: 2, right: 3 };
@@ -35,11 +35,35 @@
   const map = new Image();
   const sprite = new Image();
 
-  function loadImage(image, src) {
+  function failBoot(message) {
+    loaded = false;
+    startButton.disabled = true;
+    startButton.textContent = '起動できません';
+    loadNote.textContent = message;
+  }
+
+  function loadEmbeddedImage(image, mime, base64, label) {
     return new Promise((resolve, reject) => {
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error(`asset failed: ${src}`));
-      image.src = src;
+      if (typeof base64 !== 'string' || base64.length < 100) {
+        reject(new Error(`${label}データがありません`));
+        return;
+      }
+      let settled = false;
+      image.onload = () => {
+        if (settled) return;
+        settled = true;
+        resolve(image);
+      };
+      image.onerror = () => {
+        if (settled) return;
+        settled = true;
+        reject(new Error(`${label}の復元に失敗`));
+      };
+      image.src = `data:${mime};base64,${base64}`;
+      if (image.complete && image.naturalWidth > 0) {
+        settled = true;
+        resolve(image);
+      }
     });
   }
 
@@ -156,9 +180,12 @@
     const row = directionRows[player.dir];
     const frame = player.moving ? player.frame : 0;
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(sprite, frame * FRAME.w, row * FRAME.h, FRAME.w, FRAME.h,
+    ctx.drawImage(
+      sprite,
+      frame * FRAME.w, row * FRAME.h, FRAME.w, FRAME.h,
       player.x - PLAYER_DRAW.w / 2, player.y - PLAYER_DRAW.h + 4,
-      PLAYER_DRAW.w, PLAYER_DRAW.h);
+      PLAYER_DRAW.w, PLAYER_DRAW.h
+    );
     ctx.restore();
   }
 
@@ -175,8 +202,12 @@
   }
 
   function reset() {
-    player.x = SPAWN.x; player.y = SPAWN.y; player.dir = 'up'; player.frame = 0;
-    camera.x = SPAWN.x; camera.y = SPAWN.y;
+    player.x = SPAWN.x;
+    player.y = SPAWN.y;
+    player.dir = 'up';
+    player.frame = 0;
+    camera.x = SPAWN.x;
+    camera.y = SPAWN.y;
   }
 
   function startGame() {
@@ -185,33 +216,50 @@
     startScreen.hidden = true;
     guide.hidden = false;
     resetButton.hidden = false;
-    resize(); reset(); last = performance.now();
+    resize();
+    reset();
+    last = performance.now();
     requestAnimationFrame(loop);
     setTimeout(() => guide.classList.add('is-gone'), 7000);
   }
 
   function pointerDown(e) {
     if (!running || (e.pointerType === 'mouse' && e.button !== 0) || e.clientX > cssWidth * 0.66) return;
-    stick.active = true; stick.id = e.pointerId; stick.ox = e.clientX; stick.oy = e.clientY; stick.x = 0; stick.y = 0;
-    joystick.hidden = false; joystick.style.left = `${e.clientX}px`; joystick.style.top = `${e.clientY}px`;
-    canvas.setPointerCapture?.(e.pointerId); guide.classList.add('is-gone'); e.preventDefault();
+    stick.active = true;
+    stick.id = e.pointerId;
+    stick.ox = e.clientX;
+    stick.oy = e.clientY;
+    stick.x = 0;
+    stick.y = 0;
+    joystick.hidden = false;
+    joystick.style.left = `${e.clientX}px`;
+    joystick.style.top = `${e.clientY}px`;
+    canvas.setPointerCapture?.(e.pointerId);
+    guide.classList.add('is-gone');
+    e.preventDefault();
   }
 
   function pointerMove(e) {
     if (!stick.active || e.pointerId !== stick.id) return;
     const max = 38;
-    let dx = e.clientX - stick.ox, dy = e.clientY - stick.oy;
+    let dx = e.clientX - stick.ox;
+    let dy = e.clientY - stick.oy;
     const len = Math.hypot(dx, dy);
     if (len > max) { dx = dx / len * max; dy = dy / len * max; }
-    stick.x = dx / max; stick.y = dy / max;
+    stick.x = dx / max;
+    stick.y = dy / max;
     knob.style.transform = `translate(${dx}px,${dy}px)`;
     e.preventDefault();
   }
 
   function pointerEnd(e) {
     if (!stick.active || e.pointerId !== stick.id) return;
-    stick.active = false; stick.id = null; stick.x = 0; stick.y = 0;
-    knob.style.transform = 'translate(0,0)'; joystick.hidden = true;
+    stick.active = false;
+    stick.id = null;
+    stick.x = 0;
+    stick.y = 0;
+    knob.style.transform = 'translate(0,0)';
+    joystick.hidden = true;
   }
 
   startButton.addEventListener('click', startGame);
@@ -224,24 +272,38 @@
   window.addEventListener('keydown', e => {
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','w','a','s','d'].includes(k)) {
-      keys.add(k); guide.classList.add('is-gone'); e.preventDefault();
+      keys.add(k);
+      guide.classList.add('is-gone');
+      e.preventDefault();
     }
   }, { passive: false });
   window.addEventListener('keyup', e => keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key));
 
+  const mapData = window.__TB_MAP_B64;
+  const spriteData = window.__TB_SPRITE_B64;
+  const mapLen = typeof mapData === 'string' ? mapData.length : 0;
+  const spriteLen = typeof spriteData === 'string' ? spriteData.length : 0;
+
+  loadNote.textContent = `内蔵データを復元中… map:${mapLen} sprite:${spriteLen}`;
+
+  if (!mapLen || !spriteLen) {
+    failBoot(`内蔵データ不足 map:${mapLen} sprite:${spriteLen}`);
+    return;
+  }
+
   Promise.all([
-    loadImage(map, './assets/star-gate-garden.jpg?v=0.1.3'),
-    loadImage(sprite, './assets/shion-walk.png?v=0.1.3')
+    loadEmbeddedImage(map, 'image/jpeg', mapData, 'マップ'),
+    loadEmbeddedImage(sprite, 'image/png', spriteData, 'シオン')
   ]).then(() => {
     loaded = true;
-    resize(); reset(); draw();
+    resize();
+    reset();
+    draw();
     startButton.disabled = false;
     startButton.textContent = '星の国へ';
     loadNote.textContent = 'タップして探索を始める';
   }).catch(err => {
     console.error(err);
-    startButton.disabled = true;
-    startButton.textContent = '読み込み失敗';
-    loadNote.textContent = '画像を読み込めませんでした。ページを再読み込みしてください。';
+    failBoot(`${err.message} map:${mapLen} sprite:${spriteLen}`);
   });
 })();
