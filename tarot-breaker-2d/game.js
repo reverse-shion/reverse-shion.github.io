@@ -222,15 +222,25 @@
     camera.y = SPAWN.y;
   }
 
-  function startGame() {
+  function dismissStartScreen() {
+    startScreen.classList.add('is-dismissed');
+    startScreen.hidden = true;
+    startScreen.style.display = 'none';
+    startScreen.style.pointerEvents = 'none';
+    startScreen.setAttribute('aria-hidden', 'true');
+  }
+
+  function startGame(event) {
+    if (event) event.preventDefault();
     if (!loaded || running) return;
     running = true;
-    startScreen.hidden = true;
+    dismissStartScreen();
     guide.hidden = false;
     resetButton.hidden = false;
     resize();
     reset();
     last = performance.now();
+    draw();
     requestAnimationFrame(loop);
     setTimeout(() => guide.classList.add('is-gone'), 7000);
   }
@@ -280,6 +290,7 @@
   }
 
   startButton.addEventListener('click', startGame);
+  startButton.addEventListener('pointerup', startGame, { passive: false });
   resetButton.addEventListener('click', reset);
   canvas.addEventListener('pointerdown', pointerDown, { passive: false });
   canvas.addEventListener('pointermove', pointerMove, { passive: false });
