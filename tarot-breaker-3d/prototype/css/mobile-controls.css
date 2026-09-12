@@ -1,6 +1,6 @@
-/* Phase 2 mobile controls v1.4
-   The play field itself is the controller: left half moves, right half looks.
-   Gameplay must win over iOS text selection / touch callouts. */
+/* Phase 2 mobile controls v1.5
+   Whole-screen swipe locomotion. Safari callouts and text selection are disabled
+   only inside the gameplay surface. */
 #world,
 #world *,
 #look,
@@ -23,6 +23,22 @@
 #thumb,
 .stick-label {
   display: none !important;
+}
+
+.hud-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.hud-actions button {
+  min-height: 42px;
+  padding: 9px 14px;
+  font-size: 11px;
+  background: #101526cc;
+  white-space: nowrap;
 }
 
 .look-hint {
@@ -52,10 +68,17 @@
   .look-hint { display: block; }
 }
 
+@media (max-width: 520px) {
+  .hud { gap: 8px; }
+  .hud > div:first-child { max-width: 58vw; }
+  .hud-actions button { min-height: 38px; padding: 7px 11px; font-size: 10px; }
+}
+
 @media (max-height: 520px) and (orientation: landscape) {
   #interact { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 44px); }
   .look-hint {
     bottom: max(6px, env(safe-area-inset-bottom));
     font-size: 10px;
   }
+  .hud-actions { flex-direction: row; }
 }
