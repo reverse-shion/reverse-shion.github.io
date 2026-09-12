@@ -1,9 +1,9 @@
-import { asset, loadJSON } from './config.js?v=p2-1.6.0';
-import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.6.0';
-import { createWorld } from './world.js?v=p2-1.6.0';
-import { InputController } from './input.js?v=p2-1.6.0';
-import { AudioController } from './audio.js?v=p2-1.6.0';
-import { SkitBridge } from './skit-bridge.js?v=p2-1.6.0';
+import { asset, loadJSON } from './config.js?v=p2-1.7.0';
+import { createState, movePlayer, lookPlayer, assistView, nearbyEvent, enterSkit, leaveSkit } from './state.js?v=p2-1.7.0';
+import { createWorld } from './world.js?v=p2-1.7.0';
+import { InputController } from './input.js?v=p2-1.7.0';
+import { AudioController } from './audio.js?v=p2-1.7.0';
+import { SkitBridge } from './skit-bridge.js?v=p2-1.7.0';
 
 let running = false;
 export async function startGame({ initialAudio = null, initialSoundEnabled = false } = {}) {
@@ -26,6 +26,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   const world = createWorld($('scene'), map, events);
   running = true;
   const state = createState(map); state.mode = 'explore';
+  const completedEvents = new Set();
   let suspended = false, contextLost = false, disposed = false, raf = 0, previous = 0, lastPrompt = null, noticeTimer;
   let autoFollow = true;
   const cleanups = [];
@@ -36,7 +37,7 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   }
   function notice(message) {
     $('notice').textContent = message; $('notice').hidden = false; clearTimeout(noticeTimer);
-    noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 6500);
+    noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 4200);
   }
   function syncFollowButton() {
     const button = $('view-follow');
@@ -60,7 +61,12 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
   const skit = new SkitBridge({
     host: $('sv-skit'), mount: $('skit-mount'), closeButton: $('close-skit'), characters,
     onClose: completed => {
+      const finishedEventId = state.eventId;
       leaveSkit(state, completed);
+      if (completed && finishedEventId) {
+        completedEvents.add(finishedEventId);
+        notice('ひとつの記憶を見届けました。星界を歩き続けられます。');
+      }
       $('world').inert = false;
       $('world').removeAttribute('aria-hidden');
       sync();
@@ -87,14 +93,13 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     const event = nearbyEvent(state, events, map);
     const id = event?.id || null;
     const entering = Boolean(event) && id !== lastPrompt;
+    const completed = Boolean(id && completedEvents.has(id));
 
-    // Always refresh visibility. This matters after returning from a skit at the
-    // same position: the button was hidden during the skit and must become tappable again.
     $('interact').hidden = !event;
     $('guide').textContent = event
-      ? 'ふたりがいる。話しかけてみよう'
-      : '上へ押し出す：歩く ／ 左右：向きを変える ／ 指を離す：止まる';
-    if (event) $('interact').textContent = event.label;
+      ? (completed ? 'この記憶は見届けた。もう一度たどることもできる' : 'ここに、ふたりとの記憶が残っている')
+      : '上：歩く ／ 左右：曲がる ／ 指を離す：止まる';
+    if (event) $('interact').textContent = completed ? 'もう一度この記憶を見る' : event.label;
 
     if (entering) input.stopMovement();
     lastPrompt = id;
@@ -141,8 +146,6 @@ export async function startGame({ initialAudio = null, initialSoundEnabled = fal
     world.resize(); sync(); $('world').focus({ preventScroll: true }); startLoop();
   }
 
-  // Controls sit above the full-screen gesture surface. Stop propagation at the
-  // button boundary so a tap can never be interpreted as a locomotion gesture.
   on($('interact'), 'pointerdown', e => { e.stopPropagation(); input.stopMovement(); });
   on($('interact'), 'click', e => { e.stopPropagation(); interact(); });
   on($('sound'), 'click', e => { e.stopPropagation(); audio.toggle(); });
