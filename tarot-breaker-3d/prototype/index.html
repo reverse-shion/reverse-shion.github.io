@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#101526">
-  <title>TAROT BREAKER 3D — 星界の小さな散歩</title>
+  <title>TAROT BREAKER 3D — 1000年前のシオンの記憶</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="../../css/shiopon-skit.css?v=p2-1.3.0">
-  <link rel="stylesheet" href="./css/prototype.css?v=p2-1.3.0">
-  <link rel="stylesheet" href="./css/mobile-controls.css?v=p2-1.3.0">
+  <link rel="stylesheet" href="../../css/shiopon-skit.css?v=p2-1.4.0">
+  <link rel="stylesheet" href="./css/prototype.css?v=p2-1.4.0">
+  <link rel="stylesheet" href="./css/mobile-controls.css?v=p2-1.4.0">
 </head>
 <body>
-  <main id="world" aria-label="1000年前の星界" tabindex="-1">
-    <canvas id="scene" aria-label="シオンの目で歩く星界の回廊"></canvas>
+  <main id="world" aria-label="1000年前のシオンの記憶" tabindex="-1">
+    <canvas id="scene" aria-label="シオンの視界で追体験する星界の回廊"></canvas>
     <div id="look" aria-label="左側を指で動かして移動、右側をドラッグして見回す"></div>
     <header class="hud">
-      <div><span class="eyebrow">TAROT BREAKER</span><p>1000年前の星界 <span>／ 回廊の試作</span></p></div>
+      <div><span class="eyebrow">TAROT BREAKER</span><p>1000年前の星界 <span>／ シオンの記憶</span></p></div>
       <button id="sound" type="button" aria-pressed="true">音楽 ON</button>
     </header>
-    <p id="guide" class="guide">左側を上へなぞる：前進 ／ 右側をなぞる：視点</p>
+    <p id="guide" class="guide">シオンの視界 ｜ 左：移動 ／ 右：視点</p>
     <div class="reticle" aria-hidden="true">·</div>
     <div id="controls" hidden>
       <div id="stick" aria-hidden="true"><span id="thumb"></span><span class="stick-label">移動</span></div>
@@ -31,12 +31,12 @@
 
   <section id="start-screen" class="screen" aria-labelledby="start-title">
     <div class="intro">
-      <p class="eyebrow">TAROT BREAKER · PHASE 2</p>
-      <h1 id="start-title">星界の<br>小さな散歩</h1>
-      <p class="lead">シオンの目で歩く、1000年前。<br>正面の光へ向かうと、ふたりとの会話が始まります。</p>
-      <p class="instructions">左半分の好きな場所に指を置き、そのまま上へなぞると前進します。<br>右半分をなぞると視点が動きます。画面上に移動スティックは表示しません。</p>
-      <button id="start" class="primary" type="button">GAME START</button>
-      <p id="start-status" role="status">ゲーム開始のタップで音楽もONにします。いつでも右上からOFFにできます。</p>
+      <p class="eyebrow">TAROT BREAKER · MEMORY</p>
+      <h1 id="start-title">1000年前の<br>シオンの記憶</h1>
+      <p class="lead">これは、あなた自身がシオンになる物語ではありません。<br>星に残された記憶をたどり、観測者としてシオンの視界を追体験します。</p>
+      <p class="instructions">左半分に触れたら、待たずにそのまま指を動かして移動。<br>右半分をなぞると視点が動きます。長押しも、移動スティックを探す操作も不要です。</p>
+      <button id="start" class="primary" type="button">記憶をたどる</button>
+      <p id="start-status" role="status">正面の光へ進むと、しおぽんとリュミエールとの記憶が始まります。</p>
       <noscript>この試作にはJavaScriptが必要です。</noscript>
     </div>
   </section>
@@ -44,8 +44,8 @@
   <section id="pause-screen" class="screen" hidden aria-labelledby="pause-title">
     <div class="intro compact">
       <h2 id="pause-title">一時停止</h2>
-      <p id="pause-message">ゲームを一時停止しました。</p>
-      <button id="resume" class="primary" type="button">ゲームに戻る</button>
+      <p id="pause-message">記憶の追体験を一時停止しました。</p>
+      <button id="resume" class="primary" type="button">記憶へ戻る</button>
     </div>
   </section>
 
@@ -55,7 +55,7 @@
       <section class="sv-overlay-panel" role="dialog" aria-modal="true" aria-label="シオン・しおぽん・リュミエールの会話" tabindex="-1">
         <div class="skit-toolbar">
           <button id="skit-sound" type="button" aria-pressed="true">音楽 ON</button>
-          <button id="close-skit" type="button">星界へ戻る ×</button>
+          <button id="close-skit" type="button">記憶の回廊へ戻る ×</button>
         </div>
         <div class="sv-overlay-body"><div id="skit-mount" class="sv-engine-root"></div></div>
       </section>
@@ -63,7 +63,7 @@
   </div>
 
   <p id="notice" class="notice" role="status" hidden></p>
-  <script src="../../js/skitEngine.js?v=p2-1.3.0"></script>
-  <script type="module" src="./js/boot.js?v=p2-1.3.0"></script>
+  <script src="../../js/skitEngine.js?v=p2-1.4.0"></script>
+  <script type="module" src="./js/boot.js?v=p2-1.4.0"></script>
 </body>
 </html>
