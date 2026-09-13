@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#0b1029">
-  <title>TAROT BREAKER — 当たり判定エディタ</title>
-  <link rel="stylesheet" href="./collision-editor.css?v=editor-1">
+  <title>TAROT BREAKER — 当たり判定エディタ v2</title>
+  <link rel="stylesheet" href="./collision-editor.css?v=editor-2">
 </head>
 <body>
   <main id="editor" aria-label="星門庭園 当たり判定エディタ">
@@ -18,7 +18,7 @@
 
     <section class="topbar">
       <div>
-        <strong>当たり判定エディタ</strong>
+        <strong>当たり判定エディタ v2</strong>
         <span id="status">読み込み中…</span>
       </div>
       <button id="reset-view" type="button">全体表示</button>
@@ -26,29 +26,38 @@
 
     <section class="modebar" aria-label="編集モード">
       <button id="mode-pan" class="active" type="button">移動</button>
-      <button id="mode-draw" type="button">歩行エリアを描く</button>
+      <button id="mode-edit" type="button">点を修正</button>
+      <button id="mode-draw" type="button">新規範囲</button>
+    </section>
+
+    <section class="selectionbar" id="selectionbar">
+      <span id="selection-label">範囲未選択</span>
+      <button id="add-vertex" type="button">辺に点追加</button>
+      <button id="delete-vertex" type="button">選択点削除</button>
+      <button id="delete-selected-poly" class="danger" type="button">範囲削除</button>
     </section>
 
     <section class="actions" aria-label="編集操作">
       <button id="undo-point" type="button">1点戻す</button>
-      <button id="finish-poly" type="button">この範囲を確定</button>
-      <button id="delete-poly" type="button">最後の範囲を削除</button>
+      <button id="finish-poly" type="button">新規範囲を確定</button>
+      <button id="reload-official" type="button">GitHub版を再読込</button>
       <button id="clear-all" class="danger" type="button">全消去</button>
       <button id="copy-json" class="primary" type="button">JSONをコピー</button>
     </section>
 
     <aside id="help" class="help">
-      <b>使い方</b><br>
-      ①「移動」でドラッグ／ピンチして位置を合わせる<br>
-      ②「歩行エリアを描く」にして通路の端を順番にタップ<br>
-      ③ 3点以上置いたら「この範囲を確定」<br>
-      ④ 通路が分かれる場所は複数の範囲に分けてOK<br>
-      ⑤ 最後に「JSONをコピー」
+      <b>修正のしかた</b><br>
+      ①「点を修正」→ 緑の範囲をタップして選択<br>
+      ② 黄色い点を指でドラッグして境界を動かす<br>
+      ③ 点を消すときは点を選んで「選択点削除」<br>
+      ④ 点を増やすときは「辺に点追加」→ 追加したい辺をタップ<br>
+      ⑤ 新しい通路は「新規範囲」で描く<br>
+      ⑥ 完了したら「JSONをコピー」してこのチャットへ貼る
       <button id="close-help" type="button" aria-label="説明を閉じる">×</button>
     </aside>
 
     <textarea id="json-output" class="json-output" readonly hidden></textarea>
   </main>
-  <script src="./collision-editor.js?v=editor-1" defer></script>
+  <script src="./collision-editor.js?v=editor-2" defer></script>
 </body>
 </html>
