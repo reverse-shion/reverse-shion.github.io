@@ -17,7 +17,7 @@
   const SPEED = 155;
   const DPR_LIMIT = 2;
   const FRAME = { w: 384, h: 512, baseline: 480, count: 4 };
-  const DRAW_HEIGHT = 52;
+  const DRAW_HEIGHT = 65;
   const RAW = 'https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/sprites/shion/';
   const files = {
     idle: RAW + 'shion_idle.png',
