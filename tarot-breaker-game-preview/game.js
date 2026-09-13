@@ -18,6 +18,8 @@
   const DPR_LIMIT = 2;
   const FRAME = { w: 384, h: 512, baseline: 480, count: 4 };
   const DRAW_HEIGHT = 65;
+  const CAMERA_MIN_ZOOM = 1.0;
+  const CAMERA_MAX_ZOOM = 1.22;
   const RAW = 'https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/sprites/shion/';
   const files = {
     idle: RAW + 'shion_idle.png',
@@ -102,7 +104,7 @@
     canvas.width = Math.round(cssWidth * dpr);
     canvas.height = Math.round(cssHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    camera.zoom = clamp(Math.min(cssWidth / 620, cssHeight / 560), 0.88, 1.22);
+    camera.zoom = clamp(Math.min(cssWidth / 620, cssHeight / 560), CAMERA_MIN_ZOOM, CAMERA_MAX_ZOOM);
   }
 
   function reset() {
