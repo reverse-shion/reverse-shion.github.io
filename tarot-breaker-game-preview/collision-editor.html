@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#0b1029">
+  <title>TAROT BREAKER — 当たり判定エディタ</title>
+  <link rel="stylesheet" href="./collision-editor.css?v=editor-1">
+</head>
+<body>
+  <main id="editor" aria-label="星門庭園 当たり判定エディタ">
+    <div id="viewport" class="viewport">
+      <div id="world" class="world">
+        <img id="map" src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/maps/star-country-gate-garden.webp" alt="星門庭園" draggable="false">
+        <svg id="overlay" viewBox="0 0 1448 1086" aria-hidden="true"></svg>
+      </div>
+    </div>
+
+    <section class="topbar">
+      <div>
+        <strong>当たり判定エディタ</strong>
+        <span id="status">読み込み中…</span>
+      </div>
+      <button id="reset-view" type="button">全体表示</button>
+    </section>
+
+    <section class="modebar" aria-label="編集モード">
+      <button id="mode-pan" class="active" type="button">移動</button>
+      <button id="mode-draw" type="button">歩行エリアを描く</button>
+    </section>
+
+    <section class="actions" aria-label="編集操作">
+      <button id="undo-point" type="button">1点戻す</button>
+      <button id="finish-poly" type="button">この範囲を確定</button>
+      <button id="delete-poly" type="button">最後の範囲を削除</button>
+      <button id="clear-all" class="danger" type="button">全消去</button>
+      <button id="copy-json" class="primary" type="button">JSONをコピー</button>
+    </section>
+
+    <aside id="help" class="help">
+      <b>使い方</b><br>
+      ①「移動」でドラッグ／ピンチして位置を合わせる<br>
+      ②「歩行エリアを描く」にして通路の端を順番にタップ<br>
+      ③ 3点以上置いたら「この範囲を確定」<br>
+      ④ 通路が分かれる場所は複数の範囲に分けてOK<br>
+      ⑤ 最後に「JSONをコピー」
+      <button id="close-help" type="button" aria-label="説明を閉じる">×</button>
+    </aside>
+
+    <textarea id="json-output" class="json-output" readonly hidden></textarea>
+  </main>
+  <script src="./collision-editor.js?v=editor-1" defer></script>
+</body>
+</html>
