@@ -20,6 +20,9 @@
   const DRAW_HEIGHT = 65;
   const CAMERA_MIN_ZOOM = 1.0;
   const CAMERA_MAX_ZOOM = 1.22;
+  const CAMERA_BASE_OFFSET_Y = 58;
+  const CAMERA_LOOK_AHEAD_Y = 28;
+
   const RAW = 'https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/sprites/shion/';
   const files = {
     idle: RAW + 'shion_idle.png',
@@ -40,7 +43,7 @@
   const keys = new Set();
   const stick = { active: false, id: null, ox: 0, oy: 0, x: 0, y: 0 };
   const player = { x: SPAWN.x, y: SPAWN.y, dir: 'up', moving: false, frame: 0 };
-  const camera = { x: SPAWN.x, y: SPAWN.y - 42, zoom: 1 };
+  const camera = { x: SPAWN.x, y: SPAWN.y - CAMERA_BASE_OFFSET_Y, zoom: 1 };
 
   let world = { w: REF.w, h: REF.h };
   let scale = { x: 1, y: 1 };
@@ -114,7 +117,7 @@
     player.moving = false;
     player.frame = 0;
     camera.x = player.x;
-    camera.y = player.y - 42 * scale.y;
+    camera.y = player.y - CAMERA_BASE_OFFSET_Y * scale.y;
   }
 
   function inputVector() {
@@ -161,14 +164,21 @@
     }
   }
 
+  function cameraOffsetY() {
+    let offset = CAMERA_BASE_OFFSET_Y;
+    if (player.moving && player.dir === 'up') offset += CAMERA_LOOK_AHEAD_Y;
+    if (player.moving && player.dir === 'down') offset -= CAMERA_LOOK_AHEAD_Y;
+    return offset * scale.y;
+  }
+
   function updateCamera(dt) {
     const viewW = cssWidth / camera.zoom;
     const viewH = cssHeight / camera.zoom;
     const halfW = viewW / 2;
     const halfH = viewH / 2;
     const targetX = clamp(player.x, halfW, Math.max(halfW, world.w - halfW));
-    const targetY = clamp(player.y - 42 * scale.y, halfH, Math.max(halfH, world.h - halfH));
-    const ease = 1 - Math.exp(-7 * dt);
+    const targetY = clamp(player.y - cameraOffsetY(), halfH, Math.max(halfH, world.h - halfH));
+    const ease = 1 - Math.exp(-6.5 * dt);
     camera.x += (targetX - camera.x) * ease;
     camera.y += (targetY - camera.y) * ease;
   }
@@ -182,18 +192,55 @@
     };
   }
 
+  function spriteFrame() {
+    const idleIndex = { down: 0, up: 1, left: 2, right: 3 }[player.dir];
+    return {
+      image: player.moving ? images[player.dir] : images.idle,
+      sourceX: (player.moving ? player.frame : idleIndex) * FRAME.w
+    };
+  }
+
+  function drawSpritePass(image, sourceX, dx, dy, drawW, drawH, shadowColor, shadowBlur) {
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.shadowColor = shadowColor;
+    ctx.shadowBlur = shadowBlur / camera.zoom;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.drawImage(image, sourceX, 0, FRAME.w, FRAME.h, dx, dy, drawW, drawH);
+    ctx.restore();
+  }
+
   function drawPlayer() {
     const scaleDraw = DRAW_HEIGHT / FRAME.h;
     const drawW = FRAME.w * scaleDraw;
     const drawH = FRAME.h * scaleDraw;
     const dx = player.x - drawW / 2;
     const dy = player.y - FRAME.baseline * scaleDraw;
-    const idleIndex = { down: 0, up: 1, left: 2, right: 3 }[player.dir];
-    const image = player.moving ? images[player.dir] : images.idle;
-    const sourceX = (player.moving ? player.frame : idleIndex) * FRAME.w;
+    const { image, sourceX } = spriteFrame();
 
+    drawSpritePass(image, sourceX, dx, dy, drawW, drawH, 'rgba(255,236,190,.22)', 5.0);
+    drawSpritePass(image, sourceX, dx, dy, drawW, drawH, 'rgba(6,9,28,.86)', 2.0);
+
+    ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(image, sourceX, 0, FRAME.w, FRAME.h, dx, dy, drawW, drawH);
+    ctx.restore();
+  }
+
+  function drawGroundShadow() {
+    ctx.save();
+    ctx.translate(player.x, player.y + 2);
+    ctx.scale(1, 0.34);
+    const gradient = ctx.createRadialGradient(0, 0, 2, 0, 0, 17);
+    gradient.addColorStop(0, 'rgba(5,7,20,.46)');
+    gradient.addColorStop(0.62, 'rgba(5,7,20,.28)');
+    gradient.addColorStop(1, 'rgba(5,7,20,0)');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, 17, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
   function draw() {
@@ -207,11 +254,7 @@
     ctx.save();
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-origin.x, -origin.y);
-
-    ctx.fillStyle = 'rgba(12,10,30,.22)';
-    ctx.beginPath();
-    ctx.ellipse(player.x, player.y + 1, 10, 3.5, 0, 0, Math.PI * 2);
-    ctx.fill();
+    drawGroundShadow();
     drawPlayer();
     ctx.restore();
   }
@@ -330,7 +373,7 @@
       draw();
       start.disabled = false;
       start.textContent = '星の国へ';
-      note.textContent = `公開プレビュー / 正式シオン4方向4フレーム / ${world.w}×${world.h}`;
+      note.textContent = `公開プレビュー / 視認性ブラッシュアップ / ${world.w}×${world.h}`;
     } catch (error) {
       console.error(error);
       start.disabled = true;
