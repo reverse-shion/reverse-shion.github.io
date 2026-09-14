@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#0b1029">
-  <title>TAROT BREAKER — 当たり判定エディタ v2</title>
-  <link rel="stylesheet" href="./collision-editor.css?v=editor-2">
+  <title>TAROT BREAKER — 当たり判定エディタ v3</title>
+  <link rel="stylesheet" href="./collision-editor.css?v=editor-3">
 </head>
-<body>
+<body data-area-kind="walk">
   <main id="editor" aria-label="星門庭園 当たり判定エディタ">
     <div id="viewport" class="viewport">
       <div id="world" class="world">
@@ -18,7 +18,7 @@
 
     <section class="topbar">
       <div>
-        <strong>当たり判定エディタ v2</strong>
+        <strong>当たり判定エディタ v3</strong>
         <span id="status">読み込み中…</span>
       </div>
       <button id="reset-view" type="button">全体表示</button>
@@ -28,6 +28,11 @@
       <button id="mode-pan" class="active" type="button">移動</button>
       <button id="mode-edit" type="button">点を修正</button>
       <button id="mode-draw" type="button">新規範囲</button>
+    </section>
+
+    <section class="kindbar" aria-label="範囲の種類">
+      <button id="kind-walk" class="active walk" type="button">歩行可能（緑）</button>
+      <button id="kind-blocked" class="blocked" type="button">侵入禁止（赤）</button>
     </section>
 
     <section class="selectionbar" id="selectionbar">
@@ -46,18 +51,19 @@
     </section>
 
     <aside id="help" class="help">
-      <b>修正のしかた</b><br>
-      ①「点を修正」→ 緑の範囲をタップして選択<br>
-      ② 黄色い点を指でドラッグして境界を動かす<br>
-      ③ 点を消すときは点を選んで「選択点削除」<br>
-      ④ 点を増やすときは「辺に点追加」→ 追加したい辺をタップ<br>
-      ⑤ 新しい通路は「新規範囲」で描く<br>
-      ⑥ 完了したら「JSONをコピー」してこのチャットへ貼る
+      <b>歩ける場所／入れない場所を同じ画面で編集できます</b><br>
+      ① 緑の「歩行可能」か、赤の「侵入禁止」を選ぶ<br>
+      ②「新規範囲」→ 地図を順番にタップして点を置く<br>
+      ③ 最初の点を再タップ、または「新規範囲を確定」で完成<br>
+      ④「点を修正」なら緑・赤どちらの範囲も点を移動できます<br>
+      ⑤ 噴水・花壇・柱など、絶対に入れたくない場所は赤で囲む<br>
+      ⑥ 完了したら「JSONをコピー」してこのチャットへ貼る<br><br>
+      <b>判定：</b>緑の内側でも、赤の内側なら侵入できません。
       <button id="close-help" type="button" aria-label="説明を閉じる">×</button>
     </aside>
 
     <textarea id="json-output" class="json-output" readonly hidden></textarea>
   </main>
-  <script src="./collision-editor.js?v=editor-2" defer></script>
+  <script src="./collision-editor.js?v=editor-3" defer></script>
 </body>
 </html>
