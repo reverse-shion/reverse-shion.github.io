@@ -1,17 +1,29 @@
 {
-  "version": "preview-37",
+  "version": "preview-38",
   "repository": "reverse-shion/tarot-breaker-game",
-  "commit": "bab2d13dcf11d90b9215a4b53cf3ab456f2b753b",
-  "syncMode": "manual-preview37-separated-world-clouds",
-  "sourceRuntimeBlobs": {
-    "index.html": "7ba0d7e065e5f341a429b18182548069aa8aaf1d",
-    "game.css": "dd6414af5f4e58479cd250ad565159a14b0d146c",
-    "fountain-polish.css": "5c7a6498b6bb665978496cf7fa8d668f3db5e81d",
-    "cloud-motion-fix.css": "f5dd39b353db0f087b8a22bc5c2cf5dfc14d48c2"
-  },
+  "commit": "57e6f5608032e48bdf18aa3a326b6248f3de55be",
+  "syncMode": "manual-preview38-celestial-atmosphere",
   "artwork": {
-    "islands": "assets/maps/star-country-world-islands.webp",
-    "clouds": "assets/maps/star-country-world-clouds.webp"
+    "farthestSky": "assets/maps/star-country-farthest-sky-background.webp",
+    "nebulaStars": "assets/maps/star-country-gate-garden-star-sky.webp",
+    "clouds": "assets/maps/star-country-world-clouds.webp",
+    "islands": "assets/maps/star-country-world-islands.webp"
+  },
+  "motion": {
+    "farthestSky": "static world plate; no independent animation",
+    "nebulaDrift": "42s sub-percent alternate drift",
+    "nebulaShimmer": "8.5s subtle luminance shimmer",
+    "starTwinkle": "6.8s subtle sparkle",
+    "sunBloom": "7.5s fixed-position halo and scattering",
+    "cloudScroll": "64s continuous right-to-left, two-copy 200% track",
+    "cloudReducedMotion": "112s continuous right-to-left"
+  },
+  "cloudBlend": {
+    "opacity": 0.54,
+    "overlapPx": 3,
+    "scale": 1.016,
+    "blurPx": 0.55,
+    "blendMode": "screen"
   },
   "unchangedRuntime": [
     "game.js",
@@ -28,5 +40,10 @@
     "lumiere-outline.js"
   ],
   "collisionSha256": "671557d8a59b222ea2e625343b9f70b95dde11f89f14316031ba6e1b856bba25",
-  "note": "Preview 37 replaces the previous baked garden/cloud presentation with the newly uploaded separated world islands and cloud artwork. The islands remain static while exactly two copies of star-country-world-clouds.webp form one 200% track that moves continuously right-to-left by 50% over 64 seconds. The cloud layer is placed behind the islands and above the star sky; a 2px overlap reduces visible seams. Reduced Motion keeps the same one-way motion at 108 seconds. Fountain, waterfall, Star Gate, collision, navigation, dialogue, audio and actor logic remain unchanged. GitHub Actions run #128 passed."
+  "validation": {
+    "githubActionsRun": 139,
+    "testsPassed": 64,
+    "backgroundWebPIntegrity": "passed"
+  },
+  "note": "Preview 38 rebuilds the Star Country atmosphere as four responsibilities: a static farthest celestial sky, a low-opacity nebula/star layer with tiny shimmer and sub-percent drift, a fixed sun-light enhancement aligned to the baked sun, and a softened dedicated cloud layer that repeats continuously right-to-left. The islands and garden remain static above the atmosphere. Collision, navigation, dialogue, audio and actor logic are unchanged."
 }
