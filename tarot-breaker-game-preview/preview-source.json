@@ -1,13 +1,21 @@
 {
-  "version": "preview-38",
+  "version": "preview-39",
   "repository": "reverse-shion/tarot-breaker-game",
-  "commit": "ba64ef98ff18015ed8848cfb25b668ca1c54fc6c",
-  "syncMode": "manual-preview38-celestial-atmosphere",
+  "commit": "adfa69b702b74fe7be5014f699c2a008c24203fb",
+  "syncMode": "manual-preview39-avenue-alignment",
   "artwork": {
     "farthestSky": "assets/maps/star-country-farthest-sky-background.webp",
     "nebulaStars": "assets/maps/star-country-gate-garden-star-sky.webp",
     "clouds": "assets/maps/star-country-world-clouds.webp",
-    "islands": "assets/maps/star-country-world-islands.webp"
+    "islands": "assets/maps/star-country-world-islands.webp",
+    "ground": "assets/maps/star-country-gate-garden-ground.webp",
+    "foreground": "assets/maps/star-country-gate-garden-foreground.webp"
+  },
+  "alignment": {
+    "groundReference": "kept fixed on the authored avenue/fountain centreline",
+    "foregroundOffsetReferencePx": {"x": -12, "y": 0},
+    "occludersFollowForeground": true,
+    "foregroundSolidBasesFollowOffset": true
   },
   "motion": {
     "farthestSky": "static world plate; no independent animation",
@@ -30,25 +38,11 @@
     "cloudsBlob": "8b670bab5488dcf0639cdf137abf2d5afa5335e4",
     "nebulaStarsBlob": "53104581aa07c18ba5570f6d5aeb60d2b163f21d"
   },
-  "unchangedRuntime": [
-    "game.js",
-    "game.css",
-    "scene-layout.js",
-    "scene-effects.js",
-    "navigation.js",
-    "blocked-collision.js",
-    "controls.js",
-    "dialogue.js",
-    "dialogue.css",
-    "audio.js",
-    "audio.css",
-    "lumiere-outline.js"
-  ],
   "collisionSha256": "671557d8a59b222ea2e625343b9f70b95dde11f89f14316031ba6e1b856bba25",
   "validation": {
-    "githubActionsRun": 140,
-    "testsPassed": 64,
+    "githubActionsRun": 142,
+    "status": "success",
     "backgroundWebPIntegrity": "passed"
   },
-  "note": "Preview 38 rebuilds the Star Country atmosphere as four responsibilities: a static farthest celestial sky, a low-opacity nebula/star layer with tiny shimmer and sub-percent drift, a fixed sun-light enhancement aligned to the baked sun, and a softened dedicated cloud layer that repeats continuously right-to-left. The full-quality uploaded farthest-sky WebP is pinned by blob SHA. The islands and garden remain static above the atmosphere. Collision, navigation, dialogue, audio and actor logic are unchanged."
+  "note": "Preview 39 corrects the split-map reconstruction around the main avenue. The authored ground, fountain and route centreline remain fixed; the foreground cutout is moved 12 reference pixels left so the flowerbeds, posts and front scenery sit back on the avenue axis. Foreground occlusion masks and local physical bases receive the same correction, preventing actor-depth and collision drift. Preview 38 celestial sky, sun, nebula and cloud motion remain unchanged."
 }
