@@ -1,10 +1,32 @@
 {
-  "version": "preview-40",
+  "version": "preview-41",
   "repository": "reverse-shion/tarot-breaker-game",
-  "commit": "5e750f8976e8b547dd671d5765c875ed1c2293fa",
-  "syncMode": "manual-preview40-foreground-and-gate-cleanup",
-  "alignment": {"foregroundOffsetReferencePx":{"x":-15,"y":0},"preview39DeltaPx":{"x":-3,"y":0},"occludersFollowForeground":true,"foregroundSolidBasesFollowOffset":true},
-  "gate": {"visibleBody":"authored map gate","standaloneHighDetailBaseVisible":false,"standaloneHighDetailBasePurpose":"mask-only source","innerLightParticleEventFx":"retained"},
-  "validation": {"githubActionsRun":146,"status":"success"},
-  "note": "Preview 40 shifts the split foreground three more reference pixels left (total x=-15) and hides the standalone high-detail Star Gate base so the authored map gate is the visible body. Foreground occluders and local solid bases follow the same offset; gate light/particle/event FX remain."
+  "runtimeCommit": "ba43f1ca699fd617c84cb5bedc83a5734592d2a3",
+  "transparentIslandsCommit": "2d8b4cec9b6dbb96f5dc0c4d8412f8a44acae59f",
+  "publicPreviewCommit": "614bea87a84b3106f159cdb55a18d3e8402fb153",
+  "syncMode": "preview41-authored-gate-and-transparent-islands",
+  "alignment": {
+    "foregroundOffsetReferencePx": {"x": -15, "y": 0},
+    "occludersFollowForeground": true,
+    "foregroundSolidBasesFollowOffset": true
+  },
+  "gate": {
+    "visibleBody": "authored split-map gate",
+    "standaloneHighDetailBaseVisible": false,
+    "standaloneHighDetailBasePurpose": "mask-only source",
+    "legacyGateRemovalDisabled": true,
+    "innerLightParticleEventFx": "retained"
+  },
+  "islands": {
+    "asset": "assets/maps/star-country-world-islands.webp",
+    "sourceCommit": "2d8b4cec9b6dbb96f5dc0c4d8412f8a44acae59f",
+    "reason": "use latest user-uploaded transparent plate instead of Preview 40 white-backed pinned asset"
+  },
+  "validation": {
+    "githubActionsRun": 149,
+    "status": "success",
+    "pagesRun": 4390,
+    "pagesStatus": "success"
+  },
+  "note": "Preview 41 fixes the Preview 40 regression where the standalone Star Gate was hidden but the authored gate was still erased from the split background/foreground canvases. The authored gate is now preserved while only its light/particle/event FX remain separate. It also pins the user-uploaded transparent world-islands WebP from main commit 2d8b4cec so white gaps no longer come from the older feature-branch asset."
 }
