@@ -1,11 +1,11 @@
 {
-  "version": "preview-43",
+  "version": "preview-44",
   "repository": "reverse-shion/tarot-breaker-game",
-  "runtimeCommit": "9a4c997221aea8dc91fa4799eadb3deff6ffd085",
-  "validatedHead": "9a4c997221aea8dc91fa4799eadb3deff6ffd085",
+  "runtimeCommit": "5d5b6bb903960106fb452d4ed6f44f1bffbc2c4b",
+  "validatedHead": "5d5b6bb903960106fb452d4ed6f44f1bffbc2c4b",
   "transparentIslandsCommit": "2d8b4cec9b6dbb96f5dc0c4d8412f8a44acae59f",
-  "publicPreviewCommit": "1830149adef03f809504703717792db341769ef9",
-  "syncMode": "preview43-authored-cloud-drift-crystal-depth-and-zero-gate-haze",
+  "publicPreviewCommit": "89d88aa71febd66e45d08e4d24d9e64eeb8719d8",
+  "syncMode": "preview44-three-copy-seamless-cloud-loop",
   "alignment": {
     "foregroundOffsetReferencePx": {"x": -15, "y": 0},
     "occludersFollowForeground": true,
@@ -13,7 +13,7 @@
   },
   "fountain": {
     "water": {"x": 650, "y": 409, "w": 300, "h": 176},
-    "crystal": {"x": 708, "y": 333, "w": 184, "h": 230, "deltaYFromPreview42": -20},
+    "crystal": {"x": 708, "y": 333, "w": 184, "h": 230},
     "glowY": 318,
     "sparkleY": 358,
     "detachedGoldRingVisible": false
@@ -29,24 +29,25 @@
   },
   "clouds": {
     "asset": "assets/maps/star-country-world-clouds.webp",
-    "copies": 2,
+    "copies": 3,
     "authoredSizePreserved": true,
     "direction": "right-to-left",
     "durationSeconds": 64,
     "opacity": 0.72,
+    "loopWindow": "middle copy to next identical copy",
+    "startTransform": "-33.333333%",
+    "endTransform": "-66.666667%",
+    "negativeAnimationDelay": false,
     "perCopyScale": false,
     "perCopyFilter": false,
+    "seamOverlapPx": 1,
     "edgeSoftening": "viewport mask only"
   },
-  "islands": {
-    "asset": "assets/maps/star-country-world-islands.webp",
-    "sourceCommit": "2d8b4cec9b6dbb96f5dc0c4d8412f8a44acae59f"
-  },
   "validation": {
-    "githubActionsRun": 159,
+    "githubActionsRun": 163,
     "status": "success",
-    "pagesRun": 4396,
+    "pagesRun": 4399,
     "pagesStatus": "success"
   },
-  "note": "Preview 43 keeps the uploaded cloud artwork at its authored size and moves two exact copies continuously from right to left with a simple compositor transform, removing scale, drop-shadow and heavy filtering that could stutter on iPhone Safari. The cloud layer is denser without enlarging the artwork. The crystal stack moves another 20 reference pixels toward the rear of the basin, the detached ring stays hidden, and all always-on Star Gate inner-light/particle haze around Lumiere is disabled while opt-in event FX remains available."
+  "note": "Preview 44 fixes the visible cloud pop at loop boundaries. The supplied cloud artwork is not enlarged. Three identical copies are buffered in one 300% track, and only the middle-to-next-copy interval is animated. The start and end frames therefore represent identical cloud pixels, eliminating the visible reset. The negative animation delay is removed, movement stays linear right-to-left, and a one-pixel overlap hides subpixel seams. Preview 43 crystal depth and zero always-on Lumiere gate haze remain unchanged."
 }
