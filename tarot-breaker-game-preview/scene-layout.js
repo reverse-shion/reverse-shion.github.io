@@ -15,6 +15,8 @@
     if (shape.type === "ellipse") return {...shape,cx:shape.cx+dx,cy:shape.cy+dy};
     return {...shape,points:shiftPoints(shape.points,dx,dy)};
   };
+  // The opening is at source x=720, not at the image centre (724).
+  // Align it to the stair star/centreline at x=800; Lumiere stays at (810,212).
   const gate = { x: 800 - 720 * 560 / 1448, y: -70, w: 560, h: 420,
     openingX: 800, baseline: 242 };
   const legacyGate = [[629,0],[997,0],[997,269],[946,281],[881,278],
@@ -24,10 +26,17 @@
     const dx = source === "foreground" ? foregroundOffset.x : 0;
     const dy = source === "foreground" ? foregroundOffset.y : 0;
     const [x,y,w,h] = bounds;
-    return {id,bounds:[x+dx,y+dy,w,h],baseline:baseline+dy,
-      footArea:shiftShape(footArea,dx,dy),source,
-      points:shiftPoints(points || rect(...bounds).points,dx,dy)};
+    return {
+      id,
+      bounds:[x+dx,y+dy,w,h],
+      baseline:baseline+dy,
+      footArea:shiftShape(footArea,dx,dy),
+      source,
+      points:shiftPoints(points || rect(...bounds).points,dx,dy),
+    };
   };
+  // Only real, local floor behind a visual may activate it. The long bridge
+  // supports hanging in empty sky are background, never occluders.
   const occluders = [
     occluder("west-bridge-post",[215,365,63,101],448,rect(215,398,67,50)),
     occluder("west-court-post",[558,374,60,100],463,rect(554,426,74,37)),
@@ -45,9 +54,13 @@
     occluder("gate-west-pillar",[743,65,34,181],242,rect(740,198,41,44),"gate"),
     occluder("gate-east-pillar",[830,65,34,181],242,rect(824,198,44,44),"gate"),
     occluder("gate-arch",[763,27,76,136],242,rect(772,180,57,62),"gate"),
+    // Only the raised front rim; the basin and crystal stay behind actors.
     occluder("fountain-front-rim",[625,543,350,66],608,rect(617,519,366,89),"fountain",
       [[627,543],[662,566],[706,585],[751,596],[800,600],[850,596],[895,585],[940,566],[973,543],[973,609],[625,609]])
   ];
+  // Small physical footprints, independent of masks. The authored walk polygons
+  // remain untouched; these only make the placed objects solid. Foreground
+  // posts follow the same horizontal correction as their visible cutout.
   const solidBases = [
     {type:"ellipse",cx:800,cy:533,rx:170,ry:75},
     rect(746,233,28,15), rect(831,233,28,15),
@@ -80,11 +93,15 @@
     ctx.save(); ctx.globalCompositeOperation = "destination-out";
     trace(ctx,shiftPoints(legacyGate,dx,dy)); ctx.fill(); ctx.restore();
   }
+  // Reuse the supplied star-sky behind a clipped hole. Source WebPs stay intact;
+  // no regenerated architecture, image re-encoding or opaque cover over actors.
   function paintBackground(ctx, background, sky) {
     ctx.clearRect(0,0,1448,1086);
     ctx.drawImage(background,0,0,1448,1086);
     const fill = ctx.createLinearGradient(0,0,0,290);
     fill.addColorStop(0,"#263b76"); fill.addColorStop(1,"#9b95ce");
+    // Soften only OUTSIDE the removal boundary: no old arch pixels survive
+    // in the opaque centre, and the reused sky has no hard rectangular seam.
     for(let band=16;band>=0;band-=2) {
       const points=legacyGate.map(([x,y])=>[800+(x-800)*(1+band/175),140+(y-140)*(1+band/175)]);
       ctx.save();trace(ctx,points);ctx.clip();ctx.globalAlpha=band===0?1:.2;
@@ -97,10 +114,15 @@
     ctx.drawImage(foreground,foregroundOffset.x,foregroundOffset.y,1448,1086);
     removeLegacyGate(ctx,foregroundOffset.x,foregroundOffset.y);
   }
+  // Derive two runtime masks from the existing artwork. The upright crystal
+  // uses its own blue facet texture underneath the removed gold crossing;
+  // only the detached gold gimbal rotates. No new raster asset is required.
   function splitCrystal(core, ring, image) {
     const w=image.naturalWidth || image.width, h=image.naturalHeight || image.height;
     core.clearRect(0,0,w,h);core.drawImage(image,0,0,w,h);
     const original=core.getImageData(0,0,w,h);
+    // Keep the tip ornaments. Reuse the unobstructed upper blue facets to
+    // complete the upright body beneath the source's broad star/metal bands.
     core.clearRect(0,140*h/1254,w,970*h/1254);
     core.save();core.scale(w/1254,h/1254);
     const silhouette=[[624,136],[747,355],[754,580],[738,744],[693,930],[638,1107],[621,1107],[550,938],[510,752],[493,577],[505,355]];
@@ -119,6 +141,10 @@
       if(p[3]>240 && !gold && !contains(point,star) && contains(point,{type:"poly",points:silhouette})) restored.data.set(p,i);
     }
     core.putImageData(restored,0,0);
+    // The source hides its rear ring behind the crystal. Trace the same three
+    // gold hoops as complete paths instead of rotating those missing pixels.
+    // This is a lightweight code-native gimbal, with colours/shapes taken from
+    // the supplied artwork; the crystal itself remains the supplied texture.
     ring.clearRect(0,0,w,h);ring.save();ring.scale(w/1254,h/1254);
     const metal=ring.createLinearGradient(210,350,1020,950);
     metal.addColorStop(0,"#a56922");metal.addColorStop(.2,"#f7cf72");
