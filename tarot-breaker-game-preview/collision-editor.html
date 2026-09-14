@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#0b1029">
   <title>TAROT BREAKER — 当たり判定エディタ v3</title>
-  <link rel="stylesheet" href="./collision-editor.css?v=editor-3">
+  <link rel="stylesheet" href="./collision-editor.css?v=editor-5">
 </head>
-<body data-area-kind="walk">
+<body data-area-kind="walk" class="tools-collapsed labels-minimal">
   <main id="editor" aria-label="星門庭園 当たり判定エディタ">
     <div id="viewport" class="viewport">
       <div id="world" class="world">
@@ -17,11 +17,15 @@
     </div>
 
     <section class="topbar">
-      <div>
+      <div class="topbar__status">
         <strong>当たり判定エディタ v3</strong>
         <span id="status">読み込み中…</span>
       </div>
-      <button id="reset-view" type="button">全体表示</button>
+      <div class="topbar__actions">
+        <button id="label-toggle" type="button" aria-pressed="false">番号：選択のみ</button>
+        <button id="reset-view" type="button">全体表示</button>
+        <button id="editor-tools-toggle" class="primary-toggle" type="button" aria-expanded="false">編集</button>
+      </div>
     </section>
 
     <section class="modebar" aria-label="編集モード">
@@ -52,11 +56,11 @@
 
     <aside id="help" class="help">
       <b>歩ける場所／入れない場所を同じ画面で編集できます</b><br>
-      ① 緑の「歩行可能」か、赤の「侵入禁止」を選ぶ<br>
-      ②「新規範囲」→ 地図を順番にタップして点を置く<br>
-      ③ 最初の点を再タップ、または「新規範囲を確定」で完成<br>
-      ④「点を修正」なら緑・赤どちらの範囲も点を移動できます<br>
-      ⑤ 噴水・花壇・柱など、絶対に入れたくない場所は赤で囲む<br>
+      ① 右上の「編集」でメニューを開く<br>
+      ② 緑の「歩行可能」か、赤の「侵入禁止」を選ぶ<br>
+      ③「新規範囲」→ 地図を順番にタップして点を置く<br>
+      ④ 最初の点を再タップ、または「新規範囲を確定」で完成<br>
+      ⑤「点を修正」なら緑・赤どちらの範囲も点を移動できます<br>
       ⑥ 完了したら「JSONをコピー」してこのチャットへ貼る<br><br>
       <b>判定：</b>緑の内側でも、赤の内側なら侵入できません。
       <button id="close-help" type="button" aria-label="説明を閉じる">×</button>
@@ -65,5 +69,6 @@
     <textarea id="json-output" class="json-output" readonly hidden></textarea>
   </main>
   <script src="./collision-editor.js?v=editor-4" defer></script>
+  <script src="./collision-editor-ui.js?v=editor-5" defer></script>
 </body>
 </html>
