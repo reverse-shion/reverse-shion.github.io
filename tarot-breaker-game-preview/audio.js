@@ -9,7 +9,7 @@
   const NORMAL_VOLUME = 0.35;
   const INTERACTION_VOLUME = 0.16;
   const FADE_MS = 320;
-  const BGM_SRC = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/audio/bgm/hoshi-no-kioku_toki-no-inori.mp3";
+  const BGM_SRC = document.currentScript?.dataset.bgmUrl || "./assets/audio/bgm/hoshi-no-kioku_toki-no-inori.mp3";
 
   const bgm = new Audio(BGM_SRC);
   bgm.loop = true;
@@ -24,19 +24,28 @@
   let fadeToken = 0;
 
   function readPreference() {
-    try { return localStorage.getItem(STORAGE_KEY) !== "0"; }
-    catch { return true; }
+    try {
+      return localStorage.getItem(STORAGE_KEY) !== "0";
+    } catch {
+      return true;
+    }
   }
 
   function savePreference() {
-    try { localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0"); }
-    catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
+    } catch {
+      // Private browsing or storage restrictions must not block the game.
+    }
   }
 
   function renderToggle() {
     toggleButton.dataset.enabled = String(enabled);
     toggleButton.setAttribute("aria-pressed", String(enabled));
-    toggleButton.setAttribute("aria-label", enabled ? "BGMをオフにする" : "BGMをオンにする");
+    toggleButton.setAttribute(
+      "aria-label",
+      enabled ? "BGMをオフにする" : "BGMをオンにする",
+    );
     toggleButton.title = enabled ? "BGM ON" : "BGM OFF";
     toggleButton.textContent = enabled ? "♪" : "♪×";
   }
@@ -52,19 +61,25 @@
     const token = fadeToken;
     const from = bgm.volume;
     const to = Math.max(0, Math.min(1, nextVolume));
+
     if (duration <= 0 || Math.abs(from - to) < 0.001) {
       bgm.volume = to;
       onComplete?.();
       return;
     }
+
     const startedAt = performance.now();
     const step = (now) => {
       if (token !== fadeToken) return;
       const progress = Math.min(1, (now - startedAt) / duration);
       const eased = 1 - Math.pow(1 - progress, 3);
       bgm.volume = from + (to - from) * eased;
-      if (progress < 1) fadeFrame = requestAnimationFrame(step);
-      else { fadeFrame = 0; onComplete?.(); }
+      if (progress < 1) {
+        fadeFrame = requestAnimationFrame(step);
+        return;
+      }
+      fadeFrame = 0;
+      onComplete?.();
     };
     fadeFrame = requestAnimationFrame(step);
   }
@@ -74,7 +89,10 @@
     try {
       const playResult = bgm.play();
       if (playResult?.then) await playResult;
-      if (!enabled || document.hidden) { bgm.pause(); return; }
+      if (!enabled || document.hidden) {
+        bgm.pause();
+        return;
+      }
       fadeTo(targetVolume);
     } catch (error) {
       console.warn("BGMを再生できませんでした", error);
@@ -108,7 +126,9 @@
   }
 
   startButton.addEventListener("click", enterWorld, { capture: true });
-  toggleButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+  toggleButton.addEventListener("pointerdown", (event) => {
+    event.stopPropagation();
+  });
   toggleButton.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -140,9 +160,14 @@
   });
 
   renderToggle();
+
   window.TarotAudio = Object.freeze({
-    get enabled() { return enabled; },
-    get enteredWorld() { return enteredWorld; },
+    get enabled() {
+      return enabled;
+    },
+    get enteredWorld() {
+      return enteredWorld;
+    },
     setEnabled,
   });
 })();

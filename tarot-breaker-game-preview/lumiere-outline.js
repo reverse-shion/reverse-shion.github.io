@@ -39,6 +39,9 @@
       return originalDrawImage.call(this, image, ...args);
     }
 
+    // Lumiere shares the world's outline language with Shion, but keeps a
+    // softer navy-violet edge so the spirit-like, luminous impression remains.
+    // One final draw only: no duplicated body, no black underpaint, no broad halo.
     this.save();
     this.imageSmoothingEnabled = false;
     this.shadowColor = OUTLINE_COLOR;

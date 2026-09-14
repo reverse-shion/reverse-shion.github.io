@@ -3,12 +3,7 @@
 
   const SHIOPON_HOME = { x: 810, y: 800 };
   const LUMIERE_HOME = { x: 810, y: 212 };
-  const REF = { w: 1448, h: 1086 };
   const TRIGGERS = { shiopon: 62, lumiere: 70 };
-  const FOLLOW_HIDE_RADIUS = 96;
-  const FOLLOW_DISTANCE = 42;
-  const FOLLOW_SPEED = 170;
-  const SHIOPON_ASSET_BASE = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/sprites/shiopon/";
 
   const scripts = {
     shioponMeet: [
@@ -148,35 +143,39 @@
     lumiereDone: false,
     joined: false,
     player: { x: 724, y: 1015 },
-    playerDir: "up",
-    follower: { x: 810, y: 800, dir: "up", frame: 0, anim: 0 },
     objective: "",
   };
 
-  const distance = (a,b) => Math.hypot(a.x-b.x, a.y-b.y);
+  const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
   function makeUi() {
     const shell = document.getElementById("game-shell");
     if (!shell || document.getElementById("dialogue-layer")) return;
+
     const dialogue = document.createElement("section");
     dialogue.id = "dialogue-layer";
     dialogue.className = "dialogue-layer";
     dialogue.hidden = true;
     dialogue.setAttribute("aria-live", "polite");
-    dialogue.innerHTML = `<button id="dialogue-advance" class="dialogue-box" type="button" aria-label="会話を進める"><span id="dialogue-speaker" class="dialogue-speaker"></span><span id="dialogue-text" class="dialogue-text"></span><span class="dialogue-next" aria-hidden="true">▼</span></button>`;
+    dialogue.innerHTML = `
+      <button id="dialogue-advance" class="dialogue-box" type="button" aria-label="会話を進める">
+        <span id="dialogue-speaker" class="dialogue-speaker"></span>
+        <span id="dialogue-text" class="dialogue-text"></span>
+        <span class="dialogue-next" aria-hidden="true">▼</span>
+      </button>`;
     shell.appendChild(dialogue);
+
     const objective = document.createElement("aside");
     objective.id = "story-objective";
     objective.className = "story-objective";
     objective.hidden = true;
     shell.appendChild(objective);
-    const follower = document.createElement("div");
-    follower.id = "party-shiopon";
-    follower.className = "party-shiopon";
-    follower.hidden = true;
-    follower.setAttribute("aria-hidden", "true");
-    shell.appendChild(follower);
-    document.getElementById("dialogue-advance").addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); advance(); });
+
+    document.getElementById("dialogue-advance").addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      advance();
+    });
   }
 
   function showObjective(text) {
@@ -187,13 +186,29 @@
     el.hidden = !text;
   }
 
+  function runLineCue() {
+    if (story.eventId !== "shioponMeet") return;
+    if (story.lineIndex === 0)
+      window.dispatchEvent(new Event("tarot-breaker:shiopon-face-player"));
+    if (story.lineIndex === 55)
+      window.dispatchEvent(new Event("tarot-breaker:shiopon-race-start"));
+    if (story.lineIndex === 58)
+      window.dispatchEvent(new Event("tarot-breaker:shiopon-trip"));
+    if (story.lineIndex === 61)
+      window.dispatchEvent(new Event("tarot-breaker:shiopon-recover"));
+  }
+
   function renderLine() {
     const line = scripts[story.eventId]?.[story.lineIndex];
     if (!line) return finishEvent();
-    const [speaker,text] = line;
-    document.getElementById("dialogue-speaker").textContent = speaker;
-    document.getElementById("dialogue-text").textContent = text;
+    const [speaker, text] = line;
+    const speakerEl = document.getElementById("dialogue-speaker");
+    const textEl = document.getElementById("dialogue-text");
+    if (!speakerEl || !textEl) return;
+    speakerEl.textContent = speaker;
+    textEl.textContent = text;
     document.getElementById("dialogue-layer").dataset.speaker = speaker;
+    runLineCue();
   }
 
   function startEvent(eventId) {
@@ -203,10 +218,11 @@
     story.eventId = eventId;
     story.lineIndex = 0;
     document.getElementById("guide")?.setAttribute("hidden", "");
-    document.getElementById("dialogue-layer").hidden = false;
+    const layer = document.getElementById("dialogue-layer");
+    layer.hidden = false;
     window.dispatchEvent(new Event("tarot-breaker:interaction-start"));
     renderLine();
-    queueMicrotask(() => document.getElementById("dialogue-advance")?.focus({preventScroll:true}));
+    queueMicrotask(() => document.getElementById("dialogue-advance")?.focus({ preventScroll: true }));
   }
 
   function finishEvent() {
@@ -216,18 +232,20 @@
     story.lineIndex = 0;
     const layer = document.getElementById("dialogue-layer");
     if (layer) layer.hidden = true;
+
     if (completed === "shioponMeet") {
+      window.dispatchEvent(new Event("tarot-breaker:shiopon-recover"));
       story.shioponDone = true;
       story.joined = true;
-      story.follower.x = SHIOPON_HOME.x;
-      story.follower.y = SHIOPON_HOME.y;
       showObjective("星門へ向かう");
+      window.dispatchEvent(new Event("tarot-breaker:shiopon-follow-start"));
     } else if (completed === "lumiereGate") {
       story.lumiereDone = true;
       showObjective("星門の様子を確かめる");
     }
+
     window.dispatchEvent(new Event("tarot-breaker:interaction-end"));
-    document.getElementById("game")?.focus?.({preventScroll:true});
+    document.getElementById("game")?.focus?.({ preventScroll: true });
   }
 
   function advance() {
@@ -236,75 +254,21 @@
     renderLine();
   }
 
-  function observePlayer(next,dt) {
+  function observePlayer(next) {
     story.player.x = next.x;
     story.player.y = next.y;
-    if (Math.abs(next.dx) > Math.abs(next.dy) && Math.abs(next.dx) > 1e-5) story.playerDir = next.dx < 0 ? "left" : "right";
-    else if (Math.abs(next.dy) > 1e-5) story.playerDir = next.dy < 0 ? "up" : "down";
-    updateFollower(dt);
     if (story.active) return;
-    if (!story.shioponDone && distance(story.player, SHIOPON_HOME) <= TRIGGERS.shiopon) { startEvent("shioponMeet"); return; }
-    if (story.joined && !story.lumiereDone && distance(story.player, LUMIERE_HOME) <= TRIGGERS.lumiere) startEvent("lumiereGate");
-  }
 
-  function followerTarget() {
-    const target = {...story.player};
-    if (story.playerDir === "up") target.y += FOLLOW_DISTANCE;
-    else if (story.playerDir === "down") target.y -= FOLLOW_DISTANCE;
-    else if (story.playerDir === "left") target.x += FOLLOW_DISTANCE;
-    else target.x -= FOLLOW_DISTANCE;
-    return target;
-  }
-
-  function updateFollower(dt) {
-    if (!story.joined) return;
-    const target = followerTarget();
-    const dx = target.x-story.follower.x, dy = target.y-story.follower.y;
-    const d = Math.hypot(dx,dy);
-    if (d > .5) {
-      const step = Math.min(d, FOLLOW_SPEED*Math.max(0,Math.min(.05,dt||0)));
-      story.follower.x += dx/d*step;
-      story.follower.y += dy/d*step;
-      story.follower.dir = Math.abs(dx)>Math.abs(dy) ? (dx<0?"left":"right") : (dy<0?"up":"down");
-      story.follower.anim += dt||0;
-      while (story.follower.anim >= .16) { story.follower.anim -= .16; story.follower.frame = (story.follower.frame+1)%4; }
-    } else { story.follower.frame=0; story.follower.anim=0; }
-    renderFollower(d>.5);
-  }
-
-  function mapTransform() {
-    const map = document.getElementById("map-layer");
-    if (!map) return null;
-    const match = (map.style.transform||"").match(/translate3d\(([-\d.]+)px,\s*([-\d.]+)px,\s*0(?:px)?\)\s*scale\(([-\d.]+)\)/);
-    if (!match) return null;
-    const worldW = parseFloat(map.style.width)||map.naturalWidth||REF.w;
-    const worldH = parseFloat(map.style.height)||map.naturalHeight||REF.h;
-    return { tx:Number(match[1]), ty:Number(match[2]), zoom:Number(match[3]), sx:worldW/REF.w, sy:worldH/REF.h };
-  }
-
-  function renderFollower(moving) {
-    const el = document.getElementById("party-shiopon");
-    if (!el) return;
-    const farEnough = distance(story.player,SHIOPON_HOME) > FOLLOW_HIDE_RADIUS;
-    el.hidden = !story.joined || !farEnough;
-    if (el.hidden) return;
-    const t = mapTransform();
-    if (!t) return;
-    const x = story.follower.x*t.sx*t.zoom+t.tx;
-    const y = story.follower.y*t.sy*t.zoom+t.ty;
-    const height = 76*t.zoom, width = height*.75;
-    el.style.width = `${width}px`;
-    el.style.height = `${height}px`;
-    el.style.left = `${x-width/2}px`;
-    el.style.top = `${y-height*.94}px`;
-    const dir = story.follower.dir;
-    if (moving) {
-      el.style.backgroundImage = `url("${SHIOPON_ASSET_BASE}shiopon_walk_${dir}.png")`;
-      el.style.backgroundPosition = `${[0,33.333,66.667,100][story.follower.frame]}% 0`;
-    } else {
-      const idleIndex = {down:0,up:1,left:2,right:3}[dir] ?? 0;
-      el.style.backgroundImage = `url("${SHIOPON_ASSET_BASE}shiopon_idle.png")`;
-      el.style.backgroundPosition = `${[0,33.333,66.667,100][idleIndex]}% 0`;
+    if (!story.shioponDone && distance(story.player, SHIOPON_HOME) <= TRIGGERS.shiopon) {
+      startEvent("shioponMeet");
+      return;
+    }
+    if (
+      story.joined &&
+      !story.lumiereDone &&
+      distance(story.player, LUMIERE_HOME) <= TRIGGERS.lumiere
+    ) {
+      startEvent("lumiereGate");
     }
   }
 
@@ -312,12 +276,12 @@
     const api = window.TarotControls;
     if (!api?.createControls || api.__dialogueWrapped) return;
     const originalCreateControls = api.createControls;
-    api.createControls = function(...args) {
-      const controls = originalCreateControls.apply(this,args);
+    api.createControls = function (...args) {
+      const controls = originalCreateControls.apply(this, args);
       const originalStep = controls.step;
-      controls.step = function(position,dt,speed) {
-        const next = originalStep.call(this,position,dt,speed);
-        observePlayer(next,dt);
+      controls.step = function (position, dt, speed) {
+        const next = originalStep.call(this, position, dt, speed);
+        observePlayer(next);
         return next;
       };
       return controls;
@@ -327,16 +291,37 @@
 
   function resetStory() {
     if (story.active) window.dispatchEvent(new Event("tarot-breaker:interaction-end"));
-    Object.assign(story,{active:false,eventId:null,lineIndex:0,shioponDone:false,lumiereDone:false,joined:false,player:{x:724,y:1015},playerDir:"up",follower:{x:810,y:800,dir:"up",frame:0,anim:0},objective:""});
-    const layer=document.getElementById("dialogue-layer"), objective=document.getElementById("story-objective"), follower=document.getElementById("party-shiopon");
-    if(layer) layer.hidden=true;
-    if(objective) objective.hidden=true;
-    if(follower) follower.hidden=true;
+    window.dispatchEvent(new Event("tarot-breaker:shiopon-follow-stop"));
+    window.dispatchEvent(new Event("tarot-breaker:shiopon-recover"));
+    story.active = false;
+    story.eventId = null;
+    story.lineIndex = 0;
+    story.shioponDone = false;
+    story.lumiereDone = false;
+    story.joined = false;
+    story.player = { x: 724, y: 1015 };
+    story.objective = "";
+    const layer = document.getElementById("dialogue-layer");
+    const objective = document.getElementById("story-objective");
+    if (layer) layer.hidden = true;
+    if (objective) objective.hidden = true;
   }
 
-  window.addEventListener("keydown", e => { if (!story.active || !["Enter"," "].includes(e.key)) return; e.preventDefault(); advance(); });
+  window.addEventListener("keydown", (event) => {
+    if (!story.active || !["Enter", " "].includes(event.key)) return;
+    event.preventDefault();
+    advance();
+  });
+
   installControlsObserver();
   makeUi();
-  document.getElementById("reset")?.addEventListener("click",resetStory);
-  window.TarotDialogue = { start:startEvent, advance, reset:resetStory, getState:()=>JSON.parse(JSON.stringify(story)), scripts };
+  document.getElementById("reset")?.addEventListener("click", resetStory);
+
+  window.TarotDialogue = {
+    start: startEvent,
+    advance,
+    reset: resetStory,
+    getState: () => JSON.parse(JSON.stringify(story)),
+    scripts,
+  };
 })();
