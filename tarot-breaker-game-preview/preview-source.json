@@ -3,54 +3,8 @@
   "repository": "reverse-shion/tarot-breaker-game",
   "commit": "e4ab7e07783e56b863236badd09824ecb42f953d",
   "syncMode": "manual-preview40-foreground-and-gate-cleanup",
-  "artwork": {
-    "farthestSky": "assets/maps/star-country-farthest-sky-background.webp",
-    "nebulaStars": "assets/maps/star-country-gate-garden-star-sky.webp",
-    "clouds": "assets/maps/star-country-world-clouds.webp",
-    "islands": "assets/maps/star-country-world-islands.webp",
-    "ground": "assets/maps/star-country-gate-garden-ground.webp",
-    "foreground": "assets/maps/star-country-gate-garden-foreground.webp",
-    "standaloneGateMaskSource": "assets/maps/star-country-gate-garden-star-gate-base.webp"
-  },
-  "alignment": {
-    "groundReference": "kept fixed on the authored avenue/fountain centreline",
-    "foregroundOffsetReferencePx": {"x": -15, "y": 0},
-    "preview39DeltaPx": {"x": -3, "y": 0},
-    "occludersFollowForeground": true,
-    "foregroundSolidBasesFollowOffset": true
-  },
-  "gate": {
-    "visibleBody": "authored map gate",
-    "standaloneHighDetailBaseVisible": false,
-    "standaloneHighDetailBasePurpose": "mask-only source for existing gate occlusion behavior",
-    "innerLightParticleEventFx": "retained"
-  },
-  "motion": {
-    "farthestSky": "static world plate; no independent animation",
-    "nebulaDrift": "42s sub-percent alternate drift",
-    "nebulaShimmer": "8.5s subtle luminance shimmer",
-    "starTwinkle": "6.8s subtle sparkle",
-    "sunBloom": "7.5s fixed-position halo and scattering",
-    "cloudScroll": "64s continuous right-to-left, two-copy 200% track",
-    "cloudReducedMotion": "112s continuous right-to-left"
-  },
-  "cloudBlend": {
-    "opacity": 0.54,
-    "overlapPx": 3,
-    "scale": 1.016,
-    "blurPx": 0.55,
-    "blendMode": "screen"
-  },
-  "artworkIntegrity": {
-    "farthestSkyBlob": "ee3e4f9c8dcfd612a3d2c3934aae44983add0c32",
-    "cloudsBlob": "8b670bab5488dcf0639cdf137abf2d5afa5335e4",
-    "nebulaStarsBlob": "53104581aa07c18ba5570f6d5aeb60d2b163f21d"
-  },
-  "collisionSha256": "671557d8a59b222ea2e625343b9f70b95dde11f89f14316031ba6e1b856bba25",
-  "validation": {
-    "githubActionsRun": 145,
-    "status": "success",
-    "backgroundWebPIntegrity": "passed"
-  },
-  "note": "Preview 40 moves the split foreground three additional reference pixels left, for a total x=-15px correction, while the authored ground, fountain and route centreline remain fixed. All foreground-derived occluders and local solid bases follow the same offset. The separately rendered high-detail Star Gate base is no longer visible; the gate already painted into the authored map is now the visible gate body. The standalone gate image remains loaded only as a non-visible mask source so existing actor occlusion behavior is preserved. Inner light, particle and event FX remain available."
+  "alignment": {"foregroundOffsetReferencePx":{"x":-15,"y":0},"preview39DeltaPx":{"x":-3,"y":0},"occludersFollowForeground":true,"foregroundSolidBasesFollowOffset":true},
+  "gate": {"visibleBody":"authored map gate","standaloneHighDetailBaseVisible":false,"standaloneHighDetailBasePurpose":"mask-only source","innerLightParticleEventFx":"retained"},
+  "validation": {"githubActionsRun":145,"status":"success"},
+  "note": "Preview 40 shifts the split foreground three more reference pixels left (total x=-15) and hides the standalone high-detail Star Gate base so the authored map gate is the visible body. Foreground occluders and local solid bases follow the same offset; gate light/particle/event FX remain."
 }
