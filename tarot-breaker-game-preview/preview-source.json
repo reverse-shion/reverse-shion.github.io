@@ -1,21 +1,29 @@
 {
-  "version": "preview-39",
+  "version": "preview-40",
   "repository": "reverse-shion/tarot-breaker-game",
-  "commit": "adfa69b702b74fe7be5014f699c2a008c24203fb",
-  "syncMode": "manual-preview39-avenue-alignment",
+  "commit": "e4ab7e07783e56b863236badd09824ecb42f953d",
+  "syncMode": "manual-preview40-foreground-and-gate-cleanup",
   "artwork": {
     "farthestSky": "assets/maps/star-country-farthest-sky-background.webp",
     "nebulaStars": "assets/maps/star-country-gate-garden-star-sky.webp",
     "clouds": "assets/maps/star-country-world-clouds.webp",
     "islands": "assets/maps/star-country-world-islands.webp",
     "ground": "assets/maps/star-country-gate-garden-ground.webp",
-    "foreground": "assets/maps/star-country-gate-garden-foreground.webp"
+    "foreground": "assets/maps/star-country-gate-garden-foreground.webp",
+    "standaloneGateMaskSource": "assets/maps/star-country-gate-garden-star-gate-base.webp"
   },
   "alignment": {
     "groundReference": "kept fixed on the authored avenue/fountain centreline",
-    "foregroundOffsetReferencePx": {"x": -12, "y": 0},
+    "foregroundOffsetReferencePx": {"x": -15, "y": 0},
+    "preview39DeltaPx": {"x": -3, "y": 0},
     "occludersFollowForeground": true,
     "foregroundSolidBasesFollowOffset": true
+  },
+  "gate": {
+    "visibleBody": "authored map gate",
+    "standaloneHighDetailBaseVisible": false,
+    "standaloneHighDetailBasePurpose": "mask-only source for existing gate occlusion behavior",
+    "innerLightParticleEventFx": "retained"
   },
   "motion": {
     "farthestSky": "static world plate; no independent animation",
@@ -40,9 +48,9 @@
   },
   "collisionSha256": "671557d8a59b222ea2e625343b9f70b95dde11f89f14316031ba6e1b856bba25",
   "validation": {
-    "githubActionsRun": 142,
+    "githubActionsRun": 145,
     "status": "success",
     "backgroundWebPIntegrity": "passed"
   },
-  "note": "Preview 39 corrects the split-map reconstruction around the main avenue. The authored ground, fountain and route centreline remain fixed; the foreground cutout is moved 12 reference pixels left so the flowerbeds, posts and front scenery sit back on the avenue axis. Foreground occlusion masks and local physical bases receive the same correction, preventing actor-depth and collision drift. Preview 38 celestial sky, sun, nebula and cloud motion remain unchanged."
+  "note": "Preview 40 moves the split foreground three additional reference pixels left, for a total x=-15px correction, while the authored ground, fountain and route centreline remain fixed. All foreground-derived occluders and local solid bases follow the same offset. The separately rendered high-detail Star Gate base is no longer visible; the gate already painted into the authored map is now the visible gate body. The standalone gate image remains loaded only as a non-visible mask source so existing actor occlusion behavior is preserved. Inner light, particle and event FX remain available."
 }
