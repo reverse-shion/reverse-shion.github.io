@@ -8,12 +8,12 @@
     />
     <meta name="theme-color" content="#0b1029" />
     <title>TAROT BREAKER — 1000年前の星の国</title>
-    <link rel="stylesheet" href="./game.css?v=preview-39" />
-    <link rel="stylesheet" href="./fountain-polish.css?v=preview-39" />
-    <link rel="stylesheet" href="./sky-atmosphere.css?v=preview-39" />
-    <link rel="stylesheet" href="./cloud-motion-fix.css?v=preview-39" />
-    <link rel="stylesheet" href="./audio.css?v=preview-39" />
-    <link rel="stylesheet" href="./dialogue.css?v=preview-39" />
+    <link rel="stylesheet" href="./game.css?v=preview-40" />
+    <link rel="stylesheet" href="./fountain-polish.css?v=preview-40" />
+    <link rel="stylesheet" href="./sky-atmosphere.css?v=preview-40" />
+    <link rel="stylesheet" href="./cloud-motion-fix.css?v=preview-40" />
+    <link rel="stylesheet" href="./audio.css?v=preview-40" />
+    <link rel="stylesheet" href="./dialogue.css?v=preview-40" />
     <style>.editor-link{display:block;width:max-content;margin:12px auto 0;color:#f1dfad;font:600 13px/1.4 system-ui,sans-serif;text-decoration:none;border-bottom:1px solid rgba(241,223,173,.55);padding:3px 1px}</style>
   </head>
   <body>
@@ -66,14 +66,18 @@
       <div class="scene-world-layer scene-back scene-foreground" data-scene-world aria-hidden="true">
         <img crossorigin="anonymous" hidden src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/maps/star-country-gate-garden-foreground.webp" alt="" draggable="false" />
       <canvas width="1448" height="1086"></canvas></div>
+      <!-- Preview 40: keep the high-detail gate image available only as an
+           occlusion mask source; the authored map gate is the visible body. -->
       <div
         class="scene-object scene-back scene-gate-base"
         data-scene-object
+        data-mask-only="true"
         data-world-x="521.5469613259668"
         data-world-y="-70"
         data-world-w="560"
         data-world-h="420"
         aria-hidden="true"
+        hidden
       >
         <img crossorigin="anonymous" src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/maps/star-country-gate-garden-star-gate-base.webp" alt="" draggable="false" />
       </div>
@@ -174,7 +178,7 @@
         <div class="start-card">
           <div class="eyebrow">TAROT BREAKER</div>
           <h1>1000年前の星の国</h1>
-          <p>星門庭園 — PUBLIC PREVIEW 39</p>
+          <p>星門庭園 — PUBLIC PREVIEW 40</p>
           <button id="start" type="button" disabled>起動準備中…</button>
           <a class="editor-link" href="./collision-editor.html?v=3">当たり判定を編集する</a>
           <small id="load-note">動的星門庭園とキャラクターを読み込んでいます</small>
@@ -192,16 +196,16 @@
       <button id="audio-toggle" class="audio-toggle" type="button" aria-label="BGMをオフにする" aria-pressed="true" hidden>♪</button>
     </main>
 
-    <script src="./navigation.js?v=preview-39" defer></script>
-    <script src="./blocked-collision.js?v=preview-39" defer></script>
-    <script src="./controls.js?v=preview-39" defer></script>
-    <script src="./audio.js?v=preview-39" data-bgm-url="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/audio/bgm/hoshi-no-kioku_toki-no-inori.mp3" defer></script>
-    <script src="./lumiere-outline.js?v=preview-39" defer></script>
-    <script src="./dialogue.js?v=preview-39" defer></script>
-    <script src="./scene-layout.js?v=preview-39" defer></script>
-    <script src="./scene-effects.js?v=preview-39" defer></script>
+    <script src="./navigation.js?v=preview-40" defer></script>
+    <script src="./blocked-collision.js?v=preview-40" defer></script>
+    <script src="./controls.js?v=preview-40" defer></script>
+    <script src="./audio.js?v=preview-40" data-bgm-url="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/audio/bgm/hoshi-no-kioku_toki-no-inori.mp3" defer></script>
+    <script src="./lumiere-outline.js?v=preview-40" defer></script>
+    <script src="./dialogue.js?v=preview-40" defer></script>
+    <script src="./scene-layout.js?v=preview-40" defer></script>
+    <script src="./scene-effects.js?v=preview-40" defer></script>
     <script
-      src="./game.js?v=preview-39" data-collision-url="./star-country-gate-garden-collision.json?v=preview-39" data-sprite-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/sprites/shion/" data-shiopon-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/sprites/shiopon/" data-lumiere-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/sprites/lumiere/"
+      src="./game.js?v=preview-40" data-collision-url="./star-country-gate-garden-collision.json?v=preview-40" data-sprite-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/sprites/shion/" data-shiopon-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/sprites/shiopon/" data-lumiere-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/adfa69b702b74fe7be5014f699c2a008c24203fb/assets/sprites/lumiere/"
       defer
     ></script>
   </body>
