@@ -4,6 +4,19 @@
   if (!layout) return;
 
   const REFERENCE = layout.referenceSize;
+  const ASSET_BASE = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/863e889fd43e3be0a8dbb8cab416a40365a44c47/assets/maps/";
+
+  // PUBLIC PREVIEW had old commit-pinned artwork URLs in index.html.
+  // Override ONLY the three requested map plates before game.js initializes.
+  const mapLayer = document.getElementById("map-layer");
+  if (mapLayer) mapLayer.src = ASSET_BASE + "star-country-world-islands.webp";
+
+  document.querySelectorAll(".scene-cloud-copy").forEach((img) => {
+    img.src = ASSET_BASE + "star-country-world-clouds.webp";
+  });
+
+  const foregroundImage = document.querySelector(".scene-foreground img");
+  if (foregroundImage) foregroundImage.src = ASSET_BASE + "star-country-gate-garden-foreground.webp";
 
   // Latest uploaded island plate: preserve aspect ratio and draw once.
   layout.paintBackground = function paintBackground(ctx, background) {
@@ -87,18 +100,8 @@
     const rearLeft = Math.max(0, minX + dx - 12);
     const rearRight = Math.min(layout.referenceSize.width, maxX + dx + 12);
 
-    const bounds = [
-      visualLeft,
-      visualTop,
-      Math.max(1, visualRight - visualLeft),
-      Math.max(1, visualBottom - visualTop),
-    ];
-    const footArea = layout.rect(
-      rearLeft,
-      rearTop,
-      Math.max(1, rearRight - rearLeft),
-      Math.max(1, rearBottom - rearTop),
-    );
+    const bounds = [visualLeft, visualTop, Math.max(1, visualRight - visualLeft), Math.max(1, visualBottom - visualTop)];
+    const footArea = layout.rect(rearLeft, rearTop, Math.max(1, rearRight - rearLeft), Math.max(1, rearBottom - rearTop));
 
     layout.occluders.push({
       id: fullId,
@@ -115,23 +118,13 @@
   layout.activeOccluders = function activeOccluders(foot, areas = layout.occluders) {
     if (!foot || !Number.isFinite(foot.x) || !Number.isFinite(foot.y)) return [];
     if (layout.solidBases.some((shape) => layout.contains(foot, shape))) return [];
-    return areas.filter((area) =>
-      foot.y < area.baseline - (area.rearInset ?? 4) &&
-      layout.contains(foot, area.footArea),
-    );
+    return areas.filter((area) => foot.y < area.baseline - (area.rearInset ?? 4) && layout.contains(foot, area.footArea));
   };
 
   layout.depthModelVersion = "preview-49";
   layout.artworkPlacement = Object.freeze({
     islands: Object.freeze({ mode: "contain-once", alignX: 0.5, alignY: 0, repeat: false }),
-    foreground: Object.freeze({
-      mode: "fit-width-once",
-      x: 0,
-      y: 0,
-      repeat: false,
-      sourceWidth: 1672,
-      sceneWidth: REFERENCE.width,
-    }),
+    foreground: Object.freeze({ mode: "fit-width-once", x: 0, y: 0, repeat: false, sourceWidth: 1672, sceneWidth: REFERENCE.width }),
   });
-  layout.artworkModelVersion = "latest-two-artworks-fit-once";
+  layout.artworkModelVersion = "requested-three-artworks-863e889f";
 })(window);
