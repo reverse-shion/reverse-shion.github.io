@@ -3,57 +3,40 @@
   const layout = root.TarotSceneLayout;
   if (!layout) return;
 
-  // Preview 41+: keep the gate painted into the authored map visible. The
-  // standalone high-detail gate remains hidden/mask-only.
-  layout.paintBackground = function paintBackground(ctx, background) {
-    ctx.clearRect(0, 0, layout.referenceSize.width, layout.referenceSize.height);
-    ctx.drawImage(background, 0, 0, layout.referenceSize.width, layout.referenceSize.height);
-  };
+  const REFERENCE = layout.referenceSize;
 
-  // Preview 45: keep the -15px foreground correction around the central route,
-  // but close the 15px gap at the far-right world edge.
-  layout.paintForeground = function paintForeground(ctx, foreground) {
-    const w = layout.referenceSize.width;
-    const h = layout.referenceSize.height;
-    const dx = layout.foregroundOffset.x;
-    const dy = layout.foregroundOffset.y;
+  // Latest uploaded island plate: preserve aspect ratio and draw once.
+  layout.paintBackground = function paintBackground(ctx, background) {
+    const w = REFERENCE.width;
+    const h = REFERENCE.height;
+    const sourceW = background.naturalWidth || w;
+    const sourceH = background.naturalHeight || h;
+    const scale = Math.min(w / sourceW, h / sourceH);
+    const drawW = sourceW * scale;
+    const drawH = sourceH * scale;
+    const drawX = (w - drawW) / 2;
 
     ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(foreground, dx, dy, w, h);
-
-    const gap = Math.max(0, -dx);
-    if (!gap) return;
-
-    const blendWidth = Math.max(84, gap * 6);
-    const edge = document.createElement("canvas");
-    edge.width = w;
-    edge.height = h;
-    const paint = edge.getContext("2d");
-
-    paint.save();
-    paint.beginPath();
-    paint.rect(w - blendWidth, 0, blendWidth, h);
-    paint.clip();
-    paint.drawImage(foreground, 0, dy, w, h);
-    paint.globalCompositeOperation = "destination-in";
-    const fade = paint.createLinearGradient(w - blendWidth, 0, w, 0);
-    fade.addColorStop(0, "rgba(0,0,0,0)");
-    fade.addColorStop(0.72, "rgba(0,0,0,0.55)");
-    fade.addColorStop(1, "rgba(0,0,0,1)");
-    paint.fillStyle = fade;
-    paint.fillRect(w - blendWidth, 0, blendWidth, h);
-    paint.restore();
-
-    ctx.drawImage(edge, 0, 0);
+    ctx.drawImage(background, drawX, 0, drawW, drawH);
   };
 
-  // Preview 49 depth/collision fix.
-  // The foreground is one authored plate, but only a small subset of its
-  // pillars and flower fronts used to participate in actor occlusion. That let
-  // actors appear on top of banners/crystal pedestals in some places, while
-  // disappearing too early beside a blocked area in others.
-  const dx = layout.foregroundOffset?.x || 0;
-  const dy = layout.foregroundOffset?.y || 0;
+  // Latest uploaded foreground: fit the complete source to scene width once.
+  // Never repeat, mirror, edge-patch or enlarge the right edge.
+  layout.paintForeground = function paintForeground(ctx, foreground) {
+    const w = REFERENCE.width;
+    const h = REFERENCE.height;
+    const sourceW = foreground.naturalWidth || w;
+    const sourceH = foreground.naturalHeight || h;
+    const fit = w / sourceW;
+    const drawW = w;
+    const drawH = sourceH * fit;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(foreground, 0, 0, drawW, drawH);
+  };
+
+  const dx = 0;
+  const dy = 0;
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
   function hasNearbySolid(shape) {
@@ -65,8 +48,6 @@
     );
   }
 
-  // Make every foreground post/pillar with a crystal or cap physically solid.
-  // Previously only four had bases, so several pedestals could be walked on.
   for (const area of layout.occluders) {
     if (!/(post|pillar)$/.test(area.id)) continue;
     const [x, , w] = area.bounds;
@@ -81,9 +62,6 @@
     if (!hasNearbySolid(solid)) layout.solidBases.push(solid);
   }
 
-  // Narrow rear strips derived from the current blocked geometry. Only an actor
-  // genuinely behind these structures is masked by foreground alpha. Touching a
-  // forbidden edge from the front no longer makes the actor vanish.
   const depthZones = [
     ["east-upper-structure", 867, 217, 1215, 470],
     ["east-mid-structure", 873, 508, 1214, 697],
@@ -136,11 +114,7 @@
 
   layout.activeOccluders = function activeOccluders(foot, areas = layout.occluders) {
     if (!foot || !Number.isFinite(foot.x) || !Number.isFinite(foot.y)) return [];
-
-    // During collision projection or scripted motion a foot can briefly sit on
-    // an exact physical boundary. Keep that ambiguous frame visible.
     if (layout.solidBases.some((shape) => layout.contains(foot, shape))) return [];
-
     return areas.filter((area) =>
       foot.y < area.baseline - (area.rearInset ?? 4) &&
       layout.contains(foot, area.footArea),
@@ -148,10 +122,16 @@
   };
 
   layout.depthModelVersion = "preview-49";
-
-  // Pin the latest transparent island plate.
-  const transparentIslands =
-    "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/2d8b4cec9b6dbb96f5dc0c4d8412f8a44acae59f/assets/maps/star-country-world-islands.webp";
-  const mapLayer = document.getElementById("map-layer");
-  if (mapLayer && mapLayer.src !== transparentIslands) mapLayer.src = transparentIslands;
+  layout.artworkPlacement = Object.freeze({
+    islands: Object.freeze({ mode: "contain-once", alignX: 0.5, alignY: 0, repeat: false }),
+    foreground: Object.freeze({
+      mode: "fit-width-once",
+      x: 0,
+      y: 0,
+      repeat: false,
+      sourceWidth: 1672,
+      sceneWidth: REFERENCE.width,
+    }),
+  });
+  layout.artworkModelVersion = "latest-two-artworks-fit-once";
 })(window);
