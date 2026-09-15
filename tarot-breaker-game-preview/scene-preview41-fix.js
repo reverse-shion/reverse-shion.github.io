@@ -5,6 +5,7 @@
 
   const REFERENCE = layout.referenceSize;
   const FOREGROUND_SOURCE_SCALE = 0.81;
+  const FOREGROUND_NUDGE_X = 4;
   const ASSET_BASE = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/aebd5e6ff0a4bed45c3e3a97e4896cb295786e0d/assets/maps/";
 
   // Pin only the three currently approved map plates.
@@ -28,7 +29,7 @@
   };
 
   // Restore the authored scene scale encoded in the current wider foreground
-  // upload. Keep the established -15px correction and draw exactly once.
+  // upload, then move the full foreground 4px right and draw exactly once.
   layout.paintForeground = function paintForeground(ctx, foreground) {
     const w = REFERENCE.width;
     const h = REFERENCE.height;
@@ -36,13 +37,13 @@
     const sourceH = foreground.naturalHeight || h * FOREGROUND_SOURCE_SCALE;
     const drawW = sourceW / FOREGROUND_SOURCE_SCALE;
     const drawH = sourceH / FOREGROUND_SOURCE_SCALE;
-    const dx = layout.foregroundOffset?.x || 0;
+    const dx = (layout.foregroundOffset?.x || 0) + FOREGROUND_NUDGE_X;
     const dy = layout.foregroundOffset?.y || 0;
     ctx.clearRect(0, 0, w, h);
     ctx.drawImage(foreground, dx, dy, drawW, drawH);
   };
 
-  const dx = layout.foregroundOffset?.x || 0;
+  const dx = (layout.foregroundOffset?.x || 0) + FOREGROUND_NUDGE_X;
   const dy = layout.foregroundOffset?.y || 0;
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -89,5 +90,5 @@
     islands: Object.freeze({ mode: "contain", alignX: 0.5, alignY: 0 }),
     foreground: Object.freeze({ sourceScale: FOREGROUND_SOURCE_SCALE, x: dx, y: dy, repeat: false }),
   });
-  layout.artworkModelVersion = "foreground-authored-alignment-restored";
+  layout.artworkModelVersion = "foreground-authored-alignment-right-4px";
 })(window);
