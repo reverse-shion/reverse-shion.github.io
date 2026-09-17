@@ -1,1 +1,51 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#090c20"><title>TAROT BREAKER MAP EDIT MODE — Collision v5</title><link rel="stylesheet" href="./map-editor.css?v=2"></head><body data-collision-url="./star-country-gate-garden-collision.json?v=6e2fefb3" data-depth-url="./star-country-gate-garden-depth.json?v=d8ea3484"><main id="editor"><iframe id="game-frame" src="./index.html?mapEditor=1&editor=collision-v5&data=6e2fefb3-d8ea3484&ui=69defbda" title="実際のTAROT BREAKERゲーム画面"></iframe><canvas id="overlay"></canvas><header><strong>MAP EDIT MODE / COLLISION v5</strong><span id="status">読み込み中…</span></header><nav id="tools"><button data-mode="play">PLAY</button><button data-mode="walk">歩行可能</button><button data-mode="blocked">侵入禁止</button><button data-mode="behind">前景の裏</button><button data-mode="erase">消去</button></nav><footer><button id="undo">1点戻す</button><button id="finish">範囲確定</button><button id="copy">JSONコピー</button></footer><dialog id="output"><h2>編集結果</h2><p>基本ルール：何も指定しない場所は侵入不可・キャラクターが手前。緑で囲った場所だけ歩行可能。赤は緑の中の障害物。紫は歩行可能な場所で前景の裏を通したい特殊箇所だけ指定します。</p><textarea readonly></textarea><button id="copy-dialog">コピー</button><button id="close-dialog">閉じる</button></dialog></main><script src="./map-editor.js?v=7"></script><script src="./editor-route-fix.js?v=69defbda"></script></body></html>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#090c20" />
+  <title>TAROT BREAKER — Collision Editor v7</title>
+  <link rel="stylesheet" href="./map-editor.css?v=7.0.0" />
+</head>
+<body data-collision-url="./star-country-gate-garden-collision.json?v=collision-v7">
+  <main id="editor">
+    <iframe id="game-frame" src="./index.html?mapEditor=1&collisionEditor=1&build=collision-editor-v7" title="TAROT BREAKER 星門庭園"></iframe>
+    <canvas id="overlay" aria-label="当たり判定編集レイヤー"></canvas>
+
+    <header>
+      <strong>COLLISION EDITOR v7</strong>
+      <span id="status">読み込み中…</span>
+      <span id="counts"></span>
+    </header>
+
+    <nav id="tools" aria-label="編集モード">
+      <button type="button" data-mode="play">PLAY</button>
+      <button type="button" data-mode="walk">歩行範囲</button>
+      <button type="button" data-mode="blocked">障害物</button>
+      <button type="button" data-mode="edit">頂点編集</button>
+      <button type="button" data-mode="erase">削除</button>
+    </nav>
+
+    <footer aria-label="編集操作">
+      <button type="button" id="undo">戻す</button>
+      <button type="button" id="clear-draft">未確定取消</button>
+      <button type="button" id="finish">範囲確定</button>
+      <button type="button" id="delete-selected">選択削除</button>
+      <button type="button" id="restore-local" disabled>端末下書き復元</button>
+      <button type="button" id="reset-server">初期JSON</button>
+      <button type="button" id="copy">JSONコピー</button>
+    </footer>
+
+    <dialog id="output">
+      <h2>Collision JSON</h2>
+      <p>緑が歩行可能範囲、赤が緑の中に置く障害物です。歩行範囲が0件の間だけ、現在のゲームはリセット状態として全体歩行可になります。緑を1つ以上確定すると、緑の内側だけが歩行可能になります。</p>
+      <textarea readonly spellcheck="false"></textarea>
+      <div class="dialog-actions">
+        <button type="button" id="copy-dialog">コピー</button>
+        <button type="button" id="close-dialog">閉じる</button>
+      </div>
+    </dialog>
+  </main>
+  <script src="./map-editor.js?v=7.0.0"></script>
+</body>
+</html>
