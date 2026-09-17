@@ -15,6 +15,8 @@
   const CLOUDS_ASSET = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/maps/star-country-world-clouds.webp?asset=eaea4c9513cf";
   const WATERFALL_ASSET = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/maps/star-country-gate-garden-waterfall.webp?single-map=v6";
   const STAR_GATE_ASSET = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/maps/star-country-gate-garden-star-gate.webp?single-map-gate=v6";
+  const WATERFALL_OFFSET_Y = 22;
+  const FOUNTAIN_OFFSET_Y = 28;
 
   let precisePolys = [];
 
@@ -98,12 +100,15 @@
   const islandsImage = islandsLayer?.querySelector("img");
   if (islandsImage) islandsImage.src = ISLANDS_ASSET;
 
+  // Shift waterfall down in world space without overwriting camera transforms.
   document.querySelectorAll(".scene-waterfall img").forEach((image) => {
     image.crossOrigin = "anonymous";
     image.src = WATERFALL_ASSET;
   });
-
-  // Fountain uses the original HTML coordinates. No runtime X/Y correction.
+  document.querySelectorAll(".scene-waterfall").forEach((layer) => {
+    layer.style.top = `${WATERFALL_OFFSET_Y}px`;
+    layer.dataset.positionRevision = "waterfall-v7";
+  });
 
   const STAIR_TOP_Y = layout.gate?.baseline ?? 242;
   const GATE_CENTER_X = layout.gate?.openingX ?? 800;
@@ -124,6 +129,13 @@
     node.dataset.worldW = String(w);
     node.dataset.worldH = String(h);
   }
+
+  // Move the whole fountain assembly toward the foreground as one unit.
+  placeObject(document.querySelector(".scene-fountain-base"), 625, 388 + FOUNTAIN_OFFSET_Y, 350, 245);
+  placeObject(document.querySelector(".scene-fountain-water"), 650, 409 + FOUNTAIN_OFFSET_Y, 300, 176);
+  placeObject(document.querySelector(".scene-fountain-crystal"), 708, 333 + FOUNTAIN_OFFSET_Y, 184, 230);
+  placeObject(document.querySelector(".scene-fountain-glow"), 650, 318 + FOUNTAIN_OFFSET_Y, 300, 250);
+  placeObject(document.querySelector(".scene-fountain-sparkle"), 640, 358 + FOUNTAIN_OFFSET_Y, 320, 220);
 
   let starGate = document.querySelector(".scene-star-gate");
   if (!starGate && shell) {
@@ -163,7 +175,7 @@
     lift: GATE_LIFT,
     starGate: Object.freeze({ x: STAR_GATE_X, y: STAR_GATE_Y, w: STAR_GATE_W, h: STAR_GATE_H }),
     innerLight: Object.freeze({ x: INNER_LIGHT_X, y: INNER_LIGHT_Y, w: INNER_LIGHT_W, h: INNER_LIGHT_H }),
-    version: "single-map-gate-v6",
+    version: "single-map-gate-v7",
   });
 
   layout.foregroundOffset = Object.freeze({ x: 0, y: 0 });
@@ -223,7 +235,7 @@
       drawW: w,
       drawH: h,
       scale: 1,
-      mode: "single-map-layer-order-v6",
+      mode: "single-map-layer-order-v7",
       occluderCount: precisePolys.length,
     });
   };
@@ -241,11 +253,12 @@
     ...(layout.artworkPlacement || {}),
     islands: Object.freeze({ mode: "world-layer-latest", asset: "34856728cf2b", x: 0, y: 0, w: reference.width, h: reference.height }),
     clouds: Object.freeze({ mode: "three-copy-latest", asset: "eaea4c9513cf", x: 0, y: 0, w: reference.width, h: reference.height }),
-    waterfall: Object.freeze({ mode: "world-layer", x: 0, y: 0, w: reference.width, h: reference.height }),
+    waterfall: Object.freeze({ mode: "world-layer-offset-v7", x: 0, y: WATERFALL_OFFSET_Y, w: reference.width, h: reference.height }),
+    fountain: Object.freeze({ mode: "group-offset-v7", x: 0, y: FOUNTAIN_OFFSET_Y }),
     background: Object.freeze({ mode: "single-map-authoritative-v6", x: 0, y: 0, w: reference.width, h: reference.height, scale: 1 }),
-    foreground: Object.freeze({ mode: "single-map-layer-order-v6", x: 0, y: 0, w: reference.width, h: reference.height, scale: 1 }),
+    foreground: Object.freeze({ mode: "single-map-layer-order-v7", x: 0, y: 0, w: reference.width, h: reference.height, scale: 1 }),
     gate: layout.gateAssembly,
   });
-  layout.depthModelVersion = "single-map-layer-order-v6";
-  layout.artworkModelVersion = "single-map-transparent-v6";
+  layout.depthModelVersion = "single-map-layer-order-v7";
+  layout.artworkModelVersion = "single-map-transparent-v7";
 })(window);
