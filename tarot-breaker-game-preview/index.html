@@ -61,8 +61,6 @@
         <img crossorigin="anonymous" hidden src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/maps/star-country-gate-garden-waterfall.webp" alt="" draggable="false" />
       <canvas width="1448" height="1086"></canvas></div>
 
-      <!-- Single-map mode: one authored image is the map; foreground pixels are
-           clipped from this exact same source by single-map-occlusion.js. -->
       <div class="scene-world-layer scene-back scene-ground" data-scene-world aria-hidden="true">
         <img crossorigin="anonymous" src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/3496d326f5060df35047cff18725d1ed6fee1feb/assets/maps/star-country-gate-garden-transparent.webp" alt="" draggable="false" />
       </div>
@@ -70,8 +68,7 @@
       <div class="scene-world-layer scene-front scene-foreground" data-scene-world aria-hidden="true">
         <img crossorigin="anonymous" hidden src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/3496d326f5060df35047cff18725d1ed6fee1feb/assets/maps/star-country-gate-garden-transparent.webp" alt="" draggable="false" />
       <canvas width="1448" height="1086"></canvas></div>
-      <!-- Legacy/high-detail gate base stays hidden. The approved gate artwork
-           is the inner-light WebP below; only effects are layered around it. -->
+
       <div
         class="scene-object scene-back scene-gate-base"
         data-scene-object
@@ -108,8 +105,6 @@
       >
         <img crossorigin="anonymous" src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/maps/star-country-gate-garden-fountain-water.webp" alt="" draggable="false" />
       </div>
-      <!-- Preview 43: preserve the supplied crystal size and move the complete
-           crystal stack another 20 reference pixels toward the rear of basin. -->
       <div
         class="scene-object scene-back scene-fountain-crystal"
         data-scene-object
@@ -146,8 +141,7 @@
       >
         <img crossorigin="anonymous" src="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/maps/star-country-gate-garden-fountain-sparkle.webp" alt="" draggable="false" />
       </div>
-      <!-- Approved Star Gate artwork. Position/size stay unchanged; polish v2
-           only softens its lower edge and adds restrained light/particles. -->
+
       <div
         class="scene-object scene-back scene-gate-inner-light"
         data-scene-object
@@ -203,25 +197,8 @@
         <div class="joystick__ring"></div>
         <div id="joystick-knob" class="joystick__knob"></div>
       </div>
-      <button
-        id="reset"
-        class="reset"
-        type="button"
-        aria-label="開始地点へ戻る"
-        hidden
-      >
-        ↺
-      </button>
-      <button
-        id="audio-toggle"
-        class="audio-toggle"
-        type="button"
-        aria-label="BGMをオフにする"
-        aria-pressed="true"
-        hidden
-      >
-        ♪
-      </button>
+      <button id="reset" class="reset" type="button" aria-label="開始地点へ戻る" hidden>↺</button>
+      <button id="audio-toggle" class="audio-toggle" type="button" aria-label="BGMをオフにする" aria-pressed="true" hidden>♪</button>
     </main>
 
     <script src="./navigation.js?v=preview-48" defer></script>
@@ -233,11 +210,16 @@
     <script src="./scene-layout.js?v=preview-48" defer></script>
     <script src="./scene-preview41-fix.js?v=gate-polish-v2" defer></script>
     <script src="./single-map-occlusion.js?v=latest-assets-v7-waterfall-fountain" defer></script>
-    <script src="./scene-effects.js?v=preview-48" defer></script>
+    <script src="./scene-effects.js?v=fountain-editor-v1" defer></script>
     <script src="./lumiere-render-fix.js?v=preview-48" defer></script>
     <script
-      src="./game.js?v=preview-48-collision-6e2fefb3" data-collision-url="./star-country-gate-garden-collision.json?v=6e2fefb3" data-sprite-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/sprites/shion/" data-shiopon-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/sprites/shiopon/" data-lumiere-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/sprites/lumiere/"
+      src="./game.js?v=preview-48-collision-6e2fefb3"
+      data-collision-url="./star-country-gate-garden-collision.json?v=6e2fefb3"
+      data-sprite-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/sprites/shion/"
+      data-shiopon-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/sprites/shiopon/"
+      data-lumiere-base="https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/d9e879d54a1fb112d297d6c98ed3bdbc7c947979/assets/sprites/lumiere/"
       defer
     ></script>
+    <script src="./fountain-position-editor.js?v=1.0.0" defer></script>
   </body>
 </html>
