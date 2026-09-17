@@ -14,7 +14,7 @@
     [".scene-fountain-sparkle",640,358,320,220],
   ];
 
-  function finite(value,fallback){const n=Number(value);return Number.isFinite(n)?n:fallback}
+  function finite(value,fallback){if(value===null||value===""||typeof value==="undefined")return fallback;const n=Number(value);return Number.isFinite(n)?n:fallback}
   function signed(value){const n=Math.round(value);return `${n>=0?"+":""}${n}`}
 
   let saved={};
@@ -142,11 +142,7 @@
   }
 
   function waitForScene(){
-    if(window.TarotSceneEffects?.refreshCamera){
-      apply();
-      trackHitbox();
-      return;
-    }
+    if(window.TarotSceneEffects?.refreshCamera){apply();trackHitbox();return}
     setTimeout(waitForScene,50);
   }
 
