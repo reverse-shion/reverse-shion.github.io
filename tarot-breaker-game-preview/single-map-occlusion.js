@@ -16,7 +16,10 @@
   const WATERFALL_ASSET = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/maps/star-country-gate-garden-waterfall.webp?single-map=v6";
   const STAR_GATE_ASSET = "https://raw.githubusercontent.com/reverse-shion/tarot-breaker-game/main/assets/maps/star-country-gate-garden-star-gate.webp?single-map-gate=v6";
   const WATERFALL_OFFSET_Y = 22;
-  const FOUNTAIN_OFFSET_Y = 28;
+  const FOUNTAIN_ANCHOR = Object.freeze({ x: 800, y: 510.5 });
+  const FOUNTAIN_OFFSET_X = -11;
+  const FOUNTAIN_OFFSET_Y = 12;
+  const FOUNTAIN_SCALE = 1.16;
 
   let precisePolys = [];
 
@@ -76,7 +79,6 @@
   }
   if (groundLayer) groundLayer.hidden = true;
 
-  // All moving cloud copies are forced to one canonical latest asset.
   document.querySelectorAll(".scene-cloud-copy").forEach((image) => {
     image.crossOrigin = "anonymous";
     image.src = CLOUDS_ASSET;
@@ -100,7 +102,6 @@
   const islandsImage = islandsLayer?.querySelector("img");
   if (islandsImage) islandsImage.src = ISLANDS_ASSET;
 
-  // Shift waterfall down in world space without overwriting camera transforms.
   document.querySelectorAll(".scene-waterfall img").forEach((image) => {
     image.crossOrigin = "anonymous";
     image.src = WATERFALL_ASSET;
@@ -130,12 +131,17 @@
     node.dataset.worldH = String(h);
   }
 
-  // Move the whole fountain assembly toward the foreground as one unit.
-  placeObject(document.querySelector(".scene-fountain-base"), 625, 388 + FOUNTAIN_OFFSET_Y, 350, 245);
-  placeObject(document.querySelector(".scene-fountain-water"), 650, 409 + FOUNTAIN_OFFSET_Y, 300, 176);
-  placeObject(document.querySelector(".scene-fountain-crystal"), 708, 333 + FOUNTAIN_OFFSET_Y, 184, 230);
-  placeObject(document.querySelector(".scene-fountain-glow"), 650, 318 + FOUNTAIN_OFFSET_Y, 300, 250);
-  placeObject(document.querySelector(".scene-fountain-sparkle"), 640, 358 + FOUNTAIN_OFFSET_Y, 320, 220);
+  function placeFountainPart(selector, x, y, w, h) {
+    const scaledX = FOUNTAIN_ANCHOR.x + FOUNTAIN_OFFSET_X + (x - FOUNTAIN_ANCHOR.x) * FOUNTAIN_SCALE;
+    const scaledY = FOUNTAIN_ANCHOR.y + FOUNTAIN_OFFSET_Y + (y - FOUNTAIN_ANCHOR.y) * FOUNTAIN_SCALE;
+    placeObject(document.querySelector(selector), scaledX, scaledY, w * FOUNTAIN_SCALE, h * FOUNTAIN_SCALE);
+  }
+
+  placeFountainPart(".scene-fountain-base", 625, 388, 350, 245);
+  placeFountainPart(".scene-fountain-water", 650, 409, 300, 176);
+  placeFountainPart(".scene-fountain-crystal", 708, 333, 184, 230);
+  placeFountainPart(".scene-fountain-glow", 650, 318, 300, 250);
+  placeFountainPart(".scene-fountain-sparkle", 640, 358, 320, 220);
 
   let starGate = document.querySelector(".scene-star-gate");
   if (!starGate && shell) {
@@ -235,7 +241,7 @@
       drawW: w,
       drawH: h,
       scale: 1,
-      mode: "single-map-layer-order-v7",
+      mode: "single-map-layer-order-v8",
       occluderCount: precisePolys.length,
     });
   };
@@ -254,11 +260,11 @@
     islands: Object.freeze({ mode: "world-layer-latest", asset: "34856728cf2b", x: 0, y: 0, w: reference.width, h: reference.height }),
     clouds: Object.freeze({ mode: "three-copy-latest", asset: "eaea4c9513cf", x: 0, y: 0, w: reference.width, h: reference.height }),
     waterfall: Object.freeze({ mode: "world-layer-offset-v7", x: 0, y: WATERFALL_OFFSET_Y, w: reference.width, h: reference.height }),
-    fountain: Object.freeze({ mode: "group-offset-v7", x: 0, y: FOUNTAIN_OFFSET_Y }),
+    fountain: Object.freeze({ mode: "group-offset-scale-v8", x: FOUNTAIN_OFFSET_X, y: FOUNTAIN_OFFSET_Y, scale: FOUNTAIN_SCALE, anchor: FOUNTAIN_ANCHOR }),
     background: Object.freeze({ mode: "single-map-authoritative-v6", x: 0, y: 0, w: reference.width, h: reference.height, scale: 1 }),
-    foreground: Object.freeze({ mode: "single-map-layer-order-v7", x: 0, y: 0, w: reference.width, h: reference.height, scale: 1 }),
+    foreground: Object.freeze({ mode: "single-map-layer-order-v8", x: 0, y: 0, w: reference.width, h: reference.height, scale: 1 }),
     gate: layout.gateAssembly,
   });
   layout.depthModelVersion = "single-map-layer-order-v7";
-  layout.artworkModelVersion = "single-map-transparent-v7";
+  layout.artworkModelVersion = "single-map-transparent-v8";
 })(window);
