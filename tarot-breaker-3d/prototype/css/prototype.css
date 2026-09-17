@@ -1,0 +1,90 @@
+:root { color-scheme: dark; font-family: system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif; color: #f2eee6; background: #101526; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; overflow: hidden; }
+button { font: inherit; color: inherit; background: #20293e; border: 1px solid #abb4cb55; border-radius: 999px; padding: 11px 18px; min-height: 46px; cursor: pointer; touch-action: manipulation; }
+button:focus-visible { outline: 2px solid #e5ce91; outline-offset: 4px; }
+button:disabled { opacity: .5; cursor: wait; }
+
+#world, #scene, #look { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; }
+#world { outline: none; }
+#scene { display: block; }
+#look { touch-action: none; user-select: none; }
+
+.hud { position: absolute; inset: max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) auto max(18px,env(safe-area-inset-left)); display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; pointer-events: none; }
+.hud button { pointer-events: auto; background: #101526a8; font-size: 11px; white-space: nowrap; border-color: #abb4cb2e; }
+.eyebrow { font-size: 10px; letter-spacing: .22em; color: #c9b889; }
+.hud p { font-size: 12px; margin: 6px 0 0; color: #e7eaf1cc; }
+
+.guide { position: absolute; top: calc(max(18px,env(safe-area-inset-top)) + 66px); left: 50%; transform: translateX(-50%); margin: 0; width: max-content; max-width: 86%; text-align: center; font-size: 11px; letter-spacing: .05em; color: #e9edf7; background: #10152670; padding: 7px 13px; border-radius: 20px; pointer-events: none; backdrop-filter: blur(4px); }
+.reticle { position: absolute; top: 48%; left: 50%; font-size: 24px; color: #ffffff55; pointer-events: none; }
+
+#stick { position: absolute; left: max(26px,env(safe-area-inset-left)); bottom: calc(max(24px,env(safe-area-inset-bottom)) + 22px); width: 130px; height: 130px; }
+#thumb { width: 48px; height: 48px; }
+.stick-label { position: absolute; }
+#interact { position: absolute; left: 50%; bottom: calc(max(24px,env(safe-area-inset-bottom)) + 110px); transform: translateX(-50%); background: #e2d5b3e8; color: #202638; font-size: 13px; min-width: 180px; box-shadow: 0 8px 24px #0006; backdrop-filter: blur(5px); }
+
+.screen { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: max(24px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left)); overflow: auto; background: radial-gradient(ellipse at 72% 14%,#394d66 0,transparent 48%),radial-gradient(ellipse at 18% 82%,#242c46 0,transparent 52%),linear-gradient(155deg,#1b253a,#0d1220 76%); }
+.intro { width: min(100%,620px); margin: auto; }
+.intro-cinematic { text-align: center; max-width: 520px; }
+.intro h1 { font-family: "Hiragino Mincho ProN","Yu Mincho",serif; font-weight: 400; font-size: clamp(42px,8vw,76px); line-height: 1.32; letter-spacing: .06em; margin: 24px 0 18px; }
+.intro-cinematic .lead { margin: 0 auto 34px; color: #d7ddea; font-family: "Hiragino Mincho ProN","Yu Mincho",serif; font-size: clamp(14px,3vw,18px); letter-spacing: .08em; line-height: 2; }
+.primary { background: #e5d6ad; border: none; color: #182136; letter-spacing: .12em; border-radius: 4px; padding: 17px 34px; }
+#start-status { font-size: 11px; line-height: 1.8; max-width: 420px; color: #a9b6ca; margin: 18px auto 0; }
+.compact { text-align: center; max-width: 440px; }
+.compact h2 { font-family: "Hiragino Mincho ProN","Yu Mincho",serif; font-weight: 400; font-size: clamp(28px,6vw,44px); margin: 18px 0 12px; }
+.compact p { line-height: 2; color: #d0d7e4; margin: 0 0 28px; }
+#pause-screen { z-index: 12000; background: radial-gradient(ellipse at center,#26334a 0,#101526f5 70%); }
+
+.notice { position: fixed; z-index: 10001; bottom: max(16px,env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); max-width: min(88%,560px); width: max-content; margin: 0; padding: 10px 16px; border: 1px solid #b7c6db3d; border-radius: 999px; background: #111928d9; color: #eef2f8; font-size: 11px; line-height: 1.6; backdrop-filter: blur(6px); }
+
+/* 3D host adaptation for the shared skit engine. */
+#sv-skit .sv-overlay { background: #0c1120a8; }
+#sv-skit .sv-overlay-panel { width: min(960px,100%); height: min(760px,100dvh); padding: max(14px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); overflow-y: auto; }
+.skit-toolbar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; min-height: 42px; }
+#skip-memory, #skit-sound, #close-skit { min-height: 36px; padding: 7px 11px; position: relative; z-index: 5; font-size: 10px; background: #131d31c7; border-color: #aab8ce33; }
+#skip-memory { letter-spacing: .12em; }
+#close-skit { margin-left: auto; }
+#sv-skit .sv-overlay-body { height: calc(100% - 50px); min-height: 330px; padding: 0; }
+#sv-skit .sv-engine-root { height: 100%; opacity: 1; transform: translateY(0); transition: opacity .36s ease, transform .36s ease; }
+#sv-skit .sv-engine-root.sv-memory-complete { opacity: 0; transform: translateY(4px); pointer-events: none; }
+#sv-skit .sv-shell { height: 100%; grid-template-rows: minmax(100px,1fr) auto; gap: 10px; }
+#sv-skit .sv-stage { min-height: 100px; padding: 6px; gap: 5px; }
+#sv-skit .sv-slot { min-height: 100px; }
+#sv-skit .sv-portrait { min-height: 100px; }
+#sv-skit .sv-dialogue { max-height: 52dvh; overflow-y: auto; padding: 14px; }
+#sv-skit .sv-text { font-size: clamp(14px,2.5vw,18px); line-height: 1.8; }
+#sv-skit .sv-hint { display: block !important; min-height: 16px; text-align: right; font-size: 18px; line-height: 1; color: #8e9ab377; padding-right: 4px; }
+#sv-skit .sv-dialogue-actions { display: none !important; }
+#sv-skit .sv-log-btn { display: none !important; }
+#sv-skit .sv-auto-btn { min-height: 32px; padding: 5px 10px; font-size: 10px; letter-spacing: .08em; opacity: .72; }
+
+/* Shared CSS contains legacy !important positioning; override only in this host. */
+body #sv-skit .sv-overlay-panel { width: min(960px,100%) !important; height: min(760px,100dvh) !important; }
+body #sv-skit .sv-overlay-body { height: calc(100% - 50px) !important; }
+body #sv-skit .sv-shell { grid-template-rows: minmax(100px,1fr) auto !important; gap: 10px !important; }
+body #sv-skit .sv-stage { transform: none !important; height: 100% !important; align-self: stretch !important; padding: 6px !important; gap: 5px !important; }
+body #sv-skit .sv-dialogue { min-height: 132px !important; }
+
+@media (max-width: 520px) {
+  .intro h1 { font-size: clamp(38px,12vw,58px); }
+  .hud p { display: none; }
+  .guide { top: calc(max(18px,env(safe-area-inset-top)) + 48px); }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .intro h1 { font-size: 34px; margin: 8px 0 10px; }
+  .intro-cinematic .lead { margin-bottom: 16px; font-size: 12px; }
+  #start-status { margin-top: 8px; }
+  .primary { padding: 12px 28px; }
+  #interact { bottom: max(28px,env(safe-area-inset-bottom)); }
+  body #sv-skit .sv-overlay-panel { height: 100dvh !important; }
+  #sv-skit .sv-overlay-body { min-height: 220px; }
+  body #sv-skit .sv-shell { grid-template-columns: 44% 1fr; grid-template-rows: 1fr !important; }
+  #sv-skit .sv-dialogue { max-height: none; min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sv-skit *, #sv-skit *::before, #sv-skit *::after { animation: none !important; transition: none !important; }
+  #sv-skit .sv-engine-root.sv-memory-complete { transform: none; }
+}
